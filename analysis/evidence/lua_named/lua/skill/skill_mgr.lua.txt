@@ -1,0 +1,481 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\7312f8a2c802ae8e29e44254ca78d622.data'; root=proto12
+
+FUNCTION proto0 offset=0x4a source_lines=42-44 params=0
+UPVALUES ['print', 'string']
+00001 [L43] UGET     A=0 B=0 C=0 D=0 print
+00002 [L43] UGET     A=1 B=0 C=1 D=1 string
+00003 [L43] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L43] VARG     A=2 B=0 C=0 D=0 
+00005 [L43] CALLM    A=1 B=0 C=0 D=0 
+00006 [L43] CALLM    A=0 B=1 C=0 D=256 
+00007 [L44] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x91 source_lines=192-197 params=2
+UPVALUES []
+00001 [L193] TGETS    A=2 B=0 C=0 D=0 'skill_type'
+00002 [L193] TGETS    A=3 B=1 C=0 D=256 'skill_type'
+00003 [L193] ISGE     A=2 B=0 C=3 D=3 
+00004 [L193] JMP      A=2 B=128 C=2 D=32770 target=7
+00005 [L194] KPRI     A=2 B=0 C=2 D=2 
+00006 [L194] RET1     A=2 B=0 C=2 D=2 
+00007 [L196] KPRI     A=2 B=0 C=1 D=1 
+00008 [L196] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto2 offset=0xda source_lines=165-201 params=0
+UPVALUES ['pairs', 'current_skill', 'math', 'table']
+00001 [L169] TNEW     A=0 B=0 C=0 D=0 
+00002 [L171] UGET     A=1 B=0 C=0 D=0 pairs
+00003 [L171] UGET     A=2 B=0 C=1 D=1 current_skill
+00004 [L171] CALL     A=1 B=4 C=2 D=1026 
+00005 [L171] ISNEXT   A=4 B=128 C=47 D=32815 target=53
+00006 [L173] GGET     A=6 B=0 C=0 D=0 'd_ms'
+00007 [L173] TGETS    A=6 B=6 C=1 D=1537 'd_fight_data'
+00008 [L173] TGETS    A=6 B=6 C=2 D=1538 'g_test_skill_start'
+00009 [L173] ISGT     A=6 B=0 C=4 D=4 
+00010 [L173] JMP      A=6 B=128 C=42 D=32810 target=53
+00011 [L174] TDUP     A=6 B=0 C=3 D=3 {'kind': 'table', 'value': {'is_src': False}}
+00012 [L174] TDUP     A=7 B=0 C=4 D=4 {'kind': 'table', 'value': {1: 10, 2: 20, 3: 30, 4: 40, 5: 50, 6: 60, 7: 70, 8: 80}}
+00013 [L174] TSETS    A=7 B=6 C=5 D=1541 'damage_list'
+00014 [L175] TDUP     A=7 B=0 C=6 D=6 {'kind': 'table', 'value': {'is_src': True}}
+00015 [L175] TDUP     A=8 B=0 C=7 D=7 {'kind': 'table', 'value': {1: 10, 2: 20, 3: 30, 4: 40, 5: 50, 6: 60, 7: 70, 8: 80}}
+00016 [L175] TSETS    A=8 B=7 C=5 D=1797 'damage_list'
+00017 [L177] TSETS    A=4 B=6 C=8 D=1544 'skill_type'
+00018 [L178] TSETS    A=4 B=7 C=8 D=1800 'skill_type'
+00019 [L180] UGET     A=8 B=0 C=2 D=2 math
+00020 [L180] TGETS    A=8 B=8 C=10 D=2058 'random'
+00021 [L180] KSHORT   A=9 B=0 C=1 D=1 1
+00022 [L180] KSHORT   A=10 B=0 C=4 D=4 4
+00023 [L180] CALL     A=8 B=2 C=3 D=515 
+00024 [L180] TSETS    A=8 B=6 C=9 D=1545 'src_order'
+00025 [L181] UGET     A=8 B=0 C=2 D=2 math
+00026 [L181] TGETS    A=8 B=8 C=10 D=2058 'random'
+00027 [L181] KSHORT   A=9 B=0 C=1 D=1 1
+00028 [L181] KSHORT   A=10 B=0 C=4 D=4 4
+00029 [L181] CALL     A=8 B=2 C=3 D=515 
+00030 [L181] TSETS    A=8 B=7 C=9 D=1801 'src_order'
+00031 [L182] UGET     A=8 B=0 C=2 D=2 math
+00032 [L182] TGETS    A=8 B=8 C=10 D=2058 'random'
+00033 [L182] KSHORT   A=9 B=0 C=1 D=1 1
+00034 [L182] KSHORT   A=10 B=0 C=4 D=4 4
+00035 [L182] CALL     A=8 B=2 C=3 D=515 
+00036 [L182] TSETS    A=8 B=6 C=11 D=1547 'des_order'
+00037 [L183] UGET     A=8 B=0 C=2 D=2 math
+00038 [L183] TGETS    A=8 B=8 C=10 D=2058 'random'
+00039 [L183] KSHORT   A=9 B=0 C=1 D=1 1
+00040 [L183] KSHORT   A=10 B=0 C=4 D=4 4
+00041 [L183] CALL     A=8 B=2 C=3 D=515 
+00042 [L183] TSETS    A=8 B=7 C=11 D=1803 'des_order'
+00043 [L185] UGET     A=8 B=0 C=3 D=3 table
+00044 [L185] TGETS    A=8 B=8 C=12 D=2060 'insert'
+00045 [L185] MOV      A=9 B=0 C=0 D=0 
+00046 [L185] MOV      A=10 B=0 C=6 D=6 
+00047 [L185] CALL     A=8 B=1 C=3 D=259 
+00048 [L186] UGET     A=8 B=0 C=3 D=3 table
+00049 [L186] TGETS    A=8 B=8 C=12 D=2060 'insert'
+00050 [L186] MOV      A=9 B=0 C=0 D=0 
+00051 [L186] MOV      A=10 B=0 C=7 D=7 
+00052 [L186] CALL     A=8 B=1 C=3 D=259 
+00053 [L171] ITERN    A=4 B=3 C=3 D=771 
+00054 [L171] ITERL    A=4 B=127 C=207 D=32719 target=6
+00055 [L197] FNEW     A=1 B=0 C=13 D=13 {'kind': 'proto', 'id': 1}
+00056 [L192] GSET     A=1 B=0 C=14 D=14 'skill_sort'
+00057 [L198] UGET     A=1 B=0 C=3 D=3 table
+00058 [L198] TGETS    A=1 B=1 C=15 D=271 'sort'
+00059 [L198] MOV      A=2 B=0 C=0 D=0 
+00060 [L198] GGET     A=3 B=0 C=14 D=14 'skill_sort'
+00061 [L198] CALL     A=1 B=1 C=3 D=259 
+00062 [L200] UCLO     A=0 B=128 C=0 D=32768 target=63
+00063 [L200] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto3 offset=0x32b source_lines=204-209 params=0
+UPVALUES []
+00001 [L205] GGET     A=0 B=0 C=0 D=0 'g_self'
+00002 [L205] TGETS    A=0 B=0 C=1 D=1 'skill_map'
+00003 [L205] ISF      A=0 B=0 C=0 D=0 
+00004 [L205] JMP      A=0 B=128 C=6 D=32774 target=11
+00005 [L205] GGET     A=0 B=0 C=0 D=0 'g_self'
+00006 [L205] TGETS    A=0 B=0 C=1 D=1 'skill_map'
+00007 [L205] LEN      A=0 B=0 C=0 D=0 
+00008 [L205] KSHORT   A=1 B=0 C=0 D=0 0
+00009 [L205] ISGT     A=0 B=0 C=1 D=1 
+00010 [L205] JMP      A=0 B=128 C=4 D=32772 target=15
+00011 [L206] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00012 [L206] TGETS    A=0 B=0 C=3 D=3 'd_packageUI'
+00013 [L206] TGETS    A=0 B=0 C=4 D=4 'getPackageCSVConfig'
+00014 [L206] CALL     A=0 B=1 C=1 D=257 
+00015 [L208] GGET     A=0 B=0 C=0 D=0 'g_self'
+00016 [L208] GGET     A=1 B=0 C=2 D=2 'd_ms'
+00017 [L208] TGETS    A=1 B=1 C=3 D=259 'd_packageUI'
+00018 [L208] TGETS    A=1 B=1 C=5 D=261 'g_itemSkillTable'
+00019 [L208] TSETS    A=1 B=0 C=1 D=1 'skill_map'
+00020 [L209] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto4 offset=0x3e3 source_lines=213-221 params=1
+UPVALUES []
+00001 [L214] KPRI     A=1 B=0 C=0 D=0 
+00002 [L215] GGET     A=2 B=0 C=0 D=0 'g_self'
+00003 [L215] TGETS    A=2 B=2 C=1 D=513 'skill_map'
+00004 [L215] TGETV    A=2 B=2 C=0 D=512 
+00005 [L215] ISF      A=0 B=0 C=2 D=2 
+00006 [L215] JMP      A=3 B=128 C=5 D=32773 target=12
+00007 [L216] GGET     A=2 B=0 C=0 D=0 'g_self'
+00008 [L216] TGETS    A=2 B=2 C=1 D=513 'skill_map'
+00009 [L216] TGETV    A=2 B=2 C=0 D=512 
+00010 [L216] TGETS    A=1 B=2 C=2 D=514 'name'
+00011 [L216] JMP      A=2 B=128 C=1 D=32769 target=13
+00012 [L218] KSTR     A=1 B=0 C=3 D=3 ''
+00013 [L220] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto5 offset=0x45c source_lines=225-231 params=0
+UPVALUES []
+00001 [L226] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L226] TGETS    A=0 B=0 C=1 D=1 'd_setting'
+00003 [L226] TGETS    A=0 B=0 C=2 D=2 'g_setting'
+00004 [L226] TGETS    A=0 B=0 C=3 D=3 'simpleFight'
+00005 [L226] ISNEN    A=0 B=0 C=0 D=0 1
+00006 [L226] JMP      A=0 B=128 C=3 D=32771 target=10
+00007 [L227] KPRI     A=0 B=0 C=2 D=2 
+00008 [L227] RET1     A=0 B=0 C=2 D=2 
+00009 [L227] JMP      A=0 B=128 C=2 D=32770 target=12
+00010 [L229] KPRI     A=0 B=0 C=1 D=1 
+00011 [L229] RET1     A=0 B=0 C=2 D=2 
+00012 [L231] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x4cb source_lines=233-240 params=1
+UPVALUES ['pairs']
+00001 [L234] UGET     A=1 B=0 C=0 D=0 pairs
+00002 [L234] MOV      A=2 B=0 C=0 D=0 
+00003 [L234] CALL     A=1 B=4 C=2 D=1026 
+00004 [L234] ISNEXT   A=4 B=128 C=7 D=32775 target=12
+00005 [L235] ISF      A=0 B=0 C=5 D=5 
+00006 [L235] JMP      A=6 B=128 C=5 D=32773 target=12
+00007 [L235] KSHORT   A=6 B=0 C=0 D=0 0
+00008 [L235] ISGE     A=6 B=0 C=5 D=5 
+00009 [L235] JMP      A=6 B=128 C=2 D=32770 target=12
+00010 [L236] KPRI     A=6 B=0 C=2 D=2 
+00011 [L236] RET1     A=6 B=0 C=2 D=2 
+00012 [L234] ITERN    A=4 B=3 C=3 D=771 
+00013 [L234] ITERL    A=4 B=127 C=247 D=32759 target=5
+00014 [L239] KPRI     A=1 B=0 C=1 D=1 
+00015 [L239] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto7 offset=0x543 source_lines=242-248 params=1
+UPVALUES []
+00001 [L243] ISEQN    A=0 B=0 C=0 D=0 8
+00002 [L243] JMP      A=1 B=128 C=4 D=32772 target=7
+00003 [L243] ISEQN    A=0 B=0 C=1 D=1 9
+00004 [L243] JMP      A=1 B=128 C=2 D=32770 target=7
+00005 [L243] ISNEN    A=0 B=0 C=2 D=2 10
+00006 [L243] JMP      A=1 B=128 C=3 D=32771 target=10
+00007 [L244] KPRI     A=1 B=0 C=2 D=2 
+00008 [L244] RET1     A=1 B=0 C=2 D=2 
+00009 [L244] JMP      A=1 B=128 C=2 D=32770 target=12
+00010 [L246] KPRI     A=1 B=0 C=1 D=1 
+00011 [L246] RET1     A=1 B=0 C=2 D=2 
+00012 [L248] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto8 offset=0x59d source_lines=251-330 params=1
+UPVALUES ['string', 'cclog', 'current_skill', 'math', '_G', 'package', 'require']
+00001 [L252] GGET     A=1 B=0 C=0 D=0 'init'
+00002 [L252] CALL     A=1 B=1 C=1 D=257 
+00003 [L253] UGET     A=1 B=0 C=0 D=0 string
+00004 [L253] TGETS    A=1 B=1 C=1 D=257 'format'
+00005 [L253] KSTR     A=2 B=0 C=2 D=2 'skill.skill_%d'
+00006 [L253] TGETS    A=3 B=0 C=3 D=3 'attackInfo'
+00007 [L253] TGETS    A=3 B=3 C=4 D=772 'skill_type'
+00008 [L253] CALL     A=1 B=2 C=3 D=515 
+00009 [L256] TGETS    A=2 B=0 C=3 D=3 'attackInfo'
+00010 [L256] TGETS    A=2 B=2 C=4 D=516 'skill_type'
+00011 [L256] ISNEN    A=2 B=0 C=0 D=0 1
+00012 [L256] JMP      A=2 B=128 C=15 D=32783 target=28
+00013 [L257] TGETS    A=2 B=0 C=5 D=5 'attacker'
+00014 [L257] TGETS    A=2 B=2 C=6 D=518 'isAP'
+00015 [L257] ISNEP    A=2 B=0 C=2 D=2 
+00016 [L257] JMP      A=2 B=128 C=3 D=32771 target=20
+00017 [L258] MOV      A=2 B=0 C=1 D=1 
+00018 [L258] KSTR     A=3 B=0 C=7 D=7 'Far'
+00019 [L258] CAT      A=1 B=2 C=3 D=515 
+00020 [L262] GGET     A=2 B=0 C=8 D=8 'isSF'
+00021 [L262] CALL     A=2 B=2 C=1 D=513 
+00022 [L262] ISEQP    A=2 B=0 C=2 D=2 
+00023 [L262] JMP      A=2 B=128 C=15 D=32783 target=39
+00024 [L263] MOV      A=2 B=0 C=1 D=1 
+00025 [L263] KSTR     A=3 B=0 C=9 D=9 '_new'
+00026 [L263] CAT      A=1 B=2 C=3 D=515 
+00027 [L264] JMP      A=2 B=128 C=11 D=32779 target=39
+00028 [L266] TGETS    A=2 B=0 C=3 D=3 'attackInfo'
+00029 [L266] TGETS    A=2 B=2 C=4 D=516 'skill_type'
+00030 [L266] KSHORT   A=3 B=39 C=16 D=10000 10000
+00031 [L266] ISGE     A=3 B=0 C=2 D=2 
+00032 [L266] JMP      A=2 B=128 C=6 D=32774 target=39
+00033 [L267] GGET     A=2 B=0 C=10 D=10 'd_ms'
+00034 [L267] TGETS    A=2 B=2 C=11 D=523 'd_skillExt'
+00035 [L267] TGETS    A=2 B=2 C=12 D=524 'showSkillExtPassive'
+00036 [L267] MOV      A=3 B=0 C=0 D=0 
+00037 [L267] CALL     A=2 B=1 C=2 D=258 
+00038 [L268] RET0     A=0 B=0 C=1 D=1 
+00039 [L273] GGET     A=2 B=0 C=14 D=14 'getSkillName'
+00040 [L273] TGETS    A=3 B=0 C=3 D=3 'attackInfo'
+00041 [L273] TGETS    A=3 B=3 C=4 D=772 'skill_type'
+00042 [L273] CALL     A=2 B=2 C=2 D=514 
+00043 [L273] TSETS    A=2 B=0 C=13 D=13 'name'
+00044 [L275] TGETS    A=2 B=0 C=13 D=13 'name'
+00045 [L275] LEN      A=2 B=0 C=2 D=2 
+00046 [L275] KSHORT   A=3 B=0 C=0 D=0 0
+00047 [L275] ISGT     A=2 B=0 C=3 D=3 
+00048 [L275] JMP      A=2 B=128 C=9 D=32777 target=58
+00049 [L276] UGET     A=2 B=0 C=1 D=1 cclog
+00050 [L276] KSTR     A=3 B=0 C=15 D=15 'ERROR: skill config error, ignore...'
+00051 [L276] CALL     A=2 B=1 C=2 D=258 
+00052 [L277] TGETS    A=2 B=0 C=16 D=16 'call_back'
+00053 [L277] ISF      A=0 B=0 C=2 D=2 
+00054 [L277] JMP      A=3 B=128 C=2 D=32770 target=57
+00055 [L278] TGETS    A=2 B=0 C=16 D=16 'call_back'
+00056 [L278] CALL     A=2 B=1 C=1 D=257 
+00057 [L280] RET0     A=0 B=0 C=1 D=1 
+00058 [L283] UGET     A=2 B=0 C=2 D=2 current_skill
+00059 [L283] TGETS    A=3 B=0 C=3 D=3 'attackInfo'
+00060 [L283] TGETS    A=3 B=3 C=4 D=772 'skill_type'
+00061 [L283] TGETV    A=2 B=2 C=3 D=515 
+00062 [L284] ISF      A=0 B=0 C=2 D=2 
+00063 [L284] JMP      A=3 B=128 C=3 D=32771 target=67
+00064 [L284] KSHORT   A=3 B=0 C=0 D=0 0
+00065 [L284] ISGT     A=2 B=0 C=3 D=3 
+00066 [L284] JMP      A=3 B=128 C=30 D=32798 target=97
+00067 [L286] GGET     A=3 B=0 C=17 D=17 'isMultiSkill'
+00068 [L286] TGETS    A=4 B=0 C=3 D=3 'attackInfo'
+00069 [L286] TGETS    A=4 B=4 C=4 D=1028 'skill_type'
+00070 [L286] CALL     A=3 B=2 C=2 D=514 
+00071 [L286] ISF      A=0 B=0 C=3 D=3 
+00072 [L286] JMP      A=4 B=128 C=2 D=32770 target=75
+00073 [L287] KSTR     A=1 B=0 C=18 D=18 'skill.skill_101'
+00074 [L287] JMP      A=3 B=128 C=22 D=32790 target=97
+00075 [L288] GGET     A=3 B=0 C=19 D=19 'isPassiveSkill'
+00076 [L288] TGETS    A=4 B=0 C=3 D=3 'attackInfo'
+00077 [L288] TGETS    A=4 B=4 C=4 D=1028 'skill_type'
+00078 [L288] CALL     A=3 B=2 C=2 D=514 
+00079 [L288] ISF      A=0 B=0 C=3 D=3 
+00080 [L288] JMP      A=4 B=128 C=4 D=32772 target=85
+00081 [L289] KSHORT   A=3 B=0 C=2 D=2 2
+00082 [L289] TSETS    A=3 B=0 C=20 D=20 'passive_type'
+00083 [L290] KSTR     A=1 B=0 C=21 D=21 'skill.skill_22'
+00084 [L290] JMP      A=3 B=128 C=12 D=32780 target=97
+00085 [L292] TGETS    A=3 B=0 C=3 D=3 'attackInfo'
+00086 [L292] UGET     A=4 B=0 C=3 D=3 math
+00087 [L292] TGETS    A=4 B=4 C=22 D=1046 'random'
+00088 [L292] KSHORT   A=5 B=0 C=2 D=2 2
+00089 [L292] KSHORT   A=6 B=0 C=9 D=9 9
+00090 [L292] CALL     A=4 B=2 C=3 D=515 
+00091 [L292] ADDNV    A=4 B=4 C=1 D=1025 
+00092 [L292] TSETS    A=4 B=3 C=4 D=772 'skill_type'
+00093 [L293] KSTR     A=3 B=0 C=23 D=23 'skill.skill_'
+00094 [L293] TGETS    A=4 B=0 C=3 D=3 'attackInfo'
+00095 [L293] TGETS    A=4 B=4 C=4 D=1028 'skill_type'
+00096 [L293] CAT      A=1 B=3 C=4 D=772 
+00097 [L298] ISF      A=0 B=0 C=2 D=2 
+00098 [L298] JMP      A=3 B=128 C=8 D=32776 target=107
+00099 [L298] KSHORT   A=3 B=0 C=1 D=1 1
+00100 [L298] ISGE     A=3 B=0 C=2 D=2 
+00101 [L298] JMP      A=3 B=128 C=5 D=32773 target=107
+00102 [L298] KSHORT   A=3 B=0 C=5 D=5 5
+00103 [L298] ISGE     A=2 B=0 C=3 D=3 
+00104 [L298] JMP      A=3 B=128 C=2 D=32770 target=107
+00105 [L299] TSETS    A=2 B=0 C=20 D=20 'passive_type'
+00106 [L300] KSTR     A=1 B=0 C=21 D=21 'skill.skill_22'
+00107 [L303] GGET     A=3 B=0 C=24 D=24 'isKSkill'
+00108 [L303] TGETS    A=4 B=0 C=3 D=3 'attackInfo'
+00109 [L303] TGETS    A=4 B=4 C=4 D=1028 'skill_type'
+00110 [L303] CALL     A=3 B=2 C=2 D=514 
+00111 [L303] ISF      A=0 B=0 C=3 D=3 
+00112 [L303] JMP      A=4 B=128 C=4 D=32772 target=117
+00113 [L304] KSTR     A=3 B=0 C=25 D=25 'skill.skill_k_'
+00114 [L304] TGETS    A=4 B=0 C=3 D=3 'attackInfo'
+00115 [L304] TGETS    A=4 B=4 C=4 D=1028 'skill_type'
+00116 [L304] CAT      A=1 B=3 C=4 D=772 
+00117 [L314] UGET     A=3 B=0 C=0 D=0 string
+00118 [L314] TGETS    A=3 B=3 C=26 D=794 'sub'
+00119 [L314] MOV      A=4 B=0 C=1 D=1 
+00120 [L314] KSHORT   A=5 B=0 C=7 D=7 7
+00121 [L314] CALL     A=3 B=2 C=3 D=515 
+00122 [L315] UGET     A=4 B=0 C=4 D=4 _G
+00123 [L315] TGETS    A=4 B=4 C=27 D=1051 'skill'
+00124 [L315] ISF      A=0 B=0 C=4 D=4 
+00125 [L315] JMP      A=5 B=128 C=13 D=32781 target=139
+00126 [L315] UGET     A=4 B=0 C=4 D=4 _G
+00127 [L315] TGETS    A=4 B=4 C=27 D=1051 'skill'
+00128 [L315] TGETV    A=4 B=4 C=3 D=1027 
+00129 [L315] ISF      A=0 B=0 C=4 D=4 
+00130 [L315] JMP      A=5 B=128 C=8 D=32776 target=139
+00131 [L316] UGET     A=4 B=0 C=4 D=4 _G
+00132 [L316] TGETS    A=4 B=4 C=27 D=1051 'skill'
+00133 [L316] KPRI     A=5 B=0 C=0 D=0 
+00134 [L316] TSETV    A=5 B=4 C=3 D=1027 
+00135 [L317] UGET     A=4 B=0 C=5 D=5 package
+00136 [L317] TGETS    A=4 B=4 C=28 D=1052 'loaded'
+00137 [L317] KPRI     A=5 B=0 C=0 D=0 
+00138 [L317] TSETV    A=5 B=4 C=1 D=1025 
+00139 [L319] UGET     A=4 B=0 C=6 D=6 require
+00140 [L319] MOV      A=5 B=0 C=1 D=1 
+00141 [L319] CALL     A=4 B=2 C=2 D=514 
+00142 [L323] GGET     A=5 B=0 C=19 D=19 'isPassiveSkill'
+00143 [L323] TGETS    A=6 B=0 C=3 D=3 'attackInfo'
+00144 [L323] TGETS    A=6 B=6 C=4 D=1540 'skill_type'
+00145 [L323] CALL     A=5 B=2 C=2 D=514 
+00146 [L323] ISF      A=0 B=0 C=5 D=5 
+00147 [L323] JMP      A=6 B=128 C=8 D=32776 target=156
+00148 [L324] TGETS    A=5 B=4 C=29 D=1053 'g_classname'
+00149 [L324] TGETS    A=5 B=5 C=30 D=1310 'new'
+00150 [L324] MOV      A=6 B=0 C=0 D=0 
+00151 [L324] CALL     A=5 B=2 C=2 D=514 
+00152 [L325] MOV      A=7 B=0 C=5 D=5 
+00153 [L325] TGETS    A=6 B=5 C=31 D=1311 'showSkill'
+00154 [L325] CALL     A=6 B=1 C=2 D=258 
+00155 [L325] JMP      A=5 B=128 C=3 D=32771 target=159
+00156 [L327] TGETS    A=5 B=4 C=31 D=1055 'showSkill'
+00157 [L327] MOV      A=6 B=0 C=0 D=0 
+00158 [L327] CALL     A=5 B=1 C=2 D=258 
+00159 [L330] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto9 offset=0xab8 source_lines=335-347 params=1
+UPVALUES ['cclog']
+00001 [L336] KPRI     A=1 B=0 C=1 D=1 
+00002 [L337] GGET     A=2 B=0 C=0 D=0 'g_self'
+00003 [L337] TGETS    A=2 B=2 C=1 D=513 'skill_map'
+00004 [L337] TGETV    A=2 B=2 C=0 D=512 
+00005 [L337] ISF      A=0 B=0 C=2 D=2 
+00006 [L337] JMP      A=3 B=128 C=8 D=32776 target=15
+00007 [L338] GGET     A=2 B=0 C=0 D=0 'g_self'
+00008 [L338] TGETS    A=2 B=2 C=1 D=513 'skill_map'
+00009 [L338] TGETV    A=2 B=2 C=0 D=512 
+00010 [L338] TGETS    A=2 B=2 C=2 D=514 'attackType'
+00011 [L338] ISNEN    A=2 B=0 C=0 D=0 2
+00012 [L338] JMP      A=2 B=128 C=12 D=32780 target=25
+00013 [L339] KPRI     A=1 B=0 C=2 D=2 
+00014 [L340] JMP      A=2 B=128 C=10 D=32778 target=25
+00015 [L341] ISEQN    A=0 B=0 C=1 D=1 101181
+00016 [L341] JMP      A=2 B=128 C=2 D=32770 target=19
+00017 [L341] ISNEN    A=0 B=0 C=2 D=2 102181
+00018 [L341] JMP      A=2 B=128 C=2 D=32770 target=21
+00019 [L342] KPRI     A=1 B=0 C=1 D=1 
+00020 [L342] JMP      A=2 B=128 C=4 D=32772 target=25
+00021 [L344] UGET     A=2 B=0 C=0 D=0 cclog
+00022 [L344] KSTR     A=3 B=0 C=3 D=3 'ERROR: isMultiSkill skill_type error=%d'
+00023 [L344] MOV      A=4 B=0 C=0 D=0 
+00024 [L344] CALL     A=2 B=1 C=3 D=259 
+00025 [L346] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto10 offset=0xba9 source_lines=350-364 params=1
+UPVALUES ['cclog']
+00001 [L351] KPRI     A=1 B=0 C=1 D=1 
+00002 [L352] GGET     A=2 B=0 C=0 D=0 'g_self'
+00003 [L352] TGETS    A=2 B=2 C=1 D=513 'skill_map'
+00004 [L352] TGETV    A=2 B=2 C=0 D=512 
+00005 [L352] ISF      A=0 B=0 C=2 D=2 
+00006 [L352] JMP      A=3 B=128 C=8 D=32776 target=15
+00007 [L353] GGET     A=2 B=0 C=0 D=0 'g_self'
+00008 [L353] TGETS    A=2 B=2 C=1 D=513 'skill_map'
+00009 [L353] TGETV    A=2 B=2 C=0 D=512 
+00010 [L353] TGETS    A=2 B=2 C=2 D=514 'skillType'
+00011 [L353] ISNEN    A=2 B=0 C=0 D=0 2
+00012 [L353] JMP      A=2 B=128 C=18 D=32786 target=31
+00013 [L354] KPRI     A=1 B=0 C=2 D=2 
+00014 [L355] JMP      A=2 B=128 C=16 D=32784 target=31
+00015 [L356] ISEQN    A=0 B=0 C=1 D=1 101131
+00016 [L356] JMP      A=2 B=128 C=2 D=32770 target=19
+00017 [L356] ISNEN    A=0 B=0 C=2 D=2 102131
+00018 [L356] JMP      A=2 B=128 C=2 D=32770 target=21
+00019 [L357] KPRI     A=1 B=0 C=2 D=2 
+00020 [L357] JMP      A=2 B=128 C=10 D=32778 target=31
+00021 [L358] ISEQN    A=0 B=0 C=3 D=3 101181
+00022 [L358] JMP      A=2 B=128 C=2 D=32770 target=25
+00023 [L358] ISNEN    A=0 B=0 C=4 D=4 102181
+00024 [L358] JMP      A=2 B=128 C=2 D=32770 target=27
+00025 [L359] KPRI     A=1 B=0 C=1 D=1 
+00026 [L359] JMP      A=2 B=128 C=4 D=32772 target=31
+00027 [L361] UGET     A=2 B=0 C=0 D=0 cclog
+00028 [L361] KSTR     A=3 B=0 C=3 D=3 'ERROR: isPassiveSkill skill_type error=%d'
+00029 [L361] MOV      A=4 B=0 C=0 D=0 
+00030 [L361] CALL     A=2 B=1 C=3 D=259 
+00031 [L363] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto11 offset=0xcbe source_lines=368-374 params=1
+UPVALUES []
+00001 [L369] KPRI     A=1 B=0 C=1 D=1 
+00002 [L370] ISNEN    A=0 B=0 C=0 D=0 6
+00003 [L370] JMP      A=2 B=128 C=1 D=32769 target=5
+00004 [L371] KPRI     A=1 B=0 C=2 D=2 
+00005 [L373] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto12 offset=0xcf9 source_lines=0-375 params=0
+UPVALUES []
+00001 [L2] GGET     A=0 B=0 C=0 D=0 'require'
+00002 [L3] GGET     A=1 B=0 C=1 D=1 'bits'
+00003 [L4] GGET     A=2 B=0 C=2 D=2 'sqlite'
+00004 [L5] GGET     A=3 B=0 C=3 D=3 'type'
+00005 [L6] GGET     A=4 B=0 C=4 D=4 'print'
+00006 [L7] GGET     A=5 B=0 C=5 D=5 'tostring'
+00007 [L8] GGET     A=6 B=0 C=6 D=6 'pairs'
+00008 [L9] GGET     A=7 B=0 C=7 D=7 'ipairs'
+00009 [L10] GGET     A=8 B=0 C=8 D=8 'string'
+00010 [L11] GGET     A=9 B=0 C=9 D=9 'package'
+00011 [L12] GGET     A=10 B=0 C=10 D=10 'main_server'
+00012 [L13] GGET     A=11 B=0 C=11 D=11 '_G'
+00013 [L14] MOV      A=12 B=0 C=1 D=1 
+00014 [L19] GGET     A=13 B=0 C=12 D=12 'class'
+00015 [L20] GGET     A=14 B=0 C=13 D=13 'CCArray'
+00016 [L21] GGET     A=15 B=0 C=14 D=14 'CCDirector'
+00017 [L22] GGET     A=16 B=0 C=15 D=15 'CCLayer'
+00018 [L23] GGET     A=17 B=0 C=16 D=16 'CCMenu'
+00019 [L24] GGET     A=18 B=0 C=17 D=17 'CCMenuItemImage'
+00020 [L25] GGET     A=19 B=0 C=18 D=18 'CCSprite'
+00021 [L26] GGET     A=20 B=0 C=19 D=19 'CCScene'
+00022 [L27] GGET     A=21 B=0 C=20 D=20 'CCTextFieldTTF'
+00023 [L28] GGET     A=22 B=0 C=21 D=21 'CCTOUCHBEGAN'
+00024 [L29] GGET     A=23 B=0 C=22 D=22 'CCTOUCHMOVED'
+00025 [L30] GGET     A=24 B=0 C=23 D=23 'math'
+00026 [L31] GGET     A=25 B=0 C=24 D=24 'tonumber'
+00027 [L32] GGET     A=26 B=0 C=25 D=25 'table'
+00028 [L34] GGET     A=27 B=0 C=26 D=26 'module'
+00029 [L34] KSTR     A=28 B=0 C=27 D=27 'skill.skill_mgr'
+00030 [L34] CALL     A=27 B=1 C=2 D=258 
+00031 [L37] MOV      A=27 B=0 C=0 D=0 
+00032 [L37] KSTR     A=28 B=0 C=28 D=28 'ms'
+00033 [L37] CALL     A=27 B=2 C=2 D=514 
+00034 [L37] GSET     A=27 B=0 C=29 D=29 'd_ms'
+00035 [L38] GGET     A=27 B=0 C=29 D=29 'd_ms'
+00036 [L38] IST      A=0 B=0 C=27 D=27 
+00037 [L38] JMP      A=27 B=128 C=3 D=32771 target=41
+00038 [L39] MOV      A=27 B=0 C=4 D=4 
+00039 [L39] KSTR     A=28 B=0 C=30 D=30 'skill load d_ms fail.'
+00040 [L39] CALL     A=27 B=1 C=2 D=258 
+00041 [L44] FNEW     A=27 B=0 C=31 D=31 {'kind': 'proto', 'id': 0}
+00042 [L62] TNEW     A=28 B=0 C=0 D=0 
+00043 [L62] GSET     A=28 B=0 C=32 D=32 'g_self'
+00044 [L63] GGET     A=28 B=0 C=32 D=32 'g_self'
+00045 [L63] TNEW     A=29 B=0 C=0 D=0 
+00046 [L63] TSETS    A=29 B=28 C=33 D=7201 'csv'
+00047 [L65] GGET     A=28 B=0 C=32 D=32 'g_self'
+00048 [L65] TNEW     A=29 B=0 C=0 D=0 
+00049 [L65] TSETS    A=29 B=28 C=34 D=7202 'skill_map'
+00050 [L70] TDUP     A=28 B=0 C=35 D=35 {'kind': 'table', 'value': {1: 1, 2: 4, 3: 4, 5: 4, 6: 6, 7: 4, 8: 1, 9: 1, 10: 1, 22: 2, 23: 2, 25: 2, 27: 2, 28: 2, 29: 2, 31: 3, 32: 3, 34: 3, 35: 3, 36: 3, 38: 3, 39: 3, 42: 4, 43: 4, 45: 4, 46: 4, 48: 4, 49: 4, 101: 1, 102: 1, 103: 1, 104: 1, 105: 1, 106: 1, 107: 1, 108: 1, 110: 1, 112: 1, 102131.0: 2, 202.0: 1, 222.0: 1, 101131.0: 2, 223.0: 1, 204.0: 1, 220.0: 1, 207.0: 1, 221.0: 1, 206.0: 1, 210.0: 1, 205.0: 1, 211.0: 1, 102181.0: 5, 208.0: 1, 217.0: 1, 209.0: 1, 101181.0: 5, 214.0: 1, 226.0: 1, 215.0: 1, 212.0: 1, 213.0: 1, 218.0: 1, 216.0: 1, 203.0: 1}}
+00051 [L201] FNEW     A=29 B=0 C=36 D=36 {'kind': 'proto', 'id': 2}
+00052 [L165] GSET     A=29 B=0 C=37 D=37 'createAllSkill'
+00053 [L209] FNEW     A=29 B=0 C=38 D=38 {'kind': 'proto', 'id': 3}
+00054 [L204] GSET     A=29 B=0 C=39 D=39 'init'
+00055 [L221] FNEW     A=29 B=0 C=40 D=40 {'kind': 'proto', 'id': 4}
+00056 [L213] GSET     A=29 B=0 C=41 D=41 'getSkillName'
+00057 [L231] FNEW     A=29 B=0 C=42 D=42 {'kind': 'proto', 'id': 5}
+00058 [L225] GSET     A=29 B=0 C=43 D=43 'isSF'
+00059 [L240] FNEW     A=29 B=0 C=44 D=44 {'kind': 'proto', 'id': 6}
+00060 [L248] FNEW     A=30 B=0 C=45 D=45 {'kind': 'proto', 'id': 7}
+00061 [L242] GSET     A=30 B=0 C=46 D=46 'isKSkill'
+00062 [L330] FNEW     A=30 B=0 C=47 D=47 {'kind': 'proto', 'id': 8}
+00063 [L251] GSET     A=30 B=0 C=48 D=48 'showSkill'
+00064 [L347] FNEW     A=30 B=0 C=49 D=49 {'kind': 'proto', 'id': 9}
+00065 [L335] GSET     A=30 B=0 C=50 D=50 'isMultiSkill'
+00066 [L364] FNEW     A=30 B=0 C=51 D=51 {'kind': 'proto', 'id': 10}
+00067 [L350] GSET     A=30 B=0 C=52 D=52 'isPassiveSkill'
+00068 [L374] FNEW     A=30 B=0 C=53 D=53 {'kind': 'proto', 'id': 11}
+00069 [L368] GSET     A=30 B=0 C=54 D=54 'isHealthSkill'
+00070 [L374] UCLO     A=0 B=128 C=0 D=32768 target=71
+00071 [L374] RET0     A=0 B=0 C=1 D=1 

@@ -1,0 +1,414 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\5d48128d9343254655dfce1597383608.data'; root=proto10
+
+FUNCTION proto0 offset=0x4a source_lines=38-40 params=0
+UPVALUES ['CCLuaLog', 'string']
+00001 [L39] UGET     A=0 B=0 C=0 D=0 CCLuaLog
+00002 [L39] UGET     A=1 B=0 C=1 D=1 string
+00003 [L39] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L39] KSTR     A=2 B=0 C=1 D=1 'Lua : config >>%s'
+00005 [L39] UGET     A=3 B=0 C=1 D=1 string
+00006 [L39] TGETS    A=3 B=3 C=0 D=768 'format'
+00007 [L39] VARG     A=4 B=0 C=0 D=0 
+00008 [L39] CALLM    A=3 B=0 C=0 D=0 
+00009 [L39] CALLM    A=1 B=0 C=1 D=1 
+00010 [L39] CALLM    A=0 B=1 C=0 D=256 
+00011 [L40] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0xbb source_lines=44-54 params=0
+UPVALUES ['main_server']
+00001 [L45] GGET     A=0 B=0 C=0 D=0 'g_force_use_debug_evn'
+00002 [L46] UGET     A=1 B=0 C=0 D=0 main_server
+00003 [L46] TGETS    A=1 B=1 C=1 D=257 'getThirdPartyFlag'
+00004 [L46] ISF      A=0 B=0 C=1 D=1 
+00005 [L46] JMP      A=2 B=128 C=9 D=32777 target=15
+00006 [L47] UGET     A=1 B=0 C=0 D=0 main_server
+00007 [L47] TGETS    A=1 B=1 C=1 D=257 'getThirdPartyFlag'
+00008 [L47] CALL     A=1 B=2 C=1 D=513 
+00009 [L48] KSHORT   A=2 B=39 C=16 D=10000 10000
+00010 [L48] ISGT     A=2 B=0 C=1 D=1 
+00011 [L48] JMP      A=2 B=128 C=3 D=32771 target=15
+00012 [L49] KPRI     A=0 B=0 C=2 D=2 
+00013 [L50] KPRI     A=2 B=0 C=2 D=2 
+00014 [L50] GSET     A=2 B=0 C=2 D=2 'g_env_flag'
+00015 [L53] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto2 offset=0x16c source_lines=99-101 params=0
+UPVALUES ['d_u']
+00001 [L100] UGET     A=0 B=0 C=0 D=0 d_u
+00002 [L100] TGETS    A=0 B=0 C=0 D=0 'isLuaC'
+00003 [L100] CALLT    A=0 B=0 C=1 D=1 
+
+FUNCTION proto3 offset=0x194 source_lines=102-104 params=0
+UPVALUES ['d_u']
+00001 [L103] UGET     A=0 B=0 C=0 D=0 d_u
+00002 [L103] TGETS    A=0 B=0 C=0 D=0 'isIOS'
+00003 [L103] CALLT    A=0 B=0 C=1 D=1 
+
+FUNCTION proto4 offset=0x1bc source_lines=106-128 params=0
+UPVALUES ['d_u', 'table', 'cclog', 'tostring']
+00001 [L107] GGET     A=0 B=0 C=0 D=0 'g_env_flag'
+00002 [L107] ISNEP    A=0 B=0 C=2 D=2 
+00003 [L107] JMP      A=0 B=128 C=16 D=32784 target=20
+00004 [L107] UGET     A=0 B=0 C=0 D=0 d_u
+00005 [L107] TGETS    A=0 B=0 C=1 D=1 'isWin32'
+00006 [L107] CALL     A=0 B=2 C=1 D=513 
+00007 [L107] ISF      A=0 B=0 C=0 D=0 
+00008 [L107] JMP      A=1 B=128 C=11 D=32779 target=20
+00009 [L107] GGET     A=0 B=0 C=2 D=2 'g_server_list_root_url_test'
+00010 [L107] LEN      A=0 B=0 C=0 D=0 
+00011 [L107] KSHORT   A=1 B=0 C=1 D=1 1
+00012 [L107] ISGT     A=0 B=0 C=1 D=1 
+00013 [L107] JMP      A=0 B=128 C=6 D=32774 target=20
+00014 [L108] UGET     A=0 B=0 C=1 D=1 table
+00015 [L108] TGETS    A=0 B=0 C=3 D=3 'insert'
+00016 [L108] GGET     A=1 B=0 C=2 D=2 'g_server_list_root_url_test'
+00017 [L108] KSHORT   A=2 B=0 C=1 D=1 1
+00018 [L108] KSTR     A=3 B=0 C=4 D=4 'http://192.168.10.108:8081/'
+00019 [L108] CALL     A=0 B=1 C=4 D=260 
+00020 [L110] GGET     A=0 B=0 C=0 D=0 'g_env_flag'
+00021 [L110] ISNEP    A=0 B=0 C=2 D=2 
+00022 [L110] JMP      A=0 B=128 C=29 D=32797 target=52
+00023 [L111] GGET     A=0 B=0 C=5 D=5 'isLuaC'
+00024 [L111] CALL     A=0 B=2 C=1 D=513 
+00025 [L111] ISF      A=0 B=0 C=0 D=0 
+00026 [L111] JMP      A=1 B=128 C=8 D=32776 target=35
+00027 [L111] GGET     A=0 B=0 C=6 D=6 'isIOS'
+00028 [L111] CALL     A=0 B=2 C=1 D=513 
+00029 [L111] ISF      A=0 B=0 C=0 D=0 
+00030 [L111] JMP      A=1 B=128 C=4 D=32772 target=35
+00031 [L112] GGET     A=0 B=0 C=7 D=7 'g_server_list_root_url_https_test_ios64'
+00032 [L112] TGETB    A=0 B=0 C=1 D=1 
+00033 [L112] RET1     A=0 B=0 C=2 D=2 
+00034 [L112] JMP      A=0 B=128 C=49 D=32817 target=84
+00035 [L113] GGET     A=0 B=0 C=5 D=5 'isLuaC'
+00036 [L113] CALL     A=0 B=2 C=1 D=513 
+00037 [L113] ISF      A=0 B=0 C=0 D=0 
+00038 [L113] JMP      A=1 B=128 C=4 D=32772 target=43
+00039 [L114] GGET     A=0 B=0 C=8 D=8 'g_server_list_root_url_test_ios64'
+00040 [L114] TGETB    A=0 B=0 C=1 D=1 
+00041 [L114] RET1     A=0 B=0 C=2 D=2 
+00042 [L114] JMP      A=0 B=128 C=41 D=32809 target=84
+00043 [L116] GGET     A=0 B=0 C=2 D=2 'g_server_list_root_url_test'
+00044 [L116] GGET     A=1 B=0 C=9 D=9 'g_server_list_root_url_index'
+00045 [L116] TGETV    A=0 B=0 C=1 D=1 
+00046 [L116] IST      A=0 B=0 C=0 D=0 
+00047 [L116] JMP      A=1 B=128 C=2 D=32770 target=50
+00048 [L116] GGET     A=0 B=0 C=2 D=2 'g_server_list_root_url_test'
+00049 [L116] TGETB    A=0 B=0 C=1 D=1 
+00050 [L116] RET1     A=0 B=0 C=2 D=2 
+00051 [L117] JMP      A=0 B=128 C=32 D=32800 target=84
+00052 [L119] UGET     A=0 B=0 C=2 D=2 cclog
+00053 [L119] KSTR     A=1 B=0 C=10 D=10 'cur g_server_list_root_url_index ====%s'
+00054 [L119] UGET     A=2 B=0 C=3 D=3 tostring
+00055 [L119] GGET     A=3 B=0 C=9 D=9 'g_server_list_root_url_index'
+00056 [L119] CALL     A=2 B=0 C=2 D=2 
+00057 [L119] CALLM    A=0 B=1 C=1 D=257 
+00058 [L120] GGET     A=0 B=0 C=5 D=5 'isLuaC'
+00059 [L120] CALL     A=0 B=2 C=1 D=513 
+00060 [L120] ISF      A=0 B=0 C=0 D=0 
+00061 [L120] JMP      A=1 B=128 C=9 D=32777 target=71
+00062 [L120] GGET     A=0 B=0 C=6 D=6 'isIOS'
+00063 [L120] CALL     A=0 B=2 C=1 D=513 
+00064 [L120] ISF      A=0 B=0 C=0 D=0 
+00065 [L120] JMP      A=1 B=128 C=5 D=32773 target=71
+00066 [L121] GGET     A=0 B=0 C=11 D=11 'g_server_list_root_url_https_ios64'
+00067 [L121] GGET     A=1 B=0 C=9 D=9 'g_server_list_root_url_index'
+00068 [L121] TGETV    A=0 B=0 C=1 D=1 
+00069 [L121] RET1     A=0 B=0 C=2 D=2 
+00070 [L121] JMP      A=0 B=128 C=13 D=32781 target=84
+00071 [L122] GGET     A=0 B=0 C=5 D=5 'isLuaC'
+00072 [L122] CALL     A=0 B=2 C=1 D=513 
+00073 [L122] ISF      A=0 B=0 C=0 D=0 
+00074 [L122] JMP      A=1 B=128 C=5 D=32773 target=80
+00075 [L123] GGET     A=0 B=0 C=12 D=12 'g_server_list_root_url_ios64'
+00076 [L123] GGET     A=1 B=0 C=9 D=9 'g_server_list_root_url_index'
+00077 [L123] TGETV    A=0 B=0 C=1 D=1 
+00078 [L123] RET1     A=0 B=0 C=2 D=2 
+00079 [L123] JMP      A=0 B=128 C=4 D=32772 target=84
+00080 [L125] GGET     A=0 B=0 C=13 D=13 'g_server_list_root_url'
+00081 [L125] GGET     A=1 B=0 C=9 D=9 'g_server_list_root_url_index'
+00082 [L125] TGETV    A=0 B=0 C=1 D=1 
+00083 [L125] RET1     A=0 B=0 C=2 D=2 
+00084 [L128] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto5 offset=0x4d3 source_lines=131-144 params=0
+UPVALUES []
+00001 [L132] GGET     A=0 B=0 C=0 D=0 'g_server_list_root_url_index'
+00002 [L132] ADDVN    A=0 B=0 C=0 D=0 
+00003 [L132] GSET     A=0 B=0 C=0 D=0 'g_server_list_root_url_index'
+00004 [L133] GGET     A=0 B=0 C=1 D=1 'isLuaC'
+00005 [L133] CALL     A=0 B=2 C=1 D=513 
+00006 [L133] ISF      A=0 B=0 C=0 D=0 
+00007 [L133] JMP      A=1 B=128 C=8 D=32776 target=16
+00008 [L134] GGET     A=0 B=0 C=0 D=0 'g_server_list_root_url_index'
+00009 [L134] GGET     A=1 B=0 C=2 D=2 'g_server_list_root_url_ios64'
+00010 [L134] LEN      A=1 B=0 C=1 D=1 
+00011 [L134] ISGE     A=1 B=0 C=0 D=0 
+00012 [L134] JMP      A=0 B=128 C=10 D=32778 target=23
+00013 [L135] KSHORT   A=0 B=0 C=1 D=1 1
+00014 [L135] GSET     A=0 B=0 C=0 D=0 'g_server_list_root_url_index'
+00015 [L136] JMP      A=0 B=128 C=7 D=32775 target=23
+00016 [L138] GGET     A=0 B=0 C=0 D=0 'g_server_list_root_url_index'
+00017 [L138] GGET     A=1 B=0 C=3 D=3 'g_server_list_root_url'
+00018 [L138] LEN      A=1 B=0 C=1 D=1 
+00019 [L138] ISGE     A=1 B=0 C=0 D=0 
+00020 [L138] JMP      A=0 B=128 C=2 D=32770 target=23
+00021 [L139] KSHORT   A=0 B=0 C=1 D=1 1
+00022 [L139] GSET     A=0 B=0 C=0 D=0 'g_server_list_root_url_index'
+00023 [L143] GGET     A=0 B=0 C=0 D=0 'g_server_list_root_url_index'
+00024 [L143] GSET     A=0 B=0 C=4 D=4 'g_update_list_root_url_index'
+00025 [L144] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x5d4 source_lines=188-206 params=0
+UPVALUES []
+00001 [L189] GGET     A=0 B=0 C=0 D=0 'g_env_flag'
+00002 [L189] ISNEP    A=0 B=0 C=2 D=2 
+00003 [L189] JMP      A=0 B=128 C=24 D=32792 target=28
+00004 [L190] GGET     A=0 B=0 C=1 D=1 'isLuaC'
+00005 [L190] CALL     A=0 B=2 C=1 D=513 
+00006 [L190] ISF      A=0 B=0 C=0 D=0 
+00007 [L190] JMP      A=1 B=128 C=8 D=32776 target=16
+00008 [L190] GGET     A=0 B=0 C=2 D=2 'isIOS'
+00009 [L190] CALL     A=0 B=2 C=1 D=513 
+00010 [L190] ISF      A=0 B=0 C=0 D=0 
+00011 [L190] JMP      A=1 B=128 C=4 D=32772 target=16
+00012 [L191] GGET     A=0 B=0 C=3 D=3 'g_update_list_root_https_url_test_ios64'
+00013 [L191] TGETB    A=0 B=0 C=1 D=1 
+00014 [L191] RET1     A=0 B=0 C=2 D=2 
+00015 [L191] JMP      A=0 B=128 C=38 D=32806 target=54
+00016 [L192] GGET     A=0 B=0 C=1 D=1 'isLuaC'
+00017 [L192] CALL     A=0 B=2 C=1 D=513 
+00018 [L192] ISF      A=0 B=0 C=0 D=0 
+00019 [L192] JMP      A=1 B=128 C=4 D=32772 target=24
+00020 [L193] GGET     A=0 B=0 C=4 D=4 'g_update_list_root_url_test_ios64'
+00021 [L193] TGETB    A=0 B=0 C=1 D=1 
+00022 [L193] RET1     A=0 B=0 C=2 D=2 
+00023 [L193] JMP      A=0 B=128 C=30 D=32798 target=54
+00024 [L195] GGET     A=0 B=0 C=5 D=5 'g_update_list_root_url_test'
+00025 [L195] TGETB    A=0 B=0 C=1 D=1 
+00026 [L195] RET1     A=0 B=0 C=2 D=2 
+00027 [L196] JMP      A=0 B=128 C=26 D=32794 target=54
+00028 [L198] GGET     A=0 B=0 C=1 D=1 'isLuaC'
+00029 [L198] CALL     A=0 B=2 C=1 D=513 
+00030 [L198] ISF      A=0 B=0 C=0 D=0 
+00031 [L198] JMP      A=1 B=128 C=9 D=32777 target=41
+00032 [L198] GGET     A=0 B=0 C=2 D=2 'isIOS'
+00033 [L198] CALL     A=0 B=2 C=1 D=513 
+00034 [L198] ISF      A=0 B=0 C=0 D=0 
+00035 [L198] JMP      A=1 B=128 C=5 D=32773 target=41
+00036 [L199] GGET     A=0 B=0 C=6 D=6 'g_update_list_root_url_https_ios64'
+00037 [L199] GGET     A=1 B=0 C=7 D=7 'g_update_list_root_url_index'
+00038 [L199] TGETV    A=0 B=0 C=1 D=1 
+00039 [L199] RET1     A=0 B=0 C=2 D=2 
+00040 [L199] JMP      A=0 B=128 C=13 D=32781 target=54
+00041 [L200] GGET     A=0 B=0 C=1 D=1 'isLuaC'
+00042 [L200] CALL     A=0 B=2 C=1 D=513 
+00043 [L200] ISF      A=0 B=0 C=0 D=0 
+00044 [L200] JMP      A=1 B=128 C=5 D=32773 target=50
+00045 [L201] GGET     A=0 B=0 C=8 D=8 'g_update_list_root_url_ios64'
+00046 [L201] GGET     A=1 B=0 C=7 D=7 'g_update_list_root_url_index'
+00047 [L201] TGETV    A=0 B=0 C=1 D=1 
+00048 [L201] RET1     A=0 B=0 C=2 D=2 
+00049 [L201] JMP      A=0 B=128 C=4 D=32772 target=54
+00050 [L203] GGET     A=0 B=0 C=9 D=9 'g_update_list_root_url'
+00051 [L203] GGET     A=1 B=0 C=7 D=7 'g_update_list_root_url_index'
+00052 [L203] TGETV    A=0 B=0 C=1 D=1 
+00053 [L203] RET1     A=0 B=0 C=2 D=2 
+00054 [L206] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto7 offset=0x7e2 source_lines=209-220 params=0
+UPVALUES []
+00001 [L210] GGET     A=0 B=0 C=0 D=0 'g_update_list_root_url_index'
+00002 [L210] ADDVN    A=0 B=0 C=0 D=0 
+00003 [L210] GSET     A=0 B=0 C=0 D=0 'g_update_list_root_url_index'
+00004 [L211] GGET     A=0 B=0 C=1 D=1 'isLuaC'
+00005 [L211] CALL     A=0 B=2 C=1 D=513 
+00006 [L211] ISF      A=0 B=0 C=0 D=0 
+00007 [L211] JMP      A=1 B=128 C=8 D=32776 target=16
+00008 [L212] GGET     A=0 B=0 C=0 D=0 'g_update_list_root_url_index'
+00009 [L212] GGET     A=1 B=0 C=2 D=2 'g_update_list_root_url_ios64'
+00010 [L212] LEN      A=1 B=0 C=1 D=1 
+00011 [L212] ISGE     A=1 B=0 C=0 D=0 
+00012 [L212] JMP      A=0 B=128 C=10 D=32778 target=23
+00013 [L213] KSHORT   A=0 B=0 C=1 D=1 1
+00014 [L213] GSET     A=0 B=0 C=0 D=0 'g_update_list_root_url_index'
+00015 [L214] JMP      A=0 B=128 C=7 D=32775 target=23
+00016 [L216] GGET     A=0 B=0 C=0 D=0 'g_update_list_root_url_index'
+00017 [L216] GGET     A=1 B=0 C=3 D=3 'g_update_list_root_url'
+00018 [L216] LEN      A=1 B=0 C=1 D=1 
+00019 [L216] ISGE     A=1 B=0 C=0 D=0 
+00020 [L216] JMP      A=0 B=128 C=2 D=32770 target=23
+00021 [L217] KSHORT   A=0 B=0 C=1 D=1 1
+00022 [L217] GSET     A=0 B=0 C=0 D=0 'g_update_list_root_url_index'
+00023 [L220] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto8 offset=0x8bc source_lines=267-285 params=0
+UPVALUES []
+00001 [L268] GGET     A=0 B=0 C=0 D=0 'g_env_flag'
+00002 [L268] ISNEP    A=0 B=0 C=2 D=2 
+00003 [L268] JMP      A=0 B=128 C=24 D=32792 target=28
+00004 [L269] GGET     A=0 B=0 C=1 D=1 'isLuaC'
+00005 [L269] CALL     A=0 B=2 C=1 D=513 
+00006 [L269] ISF      A=0 B=0 C=0 D=0 
+00007 [L269] JMP      A=1 B=128 C=8 D=32776 target=16
+00008 [L269] GGET     A=0 B=0 C=2 D=2 'isIOS'
+00009 [L269] CALL     A=0 B=2 C=1 D=513 
+00010 [L269] ISF      A=0 B=0 C=0 D=0 
+00011 [L269] JMP      A=1 B=128 C=4 D=32772 target=16
+00012 [L270] GGET     A=0 B=0 C=3 D=3 'g_zip_list_root_url_https_test_ios64'
+00013 [L270] TGETB    A=0 B=0 C=1 D=1 
+00014 [L270] RET1     A=0 B=0 C=2 D=2 
+00015 [L270] JMP      A=0 B=128 C=38 D=32806 target=54
+00016 [L271] GGET     A=0 B=0 C=1 D=1 'isLuaC'
+00017 [L271] CALL     A=0 B=2 C=1 D=513 
+00018 [L271] ISF      A=0 B=0 C=0 D=0 
+00019 [L271] JMP      A=1 B=128 C=4 D=32772 target=24
+00020 [L272] GGET     A=0 B=0 C=4 D=4 'g_zip_list_root_url_test_ios64'
+00021 [L272] TGETB    A=0 B=0 C=1 D=1 
+00022 [L272] RET1     A=0 B=0 C=2 D=2 
+00023 [L272] JMP      A=0 B=128 C=30 D=32798 target=54
+00024 [L274] GGET     A=0 B=0 C=5 D=5 'g_zip_list_root_url_test'
+00025 [L274] TGETB    A=0 B=0 C=1 D=1 
+00026 [L274] RET1     A=0 B=0 C=2 D=2 
+00027 [L275] JMP      A=0 B=128 C=26 D=32794 target=54
+00028 [L277] GGET     A=0 B=0 C=1 D=1 'isLuaC'
+00029 [L277] CALL     A=0 B=2 C=1 D=513 
+00030 [L277] ISF      A=0 B=0 C=0 D=0 
+00031 [L277] JMP      A=1 B=128 C=9 D=32777 target=41
+00032 [L277] GGET     A=0 B=0 C=2 D=2 'isIOS'
+00033 [L277] CALL     A=0 B=2 C=1 D=513 
+00034 [L277] ISF      A=0 B=0 C=0 D=0 
+00035 [L277] JMP      A=1 B=128 C=5 D=32773 target=41
+00036 [L278] GGET     A=0 B=0 C=6 D=6 'g_zip_list_root_url_https_ios64'
+00037 [L278] GGET     A=1 B=0 C=7 D=7 'g_zip_list_root_url_index'
+00038 [L278] TGETV    A=0 B=0 C=1 D=1 
+00039 [L278] RET1     A=0 B=0 C=2 D=2 
+00040 [L278] JMP      A=0 B=128 C=13 D=32781 target=54
+00041 [L279] GGET     A=0 B=0 C=1 D=1 'isLuaC'
+00042 [L279] CALL     A=0 B=2 C=1 D=513 
+00043 [L279] ISF      A=0 B=0 C=0 D=0 
+00044 [L279] JMP      A=1 B=128 C=5 D=32773 target=50
+00045 [L280] GGET     A=0 B=0 C=8 D=8 'g_zip_list_root_url_ios64'
+00046 [L280] GGET     A=1 B=0 C=7 D=7 'g_zip_list_root_url_index'
+00047 [L280] TGETV    A=0 B=0 C=1 D=1 
+00048 [L280] RET1     A=0 B=0 C=2 D=2 
+00049 [L280] JMP      A=0 B=128 C=4 D=32772 target=54
+00050 [L282] GGET     A=0 B=0 C=9 D=9 'g_zip_list_root_url'
+00051 [L282] GGET     A=1 B=0 C=7 D=7 'g_zip_list_root_url_index'
+00052 [L282] TGETV    A=0 B=0 C=1 D=1 
+00053 [L282] RET1     A=0 B=0 C=2 D=2 
+00054 [L285] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto9 offset=0xab5 source_lines=288-300 params=0
+UPVALUES []
+00001 [L289] GGET     A=0 B=0 C=0 D=0 'g_zip_list_root_url_index'
+00002 [L289] ADDVN    A=0 B=0 C=0 D=0 
+00003 [L289] GSET     A=0 B=0 C=0 D=0 'g_zip_list_root_url_index'
+00004 [L290] GGET     A=0 B=0 C=1 D=1 'isLuaC'
+00005 [L290] CALL     A=0 B=2 C=1 D=513 
+00006 [L290] ISF      A=0 B=0 C=0 D=0 
+00007 [L290] JMP      A=1 B=128 C=8 D=32776 target=16
+00008 [L291] GGET     A=0 B=0 C=0 D=0 'g_zip_list_root_url_index'
+00009 [L291] GGET     A=1 B=0 C=2 D=2 'g_zip_list_root_url_ios64'
+00010 [L291] LEN      A=1 B=0 C=1 D=1 
+00011 [L291] ISGE     A=1 B=0 C=0 D=0 
+00012 [L291] JMP      A=0 B=128 C=10 D=32778 target=23
+00013 [L292] KSHORT   A=0 B=0 C=1 D=1 1
+00014 [L292] GSET     A=0 B=0 C=0 D=0 'g_zip_list_root_url_index'
+00015 [L293] JMP      A=0 B=128 C=7 D=32775 target=23
+00016 [L295] GGET     A=0 B=0 C=0 D=0 'g_zip_list_root_url_index'
+00017 [L295] GGET     A=1 B=0 C=3 D=3 'g_zip_list_root_url'
+00018 [L295] LEN      A=1 B=0 C=1 D=1 
+00019 [L295] ISGE     A=1 B=0 C=0 D=0 
+00020 [L295] JMP      A=0 B=128 C=2 D=32770 target=23
+00021 [L296] KSHORT   A=0 B=0 C=1 D=1 1
+00022 [L296] GSET     A=0 B=0 C=0 D=0 'g_zip_list_root_url_index'
+00023 [L300] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto10 offset=0xb86 source_lines=0-302 params=0
+UPVALUES []
+00001 [L7] GGET     A=0 B=0 C=0 D=0 'module'
+00002 [L8] GGET     A=1 B=0 C=1 D=1 'main_server'
+00003 [L9] GGET     A=2 B=0 C=2 D=2 'CCApplication'
+00004 [L10] GGET     A=3 B=0 C=3 D=3 'string'
+00005 [L11] GGET     A=4 B=0 C=4 D=4 'CCLuaLog'
+00006 [L12] GGET     A=5 B=0 C=5 D=5 'tostring'
+00007 [L13] GGET     A=6 B=0 C=6 D=6 'require'
+00008 [L14] GGET     A=7 B=0 C=7 D=7 'table'
+00009 [L15] MOV      A=8 B=0 C=0 D=0 
+00010 [L15] KSTR     A=9 B=0 C=8 D=8 'config.config'
+00011 [L15] CALL     A=8 B=1 C=2 D=258 
+00012 [L17] MOV      A=8 B=0 C=6 D=6 
+00013 [L17] KSTR     A=9 B=0 C=9 D=9 'common.utils'
+00014 [L17] CALL     A=8 B=2 C=2 D=514 
+00015 [L21] KSTR     A=9 B=0 C=10 D=10 'http://mgs.syyx.com/'
+00016 [L21] GSET     A=9 B=0 C=11 D=11 'g_stat_root_url'
+00017 [L24] KSTR     A=9 B=0 C=12 D=12 'http://jgbkf.syyx.com/'
+00018 [L24] GSET     A=9 B=0 C=13 D=13 'g_bug_report_root_url'
+00019 [L28] KPRI     A=9 B=0 C=1 D=1 
+00020 [L28] GSET     A=9 B=0 C=14 D=14 'g_force_use_debug_evn'
+00021 [L31] KPRI     A=9 B=0 C=1 D=1 
+00022 [L31] GSET     A=9 B=0 C=15 D=15 'g_env_flag'
+00023 [L34] KSHORT   A=9 B=0 C=1 D=1 1
+00024 [L34] GSET     A=9 B=0 C=16 D=16 'g_server_list_root_url_index'
+00025 [L35] KSHORT   A=9 B=0 C=1 D=1 1
+00026 [L35] GSET     A=9 B=0 C=17 D=17 'g_update_list_root_url_index'
+00027 [L36] KSHORT   A=9 B=0 C=1 D=1 1
+00028 [L36] GSET     A=9 B=0 C=18 D=18 'g_zip_list_root_url_index'
+00029 [L40] FNEW     A=9 B=0 C=19 D=19 {'kind': 'proto', 'id': 0}
+00030 [L54] FNEW     A=10 B=0 C=20 D=20 {'kind': 'proto', 'id': 1}
+00031 [L44] GSET     A=10 B=0 C=21 D=21 'getForceUseDebugFlag'
+00032 [L60] TDUP     A=10 B=0 C=22 D=22 {'kind': 'table', 'value': {1: 'http://jgbupdate02.shangyoo.com/update/jgb/', 2: 'http://jgbupdate04.shangyoo.com/update/jgb/', 3: 'http://123.103.22.250/update/jgb/', 4: 'http://113.105.245.176/update/jgb/'}}
+00033 [L66] GSET     A=10 B=0 C=23 D=23 'g_server_list_root_url'
+00034 [L69] TDUP     A=10 B=0 C=24 D=24 {'kind': 'table', 'value': {1: 'http://jgbupdate02.shangyoo.com/jgb_ios_64/serverlist/', 2: 'http://jgbupdate04.shangyoo.com/jgb_ios_64/serverlist/', 3: 'http://123.103.22.250/jgb_ios_64/serverlist/', 4: 'http://123.103.63.60/jgb_ios_64/serverlist/'}}
+00035 [L75] GSET     A=10 B=0 C=25 D=25 'g_server_list_root_url_ios64'
+00036 [L77] TDUP     A=10 B=0 C=26 D=26 {'kind': 'table', 'value': {1: 'https://jgbupdate02.syyx.com/jgb_ios_64/serverlist/', 2: 'https://jgbupdate04.syyx.com/jgb_ios_64/serverlist/', 3: 'https://123.103.22.250/jgb_ios_64/serverlist/', 4: 'https://123.103.63.60/jgb_ios_64/serverlist/'}}
+00037 [L83] GSET     A=10 B=0 C=27 D=27 'g_server_list_root_url_https_ios64'
+00038 [L85] TDUP     A=10 B=0 C=28 D=28 {'kind': 'table', 'value': {1: 'http://sx01-mxybs01.shangyoo.com:8081/'}}
+00039 [L88] GSET     A=10 B=0 C=29 D=29 'g_server_list_root_url_test'
+00040 [L90] TDUP     A=10 B=0 C=30 D=30 {'kind': 'table', 'value': {1: 'http://sx01-mxybs01.shangyoo.com:8081/ios_64/'}}
+00041 [L93] GSET     A=10 B=0 C=31 D=31 'g_server_list_root_url_test_ios64'
+00042 [L94] TDUP     A=10 B=0 C=32 D=32 {'kind': 'table', 'value': {1: 'https://sx01-mxybs01.shangyoo.com:8443/ios_64/'}}
+00043 [L97] GSET     A=10 B=0 C=33 D=33 'g_server_list_root_url_https_test_ios64'
+00044 [L101] FNEW     A=10 B=0 C=34 D=34 {'kind': 'proto', 'id': 2}
+00045 [L99] GSET     A=10 B=0 C=35 D=35 'isLuaC'
+00046 [L104] FNEW     A=10 B=0 C=36 D=36 {'kind': 'proto', 'id': 3}
+00047 [L102] GSET     A=10 B=0 C=37 D=37 'isIOS'
+00048 [L128] FNEW     A=10 B=0 C=38 D=38 {'kind': 'proto', 'id': 4}
+00049 [L106] GSET     A=10 B=0 C=39 D=39 'getServerListRootUrl'
+00050 [L144] FNEW     A=10 B=0 C=40 D=40 {'kind': 'proto', 'id': 5}
+00051 [L131] GSET     A=10 B=0 C=41 D=41 'getServerListFail'
+00052 [L151] TDUP     A=10 B=0 C=42 D=42 {'kind': 'table', 'value': {1: 'http://jgbupdate02.shangyoo.com/update/jgb/', 2: 'http://jgbupdate04.shangyoo.com/update/jgb/', 3: 'http://123.103.22.250/update/jgb/', 4: 'http://113.105.245.176/update/jgb/'}}
+00053 [L157] GSET     A=10 B=0 C=43 D=43 'g_update_list_root_url'
+00054 [L160] TDUP     A=10 B=0 C=44 D=44 {'kind': 'table', 'value': {1: 'http://jgbupdate02.shangyoo.com/jgb_ios_64/update/', 2: 'http://jgbupdate04.shangyoo.com/jgb_ios_64/update/', 3: 'http://123.103.22.250/jgb_ios_64/update/', 4: 'http://123.103.63.60/jgb_ios_64/update/'}}
+00055 [L166] GSET     A=10 B=0 C=45 D=45 'g_update_list_root_url_ios64'
+00056 [L168] TDUP     A=10 B=0 C=46 D=46 {'kind': 'table', 'value': {1: 'https://jgbupdate02.syyx.com/jgb_ios_64/update/', 2: 'https://jgbupdate04.syyx.com/jgb_ios_64/update/', 3: 'https://123.103.22.250/jgb_ios_64/update/', 4: 'https://123.103.63.60/jgb_ios_64/update/'}}
+00057 [L174] GSET     A=10 B=0 C=47 D=47 'g_update_list_root_url_https_ios64'
+00058 [L175] TDUP     A=10 B=0 C=48 D=48 {'kind': 'table', 'value': {1: 'http://sx01-mxybs01.shangyoo.com:8081/'}}
+00059 [L178] GSET     A=10 B=0 C=49 D=49 'g_update_list_root_url_test'
+00060 [L180] TDUP     A=10 B=0 C=50 D=50 {'kind': 'table', 'value': {1: 'http://sx01-mxybs01.shangyoo.com:8081/ios_64/'}}
+00061 [L183] GSET     A=10 B=0 C=51 D=51 'g_update_list_root_url_test_ios64'
+00062 [L184] TDUP     A=10 B=0 C=52 D=52 {'kind': 'table', 'value': {1: 'https://sx01-mxybs01.shangyoo.com:8443/ios_64/'}}
+00063 [L187] GSET     A=10 B=0 C=53 D=53 'g_update_list_root_https_url_test_ios64'
+00064 [L206] FNEW     A=10 B=0 C=54 D=54 {'kind': 'proto', 'id': 6}
+00065 [L188] GSET     A=10 B=0 C=55 D=55 'getUpdateListRootUrl'
+00066 [L220] FNEW     A=10 B=0 C=56 D=56 {'kind': 'proto', 'id': 7}
+00067 [L209] GSET     A=10 B=0 C=57 D=57 'getUpdateListFail'
+00068 [L227] TDUP     A=10 B=0 C=58 D=58 {'kind': 'table', 'value': {1: 'http://jgbupdate02.shangyoo.com/jgb/update/updatefile/', 2: 'http://jgbupdate04.shangyoo.com/jgb/update/updatefile/', 3: 'http://123.103.22.250/jgb/update/updatefile/', 4: 'http://113.105.245.176/jgb/update/updatefile/'}}
+00069 [L233] GSET     A=10 B=0 C=59 D=59 'g_zip_list_root_url'
+00070 [L236] TDUP     A=10 B=0 C=60 D=60 {'kind': 'table', 'value': {1: 'http://jgbupdate02.shangyoo.com/jgb_ios_64/update/', 2: 'http://jgbupdate04.shangyoo.com/jgb_ios_64/update/', 3: 'http://123.103.22.250/jgb_ios_64/update/', 4: 'http://123.103.63.60/jgb_ios_64/update/'}}
+00071 [L242] GSET     A=10 B=0 C=61 D=61 'g_zip_list_root_url_ios64'
+00072 [L244] TDUP     A=10 B=0 C=62 D=62 {'kind': 'table', 'value': {1: 'https://jgbupdate02.syyx.com/jgb_ios_64/update/', 2: 'https://jgbupdate04.syyx.com/jgb_ios_64/update/', 3: 'https://123.103.22.250/jgb_ios_64/update/', 4: 'https://123.103.63.60/jgb_ios_64/update/'}}
+00073 [L250] GSET     A=10 B=0 C=63 D=63 'g_zip_list_root_url_https_ios64'
+00074 [L253] TDUP     A=10 B=0 C=64 D=64 {'kind': 'table', 'value': {1: 'http://sx01-mxybs01.shangyoo.com:8081/'}}
+00075 [L256] GSET     A=10 B=0 C=65 D=65 'g_zip_list_root_url_test'
+00076 [L258] TDUP     A=10 B=0 C=66 D=66 {'kind': 'table', 'value': {1: 'http://sx01-mxybs01.shangyoo.com:8081/ios_64/'}}
+00077 [L261] GSET     A=10 B=0 C=67 D=67 'g_zip_list_root_url_test_ios64'
+00078 [L262] TDUP     A=10 B=0 C=68 D=68 {'kind': 'table', 'value': {1: 'https://sx01-mxybs01.shangyoo.com:8443/ios_64/'}}
+00079 [L265] GSET     A=10 B=0 C=69 D=69 'g_zip_list_root_url_https_test_ios64'
+00080 [L285] FNEW     A=10 B=0 C=70 D=70 {'kind': 'proto', 'id': 8}
+00081 [L267] GSET     A=10 B=0 C=71 D=71 'getZipListRootUrl'
+00082 [L300] FNEW     A=10 B=0 C=72 D=72 {'kind': 'proto', 'id': 9}
+00083 [L288] GSET     A=10 B=0 C=73 D=73 'getZipListFail'
+00084 [L300] UCLO     A=0 B=128 C=0 D=32768 target=85
+00085 [L300] RET0     A=0 B=0 C=1 D=1 

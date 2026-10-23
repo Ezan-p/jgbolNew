@@ -1,0 +1,481 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\91c18d74512755e09145fdf82fd2bfd1.data'; root=proto7
+
+FUNCTION proto0 offset=0x4a source_lines=55-57 params=0
+UPVALUES ['CCLuaLog', 'string']
+00001 [L56] UGET     A=0 B=0 C=0 D=0 CCLuaLog
+00002 [L56] UGET     A=1 B=0 C=1 D=1 string
+00003 [L56] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L56] VARG     A=2 B=0 C=0 D=0 
+00005 [L56] CALLM    A=1 B=0 C=0 D=0 
+00006 [L56] CALLM    A=0 B=1 C=0 D=256 
+00007 [L57] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x95 source_lines=61-90 params=0
+UPVALUES ['cclog', 'd_ms', 'main_server']
+00001 [L62] UGET     A=0 B=0 C=0 D=0 cclog
+00002 [L62] KSTR     A=1 B=0 C=0 D=0 'call main_init...'
+00003 [L62] CALL     A=0 B=1 C=2 D=258 
+00004 [L64] UGET     A=0 B=0 C=1 D=1 d_ms
+00005 [L64] TGETS    A=0 B=0 C=1 D=1 'd_file'
+00006 [L64] TGETS    A=0 B=0 C=2 D=2 'get'
+00007 [L64] KSTR     A=1 B=0 C=3 D=3 'main_init_times'
+00008 [L64] CALL     A=0 B=2 C=2 D=514 
+00009 [L64] IST      A=0 B=0 C=0 D=0 
+00010 [L64] JMP      A=1 B=128 C=1 D=32769 target=12
+00011 [L64] KSHORT   A=0 B=0 C=0 D=0 0
+00012 [L65] ADDVN    A=0 B=0 C=0 D=0 
+00013 [L66] UGET     A=1 B=0 C=1 D=1 d_ms
+00014 [L66] TGETS    A=1 B=1 C=1 D=257 'd_file'
+00015 [L66] TGETS    A=1 B=1 C=4 D=260 'set'
+00016 [L66] KSTR     A=2 B=0 C=3 D=3 'main_init_times'
+00017 [L66] MOV      A=3 B=0 C=0 D=0 
+00018 [L66] CALL     A=1 B=1 C=3 D=259 
+00019 [L69] GGET     A=1 B=0 C=5 D=5 'collectgarbage'
+00020 [L69] KSTR     A=2 B=0 C=6 D=6 'setpause'
+00021 [L69] KSHORT   A=3 B=0 C=200 D=200 200
+00022 [L69] CALL     A=1 B=1 C=3 D=259 
+00023 [L70] GGET     A=1 B=0 C=5 D=5 'collectgarbage'
+00024 [L70] KSTR     A=2 B=0 C=7 D=7 'setstepmul'
+00025 [L70] KSHORT   A=3 B=1 C=144 D=400 400
+00026 [L70] CALL     A=1 B=1 C=3 D=259 
+00027 [L73] KSTR     A=1 B=0 C=8 D=8 'type=i,size=i,totalSize='
+00028 [L73] KSTR     A=2 B=0 C=9 D=9 'd'
+00029 [L73] KSTR     A=3 B=0 C=10 D=10 ',status=i,filename=S['
+00030 [L73] KSTR     A=4 B=0 C=11 D=11 '255'
+00031 [L73] KSTR     A=5 B=0 C=12 D=12 ']'
+00032 [L73] CAT      A=1 B=1 C=5 D=261 
+00033 [L74] UGET     A=2 B=0 C=2 D=2 main_server
+00034 [L74] TGETS    A=2 B=2 C=13 D=525 'register_type'
+00035 [L74] KSHORT   A=3 B=0 C=21 D=21 21
+00036 [L74] MOV      A=4 B=0 C=1 D=1 
+00037 [L74] CALL     A=2 B=1 C=3 D=259 
+00038 [L77] UGET     A=2 B=0 C=2 D=2 main_server
+00039 [L77] TGETS    A=2 B=2 C=13 D=525 'register_type'
+00040 [L77] KSHORT   A=3 B=0 C=20 D=20 20
+00041 [L77] MOV      A=4 B=0 C=1 D=1 
+00042 [L77] CALL     A=2 B=1 C=3 D=259 
+00043 [L79] UGET     A=2 B=0 C=1 D=1 d_ms
+00044 [L79] TGETS    A=2 B=2 C=14 D=526 'd_hz'
+00045 [L79] TGETS    A=2 B=2 C=15 D=527 'init'
+00046 [L79] CALL     A=2 B=1 C=1 D=257 
+00047 [L82] UGET     A=2 B=0 C=1 D=1 d_ms
+00048 [L82] TGETS    A=2 B=2 C=16 D=528 'd_setting'
+00049 [L82] TGETS    A=2 B=2 C=17 D=529 'initSetting'
+00050 [L82] CALL     A=2 B=1 C=1 D=257 
+00051 [L84] UGET     A=2 B=0 C=1 D=1 d_ms
+00052 [L84] TGETS    A=2 B=2 C=18 D=530 'd_update_mgr'
+00053 [L84] TGETS    A=2 B=2 C=19 D=531 'doStatReport'
+00054 [L84] CALL     A=2 B=1 C=1 D=257 
+00055 [L86] UGET     A=2 B=0 C=1 D=1 d_ms
+00056 [L86] TGETS    A=2 B=2 C=20 D=532 'd_updateUI'
+00057 [L86] TGETS    A=2 B=2 C=21 D=533 'show'
+00058 [L86] CALL     A=2 B=1 C=1 D=257 
+00059 [L89] UGET     A=2 B=0 C=1 D=1 d_ms
+00060 [L89] TGETS    A=2 B=2 C=22 D=534 'd_stat'
+00061 [L89] TGETS    A=2 B=2 C=23 D=535 'checkReportDumpFile'
+00062 [L89] CALL     A=2 B=1 C=1 D=257 
+00063 [L90] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto2 offset=0x30c source_lines=96-165 params=3
+UPVALUES ['cclog', 'main_server', 'd_ms', 'd_quitUI']
+00001 [L97] UGET     A=3 B=0 C=0 D=0 cclog
+00002 [L97] KSTR     A=4 B=0 C=0 D=0 'call main_entrance...'
+00003 [L97] CALL     A=3 B=1 C=2 D=258 
+00004 [L100] KSTR     A=3 B=0 C=1 D=1 'type=i,size=i,totalSize='
+00005 [L100] KSTR     A=4 B=0 C=2 D=2 'd'
+00006 [L100] KSTR     A=5 B=0 C=3 D=3 ',status=i,filename=S['
+00007 [L100] KSTR     A=6 B=0 C=4 D=4 '255'
+00008 [L100] KSTR     A=7 B=0 C=5 D=5 ']'
+00009 [L100] CAT      A=3 B=3 C=7 D=775 
+00010 [L101] UGET     A=4 B=0 C=1 D=1 main_server
+00011 [L101] TGETS    A=4 B=4 C=6 D=1030 'register_type'
+00012 [L101] KSHORT   A=5 B=0 C=21 D=21 21
+00013 [L101] MOV      A=6 B=0 C=3 D=3 
+00014 [L101] CALL     A=4 B=1 C=3 D=259 
+00015 [L104] UGET     A=4 B=0 C=1 D=1 main_server
+00016 [L104] TGETS    A=4 B=4 C=6 D=1030 'register_type'
+00017 [L104] KSHORT   A=5 B=0 C=20 D=20 20
+00018 [L104] MOV      A=6 B=0 C=3 D=3 
+00019 [L104] CALL     A=4 B=1 C=3 D=259 
+00020 [L107] KSTR     A=3 B=0 C=7 D=7 'eventID=i,status=i'
+00021 [L108] UGET     A=4 B=0 C=1 D=1 main_server
+00022 [L108] TGETS    A=4 B=4 C=6 D=1030 'register_type'
+00023 [L108] KSHORT   A=5 B=0 C=22 D=22 22
+00024 [L108] MOV      A=6 B=0 C=3 D=3 
+00025 [L108] CALL     A=4 B=1 C=3 D=259 
+00026 [L110] TNEW     A=4 B=0 C=0 D=0 
+00027 [L111] UGET     A=5 B=0 C=1 D=1 main_server
+00028 [L111] TGETS    A=5 B=5 C=8 D=1288 'recv_msg'
+00029 [L111] MOV      A=6 B=0 C=0 D=0 
+00030 [L111] MOV      A=7 B=0 C=1 D=1 
+00031 [L111] MOV      A=8 B=0 C=4 D=4 
+00032 [L111] CALL     A=5 B=1 C=4 D=260 
+00033 [L114] ISNEN    A=0 B=0 C=0 D=0 20
+00034 [L114] JMP      A=5 B=128 C=45 D=32813 target=80
+00035 [L115] ISF      A=0 B=0 C=4 D=4 
+00036 [L115] JMP      A=5 B=128 C=15 D=32783 target=52
+00037 [L115] TGETS    A=5 B=4 C=9 D=1033 'type'
+00038 [L115] ISNEN    A=5 B=0 C=1 D=1 201
+00039 [L115] JMP      A=5 B=128 C=12 D=32780 target=52
+00040 [L116] GGET     A=5 B=0 C=10 D=10 'CCTextureCache'
+00041 [L116] MOV      A=6 B=0 C=5 D=5 
+00042 [L116] TGETS    A=5 B=5 C=11 D=1291 'sharedTextureCache'
+00043 [L116] CALL     A=5 B=2 C=2 D=514 
+00044 [L116] MOV      A=6 B=0 C=5 D=5 
+00045 [L116] TGETS    A=5 B=5 C=12 D=1292 'removeUnusedTextures'
+00046 [L116] CALL     A=5 B=1 C=2 D=258 
+00047 [L117] UGET     A=5 B=0 C=2 D=2 d_ms
+00048 [L117] TGETS    A=5 B=5 C=13 D=1293 'd_u'
+00049 [L117] TGETS    A=5 B=5 C=14 D=1294 'reload_pic'
+00050 [L117] CALL     A=5 B=1 C=1 D=257 
+00051 [L117] JMP      A=5 B=128 C=155 D=32923 target=207
+00052 [L118] ISF      A=0 B=0 C=4 D=4 
+00053 [L118] JMP      A=5 B=128 C=153 D=32921 target=207
+00054 [L118] TGETS    A=5 B=4 C=9 D=1033 'type'
+00055 [L118] ISNEN    A=5 B=0 C=2 D=2 202
+00056 [L118] JMP      A=5 B=128 C=150 D=32918 target=207
+00057 [L119] UGET     A=5 B=0 C=2 D=2 d_ms
+00058 [L119] TGETS    A=5 B=5 C=13 D=1293 'd_u'
+00059 [L119] TGETS    A=5 B=5 C=15 D=1295 'reload_pic_clean'
+00060 [L119] CALL     A=5 B=1 C=1 D=257 
+00061 [L121] UGET     A=5 B=0 C=2 D=2 d_ms
+00062 [L121] TGETS    A=5 B=5 C=16 D=1296 'd_update_mgr'
+00063 [L121] TGETS    A=5 B=5 C=17 D=1297 'g_downloading_zip'
+00064 [L121] ISNEP    A=5 B=0 C=1 D=1 
+00065 [L121] JMP      A=5 B=128 C=141 D=32909 target=207
+00066 [L122] UGET     A=5 B=0 C=2 D=2 d_ms
+00067 [L122] TGETS    A=5 B=5 C=18 D=1298 'd_updateUI'
+00068 [L122] TGETS    A=5 B=5 C=19 D=1299 'g_self'
+00069 [L122] TNEW     A=6 B=0 C=0 D=0 
+00070 [L122] TSETS    A=6 B=5 C=20 D=1300 'server_infos'
+00071 [L124] UGET     A=5 B=0 C=2 D=2 d_ms
+00072 [L124] TGETS    A=5 B=5 C=13 D=1293 'd_u'
+00073 [L124] TGETS    A=5 B=5 C=21 D=1301 'delay_node'
+00074 [L124] KSHORT   A=6 B=0 C=0 D=0 0
+00075 [L124] UGET     A=7 B=0 C=2 D=2 d_ms
+00076 [L124] TGETS    A=7 B=7 C=16 D=1808 'd_update_mgr'
+00077 [L124] TGETS    A=7 B=7 C=22 D=1814 'downloadServerList'
+00078 [L124] CALL     A=5 B=1 C=3 D=259 
+00079 [L126] JMP      A=5 B=128 C=127 D=32895 target=207
+00080 [L128] ISNEN    A=0 B=0 C=3 D=3 21
+00081 [L128] JMP      A=5 B=128 C=78 D=32846 target=160
+00082 [L129] TGETS    A=5 B=4 C=9 D=1033 'type'
+00083 [L129] ISF      A=0 B=0 C=5 D=5 
+00084 [L129] JMP      A=6 B=128 C=59 D=32827 target=144
+00085 [L129] TGETS    A=5 B=4 C=9 D=1033 'type'
+00086 [L129] ISNEN    A=5 B=0 C=4 D=4 105
+00087 [L129] JMP      A=5 B=128 C=56 D=32824 target=144
+00088 [L130] TGETS    A=5 B=4 C=23 D=1047 'status'
+00089 [L130] ISNEN    A=5 B=0 C=5 D=5 2
+00090 [L130] JMP      A=5 B=128 C=10 D=32778 target=101
+00091 [L131] UGET     A=5 B=0 C=2 D=2 d_ms
+00092 [L131] TGETS    A=5 B=5 C=16 D=1296 'd_update_mgr'
+00093 [L131] TGETS    A=5 B=5 C=24 D=1304 'doDownLoadFile'
+00094 [L131] MOV      A=6 B=0 C=4 D=4 
+00095 [L131] CALL     A=5 B=1 C=2 D=258 
+00096 [L132] UGET     A=5 B=0 C=2 D=2 d_ms
+00097 [L132] TGETS    A=5 B=5 C=16 D=1296 'd_update_mgr'
+00098 [L132] KPRI     A=6 B=0 C=1 D=1 
+00099 [L132] TSETS    A=6 B=5 C=17 D=1297 'g_downloading_zip'
+00100 [L132] JMP      A=5 B=128 C=106 D=32874 target=207
+00101 [L133] TGETS    A=5 B=4 C=23 D=1047 'status'
+00102 [L133] ISNEN    A=5 B=0 C=6 D=6 1
+00103 [L133] JMP      A=5 B=128 C=6 D=32774 target=110
+00104 [L134] UGET     A=5 B=0 C=2 D=2 d_ms
+00105 [L134] TGETS    A=5 B=5 C=16 D=1296 'd_update_mgr'
+00106 [L134] TGETS    A=5 B=5 C=25 D=1305 'downloadingFile'
+00107 [L134] MOV      A=6 B=0 C=4 D=4 
+00108 [L134] CALL     A=5 B=1 C=2 D=258 
+00109 [L134] JMP      A=5 B=128 C=97 D=32865 target=207
+00110 [L135] TGETS    A=5 B=4 C=23 D=1047 'status'
+00111 [L135] ISNEN    A=5 B=0 C=7 D=7 -1
+00112 [L135] JMP      A=5 B=128 C=10 D=32778 target=123
+00113 [L136] UGET     A=5 B=0 C=2 D=2 d_ms
+00114 [L136] TGETS    A=5 B=5 C=16 D=1296 'd_update_mgr'
+00115 [L136] TGETS    A=5 B=5 C=26 D=1306 'downloadFailed'
+00116 [L136] MOV      A=6 B=0 C=4 D=4 
+00117 [L136] CALL     A=5 B=1 C=2 D=258 
+00118 [L137] UGET     A=5 B=0 C=2 D=2 d_ms
+00119 [L137] TGETS    A=5 B=5 C=16 D=1296 'd_update_mgr'
+00120 [L137] KPRI     A=6 B=0 C=1 D=1 
+00121 [L137] TSETS    A=6 B=5 C=17 D=1297 'g_downloading_zip'
+00122 [L137] JMP      A=5 B=128 C=84 D=32852 target=207
+00123 [L138] TGETS    A=5 B=4 C=23 D=1047 'status'
+00124 [L138] ISNEN    A=5 B=0 C=8 D=8 -2
+00125 [L138] JMP      A=5 B=128 C=81 D=32849 target=207
+00126 [L139] UGET     A=5 B=0 C=0 D=0 cclog
+00127 [L139] KSTR     A=6 B=0 C=27 D=27 'mu time out(30s)!!!'
+00128 [L139] CALL     A=5 B=1 C=2 D=258 
+00129 [L140] UGET     A=5 B=0 C=2 D=2 d_ms
+00130 [L140] TGETS    A=5 B=5 C=18 D=1298 'd_updateUI'
+00131 [L140] TGETS    A=5 B=5 C=28 D=1308 'info'
+00132 [L140] KSTR     A=6 B=0 C=29 D=29 'timeout (30s)'
+00133 [L140] CALL     A=5 B=1 C=2 D=258 
+00134 [L141] UGET     A=5 B=0 C=2 D=2 d_ms
+00135 [L141] TGETS    A=5 B=5 C=16 D=1296 'd_update_mgr'
+00136 [L141] TGETS    A=5 B=5 C=26 D=1306 'downloadFailed'
+00137 [L141] MOV      A=6 B=0 C=4 D=4 
+00138 [L141] CALL     A=5 B=1 C=2 D=258 
+00139 [L142] UGET     A=5 B=0 C=2 D=2 d_ms
+00140 [L142] TGETS    A=5 B=5 C=16 D=1296 'd_update_mgr'
+00141 [L142] KPRI     A=6 B=0 C=1 D=1 
+00142 [L142] TSETS    A=6 B=5 C=17 D=1297 'g_downloading_zip'
+00143 [L143] JMP      A=5 B=128 C=63 D=32831 target=207
+00144 [L145] TGETS    A=5 B=4 C=9 D=1033 'type'
+00145 [L145] IST      A=0 B=0 C=5 D=5 
+00146 [L145] JMP      A=6 B=128 C=1 D=32769 target=148
+00147 [L145] KSTR     A=5 B=0 C=30 D=30 'null'
+00148 [L146] TGETS    A=6 B=4 C=31 D=1055 'filename'
+00149 [L146] IST      A=0 B=0 C=6 D=6 
+00150 [L146] JMP      A=7 B=128 C=1 D=32769 target=152
+00151 [L146] KSTR     A=6 B=0 C=30 D=30 'null'
+00152 [L147] UGET     A=7 B=0 C=0 D=0 cclog
+00153 [L147] KSTR     A=8 B=0 C=32 D=32 'ERROR: unhandle update_info_21, type='
+00154 [L147] MOV      A=9 B=0 C=5 D=5 
+00155 [L147] KSTR     A=10 B=0 C=33 D=33 ', filename='
+00156 [L147] MOV      A=11 B=0 C=6 D=6 
+00157 [L147] CAT      A=8 B=8 C=11 D=2059 
+00158 [L147] CALL     A=7 B=1 C=2 D=258 
+00159 [L148] JMP      A=5 B=128 C=47 D=32815 target=207
+00160 [L149] ISNEN    A=0 B=0 C=9 D=9 22
+00161 [L149] JMP      A=5 B=128 C=41 D=32809 target=203
+00162 [L150] UGET     A=5 B=0 C=0 D=0 cclog
+00163 [L150] KSTR     A=6 B=0 C=34 D=34 'msgid==22'
+00164 [L150] CALL     A=5 B=1 C=2 D=258 
+00165 [L152] TGETS    A=5 B=4 C=35 D=1059 'eventID'
+00166 [L152] ISNEN    A=5 B=0 C=10 D=10 4
+00167 [L152] JMP      A=5 B=128 C=4 D=32772 target=172
+00168 [L153] UGET     A=5 B=0 C=3 D=3 d_quitUI
+00169 [L153] TGETS    A=5 B=5 C=36 D=1316 'show'
+00170 [L153] CALL     A=5 B=1 C=1 D=257 
+00171 [L153] JMP      A=5 B=128 C=35 D=32803 target=207
+00172 [L154] TGETS    A=5 B=4 C=35 D=1059 'eventID'
+00173 [L154] ISEQN    A=5 B=0 C=11 D=11 24
+00174 [L154] JMP      A=5 B=128 C=3 D=32771 target=178
+00175 [L154] TGETS    A=5 B=4 C=35 D=1059 'eventID'
+00176 [L154] ISNEN    A=5 B=0 C=12 D=12 25
+00177 [L154] JMP      A=5 B=128 C=6 D=32774 target=184
+00178 [L155] UGET     A=5 B=0 C=2 D=2 d_ms
+00179 [L155] TGETS    A=5 B=5 C=37 D=1317 'd_music_mgr'
+00180 [L155] TGETS    A=5 B=5 C=38 D=1318 'adjustVolume'
+00181 [L155] TGETS    A=6 B=4 C=35 D=1059 'eventID'
+00182 [L155] CALL     A=5 B=1 C=2 D=258 
+00183 [L155] JMP      A=5 B=128 C=23 D=32791 target=207
+00184 [L156] UGET     A=5 B=0 C=2 D=2 d_ms
+00185 [L156] TGETS    A=5 B=5 C=13 D=1293 'd_u'
+00186 [L156] TGETS    A=5 B=5 C=39 D=1319 'isWP8'
+00187 [L156] CALL     A=5 B=2 C=1 D=513 
+00188 [L156] ISF      A=0 B=0 C=5 D=5 
+00189 [L156] JMP      A=6 B=128 C=7 D=32775 target=197
+00190 [L156] TGETS    A=5 B=4 C=35 D=1059 'eventID'
+00191 [L156] ISNEN    A=5 B=0 C=13 D=13 9
+00192 [L156] JMP      A=5 B=128 C=4 D=32772 target=197
+00193 [L157] UGET     A=5 B=0 C=3 D=3 d_quitUI
+00194 [L157] TGETS    A=5 B=5 C=36 D=1316 'show'
+00195 [L157] CALL     A=5 B=1 C=1 D=257 
+00196 [L157] JMP      A=5 B=128 C=10 D=32778 target=207
+00197 [L159] UGET     A=5 B=0 C=0 D=0 cclog
+00198 [L159] KSTR     A=6 B=0 C=40 D=40 'ERROR: unhandle event22, code='
+00199 [L159] TGETS    A=7 B=4 C=35 D=1059 'eventID'
+00200 [L159] CAT      A=6 B=6 C=7 D=1543 
+00201 [L159] CALL     A=5 B=1 C=2 D=258 
+00202 [L160] JMP      A=5 B=128 C=4 D=32772 target=207
+00203 [L162] UGET     A=5 B=0 C=0 D=0 cclog
+00204 [L162] KSTR     A=6 B=0 C=41 D=41 'ERROR: unhandle msg=%d'
+00205 [L162] MOV      A=7 B=0 C=0 D=0 
+00206 [L162] CALL     A=5 B=1 C=3 D=259 
+00207 [L165] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto3 offset=0x9db source_lines=171-174 params=3
+UPVALUES ['cclog']
+00001 [L172] UGET     A=3 B=0 C=0 D=0 cclog
+00002 [L172] KSTR     A=4 B=0 C=0 D=0 '>>call error_handler[%d]!!!'
+00003 [L172] MOV      A=5 B=0 C=0 D=0 
+00004 [L172] CALL     A=3 B=1 C=3 D=259 
+00005 [L173] KSHORT   A=3 B=0 C=0 D=0 0
+00006 [L173] RET1     A=3 B=0 C=2 D=2 
+
+FUNCTION proto4 offset=0xa40 source_lines=179-188 params=1
+UPVALUES ['os']
+00001 [L180] UGET     A=1 B=0 C=0 D=0 os
+00002 [L180] TGETS    A=1 B=1 C=0 D=256 'time'
+00003 [L180] CALL     A=1 B=2 C=1 D=513 
+00004 [L181] GGET     A=2 B=0 C=1 D=1 'g_last_report_error_time'
+00005 [L181] SUBVV    A=2 B=1 C=2 D=258 
+00006 [L181] KSHORT   A=3 B=0 C=60 D=60 60
+00007 [L181] ISGE     A=3 B=0 C=2 D=2 
+00008 [L181] JMP      A=2 B=128 C=13 D=32781 target=22
+00009 [L182] GSET     A=1 B=0 C=1 D=1 'g_last_report_error_time'
+00010 [L183] GGET     A=2 B=0 C=2 D=2 'require'
+00011 [L183] KSTR     A=3 B=0 C=3 D=3 'common.statistics'
+00012 [L183] CALL     A=2 B=2 C=2 D=514 
+00013 [L184] GGET     A=3 B=0 C=2 D=2 'require'
+00014 [L184] KSTR     A=4 B=0 C=4 D=4 'update.update_mgr'
+00015 [L184] CALL     A=3 B=2 C=2 D=514 
+00016 [L185] TGETS    A=4 B=2 C=5 D=517 'getReportErrorParams'
+00017 [L185] MOV      A=5 B=0 C=0 D=0 
+00018 [L185] CALL     A=4 B=2 C=2 D=514 
+00019 [L186] TGETS    A=5 B=3 C=6 D=774 'reportError'
+00020 [L186] MOV      A=6 B=0 C=4 D=4 
+00021 [L186] CALL     A=5 B=1 C=2 D=258 
+00022 [L188] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto5 offset=0xb5f source_lines=190-196 params=1
+UPVALUES ['CCLuaLog']
+00001 [L191] UGET     A=1 B=0 C=0 D=0 CCLuaLog
+00002 [L191] KSTR     A=2 B=0 C=0 D=0 'mu__G__TRACKBACK__:----------------------------------------'
+00003 [L191] CALL     A=1 B=1 C=2 D=258 
+00004 [L192] UGET     A=1 B=0 C=0 D=0 CCLuaLog
+00005 [L192] KSTR     A=2 B=0 C=1 D=1 'LUA ERROR: '
+00006 [L192] GGET     A=3 B=0 C=2 D=2 'tostring'
+00007 [L192] MOV      A=4 B=0 C=0 D=0 
+00008 [L192] CALL     A=3 B=2 C=2 D=514 
+00009 [L192] KSTR     A=4 B=0 C=3 D=3 '\n'
+00010 [L192] CAT      A=2 B=2 C=4 D=516 
+00011 [L192] CALL     A=1 B=1 C=2 D=258 
+00012 [L193] UGET     A=1 B=0 C=0 D=0 CCLuaLog
+00013 [L193] GGET     A=2 B=0 C=4 D=4 'debug'
+00014 [L193] TGETS    A=2 B=2 C=5 D=517 'traceback'
+00015 [L193] CALL     A=2 B=0 C=1 D=1 
+00016 [L193] CALLM    A=1 B=1 C=0 D=256 
+00017 [L194] UGET     A=1 B=0 C=0 D=0 CCLuaLog
+00018 [L194] KSTR     A=2 B=0 C=6 D=6 '----------------------------------------'
+00019 [L194] CALL     A=1 B=1 C=2 D=258 
+00020 [L195] GGET     A=1 B=0 C=7 D=7 'report_error'
+00021 [L195] GGET     A=2 B=0 C=2 D=2 'tostring'
+00022 [L195] MOV      A=3 B=0 C=0 D=0 
+00023 [L195] CALL     A=2 B=2 C=2 D=514 
+00024 [L195] KSTR     A=3 B=0 C=3 D=3 '\n'
+00025 [L195] GGET     A=4 B=0 C=4 D=4 'debug'
+00026 [L195] TGETS    A=4 B=4 C=5 D=1029 'traceback'
+00027 [L195] CALL     A=4 B=2 C=1 D=513 
+00028 [L195] CAT      A=2 B=2 C=4 D=516 
+00029 [L195] CALL     A=1 B=1 C=2 D=258 
+00030 [L196] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0xcac source_lines=213-217 params=0
+UPVALUES ['xpcall', 'main_init']
+00001 [L215] UGET     A=0 B=0 C=0 D=0 xpcall
+00002 [L216] MOV      A=1 B=0 C=0 D=0 
+00003 [L216] UGET     A=2 B=0 C=1 D=1 main_init
+00004 [L216] GGET     A=3 B=0 C=0 D=0 '__G__TRACKBACK__'
+00005 [L216] CALL     A=1 B=1 C=3 D=259 
+00006 [L217] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto7 offset=0xd07 source_lines=0-226 params=0
+UPVALUES []
+00001 [L7] GGET     A=0 B=0 C=0 D=0 'CCApplication'
+00002 [L8] GGET     A=1 B=0 C=1 D=1 'require'
+00003 [L8] KSTR     A=2 B=0 C=2 D=2 'common.utils'
+00004 [L8] CALL     A=1 B=2 C=2 D=514 
+00005 [L9] MOV      A=3 B=0 C=0 D=0 
+00006 [L9] TGETS    A=2 B=0 C=3 D=3 'sharedApplication'
+00007 [L9] CALL     A=2 B=2 C=2 D=514 
+00008 [L9] MOV      A=3 B=0 C=2 D=2 
+00009 [L9] TGETS    A=2 B=2 C=4 D=516 'getTargetPlatform'
+00010 [L9] CALL     A=2 B=2 C=2 D=514 
+00011 [L9] ISNEN    A=2 B=0 C=0 D=0 0
+00012 [L9] JMP      A=2 B=128 C=1 D=32769 target=14
+00013 [L9] JMP      A=2 B=128 C=7 D=32775 target=21
+00014 [L12] TGETS    A=2 B=1 C=5 D=261 'isLuaC'
+00015 [L12] CALL     A=2 B=2 C=1 D=513 
+00016 [L12] IST      A=0 B=0 C=2 D=2 
+00017 [L12] JMP      A=2 B=128 C=3 D=32771 target=21
+00018 [L13] GGET     A=2 B=0 C=6 D=6 'jit'
+00019 [L13] TGETS    A=2 B=2 C=7 D=519 'off'
+00020 [L13] CALL     A=2 B=1 C=1 D=257 
+00021 [L18] GGET     A=2 B=0 C=8 D=8 'package'
+00022 [L18] TGETS    A=2 B=2 C=9 D=521 'path'
+00023 [L18] LEN      A=2 B=0 C=2 D=2 
+00024 [L18] KSHORT   A=3 B=0 C=0 D=0 0
+00025 [L18] ISGT     A=2 B=0 C=3 D=3 
+00026 [L18] JMP      A=2 B=128 C=10 D=32778 target=37
+00027 [L19] GGET     A=2 B=0 C=8 D=8 'package'
+00028 [L19] KSTR     A=3 B=0 C=10 D=10 '../assets/lua/?.data;lua/?.data;../lua/?.data;./lua/?.data;../?.data;'
+00029 [L19] TSETS    A=3 B=2 C=9 D=521 'path'
+00030 [L20] GGET     A=2 B=0 C=8 D=8 'package'
+00031 [L20] GGET     A=3 B=0 C=8 D=8 'package'
+00032 [L20] TGETS    A=3 B=3 C=9 D=777 'path'
+00033 [L20] KSTR     A=4 B=0 C=11 D=11 '../assets/lua/?.lua;lua/?.lua;../lua/?.lua;./lua/?.lua;../?.lua;'
+00034 [L20] CAT      A=3 B=3 C=4 D=772 
+00035 [L20] TSETS    A=3 B=2 C=9 D=521 'path'
+00036 [L20] JMP      A=2 B=128 C=12 D=32780 target=49
+00037 [L22] GGET     A=2 B=0 C=8 D=8 'package'
+00038 [L22] GGET     A=3 B=0 C=8 D=8 'package'
+00039 [L22] TGETS    A=3 B=3 C=9 D=777 'path'
+00040 [L22] KSTR     A=4 B=0 C=12 D=12 ';../assets/lua/?.data;lua/?.data;../lua/?.data;./lua/?.data;../?.data;'
+00041 [L22] CAT      A=3 B=3 C=4 D=772 
+00042 [L22] TSETS    A=3 B=2 C=9 D=521 'path'
+00043 [L23] GGET     A=2 B=0 C=8 D=8 'package'
+00044 [L23] GGET     A=3 B=0 C=8 D=8 'package'
+00045 [L23] TGETS    A=3 B=3 C=9 D=777 'path'
+00046 [L23] KSTR     A=4 B=0 C=13 D=13 ';../assets/lua/?.lua;lua/?.lua;../lua/?.lua;./lua/?.lua;../?.lua;'
+00047 [L23] CAT      A=3 B=3 C=4 D=772 
+00048 [L23] TSETS    A=3 B=2 C=9 D=521 'path'
+00049 [L27] GGET     A=2 B=0 C=14 D=14 'string'
+00050 [L27] TGETS    A=2 B=2 C=15 D=527 'sub'
+00051 [L27] GGET     A=3 B=0 C=8 D=8 'package'
+00052 [L27] TGETS    A=3 B=3 C=16 D=784 'cpath'
+00053 [L27] KSHORT   A=4 B=255 C=254 D=65534 -2
+00054 [L27] KSHORT   A=5 B=255 C=255 D=65535 -1
+00055 [L27] CALL     A=2 B=2 C=4 D=516 
+00056 [L27] ISNES    A=2 B=0 C=17 D=17 'so'
+00057 [L27] JMP      A=2 B=128 C=7 D=32775 target=65
+00058 [L28] GGET     A=2 B=0 C=8 D=8 'package'
+00059 [L28] GGET     A=3 B=0 C=8 D=8 'package'
+00060 [L28] TGETS    A=3 B=3 C=16 D=784 'cpath'
+00061 [L28] KSTR     A=4 B=0 C=18 D=18 ';../lua/?.so'
+00062 [L28] CAT      A=3 B=3 C=4 D=772 
+00063 [L28] TSETS    A=3 B=2 C=16 D=528 'cpath'
+00064 [L28] JMP      A=2 B=128 C=6 D=32774 target=71
+00065 [L30] GGET     A=2 B=0 C=8 D=8 'package'
+00066 [L30] GGET     A=3 B=0 C=8 D=8 'package'
+00067 [L30] TGETS    A=3 B=3 C=16 D=784 'cpath'
+00068 [L30] KSTR     A=4 B=0 C=19 D=19 './?.dll;../lua/?.dll'
+00069 [L30] CAT      A=3 B=3 C=4 D=772 
+00070 [L30] TSETS    A=3 B=2 C=16 D=528 'cpath'
+00071 [L34] GGET     A=2 B=0 C=20 D=20 'math'
+00072 [L35] GGET     A=3 B=0 C=21 D=21 'CCLuaLog'
+00073 [L36] GGET     A=4 B=0 C=22 D=22 'table'
+00074 [L37] GGET     A=5 B=0 C=23 D=23 'pairs'
+00075 [L38] GGET     A=6 B=0 C=14 D=14 'string'
+00076 [L40] GGET     A=7 B=0 C=24 D=24 'CCString'
+00077 [L41] GGET     A=8 B=0 C=25 D=25 'main_server'
+00078 [L42] GGET     A=9 B=0 C=26 D=26 'CCFileUtils'
+00079 [L43] GGET     A=10 B=0 C=27 D=27 'os'
+00080 [L44] GGET     A=11 B=0 C=28 D=28 '_G'
+00081 [L47] GGET     A=12 B=0 C=1 D=1 'require'
+00082 [L47] KSTR     A=13 B=0 C=29 D=29 'ui.quitUI'
+00083 [L47] CALL     A=12 B=2 C=2 D=514 
+00084 [L49] GGET     A=13 B=0 C=1 D=1 'require'
+00085 [L49] KSTR     A=14 B=0 C=30 D=30 'update.update_ms'
+00086 [L49] CALL     A=13 B=2 C=2 D=514 
+00087 [L50] IST      A=0 B=0 C=13 D=13 
+00088 [L50] JMP      A=14 B=128 C=3 D=32771 target=92
+00089 [L51] MOV      A=14 B=0 C=3 D=3 
+00090 [L51] KSTR     A=15 B=0 C=31 D=31 'mg_update load update_ms fail.'
+00091 [L51] CALL     A=14 B=1 C=2 D=258 
+00092 [L57] FNEW     A=14 B=0 C=32 D=32 {'kind': 'proto', 'id': 0}
+00093 [L90] FNEW     A=15 B=0 C=33 D=33 {'kind': 'proto', 'id': 1}
+00094 [L165] FNEW     A=16 B=0 C=34 D=34 {'kind': 'proto', 'id': 2}
+00095 [L96] GSET     A=16 B=0 C=35 D=35 'main_entrance'
+00096 [L174] FNEW     A=16 B=0 C=36 D=36 {'kind': 'proto', 'id': 3}
+00097 [L171] GSET     A=16 B=0 C=37 D=37 'error_handler'
+00098 [L178] KSHORT   A=16 B=0 C=0 D=0 0
+00099 [L178] GSET     A=16 B=0 C=38 D=38 'g_last_report_error_time'
+00100 [L188] FNEW     A=16 B=0 C=39 D=39 {'kind': 'proto', 'id': 4}
+00101 [L179] GSET     A=16 B=0 C=40 D=40 'report_error'
+00102 [L196] FNEW     A=16 B=0 C=41 D=41 {'kind': 'proto', 'id': 5}
+00103 [L190] GSET     A=16 B=0 C=42 D=42 '__G__TRACKBACK__'
+00104 [L204] GGET     A=16 B=0 C=43 D=43 'xpcall'
+00105 [L204] MOV      A=17 B=0 C=15 D=15 
+00106 [L204] GGET     A=18 B=0 C=42 D=42 '__G__TRACKBACK__'
+00107 [L204] CALL     A=16 B=1 C=3 D=259 
+00108 [L208] GGET     A=16 B=0 C=43 D=43 'xpcall'
+00109 [L210] GGET     A=17 B=0 C=44 D=44 'module'
+00110 [L210] KSTR     A=18 B=0 C=45 D=45 'mg_update'
+00111 [L210] CALL     A=17 B=1 C=2 D=258 
+00112 [L217] FNEW     A=17 B=0 C=46 D=46 {'kind': 'proto', 'id': 6}
+00113 [L213] GSET     A=17 B=0 C=47 D=47 'call_init_game'
+00114 [L217] UCLO     A=0 B=128 C=0 D=32768 target=115
+00115 [L217] RET0     A=0 B=0 C=1 D=1 

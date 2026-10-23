@@ -1,0 +1,176 @@
+{
+  "date": "2026-10-23",
+  "timezone": "Asia/Shanghai",
+  "unit_tests": 13,
+  "existing_tests": 17,
+  "sessions": [
+    {
+      "path": ".runtime/observations/20261023T141236Z-4149fd3a",
+      "metadata": {
+        "package": "com.sygame.jingubang.p360",
+        "serial": "emulator-5562",
+        "device": {
+          "serial": "emulator-5562",
+          "android": "6.0",
+          "abis": "armeabi-v7a,armeabi",
+          "abis32": "armeabi-v7a,armeabi",
+          "required_abis": [
+            "armeabi"
+          ],
+          "booted": true,
+          "compatible": true,
+          "issue": null
+        },
+        "mode": "snapshot",
+        "hook_requested": false,
+        "session": "20261023T141236Z-4149fd3a",
+        "started_at": "2026-10-23T14:12:36.528+00:00",
+        "schema": 1
+      },
+      "summary": {
+        "session": "20261023T141236Z-4149fd3a",
+        "ended_at": "2026-10-23T14:12:42.692+00:00",
+        "events": 3369,
+        "counts": {
+          "observer": 3,
+          "level:I": 101,
+          "android": 145,
+          "level:W": 7,
+          "engine": 3091,
+          "level:D": 3254,
+          "lua": 130,
+          "level:E": 7
+        },
+        "retention": {
+          "max_bytes": 8388608,
+          "backups": 4
+        }
+      },
+      "hook_status": [],
+      "print_hook_ready": false,
+      "smoke_results": []
+    },
+    {
+      "path": ".runtime/observations/20261023T141712Z-501bbb57",
+      "metadata": {
+        "package": "com.sygame.jingubang.p360",
+        "serial": "emulator-5562",
+        "device": {
+          "serial": "emulator-5562",
+          "android": "6.0",
+          "abis": "armeabi-v7a,armeabi",
+          "abis32": "armeabi-v7a,armeabi",
+          "required_abis": [
+            "armeabi"
+          ],
+          "booted": true,
+          "compatible": true,
+          "issue": null
+        },
+        "mode": "collect",
+        "hook_requested": true,
+        "session": "20261023T141712Z-501bbb57",
+        "started_at": "2026-10-23T14:17:12.532+00:00",
+        "schema": 1
+      },
+      "summary": {
+        "session": "20261023T141712Z-501bbb57",
+        "ended_at": "2026-10-23T14:17:25.621+00:00",
+        "events": 10,
+        "counts": {
+          "observer": 9,
+          "level:I": 10,
+          "android": 1
+        },
+        "retention": {
+          "max_bytes": 8388608,
+          "backups": 4
+        }
+      },
+      "hook_status": [
+        {
+          "type": "hook_status",
+          "library": "libxiyoujilua.so",
+          "installed": [
+            "lua_pcall",
+            "luaL_openlibs",
+            "luaL_loadbuffer",
+            "luaL_loadfile",
+            "lua_resume",
+            "lua_close"
+          ],
+          "missing": [],
+          "errors": []
+        }
+      ],
+      "print_hook_ready": true,
+      "smoke_results": []
+    },
+    {
+      "path": ".runtime/observations/20261023T142031Z-b584d1cc",
+      "metadata": {
+        "mode": "isolated_lua_smoke",
+        "package": "com.sygame.jingubang.p360",
+        "serial": "emulator-5562",
+        "session": "20261023T142031Z-b584d1cc",
+        "started_at": "2026-10-23T14:20:31.640+00:00",
+        "schema": 1
+      },
+      "summary": {
+        "session": "20261023T142031Z-b584d1cc",
+        "ended_at": "2026-10-23T14:20:32.876+00:00",
+        "events": 11,
+        "counts": {
+          "observer": 6,
+          "level:I": 8,
+          "lua": 5,
+          "level:D": 1,
+          "level:E": 2
+        },
+        "retention": {
+          "max_bytes": 8388608,
+          "backups": 4
+        }
+      },
+      "hook_status": [
+        {
+          "type": "hook_status",
+          "library": "libxiyoujilua.so",
+          "installed": [
+            "lua_pcall",
+            "luaL_openlibs",
+            "luaL_loadbuffer",
+            "luaL_loadfile",
+            "lua_resume",
+            "lua_close"
+          ],
+          "missing": [],
+          "errors": []
+        }
+      ],
+      "print_hook_ready": true,
+      "smoke_results": [
+        {
+          "initialTop": 0,
+          "load": 0,
+          "call": 2,
+          "errorTop": 1,
+          "invalidLoad": 3,
+          "invalidTop": 1
+        }
+      ]
+    }
+  ],
+  "lifecycle_check": {
+    "signal_exit": 0,
+    "rotation_files": 3,
+    "replay_exit": 0,
+    "summary_events": 172,
+    "path": ".runtime/observer/lifecycle-check/20261023T142308Z-a18361ae"
+  },
+  "cleanup": {
+    "hook_detached": true,
+    "verification_server_stopped": true,
+    "game_processes_remain": true
+  }
+}

@@ -1,0 +1,1537 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\23ef252d0e6cb29df1721be5fd919bc1.data'; root=proto28
+
+FUNCTION proto0 offset=0x4a source_lines=41-43 params=0
+UPVALUES ['CCLuaLog', 'string']
+00001 [L42] UGET     A=0 B=0 C=0 D=0 CCLuaLog
+00002 [L42] UGET     A=1 B=0 C=1 D=1 string
+00003 [L42] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L42] VARG     A=2 B=0 C=0 D=0 
+00005 [L42] CALLM    A=1 B=0 C=0 D=0 
+00006 [L42] CALLM    A=0 B=1 C=0 D=256 
+00007 [L43] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x94 source_lines=80-84 params=0
+UPVALUES ['cclog']
+00001 [L81] GGET     A=0 B=0 C=0 D=0 'g_self'
+00002 [L81] TGETS    A=0 B=0 C=1 D=1 'stat'
+00003 [L81] KSHORT   A=1 B=0 C=1 D=1 1
+00004 [L81] TSETS    A=1 B=0 C=2 D=2 'crash_flag'
+00005 [L82] GGET     A=0 B=0 C=3 D=3 'saveReportToFile'
+00006 [L82] CALL     A=0 B=1 C=1 D=257 
+00007 [L83] UGET     A=0 B=0 C=0 D=0 cclog
+00008 [L83] KSTR     A=1 B=0 C=4 D=4 'set CrashFlag'
+00009 [L83] CALL     A=0 B=1 C=2 D=258 
+00010 [L84] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto2 offset=0x110 source_lines=87-91 params=0
+UPVALUES ['cclog']
+00001 [L88] GGET     A=0 B=0 C=0 D=0 'g_self'
+00002 [L88] TGETS    A=0 B=0 C=1 D=1 'stat'
+00003 [L88] KSHORT   A=1 B=0 C=0 D=0 0
+00004 [L88] TSETS    A=1 B=0 C=2 D=2 'crash_flag'
+00005 [L89] GGET     A=0 B=0 C=3 D=3 'saveReportToFile'
+00006 [L89] CALL     A=0 B=1 C=1 D=257 
+00007 [L90] UGET     A=0 B=0 C=0 D=0 cclog
+00008 [L90] KSTR     A=1 B=0 C=4 D=4 'clean CrashFlag'
+00009 [L90] CALL     A=0 B=1 C=2 D=258 
+00010 [L91] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto3 offset=0x18f source_lines=94-103 params=0
+UPVALUES []
+00001 [L96] GGET     A=0 B=0 C=0 D=0 'g_self'
+00002 [L96] TGETS    A=0 B=0 C=1 D=1 'stat'
+00003 [L96] TGETS    A=0 B=0 C=2 D=2 'net'
+00004 [L96] KSHORT   A=1 B=0 C=0 D=0 0
+00005 [L96] TSETS    A=1 B=0 C=3 D=3 'login_cost_time'
+00006 [L97] GGET     A=0 B=0 C=0 D=0 'g_self'
+00007 [L97] TGETS    A=0 B=0 C=1 D=1 'stat'
+00008 [L97] TGETS    A=0 B=0 C=2 D=2 'net'
+00009 [L97] KSHORT   A=1 B=0 C=0 D=0 0
+00010 [L97] TSETS    A=1 B=0 C=4 D=4 'req_all_time'
+00011 [L98] GGET     A=0 B=0 C=0 D=0 'g_self'
+00012 [L98] TGETS    A=0 B=0 C=1 D=1 'stat'
+00013 [L98] TGETS    A=0 B=0 C=2 D=2 'net'
+00014 [L98] KSHORT   A=1 B=0 C=0 D=0 0
+00015 [L98] TSETS    A=1 B=0 C=5 D=5 'req_count'
+00016 [L99] GGET     A=0 B=0 C=0 D=0 'g_self'
+00017 [L99] TGETS    A=0 B=0 C=1 D=1 'stat'
+00018 [L99] TGETS    A=0 B=0 C=2 D=2 'net'
+00019 [L99] KSHORT   A=1 B=0 C=0 D=0 0
+00020 [L99] TSETS    A=1 B=0 C=6 D=6 'timeout_count'
+00021 [L100] GGET     A=0 B=0 C=0 D=0 'g_self'
+00022 [L100] TGETS    A=0 B=0 C=1 D=1 'stat'
+00023 [L100] KSHORT   A=1 B=0 C=0 D=0 0
+00024 [L100] TSETS    A=1 B=0 C=7 D=7 'login_count'
+00025 [L102] GGET     A=0 B=0 C=0 D=0 'g_self'
+00026 [L102] TGETS    A=0 B=0 C=1 D=1 'stat'
+00027 [L102] KSHORT   A=1 B=0 C=0 D=0 0
+00028 [L102] TSETS    A=1 B=0 C=8 D=8 'update_zip_fail'
+00029 [L103] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto4 offset=0x28d source_lines=106-108 params=0
+UPVALUES []
+00001 [L107] GGET     A=0 B=0 C=0 D=0 'g_self'
+00002 [L107] TGETS    A=0 B=0 C=1 D=1 'stat'
+00003 [L107] TGETS    A=0 B=0 C=2 D=2 'net'
+00004 [L107] GGET     A=1 B=0 C=0 D=0 'g_self'
+00005 [L107] TGETS    A=1 B=1 C=1 D=257 'stat'
+00006 [L107] TGETS    A=1 B=1 C=2 D=258 'net'
+00007 [L107] TGETS    A=1 B=1 C=3 D=259 'req_count'
+00008 [L107] ADDVN    A=1 B=1 C=0 D=256 
+00009 [L107] TSETS    A=1 B=0 C=3 D=3 'req_count'
+00010 [L108] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto5 offset=0x2e7 source_lines=113-122 params=1
+UPVALUES ['os']
+00001 [L114] GGET     A=1 B=0 C=0 D=0 'g_self'
+00002 [L114] TGETS    A=1 B=1 C=1 D=257 'stat'
+00003 [L114] TGETS    A=1 B=1 C=2 D=258 'net'
+00004 [L114] GGET     A=2 B=0 C=0 D=0 'g_self'
+00005 [L114] TGETS    A=2 B=2 C=1 D=513 'stat'
+00006 [L114] TGETS    A=2 B=2 C=2 D=514 'net'
+00007 [L114] TGETS    A=2 B=2 C=3 D=515 'req_all_time'
+00008 [L114] ADDVV    A=2 B=2 C=0 D=512 
+00009 [L114] TSETS    A=2 B=1 C=3 D=259 'req_all_time'
+00010 [L116] UGET     A=1 B=0 C=0 D=0 os
+00011 [L116] TGETS    A=1 B=1 C=4 D=260 'time'
+00012 [L116] CALL     A=1 B=2 C=1 D=513 
+00013 [L117] GGET     A=2 B=0 C=0 D=0 'g_self'
+00014 [L117] TGETS    A=2 B=2 C=5 D=517 'write_file_time'
+00015 [L117] SUBVV    A=2 B=1 C=2 D=258 
+00016 [L117] KSHORT   A=3 B=1 C=44 D=300 300
+00017 [L117] ISGE     A=3 B=0 C=2 D=2 
+00018 [L117] JMP      A=2 B=128 C=4 D=32772 target=23
+00019 [L118] GGET     A=2 B=0 C=0 D=0 'g_self'
+00020 [L118] TSETS    A=1 B=2 C=5 D=517 'write_file_time'
+00021 [L120] GGET     A=2 B=0 C=6 D=6 'saveReportToFile'
+00022 [L120] CALL     A=2 B=1 C=1 D=257 
+00023 [L122] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x3c4 source_lines=126-128 params=0
+UPVALUES []
+00001 [L127] GGET     A=0 B=0 C=0 D=0 'g_self'
+00002 [L127] TGETS    A=0 B=0 C=1 D=1 'stat'
+00003 [L127] TGETS    A=0 B=0 C=2 D=2 'net'
+00004 [L127] GGET     A=1 B=0 C=0 D=0 'g_self'
+00005 [L127] TGETS    A=1 B=1 C=1 D=257 'stat'
+00006 [L127] TGETS    A=1 B=1 C=2 D=258 'net'
+00007 [L127] TGETS    A=1 B=1 C=3 D=259 'timeout_count'
+00008 [L127] ADDVN    A=1 B=1 C=0 D=256 
+00009 [L127] TSETS    A=1 B=0 C=3 D=3 'timeout_count'
+00010 [L128] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto7 offset=0x422 source_lines=132-162 params=0
+UPVALUES ['tonumber', 'd_u', 'd_setting', 'd_tp_config']
+00001 [L134] GGET     A=0 B=0 C=0 D=0 'setConstant'
+00002 [L134] CALL     A=0 B=1 C=1 D=257 
+00003 [L136] KSHORT   A=0 B=0 C=0 D=0 0
+00004 [L137] UGET     A=1 B=0 C=0 D=0 tonumber
+00005 [L137] GGET     A=2 B=0 C=1 D=1 'g_self'
+00006 [L137] TGETS    A=2 B=2 C=2 D=514 'stat'
+00007 [L137] TGETS    A=2 B=2 C=3 D=515 'net'
+00008 [L137] TGETS    A=2 B=2 C=4 D=516 'req_count'
+00009 [L137] CALL     A=1 B=2 C=2 D=514 
+00010 [L137] KSHORT   A=2 B=0 C=0 D=0 0
+00011 [L137] ISGE     A=2 B=0 C=1 D=1 
+00012 [L137] JMP      A=1 B=128 C=13 D=32781 target=26
+00013 [L138] UGET     A=1 B=0 C=0 D=0 tonumber
+00014 [L138] GGET     A=2 B=0 C=1 D=1 'g_self'
+00015 [L138] TGETS    A=2 B=2 C=2 D=514 'stat'
+00016 [L138] TGETS    A=2 B=2 C=3 D=515 'net'
+00017 [L138] TGETS    A=2 B=2 C=5 D=517 'req_all_time'
+00018 [L138] CALL     A=1 B=2 C=2 D=514 
+00019 [L138] UGET     A=2 B=0 C=0 D=0 tonumber
+00020 [L138] GGET     A=3 B=0 C=1 D=1 'g_self'
+00021 [L138] TGETS    A=3 B=3 C=2 D=770 'stat'
+00022 [L138] TGETS    A=3 B=3 C=3 D=771 'net'
+00023 [L138] TGETS    A=3 B=3 C=4 D=772 'req_count'
+00024 [L138] CALL     A=2 B=2 C=2 D=514 
+00025 [L138] DIVVV    A=0 B=1 C=2 D=258 
+00026 [L141] KSTR     A=1 B=0 C=6 D=6 'login_cost_time='
+00027 [L141] UGET     A=2 B=0 C=1 D=1 d_u
+00028 [L141] TGETS    A=2 B=2 C=7 D=519 'codeForUrl'
+00029 [L141] GGET     A=3 B=0 C=1 D=1 'g_self'
+00030 [L141] TGETS    A=3 B=3 C=2 D=770 'stat'
+00031 [L141] TGETS    A=3 B=3 C=3 D=771 'net'
+00032 [L141] TGETS    A=3 B=3 C=8 D=776 'login_cost_time'
+00033 [L141] CALL     A=2 B=2 C=2 D=514 
+00034 [L141] CAT      A=1 B=1 C=2 D=258 
+00035 [L142] MOV      A=2 B=0 C=1 D=1 
+00036 [L142] KSTR     A=3 B=0 C=9 D=9 '&req_avg_time='
+00037 [L142] MOV      A=4 B=0 C=0 D=0 
+00038 [L142] CAT      A=1 B=2 C=4 D=516 
+00039 [L143] MOV      A=2 B=0 C=1 D=1 
+00040 [L143] KSTR     A=3 B=0 C=10 D=10 '&req_id='
+00041 [L143] UGET     A=4 B=0 C=1 D=1 d_u
+00042 [L143] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00043 [L143] GGET     A=5 B=0 C=1 D=1 'g_self'
+00044 [L143] TGETS    A=5 B=5 C=2 D=1282 'stat'
+00045 [L143] TGETS    A=5 B=5 C=11 D=1291 'req_id'
+00046 [L143] CALL     A=4 B=2 C=2 D=514 
+00047 [L143] CAT      A=1 B=2 C=4 D=516 
+00048 [L144] MOV      A=2 B=0 C=1 D=1 
+00049 [L144] KSTR     A=3 B=0 C=12 D=12 '&req_count='
+00050 [L144] UGET     A=4 B=0 C=1 D=1 d_u
+00051 [L144] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00052 [L144] GGET     A=5 B=0 C=1 D=1 'g_self'
+00053 [L144] TGETS    A=5 B=5 C=2 D=1282 'stat'
+00054 [L144] TGETS    A=5 B=5 C=3 D=1283 'net'
+00055 [L144] TGETS    A=5 B=5 C=4 D=1284 'req_count'
+00056 [L144] CALL     A=4 B=2 C=2 D=514 
+00057 [L144] CAT      A=1 B=2 C=4 D=516 
+00058 [L145] MOV      A=2 B=0 C=1 D=1 
+00059 [L145] KSTR     A=3 B=0 C=13 D=13 '&timeout_count='
+00060 [L145] UGET     A=4 B=0 C=1 D=1 d_u
+00061 [L145] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00062 [L145] GGET     A=5 B=0 C=1 D=1 'g_self'
+00063 [L145] TGETS    A=5 B=5 C=2 D=1282 'stat'
+00064 [L145] TGETS    A=5 B=5 C=3 D=1283 'net'
+00065 [L145] TGETS    A=5 B=5 C=14 D=1294 'timeout_count'
+00066 [L145] CALL     A=4 B=2 C=2 D=514 
+00067 [L145] CAT      A=1 B=2 C=4 D=516 
+00068 [L146] MOV      A=2 B=0 C=1 D=1 
+00069 [L146] KSTR     A=3 B=0 C=15 D=15 '&screen_w='
+00070 [L146] UGET     A=4 B=0 C=1 D=1 d_u
+00071 [L146] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00072 [L146] GGET     A=5 B=0 C=1 D=1 'g_self'
+00073 [L146] TGETS    A=5 B=5 C=2 D=1282 'stat'
+00074 [L146] TGETS    A=5 B=5 C=16 D=1296 'screen'
+00075 [L146] TGETS    A=5 B=5 C=17 D=1297 'w'
+00076 [L146] CALL     A=4 B=2 C=2 D=514 
+00077 [L146] CAT      A=1 B=2 C=4 D=516 
+00078 [L147] MOV      A=2 B=0 C=1 D=1 
+00079 [L147] KSTR     A=3 B=0 C=18 D=18 '&screen_h='
+00080 [L147] UGET     A=4 B=0 C=1 D=1 d_u
+00081 [L147] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00082 [L147] GGET     A=5 B=0 C=1 D=1 'g_self'
+00083 [L147] TGETS    A=5 B=5 C=2 D=1282 'stat'
+00084 [L147] TGETS    A=5 B=5 C=16 D=1296 'screen'
+00085 [L147] TGETS    A=5 B=5 C=19 D=1299 'h'
+00086 [L147] CALL     A=4 B=2 C=2 D=514 
+00087 [L147] CAT      A=1 B=2 C=4 D=516 
+00088 [L148] MOV      A=2 B=0 C=1 D=1 
+00089 [L148] KSTR     A=3 B=0 C=20 D=20 '&os_type='
+00090 [L148] UGET     A=4 B=0 C=1 D=1 d_u
+00091 [L148] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00092 [L148] GGET     A=5 B=0 C=1 D=1 'g_self'
+00093 [L148] TGETS    A=5 B=5 C=2 D=1282 'stat'
+00094 [L148] TGETS    A=5 B=5 C=21 D=1301 'os_type'
+00095 [L148] CALL     A=4 B=2 C=2 D=514 
+00096 [L148] CAT      A=1 B=2 C=4 D=516 
+00097 [L149] MOV      A=2 B=0 C=1 D=1 
+00098 [L149] KSTR     A=3 B=0 C=22 D=22 '&mobile_type='
+00099 [L149] UGET     A=4 B=0 C=1 D=1 d_u
+00100 [L149] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00101 [L149] GGET     A=5 B=0 C=1 D=1 'g_self'
+00102 [L149] TGETS    A=5 B=5 C=2 D=1282 'stat'
+00103 [L149] TGETS    A=5 B=5 C=23 D=1303 'mobile_type'
+00104 [L149] CALL     A=4 B=2 C=2 D=514 
+00105 [L149] CAT      A=1 B=2 C=4 D=516 
+00106 [L150] MOV      A=2 B=0 C=1 D=1 
+00107 [L150] KSTR     A=3 B=0 C=24 D=24 '&pf_type='
+00108 [L150] UGET     A=4 B=0 C=1 D=1 d_u
+00109 [L150] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00110 [L150] GGET     A=5 B=0 C=1 D=1 'g_self'
+00111 [L150] TGETS    A=5 B=5 C=2 D=1282 'stat'
+00112 [L150] TGETS    A=5 B=5 C=25 D=1305 'pf_type'
+00113 [L150] IST      A=0 B=0 C=5 D=5 
+00114 [L150] JMP      A=6 B=128 C=1 D=32769 target=116
+00115 [L150] KSTR     A=5 B=0 C=26 D=26 'unknow'
+00116 [L150] CALL     A=4 B=2 C=2 D=514 
+00117 [L150] CAT      A=1 B=2 C=4 D=516 
+00118 [L151] MOV      A=2 B=0 C=1 D=1 
+00119 [L151] KSTR     A=3 B=0 C=27 D=27 '&app_id='
+00120 [L151] UGET     A=4 B=0 C=1 D=1 d_u
+00121 [L151] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00122 [L151] GGET     A=5 B=0 C=1 D=1 'g_self'
+00123 [L151] TGETS    A=5 B=5 C=2 D=1282 'stat'
+00124 [L151] TGETS    A=5 B=5 C=28 D=1308 'app_id'
+00125 [L151] IST      A=0 B=0 C=5 D=5 
+00126 [L151] JMP      A=6 B=128 C=1 D=32769 target=128
+00127 [L151] KSTR     A=5 B=0 C=26 D=26 'unknow'
+00128 [L151] CALL     A=4 B=2 C=2 D=514 
+00129 [L151] CAT      A=1 B=2 C=4 D=516 
+00130 [L152] MOV      A=2 B=0 C=1 D=1 
+00131 [L152] KSTR     A=3 B=0 C=29 D=29 '&sub_id='
+00132 [L152] UGET     A=4 B=0 C=1 D=1 d_u
+00133 [L152] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00134 [L152] GGET     A=5 B=0 C=1 D=1 'g_self'
+00135 [L152] TGETS    A=5 B=5 C=2 D=1282 'stat'
+00136 [L152] TGETS    A=5 B=5 C=30 D=1310 'sub_id'
+00137 [L152] IST      A=0 B=0 C=5 D=5 
+00138 [L152] JMP      A=6 B=128 C=1 D=32769 target=140
+00139 [L152] KSTR     A=5 B=0 C=26 D=26 'unknow'
+00140 [L152] CALL     A=4 B=2 C=2 D=514 
+00141 [L152] CAT      A=1 B=2 C=4 D=516 
+00142 [L153] MOV      A=2 B=0 C=1 D=1 
+00143 [L153] KSTR     A=3 B=0 C=31 D=31 '&mac='
+00144 [L153] UGET     A=4 B=0 C=1 D=1 d_u
+00145 [L153] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00146 [L153] GGET     A=5 B=0 C=1 D=1 'g_self'
+00147 [L153] TGETS    A=5 B=5 C=2 D=1282 'stat'
+00148 [L153] TGETS    A=5 B=5 C=32 D=1312 'mac'
+00149 [L153] IST      A=0 B=0 C=5 D=5 
+00150 [L153] JMP      A=6 B=128 C=1 D=32769 target=152
+00151 [L153] KSTR     A=5 B=0 C=26 D=26 'unknow'
+00152 [L153] CALL     A=4 B=2 C=2 D=514 
+00153 [L153] CAT      A=1 B=2 C=4 D=516 
+00154 [L154] MOV      A=2 B=0 C=1 D=1 
+00155 [L154] KSTR     A=3 B=0 C=33 D=33 '&net_type='
+00156 [L154] UGET     A=4 B=0 C=1 D=1 d_u
+00157 [L154] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00158 [L154] GGET     A=5 B=0 C=1 D=1 'g_self'
+00159 [L154] TGETS    A=5 B=5 C=2 D=1282 'stat'
+00160 [L154] TGETS    A=5 B=5 C=34 D=1314 'net_type'
+00161 [L154] CALL     A=4 B=2 C=2 D=514 
+00162 [L154] CAT      A=1 B=2 C=4 D=516 
+00163 [L155] MOV      A=2 B=0 C=1 D=1 
+00164 [L155] KSTR     A=3 B=0 C=35 D=35 '&login_count='
+00165 [L155] UGET     A=4 B=0 C=1 D=1 d_u
+00166 [L155] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00167 [L155] GGET     A=5 B=0 C=1 D=1 'g_self'
+00168 [L155] TGETS    A=5 B=5 C=2 D=1282 'stat'
+00169 [L155] TGETS    A=5 B=5 C=36 D=1316 'login_count'
+00170 [L155] CALL     A=4 B=2 C=2 D=514 
+00171 [L155] CAT      A=1 B=2 C=4 D=516 
+00172 [L156] MOV      A=2 B=0 C=1 D=1 
+00173 [L156] KSTR     A=3 B=0 C=37 D=37 '&crash_flag='
+00174 [L156] UGET     A=4 B=0 C=1 D=1 d_u
+00175 [L156] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00176 [L156] GGET     A=5 B=0 C=1 D=1 'g_self'
+00177 [L156] TGETS    A=5 B=5 C=2 D=1282 'stat'
+00178 [L156] TGETS    A=5 B=5 C=38 D=1318 'crash_flag'
+00179 [L156] IST      A=0 B=0 C=5 D=5 
+00180 [L156] JMP      A=6 B=128 C=1 D=32769 target=182
+00181 [L156] KSHORT   A=5 B=0 C=0 D=0 0
+00182 [L156] CALL     A=4 B=2 C=2 D=514 
+00183 [L156] CAT      A=1 B=2 C=4 D=516 
+00184 [L157] MOV      A=2 B=0 C=1 D=1 
+00185 [L157] KSTR     A=3 B=0 C=39 D=39 '&update_zip_fail='
+00186 [L157] UGET     A=4 B=0 C=1 D=1 d_u
+00187 [L157] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00188 [L157] GGET     A=5 B=0 C=1 D=1 'g_self'
+00189 [L157] TGETS    A=5 B=5 C=2 D=1282 'stat'
+00190 [L157] TGETS    A=5 B=5 C=40 D=1320 'update_zip_fail'
+00191 [L157] IST      A=0 B=0 C=5 D=5 
+00192 [L157] JMP      A=6 B=128 C=1 D=32769 target=194
+00193 [L157] KSHORT   A=5 B=0 C=0 D=0 0
+00194 [L157] CALL     A=4 B=2 C=2 D=514 
+00195 [L157] CAT      A=1 B=2 C=4 D=516 
+00196 [L158] MOV      A=2 B=0 C=1 D=1 
+00197 [L158] KSTR     A=3 B=0 C=41 D=41 '&role_id='
+00198 [L158] UGET     A=4 B=0 C=1 D=1 d_u
+00199 [L158] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00200 [L158] UGET     A=5 B=0 C=2 D=2 d_setting
+00201 [L158] TGETS    A=5 B=5 C=42 D=1322 'g_setting'
+00202 [L158] TGETS    A=5 B=5 C=43 D=1323 'role_id'
+00203 [L158] IST      A=0 B=0 C=5 D=5 
+00204 [L158] JMP      A=6 B=128 C=1 D=32769 target=206
+00205 [L158] KSTR     A=5 B=0 C=44 D=44 ''
+00206 [L158] CALL     A=4 B=2 C=2 D=514 
+00207 [L158] CAT      A=1 B=2 C=4 D=516 
+00208 [L159] MOV      A=2 B=0 C=1 D=1 
+00209 [L159] KSTR     A=3 B=0 C=45 D=45 '&server_id='
+00210 [L159] UGET     A=4 B=0 C=1 D=1 d_u
+00211 [L159] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00212 [L159] UGET     A=5 B=0 C=2 D=2 d_setting
+00213 [L159] TGETS    A=5 B=5 C=42 D=1322 'g_setting'
+00214 [L159] TGETS    A=5 B=5 C=46 D=1326 'server_id'
+00215 [L159] IST      A=0 B=0 C=5 D=5 
+00216 [L159] JMP      A=6 B=128 C=1 D=32769 target=218
+00217 [L159] KSHORT   A=5 B=0 C=0 D=0 0
+00218 [L159] CALL     A=4 B=2 C=2 D=514 
+00219 [L159] CAT      A=1 B=2 C=4 D=516 
+00220 [L160] MOV      A=2 B=0 C=1 D=1 
+00221 [L160] KSTR     A=3 B=0 C=47 D=47 '&ad_channel='
+00222 [L160] UGET     A=4 B=0 C=1 D=1 d_u
+00223 [L160] TGETS    A=4 B=4 C=7 D=1031 'codeForUrl'
+00224 [L160] UGET     A=5 B=0 C=3 D=3 d_tp_config
+00225 [L160] TGETS    A=5 B=5 C=48 D=1328 'getAdChannel'
+00226 [L160] CALL     A=5 B=0 C=1 D=1 
+00227 [L160] CALLM    A=4 B=2 C=0 D=512 
+00228 [L160] CAT      A=1 B=2 C=4 D=516 
+00229 [L161] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto8 offset=0xada source_lines=166-183 params=0
+UPVALUES ['d_u', 'd_setting']
+00001 [L168] GGET     A=0 B=0 C=0 D=0 'setConstant'
+00002 [L168] CALL     A=0 B=1 C=1 D=257 
+00003 [L170] KSTR     A=0 B=0 C=1 D=1 ''
+00004 [L171] MOV      A=1 B=0 C=0 D=0 
+00005 [L171] KSTR     A=2 B=0 C=2 D=2 'screen_w='
+00006 [L171] UGET     A=3 B=0 C=0 D=0 d_u
+00007 [L171] TGETS    A=3 B=3 C=3 D=771 'codeForUrl'
+00008 [L171] GGET     A=4 B=0 C=4 D=4 'g_self'
+00009 [L171] TGETS    A=4 B=4 C=5 D=1029 'stat'
+00010 [L171] TGETS    A=4 B=4 C=6 D=1030 'screen'
+00011 [L171] TGETS    A=4 B=4 C=7 D=1031 'w'
+00012 [L171] CALL     A=3 B=2 C=2 D=514 
+00013 [L171] CAT      A=0 B=1 C=3 D=259 
+00014 [L172] MOV      A=1 B=0 C=0 D=0 
+00015 [L172] KSTR     A=2 B=0 C=8 D=8 '&screen_h='
+00016 [L172] UGET     A=3 B=0 C=0 D=0 d_u
+00017 [L172] TGETS    A=3 B=3 C=3 D=771 'codeForUrl'
+00018 [L172] GGET     A=4 B=0 C=4 D=4 'g_self'
+00019 [L172] TGETS    A=4 B=4 C=5 D=1029 'stat'
+00020 [L172] TGETS    A=4 B=4 C=6 D=1030 'screen'
+00021 [L172] TGETS    A=4 B=4 C=9 D=1033 'h'
+00022 [L172] CALL     A=3 B=2 C=2 D=514 
+00023 [L172] CAT      A=0 B=1 C=3 D=259 
+00024 [L173] MOV      A=1 B=0 C=0 D=0 
+00025 [L173] KSTR     A=2 B=0 C=10 D=10 '&os_type='
+00026 [L173] UGET     A=3 B=0 C=0 D=0 d_u
+00027 [L173] TGETS    A=3 B=3 C=3 D=771 'codeForUrl'
+00028 [L173] GGET     A=4 B=0 C=4 D=4 'g_self'
+00029 [L173] TGETS    A=4 B=4 C=5 D=1029 'stat'
+00030 [L173] TGETS    A=4 B=4 C=11 D=1035 'os_type'
+00031 [L173] CALL     A=3 B=2 C=2 D=514 
+00032 [L173] CAT      A=0 B=1 C=3 D=259 
+00033 [L174] MOV      A=1 B=0 C=0 D=0 
+00034 [L174] KSTR     A=2 B=0 C=12 D=12 '&mobile_type='
+00035 [L174] UGET     A=3 B=0 C=0 D=0 d_u
+00036 [L174] TGETS    A=3 B=3 C=3 D=771 'codeForUrl'
+00037 [L174] GGET     A=4 B=0 C=4 D=4 'g_self'
+00038 [L174] TGETS    A=4 B=4 C=5 D=1029 'stat'
+00039 [L174] TGETS    A=4 B=4 C=13 D=1037 'mobile_type'
+00040 [L174] CALL     A=3 B=2 C=2 D=514 
+00041 [L174] CAT      A=0 B=1 C=3 D=259 
+00042 [L175] MOV      A=1 B=0 C=0 D=0 
+00043 [L175] KSTR     A=2 B=0 C=14 D=14 '&pf_type='
+00044 [L175] UGET     A=3 B=0 C=0 D=0 d_u
+00045 [L175] TGETS    A=3 B=3 C=3 D=771 'codeForUrl'
+00046 [L175] GGET     A=4 B=0 C=4 D=4 'g_self'
+00047 [L175] TGETS    A=4 B=4 C=5 D=1029 'stat'
+00048 [L175] TGETS    A=4 B=4 C=15 D=1039 'pf_type'
+00049 [L175] IST      A=0 B=0 C=4 D=4 
+00050 [L175] JMP      A=5 B=128 C=1 D=32769 target=52
+00051 [L175] KSTR     A=4 B=0 C=16 D=16 'unknow'
+00052 [L175] CALL     A=3 B=2 C=2 D=514 
+00053 [L175] CAT      A=0 B=1 C=3 D=259 
+00054 [L176] MOV      A=1 B=0 C=0 D=0 
+00055 [L176] KSTR     A=2 B=0 C=17 D=17 '&app_id='
+00056 [L176] UGET     A=3 B=0 C=0 D=0 d_u
+00057 [L176] TGETS    A=3 B=3 C=3 D=771 'codeForUrl'
+00058 [L176] GGET     A=4 B=0 C=4 D=4 'g_self'
+00059 [L176] TGETS    A=4 B=4 C=5 D=1029 'stat'
+00060 [L176] TGETS    A=4 B=4 C=18 D=1042 'app_id'
+00061 [L176] IST      A=0 B=0 C=4 D=4 
+00062 [L176] JMP      A=5 B=128 C=1 D=32769 target=64
+00063 [L176] KSTR     A=4 B=0 C=16 D=16 'unknow'
+00064 [L176] CALL     A=3 B=2 C=2 D=514 
+00065 [L176] CAT      A=0 B=1 C=3 D=259 
+00066 [L177] MOV      A=1 B=0 C=0 D=0 
+00067 [L177] KSTR     A=2 B=0 C=19 D=19 '&sub_id='
+00068 [L177] UGET     A=3 B=0 C=0 D=0 d_u
+00069 [L177] TGETS    A=3 B=3 C=3 D=771 'codeForUrl'
+00070 [L177] GGET     A=4 B=0 C=4 D=4 'g_self'
+00071 [L177] TGETS    A=4 B=4 C=5 D=1029 'stat'
+00072 [L177] TGETS    A=4 B=4 C=20 D=1044 'sub_id'
+00073 [L177] IST      A=0 B=0 C=4 D=4 
+00074 [L177] JMP      A=5 B=128 C=1 D=32769 target=76
+00075 [L177] KSTR     A=4 B=0 C=16 D=16 'unknow'
+00076 [L177] CALL     A=3 B=2 C=2 D=514 
+00077 [L177] CAT      A=0 B=1 C=3 D=259 
+00078 [L178] MOV      A=1 B=0 C=0 D=0 
+00079 [L178] KSTR     A=2 B=0 C=21 D=21 '&mac='
+00080 [L178] UGET     A=3 B=0 C=0 D=0 d_u
+00081 [L178] TGETS    A=3 B=3 C=3 D=771 'codeForUrl'
+00082 [L178] GGET     A=4 B=0 C=4 D=4 'g_self'
+00083 [L178] TGETS    A=4 B=4 C=5 D=1029 'stat'
+00084 [L178] TGETS    A=4 B=4 C=22 D=1046 'mac'
+00085 [L178] IST      A=0 B=0 C=4 D=4 
+00086 [L178] JMP      A=5 B=128 C=1 D=32769 target=88
+00087 [L178] KSTR     A=4 B=0 C=16 D=16 'unknow'
+00088 [L178] CALL     A=3 B=2 C=2 D=514 
+00089 [L178] CAT      A=0 B=1 C=3 D=259 
+00090 [L179] MOV      A=1 B=0 C=0 D=0 
+00091 [L179] KSTR     A=2 B=0 C=23 D=23 '&net_type='
+00092 [L179] UGET     A=3 B=0 C=0 D=0 d_u
+00093 [L179] TGETS    A=3 B=3 C=3 D=771 'codeForUrl'
+00094 [L179] GGET     A=4 B=0 C=4 D=4 'g_self'
+00095 [L179] TGETS    A=4 B=4 C=5 D=1029 'stat'
+00096 [L179] TGETS    A=4 B=4 C=24 D=1048 'net_type'
+00097 [L179] CALL     A=3 B=2 C=2 D=514 
+00098 [L179] CAT      A=0 B=1 C=3 D=259 
+00099 [L180] MOV      A=1 B=0 C=0 D=0 
+00100 [L180] KSTR     A=2 B=0 C=25 D=25 '&role_id='
+00101 [L180] UGET     A=3 B=0 C=0 D=0 d_u
+00102 [L180] TGETS    A=3 B=3 C=3 D=771 'codeForUrl'
+00103 [L180] UGET     A=4 B=0 C=1 D=1 d_setting
+00104 [L180] TGETS    A=4 B=4 C=26 D=1050 'g_setting'
+00105 [L180] TGETS    A=4 B=4 C=27 D=1051 'role_id'
+00106 [L180] IST      A=0 B=0 C=4 D=4 
+00107 [L180] JMP      A=5 B=128 C=1 D=32769 target=109
+00108 [L180] KSTR     A=4 B=0 C=1 D=1 ''
+00109 [L180] CALL     A=3 B=2 C=2 D=514 
+00110 [L180] CAT      A=0 B=1 C=3 D=259 
+00111 [L181] MOV      A=1 B=0 C=0 D=0 
+00112 [L181] KSTR     A=2 B=0 C=28 D=28 '&server_id='
+00113 [L181] UGET     A=3 B=0 C=0 D=0 d_u
+00114 [L181] TGETS    A=3 B=3 C=3 D=771 'codeForUrl'
+00115 [L181] UGET     A=4 B=0 C=1 D=1 d_setting
+00116 [L181] TGETS    A=4 B=4 C=26 D=1050 'g_setting'
+00117 [L181] TGETS    A=4 B=4 C=29 D=1053 'server_id'
+00118 [L181] IST      A=0 B=0 C=4 D=4 
+00119 [L181] JMP      A=5 B=128 C=1 D=32769 target=121
+00120 [L181] KSHORT   A=4 B=0 C=0 D=0 0
+00121 [L181] CALL     A=3 B=2 C=2 D=514 
+00122 [L181] CAT      A=0 B=1 C=3 D=259 
+00123 [L182] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto9 offset=0xe61 source_lines=187-199 params=0
+UPVALUES ['d_u', 'd_setting']
+00001 [L188] KSTR     A=0 B=0 C=0 D=0 ''
+00002 [L189] MOV      A=1 B=0 C=0 D=0 
+00003 [L189] KSTR     A=2 B=0 C=1 D=1 'system='
+00004 [L189] UGET     A=3 B=0 C=0 D=0 d_u
+00005 [L189] TGETS    A=3 B=3 C=2 D=770 'codeForUrl'
+00006 [L189] GGET     A=4 B=0 C=3 D=3 'g_self'
+00007 [L189] TGETS    A=4 B=4 C=4 D=1028 'stat'
+00008 [L189] TGETS    A=4 B=4 C=5 D=1029 'os_type'
+00009 [L189] CALL     A=3 B=2 C=2 D=514 
+00010 [L189] CAT      A=0 B=1 C=3 D=259 
+00011 [L190] MOV      A=1 B=0 C=0 D=0 
+00012 [L190] KSTR     A=2 B=0 C=6 D=6 '&mobile_type='
+00013 [L190] UGET     A=3 B=0 C=0 D=0 d_u
+00014 [L190] TGETS    A=3 B=3 C=2 D=770 'codeForUrl'
+00015 [L190] GGET     A=4 B=0 C=3 D=3 'g_self'
+00016 [L190] TGETS    A=4 B=4 C=4 D=1028 'stat'
+00017 [L190] TGETS    A=4 B=4 C=7 D=1031 'mobile_type'
+00018 [L190] CALL     A=3 B=2 C=2 D=514 
+00019 [L190] CAT      A=0 B=1 C=3 D=259 
+00020 [L191] MOV      A=1 B=0 C=0 D=0 
+00021 [L191] KSTR     A=2 B=0 C=8 D=8 '&pf_type='
+00022 [L191] UGET     A=3 B=0 C=0 D=0 d_u
+00023 [L191] TGETS    A=3 B=3 C=2 D=770 'codeForUrl'
+00024 [L191] GGET     A=4 B=0 C=3 D=3 'g_self'
+00025 [L191] TGETS    A=4 B=4 C=4 D=1028 'stat'
+00026 [L191] TGETS    A=4 B=4 C=9 D=1033 'pf_type'
+00027 [L191] IST      A=0 B=0 C=4 D=4 
+00028 [L191] JMP      A=5 B=128 C=1 D=32769 target=30
+00029 [L191] KSTR     A=4 B=0 C=10 D=10 'unknow'
+00030 [L191] CALL     A=3 B=2 C=2 D=514 
+00031 [L191] CAT      A=0 B=1 C=3 D=259 
+00032 [L192] MOV      A=1 B=0 C=0 D=0 
+00033 [L192] KSTR     A=2 B=0 C=11 D=11 '&device_num='
+00034 [L192] UGET     A=3 B=0 C=0 D=0 d_u
+00035 [L192] TGETS    A=3 B=3 C=2 D=770 'codeForUrl'
+00036 [L192] GGET     A=4 B=0 C=3 D=3 'g_self'
+00037 [L192] TGETS    A=4 B=4 C=4 D=1028 'stat'
+00038 [L192] TGETS    A=4 B=4 C=12 D=1036 'app_id'
+00039 [L192] IST      A=0 B=0 C=4 D=4 
+00040 [L192] JMP      A=5 B=128 C=1 D=32769 target=42
+00041 [L192] KSTR     A=4 B=0 C=10 D=10 'unknow'
+00042 [L192] CALL     A=3 B=2 C=2 D=514 
+00043 [L192] CAT      A=0 B=1 C=3 D=259 
+00044 [L193] MOV      A=1 B=0 C=0 D=0 
+00045 [L193] KSTR     A=2 B=0 C=13 D=13 '&sub_id='
+00046 [L193] UGET     A=3 B=0 C=0 D=0 d_u
+00047 [L193] TGETS    A=3 B=3 C=2 D=770 'codeForUrl'
+00048 [L193] GGET     A=4 B=0 C=3 D=3 'g_self'
+00049 [L193] TGETS    A=4 B=4 C=4 D=1028 'stat'
+00050 [L193] TGETS    A=4 B=4 C=14 D=1038 'sub_id'
+00051 [L193] IST      A=0 B=0 C=4 D=4 
+00052 [L193] JMP      A=5 B=128 C=1 D=32769 target=54
+00053 [L193] KSTR     A=4 B=0 C=10 D=10 'unknow'
+00054 [L193] CALL     A=3 B=2 C=2 D=514 
+00055 [L193] CAT      A=0 B=1 C=3 D=259 
+00056 [L194] MOV      A=1 B=0 C=0 D=0 
+00057 [L194] KSTR     A=2 B=0 C=15 D=15 '&mac='
+00058 [L194] UGET     A=3 B=0 C=0 D=0 d_u
+00059 [L194] TGETS    A=3 B=3 C=2 D=770 'codeForUrl'
+00060 [L194] GGET     A=4 B=0 C=3 D=3 'g_self'
+00061 [L194] TGETS    A=4 B=4 C=4 D=1028 'stat'
+00062 [L194] TGETS    A=4 B=4 C=16 D=1040 'mac'
+00063 [L194] IST      A=0 B=0 C=4 D=4 
+00064 [L194] JMP      A=5 B=128 C=1 D=32769 target=66
+00065 [L194] KSTR     A=4 B=0 C=10 D=10 'unknow'
+00066 [L194] CALL     A=3 B=2 C=2 D=514 
+00067 [L194] CAT      A=0 B=1 C=3 D=259 
+00068 [L195] MOV      A=1 B=0 C=0 D=0 
+00069 [L195] KSTR     A=2 B=0 C=17 D=17 '&net_type='
+00070 [L195] UGET     A=3 B=0 C=0 D=0 d_u
+00071 [L195] TGETS    A=3 B=3 C=2 D=770 'codeForUrl'
+00072 [L195] GGET     A=4 B=0 C=3 D=3 'g_self'
+00073 [L195] TGETS    A=4 B=4 C=4 D=1028 'stat'
+00074 [L195] TGETS    A=4 B=4 C=18 D=1042 'net_type'
+00075 [L195] CALL     A=3 B=2 C=2 D=514 
+00076 [L195] CAT      A=0 B=1 C=3 D=259 
+00077 [L196] MOV      A=1 B=0 C=0 D=0 
+00078 [L196] KSTR     A=2 B=0 C=19 D=19 '&user_account='
+00079 [L196] UGET     A=3 B=0 C=0 D=0 d_u
+00080 [L196] TGETS    A=3 B=3 C=2 D=770 'codeForUrl'
+00081 [L196] UGET     A=4 B=0 C=1 D=1 d_setting
+00082 [L196] TGETS    A=4 B=4 C=20 D=1044 'g_setting'
+00083 [L196] TGETS    A=4 B=4 C=21 D=1045 'role_id'
+00084 [L196] IST      A=0 B=0 C=4 D=4 
+00085 [L196] JMP      A=5 B=128 C=1 D=32769 target=87
+00086 [L196] KSTR     A=4 B=0 C=0 D=0 ''
+00087 [L196] CALL     A=3 B=2 C=2 D=514 
+00088 [L196] CAT      A=0 B=1 C=3 D=259 
+00089 [L197] MOV      A=1 B=0 C=0 D=0 
+00090 [L197] KSTR     A=2 B=0 C=22 D=22 '&server_id='
+00091 [L197] UGET     A=3 B=0 C=0 D=0 d_u
+00092 [L197] TGETS    A=3 B=3 C=2 D=770 'codeForUrl'
+00093 [L197] UGET     A=4 B=0 C=1 D=1 d_setting
+00094 [L197] TGETS    A=4 B=4 C=20 D=1044 'g_setting'
+00095 [L197] TGETS    A=4 B=4 C=23 D=1047 'server_id'
+00096 [L197] IST      A=0 B=0 C=4 D=4 
+00097 [L197] JMP      A=5 B=128 C=1 D=32769 target=99
+00098 [L197] KSHORT   A=4 B=0 C=0 D=0 0
+00099 [L197] CALL     A=3 B=2 C=2 D=514 
+00100 [L197] CAT      A=0 B=1 C=3 D=259 
+00101 [L198] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto10 offset=0x1154 source_lines=205-214 params=0
+UPVALUES ['d_u', 'cclog']
+00001 [L206] UGET     A=0 B=0 C=0 D=0 d_u
+00002 [L206] TGETS    A=0 B=0 C=0 D=0 'codeCharBase64'
+00003 [L206] GGET     A=1 B=0 C=1 D=1 'g_self'
+00004 [L206] TGETS    A=1 B=1 C=2 D=258 'stat'
+00005 [L206] TGETS    A=1 B=1 C=3 D=259 'net_type'
+00006 [L206] IST      A=0 B=0 C=1 D=1 
+00007 [L206] JMP      A=2 B=128 C=1 D=32769 target=9
+00008 [L206] KSTR     A=1 B=0 C=4 D=4 'unknow'
+00009 [L206] CALL     A=0 B=2 C=2 D=514 
+00010 [L207] MOV      A=1 B=0 C=0 D=0 
+00011 [L207] KSTR     A=2 B=0 C=5 D=5 '&'
+00012 [L207] UGET     A=3 B=0 C=0 D=0 d_u
+00013 [L207] TGETS    A=3 B=3 C=0 D=768 'codeCharBase64'
+00014 [L207] GGET     A=4 B=0 C=1 D=1 'g_self'
+00015 [L207] TGETS    A=4 B=4 C=2 D=1026 'stat'
+00016 [L207] TGETS    A=4 B=4 C=6 D=1030 'mobile_type'
+00017 [L207] IST      A=0 B=0 C=4 D=4 
+00018 [L207] JMP      A=5 B=128 C=1 D=32769 target=20
+00019 [L207] KSTR     A=4 B=0 C=4 D=4 'unknow'
+00020 [L207] CALL     A=3 B=2 C=2 D=514 
+00021 [L207] CAT      A=0 B=1 C=3 D=259 
+00022 [L208] MOV      A=1 B=0 C=0 D=0 
+00023 [L208] KSTR     A=2 B=0 C=5 D=5 '&'
+00024 [L208] UGET     A=3 B=0 C=0 D=0 d_u
+00025 [L208] TGETS    A=3 B=3 C=0 D=768 'codeCharBase64'
+00026 [L208] GGET     A=4 B=0 C=1 D=1 'g_self'
+00027 [L208] TGETS    A=4 B=4 C=2 D=1026 'stat'
+00028 [L208] TGETS    A=4 B=4 C=7 D=1031 'app_id'
+00029 [L208] IST      A=0 B=0 C=4 D=4 
+00030 [L208] JMP      A=5 B=128 C=1 D=32769 target=32
+00031 [L208] KSTR     A=4 B=0 C=4 D=4 'unknow'
+00032 [L208] CALL     A=3 B=2 C=2 D=514 
+00033 [L208] CAT      A=0 B=1 C=3 D=259 
+00034 [L209] MOV      A=1 B=0 C=0 D=0 
+00035 [L209] KSTR     A=2 B=0 C=5 D=5 '&'
+00036 [L209] UGET     A=3 B=0 C=0 D=0 d_u
+00037 [L209] TGETS    A=3 B=3 C=0 D=768 'codeCharBase64'
+00038 [L209] GGET     A=4 B=0 C=1 D=1 'g_self'
+00039 [L209] TGETS    A=4 B=4 C=2 D=1026 'stat'
+00040 [L209] TGETS    A=4 B=4 C=8 D=1032 'mac'
+00041 [L209] IST      A=0 B=0 C=4 D=4 
+00042 [L209] JMP      A=5 B=128 C=1 D=32769 target=44
+00043 [L209] KSTR     A=4 B=0 C=4 D=4 'unknow'
+00044 [L209] CALL     A=3 B=2 C=2 D=514 
+00045 [L209] CAT      A=0 B=1 C=3 D=259 
+00046 [L210] MOV      A=1 B=0 C=0 D=0 
+00047 [L210] KSTR     A=2 B=0 C=5 D=5 '&'
+00048 [L210] UGET     A=3 B=0 C=0 D=0 d_u
+00049 [L210] TGETS    A=3 B=3 C=0 D=768 'codeCharBase64'
+00050 [L210] GGET     A=4 B=0 C=1 D=1 'g_self'
+00051 [L210] TGETS    A=4 B=4 C=2 D=1026 'stat'
+00052 [L210] TGETS    A=4 B=4 C=9 D=1033 'pf_type'
+00053 [L210] IST      A=0 B=0 C=4 D=4 
+00054 [L210] JMP      A=5 B=128 C=1 D=32769 target=56
+00055 [L210] KSTR     A=4 B=0 C=4 D=4 'unknow'
+00056 [L210] CALL     A=3 B=2 C=2 D=514 
+00057 [L210] CAT      A=0 B=1 C=3 D=259 
+00058 [L211] MOV      A=1 B=0 C=0 D=0 
+00059 [L211] KSTR     A=2 B=0 C=5 D=5 '&'
+00060 [L211] UGET     A=3 B=0 C=0 D=0 d_u
+00061 [L211] TGETS    A=3 B=3 C=0 D=768 'codeCharBase64'
+00062 [L211] GGET     A=4 B=0 C=1 D=1 'g_self'
+00063 [L211] TGETS    A=4 B=4 C=2 D=1026 'stat'
+00064 [L211] TGETS    A=4 B=4 C=10 D=1034 'ad_channel'
+00065 [L211] IST      A=0 B=0 C=4 D=4 
+00066 [L211] JMP      A=5 B=128 C=1 D=32769 target=68
+00067 [L211] KSTR     A=4 B=0 C=4 D=4 'unknow'
+00068 [L211] CALL     A=3 B=2 C=2 D=514 
+00069 [L211] CAT      A=0 B=1 C=3 D=259 
+00070 [L212] UGET     A=1 B=0 C=1 D=1 cclog
+00071 [L212] KSTR     A=2 B=0 C=11 D=11 'call getGsReportParams, ret=[%s]'
+00072 [L212] MOV      A=3 B=0 C=0 D=0 
+00073 [L212] CALL     A=1 B=1 C=3 D=259 
+00074 [L213] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto11 offset=0x1360 source_lines=218-245 params=0
+UPVALUES ['cclog']
+00001 [L220] GGET     A=0 B=0 C=0 D=0 'readReportFromFile'
+00002 [L220] CALL     A=0 B=1 C=1 D=257 
+00003 [L222] UGET     A=0 B=0 C=0 D=0 cclog
+00004 [L222] KSTR     A=1 B=0 C=1 D=1 'call getReportUrlParams'
+00005 [L222] CALL     A=0 B=1 C=2 D=258 
+00006 [L223] GGET     A=0 B=0 C=2 D=2 'static_tostring'
+00007 [L223] CALL     A=0 B=2 C=1 D=513 
+00008 [L224] LEN      A=1 B=0 C=0 D=0 
+00009 [L224] KSHORT   A=2 B=0 C=0 D=0 0
+00010 [L224] ISGE     A=2 B=0 C=1 D=1 
+00011 [L224] JMP      A=1 B=128 C=3 D=32771 target=15
+00012 [L225] KSTR     A=1 B=0 C=3 D=3 '?'
+00013 [L225] MOV      A=2 B=0 C=0 D=0 
+00014 [L225] CAT      A=0 B=1 C=2 D=258 
+00015 [L228] GGET     A=1 B=0 C=4 D=4 'g_self'
+00016 [L228] TGETS    A=1 B=1 C=5 D=261 'stat'
+00017 [L228] TGETS    A=1 B=1 C=6 D=262 'first_open_app'
+00018 [L228] ISNEN    A=1 B=0 C=0 D=0 1
+00019 [L228] JMP      A=1 B=128 C=3 D=32771 target=23
+00020 [L229] MOV      A=1 B=0 C=0 D=0 
+00021 [L229] KSTR     A=2 B=0 C=7 D=7 '&first_open_app=1'
+00022 [L229] CAT      A=0 B=1 C=2 D=258 
+00023 [L232] UGET     A=1 B=0 C=0 D=0 cclog
+00024 [L232] KSTR     A=2 B=0 C=8 D=8 'stat_info = %s'
+00025 [L232] MOV      A=3 B=0 C=0 D=0 
+00026 [L232] CALL     A=1 B=1 C=3 D=259 
+00027 [L242] GGET     A=1 B=0 C=9 D=9 'setCrashFlag'
+00028 [L242] CALL     A=1 B=1 C=1 D=257 
+00029 [L244] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto12 offset=0x149a source_lines=250-266 params=1
+UPVALUES ['string', 'main_server', 'd_u']
+00001 [L251] KSTR     A=1 B=0 C=0 D=0 ''
+00002 [L252] LEN      A=2 B=0 C=0 D=0 
+00003 [L252] KSHORT   A=3 B=0 C=0 D=0 0
+00004 [L252] ISGE     A=3 B=0 C=2 D=2 
+00005 [L252] JMP      A=2 B=128 C=34 D=32802 target=40
+00006 [L253] UGET     A=2 B=0 C=0 D=0 string
+00007 [L253] TGETS    A=2 B=2 C=1 D=513 'sub'
+00008 [L253] MOV      A=3 B=0 C=0 D=0 
+00009 [L253] KSHORT   A=4 B=0 C=1 D=1 1
+00010 [L253] KSHORT   A=5 B=7 C=8 D=1800 1800
+00011 [L253] CALL     A=2 B=2 C=4 D=516 
+00012 [L253] MOV      A=0 B=0 C=2 D=2 
+00013 [L255] KSTR     A=2 B=0 C=0 D=0 ''
+00014 [L256] UGET     A=3 B=0 C=1 D=1 main_server
+00015 [L256] TGETS    A=3 B=3 C=2 D=770 'get_app_id'
+00016 [L256] ISF      A=0 B=0 C=3 D=3 
+00017 [L256] JMP      A=4 B=128 C=3 D=32771 target=21
+00018 [L257] GGET     A=3 B=0 C=3 D=3 'get_brief_info_tostring'
+00019 [L257] CALL     A=3 B=2 C=1 D=513 
+00020 [L257] MOV      A=2 B=0 C=3 D=3 
+00021 [L259] LEN      A=3 B=0 C=2 D=2 
+00022 [L259] KSHORT   A=4 B=0 C=0 D=0 0
+00023 [L259] ISGE     A=4 B=0 C=3 D=3 
+00024 [L259] JMP      A=3 B=128 C=9 D=32777 target=34
+00025 [L260] KSTR     A=3 B=0 C=4 D=4 '?'
+00026 [L260] MOV      A=4 B=0 C=2 D=2 
+00027 [L260] KSTR     A=5 B=0 C=5 D=5 '&le='
+00028 [L260] UGET     A=6 B=0 C=2 D=2 d_u
+00029 [L260] TGETS    A=6 B=6 C=6 D=1542 'codeCharBase64'
+00030 [L260] MOV      A=7 B=0 C=0 D=0 
+00031 [L260] CALL     A=6 B=2 C=2 D=514 
+00032 [L260] CAT      A=1 B=3 C=6 D=774 
+00033 [L260] JMP      A=3 B=128 C=6 D=32774 target=40
+00034 [L262] KSTR     A=3 B=0 C=7 D=7 '?le='
+00035 [L262] UGET     A=4 B=0 C=2 D=2 d_u
+00036 [L262] TGETS    A=4 B=4 C=6 D=1030 'codeCharBase64'
+00037 [L262] MOV      A=5 B=0 C=0 D=0 
+00038 [L262] CALL     A=4 B=2 C=2 D=514 
+00039 [L262] CAT      A=1 B=3 C=4 D=772 
+00040 [L265] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto13 offset=0x15e7 source_lines=270-286 params=1
+UPVALUES ['string', 'main_server', 'd_u']
+00001 [L271] KSTR     A=1 B=0 C=0 D=0 ''
+00002 [L272] LEN      A=2 B=0 C=0 D=0 
+00003 [L272] KSHORT   A=3 B=0 C=0 D=0 0
+00004 [L272] ISGE     A=3 B=0 C=2 D=2 
+00005 [L272] JMP      A=2 B=128 C=33 D=32801 target=39
+00006 [L273] UGET     A=2 B=0 C=0 D=0 string
+00007 [L273] TGETS    A=2 B=2 C=1 D=513 'sub'
+00008 [L273] MOV      A=3 B=0 C=0 D=0 
+00009 [L273] KSHORT   A=4 B=0 C=1 D=1 1
+00010 [L273] KSHORT   A=5 B=4 C=0 D=1024 1024
+00011 [L273] CALL     A=2 B=2 C=4 D=516 
+00012 [L273] MOV      A=0 B=0 C=2 D=2 
+00013 [L275] KSTR     A=2 B=0 C=0 D=0 ''
+00014 [L276] UGET     A=3 B=0 C=1 D=1 main_server
+00015 [L276] TGETS    A=3 B=3 C=2 D=770 'get_app_id'
+00016 [L276] ISF      A=0 B=0 C=3 D=3 
+00017 [L276] JMP      A=4 B=128 C=3 D=32771 target=21
+00018 [L277] GGET     A=3 B=0 C=3 D=3 'get_brief_info_tostring_oa'
+00019 [L277] CALL     A=3 B=2 C=1 D=513 
+00020 [L277] MOV      A=2 B=0 C=3 D=3 
+00021 [L279] LEN      A=3 B=0 C=2 D=2 
+00022 [L279] KSHORT   A=4 B=0 C=0 D=0 0
+00023 [L279] ISGE     A=4 B=0 C=3 D=3 
+00024 [L279] JMP      A=3 B=128 C=8 D=32776 target=33
+00025 [L280] MOV      A=3 B=0 C=2 D=2 
+00026 [L280] KSTR     A=4 B=0 C=4 D=4 '&content='
+00027 [L280] UGET     A=5 B=0 C=2 D=2 d_u
+00028 [L280] TGETS    A=5 B=5 C=5 D=1285 'codeCharBase64'
+00029 [L280] MOV      A=6 B=0 C=0 D=0 
+00030 [L280] CALL     A=5 B=2 C=2 D=514 
+00031 [L280] CAT      A=1 B=3 C=5 D=773 
+00032 [L280] JMP      A=3 B=128 C=6 D=32774 target=39
+00033 [L282] KSTR     A=3 B=0 C=6 D=6 'content='
+00034 [L282] UGET     A=4 B=0 C=2 D=2 d_u
+00035 [L282] TGETS    A=4 B=4 C=5 D=1029 'codeCharBase64'
+00036 [L282] MOV      A=5 B=0 C=0 D=0 
+00037 [L282] CALL     A=4 B=2 C=2 D=514 
+00038 [L282] CAT      A=1 B=3 C=4 D=772 
+00039 [L285] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto14 offset=0x1738 source_lines=291-295 params=0
+UPVALUES []
+00001 [L292] GGET     A=0 B=0 C=0 D=0 'clean_stat'
+00002 [L292] CALL     A=0 B=1 C=1 D=257 
+00003 [L293] GGET     A=0 B=0 C=1 D=1 'g_self'
+00004 [L293] TGETS    A=0 B=0 C=2 D=2 'stat'
+00005 [L293] KSHORT   A=1 B=0 C=2 D=2 2
+00006 [L293] TSETS    A=1 B=0 C=3 D=3 'first_open_app'
+00007 [L294] GGET     A=0 B=0 C=4 D=4 'saveReportToFile'
+00008 [L294] CALL     A=0 B=1 C=1 D=257 
+00009 [L295] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto15 offset=0x17a9 source_lines=299-304 params=0
+UPVALUES []
+00001 [L300] GGET     A=0 B=0 C=0 D=0 'g_self'
+00002 [L300] TGETS    A=0 B=0 C=1 D=1 'stat'
+00003 [L300] TGETS    A=0 B=0 C=2 D=2 'update_zip_fail'
+00004 [L300] ISNEN    A=0 B=0 C=0 D=0 0
+00005 [L300] JMP      A=0 B=128 C=6 D=32774 target=12
+00006 [L301] GGET     A=0 B=0 C=0 D=0 'g_self'
+00007 [L301] TGETS    A=0 B=0 C=1 D=1 'stat'
+00008 [L301] KSHORT   A=1 B=0 C=1 D=1 1
+00009 [L301] TSETS    A=1 B=0 C=2 D=2 'update_zip_fail'
+00010 [L302] GGET     A=0 B=0 C=3 D=3 'saveReportToFile'
+00011 [L302] CALL     A=0 B=1 C=1 D=257 
+00012 [L304] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto16 offset=0x1821 source_lines=310-410 params=0
+UPVALUES ['CCDirector', 'cclog', 'd_u', 'main_server', 'd_tp_config', 'tonumber', 'PlatformUtility']
+00001 [L312] GGET     A=0 B=0 C=0 D=0 'g_self'
+00002 [L312] TGETS    A=0 B=0 C=1 D=1 'has_setConstant'
+00003 [L312] ISNEP    A=0 B=0 C=2 D=2 
+00004 [L312] JMP      A=0 B=128 C=1 D=32769 target=6
+00005 [L314] RET0     A=0 B=0 C=1 D=1 
+00006 [L317] GGET     A=0 B=0 C=2 D=2 'readReportFromFile'
+00007 [L317] CALL     A=0 B=1 C=1 D=257 
+00008 [L320] UGET     A=0 B=0 C=0 D=0 CCDirector
+00009 [L320] MOV      A=1 B=0 C=0 D=0 
+00010 [L320] TGETS    A=0 B=0 C=3 D=3 'sharedDirector'
+00011 [L320] CALL     A=0 B=2 C=2 D=514 
+00012 [L320] MOV      A=1 B=0 C=0 D=0 
+00013 [L320] TGETS    A=0 B=0 C=4 D=4 'getOpenGLView'
+00014 [L320] CALL     A=0 B=2 C=2 D=514 
+00015 [L320] MOV      A=1 B=0 C=0 D=0 
+00016 [L320] TGETS    A=0 B=0 C=5 D=5 'getFrameSize'
+00017 [L320] CALL     A=0 B=2 C=2 D=514 
+00018 [L321] GGET     A=1 B=0 C=0 D=0 'g_self'
+00019 [L321] TGETS    A=1 B=1 C=6 D=262 'stat'
+00020 [L321] TNEW     A=2 B=0 C=0 D=0 
+00021 [L321] TSETS    A=2 B=1 C=7 D=263 'screen'
+00022 [L322] GGET     A=1 B=0 C=0 D=0 'g_self'
+00023 [L322] TGETS    A=1 B=1 C=6 D=262 'stat'
+00024 [L322] TGETS    A=1 B=1 C=7 D=263 'screen'
+00025 [L322] TGETS    A=2 B=0 C=9 D=9 'width'
+00026 [L322] TSETS    A=2 B=1 C=8 D=264 'w'
+00027 [L323] GGET     A=1 B=0 C=0 D=0 'g_self'
+00028 [L323] TGETS    A=1 B=1 C=6 D=262 'stat'
+00029 [L323] TGETS    A=1 B=1 C=7 D=263 'screen'
+00030 [L323] TGETS    A=2 B=0 C=11 D=11 'height'
+00031 [L323] TSETS    A=2 B=1 C=10 D=266 'h'
+00032 [L324] UGET     A=1 B=0 C=1 D=1 cclog
+00033 [L324] KSTR     A=2 B=0 C=12 D=12 'get mobile screen = [%d], [%d]'
+00034 [L324] GGET     A=3 B=0 C=0 D=0 'g_self'
+00035 [L324] TGETS    A=3 B=3 C=6 D=774 'stat'
+00036 [L324] TGETS    A=3 B=3 C=7 D=775 'screen'
+00037 [L324] TGETS    A=3 B=3 C=8 D=776 'w'
+00038 [L324] GGET     A=4 B=0 C=0 D=0 'g_self'
+00039 [L324] TGETS    A=4 B=4 C=6 D=1030 'stat'
+00040 [L324] TGETS    A=4 B=4 C=7 D=1031 'screen'
+00041 [L324] TGETS    A=4 B=4 C=10 D=1034 'h'
+00042 [L324] CALL     A=1 B=1 C=4 D=260 
+00043 [L334] UGET     A=1 B=0 C=2 D=2 d_u
+00044 [L334] TGETS    A=1 B=1 C=13 D=269 'getOS'
+00045 [L334] CALL     A=1 B=2 C=1 D=513 
+00046 [L335] ISEQN    A=1 B=0 C=0 D=0 2
+00047 [L335] JMP      A=2 B=128 C=4 D=32772 target=52
+00048 [L335] ISEQN    A=1 B=0 C=1 D=1 4
+00049 [L335] JMP      A=2 B=128 C=2 D=32770 target=52
+00050 [L335] ISNEN    A=1 B=0 C=2 D=2 5
+00051 [L335] JMP      A=2 B=128 C=5 D=32773 target=57
+00052 [L336] GGET     A=2 B=0 C=0 D=0 'g_self'
+00053 [L336] TGETS    A=2 B=2 C=6 D=518 'stat'
+00054 [L336] KSTR     A=3 B=0 C=15 D=15 'Ios'
+00055 [L336] TSETS    A=3 B=2 C=14 D=526 'os_type'
+00056 [L336] JMP      A=2 B=128 C=20 D=32788 target=77
+00057 [L337] ISNEN    A=1 B=0 C=3 D=3 3
+00058 [L337] JMP      A=2 B=128 C=5 D=32773 target=64
+00059 [L338] GGET     A=2 B=0 C=0 D=0 'g_self'
+00060 [L338] TGETS    A=2 B=2 C=6 D=518 'stat'
+00061 [L338] KSTR     A=3 B=0 C=16 D=16 'Android'
+00062 [L338] TSETS    A=3 B=2 C=14 D=526 'os_type'
+00063 [L338] JMP      A=2 B=128 C=13 D=32781 target=77
+00064 [L339] ISNEN    A=1 B=0 C=4 D=4 0
+00065 [L339] JMP      A=2 B=128 C=5 D=32773 target=71
+00066 [L340] GGET     A=2 B=0 C=0 D=0 'g_self'
+00067 [L340] TGETS    A=2 B=2 C=6 D=518 'stat'
+00068 [L340] KSTR     A=3 B=0 C=17 D=17 'Win32'
+00069 [L340] TSETS    A=3 B=2 C=14 D=526 'os_type'
+00070 [L340] JMP      A=2 B=128 C=6 D=32774 target=77
+00071 [L342] GGET     A=2 B=0 C=0 D=0 'g_self'
+00072 [L342] TGETS    A=2 B=2 C=6 D=518 'stat'
+00073 [L342] KSTR     A=3 B=0 C=18 D=18 'unknown_'
+00074 [L342] MOV      A=4 B=0 C=1 D=1 
+00075 [L342] CAT      A=3 B=3 C=4 D=772 
+00076 [L342] TSETS    A=3 B=2 C=14 D=526 'os_type'
+00077 [L346] UGET     A=2 B=0 C=3 D=3 main_server
+00078 [L346] TGETS    A=2 B=2 C=19 D=531 'get_mobile_type'
+00079 [L346] ISF      A=0 B=0 C=2 D=2 
+00080 [L346] JMP      A=3 B=128 C=7 D=32775 target=88
+00081 [L347] GGET     A=2 B=0 C=0 D=0 'g_self'
+00082 [L347] TGETS    A=2 B=2 C=6 D=518 'stat'
+00083 [L347] UGET     A=3 B=0 C=3 D=3 main_server
+00084 [L347] TGETS    A=3 B=3 C=19 D=787 'get_mobile_type'
+00085 [L347] CALL     A=3 B=2 C=1 D=513 
+00086 [L347] TSETS    A=3 B=2 C=20 D=532 'mobile_type'
+00087 [L347] JMP      A=2 B=128 C=4 D=32772 target=92
+00088 [L349] GGET     A=2 B=0 C=0 D=0 'g_self'
+00089 [L349] TGETS    A=2 B=2 C=6 D=518 'stat'
+00090 [L349] KSTR     A=3 B=0 C=21 D=21 'unsupport'
+00091 [L349] TSETS    A=3 B=2 C=20 D=532 'mobile_type'
+00092 [L351] UGET     A=2 B=0 C=1 D=1 cclog
+00093 [L351] KSTR     A=3 B=0 C=22 D=22 'mobile_type='
+00094 [L351] GGET     A=4 B=0 C=0 D=0 'g_self'
+00095 [L351] TGETS    A=4 B=4 C=6 D=1030 'stat'
+00096 [L351] TGETS    A=4 B=4 C=20 D=1044 'mobile_type'
+00097 [L351] CAT      A=3 B=3 C=4 D=772 
+00098 [L351] CALL     A=2 B=1 C=2 D=258 
+00099 [L354] GGET     A=2 B=0 C=0 D=0 'g_self'
+00100 [L354] TGETS    A=2 B=2 C=6 D=518 'stat'
+00101 [L354] UGET     A=3 B=0 C=4 D=4 d_tp_config
+00102 [L354] TGETS    A=3 B=3 C=24 D=792 'getThirdPartyFlag'
+00103 [L354] CALL     A=3 B=2 C=1 D=513 
+00104 [L354] TSETS    A=3 B=2 C=23 D=535 'pf_type'
+00105 [L355] UGET     A=2 B=0 C=1 D=1 cclog
+00106 [L355] KSTR     A=3 B=0 C=25 D=25 'pf_type='
+00107 [L355] GGET     A=4 B=0 C=0 D=0 'g_self'
+00108 [L355] TGETS    A=4 B=4 C=6 D=1030 'stat'
+00109 [L355] TGETS    A=4 B=4 C=23 D=1047 'pf_type'
+00110 [L355] CAT      A=3 B=3 C=4 D=772 
+00111 [L355] CALL     A=2 B=1 C=2 D=258 
+00112 [L359] UGET     A=2 B=0 C=2 D=2 d_u
+00113 [L359] TGETS    A=2 B=2 C=26 D=538 'isWP8'
+00114 [L359] CALL     A=2 B=2 C=1 D=513 
+00115 [L359] ISF      A=0 B=0 C=2 D=2 
+00116 [L359] JMP      A=3 B=128 C=10 D=32778 target=127
+00117 [L360] UGET     A=2 B=0 C=3 D=3 main_server
+00118 [L360] TGETS    A=2 B=2 C=27 D=539 'getTPValue'
+00119 [L360] KSTR     A=3 B=0 C=28 D=28 'getNetworkState'
+00120 [L360] CALL     A=2 B=2 C=2 D=514 
+00121 [L361] GGET     A=3 B=0 C=0 D=0 'g_self'
+00122 [L361] UGET     A=4 B=0 C=5 D=5 tonumber
+00123 [L361] MOV      A=5 B=0 C=2 D=2 
+00124 [L361] CALL     A=4 B=2 C=2 D=514 
+00125 [L361] TSETS    A=4 B=3 C=29 D=797 'netStates'
+00126 [L361] JMP      A=2 B=128 C=6 D=32774 target=133
+00127 [L363] GGET     A=2 B=0 C=0 D=0 'g_self'
+00128 [L363] UGET     A=3 B=0 C=6 D=6 PlatformUtility
+00129 [L363] MOV      A=4 B=0 C=3 D=3 
+00130 [L363] TGETS    A=3 B=3 C=28 D=796 'getNetworkState'
+00131 [L363] CALL     A=3 B=2 C=2 D=514 
+00132 [L363] TSETS    A=3 B=2 C=29 D=541 'netStates'
+00133 [L365] KSTR     A=2 B=0 C=30 D=30 ''
+00134 [L366] GGET     A=3 B=0 C=0 D=0 'g_self'
+00135 [L366] TGETS    A=3 B=3 C=29 D=797 'netStates'
+00136 [L366] ISNEN    A=3 B=0 C=5 D=5 1
+00137 [L366] JMP      A=3 B=128 C=5 D=32773 target=143
+00138 [L367] GGET     A=3 B=0 C=0 D=0 'g_self'
+00139 [L367] TGETS    A=3 B=3 C=6 D=774 'stat'
+00140 [L367] KSTR     A=4 B=0 C=32 D=32 'No_internet'
+00141 [L367] TSETS    A=4 B=3 C=31 D=799 'net_type'
+00142 [L367] JMP      A=3 B=128 C=22 D=32790 target=165
+00143 [L368] GGET     A=3 B=0 C=0 D=0 'g_self'
+00144 [L368] TGETS    A=3 B=3 C=29 D=797 'netStates'
+00145 [L368] ISNEN    A=3 B=0 C=0 D=0 2
+00146 [L368] JMP      A=3 B=128 C=5 D=32773 target=152
+00147 [L369] GGET     A=3 B=0 C=0 D=0 'g_self'
+00148 [L369] TGETS    A=3 B=3 C=6 D=774 'stat'
+00149 [L369] KSTR     A=4 B=0 C=33 D=33 'WIFI'
+00150 [L369] TSETS    A=4 B=3 C=31 D=799 'net_type'
+00151 [L369] JMP      A=3 B=128 C=13 D=32781 target=165
+00152 [L370] GGET     A=3 B=0 C=0 D=0 'g_self'
+00153 [L370] TGETS    A=3 B=3 C=29 D=797 'netStates'
+00154 [L370] ISNEN    A=3 B=0 C=3 D=3 3
+00155 [L370] JMP      A=3 B=128 C=5 D=32773 target=161
+00156 [L371] GGET     A=3 B=0 C=0 D=0 'g_self'
+00157 [L371] TGETS    A=3 B=3 C=6 D=774 'stat'
+00158 [L371] KSTR     A=4 B=0 C=34 D=34 'WWAN'
+00159 [L371] TSETS    A=4 B=3 C=31 D=799 'net_type'
+00160 [L371] JMP      A=3 B=128 C=4 D=32772 target=165
+00161 [L373] GGET     A=3 B=0 C=0 D=0 'g_self'
+00162 [L373] TGETS    A=3 B=3 C=6 D=774 'stat'
+00163 [L373] KSTR     A=4 B=0 C=35 D=35 'unknown_network'
+00164 [L373] TSETS    A=4 B=3 C=31 D=799 'net_type'
+00165 [L376] UGET     A=3 B=0 C=3 D=3 main_server
+00166 [L376] TGETS    A=3 B=3 C=36 D=804 'get_app_id'
+00167 [L376] ISF      A=0 B=0 C=3 D=3 
+00168 [L376] JMP      A=4 B=128 C=39 D=32807 target=208
+00169 [L376] UGET     A=3 B=0 C=3 D=3 main_server
+00170 [L376] TGETS    A=3 B=3 C=37 D=805 'get_subscriber_id'
+00171 [L376] ISF      A=0 B=0 C=3 D=3 
+00172 [L376] JMP      A=4 B=128 C=35 D=32803 target=208
+00173 [L377] GGET     A=3 B=0 C=0 D=0 'g_self'
+00174 [L377] TGETS    A=3 B=3 C=6 D=774 'stat'
+00175 [L377] UGET     A=4 B=0 C=3 D=3 main_server
+00176 [L377] TGETS    A=4 B=4 C=36 D=1060 'get_app_id'
+00177 [L377] CALL     A=4 B=2 C=1 D=513 
+00178 [L377] TSETS    A=4 B=3 C=38 D=806 'app_id'
+00179 [L378] GGET     A=3 B=0 C=0 D=0 'g_self'
+00180 [L378] TGETS    A=3 B=3 C=6 D=774 'stat'
+00181 [L378] UGET     A=4 B=0 C=3 D=3 main_server
+00182 [L378] TGETS    A=4 B=4 C=37 D=1061 'get_subscriber_id'
+00183 [L378] CALL     A=4 B=2 C=1 D=513 
+00184 [L378] TSETS    A=4 B=3 C=39 D=807 'sub_id'
+00185 [L380] GGET     A=3 B=0 C=0 D=0 'g_self'
+00186 [L380] TGETS    A=3 B=3 C=6 D=774 'stat'
+00187 [L380] TGETS    A=3 B=3 C=38 D=806 'app_id'
+00188 [L380] LEN      A=3 B=0 C=3 D=3 
+00189 [L380] KSHORT   A=4 B=0 C=0 D=0 0
+00190 [L380] ISGT     A=3 B=0 C=4 D=4 
+00191 [L380] JMP      A=3 B=128 C=4 D=32772 target=196
+00192 [L380] GGET     A=3 B=0 C=0 D=0 'g_self'
+00193 [L380] TGETS    A=3 B=3 C=6 D=774 'stat'
+00194 [L380] KSTR     A=4 B=0 C=40 D=40 'null'
+00195 [L380] TSETS    A=4 B=3 C=38 D=806 'app_id'
+00196 [L381] GGET     A=3 B=0 C=0 D=0 'g_self'
+00197 [L381] TGETS    A=3 B=3 C=6 D=774 'stat'
+00198 [L381] TGETS    A=3 B=3 C=39 D=807 'sub_id'
+00199 [L381] LEN      A=3 B=0 C=3 D=3 
+00200 [L381] KSHORT   A=4 B=0 C=0 D=0 0
+00201 [L381] ISGT     A=3 B=0 C=4 D=4 
+00202 [L381] JMP      A=3 B=128 C=13 D=32781 target=216
+00203 [L381] GGET     A=3 B=0 C=0 D=0 'g_self'
+00204 [L381] TGETS    A=3 B=3 C=6 D=774 'stat'
+00205 [L381] KSTR     A=4 B=0 C=40 D=40 'null'
+00206 [L381] TSETS    A=4 B=3 C=39 D=807 'sub_id'
+00207 [L381] JMP      A=3 B=128 C=8 D=32776 target=216
+00208 [L384] GGET     A=3 B=0 C=0 D=0 'g_self'
+00209 [L384] TGETS    A=3 B=3 C=6 D=774 'stat'
+00210 [L384] KSTR     A=4 B=0 C=41 D=41 'unknow'
+00211 [L384] TSETS    A=4 B=3 C=38 D=806 'app_id'
+00212 [L385] GGET     A=3 B=0 C=0 D=0 'g_self'
+00213 [L385] TGETS    A=3 B=3 C=6 D=774 'stat'
+00214 [L385] KSTR     A=4 B=0 C=41 D=41 'unknow'
+00215 [L385] TSETS    A=4 B=3 C=39 D=807 'sub_id'
+00216 [L389] UGET     A=3 B=0 C=3 D=3 main_server
+00217 [L389] TGETS    A=3 B=3 C=42 D=810 'get_mac'
+00218 [L389] ISF      A=0 B=0 C=3 D=3 
+00219 [L389] JMP      A=4 B=128 C=23 D=32791 target=243
+00220 [L390] GGET     A=3 B=0 C=0 D=0 'g_self'
+00221 [L390] TGETS    A=3 B=3 C=6 D=774 'stat'
+00222 [L390] UGET     A=4 B=0 C=3 D=3 main_server
+00223 [L390] TGETS    A=4 B=4 C=42 D=1066 'get_mac'
+00224 [L390] CALL     A=4 B=2 C=1 D=513 
+00225 [L390] TSETS    A=4 B=3 C=43 D=811 'mac'
+00226 [L391] GGET     A=3 B=0 C=0 D=0 'g_self'
+00227 [L391] TGETS    A=3 B=3 C=6 D=774 'stat'
+00228 [L391] TGETS    A=3 B=3 C=43 D=811 'mac'
+00229 [L391] ISF      A=0 B=0 C=3 D=3 
+00230 [L391] JMP      A=3 B=128 C=7 D=32775 target=238
+00231 [L391] GGET     A=3 B=0 C=0 D=0 'g_self'
+00232 [L391] TGETS    A=3 B=3 C=6 D=774 'stat'
+00233 [L391] TGETS    A=3 B=3 C=43 D=811 'mac'
+00234 [L391] LEN      A=3 B=0 C=3 D=3 
+00235 [L391] KSHORT   A=4 B=0 C=0 D=0 0
+00236 [L391] ISGT     A=3 B=0 C=4 D=4 
+00237 [L391] JMP      A=3 B=128 C=9 D=32777 target=247
+00238 [L392] GGET     A=3 B=0 C=0 D=0 'g_self'
+00239 [L392] TGETS    A=3 B=3 C=6 D=774 'stat'
+00240 [L392] KSTR     A=4 B=0 C=40 D=40 'null'
+00241 [L392] TSETS    A=4 B=3 C=43 D=811 'mac'
+00242 [L393] JMP      A=3 B=128 C=4 D=32772 target=247
+00243 [L395] GGET     A=3 B=0 C=0 D=0 'g_self'
+00244 [L395] TGETS    A=3 B=3 C=6 D=774 'stat'
+00245 [L395] KSTR     A=4 B=0 C=41 D=41 'unknow'
+00246 [L395] TSETS    A=4 B=3 C=43 D=811 'mac'
+00247 [L400] UGET     A=3 B=0 C=3 D=3 main_server
+00248 [L400] TGETS    A=3 B=3 C=44 D=812 'get_hash_account'
+00249 [L400] ISF      A=0 B=0 C=3 D=3 
+00250 [L400] JMP      A=4 B=128 C=15 D=32783 target=266
+00251 [L401] GGET     A=3 B=0 C=0 D=0 'g_self'
+00252 [L401] TGETS    A=3 B=3 C=6 D=774 'stat'
+00253 [L401] UGET     A=4 B=0 C=3 D=3 main_server
+00254 [L401] TGETS    A=4 B=4 C=44 D=1068 'get_hash_account'
+00255 [L401] GGET     A=5 B=0 C=0 D=0 'g_self'
+00256 [L401] TGETS    A=5 B=5 C=6 D=1286 'stat'
+00257 [L401] TGETS    A=5 B=5 C=38 D=1318 'app_id'
+00258 [L401] KSTR     A=6 B=0 C=46 D=46 'fs'
+00259 [L401] GGET     A=7 B=0 C=0 D=0 'g_self'
+00260 [L401] TGETS    A=7 B=7 C=6 D=1798 'stat'
+00261 [L401] TGETS    A=7 B=7 C=43 D=1835 'mac'
+00262 [L401] CAT      A=5 B=5 C=7 D=1287 
+00263 [L401] CALL     A=4 B=2 C=2 D=514 
+00264 [L401] TSETS    A=4 B=3 C=45 D=813 'req_id'
+00265 [L401] JMP      A=3 B=128 C=4 D=32772 target=270
+00266 [L403] GGET     A=3 B=0 C=0 D=0 'g_self'
+00267 [L403] TGETS    A=3 B=3 C=6 D=774 'stat'
+00268 [L403] KSTR     A=4 B=0 C=41 D=41 'unknow'
+00269 [L403] TSETS    A=4 B=3 C=45 D=813 'req_id'
+00270 [L406] UGET     A=3 B=0 C=1 D=1 cclog
+00271 [L406] KSTR     A=4 B=0 C=47 D=47 'set constant stat ok.'
+00272 [L406] CALL     A=3 B=1 C=2 D=258 
+00273 [L407] GGET     A=3 B=0 C=0 D=0 'g_self'
+00274 [L407] KPRI     A=4 B=0 C=2 D=2 
+00275 [L407] TSETS    A=4 B=3 C=1 D=769 'has_setConstant'
+00276 [L409] GGET     A=3 B=0 C=48 D=48 'saveReportToFile'
+00277 [L409] CALL     A=3 B=1 C=1 D=257 
+00278 [L410] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto17 offset=0x200f source_lines=413-416 params=0
+UPVALUES ['d_u']
+00001 [L414] GGET     A=0 B=0 C=0 D=0 'readReportFromFile'
+00002 [L414] CALL     A=0 B=1 C=1 D=257 
+00003 [L415] GGET     A=0 B=0 C=1 D=1 'g_self'
+00004 [L415] UGET     A=1 B=0 C=0 D=0 d_u
+00005 [L415] TGETS    A=1 B=1 C=3 D=259 'clock_begin'
+00006 [L415] KSHORT   A=2 B=78 C=33 D=20001 20001
+00007 [L415] CALL     A=1 B=2 C=2 D=514 
+00008 [L415] TSETS    A=1 B=0 C=2 D=2 'clock'
+00009 [L416] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto18 offset=0x207c source_lines=420-426 params=0
+UPVALUES ['d_u', 'cclog']
+00001 [L421] GGET     A=0 B=0 C=0 D=0 'g_self'
+00002 [L421] TGETS    A=0 B=0 C=1 D=1 'stat'
+00003 [L421] TGETS    A=0 B=0 C=2 D=2 'net'
+00004 [L421] UGET     A=1 B=0 C=0 D=0 d_u
+00005 [L421] TGETS    A=1 B=1 C=4 D=260 'clock_end'
+00006 [L421] GGET     A=2 B=0 C=0 D=0 'g_self'
+00007 [L421] TGETS    A=2 B=2 C=5 D=517 'clock'
+00008 [L421] KSHORT   A=3 B=78 C=34 D=20002 20002
+00009 [L421] CALL     A=1 B=2 C=3 D=515 
+00010 [L421] TSETS    A=1 B=0 C=3 D=3 'login_cost_time'
+00011 [L422] UGET     A=0 B=0 C=1 D=1 cclog
+00012 [L422] KSTR     A=1 B=0 C=6 D=6 'stat: login_cost_time = [%f]'
+00013 [L422] GGET     A=2 B=0 C=0 D=0 'g_self'
+00014 [L422] TGETS    A=2 B=2 C=1 D=513 'stat'
+00015 [L422] TGETS    A=2 B=2 C=2 D=514 'net'
+00016 [L422] TGETS    A=2 B=2 C=3 D=515 'login_cost_time'
+00017 [L422] CALL     A=0 B=1 C=3 D=259 
+00018 [L425] GGET     A=0 B=0 C=0 D=0 'g_self'
+00019 [L425] TGETS    A=0 B=0 C=1 D=1 'stat'
+00020 [L425] GGET     A=1 B=0 C=0 D=0 'g_self'
+00021 [L425] TGETS    A=1 B=1 C=1 D=257 'stat'
+00022 [L425] TGETS    A=1 B=1 C=7 D=263 'login_count'
+00023 [L425] ADDVN    A=1 B=1 C=0 D=256 
+00024 [L425] TSETS    A=1 B=0 C=7 D=7 'login_count'
+00025 [L426] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto19 offset=0x216f source_lines=430-439 params=0
+UPVALUES ['cclog', 'table', 'CCFileUtils', 'd_file']
+00001 [L431] UGET     A=0 B=0 C=0 D=0 cclog
+00002 [L431] KSTR     A=1 B=0 C=0 D=0 'call saveReportToFile'
+00003 [L431] CALL     A=0 B=1 C=2 D=258 
+00004 [L432] GGET     A=0 B=0 C=1 D=1 'setConstant'
+00005 [L432] CALL     A=0 B=1 C=1 D=257 
+00006 [L433] UGET     A=0 B=0 C=1 D=1 table
+00007 [L433] TGETS    A=0 B=0 C=2 D=2 'tostring'
+00008 [L433] GGET     A=1 B=0 C=3 D=3 'g_self'
+00009 [L433] TGETS    A=1 B=1 C=4 D=260 'stat'
+00010 [L433] CALL     A=0 B=2 C=2 D=514 
+00011 [L437] UGET     A=1 B=0 C=2 D=2 CCFileUtils
+00012 [L437] MOV      A=2 B=0 C=1 D=1 
+00013 [L437] TGETS    A=1 B=1 C=5 D=261 'sharedFileUtils'
+00014 [L437] CALL     A=1 B=2 C=2 D=514 
+00015 [L437] MOV      A=2 B=0 C=1 D=1 
+00016 [L437] TGETS    A=1 B=1 C=6 D=262 'getWriteablePath'
+00017 [L437] CALL     A=1 B=2 C=2 D=514 
+00018 [L437] KSTR     A=2 B=0 C=7 D=7 'setting_w/report.txt'
+00019 [L437] CAT      A=1 B=1 C=2 D=258 
+00020 [L438] UGET     A=2 B=0 C=3 D=3 d_file
+00021 [L438] TGETS    A=2 B=2 C=8 D=520 'writeFile'
+00022 [L438] MOV      A=3 B=0 C=1 D=1 
+00023 [L438] MOV      A=4 B=0 C=0 D=0 
+00024 [L438] CALL     A=2 B=1 C=3 D=259 
+00025 [L439] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto20 offset=0x22b6 source_lines=442-453 params=0
+UPVALUES ['CCFileUtils', 'd_file', 'table']
+00001 [L443] UGET     A=0 B=0 C=0 D=0 CCFileUtils
+00002 [L443] MOV      A=1 B=0 C=0 D=0 
+00003 [L443] TGETS    A=0 B=0 C=0 D=0 'sharedFileUtils'
+00004 [L443] CALL     A=0 B=2 C=2 D=514 
+00005 [L443] MOV      A=1 B=0 C=0 D=0 
+00006 [L443] TGETS    A=0 B=0 C=1 D=1 'getWriteablePath'
+00007 [L443] CALL     A=0 B=2 C=2 D=514 
+00008 [L443] KSTR     A=1 B=0 C=2 D=2 'setting_w/report.txt'
+00009 [L443] CAT      A=0 B=0 C=1 D=1 
+00010 [L444] UGET     A=1 B=0 C=1 D=1 d_file
+00011 [L444] TGETS    A=1 B=1 C=3 D=259 'readFile'
+00012 [L444] MOV      A=2 B=0 C=0 D=0 
+00013 [L444] CALL     A=1 B=2 C=2 D=514 
+00014 [L445] LEN      A=2 B=0 C=1 D=1 
+00015 [L445] KSHORT   A=3 B=0 C=0 D=0 0
+00016 [L445] ISGE     A=3 B=0 C=2 D=2 
+00017 [L445] JMP      A=2 B=128 C=12 D=32780 target=30
+00018 [L446] UGET     A=2 B=0 C=2 D=2 table
+00019 [L446] TGETS    A=2 B=2 C=4 D=516 'loadstring'
+00020 [L446] MOV      A=3 B=0 C=1 D=1 
+00021 [L446] CALL     A=2 B=2 C=2 D=514 
+00022 [L447] ISF      A=0 B=0 C=2 D=2 
+00023 [L447] JMP      A=3 B=128 C=10 D=32778 target=34
+00024 [L447] TGETS    A=3 B=2 C=5 D=517 'login_count'
+00025 [L447] ISF      A=0 B=0 C=3 D=3 
+00026 [L447] JMP      A=4 B=128 C=7 D=32775 target=34
+00027 [L448] GGET     A=3 B=0 C=6 D=6 'g_self'
+00028 [L448] TSETS    A=2 B=3 C=7 D=775 'stat'
+00029 [L449] JMP      A=2 B=128 C=4 D=32772 target=34
+00030 [L451] GGET     A=2 B=0 C=6 D=6 'g_self'
+00031 [L451] TGETS    A=2 B=2 C=7 D=519 'stat'
+00032 [L451] KSHORT   A=3 B=0 C=1 D=1 1
+00033 [L451] TSETS    A=3 B=2 C=8 D=520 'first_open_app'
+00034 [L453] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto21 offset=0x2420 source_lines=476-482 params=1
+UPVALUES ['string']
+00001 [L477] UGET     A=1 B=0 C=0 D=0 string
+00002 [L477] TGETS    A=1 B=1 C=0 D=256 'sub'
+00003 [L477] MOV      A=2 B=0 C=0 D=0 
+00004 [L477] KSHORT   A=3 B=255 C=252 D=65532 -4
+00005 [L477] KSHORT   A=4 B=255 C=255 D=65535 -1
+00006 [L477] CALL     A=1 B=2 C=4 D=516 
+00007 [L477] ISNES    A=1 B=0 C=1 D=1 '.dmp'
+00008 [L477] JMP      A=1 B=128 C=2 D=32770 target=11
+00009 [L478] KPRI     A=1 B=0 C=2 D=2 
+00010 [L478] RET1     A=1 B=0 C=2 D=2 
+00011 [L481] KPRI     A=1 B=0 C=1 D=1 
+00012 [L481] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto22 offset=0x2484 source_lines=458-504 params=0
+UPVALUES ['cclog', 'd_u', 'CCFileUtils', 'string', 'd_file', 'd_str']
+00001 [L459] UGET     A=0 B=0 C=0 D=0 cclog
+00002 [L459] KSTR     A=1 B=0 C=0 D=0 'call checkReportDumpFile'
+00003 [L459] CALL     A=0 B=1 C=2 D=258 
+00004 [L460] GGET     A=0 B=0 C=1 D=1 'setConstant'
+00005 [L460] CALL     A=0 B=1 C=1 D=257 
+00006 [L462] UGET     A=0 B=0 C=0 D=0 cclog
+00007 [L462] KSTR     A=1 B=0 C=2 D=2 'net_type='
+00008 [L462] GGET     A=2 B=0 C=3 D=3 'g_self'
+00009 [L462] TGETS    A=2 B=2 C=4 D=516 'stat'
+00010 [L462] TGETS    A=2 B=2 C=5 D=517 'net_type'
+00011 [L462] CAT      A=1 B=1 C=2 D=258 
+00012 [L462] IST      A=0 B=0 C=1 D=1 
+00013 [L462] JMP      A=2 B=128 C=1 D=32769 target=15
+00014 [L462] KSTR     A=1 B=0 C=6 D=6 ''
+00015 [L462] CALL     A=0 B=1 C=2 D=258 
+00016 [L465] GGET     A=0 B=0 C=3 D=3 'g_self'
+00017 [L465] TGETS    A=0 B=0 C=4 D=4 'stat'
+00018 [L465] TGETS    A=0 B=0 C=5 D=5 'net_type'
+00019 [L465] ISEQS    A=0 B=0 C=7 D=7 'WIFI'
+00020 [L465] JMP      A=0 B=128 C=7 D=32775 target=28
+00021 [L465] UGET     A=0 B=0 C=1 D=1 d_u
+00022 [L465] TGETS    A=0 B=0 C=8 D=8 'isWin32'
+00023 [L465] CALL     A=0 B=2 C=1 D=513 
+00024 [L465] ISNEP    A=0 B=0 C=2 D=2 
+00025 [L465] JMP      A=0 B=128 C=1 D=32769 target=27
+00026 [L465] JMP      A=0 B=128 C=1 D=32769 target=28
+00027 [L468] UCLO     A=0 B=128 C=87 D=32855 target=115
+00028 [L472] UGET     A=0 B=0 C=2 D=2 CCFileUtils
+00029 [L472] MOV      A=1 B=0 C=0 D=0 
+00030 [L472] TGETS    A=0 B=0 C=9 D=9 'sharedFileUtils'
+00031 [L472] CALL     A=0 B=2 C=2 D=514 
+00032 [L472] MOV      A=1 B=0 C=0 D=0 
+00033 [L472] TGETS    A=0 B=0 C=10 D=10 'getWriteablePath'
+00034 [L472] CALL     A=0 B=2 C=2 D=514 
+00035 [L472] KSTR     A=1 B=0 C=11 D=11 'log_w'
+00036 [L472] CAT      A=0 B=0 C=1 D=1 
+00037 [L473] TNEW     A=1 B=0 C=0 D=0 
+00038 [L482] FNEW     A=2 B=0 C=12 D=12 {'kind': 'proto', 'id': 21}
+00039 [L476] GSET     A=2 B=0 C=13 D=13 'filter_func'
+00040 [L484] UGET     A=2 B=0 C=1 D=1 d_u
+00041 [L484] TGETS    A=2 B=2 C=8 D=520 'isWin32'
+00042 [L484] CALL     A=2 B=2 C=1 D=513 
+00043 [L484] ISNEP    A=2 B=0 C=2 D=2 
+00044 [L484] JMP      A=2 B=128 C=7 D=32775 target=52
+00045 [L485] UGET     A=2 B=0 C=4 D=4 d_file
+00046 [L485] TGETS    A=2 B=2 C=14 D=526 'scandir_win'
+00047 [L485] MOV      A=3 B=0 C=0 D=0 
+00048 [L485] GGET     A=4 B=0 C=13 D=13 'filter_func'
+00049 [L485] CALL     A=2 B=2 C=3 D=515 
+00050 [L485] MOV      A=1 B=0 C=2 D=2 
+00051 [L485] JMP      A=2 B=128 C=45 D=32813 target=97
+00052 [L486] UGET     A=2 B=0 C=1 D=1 d_u
+00053 [L486] TGETS    A=2 B=2 C=15 D=527 'isIOS'
+00054 [L486] CALL     A=2 B=2 C=1 D=513 
+00055 [L486] ISNEP    A=2 B=0 C=2 D=2 
+00056 [L486] JMP      A=2 B=128 C=8 D=32776 target=65
+00057 [L487] UGET     A=2 B=0 C=4 D=4 d_file
+00058 [L487] TGETS    A=2 B=2 C=16 D=528 'scandir_ios'
+00059 [L487] MOV      A=3 B=0 C=0 D=0 
+00060 [L487] KSTR     A=4 B=0 C=17 D=17 '.dmp'
+00061 [L487] GGET     A=5 B=0 C=13 D=13 'filter_func'
+00062 [L487] CALL     A=2 B=2 C=4 D=516 
+00063 [L487] MOV      A=1 B=0 C=2 D=2 
+00064 [L487] JMP      A=2 B=128 C=32 D=32800 target=97
+00065 [L488] UGET     A=2 B=0 C=1 D=1 d_u
+00066 [L488] TGETS    A=2 B=2 C=18 D=530 'isADR'
+00067 [L488] CALL     A=2 B=2 C=1 D=513 
+00068 [L488] ISNEP    A=2 B=0 C=2 D=2 
+00069 [L488] JMP      A=2 B=128 C=24 D=32792 target=94
+00070 [L489] UGET     A=2 B=0 C=4 D=4 d_file
+00071 [L489] TGETS    A=2 B=2 C=19 D=531 'scandir_adr'
+00072 [L489] MOV      A=3 B=0 C=0 D=0 
+00073 [L489] KSTR     A=4 B=0 C=17 D=17 '.dmp'
+00074 [L489] GGET     A=5 B=0 C=13 D=13 'filter_func'
+00075 [L489] KSHORT   A=6 B=0 C=3 D=3 3
+00076 [L489] CALL     A=2 B=2 C=5 D=517 
+00077 [L490] UGET     A=3 B=0 C=0 D=0 cclog
+00078 [L490] KSTR     A=4 B=0 C=20 D=20 'tmp_file_list=['
+00079 [L490] MOV      A=5 B=0 C=2 D=2 
+00080 [L490] KSTR     A=6 B=0 C=21 D=21 ']'
+00081 [L490] CAT      A=4 B=4 C=6 D=1030 
+00082 [L490] CALL     A=3 B=1 C=2 D=258 
+00083 [L491] LEN      A=3 B=0 C=2 D=2 
+00084 [L491] KSHORT   A=4 B=0 C=0 D=0 0
+00085 [L491] ISGE     A=4 B=0 C=3 D=3 
+00086 [L491] JMP      A=3 B=128 C=10 D=32778 target=97
+00087 [L492] UGET     A=3 B=0 C=5 D=5 d_str
+00088 [L492] TGETS    A=3 B=3 C=22 D=790 'split'
+00089 [L492] MOV      A=4 B=0 C=2 D=2 
+00090 [L492] KSTR     A=5 B=0 C=23 D=23 ';'
+00091 [L492] CALL     A=3 B=2 C=3 D=515 
+00092 [L492] MOV      A=1 B=0 C=3 D=3 
+00093 [L493] JMP      A=2 B=128 C=3 D=32771 target=97
+00094 [L495] UGET     A=2 B=0 C=0 D=0 cclog
+00095 [L495] KSTR     A=3 B=0 C=24 D=24 'ERROR: unknow os.............'
+00096 [L495] CALL     A=2 B=1 C=2 D=258 
+00097 [L498] UGET     A=2 B=0 C=0 D=0 cclog
+00098 [L498] KSTR     A=3 B=0 C=25 D=25 'dmp_file_list.size=%d'
+00099 [L498] LEN      A=4 B=0 C=1 D=1 
+00100 [L498] CALL     A=2 B=1 C=3 D=259 
+00101 [L499] LEN      A=2 B=0 C=1 D=1 
+00102 [L499] KSHORT   A=3 B=0 C=0 D=0 0
+00103 [L499] ISGE     A=3 B=0 C=2 D=2 
+00104 [L499] JMP      A=2 B=128 C=9 D=32777 target=114
+00105 [L499] TGETB    A=2 B=1 C=1 D=257 
+00106 [L499] LEN      A=2 B=0 C=2 D=2 
+00107 [L499] KSHORT   A=3 B=0 C=0 D=0 0
+00108 [L499] ISGE     A=3 B=0 C=2 D=2 
+00109 [L499] JMP      A=2 B=128 C=4 D=32772 target=114
+00110 [L501] GGET     A=2 B=0 C=26 D=26 'reportDmpFile'
+00111 [L501] MOV      A=3 B=0 C=0 D=0 
+00112 [L501] TGETB    A=4 B=1 C=1 D=257 
+00113 [L501] CALL     A=2 B=1 C=3 D=259 
+00114 [L504] RET0     A=0 B=0 C=1 D=1 
+00115 [L504] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto23 offset=0x284b source_lines=509-512 params=1
+UPVALUES []
+00001 [L510] GGET     A=1 B=0 C=0 D=0 'g_self'
+00002 [L510] TGETS    A=1 B=1 C=1 D=257 'stat'
+00003 [L510] TSETS    A=0 B=1 C=2 D=258 'player_stat'
+00004 [L511] GGET     A=1 B=0 C=3 D=3 'saveReportToFile'
+00005 [L511] CALL     A=1 B=1 C=1 D=257 
+00006 [L512] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto24 offset=0x28a6 source_lines=516-518 params=1
+UPVALUES []
+00001 [L517] GGET     A=1 B=0 C=0 D=0 'g_self'
+00002 [L517] TGETS    A=1 B=1 C=1 D=257 'stat'
+00003 [L517] TGETS    A=1 B=1 C=2 D=258 'player_stat'
+00004 [L517] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto25 offset=0x28e6 source_lines=522-525 params=1
+UPVALUES []
+00001 [L523] GGET     A=1 B=0 C=0 D=0 'g_self'
+00002 [L523] TGETS    A=1 B=1 C=1 D=257 'stat'
+00003 [L523] TSETS    A=0 B=1 C=2 D=258 'debug_env'
+00004 [L524] GGET     A=1 B=0 C=3 D=3 'saveReportToFile'
+00005 [L524] CALL     A=1 B=1 C=1 D=257 
+00006 [L525] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto26 offset=0x2947 source_lines=528-531 params=0
+UPVALUES []
+00001 [L529] GGET     A=0 B=0 C=0 D=0 'readReportFromFile'
+00002 [L529] CALL     A=0 B=1 C=1 D=257 
+00003 [L530] GGET     A=0 B=0 C=1 D=1 'g_self'
+00004 [L530] TGETS    A=0 B=0 C=2 D=2 'stat'
+00005 [L530] TGETS    A=0 B=0 C=3 D=3 'debug_env'
+00006 [L530] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto27 offset=0x299c source_lines=536-551 params=2
+UPVALUES ['cclog', 'main_server', 'd_u', 'd_setting', 'd_config']
+00001 [L537] UGET     A=2 B=0 C=0 D=0 cclog
+00002 [L537] KSTR     A=3 B=0 C=0 D=0 'try report dmp file: [%s]'
+00003 [L537] MOV      A=4 B=0 C=0 D=0 
+00004 [L537] KSTR     A=5 B=0 C=1 D=1 '/'
+00005 [L537] MOV      A=6 B=0 C=1 D=1 
+00006 [L537] CAT      A=4 B=4 C=6 D=1030 
+00007 [L537] CALL     A=2 B=1 C=3 D=259 
+00008 [L539] UGET     A=2 B=0 C=1 D=1 main_server
+00009 [L539] TGETS    A=2 B=2 C=2 D=514 'http_post_file'
+00010 [L539] ISF      A=0 B=0 C=2 D=2 
+00011 [L539] JMP      A=3 B=128 C=48 D=32816 target=60
+00012 [L540] KSTR     A=2 B=0 C=3 D=3 ''
+00013 [L541] UGET     A=3 B=0 C=1 D=1 main_server
+00014 [L541] TGETS    A=3 B=3 C=4 D=772 'get_app_id'
+00015 [L541] ISF      A=0 B=0 C=3 D=3 
+00016 [L541] JMP      A=4 B=128 C=30 D=32798 target=47
+00017 [L542] KSTR     A=3 B=0 C=5 D=5 '?app_id='
+00018 [L542] UGET     A=4 B=0 C=2 D=2 d_u
+00019 [L542] TGETS    A=4 B=4 C=6 D=1030 'codeForUrl'
+00020 [L542] UGET     A=5 B=0 C=1 D=1 main_server
+00021 [L542] TGETS    A=5 B=5 C=4 D=1284 'get_app_id'
+00022 [L542] CALL     A=5 B=0 C=1 D=1 
+00023 [L542] CALLM    A=4 B=2 C=0 D=512 
+00024 [L543] KSTR     A=5 B=0 C=7 D=7 '&mobile_type='
+00025 [L543] UGET     A=6 B=0 C=2 D=2 d_u
+00026 [L543] TGETS    A=6 B=6 C=6 D=1542 'codeForUrl'
+00027 [L543] UGET     A=7 B=0 C=1 D=1 main_server
+00028 [L543] TGETS    A=7 B=7 C=8 D=1800 'get_mobile_type'
+00029 [L543] CALL     A=7 B=0 C=1 D=1 
+00030 [L543] CALLM    A=6 B=2 C=0 D=512 
+00031 [L544] KSTR     A=7 B=0 C=9 D=9 '&file_name='
+00032 [L544] UGET     A=8 B=0 C=2 D=2 d_u
+00033 [L544] TGETS    A=8 B=8 C=6 D=2054 'codeForUrl'
+00034 [L544] MOV      A=9 B=0 C=1 D=1 
+00035 [L544] CALL     A=8 B=2 C=2 D=514 
+00036 [L545] KSTR     A=9 B=0 C=10 D=10 '&user_account='
+00037 [L545] UGET     A=10 B=0 C=2 D=2 d_u
+00038 [L545] TGETS    A=10 B=10 C=6 D=2566 'codeForUrl'
+00039 [L545] UGET     A=11 B=0 C=3 D=3 d_setting
+00040 [L545] TGETS    A=11 B=11 C=11 D=2827 'g_setting'
+00041 [L545] TGETS    A=11 B=11 C=12 D=2828 'role_id'
+00042 [L545] IST      A=0 B=0 C=11 D=11 
+00043 [L545] JMP      A=12 B=128 C=1 D=32769 target=45
+00044 [L545] KSTR     A=11 B=0 C=3 D=3 ''
+00045 [L545] CALL     A=10 B=2 C=2 D=514 
+00046 [L545] CAT      A=2 B=3 C=10 D=778 
+00047 [L548] UGET     A=3 B=0 C=1 D=1 main_server
+00048 [L548] TGETS    A=3 B=3 C=2 D=770 'http_post_file'
+00049 [L548] UGET     A=4 B=0 C=4 D=4 d_config
+00050 [L548] TGETS    A=4 B=4 C=13 D=1037 'g_stat_root_url'
+00051 [L548] KSTR     A=5 B=0 C=14 D=14 'report_crash.php'
+00052 [L548] MOV      A=6 B=0 C=2 D=2 
+00053 [L548] CAT      A=4 B=4 C=6 D=1030 
+00054 [L548] MOV      A=5 B=0 C=0 D=0 
+00055 [L548] KSTR     A=6 B=0 C=1 D=1 '/'
+00056 [L548] MOV      A=7 B=0 C=1 D=1 
+00057 [L548] CAT      A=5 B=5 C=7 D=1287 
+00058 [L548] KSHORT   A=6 B=0 C=1 D=1 1
+00059 [L548] CALL     A=3 B=1 C=4 D=260 
+00060 [L551] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto28 offset=0x2beb source_lines=0-560 params=0
+UPVALUES []
+00001 [L7] GGET     A=0 B=0 C=0 D=0 'require'
+00002 [L8] GGET     A=1 B=0 C=1 D=1 'bits'
+00003 [L9] GGET     A=2 B=0 C=2 D=2 'sqlite'
+00004 [L10] GGET     A=3 B=0 C=3 D=3 'type'
+00005 [L11] GGET     A=4 B=0 C=4 D=4 'print'
+00006 [L12] GGET     A=5 B=0 C=5 D=5 'tostring'
+00007 [L13] GGET     A=6 B=0 C=6 D=6 'pairs'
+00008 [L14] GGET     A=7 B=0 C=7 D=7 'string'
+00009 [L15] GGET     A=8 B=0 C=8 D=8 'math'
+00010 [L16] GGET     A=9 B=0 C=9 D=9 'CCLuaLog'
+00011 [L17] GGET     A=10 B=0 C=10 D=10 'tolua'
+00012 [L18] GGET     A=11 B=0 C=11 D=11 'os'
+00013 [L19] GGET     A=12 B=0 C=12 D=12 'table'
+00014 [L20] GGET     A=13 B=0 C=13 D=13 'tonumber'
+00015 [L22] GGET     A=14 B=0 C=14 D=14 'CCArray'
+00016 [L23] GGET     A=15 B=0 C=15 D=15 'main_server'
+00017 [L24] GGET     A=16 B=0 C=16 D=16 'CCDirector'
+00018 [L25] GGET     A=17 B=0 C=17 D=17 'PlatformUtility'
+00019 [L26] GGET     A=18 B=0 C=18 D=18 'CCFileUtils'
+00020 [L27] GGET     A=19 B=0 C=19 D=19 'CCString'
+00021 [L29] MOV      A=20 B=0 C=0 D=0 
+00022 [L29] KSTR     A=21 B=0 C=20 D=20 'common.utils'
+00023 [L29] CALL     A=20 B=2 C=2 D=514 
+00024 [L30] MOV      A=21 B=0 C=0 D=0 
+00025 [L30] KSTR     A=22 B=0 C=21 D=21 'common.file'
+00026 [L30] CALL     A=21 B=2 C=2 D=514 
+00027 [L31] MOV      A=22 B=0 C=0 D=0 
+00028 [L31] KSTR     A=23 B=0 C=22 D=22 'config.config'
+00029 [L31] CALL     A=22 B=2 C=2 D=514 
+00030 [L32] MOV      A=23 B=0 C=0 D=0 
+00031 [L32] KSTR     A=24 B=0 C=23 D=23 'config.third_party_config'
+00032 [L32] CALL     A=23 B=2 C=2 D=514 
+00033 [L33] MOV      A=24 B=0 C=0 D=0 
+00034 [L33] KSTR     A=25 B=0 C=24 D=24 'base.setting'
+00035 [L33] CALL     A=24 B=2 C=2 D=514 
+00036 [L34] MOV      A=25 B=0 C=0 D=0 
+00037 [L34] KSTR     A=26 B=0 C=25 D=25 'base.url'
+00038 [L34] CALL     A=25 B=2 C=2 D=514 
+00039 [L35] MOV      A=26 B=0 C=0 D=0 
+00040 [L35] KSTR     A=27 B=0 C=26 D=26 'base.str'
+00041 [L35] CALL     A=26 B=2 C=2 D=514 
+00042 [L38] GGET     A=27 B=0 C=27 D=27 'module'
+00043 [L38] KSTR     A=28 B=0 C=28 D=28 'common.statistics'
+00044 [L38] CALL     A=27 B=1 C=2 D=258 
+00045 [L43] FNEW     A=27 B=0 C=29 D=29 {'kind': 'proto', 'id': 0}
+00046 [L45] TNEW     A=28 B=0 C=0 D=0 
+00047 [L45] GSET     A=28 B=0 C=30 D=30 'g_self'
+00048 [L48] GGET     A=28 B=0 C=30 D=30 'g_self'
+00049 [L48] TDUP     A=29 B=0 C=32 D=32 {'kind': 'table', 'value': {'app_id': 'unknow', 'debug_env': 0, 'crash_flag': 0, 'player_stat': 1, 'mac': 'unknow', 'mobile_type': 'unknow', 'login_count': 0, 'os_type': 'unknow', 'req_id': 'unknow', 'net_type': 'unknow', 'pf_type': 'unknow', 'first_open_app': 0, 'update_zip_fail': 0, 'sub_id': 'unknow'}}
+00050 [L51] TDUP     A=30 B=0 C=33 D=33 {'kind': 'table', 'value': {'req_all_time': 0, 'login_cost_time': 0, 'req_count': 0, 'timeout_count': 0}}
+00051 [L57] TSETS    A=30 B=29 C=34 D=7458 'net'
+00052 [L59] TDUP     A=30 B=0 C=35 D=35 {'kind': 'table', 'value': {'w': 0, 'h': 0}}
+00053 [L59] TSETS    A=30 B=29 C=36 D=7460 'screen'
+00054 [L75] TSETS    A=29 B=28 C=31 D=7199 'stat'
+00055 [L84] FNEW     A=28 B=0 C=37 D=37 {'kind': 'proto', 'id': 1}
+00056 [L80] GSET     A=28 B=0 C=38 D=38 'setCrashFlag'
+00057 [L91] FNEW     A=28 B=0 C=39 D=39 {'kind': 'proto', 'id': 2}
+00058 [L87] GSET     A=28 B=0 C=40 D=40 'cleanCrashFlag'
+00059 [L103] FNEW     A=28 B=0 C=41 D=41 {'kind': 'proto', 'id': 3}
+00060 [L94] GSET     A=28 B=0 C=42 D=42 'clean_stat'
+00061 [L108] FNEW     A=28 B=0 C=43 D=43 {'kind': 'proto', 'id': 4}
+00062 [L106] GSET     A=28 B=0 C=44 D=44 'add_req_count'
+00063 [L112] GGET     A=28 B=0 C=30 D=30 'g_self'
+00064 [L112] KSHORT   A=29 B=0 C=0 D=0 0
+00065 [L112] TSETS    A=29 B=28 C=45 D=7213 'write_file_time'
+00066 [L122] FNEW     A=28 B=0 C=46 D=46 {'kind': 'proto', 'id': 5}
+00067 [L113] GSET     A=28 B=0 C=47 D=47 'add_req_all_time'
+00068 [L128] FNEW     A=28 B=0 C=48 D=48 {'kind': 'proto', 'id': 6}
+00069 [L126] GSET     A=28 B=0 C=49 D=49 'add_timeout_count'
+00070 [L162] FNEW     A=28 B=0 C=50 D=50 {'kind': 'proto', 'id': 7}
+00071 [L132] GSET     A=28 B=0 C=51 D=51 'static_tostring'
+00072 [L183] FNEW     A=28 B=0 C=52 D=52 {'kind': 'proto', 'id': 8}
+00073 [L166] GSET     A=28 B=0 C=53 D=53 'get_brief_info_tostring'
+00074 [L199] FNEW     A=28 B=0 C=54 D=54 {'kind': 'proto', 'id': 9}
+00075 [L187] GSET     A=28 B=0 C=55 D=55 'get_brief_info_tostring_oa'
+00076 [L214] FNEW     A=28 B=0 C=56 D=56 {'kind': 'proto', 'id': 10}
+00077 [L205] GSET     A=28 B=0 C=57 D=57 'getGsReportParams'
+00078 [L245] FNEW     A=28 B=0 C=58 D=58 {'kind': 'proto', 'id': 11}
+00079 [L218] GSET     A=28 B=0 C=59 D=59 'getReportUrlParams'
+00080 [L266] FNEW     A=28 B=0 C=60 D=60 {'kind': 'proto', 'id': 12}
+00081 [L250] GSET     A=28 B=0 C=61 D=61 'getReportErrorParams'
+00082 [L286] FNEW     A=28 B=0 C=62 D=62 {'kind': 'proto', 'id': 13}
+00083 [L270] GSET     A=28 B=0 C=63 D=63 'getReportAdviceBugParams'
+00084 [L295] FNEW     A=28 B=0 C=64 D=64 {'kind': 'proto', 'id': 14}
+00085 [L291] GSET     A=28 B=0 C=65 D=65 'reportOk'
+00086 [L304] FNEW     A=28 B=0 C=66 D=66 {'kind': 'proto', 'id': 15}
+00087 [L299] GSET     A=28 B=0 C=67 D=67 'down_zip_fail'
+00088 [L307] GGET     A=28 B=0 C=30 D=30 'g_self'
+00089 [L307] KPRI     A=29 B=0 C=1 D=1 
+00090 [L307] TSETS    A=29 B=28 C=68 D=7236 'has_setConstant'
+00091 [L410] FNEW     A=28 B=0 C=69 D=69 {'kind': 'proto', 'id': 16}
+00092 [L310] GSET     A=28 B=0 C=70 D=70 'setConstant'
+00093 [L416] FNEW     A=28 B=0 C=71 D=71 {'kind': 'proto', 'id': 17}
+00094 [L413] GSET     A=28 B=0 C=72 D=72 'login_begin'
+00095 [L426] FNEW     A=28 B=0 C=73 D=73 {'kind': 'proto', 'id': 18}
+00096 [L420] GSET     A=28 B=0 C=74 D=74 'login_end'
+00097 [L439] FNEW     A=28 B=0 C=75 D=75 {'kind': 'proto', 'id': 19}
+00098 [L430] GSET     A=28 B=0 C=76 D=76 'saveReportToFile'
+00099 [L453] FNEW     A=28 B=0 C=77 D=77 {'kind': 'proto', 'id': 20}
+00100 [L442] GSET     A=28 B=0 C=78 D=78 'readReportFromFile'
+00101 [L504] FNEW     A=28 B=0 C=79 D=79 {'kind': 'proto', 'id': 22}
+00102 [L458] GSET     A=28 B=0 C=80 D=80 'checkReportDumpFile'
+00103 [L512] FNEW     A=28 B=0 C=81 D=81 {'kind': 'proto', 'id': 23}
+00104 [L509] GSET     A=28 B=0 C=82 D=82 'setPlayerStat'
+00105 [L518] FNEW     A=28 B=0 C=83 D=83 {'kind': 'proto', 'id': 24}
+00106 [L516] GSET     A=28 B=0 C=84 D=84 'getPlayerStat'
+00107 [L525] FNEW     A=28 B=0 C=85 D=85 {'kind': 'proto', 'id': 25}
+00108 [L522] GSET     A=28 B=0 C=86 D=86 'setDebugEnvFlag'
+00109 [L531] FNEW     A=28 B=0 C=87 D=87 {'kind': 'proto', 'id': 26}
+00110 [L528] GSET     A=28 B=0 C=88 D=88 'getDedugEvnFlag'
+00111 [L551] FNEW     A=28 B=0 C=89 D=89 {'kind': 'proto', 'id': 27}
+00112 [L536] GSET     A=28 B=0 C=90 D=90 'reportDmpFile'
+00113 [L551] UCLO     A=0 B=128 C=0 D=32768 target=114
+00114 [L551] RET0     A=0 B=0 C=1 D=1 

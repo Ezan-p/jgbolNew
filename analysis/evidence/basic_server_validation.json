@@ -1,0 +1,118 @@
+{
+  "verified_at": "2026-10-24T01:00:35+08:00",
+  "standalone": {
+    "endpoint": "127.0.0.1:18771",
+    "session": ".runtime/server/sessions/20261023T165437Z-3622661d",
+    "probe_results": [
+      {
+        "path": "/__redirect_health",
+        "ok": true,
+        "status": 200,
+        "response_bytes": 24,
+        "sha256": "b356aed1d6757b69486da0aae95fe7363d5a800539e93b04d32bf8bc76023d43"
+      },
+      {
+        "path": "/update/jgb/p360_a/server_list.txt",
+        "ok": true,
+        "status": 200,
+        "response_bytes": 59531,
+        "sha256": "6a5d287310fa50f535d4f20f794fd50b80b3645701579a68d9912d8fe6d5f0ce"
+      },
+      {
+        "path": "/update/jgb/p360_na/server_list.txt",
+        "ok": true,
+        "status": 200,
+        "response_bytes": 59531,
+        "sha256": "6a5d287310fa50f535d4f20f794fd50b80b3645701579a68d9912d8fe6d5f0ce"
+      }
+    ],
+    "tls_arrival_logged": true,
+    "raw_tcp_arrival_logged": true,
+    "stop_reason": "SIGTERM",
+    "summary_written": true
+  },
+  "android_socket_probe": [
+    {
+      "client": "Android emulator shell TCP client via adb reverse",
+      "path": "/__redirect_health",
+      "status": 200,
+      "response_bytes": 24,
+      "sha256": "b356aed1d6757b69486da0aae95fe7363d5a800539e93b04d32bf8bc76023d43"
+    },
+    {
+      "client": "Android emulator shell TCP client via adb reverse",
+      "path": "/update/jgb/p360_a/server_list.txt",
+      "status": 200,
+      "response_bytes": 59531,
+      "sha256": "6a5d287310fa50f535d4f20f794fd50b80b3645701579a68d9912d8fe6d5f0ce"
+    },
+    {
+      "client": "Android emulator shell TCP client via adb reverse",
+      "path": "/basic-probe-unknown",
+      "status": 501,
+      "response_bytes": 32,
+      "sha256": "ffd3efc1b628b4c6863aa665215a5c92ed7cea2f7a54b3861cc741c5350cd5b9"
+    }
+  ],
+  "real_game": {
+    "endpoint": "127.0.0.1:18770",
+    "mode": "existing offline mode preserved",
+    "session": ".runtime/redirect/sessions/20261023T165843Z-88a623dc",
+    "server_list_request": {
+      "time": "2026-10-23T16:58:56.998+00:00",
+      "kind": "http_request",
+      "connection_id": "a3d7ff28fb40",
+      "host": "jgbupdate02.shangyoo.com",
+      "path": "/update/jgb/p360_a/server_list.txt",
+      "status": 200,
+      "response_bytes": 59531,
+      "sha256": "6a5d287310fa50f535d4f20f794fd50b80b3645701579a68d9912d8fe6d5f0ce"
+    },
+    "probes": [
+      {
+        "kind": "probe_result",
+        "result": {
+          "dns": 0,
+          "resolved": "127.0.0.1",
+          "ipv4": {
+            "connect": 0,
+            "ok": true,
+            "caller_port_unchanged": true
+          },
+          "ipv6": {
+            "connect": 0,
+            "ok": true,
+            "caller_port_unchanged": true
+          }
+        }
+      },
+      {
+        "kind": "tls_probe_result",
+        "result": {
+          "status": 200,
+          "cipher": "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+        }
+      },
+      {
+        "kind": "native_tls_probe_result",
+        "result": {
+          "curl_result": 0,
+          "http_status": 200,
+          "response_bytes": 24
+        }
+      }
+    ],
+    "hook_errors": 0,
+    "left_running": true
+  },
+  "tests": {
+    "command": ".runtime/venv/bin/python -m unittest discover -s tests -v",
+    "passed": 30
+  },
+  "sources_sha256": {
+    "game_server.py": "00b72ac7b1473735740144f14e24dcf41175f506d56ebb3cb1fad320b41d6eb7",
+    "network_redirect/server.py": "d31bc93d89af5e3aaefce20b0b469115a6c099480036c77fc1e6518ca9516cb0",
+    "tests/test_game_server.py": "d00b5d0b7e21fdba4f13622adb2541c84da8e1577d2b45b901c9d26f30eb3e36",
+    "tests/test_network_redirect.py": "5d29442035060d28d8377dd154dadcc7a08e249d79211b4f85c6d2f723db6149"
+  }
+}

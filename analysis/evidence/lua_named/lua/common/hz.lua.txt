@@ -1,0 +1,267 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\aa22a935851f76ff6ce225aab6bab8a3.data'; root=proto7
+
+FUNCTION proto0 offset=0x4a source_lines=33-35 params=0
+UPVALUES ['CCLuaLog', 'string']
+00001 [L34] UGET     A=0 B=0 C=0 D=0 CCLuaLog
+00002 [L34] UGET     A=1 B=0 C=1 D=1 string
+00003 [L34] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L34] VARG     A=2 B=0 C=0 D=0 
+00005 [L34] CALLM    A=1 B=0 C=0 D=0 
+00006 [L34] CALLM    A=0 B=1 C=0 D=256 
+00007 [L35] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x95 source_lines=44-52 params=0
+UPVALUES ['CCDictionary']
+00001 [L46] GGET     A=0 B=0 C=0 D=0 'g_hz1'
+00002 [L46] ISNEP    A=0 B=0 C=0 D=0 
+00003 [L46] JMP      A=0 B=128 C=20 D=32788 target=24
+00004 [L47] UGET     A=0 B=0 C=0 D=0 CCDictionary
+00005 [L47] MOV      A=1 B=0 C=0 D=0 
+00006 [L47] TGETS    A=0 B=0 C=1 D=1 'createWithContentsOfFile'
+00007 [L47] KSTR     A=2 B=0 C=2 D=2 'v2/String.plist'
+00008 [L47] CALL     A=0 B=2 C=3 D=515 
+00009 [L47] GSET     A=0 B=0 C=0 D=0 'g_hz1'
+00010 [L48] UGET     A=0 B=0 C=0 D=0 CCDictionary
+00011 [L48] MOV      A=1 B=0 C=0 D=0 
+00012 [L48] TGETS    A=0 B=0 C=1 D=1 'createWithContentsOfFile'
+00013 [L48] KSTR     A=2 B=0 C=3 D=3 'v2/String2.plist'
+00014 [L48] CALL     A=0 B=2 C=3 D=515 
+00015 [L48] GSET     A=0 B=0 C=4 D=4 'g_hz2'
+00016 [L49] GGET     A=0 B=0 C=0 D=0 'g_hz1'
+00017 [L49] MOV      A=1 B=0 C=0 D=0 
+00018 [L49] TGETS    A=0 B=0 C=5 D=5 'retain'
+00019 [L49] CALL     A=0 B=1 C=2 D=258 
+00020 [L50] GGET     A=0 B=0 C=4 D=4 'g_hz2'
+00021 [L50] MOV      A=1 B=0 C=0 D=0 
+00022 [L50] TGETS    A=0 B=0 C=5 D=5 'retain'
+00023 [L50] CALL     A=0 B=1 C=2 D=258 
+00024 [L52] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto2 offset=0x176 source_lines=55-82 params=1
+UPVALUES ['cclog']
+00001 [L57] ISF      A=0 B=0 C=0 D=0 
+00002 [L57] JMP      A=1 B=128 C=4 D=32772 target=7
+00003 [L57] LEN      A=1 B=0 C=0 D=0 
+00004 [L57] KSHORT   A=2 B=0 C=0 D=0 0
+00005 [L57] ISGT     A=1 B=0 C=2 D=2 
+00006 [L57] JMP      A=1 B=128 C=2 D=32770 target=9
+00007 [L58] KSTR     A=1 B=0 C=0 D=0 ''
+00008 [L58] RET1     A=1 B=0 C=2 D=2 
+00009 [L61] GGET     A=1 B=0 C=1 D=1 'init'
+00010 [L61] CALL     A=1 B=1 C=1 D=257 
+00011 [L64] GGET     A=1 B=0 C=2 D=2 'g_hz1'
+00012 [L64] ISNEP    A=1 B=0 C=0 D=0 
+00013 [L64] JMP      A=1 B=128 C=5 D=32773 target=19
+00014 [L65] UGET     A=1 B=0 C=0 D=0 cclog
+00015 [L65] KSTR     A=2 B=0 C=3 D=3 'ERROR: call gethz: g_hz1=nil'
+00016 [L65] CALL     A=1 B=1 C=2 D=258 
+00017 [L66] KSTR     A=1 B=0 C=0 D=0 ''
+00018 [L66] RET1     A=1 B=0 C=2 D=2 
+00019 [L71] GGET     A=1 B=0 C=2 D=2 'g_hz1'
+00020 [L71] MOV      A=2 B=0 C=1 D=1 
+00021 [L71] TGETS    A=1 B=1 C=4 D=260 'valueForKey'
+00022 [L71] MOV      A=3 B=0 C=0 D=0 
+00023 [L71] CALL     A=1 B=2 C=3 D=515 
+00024 [L71] MOV      A=2 B=0 C=1 D=1 
+00025 [L71] TGETS    A=1 B=1 C=5 D=261 'getCString'
+00026 [L71] CALL     A=1 B=2 C=2 D=514 
+00027 [L72] ISF      A=0 B=0 C=1 D=1 
+00028 [L72] JMP      A=2 B=128 C=4 D=32772 target=33
+00029 [L72] LEN      A=2 B=0 C=1 D=1 
+00030 [L72] KSHORT   A=3 B=0 C=0 D=0 0
+00031 [L72] ISGT     A=2 B=0 C=3 D=3 
+00032 [L72] JMP      A=2 B=128 C=20 D=32788 target=53
+00033 [L76] GGET     A=2 B=0 C=6 D=6 'g_hz2'
+00034 [L76] MOV      A=3 B=0 C=2 D=2 
+00035 [L76] TGETS    A=2 B=2 C=4 D=516 'valueForKey'
+00036 [L76] MOV      A=4 B=0 C=0 D=0 
+00037 [L76] CALL     A=2 B=2 C=3 D=515 
+00038 [L76] MOV      A=3 B=0 C=2 D=2 
+00039 [L76] TGETS    A=2 B=2 C=5 D=517 'getCString'
+00040 [L76] CALL     A=2 B=2 C=2 D=514 
+00041 [L76] MOV      A=1 B=0 C=2 D=2 
+00042 [L77] ISF      A=0 B=0 C=1 D=1 
+00043 [L77] JMP      A=2 B=128 C=4 D=32772 target=48
+00044 [L77] LEN      A=2 B=0 C=1 D=1 
+00045 [L77] KSHORT   A=3 B=0 C=0 D=0 0
+00046 [L77] ISGT     A=2 B=0 C=3 D=3 
+00047 [L77] JMP      A=2 B=128 C=5 D=32773 target=53
+00048 [L78] UGET     A=2 B=0 C=0 D=0 cclog
+00049 [L78] KSTR     A=3 B=0 C=7 D=7 'ERROR: call gethz empty. name='
+00050 [L78] MOV      A=4 B=0 C=0 D=0 
+00051 [L78] CAT      A=3 B=3 C=4 D=772 
+00052 [L78] CALL     A=2 B=1 C=2 D=258 
+00053 [L81] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto3 offset=0x306 source_lines=86-99 params=3
+UPVALUES []
+00001 [L93] TGETS    A=3 B=1 C=0 D=256 'color'
+00002 [L93] IST      A=0 B=0 C=3 D=3 
+00003 [L93] JMP      A=3 B=128 C=2 D=32770 target=6
+00004 [L94] TDUP     A=3 B=0 C=1 D=1 {'kind': 'table', 'value': {1: 255, 2: 0, 3: 0}}
+00005 [L94] TSETS    A=3 B=1 C=0 D=256 'color'
+00006 [L97] GGET     A=3 B=0 C=2 D=2 'showNumberColor'
+00007 [L97] MOV      A=4 B=0 C=0 D=0 
+00008 [L97] MOV      A=5 B=0 C=1 D=1 
+00009 [L97] MOV      A=6 B=0 C=2 D=2 
+00010 [L97] CALL     A=3 B=2 C=4 D=516 
+00011 [L98] RET1     A=3 B=0 C=2 D=2 
+
+FUNCTION proto4 offset=0x38c source_lines=103-117 params=3
+UPVALUES []
+00001 [L111] TGETS    A=3 B=1 C=0 D=256 'color'
+00002 [L111] IST      A=0 B=0 C=3 D=3 
+00003 [L111] JMP      A=3 B=128 C=2 D=32770 target=6
+00004 [L112] TDUP     A=3 B=0 C=1 D=1 {'kind': 'table', 'value': {1: 0, 2: 255, 3: 0}}
+00005 [L112] TSETS    A=3 B=1 C=0 D=256 'color'
+00006 [L115] GGET     A=3 B=0 C=2 D=2 'showNumberColor'
+00007 [L115] MOV      A=4 B=0 C=0 D=0 
+00008 [L115] MOV      A=5 B=0 C=1 D=1 
+00009 [L115] MOV      A=6 B=0 C=2 D=2 
+00010 [L115] CALL     A=3 B=2 C=4 D=516 
+00011 [L116] RET1     A=3 B=0 C=2 D=2 
+
+FUNCTION proto5 offset=0x412 source_lines=122-129 params=3
+UPVALUES ['CCLabelBMFont', 'd_u']
+00001 [L123] UGET     A=3 B=0 C=0 D=0 CCLabelBMFont
+00002 [L123] MOV      A=4 B=0 C=3 D=3 
+00003 [L123] TGETS    A=3 B=3 C=0 D=768 'create'
+00004 [L123] KSTR     A=5 B=0 C=1 D=1 ''
+00005 [L123] MOV      A=6 B=0 C=0 D=0 
+00006 [L123] CAT      A=5 B=5 C=6 D=1286 
+00007 [L123] KSTR     A=6 B=0 C=2 D=2 'number/all_number_white.fnt'
+00008 [L123] CALL     A=3 B=2 C=4 D=516 
+00009 [L124] UGET     A=4 B=0 C=1 D=1 d_u
+00010 [L124] TGETS    A=4 B=4 C=3 D=1027 'setStyles'
+00011 [L124] MOV      A=5 B=0 C=3 D=3 
+00012 [L124] MOV      A=6 B=0 C=1 D=1 
+00013 [L124] CALL     A=4 B=1 C=3 D=259 
+00014 [L125] ISF      A=0 B=0 C=2 D=2 
+00015 [L125] JMP      A=4 B=128 C=5 D=32773 target=21
+00016 [L126] MOV      A=5 B=0 C=2 D=2 
+00017 [L126] TGETS    A=4 B=2 C=4 D=516 'addChild'
+00018 [L126] MOV      A=6 B=0 C=3 D=3 
+00019 [L126] TGETS    A=7 B=1 C=5 D=261 'z'
+00020 [L126] CALL     A=4 B=1 C=4 D=260 
+00021 [L128] RET1     A=3 B=0 C=2 D=2 
+
+FUNCTION proto6 offset=0x4f8 source_lines=136-164 params=2
+UPVALUES ['d_csv', 'pairs', 'string', 'tonumber']
+00001 [L137] GGET     A=2 B=0 C=0 D=0 'g_invalid_string'
+00002 [L137] ISNEP    A=2 B=0 C=0 D=0 
+00003 [L137] JMP      A=2 B=128 C=35 D=32803 target=39
+00004 [L138] UGET     A=2 B=0 C=0 D=0 d_csv
+00005 [L138] TGETS    A=2 B=2 C=1 D=513 'open2'
+00006 [L138] KSTR     A=3 B=0 C=2 D=2 'csv_config/InvalidString.csv'
+00007 [L138] CALL     A=2 B=2 C=2 D=514 
+00008 [L138] GSET     A=2 B=0 C=0 D=0 'g_invalid_string'
+00009 [L140] UGET     A=2 B=0 C=1 D=1 pairs
+00010 [L140] GGET     A=3 B=0 C=0 D=0 'g_invalid_string'
+00011 [L140] CALL     A=2 B=4 C=2 D=1026 
+00012 [L140] ISNEXT   A=5 B=128 C=24 D=32792 target=37
+00013 [L141] UGET     A=7 B=0 C=2 D=2 string
+00014 [L141] TGETS    A=7 B=7 C=3 D=1795 'sub'
+00015 [L141] TGETS    A=8 B=6 C=4 D=1540 'content'
+00016 [L141] KSHORT   A=9 B=0 C=1 D=1 1
+00017 [L141] KSHORT   A=10 B=0 C=1 D=1 1
+00018 [L141] CALL     A=7 B=2 C=4 D=516 
+00019 [L141] ISNES    A=7 B=0 C=5 D=5 '['
+00020 [L141] JMP      A=7 B=128 C=9 D=32777 target=30
+00021 [L142] UGET     A=7 B=0 C=2 D=2 string
+00022 [L142] TGETS    A=7 B=7 C=3 D=1795 'sub'
+00023 [L142] TGETS    A=8 B=6 C=4 D=1540 'content'
+00024 [L142] KSHORT   A=9 B=0 C=2 D=2 2
+00025 [L142] TGETS    A=10 B=6 C=4 D=1540 'content'
+00026 [L142] LEN      A=10 B=0 C=10 D=10 
+00027 [L142] SUBVN    A=10 B=10 C=0 D=2560 
+00028 [L142] CALL     A=7 B=2 C=4 D=516 
+00029 [L142] TSETS    A=7 B=6 C=4 D=1540 'content'
+00030 [L144] UGET     A=7 B=0 C=3 D=3 tonumber
+00031 [L144] TGETS    A=8 B=6 C=6 D=1542 'level'
+00032 [L144] CALL     A=7 B=2 C=2 D=514 
+00033 [L144] IST      A=0 B=0 C=7 D=7 
+00034 [L144] JMP      A=8 B=128 C=1 D=32769 target=36
+00035 [L144] KSHORT   A=7 B=0 C=1 D=1 1
+00036 [L144] TSETS    A=7 B=6 C=6 D=1542 'level'
+00037 [L140] ITERN    A=5 B=3 C=3 D=771 
+00038 [L140] ITERL    A=5 B=127 C=230 D=32742 target=13
+00039 [L148] IST      A=0 B=0 C=1 D=1 
+00040 [L148] JMP      A=2 B=128 C=1 D=32769 target=42
+00041 [L148] KSHORT   A=1 B=0 C=2 D=2 2
+00042 [L150] GSET     A=0 B=0 C=7 D=7 'ret'
+00043 [L151] KSHORT   A=2 B=0 C=0 D=0 0
+00044 [L154] UGET     A=3 B=0 C=1 D=1 pairs
+00045 [L154] GGET     A=4 B=0 C=0 D=0 'g_invalid_string'
+00046 [L154] CALL     A=3 B=4 C=2 D=1026 
+00047 [L154] ISNEXT   A=6 B=128 C=18 D=32786 target=66
+00048 [L155] KSHORT   A=8 B=0 C=0 D=0 0
+00049 [L156] TGETS    A=9 B=7 C=6 D=1798 'level'
+00050 [L156] ISGT     A=1 B=0 C=9 D=9 
+00051 [L156] JMP      A=9 B=128 C=13 D=32781 target=65
+00052 [L156] TGETS    A=9 B=7 C=4 D=1796 'content'
+00053 [L156] LEN      A=9 B=0 C=9 D=9 
+00054 [L156] KSHORT   A=10 B=0 C=1 D=1 1
+00055 [L156] ISGE     A=10 B=0 C=9 D=9 
+00056 [L156] JMP      A=9 B=128 C=8 D=32776 target=65
+00057 [L157] UGET     A=9 B=0 C=2 D=2 string
+00058 [L157] TGETS    A=9 B=9 C=8 D=2312 'gsub'
+00059 [L157] GGET     A=10 B=0 C=7 D=7 'ret'
+00060 [L157] TGETS    A=11 B=7 C=4 D=1796 'content'
+00061 [L157] KSTR     A=12 B=0 C=9 D=9 '**'
+00062 [L157] CALL     A=9 B=3 C=4 D=772 
+00063 [L157] MOV      A=8 B=0 C=10 D=10 
+00064 [L157] GSET     A=9 B=0 C=7 D=7 'ret'
+00065 [L160] ADDVV    A=2 B=2 C=8 D=520 
+00066 [L154] ITERN    A=6 B=3 C=3 D=771 
+00067 [L154] ITERL    A=6 B=127 C=236 D=32748 target=48
+00068 [L163] GGET     A=3 B=0 C=7 D=7 'ret'
+00069 [L163] MOV      A=4 B=0 C=2 D=2 
+00070 [L163] RET      A=3 B=0 C=3 D=3 
+
+FUNCTION proto7 offset=0x723 source_lines=0-167 params=0
+UPVALUES []
+00001 [L7] GGET     A=0 B=0 C=0 D=0 'require'
+00002 [L8] GGET     A=1 B=0 C=1 D=1 'bits'
+00003 [L9] GGET     A=2 B=0 C=2 D=2 'sqlite'
+00004 [L10] GGET     A=3 B=0 C=3 D=3 'type'
+00005 [L11] GGET     A=4 B=0 C=4 D=4 'print'
+00006 [L12] GGET     A=5 B=0 C=5 D=5 'tostring'
+00007 [L13] GGET     A=6 B=0 C=6 D=6 'pairs'
+00008 [L14] GGET     A=7 B=0 C=7 D=7 'string'
+00009 [L15] GGET     A=8 B=0 C=8 D=8 'tonumber'
+00010 [L17] GGET     A=9 B=0 C=9 D=9 'CCFileUtils'
+00011 [L18] GGET     A=10 B=0 C=10 D=10 'CCDictionary'
+00012 [L19] GGET     A=11 B=0 C=11 D=11 'CCSprite'
+00013 [L20] GGET     A=12 B=0 C=12 D=12 'CCLabelAtlas'
+00014 [L21] GGET     A=13 B=0 C=13 D=13 'CCLabelBMFont'
+00015 [L23] GGET     A=14 B=0 C=14 D=14 'CCLuaLog'
+00016 [L26] GGET     A=15 B=0 C=15 D=15 'module'
+00017 [L26] KSTR     A=16 B=0 C=16 D=16 'common.hz'
+00018 [L26] CALL     A=15 B=1 C=2 D=258 
+00019 [L29] MOV      A=15 B=0 C=0 D=0 
+00020 [L29] KSTR     A=16 B=0 C=17 D=17 'common.utils'
+00021 [L29] CALL     A=15 B=2 C=2 D=514 
+00022 [L30] MOV      A=16 B=0 C=0 D=0 
+00023 [L30] KSTR     A=17 B=0 C=18 D=18 'base.csv'
+00024 [L30] CALL     A=16 B=2 C=2 D=514 
+00025 [L35] FNEW     A=17 B=0 C=19 D=19 {'kind': 'proto', 'id': 0}
+00026 [L38] KPRI     A=18 B=0 C=0 D=0 
+00027 [L38] GSET     A=18 B=0 C=20 D=20 'g_hz1'
+00028 [L39] KPRI     A=18 B=0 C=0 D=0 
+00029 [L39] GSET     A=18 B=0 C=21 D=21 'g_hz2'
+00030 [L40] KPRI     A=18 B=0 C=0 D=0 
+00031 [L40] GSET     A=18 B=0 C=22 D=22 'g_invalid_string'
+00032 [L52] FNEW     A=18 B=0 C=23 D=23 {'kind': 'proto', 'id': 1}
+00033 [L44] GSET     A=18 B=0 C=24 D=24 'init'
+00034 [L82] FNEW     A=18 B=0 C=25 D=25 {'kind': 'proto', 'id': 2}
+00035 [L55] GSET     A=18 B=0 C=26 D=26 'gethz'
+00036 [L99] FNEW     A=18 B=0 C=27 D=27 {'kind': 'proto', 'id': 3}
+00037 [L86] GSET     A=18 B=0 C=28 D=28 'showNumber'
+00038 [L117] FNEW     A=18 B=0 C=29 D=29 {'kind': 'proto', 'id': 4}
+00039 [L103] GSET     A=18 B=0 C=30 D=30 'showAddNumber'
+00040 [L129] FNEW     A=18 B=0 C=31 D=31 {'kind': 'proto', 'id': 5}
+00041 [L122] GSET     A=18 B=0 C=32 D=32 'showNumberColor'
+00042 [L164] FNEW     A=18 B=0 C=33 D=33 {'kind': 'proto', 'id': 6}
+00043 [L136] GSET     A=18 B=0 C=34 D=34 'filter'
+00044 [L164] UCLO     A=0 B=128 C=0 D=32768 target=45
+00045 [L164] RET0     A=0 B=0 C=1 D=1 

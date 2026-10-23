@@ -1,0 +1,401 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\7c29a2ec178061e075ba962b5b9a0edf.data'; root=proto11
+
+FUNCTION proto0 offset=0x4b source_lines=64-66 params=3
+UPVALUES ['error']
+00001 [L65] UGET     A=3 B=0 C=0 D=0 error
+00002 [L65] KSTR     A=4 B=0 C=0 D=0 "the class '"
+00003 [L65] TGETS    A=5 B=0 C=1 D=1 '__class'
+00004 [L65] TGETS    A=5 B=5 C=2 D=1282 '__fullname'
+00005 [L65] KSTR     A=6 B=0 C=3 D=3 "' has no field '"
+00006 [L65] MOV      A=7 B=0 C=1 D=1 
+00007 [L65] KSTR     A=8 B=0 C=4 D=4 "'."
+00008 [L65] CAT      A=4 B=4 C=8 D=1032 
+00009 [L65] CALL     A=3 B=1 C=2 D=258 
+00010 [L66] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0xe6 source_lines=77-87 params=1
+UPVALUES ['table']
+00001 [L78] TNEW     A=1 B=0 C=0 D=0 
+00002 [L80] TGETS    A=2 B=0 C=0 D=0 '__super'
+00003 [L81] ISF      A=0 B=0 C=2 D=2 
+00004 [L81] JMP      A=3 B=128 C=8 D=32776 target=13
+00005 [L81] LOOP     A=3 B=128 C=7 D=32775 target=13
+00006 [L82] UGET     A=3 B=0 C=0 D=0 table
+00007 [L82] TGETS    A=3 B=3 C=1 D=769 'insert'
+00008 [L82] MOV      A=4 B=0 C=1 D=1 
+00009 [L82] MOV      A=5 B=0 C=2 D=2 
+00010 [L82] CALL     A=3 B=1 C=3 D=259 
+00011 [L83] TGETS    A=2 B=2 C=0 D=512 '__super'
+00012 [L83] JMP      A=3 B=127 C=246 D=32758 target=3
+00013 [L86] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto2 offset=0x16b source_lines=94-109 params=2
+UPVALUES ['pairs', 'type', 'rawget', 'super_classes']
+00001 [L95] UGET     A=2 B=0 C=0 D=0 pairs
+00002 [L95] MOV      A=3 B=0 C=1 D=1 
+00003 [L95] CALL     A=2 B=4 C=2 D=1026 
+00004 [L95] ISNEXT   A=5 B=128 C=16 D=32784 target=21
+00005 [L96] UGET     A=7 B=0 C=1 D=1 type
+00006 [L96] MOV      A=8 B=0 C=6 D=6 
+00007 [L96] CALL     A=7 B=2 C=2 D=514 
+00008 [L96] ISNES    A=7 B=0 C=0 D=0 'function'
+00009 [L96] JMP      A=7 B=128 C=11 D=32779 target=21
+00010 [L96] UGET     A=7 B=0 C=2 D=2 rawget
+00011 [L96] MOV      A=8 B=0 C=0 D=0 
+00012 [L96] MOV      A=9 B=0 C=5 D=5 
+00013 [L96] CALL     A=7 B=2 C=3 D=515 
+00014 [L96] ISNEP    A=7 B=0 C=0 D=0 
+00015 [L96] JMP      A=7 B=128 C=5 D=32773 target=21
+00016 [L96] ISEQS    A=5 B=0 C=1 D=1 'new'
+00017 [L96] JMP      A=7 B=128 C=3 D=32771 target=21
+00018 [L96] ISEQS    A=5 B=0 C=2 D=2 '__init'
+00019 [L96] JMP      A=7 B=128 C=1 D=32769 target=21
+00020 [L97] TSETV    A=6 B=0 C=5 D=5 
+00021 [L95] ITERN    A=5 B=3 C=3 D=771 
+00022 [L95] ITERL    A=5 B=127 C=238 D=32750 target=5
+00023 [L101] UGET     A=2 B=0 C=3 D=3 super_classes
+00024 [L101] MOV      A=3 B=0 C=1 D=1 
+00025 [L101] CALL     A=2 B=2 C=2 D=514 
+00026 [L102] KSHORT   A=3 B=0 C=1 D=1 1
+00027 [L102] LEN      A=4 B=0 C=2 D=2 
+00028 [L102] KSHORT   A=5 B=0 C=1 D=1 1
+00029 [L102] FORI     A=3 B=128 C=23 D=32791 target=53
+00030 [L103] UGET     A=7 B=0 C=0 D=0 pairs
+00031 [L103] TGETV    A=8 B=2 C=6 D=518 
+00032 [L103] CALL     A=7 B=4 C=2 D=1026 
+00033 [L103] ISNEXT   A=10 B=128 C=16 D=32784 target=50
+00034 [L104] UGET     A=12 B=0 C=1 D=1 type
+00035 [L104] MOV      A=13 B=0 C=11 D=11 
+00036 [L104] CALL     A=12 B=2 C=2 D=514 
+00037 [L104] ISNES    A=12 B=0 C=0 D=0 'function'
+00038 [L104] JMP      A=12 B=128 C=11 D=32779 target=50
+00039 [L104] UGET     A=12 B=0 C=2 D=2 rawget
+00040 [L104] MOV      A=13 B=0 C=0 D=0 
+00041 [L104] MOV      A=14 B=0 C=10 D=10 
+00042 [L104] CALL     A=12 B=2 C=3 D=515 
+00043 [L104] ISNEP    A=12 B=0 C=0 D=0 
+00044 [L104] JMP      A=12 B=128 C=5 D=32773 target=50
+00045 [L104] ISEQS    A=10 B=0 C=1 D=1 'new'
+00046 [L104] JMP      A=12 B=128 C=3 D=32771 target=50
+00047 [L104] ISEQS    A=10 B=0 C=2 D=2 '__init'
+00048 [L104] JMP      A=12 B=128 C=1 D=32769 target=50
+00049 [L105] TSETV    A=11 B=0 C=10 D=10 
+00050 [L103] ITERN    A=10 B=3 C=3 D=771 
+00051 [L103] ITERL    A=10 B=127 C=238 D=32750 target=34
+00052 [L102] FORL     A=3 B=127 C=233 D=32745 target=30
+00053 [L109] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto3 offset=0x307 source_lines=116-123 params=2
+UPVALUES ['super_classes']
+00001 [L117] UGET     A=2 B=0 C=0 D=0 super_classes
+00002 [L117] MOV      A=3 B=0 C=1 D=1 
+00003 [L117] CALL     A=2 B=2 C=2 D=514 
+00004 [L118] LEN      A=3 B=0 C=2 D=2 
+00005 [L118] KSHORT   A=4 B=0 C=1 D=1 1
+00006 [L118] KSHORT   A=5 B=255 C=255 D=65535 -1
+00007 [L118] FORI     A=3 B=128 C=6 D=32774 target=14
+00008 [L119] TGETV    A=7 B=2 C=6 D=518 
+00009 [L119] TGETS    A=7 B=7 C=0 D=1792 '__init'
+00010 [L119] MOV      A=8 B=0 C=0 D=0 
+00011 [L119] VARG     A=9 B=0 C=2 D=2 
+00012 [L119] CALLM    A=7 B=1 C=1 D=257 
+00013 [L118] FORL     A=3 B=127 C=250 D=32762 target=8
+00014 [L122] TGETS    A=3 B=1 C=0 D=256 '__init'
+00015 [L122] MOV      A=4 B=0 C=0 D=0 
+00016 [L122] VARG     A=5 B=0 C=2 D=2 
+00017 [L122] CALLM    A=3 B=1 C=1 D=257 
+00018 [L123] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto4 offset=0x3ac source_lines=141-166 params=0
+UPVALUES ['new_class', 'getmetatable', 'derive_variable', 'access_deny', 'heavy', 'derive_function', 'setmetatable']
+00001 [L143] UGET     A=0 B=0 C=0 D=0 new_class
+00002 [L143] TGETS    A=0 B=0 C=0 D=0 'free_class_count'
+00003 [L144] KSHORT   A=1 B=0 C=0 D=0 0
+00004 [L144] ISGE     A=1 B=0 C=0 D=0 
+00005 [L144] JMP      A=1 B=128 C=23 D=32791 target=29
+00006 [L145] UGET     A=1 B=0 C=0 D=0 new_class
+00007 [L145] TGETS    A=1 B=1 C=1 D=257 'free_class'
+00008 [L145] TGETV    A=1 B=1 C=0 D=256 
+00009 [L146] UGET     A=2 B=0 C=0 D=0 new_class
+00010 [L146] TGETS    A=2 B=2 C=1 D=513 'free_class'
+00011 [L146] KPRI     A=3 B=0 C=0 D=0 
+00012 [L146] TSETV    A=3 B=2 C=0 D=512 
+00013 [L147] UGET     A=2 B=0 C=0 D=0 new_class
+00014 [L147] SUBVN    A=3 B=0 C=0 D=0 
+00015 [L147] TSETS    A=3 B=2 C=0 D=512 'free_class_count'
+00016 [L148] UGET     A=2 B=0 C=1 D=1 getmetatable
+00017 [L148] MOV      A=3 B=0 C=1 D=1 
+00018 [L148] CALL     A=2 B=2 C=2 D=514 
+00019 [L149] KPRI     A=3 B=0 C=0 D=0 
+00020 [L149] TSETS    A=3 B=2 C=2 D=514 '__newindex'
+00021 [L150] UGET     A=3 B=0 C=2 D=2 derive_variable
+00022 [L150] MOV      A=4 B=0 C=1 D=1 
+00023 [L150] UGET     A=5 B=0 C=0 D=0 new_class
+00024 [L150] VARG     A=6 B=0 C=0 D=0 
+00025 [L150] CALLM    A=3 B=1 C=2 D=258 
+00026 [L151] UGET     A=3 B=0 C=3 D=3 access_deny
+00027 [L151] TSETS    A=3 B=2 C=2 D=514 '__newindex'
+00028 [L152] RET1     A=1 B=0 C=2 D=2 
+00029 [L156] TDUP     A=1 B=0 C=3 D=3 {'kind': 'table', 'value': {'m__rel': False}}
+00030 [L157] UGET     A=2 B=0 C=4 D=4 heavy
+00031 [L157] ISF      A=0 B=0 C=2 D=2 
+00032 [L157] JMP      A=3 B=128 C=4 D=32772 target=37
+00033 [L158] UGET     A=2 B=0 C=5 D=5 derive_function
+00034 [L158] MOV      A=3 B=0 C=1 D=1 
+00035 [L158] UGET     A=4 B=0 C=0 D=0 new_class
+00036 [L158] CALL     A=2 B=1 C=3 D=259 
+00037 [L160] UGET     A=2 B=0 C=0 D=0 new_class
+00038 [L160] TSETS    A=2 B=1 C=4 D=260 '__class'
+00039 [L161] UGET     A=2 B=0 C=6 D=6 setmetatable
+00040 [L161] MOV      A=3 B=0 C=1 D=1 
+00041 [L161] TDUP     A=4 B=0 C=5 D=5 {'kind': 'table', 'value': {}}
+00042 [L161] UGET     A=5 B=0 C=0 D=0 new_class
+00043 [L161] TSETS    A=5 B=4 C=6 D=1030 '__index'
+00044 [L161] CALL     A=2 B=1 C=3 D=259 
+00045 [L162] UGET     A=2 B=0 C=2 D=2 derive_variable
+00046 [L162] MOV      A=3 B=0 C=1 D=1 
+00047 [L162] UGET     A=4 B=0 C=0 D=0 new_class
+00048 [L162] VARG     A=5 B=0 C=0 D=0 
+00049 [L162] CALLM    A=2 B=1 C=2 D=258 
+00050 [L163] UGET     A=2 B=0 C=1 D=1 getmetatable
+00051 [L163] MOV      A=3 B=0 C=1 D=1 
+00052 [L163] CALL     A=2 B=2 C=2 D=514 
+00053 [L164] UGET     A=3 B=0 C=3 D=3 access_deny
+00054 [L164] TSETS    A=3 B=2 C=2 D=514 '__newindex'
+00055 [L165] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto5 offset=0x59d source_lines=169-172 params=1
+UPVALUES ['new_class']
+00001 [L170] UGET     A=1 B=0 C=0 D=0 new_class
+00002 [L170] UGET     A=2 B=0 C=0 D=0 new_class
+00003 [L170] TGETS    A=2 B=2 C=0 D=512 'free_class_count'
+00004 [L170] ADDVN    A=2 B=2 C=0 D=512 
+00005 [L170] TSETS    A=2 B=1 C=0 D=256 'free_class_count'
+00006 [L171] UGET     A=1 B=0 C=0 D=0 new_class
+00007 [L171] TGETS    A=1 B=1 C=1 D=257 'free_class'
+00008 [L171] UGET     A=2 B=0 C=0 D=0 new_class
+00009 [L171] TGETS    A=2 B=2 C=0 D=512 'free_class_count'
+00010 [L171] TSETV    A=0 B=1 C=2 D=258 
+00011 [L172] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x610 source_lines=175-175 params=1
+UPVALUES []
+00001 [L175] TGETS    A=1 B=0 C=0 D=0 '__super'
+00002 [L175] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto7 offset=0x637 source_lines=129-183 params=3
+UPVALUES ['setmetatable', 'getmetatable', 'derive_variable', 'access_deny', 'derive_function', 'getfenv']
+00001 [L130] TNEW     A=3 B=0 C=0 D=0 
+00002 [L131] TSETS    A=0 B=3 C=0 D=768 '__name'
+00003 [L132] TSETS    A=1 B=3 C=1 D=769 '__super'
+00004 [L134] TNEW     A=4 B=0 C=0 D=0 
+00005 [L134] TSETS    A=4 B=3 C=2 D=770 'free_class'
+00006 [L135] KSHORT   A=4 B=0 C=0 D=0 0
+00007 [L135] TSETS    A=4 B=3 C=3 D=771 'free_class_count'
+00008 [L138] ISF      A=0 B=0 C=1 D=1 
+00009 [L138] JMP      A=4 B=128 C=5 D=32773 target=15
+00010 [L139] UGET     A=4 B=0 C=0 D=0 setmetatable
+00011 [L139] MOV      A=5 B=0 C=3 D=3 
+00012 [L139] TDUP     A=6 B=0 C=4 D=4 {'kind': 'table', 'value': {}}
+00013 [L139] TSETS    A=1 B=6 C=5 D=1541 '__index'
+00014 [L139] CALL     A=4 B=1 C=3 D=259 
+00015 [L166] FNEW     A=4 B=0 C=7 D=7 {'kind': 'proto', 'id': 4}
+00016 [L166] TSETS    A=4 B=3 C=6 D=774 'new'
+00017 [L172] FNEW     A=4 B=0 C=9 D=9 {'kind': 'proto', 'id': 5}
+00018 [L172] TSETS    A=4 B=3 C=8 D=776 'del'
+00019 [L175] FNEW     A=4 B=0 C=11 D=11 {'kind': 'proto', 'id': 6}
+00020 [L175] TSETS    A=4 B=3 C=10 D=778 'super'
+00021 [L176] UGET     A=4 B=0 C=5 D=5 getfenv
+00022 [L176] KSHORT   A=5 B=0 C=2 D=2 2
+00023 [L176] CALL     A=4 B=2 C=2 D=514 
+00024 [L177] TGETS    A=5 B=4 C=12 D=1036 '_NAME'
+00025 [L177] ISF      A=0 B=0 C=5 D=5 
+00026 [L177] JMP      A=6 B=128 C=6 D=32774 target=33
+00027 [L178] TGETS    A=5 B=4 C=12 D=1036 '_NAME'
+00028 [L178] KSTR     A=6 B=0 C=14 D=14 '.'
+00029 [L178] MOV      A=7 B=0 C=0 D=0 
+00030 [L178] CAT      A=5 B=5 C=7 D=1287 
+00031 [L178] TSETS    A=5 B=3 C=13 D=781 '__fullname'
+00032 [L178] JMP      A=5 B=128 C=1 D=32769 target=34
+00033 [L180] TSETS    A=0 B=3 C=13 D=781 '__fullname'
+00034 [L182] TSETV    A=3 B=4 C=0 D=1024 
+00035 [L183] UCLO     A=0 B=128 C=0 D=32768 target=36
+00036 [L183] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto8 offset=0x7dd source_lines=188-207 params=2
+UPVALUES ['mark', 'pairs', 'type', 'string', 'table', 'assign', 'ser_table', 'tostring']
+00001 [L189] UGET     A=2 B=0 C=0 D=0 mark
+00002 [L189] TSETV    A=1 B=2 C=0 D=512 
+00003 [L190] TNEW     A=2 B=0 C=0 D=0 
+00004 [L191] UGET     A=3 B=0 C=1 D=1 pairs
+00005 [L191] MOV      A=4 B=0 C=0 D=0 
+00006 [L191] CALL     A=3 B=4 C=2 D=1026 
+00007 [L191] ISNEXT   A=6 B=128 C=92 D=32860 target=100
+00008 [L192] UGET     A=8 B=0 C=2 D=2 type
+00009 [L192] MOV      A=9 B=0 C=6 D=6 
+00010 [L192] CALL     A=8 B=2 C=2 D=514 
+00011 [L192] ISNES    A=8 B=0 C=0 D=0 'number'
+00012 [L192] JMP      A=8 B=128 C=6 D=32774 target=19
+00013 [L192] KSTR     A=8 B=0 C=1 D=1 '['
+00014 [L192] MOV      A=9 B=0 C=6 D=6 
+00015 [L192] KSTR     A=10 B=0 C=2 D=2 ']'
+00016 [L192] CAT      A=8 B=8 C=10 D=2058 
+00017 [L192] IST      A=0 B=0 C=8 D=8 
+00018 [L192] JMP      A=9 B=128 C=8 D=32776 target=27
+00019 [L192] KSTR     A=8 B=0 C=1 D=1 '['
+00020 [L192] UGET     A=9 B=0 C=3 D=3 string
+00021 [L192] TGETS    A=9 B=9 C=3 D=2307 'format'
+00022 [L192] KSTR     A=10 B=0 C=4 D=4 '%q'
+00023 [L192] MOV      A=11 B=0 C=6 D=6 
+00024 [L192] CALL     A=9 B=2 C=3 D=515 
+00025 [L192] KSTR     A=10 B=0 C=2 D=2 ']'
+00026 [L192] CAT      A=8 B=8 C=10 D=2058 
+00027 [L193] UGET     A=9 B=0 C=2 D=2 type
+00028 [L193] MOV      A=10 B=0 C=7 D=7 
+00029 [L193] CALL     A=9 B=2 C=2 D=514 
+00030 [L193] ISNES    A=9 B=0 C=5 D=5 'table'
+00031 [L193] JMP      A=9 B=128 C=30 D=32798 target=62
+00032 [L194] MOV      A=9 B=0 C=1 D=1 
+00033 [L194] MOV      A=10 B=0 C=8 D=8 
+00034 [L194] CAT      A=9 B=9 C=10 D=2314 
+00035 [L195] UGET     A=10 B=0 C=0 D=0 mark
+00036 [L195] TGETV    A=10 B=10 C=7 D=2567 
+00037 [L195] ISF      A=0 B=0 C=10 D=10 
+00038 [L195] JMP      A=11 B=128 C=11 D=32779 target=50
+00039 [L196] UGET     A=10 B=0 C=4 D=4 table
+00040 [L196] TGETS    A=10 B=10 C=6 D=2566 'insert'
+00041 [L196] UGET     A=11 B=0 C=5 D=5 assign
+00042 [L196] MOV      A=12 B=0 C=9 D=9 
+00043 [L196] KSTR     A=13 B=0 C=7 D=7 '='
+00044 [L196] UGET     A=14 B=0 C=0 D=0 mark
+00045 [L196] TGETV    A=14 B=14 C=7 D=3591 
+00046 [L196] KSTR     A=15 B=0 C=8 D=8 ''
+00047 [L196] CAT      A=12 B=12 C=15 D=3087 
+00048 [L196] CALL     A=10 B=1 C=3 D=259 
+00049 [L196] JMP      A=10 B=128 C=50 D=32818 target=100
+00050 [L198] UGET     A=10 B=0 C=4 D=4 table
+00051 [L198] TGETS    A=10 B=10 C=6 D=2566 'insert'
+00052 [L198] MOV      A=11 B=0 C=2 D=2 
+00053 [L198] MOV      A=12 B=0 C=8 D=8 
+00054 [L198] KSTR     A=13 B=0 C=7 D=7 '='
+00055 [L198] UGET     A=14 B=0 C=6 D=6 ser_table
+00056 [L198] MOV      A=15 B=0 C=7 D=7 
+00057 [L198] MOV      A=16 B=0 C=9 D=9 
+00058 [L198] CALL     A=14 B=2 C=3 D=515 
+00059 [L198] CAT      A=12 B=12 C=14 D=3086 
+00060 [L198] CALL     A=10 B=1 C=3 D=259 
+00061 [L199] JMP      A=9 B=128 C=38 D=32806 target=100
+00062 [L200] UGET     A=9 B=0 C=2 D=2 type
+00063 [L200] MOV      A=10 B=0 C=7 D=7 
+00064 [L200] CALL     A=9 B=2 C=2 D=514 
+00065 [L200] ISNES    A=9 B=0 C=9 D=9 'string'
+00066 [L200] JMP      A=9 B=128 C=13 D=32781 target=80
+00067 [L201] UGET     A=9 B=0 C=4 D=4 table
+00068 [L201] TGETS    A=9 B=9 C=6 D=2310 'insert'
+00069 [L201] MOV      A=10 B=0 C=2 D=2 
+00070 [L201] MOV      A=11 B=0 C=8 D=8 
+00071 [L201] KSTR     A=12 B=0 C=7 D=7 '='
+00072 [L201] UGET     A=13 B=0 C=3 D=3 string
+00073 [L201] TGETS    A=13 B=13 C=3 D=3331 'format'
+00074 [L201] KSTR     A=14 B=0 C=4 D=4 '%q'
+00075 [L201] MOV      A=15 B=0 C=7 D=7 
+00076 [L201] CALL     A=13 B=2 C=3 D=515 
+00077 [L201] CAT      A=11 B=11 C=13 D=2829 
+00078 [L201] CALL     A=9 B=1 C=3 D=259 
+00079 [L201] JMP      A=9 B=128 C=20 D=32788 target=100
+00080 [L202] UGET     A=9 B=0 C=2 D=2 type
+00081 [L202] MOV      A=10 B=0 C=7 D=7 
+00082 [L202] CALL     A=9 B=2 C=2 D=514 
+00083 [L202] ISEQS    A=9 B=0 C=0 D=0 'number'
+00084 [L202] JMP      A=9 B=128 C=5 D=32773 target=90
+00085 [L202] UGET     A=9 B=0 C=2 D=2 type
+00086 [L202] MOV      A=10 B=0 C=7 D=7 
+00087 [L202] CALL     A=9 B=2 C=2 D=514 
+00088 [L202] ISNES    A=9 B=0 C=10 D=10 'boolean'
+00089 [L202] JMP      A=9 B=128 C=10 D=32778 target=100
+00090 [L203] UGET     A=9 B=0 C=4 D=4 table
+00091 [L203] TGETS    A=9 B=9 C=6 D=2310 'insert'
+00092 [L203] MOV      A=10 B=0 C=2 D=2 
+00093 [L203] MOV      A=11 B=0 C=8 D=8 
+00094 [L203] KSTR     A=12 B=0 C=7 D=7 '='
+00095 [L203] UGET     A=13 B=0 C=7 D=7 tostring
+00096 [L203] MOV      A=14 B=0 C=7 D=7 
+00097 [L203] CALL     A=13 B=2 C=2 D=514 
+00098 [L203] CAT      A=11 B=11 C=13 D=2829 
+00099 [L203] CALL     A=9 B=1 C=3 D=259 
+00100 [L191] ITERN    A=6 B=3 C=3 D=771 
+00101 [L191] ITERL    A=6 B=127 C=162 D=32674 target=8
+00102 [L206] KSTR     A=3 B=0 C=11 D=11 '{'
+00103 [L206] UGET     A=4 B=0 C=4 D=4 table
+00104 [L206] TGETS    A=4 B=4 C=12 D=1036 'concat'
+00105 [L206] MOV      A=5 B=0 C=2 D=2 
+00106 [L206] KSTR     A=6 B=0 C=13 D=13 ','
+00107 [L206] CALL     A=4 B=2 C=3 D=515 
+00108 [L206] KSTR     A=5 B=0 C=14 D=14 '}'
+00109 [L206] CAT      A=3 B=3 C=5 D=773 
+00110 [L206] RET1     A=3 B=0 C=2 D=2 
+
+FUNCTION proto9 offset=0xacf source_lines=185-209 params=1
+UPVALUES ['pairs', 'type', 'string', 'table', 'tostring']
+00001 [L186] TNEW     A=1 B=0 C=0 D=0 
+00002 [L187] TNEW     A=2 B=0 C=0 D=0 
+00003 [L207] FNEW     A=3 B=0 C=0 D=0 {'kind': 'proto', 'id': 8}
+00004 [L208] MOV      A=4 B=0 C=3 D=3 
+00005 [L208] MOV      A=5 B=0 C=0 D=0 
+00006 [L208] KSTR     A=6 B=0 C=1 D=1 'ret'
+00007 [L208] CALL     A=4 B=2 C=3 D=515 
+00008 [L208] UGET     A=5 B=0 C=3 D=3 table
+00009 [L208] TGETS    A=5 B=5 C=2 D=1282 'concat'
+00010 [L208] MOV      A=6 B=0 C=2 D=2 
+00011 [L208] KSTR     A=7 B=0 C=3 D=3 ''
+00012 [L208] CALL     A=5 B=2 C=3 D=515 
+00013 [L208] CAT      A=4 B=4 C=5 D=1029 
+00014 [L208] UCLO     A=0 B=128 C=0 D=32768 target=15
+00015 [L208] RET1     A=4 B=0 C=2 D=2 
+
+FUNCTION proto10 offset=0xb7f source_lines=211-216 params=1
+UPVALUES ['loadstring']
+00001 [L212] UGET     A=1 B=0 C=0 D=0 loadstring
+00002 [L212] KSTR     A=2 B=0 C=0 D=0 'do local ret='
+00003 [L212] MOV      A=3 B=0 C=0 D=0 
+00004 [L212] KSTR     A=4 B=0 C=1 D=1 ' return ret end'
+00005 [L212] CAT      A=2 B=2 C=4 D=516 
+00006 [L212] CALL     A=1 B=2 C=2 D=514 
+00007 [L213] ISF      A=0 B=0 C=1 D=1 
+00008 [L213] JMP      A=2 B=128 C=2 D=32770 target=11
+00009 [L214] MOV      A=2 B=0 C=1 D=1 
+00010 [L214] CALLT    A=2 B=0 C=1 D=1 
+00011 [L216] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto11 offset=0xbfd source_lines=0-221 params=0
+UPVALUES []
+00001 [L8] GGET     A=0 B=0 C=0 D=0 'setmetatable'
+00002 [L9] GGET     A=1 B=0 C=1 D=1 'getmetatable'
+00003 [L10] GGET     A=2 B=0 C=2 D=2 'getfenv'
+00004 [L11] GGET     A=3 B=0 C=3 D=3 'table'
+00005 [L12] GGET     A=4 B=0 C=4 D=4 'pairs'
+00006 [L13] GGET     A=5 B=0 C=5 D=5 'type'
+00007 [L14] GGET     A=6 B=0 C=6 D=6 'error'
+00008 [L15] GGET     A=7 B=0 C=7 D=7 'rawget'
+00009 [L16] GGET     A=8 B=0 C=8 D=8 'print'
+00010 [L17] GGET     A=9 B=0 C=9 D=9 'string'
+00011 [L18] GGET     A=10 B=0 C=10 D=10 'tostring'
+00012 [L19] GGET     A=11 B=0 C=11 D=11 'loadstring'
+00013 [L57] GGET     A=12 B=0 C=12 D=12 'module'
+00014 [L57] KSTR     A=13 B=0 C=13 D=13 'base.loop'
+00015 [L57] CALL     A=12 B=1 C=2 D=258 
+00016 [L66] FNEW     A=12 B=0 C=14 D=14 {'kind': 'proto', 'id': 0}
+00017 [L69] TDUP     A=13 B=0 C=15 D=15 {'kind': 'table', 'value': {}}
+00018 [L70] TSETS    A=12 B=13 C=16 D=3344 '__index'
+00019 [L71] TSETS    A=12 B=13 C=17 D=3345 '__newindex'
+00020 [L87] FNEW     A=14 B=0 C=18 D=18 {'kind': 'proto', 'id': 1}
+00021 [L109] FNEW     A=15 B=0 C=19 D=19 {'kind': 'proto', 'id': 2}
+00022 [L123] FNEW     A=16 B=0 C=20 D=20 {'kind': 'proto', 'id': 3}
+00023 [L183] FNEW     A=17 B=0 C=21 D=21 {'kind': 'proto', 'id': 7}
+00024 [L129] GSET     A=17 B=0 C=22 D=22 'class'
+00025 [L209] FNEW     A=17 B=0 C=23 D=23 {'kind': 'proto', 'id': 9}
+00026 [L209] TSETS    A=17 B=3 C=10 D=778 'tostring'
+00027 [L216] FNEW     A=17 B=0 C=24 D=24 {'kind': 'proto', 'id': 10}
+00028 [L216] TSETS    A=17 B=3 C=11 D=779 'loadstring'
+00029 [L216] UCLO     A=0 B=128 C=0 D=32768 target=30
+00030 [L216] RET0     A=0 B=0 C=1 D=1 

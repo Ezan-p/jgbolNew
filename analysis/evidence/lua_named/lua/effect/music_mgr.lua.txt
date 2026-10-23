@@ -1,0 +1,519 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\e596a0c68c58b564b3d36e9c0f0c0e13.data'; root=proto16
+
+FUNCTION proto0 offset=0x4b source_lines=26-29 params=1
+UPVALUES ['SimpleAudioEngine']
+00001 [L27] UGET     A=1 B=0 C=0 D=0 SimpleAudioEngine
+00002 [L27] MOV      A=2 B=0 C=1 D=1 
+00003 [L27] TGETS    A=1 B=1 C=0 D=256 'sharedEngine'
+00004 [L27] CALL     A=1 B=2 C=2 D=514 
+00005 [L27] MOV      A=2 B=0 C=1 D=1 
+00006 [L27] TGETS    A=1 B=1 C=1 D=257 'setEffectsVolume'
+00007 [L27] MOV      A=3 B=0 C=0 D=0 
+00008 [L27] CALL     A=1 B=1 C=3 D=259 
+00009 [L28] UGET     A=1 B=0 C=0 D=0 SimpleAudioEngine
+00010 [L28] MOV      A=2 B=0 C=1 D=1 
+00011 [L28] TGETS    A=1 B=1 C=0 D=256 'sharedEngine'
+00012 [L28] CALL     A=1 B=2 C=2 D=514 
+00013 [L28] MOV      A=2 B=0 C=1 D=1 
+00014 [L28] TGETS    A=1 B=1 C=2 D=258 'setBackgroundMusicVolume'
+00015 [L28] MOV      A=3 B=0 C=0 D=0 
+00016 [L28] CALL     A=1 B=1 C=3 D=259 
+00017 [L29] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x100 source_lines=31-34 params=0
+UPVALUES ['CCLuaLog', 'string']
+00001 [L33] UGET     A=0 B=0 C=0 D=0 CCLuaLog
+00002 [L33] UGET     A=1 B=0 C=1 D=1 string
+00003 [L33] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L33] VARG     A=2 B=0 C=0 D=0 
+00005 [L33] CALLM    A=1 B=0 C=0 D=0 
+00006 [L33] CALLM    A=0 B=1 C=0 D=256 
+00007 [L34] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto2 offset=0x14b source_lines=37-53 params=1
+UPVALUES ['string', 'cclog']
+00001 [L38] LEN      A=1 B=0 C=0 D=0 
+00002 [L40] UGET     A=2 B=0 C=0 D=0 string
+00003 [L40] TGETS    A=2 B=2 C=0 D=512 'find'
+00004 [L40] MOV      A=3 B=0 C=0 D=0 
+00005 [L40] KSTR     A=4 B=0 C=1 D=1 '/'
+00006 [L40] CALL     A=2 B=2 C=3 D=515 
+00007 [L41] ISF      A=0 B=0 C=2 D=2 
+00008 [L41] JMP      A=3 B=128 C=29 D=32797 target=38
+00009 [L42] UGET     A=3 B=0 C=0 D=0 string
+00010 [L42] TGETS    A=3 B=3 C=0 D=768 'find'
+00011 [L42] MOV      A=4 B=0 C=0 D=0 
+00012 [L42] KSTR     A=5 B=0 C=1 D=1 '/'
+00013 [L42] ADDVN    A=6 B=2 C=0 D=512 
+00014 [L42] CALL     A=3 B=2 C=4 D=516 
+00015 [L43] ISF      A=0 B=0 C=3 D=3 
+00016 [L43] JMP      A=4 B=128 C=19 D=32787 target=36
+00017 [L44] UGET     A=4 B=0 C=0 D=0 string
+00018 [L44] TGETS    A=4 B=4 C=2 D=1026 'sub'
+00019 [L44] MOV      A=5 B=0 C=0 D=0 
+00020 [L44] KSHORT   A=6 B=0 C=1 D=1 1
+00021 [L44] SUBVN    A=7 B=3 C=1 D=769 
+00022 [L44] CALL     A=4 B=2 C=4 D=516 
+00023 [L44] UGET     A=5 B=0 C=0 D=0 string
+00024 [L44] TGETS    A=5 B=5 C=2 D=1282 'sub'
+00025 [L44] MOV      A=6 B=0 C=0 D=0 
+00026 [L44] ADDVN    A=7 B=3 C=0 D=768 
+00027 [L44] MOV      A=8 B=0 C=1 D=1 
+00028 [L44] CALL     A=5 B=2 C=4 D=516 
+00029 [L44] CAT      A=4 B=4 C=5 D=1029 
+00030 [L45] UGET     A=5 B=0 C=1 D=1 cclog
+00031 [L45] KSTR     A=6 B=0 C=3 D=3 'changeRealPath: new_real_path=%s'
+00032 [L45] MOV      A=7 B=0 C=4 D=4 
+00033 [L45] CALL     A=5 B=1 C=3 D=259 
+00034 [L46] RET1     A=4 B=0 C=2 D=2 
+00035 [L46] JMP      A=4 B=128 C=3 D=32771 target=39
+00036 [L48] RET1     A=0 B=0 C=2 D=2 
+00037 [L49] JMP      A=3 B=128 C=1 D=32769 target=39
+00038 [L51] RET1     A=0 B=0 C=2 D=2 
+00039 [L53] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto3 offset=0x290 source_lines=57-61 params=0
+UPVALUES []
+00001 [L58] GGET     A=0 B=0 C=0 D=0 'd_setting'
+00002 [L58] TGETS    A=0 B=0 C=1 D=1 'g_setting'
+00003 [L58] TGETS    A=0 B=0 C=2 D=2 'openMusic'
+00004 [L58] ISNEN    A=0 B=0 C=0 D=0 1
+00005 [L58] JMP      A=0 B=128 C=3 D=32771 target=9
+00006 [L59] GGET     A=0 B=0 C=3 D=3 'play_bkg'
+00007 [L59] KSTR     A=1 B=0 C=4 D=4 'music/ui.mp3'
+00008 [L59] CALL     A=0 B=1 C=2 D=258 
+00009 [L61] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto4 offset=0x2fe source_lines=65-69 params=0
+UPVALUES []
+00001 [L66] GGET     A=0 B=0 C=0 D=0 'd_setting'
+00002 [L66] TGETS    A=0 B=0 C=1 D=1 'g_setting'
+00003 [L66] TGETS    A=0 B=0 C=2 D=2 'openMusic'
+00004 [L66] ISNEN    A=0 B=0 C=0 D=0 1
+00005 [L66] JMP      A=0 B=128 C=3 D=32771 target=9
+00006 [L67] GGET     A=0 B=0 C=3 D=3 'play_bkg'
+00007 [L67] KSTR     A=1 B=0 C=4 D=4 'music/fight.mp3'
+00008 [L67] CALL     A=0 B=1 C=2 D=258 
+00009 [L69] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto5 offset=0x370 source_lines=73-77 params=1
+UPVALUES []
+00001 [L74] GGET     A=1 B=0 C=0 D=0 'd_setting'
+00002 [L74] TGETS    A=1 B=1 C=1 D=257 'g_setting'
+00003 [L74] TGETS    A=1 B=1 C=2 D=258 'openEffect'
+00004 [L74] ISNEN    A=1 B=0 C=0 D=0 1
+00005 [L74] JMP      A=1 B=128 C=6 D=32774 target=12
+00006 [L75] GGET     A=1 B=0 C=3 D=3 'play_efc'
+00007 [L75] KSTR     A=2 B=0 C=4 D=4 'music/'
+00008 [L75] MOV      A=3 B=0 C=0 D=0 
+00009 [L75] KSTR     A=4 B=0 C=5 D=5 '.mp3'
+00010 [L75] CAT      A=2 B=2 C=4 D=516 
+00011 [L75] CALL     A=1 B=1 C=2 D=258 
+00012 [L77] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x3f4 source_lines=81-85 params=0
+UPVALUES []
+00001 [L82] GGET     A=0 B=0 C=0 D=0 'd_setting'
+00002 [L82] TGETS    A=0 B=0 C=1 D=1 'g_setting'
+00003 [L82] TGETS    A=0 B=0 C=2 D=2 'openEffect'
+00004 [L82] ISNEN    A=0 B=0 C=0 D=0 1
+00005 [L82] JMP      A=0 B=128 C=3 D=32771 target=9
+00006 [L83] GGET     A=0 B=0 C=3 D=3 'play_efc'
+00007 [L83] KSTR     A=1 B=0 C=4 D=4 'music/click.mp3'
+00008 [L83] CALL     A=0 B=1 C=2 D=258 
+00009 [L85] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto7 offset=0x466 source_lines=89-93 params=0
+UPVALUES []
+00001 [L90] GGET     A=0 B=0 C=0 D=0 'd_setting'
+00002 [L90] TGETS    A=0 B=0 C=1 D=1 'g_setting'
+00003 [L90] TGETS    A=0 B=0 C=2 D=2 'openEffect'
+00004 [L90] ISNEN    A=0 B=0 C=0 D=0 1
+00005 [L90] JMP      A=0 B=128 C=3 D=32771 target=9
+00006 [L91] GGET     A=0 B=0 C=3 D=3 'play_efc'
+00007 [L91] KSTR     A=1 B=0 C=4 D=4 'music/lugame_cover.mp3'
+00008 [L91] CALL     A=0 B=1 C=2 D=258 
+00009 [L93] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto8 offset=0x4df source_lines=96-100 params=0
+UPVALUES []
+00001 [L97] GGET     A=0 B=0 C=0 D=0 'd_setting'
+00002 [L97] TGETS    A=0 B=0 C=1 D=1 'g_setting'
+00003 [L97] TGETS    A=0 B=0 C=2 D=2 'openEffect'
+00004 [L97] ISNEN    A=0 B=0 C=0 D=0 1
+00005 [L97] JMP      A=0 B=128 C=3 D=32771 target=9
+00006 [L98] GGET     A=0 B=0 C=3 D=3 'play_efc'
+00007 [L98] KSTR     A=1 B=0 C=4 D=4 'music/lugame_shake.mp3'
+00008 [L98] CALL     A=0 B=1 C=2 D=258 
+00009 [L100] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto9 offset=0x559 source_lines=104-126 params=1
+UPVALUES ['SimpleAudioEngine', 'cclog', 'main_server', 'CCApplication']
+00001 [L105] UGET     A=1 B=0 C=0 D=0 SimpleAudioEngine
+00002 [L105] MOV      A=2 B=0 C=1 D=1 
+00003 [L105] TGETS    A=1 B=1 C=0 D=256 'sharedEngine'
+00004 [L105] CALL     A=1 B=2 C=2 D=514 
+00005 [L105] MOV      A=2 B=0 C=1 D=1 
+00006 [L105] TGETS    A=1 B=1 C=1 D=257 'isBackgroundMusicPlaying'
+00007 [L105] CALL     A=1 B=2 C=2 D=514 
+00008 [L105] ISF      A=0 B=0 C=1 D=1 
+00009 [L105] JMP      A=2 B=128 C=4 D=32772 target=14
+00010 [L106] GGET     A=1 B=0 C=2 D=2 'g_voice'
+00011 [L106] ISNEV    A=1 B=0 C=0 D=0 
+00012 [L106] JMP      A=1 B=128 C=1 D=32769 target=14
+00013 [L107] RET0     A=0 B=0 C=1 D=1 
+00014 [L110] UGET     A=1 B=0 C=1 D=1 cclog
+00015 [L110] KSTR     A=2 B=0 C=3 D=3 'call play_bkg: name=%s'
+00016 [L110] MOV      A=3 B=0 C=0 D=0 
+00017 [L110] CALL     A=1 B=1 C=3 D=259 
+00018 [L112] GSET     A=0 B=0 C=2 D=2 'g_voice'
+00019 [L113] UGET     A=1 B=0 C=2 D=2 main_server
+00020 [L113] TGETS    A=1 B=1 C=4 D=260 'get_real_path'
+00021 [L113] MOV      A=2 B=0 C=0 D=0 
+00022 [L113] CALL     A=1 B=2 C=2 D=514 
+00023 [L115] UGET     A=2 B=0 C=3 D=3 CCApplication
+00024 [L115] MOV      A=3 B=0 C=2 D=2 
+00025 [L115] TGETS    A=2 B=2 C=5 D=517 'sharedApplication'
+00026 [L115] CALL     A=2 B=2 C=2 D=514 
+00027 [L115] MOV      A=3 B=0 C=2 D=2 
+00028 [L115] TGETS    A=2 B=2 C=6 D=518 'getTargetPlatform'
+00029 [L115] CALL     A=2 B=2 C=2 D=514 
+00030 [L115] ISNEN    A=2 B=0 C=0 D=0 0
+00031 [L115] JMP      A=2 B=128 C=1 D=32769 target=33
+00032 [L116] MOV      A=1 B=0 C=0 D=0 
+00033 [L119] UGET     A=2 B=0 C=1 D=1 cclog
+00034 [L119] KSTR     A=3 B=0 C=7 D=7 'call play_bkg: real_path=%s'
+00035 [L119] MOV      A=4 B=0 C=1 D=1 
+00036 [L119] CALL     A=2 B=1 C=3 D=259 
+00037 [L120] GGET     A=2 B=0 C=8 D=8 'd_u'
+00038 [L120] TGETS    A=2 B=2 C=9 D=521 'isIOS'
+00039 [L120] CALL     A=2 B=2 C=1 D=513 
+00040 [L120] ISF      A=0 B=0 C=2 D=2 
+00041 [L120] JMP      A=3 B=128 C=9 D=32777 target=51
+00042 [L120] GGET     A=2 B=0 C=8 D=8 'd_u'
+00043 [L120] TGETS    A=2 B=2 C=10 D=522 'isLuaC'
+00044 [L120] CALL     A=2 B=2 C=1 D=513 
+00045 [L120] ISF      A=0 B=0 C=2 D=2 
+00046 [L120] JMP      A=3 B=128 C=4 D=32772 target=51
+00047 [L121] GGET     A=2 B=0 C=11 D=11 'changeRealPath'
+00048 [L121] MOV      A=3 B=0 C=1 D=1 
+00049 [L121] CALL     A=2 B=2 C=2 D=514 
+00050 [L121] MOV      A=1 B=0 C=2 D=2 
+00051 [L125] UGET     A=2 B=0 C=0 D=0 SimpleAudioEngine
+00052 [L125] MOV      A=3 B=0 C=2 D=2 
+00053 [L125] TGETS    A=2 B=2 C=0 D=512 'sharedEngine'
+00054 [L125] CALL     A=2 B=2 C=2 D=514 
+00055 [L125] MOV      A=3 B=0 C=2 D=2 
+00056 [L125] TGETS    A=2 B=2 C=12 D=524 'playBackgroundMusic'
+00057 [L125] MOV      A=4 B=0 C=1 D=1 
+00058 [L125] KPRI     A=5 B=0 C=2 D=2 
+00059 [L125] CALL     A=2 B=1 C=4 D=260 
+00060 [L126] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto10 offset=0x7ab source_lines=128-130 params=0
+UPVALUES ['SimpleAudioEngine']
+00001 [L129] UGET     A=0 B=0 C=0 D=0 SimpleAudioEngine
+00002 [L129] MOV      A=1 B=0 C=0 D=0 
+00003 [L129] TGETS    A=0 B=0 C=0 D=0 'sharedEngine'
+00004 [L129] CALL     A=0 B=2 C=2 D=514 
+00005 [L129] MOV      A=1 B=0 C=0 D=0 
+00006 [L129] TGETS    A=0 B=0 C=1 D=1 'stopBackgroundMusic'
+00007 [L129] KPRI     A=2 B=0 C=2 D=2 
+00008 [L129] CALL     A=0 B=1 C=3 D=259 
+00009 [L130] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto11 offset=0x81b source_lines=136-147 params=0
+UPVALUES ['main_server', 'string']
+00001 [L137] GGET     A=0 B=0 C=0 D=0 'g_is_i9100'
+00002 [L137] ISNEP    A=0 B=0 C=0 D=0 
+00003 [L137] JMP      A=0 B=128 C=25 D=32793 target=29
+00004 [L138] KPRI     A=0 B=0 C=1 D=1 
+00005 [L138] GSET     A=0 B=0 C=0 D=0 'g_is_i9100'
+00006 [L139] UGET     A=0 B=0 C=0 D=0 main_server
+00007 [L139] TGETS    A=0 B=0 C=1 D=1 'get_mobile_type'
+00008 [L139] ISF      A=0 B=0 C=0 D=0 
+00009 [L139] JMP      A=1 B=128 C=19 D=32787 target=29
+00010 [L140] UGET     A=0 B=0 C=0 D=0 main_server
+00011 [L140] TGETS    A=0 B=0 C=1 D=1 'get_mobile_type'
+00012 [L140] CALL     A=0 B=2 C=1 D=513 
+00013 [L141] UGET     A=1 B=0 C=1 D=1 string
+00014 [L141] TGETS    A=1 B=1 C=2 D=258 'find'
+00015 [L141] MOV      A=2 B=0 C=0 D=0 
+00016 [L141] KSTR     A=3 B=0 C=3 D=3 'i9100'
+00017 [L141] CALL     A=1 B=2 C=3 D=515 
+00018 [L141] ISNEP    A=1 B=0 C=0 D=0 
+00019 [L141] JMP      A=1 B=128 C=7 D=32775 target=27
+00020 [L141] UGET     A=1 B=0 C=1 D=1 string
+00021 [L141] TGETS    A=1 B=1 C=2 D=258 'find'
+00022 [L141] MOV      A=2 B=0 C=0 D=0 
+00023 [L141] KSTR     A=3 B=0 C=4 D=4 'I9100'
+00024 [L141] CALL     A=1 B=2 C=3 D=515 
+00025 [L141] ISEQP    A=1 B=0 C=0 D=0 
+00026 [L141] JMP      A=1 B=128 C=2 D=32770 target=29
+00027 [L142] KPRI     A=1 B=0 C=2 D=2 
+00028 [L142] GSET     A=1 B=0 C=0 D=0 'g_is_i9100'
+00029 [L146] GGET     A=0 B=0 C=0 D=0 'g_is_i9100'
+00030 [L146] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto12 offset=0x914 source_lines=151-188 params=1
+UPVALUES ['cclog', 'main_server', 'CCApplication', 'string', 'SimpleAudioEngine', 'table']
+00001 [L153] GGET     A=1 B=0 C=0 D=0 'is_i9100'
+00002 [L153] CALL     A=1 B=2 C=1 D=513 
+00003 [L153] ISNEP    A=1 B=0 C=2 D=2 
+00004 [L153] JMP      A=1 B=128 C=1 D=32769 target=6
+00005 [L154] RET0     A=0 B=0 C=1 D=1 
+00006 [L157] ISEQP    A=0 B=0 C=0 D=0 
+00007 [L157] JMP      A=1 B=128 C=4 D=32772 target=12
+00008 [L157] LEN      A=1 B=0 C=0 D=0 
+00009 [L157] KSHORT   A=2 B=0 C=0 D=0 0
+00010 [L157] ISGT     A=1 B=0 C=2 D=2 
+00011 [L157] JMP      A=1 B=128 C=4 D=32772 target=16
+00012 [L158] UGET     A=1 B=0 C=0 D=0 cclog
+00013 [L158] KSTR     A=2 B=0 C=1 D=1 'ERROR: play_efc find ogg_name = nil or empty.'
+00014 [L158] CALL     A=1 B=1 C=2 D=258 
+00015 [L159] RET0     A=0 B=0 C=1 D=1 
+00016 [L162] UGET     A=1 B=0 C=1 D=1 main_server
+00017 [L162] TGETS    A=1 B=1 C=2 D=258 'get_real_path'
+00018 [L162] MOV      A=2 B=0 C=0 D=0 
+00019 [L162] CALL     A=1 B=2 C=2 D=514 
+00020 [L163] UGET     A=2 B=0 C=2 D=2 CCApplication
+00021 [L163] MOV      A=3 B=0 C=2 D=2 
+00022 [L163] TGETS    A=2 B=2 C=3 D=515 'sharedApplication'
+00023 [L163] CALL     A=2 B=2 C=2 D=514 
+00024 [L163] MOV      A=3 B=0 C=2 D=2 
+00025 [L163] TGETS    A=2 B=2 C=4 D=516 'getTargetPlatform'
+00026 [L163] CALL     A=2 B=2 C=2 D=514 
+00027 [L163] ISNEN    A=2 B=0 C=0 D=0 0
+00028 [L163] JMP      A=2 B=128 C=1 D=32769 target=30
+00029 [L164] MOV      A=1 B=0 C=0 D=0 
+00030 [L167] ISEQP    A=1 B=0 C=0 D=0 
+00031 [L167] JMP      A=2 B=128 C=4 D=32772 target=36
+00032 [L167] LEN      A=2 B=0 C=1 D=1 
+00033 [L167] KSHORT   A=3 B=0 C=0 D=0 0
+00034 [L167] ISGT     A=2 B=0 C=3 D=3 
+00035 [L167] JMP      A=2 B=128 C=6 D=32774 target=42
+00036 [L168] UGET     A=2 B=0 C=0 D=0 cclog
+00037 [L168] KSTR     A=3 B=0 C=5 D=5 'ERROR: set real_path='
+00038 [L168] MOV      A=4 B=0 C=0 D=0 
+00039 [L168] CAT      A=3 B=3 C=4 D=772 
+00040 [L168] CALL     A=2 B=1 C=2 D=258 
+00041 [L169] MOV      A=1 B=0 C=0 D=0 
+00042 [L172] ISEQS    A=1 B=0 C=6 D=6 'music/none.mp3'
+00043 [L172] JMP      A=2 B=128 C=8 D=32776 target=52
+00044 [L172] UGET     A=2 B=0 C=3 D=3 string
+00045 [L172] TGETS    A=2 B=2 C=7 D=519 'sub'
+00046 [L172] MOV      A=3 B=0 C=1 D=1 
+00047 [L172] KSHORT   A=4 B=0 C=1 D=1 1
+00048 [L172] KSHORT   A=5 B=0 C=11 D=11 11
+00049 [L172] CALL     A=2 B=2 C=4 D=516 
+00050 [L172] ISNES    A=2 B=0 C=8 D=8 'music/none_'
+00051 [L172] JMP      A=2 B=128 C=6 D=32774 target=58
+00052 [L173] UGET     A=2 B=0 C=0 D=0 cclog
+00053 [L173] KSTR     A=3 B=0 C=9 D=9 'ignore effect file = '
+00054 [L173] MOV      A=4 B=0 C=1 D=1 
+00055 [L173] CAT      A=3 B=3 C=4 D=772 
+00056 [L173] CALL     A=2 B=1 C=2 D=258 
+00057 [L174] RET0     A=0 B=0 C=1 D=1 
+00058 [L177] GGET     A=2 B=0 C=10 D=10 'd_u'
+00059 [L177] TGETS    A=2 B=2 C=11 D=523 'isIOS'
+00060 [L177] CALL     A=2 B=2 C=1 D=513 
+00061 [L177] ISF      A=0 B=0 C=2 D=2 
+00062 [L177] JMP      A=3 B=128 C=9 D=32777 target=72
+00063 [L177] GGET     A=2 B=0 C=10 D=10 'd_u'
+00064 [L177] TGETS    A=2 B=2 C=12 D=524 'isLuaC'
+00065 [L177] CALL     A=2 B=2 C=1 D=513 
+00066 [L177] ISF      A=0 B=0 C=2 D=2 
+00067 [L177] JMP      A=3 B=128 C=4 D=32772 target=72
+00068 [L178] GGET     A=2 B=0 C=13 D=13 'changeRealPath'
+00069 [L178] MOV      A=3 B=0 C=1 D=1 
+00070 [L178] CALL     A=2 B=2 C=2 D=514 
+00071 [L178] MOV      A=1 B=0 C=2 D=2 
+00072 [L181] UGET     A=2 B=0 C=4 D=4 SimpleAudioEngine
+00073 [L181] MOV      A=3 B=0 C=2 D=2 
+00074 [L181] TGETS    A=2 B=2 C=14 D=526 'sharedEngine'
+00075 [L181] CALL     A=2 B=2 C=2 D=514 
+00076 [L181] MOV      A=3 B=0 C=2 D=2 
+00077 [L181] TGETS    A=2 B=2 C=15 D=527 'playEffect'
+00078 [L181] MOV      A=4 B=0 C=1 D=1 
+00079 [L181] KPRI     A=5 B=0 C=1 D=1 
+00080 [L181] CALL     A=2 B=2 C=4 D=516 
+00081 [L182] KSHORT   A=3 B=0 C=1 D=1 1
+00082 [L182] GGET     A=4 B=0 C=16 D=16 'g_effects'
+00083 [L182] LEN      A=4 B=0 C=4 D=4 
+00084 [L182] KSHORT   A=5 B=0 C=1 D=1 1
+00085 [L182] FORI     A=3 B=128 C=6 D=32774 target=92
+00086 [L183] GGET     A=7 B=0 C=16 D=16 'g_effects'
+00087 [L183] TGETV    A=7 B=7 C=6 D=1798 
+00088 [L183] ISNEV    A=7 B=0 C=2 D=2 
+00089 [L183] JMP      A=7 B=128 C=1 D=32769 target=91
+00090 [L184] RET0     A=0 B=0 C=1 D=1 
+00091 [L182] FORL     A=3 B=127 C=250 D=32762 target=86
+00092 [L187] UGET     A=3 B=0 C=5 D=5 table
+00093 [L187] TGETS    A=3 B=3 C=17 D=785 'insert'
+00094 [L187] GGET     A=4 B=0 C=16 D=16 'g_effects'
+00095 [L187] MOV      A=5 B=0 C=2 D=2 
+00096 [L187] CALL     A=3 B=1 C=3 D=259 
+00097 [L188] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto13 offset=0xc7f source_lines=191-193 params=1
+UPVALUES ['SimpleAudioEngine']
+00001 [L192] UGET     A=1 B=0 C=0 D=0 SimpleAudioEngine
+00002 [L192] MOV      A=2 B=0 C=1 D=1 
+00003 [L192] TGETS    A=1 B=1 C=0 D=256 'sharedEngine'
+00004 [L192] CALL     A=1 B=2 C=2 D=514 
+00005 [L192] MOV      A=2 B=0 C=1 D=1 
+00006 [L192] TGETS    A=1 B=1 C=1 D=257 'stopEffect'
+00007 [L192] MOV      A=3 B=0 C=0 D=0 
+00008 [L192] KPRI     A=4 B=0 C=2 D=2 
+00009 [L192] CALL     A=1 B=1 C=4 D=260 
+00010 [L193] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto14 offset=0xcf4 source_lines=203-206 params=1
+UPVALUES []
+00001 [L204] GGET     A=1 B=0 C=0 D=0 'initEffectSoundCsv'
+00002 [L204] CALL     A=1 B=1 C=1 D=257 
+00003 [L205] GGET     A=1 B=0 C=1 D=1 'g_ccbi_sound_map'
+00004 [L205] TGETV    A=1 B=1 C=0 D=256 
+00005 [L205] IST      A=0 B=0 C=1 D=1 
+00006 [L205] JMP      A=2 B=128 C=1 D=32769 target=8
+00007 [L205] TNEW     A=1 B=0 C=0 D=0 
+00008 [L205] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto15 offset=0xd5a source_lines=210-247 params=0
+UPVALUES ['pairs', 'tonumber', 'cclog']
+00001 [L211] GGET     A=0 B=0 C=0 D=0 'g_ccbi_sound_map'
+00002 [L211] ISEQP    A=0 B=0 C=0 D=0 
+00003 [L211] JMP      A=0 B=128 C=1 D=32769 target=5
+00004 [L212] RET0     A=0 B=0 C=1 D=1 
+00005 [L215] GGET     A=0 B=0 C=1 D=1 'd_csv'
+00006 [L215] TGETS    A=0 B=0 C=2 D=2 'open2'
+00007 [L215] KSTR     A=1 B=0 C=3 D=3 'csv_config/effect_sound.csv'
+00008 [L215] CALL     A=0 B=2 C=2 D=514 
+00009 [L217] TNEW     A=1 B=0 C=0 D=0 
+00010 [L218] KSHORT   A=2 B=0 C=0 D=0 0
+00011 [L220] UGET     A=3 B=0 C=0 D=0 pairs
+00012 [L220] MOV      A=4 B=0 C=0 D=0 
+00013 [L220] CALL     A=3 B=4 C=2 D=1026 
+00014 [L220] ISNEXT   A=6 B=128 C=37 D=32805 target=52
+00015 [L221] TGETS    A=8 B=7 C=4 D=1796 'name'
+00016 [L222] TGETS    A=9 B=7 C=5 D=1797 'event'
+00017 [L222] ISNES    A=9 B=0 C=6 D=6 'ccbi'
+00018 [L222] JMP      A=9 B=128 C=3 D=32771 target=22
+00019 [L223] TGETS    A=9 B=7 C=4 D=1796 'name'
+00020 [L223] KSTR     A=10 B=0 C=7 D=7 '.ccbi'
+00021 [L223] CAT      A=8 B=9 C=10 D=2314 
+00022 [L226] TGETV    A=9 B=1 C=8 D=264 
+00023 [L226] IST      A=0 B=0 C=9 D=9 
+00024 [L226] JMP      A=9 B=128 C=2 D=32770 target=27
+00025 [L227] TNEW     A=9 B=0 C=0 D=0 
+00026 [L227] TSETV    A=9 B=1 C=8 D=264 
+00027 [L230] GGET     A=9 B=0 C=8 D=8 'd_str'
+00028 [L230] TGETS    A=9 B=9 C=9 D=2313 'split'
+00029 [L230] TGETS    A=10 B=7 C=10 D=1802 'sound'
+00030 [L230] KSTR     A=11 B=0 C=11 D=11 '/'
+00031 [L230] CALL     A=9 B=2 C=3 D=515 
+00032 [L231] KSHORT   A=10 B=0 C=1 D=1 1
+00033 [L231] LEN      A=11 B=0 C=9 D=9 
+00034 [L231] KSHORT   A=12 B=0 C=1 D=1 1
+00035 [L231] FORI     A=10 B=128 C=16 D=32784 target=52
+00036 [L232] GGET     A=14 B=0 C=8 D=8 'd_str'
+00037 [L232] TGETS    A=14 B=14 C=9 D=3593 'split'
+00038 [L232] TGETV    A=15 B=9 C=13 D=2317 
+00039 [L232] KSTR     A=16 B=0 C=12 D=12 '='
+00040 [L232] CALL     A=14 B=2 C=3 D=515 
+00041 [L233] LEN      A=15 B=0 C=14 D=14 
+00042 [L233] ISNEN    A=15 B=0 C=0 D=0 2
+00043 [L233] JMP      A=15 B=128 C=7 D=32775 target=51
+00044 [L234] TGETV    A=15 B=1 C=8 D=264 
+00045 [L234] UGET     A=16 B=0 C=1 D=1 tonumber
+00046 [L234] TGETB    A=17 B=14 C=1 D=3585 
+00047 [L234] CALL     A=16 B=2 C=2 D=514 
+00048 [L234] TGETB    A=17 B=14 C=2 D=3586 
+00049 [L234] TSETV    A=17 B=15 C=16 D=3856 
+00050 [L235] ADDVN    A=2 B=2 C=1 D=513 
+00051 [L231] FORL     A=10 B=127 C=240 D=32752 target=36
+00052 [L220] ITERN    A=6 B=3 C=3 D=771 
+00053 [L220] ITERL    A=6 B=127 C=217 D=32729 target=15
+00054 [L242] KSHORT   A=3 B=0 C=0 D=0 0
+00055 [L242] ISGE     A=3 B=0 C=2 D=2 
+00056 [L242] JMP      A=3 B=128 C=1 D=32769 target=58
+00057 [L243] GSET     A=1 B=0 C=0 D=0 'g_ccbi_sound_map'
+00058 [L246] UGET     A=3 B=0 C=2 D=2 cclog
+00059 [L246] KSTR     A=4 B=0 C=13 D=13 'call initEffectSoundCsv end'
+00060 [L246] CALL     A=3 B=1 C=2 D=258 
+00061 [L247] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto16 offset=0xf96 source_lines=0-250 params=0
+UPVALUES []
+00001 [L1] GGET     A=0 B=0 C=0 D=0 'table'
+00002 [L2] GGET     A=1 B=0 C=1 D=1 'string'
+00003 [L3] GGET     A=2 B=0 C=2 D=2 'SimpleAudioEngine'
+00004 [L4] GGET     A=3 B=0 C=3 D=3 'CCLuaLog'
+00005 [L5] GGET     A=4 B=0 C=4 D=4 'CCFileUtils'
+00006 [L6] GGET     A=5 B=0 C=5 D=5 'main_server'
+00007 [L7] GGET     A=6 B=0 C=6 D=6 'require'
+00008 [L8] GGET     A=7 B=0 C=7 D=7 'pairs'
+00009 [L9] GGET     A=8 B=0 C=8 D=8 'tonumber'
+00010 [L10] GGET     A=9 B=0 C=9 D=9 'CCApplication'
+00011 [L12] GGET     A=10 B=0 C=10 D=10 'module'
+00012 [L12] KSTR     A=11 B=0 C=11 D=11 'effect.music_mgr'
+00013 [L12] CALL     A=10 B=1 C=2 D=258 
+00014 [L15] MOV      A=10 B=0 C=6 D=6 
+00015 [L15] KSTR     A=11 B=0 C=12 D=12 'base.setting'
+00016 [L15] CALL     A=10 B=2 C=2 D=514 
+00017 [L15] GSET     A=10 B=0 C=13 D=13 'd_setting'
+00018 [L16] MOV      A=10 B=0 C=6 D=6 
+00019 [L16] KSTR     A=11 B=0 C=14 D=14 'base.csv'
+00020 [L16] CALL     A=10 B=2 C=2 D=514 
+00021 [L16] GSET     A=10 B=0 C=15 D=15 'd_csv'
+00022 [L17] MOV      A=10 B=0 C=6 D=6 
+00023 [L17] KSTR     A=11 B=0 C=16 D=16 'base.str'
+00024 [L17] CALL     A=10 B=2 C=2 D=514 
+00025 [L17] GSET     A=10 B=0 C=17 D=17 'd_str'
+00026 [L18] MOV      A=10 B=0 C=6 D=6 
+00027 [L18] KSTR     A=11 B=0 C=18 D=18 'common.utils'
+00028 [L18] CALL     A=10 B=2 C=2 D=514 
+00029 [L18] GSET     A=10 B=0 C=19 D=19 'd_u'
+00030 [L22] TNEW     A=10 B=0 C=0 D=0 
+00031 [L22] GSET     A=10 B=0 C=20 D=20 'g_effects'
+00032 [L23] KSTR     A=10 B=0 C=21 D=21 ''
+00033 [L23] GSET     A=10 B=0 C=22 D=22 'g_voice'
+00034 [L24] KPRI     A=10 B=0 C=1 D=1 
+00035 [L24] GSET     A=10 B=0 C=23 D=23 'g_clickShowUI'
+00036 [L29] FNEW     A=10 B=0 C=24 D=24 {'kind': 'proto', 'id': 0}
+00037 [L26] GSET     A=10 B=0 C=25 D=25 'setVolume'
+00038 [L34] FNEW     A=10 B=0 C=26 D=26 {'kind': 'proto', 'id': 1}
+00039 [L53] FNEW     A=11 B=0 C=27 D=27 {'kind': 'proto', 'id': 2}
+00040 [L37] GSET     A=11 B=0 C=28 D=28 'changeRealPath'
+00041 [L61] FNEW     A=11 B=0 C=29 D=29 {'kind': 'proto', 'id': 3}
+00042 [L57] GSET     A=11 B=0 C=30 D=30 'playUIMusic'
+00043 [L69] FNEW     A=11 B=0 C=31 D=31 {'kind': 'proto', 'id': 4}
+00044 [L65] GSET     A=11 B=0 C=32 D=32 'playFightMusic'
+00045 [L77] FNEW     A=11 B=0 C=33 D=33 {'kind': 'proto', 'id': 5}
+00046 [L73] GSET     A=11 B=0 C=34 D=34 'playSound'
+00047 [L85] FNEW     A=11 B=0 C=35 D=35 {'kind': 'proto', 'id': 6}
+00048 [L81] GSET     A=11 B=0 C=36 D=36 'playClickEffect'
+00049 [L93] FNEW     A=11 B=0 C=37 D=37 {'kind': 'proto', 'id': 7}
+00050 [L89] GSET     A=11 B=0 C=38 D=38 'playCoverEffect'
+00051 [L100] FNEW     A=11 B=0 C=39 D=39 {'kind': 'proto', 'id': 8}
+00052 [L96] GSET     A=11 B=0 C=40 D=40 'playDiceEffect'
+00053 [L126] FNEW     A=11 B=0 C=41 D=41 {'kind': 'proto', 'id': 9}
+00054 [L104] GSET     A=11 B=0 C=42 D=42 'play_bkg'
+00055 [L130] FNEW     A=11 B=0 C=43 D=43 {'kind': 'proto', 'id': 10}
+00056 [L128] GSET     A=11 B=0 C=44 D=44 'stop_bkg'
+00057 [L134] KPRI     A=11 B=0 C=0 D=0 
+00058 [L134] GSET     A=11 B=0 C=45 D=45 'g_is_i9100'
+00059 [L147] FNEW     A=11 B=0 C=46 D=46 {'kind': 'proto', 'id': 11}
+00060 [L136] GSET     A=11 B=0 C=47 D=47 'is_i9100'
+00061 [L188] FNEW     A=11 B=0 C=48 D=48 {'kind': 'proto', 'id': 12}
+00062 [L151] GSET     A=11 B=0 C=49 D=49 'play_efc'
+00063 [L193] FNEW     A=11 B=0 C=50 D=50 {'kind': 'proto', 'id': 13}
+00064 [L191] GSET     A=11 B=0 C=51 D=51 'stop_efc'
+00065 [L199] KPRI     A=11 B=0 C=0 D=0 
+00066 [L199] GSET     A=11 B=0 C=52 D=52 'g_ccbi_sound_map'
+00067 [L206] FNEW     A=11 B=0 C=53 D=53 {'kind': 'proto', 'id': 14}
+00068 [L203] GSET     A=11 B=0 C=54 D=54 'getCcbiSoundList'
+00069 [L247] FNEW     A=11 B=0 C=55 D=55 {'kind': 'proto', 'id': 15}
+00070 [L210] GSET     A=11 B=0 C=56 D=56 'initEffectSoundCsv'
+00071 [L247] UCLO     A=0 B=128 C=0 D=32768 target=72
+00072 [L247] RET0     A=0 B=0 C=1 D=1 

@@ -1,0 +1,393 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\7092393fa5155552d9905ea40edf6898.data'; root=proto11
+
+FUNCTION proto0 offset=0x4a source_lines=74-76 params=0
+UPVALUES ['print', 'string']
+00001 [L75] UGET     A=0 B=0 C=0 D=0 print
+00002 [L75] UGET     A=1 B=0 C=1 D=1 string
+00003 [L75] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L75] VARG     A=2 B=0 C=0 D=0 
+00005 [L75] CALLM    A=1 B=0 C=0 D=0 
+00006 [L75] CALLM    A=0 B=1 C=0 D=256 
+00007 [L76] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x92 source_lines=86-113 params=1
+UPVALUES []
+00001 [L88] TNEW     A=1 B=0 C=0 D=0 
+00002 [L88] GSET     A=1 B=0 C=0 D=0 'g_objs'
+00003 [L89] GGET     A=1 B=0 C=0 D=0 'g_objs'
+00004 [L89] TSETS    A=0 B=1 C=1 D=257 'skillInfo'
+00005 [L92] GGET     A=1 B=0 C=0 D=0 'g_objs'
+00006 [L92] TGETS    A=2 B=0 C=3 D=3 'attacker'
+00007 [L92] TGETS    A=2 B=2 C=2 D=514 'offset'
+00008 [L92] TSETS    A=2 B=1 C=2 D=258 'offset'
+00009 [L93] GGET     A=1 B=0 C=0 D=0 'g_objs'
+00010 [L93] TGETS    A=2 B=0 C=3 D=3 'attacker'
+00011 [L93] TGETS    A=2 B=2 C=4 D=516 'isEnemy'
+00012 [L93] TSETS    A=2 B=1 C=4 D=260 'isEnemy'
+00013 [L96] GGET     A=1 B=0 C=0 D=0 'g_objs'
+00014 [L96] TGETS    A=1 B=1 C=1 D=257 'skillInfo'
+00015 [L96] TGETS    A=1 B=1 C=5 D=261 'layer'
+00016 [L96] MOV      A=2 B=0 C=1 D=1 
+00017 [L96] TGETS    A=1 B=1 C=6 D=262 'removeAllChildrenWithCleanup'
+00018 [L96] KPRI     A=3 B=0 C=2 D=2 
+00019 [L96] CALL     A=1 B=1 C=3 D=259 
+00020 [L98] GGET     A=1 B=0 C=0 D=0 'g_objs'
+00021 [L98] TGETS    A=1 B=1 C=7 D=263 'step'
+00022 [L98] IST      A=0 B=0 C=1 D=1 
+00023 [L98] JMP      A=1 B=128 C=3 D=32771 target=27
+00024 [L99] GGET     A=1 B=0 C=0 D=0 'g_objs'
+00025 [L99] KSHORT   A=2 B=0 C=0 D=0 0
+00026 [L99] TSETS    A=2 B=1 C=7 D=263 'step'
+00027 [L103] TNEW     A=1 B=0 C=5 D=5 
+00028 [L105] GGET     A=2 B=0 C=8 D=8 'attarkerForward'
+00029 [L105] TSETB    A=2 B=1 C=1 D=257 
+00030 [L106] GGET     A=2 B=0 C=9 D=9 'castSpellEffect'
+00031 [L106] TSETB    A=2 B=1 C=2 D=258 
+00032 [L108] GGET     A=2 B=0 C=10 D=10 'targetsBeHitted'
+00033 [L108] TSETB    A=2 B=1 C=3 D=259 
+00034 [L109] GGET     A=2 B=0 C=11 D=11 'attackEnd'
+00035 [L109] TSETB    A=2 B=1 C=4 D=260 
+00036 [L110] GSET     A=1 B=0 C=12 D=12 'g_skill_step'
+00037 [L112] GGET     A=1 B=0 C=13 D=13 'continue'
+00038 [L112] CALL     A=1 B=1 C=1 D=257 
+00039 [L113] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto2 offset=0x20f source_lines=119-133 params=0
+UPVALUES []
+00001 [L120] GGET     A=0 B=0 C=0 D=0 'g_objs'
+00002 [L120] GGET     A=1 B=0 C=0 D=0 'g_objs'
+00003 [L120] TGETS    A=1 B=1 C=1 D=257 'step'
+00004 [L120] ADDVN    A=1 B=1 C=0 D=256 
+00005 [L120] TSETS    A=1 B=0 C=1 D=1 'step'
+00006 [L123] GGET     A=0 B=0 C=2 D=2 'g_skill_step'
+00007 [L123] GGET     A=1 B=0 C=0 D=0 'g_objs'
+00008 [L123] TGETS    A=1 B=1 C=1 D=257 'step'
+00009 [L123] TGETV    A=0 B=0 C=1 D=1 
+00010 [L123] ISF      A=0 B=0 C=0 D=0 
+00011 [L123] JMP      A=1 B=128 C=6 D=32774 target=18
+00012 [L124] GGET     A=0 B=0 C=2 D=2 'g_skill_step'
+00013 [L124] GGET     A=1 B=0 C=0 D=0 'g_objs'
+00014 [L124] TGETS    A=1 B=1 C=1 D=257 'step'
+00015 [L124] TGETV    A=0 B=0 C=1 D=1 
+00016 [L124] CALL     A=0 B=1 C=1 D=257 
+00017 [L124] JMP      A=0 B=128 C=9 D=32777 target=27
+00018 [L128] GGET     A=0 B=0 C=0 D=0 'g_objs'
+00019 [L128] TGETS    A=0 B=0 C=3 D=3 'skillInfo'
+00020 [L128] TGETS    A=0 B=0 C=4 D=4 'call_back'
+00021 [L128] ISF      A=0 B=0 C=0 D=0 
+00022 [L128] JMP      A=1 B=128 C=4 D=32772 target=27
+00023 [L129] GGET     A=0 B=0 C=0 D=0 'g_objs'
+00024 [L129] TGETS    A=0 B=0 C=3 D=3 'skillInfo'
+00025 [L129] TGETS    A=0 B=0 C=4 D=4 'call_back'
+00026 [L129] CALL     A=0 B=1 C=1 D=257 
+00027 [L133] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto3 offset=0x2d0 source_lines=136-138 params=0
+UPVALUES []
+00001 [L137] GGET     A=0 B=0 C=0 D=0 'g_objs'
+00002 [L137] TGETS    A=0 B=0 C=1 D=1 'skillInfo'
+00003 [L137] TGETS    A=0 B=0 C=2 D=2 'attacker'
+00004 [L137] TGETS    A=0 B=0 C=3 D=3 'posXYZ'
+00005 [L137] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto4 offset=0x317 source_lines=141-143 params=0
+UPVALUES []
+00001 [L142] GGET     A=0 B=0 C=0 D=0 'g_objs'
+00002 [L142] TGETS    A=0 B=0 C=1 D=1 'skillInfo'
+00003 [L142] TGETS    A=0 B=0 C=2 D=2 'targets'
+00004 [L142] TGETS    A=0 B=0 C=3 D=3 'posXYZ'
+00005 [L142] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto5 offset=0x35d source_lines=148-154 params=0
+UPVALUES []
+00001 [L153] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L153] TGETS    A=0 B=0 C=1 D=1 'd_skill'
+00003 [L153] TGETS    A=0 B=0 C=2 D=2 'castSpellScale'
+00004 [L153] GGET     A=1 B=0 C=3 D=3 'g_objs'
+00005 [L153] TGETS    A=1 B=1 C=4 D=260 'skillInfo'
+00006 [L153] GGET     A=2 B=0 C=5 D=5 'continue'
+00007 [L153] CALL     A=0 B=1 C=3 D=259 
+00008 [L154] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x3c8 source_lines=160-163 params=0
+UPVALUES []
+00001 [L161] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L161] TGETS    A=0 B=0 C=1 D=1 'd_fightUI'
+00003 [L161] TGETS    A=0 B=0 C=2 D=2 'funcShockBkg'
+00004 [L161] CALL     A=0 B=1 C=1 D=257 
+00005 [L162] GGET     A=0 B=0 C=3 D=3 'continue'
+00006 [L162] CALL     A=0 B=1 C=1 D=257 
+00007 [L163] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto7 offset=0x41e source_lines=159-176 params=0
+UPVALUES ['CCArray', 'CCDelayTime', 'CCCallFuncN', 'CCSequence']
+00001 [L163] FNEW     A=0 B=0 C=0 D=0 {'kind': 'proto', 'id': 6}
+00002 [L165] GGET     A=1 B=0 C=1 D=1 'g_objs'
+00003 [L165] TGETS    A=1 B=1 C=2 D=258 'isEnemy'
+00004 [L165] ISF      A=0 B=0 C=1 D=1 
+00005 [L165] JMP      A=2 B=128 C=28 D=32796 target=34
+00006 [L166] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00007 [L166] TGETS    A=1 B=1 C=4 D=260 'd_u'
+00008 [L166] TGETS    A=1 B=1 C=5 D=261 'createAnimation'
+00009 [L166] KSTR     A=2 B=0 C=6 D=6 '110_12.ccbi'
+00010 [L166] TDUP     A=3 B=0 C=7 D=7 {'kind': 'table', 'value': {'scale': 1.5}}
+00011 [L166] GGET     A=4 B=0 C=8 D=8 'getPosO'
+00012 [L166] CALL     A=4 B=2 C=1 D=513 
+00013 [L166] TGETS    A=4 B=4 C=9 D=1033 'x'
+00014 [L166] SUBVN    A=4 B=4 C=0 D=1024 
+00015 [L166] TSETS    A=4 B=3 C=9 D=777 'x'
+00016 [L166] GGET     A=4 B=0 C=8 D=8 'getPosO'
+00017 [L166] CALL     A=4 B=2 C=1 D=513 
+00018 [L166] TGETS    A=4 B=4 C=10 D=1034 'y'
+00019 [L166] ADDVN    A=4 B=4 C=1 D=1025 
+00020 [L166] TSETS    A=4 B=3 C=10 D=778 'y'
+00021 [L166] GGET     A=4 B=0 C=8 D=8 'getPosO'
+00022 [L166] CALL     A=4 B=2 C=1 D=513 
+00023 [L166] TGETS    A=4 B=4 C=11 D=1035 'z'
+00024 [L166] ADDVN    A=4 B=4 C=2 D=1026 
+00025 [L166] TSETS    A=4 B=3 C=11 D=779 'z'
+00026 [L166] KSHORT   A=4 B=0 C=1 D=1 1
+00027 [L166] KPRI     A=5 B=0 C=0 D=0 
+00028 [L166] GGET     A=6 B=0 C=1 D=1 'g_objs'
+00029 [L166] TGETS    A=6 B=6 C=12 D=1548 'skillInfo'
+00030 [L166] TGETS    A=6 B=6 C=13 D=1549 'attacker'
+00031 [L166] TGETS    A=6 B=6 C=14 D=1550 'layer'
+00032 [L166] CALL     A=1 B=2 C=6 D=518 
+00033 [L166] JMP      A=1 B=128 C=27 D=32795 target=61
+00034 [L168] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00035 [L168] TGETS    A=1 B=1 C=4 D=260 'd_u'
+00036 [L168] TGETS    A=1 B=1 C=5 D=261 'createAnimation'
+00037 [L168] KSTR     A=2 B=0 C=15 D=15 '110_11.ccbi'
+00038 [L168] TDUP     A=3 B=0 C=16 D=16 {'kind': 'table', 'value': {'scale': 1.5}}
+00039 [L168] GGET     A=4 B=0 C=8 D=8 'getPosO'
+00040 [L168] CALL     A=4 B=2 C=1 D=513 
+00041 [L168] TGETS    A=4 B=4 C=9 D=1033 'x'
+00042 [L168] ADDVN    A=4 B=4 C=0 D=1024 
+00043 [L168] TSETS    A=4 B=3 C=9 D=777 'x'
+00044 [L168] GGET     A=4 B=0 C=8 D=8 'getPosO'
+00045 [L168] CALL     A=4 B=2 C=1 D=513 
+00046 [L168] TGETS    A=4 B=4 C=10 D=1034 'y'
+00047 [L168] ADDVN    A=4 B=4 C=1 D=1025 
+00048 [L168] TSETS    A=4 B=3 C=10 D=778 'y'
+00049 [L168] GGET     A=4 B=0 C=8 D=8 'getPosO'
+00050 [L168] CALL     A=4 B=2 C=1 D=513 
+00051 [L168] TGETS    A=4 B=4 C=11 D=1035 'z'
+00052 [L168] ADDVN    A=4 B=4 C=2 D=1026 
+00053 [L168] TSETS    A=4 B=3 C=11 D=779 'z'
+00054 [L168] KSHORT   A=4 B=0 C=1 D=1 1
+00055 [L168] KPRI     A=5 B=0 C=0 D=0 
+00056 [L168] GGET     A=6 B=0 C=1 D=1 'g_objs'
+00057 [L168] TGETS    A=6 B=6 C=12 D=1548 'skillInfo'
+00058 [L168] TGETS    A=6 B=6 C=13 D=1549 'attacker'
+00059 [L168] TGETS    A=6 B=6 C=14 D=1550 'layer'
+00060 [L168] CALL     A=1 B=2 C=6 D=518 
+00061 [L171] UGET     A=1 B=0 C=0 D=0 CCArray
+00062 [L171] MOV      A=2 B=0 C=1 D=1 
+00063 [L171] TGETS    A=1 B=1 C=17 D=273 'create'
+00064 [L171] CALL     A=1 B=2 C=2 D=514 
+00065 [L172] MOV      A=3 B=0 C=1 D=1 
+00066 [L172] TGETS    A=2 B=1 C=18 D=274 'addObject'
+00067 [L172] UGET     A=4 B=0 C=1 D=1 CCDelayTime
+00068 [L172] MOV      A=5 B=0 C=4 D=4 
+00069 [L172] TGETS    A=4 B=4 C=17 D=1041 'create'
+00070 [L172] KNUM     A=6 B=0 C=0 D=0 0.3
+00071 [L172] CALL     A=4 B=0 C=3 D=3 
+00072 [L172] CALLM    A=2 B=1 C=1 D=257 
+00073 [L173] MOV      A=3 B=0 C=1 D=1 
+00074 [L173] TGETS    A=2 B=1 C=18 D=274 'addObject'
+00075 [L173] UGET     A=4 B=0 C=2 D=2 CCCallFuncN
+00076 [L173] MOV      A=5 B=0 C=4 D=4 
+00077 [L173] TGETS    A=4 B=4 C=17 D=1041 'create'
+00078 [L173] MOV      A=6 B=0 C=0 D=0 
+00079 [L173] CALL     A=4 B=0 C=3 D=3 
+00080 [L173] CALLM    A=2 B=1 C=1 D=257 
+00081 [L174] GGET     A=2 B=0 C=1 D=1 'g_objs'
+00082 [L174] TGETS    A=2 B=2 C=12 D=524 'skillInfo'
+00083 [L174] TGETS    A=2 B=2 C=14 D=526 'layer'
+00084 [L174] MOV      A=3 B=0 C=2 D=2 
+00085 [L174] TGETS    A=2 B=2 C=19 D=531 'runAction'
+00086 [L174] UGET     A=4 B=0 C=3 D=3 CCSequence
+00087 [L174] MOV      A=5 B=0 C=4 D=4 
+00088 [L174] TGETS    A=4 B=4 C=17 D=1041 'create'
+00089 [L174] MOV      A=6 B=0 C=1 D=1 
+00090 [L174] CALL     A=4 B=0 C=3 D=3 
+00091 [L174] CALLM    A=2 B=1 C=1 D=257 
+00092 [L176] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto8 offset=0x70b source_lines=182-184 params=0
+UPVALUES []
+00001 [L184] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto9 offset=0x71e source_lines=181-194 params=0
+UPVALUES []
+00001 [L184] FNEW     A=0 B=0 C=0 D=0 {'kind': 'proto', 'id': 8}
+00002 [L187] GGET     A=1 B=0 C=1 D=1 'g_objs'
+00003 [L187] TGETS    A=1 B=1 C=2 D=258 'isEnemy'
+00004 [L187] ISF      A=0 B=0 C=1 D=1 
+00005 [L187] JMP      A=2 B=128 C=26 D=32794 target=32
+00006 [L188] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00007 [L188] TGETS    A=1 B=1 C=4 D=260 'd_u'
+00008 [L188] TGETS    A=1 B=1 C=5 D=261 'createAnimation'
+00009 [L188] KSTR     A=2 B=0 C=6 D=6 '110_1.ccbi'
+00010 [L188] TDUP     A=3 B=0 C=7 D=7 {'kind': 'table', 'value': {'scale': 1.6}}
+00011 [L188] GGET     A=4 B=0 C=8 D=8 'getPosE'
+00012 [L188] CALL     A=4 B=2 C=1 D=513 
+00013 [L188] TGETS    A=4 B=4 C=9 D=1033 'x'
+00014 [L188] TSETS    A=4 B=3 C=9 D=777 'x'
+00015 [L188] GGET     A=4 B=0 C=8 D=8 'getPosE'
+00016 [L188] CALL     A=4 B=2 C=1 D=513 
+00017 [L188] TGETS    A=4 B=4 C=10 D=1034 'y'
+00018 [L188] ADDVN    A=4 B=4 C=0 D=1024 
+00019 [L188] TSETS    A=4 B=3 C=10 D=778 'y'
+00020 [L188] GGET     A=4 B=0 C=8 D=8 'getPosE'
+00021 [L188] CALL     A=4 B=2 C=1 D=513 
+00022 [L188] TGETS    A=4 B=4 C=11 D=1035 'z'
+00023 [L188] ADDVN    A=4 B=4 C=1 D=1025 
+00024 [L188] TSETS    A=4 B=3 C=11 D=779 'z'
+00025 [L188] KSHORT   A=4 B=0 C=1 D=1 1
+00026 [L188] MOV      A=5 B=0 C=0 D=0 
+00027 [L188] GGET     A=6 B=0 C=1 D=1 'g_objs'
+00028 [L188] TGETS    A=6 B=6 C=12 D=1548 'skillInfo'
+00029 [L188] TGETS    A=6 B=6 C=13 D=1549 'layer'
+00030 [L188] CALL     A=1 B=2 C=6 D=518 
+00031 [L188] JMP      A=1 B=128 C=25 D=32793 target=57
+00032 [L190] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00033 [L190] TGETS    A=1 B=1 C=4 D=260 'd_u'
+00034 [L190] TGETS    A=1 B=1 C=5 D=261 'createAnimation'
+00035 [L190] KSTR     A=2 B=0 C=6 D=6 '110_1.ccbi'
+00036 [L190] TDUP     A=3 B=0 C=14 D=14 {'kind': 'table', 'value': {'scale': 1.6}}
+00037 [L190] GGET     A=4 B=0 C=8 D=8 'getPosE'
+00038 [L190] CALL     A=4 B=2 C=1 D=513 
+00039 [L190] TGETS    A=4 B=4 C=9 D=1033 'x'
+00040 [L190] TSETS    A=4 B=3 C=9 D=777 'x'
+00041 [L190] GGET     A=4 B=0 C=8 D=8 'getPosE'
+00042 [L190] CALL     A=4 B=2 C=1 D=513 
+00043 [L190] TGETS    A=4 B=4 C=10 D=1034 'y'
+00044 [L190] ADDVN    A=4 B=4 C=0 D=1024 
+00045 [L190] TSETS    A=4 B=3 C=10 D=778 'y'
+00046 [L190] GGET     A=4 B=0 C=8 D=8 'getPosE'
+00047 [L190] CALL     A=4 B=2 C=1 D=513 
+00048 [L190] TGETS    A=4 B=4 C=11 D=1035 'z'
+00049 [L190] ADDVN    A=4 B=4 C=1 D=1025 
+00050 [L190] TSETS    A=4 B=3 C=11 D=779 'z'
+00051 [L190] KSHORT   A=4 B=0 C=1 D=1 1
+00052 [L190] MOV      A=5 B=0 C=0 D=0 
+00053 [L190] GGET     A=6 B=0 C=1 D=1 'g_objs'
+00054 [L190] TGETS    A=6 B=6 C=12 D=1548 'skillInfo'
+00055 [L190] TGETS    A=6 B=6 C=13 D=1549 'layer'
+00056 [L190] CALL     A=1 B=2 C=6 D=518 
+00057 [L193] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00058 [L193] TGETS    A=1 B=1 C=4 D=260 'd_u'
+00059 [L193] TGETS    A=1 B=1 C=15 D=271 'delay'
+00060 [L193] GGET     A=2 B=0 C=1 D=1 'g_objs'
+00061 [L193] TGETS    A=2 B=2 C=12 D=524 'skillInfo'
+00062 [L193] TGETS    A=2 B=2 C=13 D=525 'layer'
+00063 [L193] KNUM     A=3 B=0 C=2 D=2 0.3
+00064 [L193] GGET     A=4 B=0 C=16 D=16 'continue'
+00065 [L193] CALL     A=1 B=1 C=4 D=260 
+00066 [L194] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto10 offset=0x927 source_lines=199-201 params=0
+UPVALUES []
+00001 [L200] GGET     A=0 B=0 C=0 D=0 'g_objs'
+00002 [L200] TGETS    A=0 B=0 C=1 D=1 'skillInfo'
+00003 [L200] TGETS    A=0 B=0 C=2 D=2 'targets'
+00004 [L200] MOV      A=1 B=0 C=0 D=0 
+00005 [L200] TGETS    A=0 B=0 C=3 D=3 'beAttack'
+00006 [L200] GGET     A=2 B=0 C=0 D=0 'g_objs'
+00007 [L200] TGETS    A=2 B=2 C=1 D=513 'skillInfo'
+00008 [L200] TGETS    A=2 B=2 C=4 D=516 'attackInfo'
+00009 [L200] GGET     A=3 B=0 C=5 D=5 'continue'
+00010 [L200] CALL     A=0 B=1 C=4 D=260 
+00011 [L201] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto11 offset=0x9a2 source_lines=0-205 params=0
+UPVALUES []
+00001 [L5] GGET     A=0 B=0 C=0 D=0 'require'
+00002 [L6] GGET     A=1 B=0 C=1 D=1 'bits'
+00003 [L7] GGET     A=2 B=0 C=2 D=2 'sqlite'
+00004 [L8] GGET     A=3 B=0 C=3 D=3 'type'
+00005 [L9] GGET     A=4 B=0 C=4 D=4 'print'
+00006 [L10] GGET     A=5 B=0 C=5 D=5 'tostring'
+00007 [L11] GGET     A=6 B=0 C=6 D=6 'pairs'
+00008 [L12] GGET     A=7 B=0 C=7 D=7 'string'
+00009 [L14] GGET     A=8 B=0 C=8 D=8 'main_server'
+00010 [L15] GGET     A=9 B=0 C=9 D=9 '_G'
+00011 [L16] MOV      A=10 B=0 C=1 D=1 
+00012 [L20] GGET     A=11 B=0 C=10 D=10 'tolua'
+00013 [L21] GGET     A=12 B=0 C=11 D=11 'class'
+00014 [L22] GGET     A=13 B=0 C=12 D=12 'CCArray'
+00015 [L23] GGET     A=14 B=0 C=13 D=13 'CCDirector'
+00016 [L24] GGET     A=15 B=0 C=14 D=14 'CCLayer'
+00017 [L25] GGET     A=16 B=0 C=15 D=15 'CCMenu'
+00018 [L26] GGET     A=17 B=0 C=16 D=16 'CCMenuItemImage'
+00019 [L27] GGET     A=18 B=0 C=17 D=17 'CCSprite'
+00020 [L28] GGET     A=19 B=0 C=18 D=18 'CCScene'
+00021 [L29] GGET     A=20 B=0 C=19 D=19 'CCTextFieldTTF'
+00022 [L30] GGET     A=21 B=0 C=20 D=20 'CCTOUCHBEGAN'
+00023 [L31] GGET     A=22 B=0 C=21 D=21 'CCTOUCHMOVED'
+00024 [L34] GGET     A=23 B=0 C=22 D=22 'CCRepeat'
+00025 [L35] GGET     A=24 B=0 C=23 D=23 'CCSequence'
+00026 [L36] GGET     A=25 B=0 C=24 D=24 'CCCallFuncN'
+00027 [L37] GGET     A=26 B=0 C=25 D=25 'CCSpawn'
+00028 [L38] GGET     A=27 B=0 C=26 D=26 'CCMoveBy'
+00029 [L39] GGET     A=28 B=0 C=27 D=27 'CCMoveTo'
+00030 [L40] GGET     A=29 B=0 C=28 D=28 'CCPoint'
+00031 [L41] GGET     A=30 B=0 C=29 D=29 'CCPointMake'
+00032 [L42] GGET     A=31 B=0 C=30 D=30 'CCDelayTime'
+00033 [L43] GGET     A=32 B=0 C=31 D=31 'math'
+00034 [L44] GGET     A=33 B=0 C=32 D=32 'CCBezierBy'
+00035 [L45] GGET     A=34 B=0 C=33 D=33 'ccBezierConfig'
+00036 [L46] GGET     A=35 B=0 C=34 D=34 'CCBezierTo'
+00037 [L47] GGET     A=36 B=0 C=35 D=35 'CCScaleBy'
+00038 [L48] GGET     A=37 B=0 C=36 D=36 'ccColor3B'
+00039 [L49] GGET     A=38 B=0 C=37 D=37 'ccColor4B'
+00040 [L50] GGET     A=39 B=0 C=38 D=38 'CCBReader'
+00041 [L51] GGET     A=40 B=0 C=39 D=39 'CCNodeLoaderLibrary'
+00042 [L52] GGET     A=41 B=0 C=40 D=40 'CCBAnimationManager'
+00043 [L53] GGET     A=42 B=0 C=41 D=41 'CCLayerColor'
+00044 [L54] GGET     A=43 B=0 C=42 D=42 'CCRectMake'
+00045 [L55] GGET     A=44 B=0 C=43 D=43 'CCFadeOut'
+00046 [L56] GGET     A=45 B=0 C=44 D=44 'ccc4'
+00047 [L57] GGET     A=46 B=0 C=45 D=45 'CCFadeIn'
+00048 [L58] GGET     A=47 B=0 C=46 D=46 'CCTargetedAction'
+00049 [L59] MOV      A=48 B=0 C=36 D=36 
+00050 [L60] GGET     A=49 B=0 C=47 D=47 'CCScaleTo'
+00051 [L61] GGET     A=50 B=0 C=48 D=48 'CCRotateBy'
+00052 [L62] GGET     A=51 B=0 C=49 D=49 'CCRepeatForever'
+00053 [L65] GGET     A=52 B=0 C=50 D=50 'module'
+00054 [L65] KSTR     A=53 B=0 C=51 D=51 'skill.skill_205'
+00055 [L65] CALL     A=52 B=1 C=2 D=258 
+00056 [L68] MOV      A=52 B=0 C=0 D=0 
+00057 [L68] KSTR     A=53 B=0 C=52 D=52 'ms'
+00058 [L68] CALL     A=52 B=2 C=2 D=514 
+00059 [L68] GSET     A=52 B=0 C=53 D=53 'd_ms'
+00060 [L69] GGET     A=52 B=0 C=53 D=53 'd_ms'
+00061 [L69] IST      A=0 B=0 C=52 D=52 
+00062 [L69] JMP      A=52 B=128 C=3 D=32771 target=66
+00063 [L70] MOV      A=52 B=0 C=4 D=4 
+00064 [L70] KSTR     A=53 B=0 C=54 D=54 'skill load d_ms fail.'
+00065 [L70] CALL     A=52 B=1 C=2 D=258 
+00066 [L76] FNEW     A=52 B=0 C=55 D=55 {'kind': 'proto', 'id': 0}
+00067 [L80] TNEW     A=53 B=0 C=0 D=0 
+00068 [L80] GSET     A=53 B=0 C=56 D=56 'g_objs'
+00069 [L82] TNEW     A=53 B=0 C=0 D=0 
+00070 [L82] GSET     A=53 B=0 C=57 D=57 'g_skill_step'
+00071 [L113] FNEW     A=53 B=0 C=58 D=58 {'kind': 'proto', 'id': 1}
+00072 [L86] GSET     A=53 B=0 C=59 D=59 'showSkill'
+00073 [L133] FNEW     A=53 B=0 C=60 D=60 {'kind': 'proto', 'id': 2}
+00074 [L119] GSET     A=53 B=0 C=61 D=61 'continue'
+00075 [L138] FNEW     A=53 B=0 C=62 D=62 {'kind': 'proto', 'id': 3}
+00076 [L136] GSET     A=53 B=0 C=63 D=63 'getPosO'
+00077 [L143] FNEW     A=53 B=0 C=64 D=64 {'kind': 'proto', 'id': 4}
+00078 [L141] GSET     A=53 B=0 C=65 D=65 'getPosE'
+00079 [L154] FNEW     A=53 B=0 C=66 D=66 {'kind': 'proto', 'id': 5}
+00080 [L148] GSET     A=53 B=0 C=67 D=67 'attarkerForward'
+00081 [L176] FNEW     A=53 B=0 C=68 D=68 {'kind': 'proto', 'id': 7}
+00082 [L159] GSET     A=53 B=0 C=69 D=69 'castSpellEffect'
+00083 [L194] FNEW     A=53 B=0 C=70 D=70 {'kind': 'proto', 'id': 9}
+00084 [L181] GSET     A=53 B=0 C=71 D=71 'targetsBeHitted'
+00085 [L201] FNEW     A=53 B=0 C=72 D=72 {'kind': 'proto', 'id': 10}
+00086 [L199] GSET     A=53 B=0 C=73 D=73 'attackEnd'
+00087 [L201] UCLO     A=0 B=128 C=0 D=32768 target=88
+00088 [L201] RET0     A=0 B=0 C=1 D=1 

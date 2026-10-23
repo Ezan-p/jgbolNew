@@ -1,0 +1,193 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\a9bfaeae635e3a0d3b509e1c1ca39dd4.data'; root=proto6
+
+FUNCTION proto0 offset=0x4a source_lines=11-13 params=0
+UPVALUES []
+00001 [L12] GGET     A=0 B=0 C=0 D=0 'os'
+00002 [L12] TGETS    A=0 B=0 C=1 D=1 'time'
+00003 [L12] CALLT    A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x6e source_lines=15-31 params=2
+UPVALUES []
+00001 [L16] GSET     A=0 B=0 C=0 D=0 'g_total_duration'
+00002 [L17] GSET     A=1 B=0 C=1 D=1 'g_sample_count'
+00003 [L18] GGET     A=2 B=0 C=2 D=2 'math'
+00004 [L18] TGETS    A=2 B=2 C=3 D=515 'ceil'
+00005 [L18] GGET     A=3 B=0 C=0 D=0 'g_total_duration'
+00006 [L18] GGET     A=4 B=0 C=1 D=1 'g_sample_count'
+00007 [L18] DIVVV    A=3 B=3 C=4 D=772 
+00008 [L18] CALL     A=2 B=2 C=2 D=514 
+00009 [L18] GSET     A=2 B=0 C=4 D=4 'g_sample_duration'
+00010 [L19] KSHORT   A=2 B=0 C=0 D=0 0
+00011 [L19] GSET     A=2 B=0 C=5 D=5 'g_sample_sum'
+00012 [L21] GGET     A=2 B=0 C=2 D=2 'math'
+00013 [L21] TGETS    A=2 B=2 C=3 D=515 'ceil'
+00014 [L21] GGET     A=3 B=0 C=6 D=6 'get_current_time'
+00015 [L21] CALL     A=3 B=2 C=1 D=513 
+00016 [L21] GGET     A=4 B=0 C=4 D=4 'g_sample_duration'
+00017 [L21] DIVVV    A=3 B=3 C=4 D=772 
+00018 [L21] CALL     A=2 B=2 C=2 D=514 
+00019 [L21] GSET     A=2 B=0 C=7 D=7 'g_start_index'
+00020 [L22] GGET     A=2 B=0 C=7 D=7 'g_start_index'
+00021 [L22] GGET     A=3 B=0 C=1 D=1 'g_sample_count'
+00022 [L22] ADDVV    A=2 B=2 C=3 D=515 
+00023 [L22] GSET     A=2 B=0 C=8 D=8 'g_end_index'
+00024 [L24] GGET     A=2 B=0 C=9 D=9 'g_sample_table'
+00025 [L24] LEN      A=2 B=0 C=2 D=2 
+00026 [L24] KSHORT   A=3 B=0 C=0 D=0 0
+00027 [L24] ISGE     A=3 B=0 C=2 D=2 
+00028 [L24] JMP      A=2 B=128 C=6 D=32774 target=35
+00029 [L24] LOOP     A=2 B=128 C=5 D=32773 target=35
+00030 [L25] GGET     A=2 B=0 C=10 D=10 'table'
+00031 [L25] TGETS    A=2 B=2 C=11 D=523 'remove'
+00032 [L25] GGET     A=3 B=0 C=9 D=9 'g_sample_table'
+00033 [L25] CALL     A=2 B=1 C=2 D=258 
+00034 [L25] JMP      A=2 B=127 C=245 D=32757 target=24
+00035 [L28] KSHORT   A=2 B=0 C=0 D=0 0
+00036 [L28] GGET     A=3 B=0 C=1 D=1 'g_sample_count'
+00037 [L28] SUBVN    A=3 B=3 C=0 D=768 
+00038 [L28] KSHORT   A=4 B=0 C=1 D=1 1
+00039 [L28] FORI     A=2 B=128 C=7 D=32775 target=47
+00040 [L29] GGET     A=6 B=0 C=10 D=10 'table'
+00041 [L29] TGETS    A=6 B=6 C=12 D=1548 'insert'
+00042 [L29] GGET     A=7 B=0 C=9 D=9 'g_sample_table'
+00043 [L29] MOV      A=8 B=0 C=5 D=5 
+00044 [L29] KSHORT   A=9 B=0 C=0 D=0 0
+00045 [L29] CALL     A=6 B=1 C=4 D=260 
+00046 [L28] FORL     A=2 B=127 C=249 D=32761 target=40
+00047 [L31] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto2 offset=0x22b source_lines=33-39 params=1
+UPVALUES []
+00001 [L34] GGET     A=1 B=0 C=0 D=0 'get_current_time'
+00002 [L34] CALL     A=1 B=2 C=1 D=513 
+00003 [L35] GGET     A=2 B=0 C=1 D=1 'speed_make_sample_uptodate'
+00004 [L35] MOV      A=3 B=0 C=1 D=1 
+00005 [L35] CALL     A=2 B=1 C=2 D=258 
+00006 [L36] GGET     A=2 B=0 C=2 D=2 'math'
+00007 [L36] TGETS    A=2 B=2 C=3 D=515 'ceil'
+00008 [L36] GGET     A=3 B=0 C=4 D=4 'g_sample_duration'
+00009 [L36] DIVVV    A=3 B=1 C=3 D=259 
+00010 [L36] CALL     A=2 B=2 C=2 D=514 
+00011 [L36] GGET     A=3 B=0 C=5 D=5 'g_sample_count'
+00012 [L36] MODVV    A=2 B=2 C=3 D=515 
+00013 [L37] GGET     A=3 B=0 C=6 D=6 'g_sample_table'
+00014 [L37] GGET     A=4 B=0 C=6 D=6 'g_sample_table'
+00015 [L37] TGETV    A=4 B=4 C=2 D=1026 
+00016 [L37] ADDVV    A=4 B=4 C=0 D=1024 
+00017 [L37] TSETV    A=4 B=3 C=2 D=770 
+00018 [L38] GGET     A=3 B=0 C=7 D=7 'g_sample_sum'
+00019 [L38] ADDVV    A=3 B=3 C=0 D=768 
+00020 [L38] GSET     A=3 B=0 C=7 D=7 'g_sample_sum'
+00021 [L39] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto3 offset=0x334 source_lines=41-44 params=0
+UPVALUES []
+00001 [L42] GGET     A=0 B=0 C=0 D=0 'speed_make_sample_uptodate'
+00002 [L42] GGET     A=1 B=0 C=1 D=1 'get_current_time'
+00003 [L42] CALL     A=1 B=0 C=1 D=1 
+00004 [L42] CALLM    A=0 B=1 C=0 D=256 
+00005 [L43] GGET     A=0 B=0 C=2 D=2 'g_sample_sum'
+00006 [L43] GGET     A=1 B=0 C=3 D=3 'g_total_duration'
+00007 [L43] DIVVV    A=0 B=0 C=1 D=1 
+00008 [L43] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto4 offset=0x3b3 source_lines=46-53 params=0
+UPVALUES []
+00001 [L47] GGET     A=0 B=0 C=0 D=0 'pairs'
+00002 [L47] GGET     A=1 B=0 C=1 D=1 'g_sample_table'
+00003 [L47] CALL     A=0 B=4 C=2 D=1026 
+00004 [L47] ISNEXT   A=3 B=128 C=3 D=32771 target=8
+00005 [L48] GGET     A=4 B=0 C=1 D=1 'g_sample_table'
+00006 [L48] KSHORT   A=5 B=0 C=0 D=0 0
+00007 [L48] TSETV    A=5 B=4 C=3 D=1027 
+00008 [L47] ITERN    A=3 B=2 C=3 D=515 
+00009 [L47] ITERL    A=3 B=127 C=251 D=32763 target=5
+00010 [L51] GGET     A=0 B=0 C=2 D=2 'math'
+00011 [L51] TGETS    A=0 B=0 C=3 D=3 'ceil'
+00012 [L51] GGET     A=1 B=0 C=4 D=4 'get_current_time'
+00013 [L51] CALL     A=1 B=2 C=1 D=513 
+00014 [L51] GGET     A=2 B=0 C=5 D=5 'g_sample_duration'
+00015 [L51] DIVVV    A=1 B=1 C=2 D=258 
+00016 [L51] CALL     A=0 B=2 C=2 D=514 
+00017 [L51] GSET     A=0 B=0 C=6 D=6 'g_start_index'
+00018 [L52] GGET     A=0 B=0 C=6 D=6 'g_start_index'
+00019 [L52] GGET     A=1 B=0 C=7 D=7 'g_sample_count'
+00020 [L52] ADDVV    A=0 B=0 C=1 D=1 
+00021 [L52] GSET     A=0 B=0 C=8 D=8 'g_end_index'
+00022 [L53] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto5 offset=0x4a6 source_lines=55-72 params=1
+UPVALUES []
+00001 [L56] GGET     A=1 B=0 C=0 D=0 'math'
+00002 [L56] TGETS    A=1 B=1 C=1 D=257 'ceil'
+00003 [L56] GGET     A=2 B=0 C=2 D=2 'g_sample_duration'
+00004 [L56] DIVVV    A=2 B=0 C=2 D=2 
+00005 [L56] CALL     A=1 B=2 C=2 D=514 
+00006 [L57] GGET     A=2 B=0 C=3 D=3 'g_start_index'
+00007 [L57] ISGE     A=1 B=0 C=2 D=2 
+00008 [L57] JMP      A=2 B=128 C=5 D=32773 target=14
+00009 [L58] GSET     A=1 B=0 C=3 D=3 'g_start_index'
+00010 [L59] GGET     A=2 B=0 C=3 D=3 'g_start_index'
+00011 [L59] GGET     A=3 B=0 C=4 D=4 'g_sample_count'
+00012 [L59] ADDVV    A=2 B=2 C=3 D=515 
+00013 [L59] GSET     A=2 B=0 C=5 D=5 'g_end_index'
+00014 [L62] GGET     A=2 B=0 C=5 D=5 'g_end_index'
+00015 [L62] ISGT     A=2 B=0 C=1 D=1 
+00016 [L62] JMP      A=2 B=128 C=26 D=32794 target=43
+00017 [L63] GGET     A=2 B=0 C=5 D=5 'g_end_index'
+00018 [L63] SUBVV    A=2 B=1 C=2 D=258 
+00019 [L63] ADDVN    A=2 B=2 C=0 D=512 
+00020 [L64] KSHORT   A=3 B=0 C=0 D=0 0
+00021 [L64] SUBVN    A=4 B=2 C=0 D=512 
+00022 [L64] KSHORT   A=5 B=0 C=1 D=1 1
+00023 [L64] FORI     A=3 B=128 C=13 D=32781 target=37
+00024 [L65] GGET     A=7 B=0 C=3 D=3 'g_start_index'
+00025 [L65] ADDVV    A=7 B=7 C=6 D=1798 
+00026 [L65] GGET     A=8 B=0 C=4 D=4 'g_sample_count'
+00027 [L65] MODVV    A=7 B=7 C=8 D=1800 
+00028 [L66] GGET     A=8 B=0 C=6 D=6 'g_sample_sum'
+00029 [L66] GGET     A=9 B=0 C=7 D=7 'g_sample_table'
+00030 [L66] TGETV    A=9 B=9 C=7 D=2311 
+00031 [L66] SUBVV    A=8 B=8 C=9 D=2057 
+00032 [L66] GSET     A=8 B=0 C=6 D=6 'g_sample_sum'
+00033 [L67] GGET     A=8 B=0 C=7 D=7 'g_sample_table'
+00034 [L67] KSHORT   A=9 B=0 C=0 D=0 0
+00035 [L67] TSETV    A=9 B=8 C=7 D=2055 
+00036 [L64] FORL     A=3 B=127 C=243 D=32755 target=24
+00037 [L69] GGET     A=3 B=0 C=3 D=3 'g_start_index'
+00038 [L69] ADDVV    A=3 B=3 C=2 D=770 
+00039 [L69] GSET     A=3 B=0 C=3 D=3 'g_start_index'
+00040 [L70] GGET     A=3 B=0 C=5 D=5 'g_end_index'
+00041 [L70] ADDVV    A=3 B=3 C=2 D=770 
+00042 [L70] GSET     A=3 B=0 C=5 D=5 'g_end_index'
+00043 [L72] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x61b source_lines=0-73 params=0
+UPVALUES []
+00001 [L1] KSHORT   A=0 B=0 C=0 D=0 0
+00002 [L1] GSET     A=0 B=0 C=0 D=0 'g_total_duration'
+00003 [L2] KSHORT   A=0 B=0 C=0 D=0 0
+00004 [L2] GSET     A=0 B=0 C=1 D=1 'g_sample_count'
+00005 [L3] KSHORT   A=0 B=0 C=0 D=0 0
+00006 [L3] GSET     A=0 B=0 C=2 D=2 'g_sample_duration'
+00007 [L4] KSHORT   A=0 B=0 C=0 D=0 0
+00008 [L4] GSET     A=0 B=0 C=3 D=3 'g_sample_sum'
+00009 [L6] KSHORT   A=0 B=0 C=0 D=0 0
+00010 [L6] GSET     A=0 B=0 C=4 D=4 'g_start_index'
+00011 [L7] KSHORT   A=0 B=0 C=0 D=0 0
+00012 [L7] GSET     A=0 B=0 C=5 D=5 'g_end_index'
+00013 [L9] TNEW     A=0 B=0 C=0 D=0 
+00014 [L9] GSET     A=0 B=0 C=6 D=6 'g_sample_table'
+00015 [L13] FNEW     A=0 B=0 C=7 D=7 {'kind': 'proto', 'id': 0}
+00016 [L11] GSET     A=0 B=0 C=8 D=8 'get_current_time'
+00017 [L31] FNEW     A=0 B=0 C=9 D=9 {'kind': 'proto', 'id': 1}
+00018 [L15] GSET     A=0 B=0 C=10 D=10 'speed_init'
+00019 [L39] FNEW     A=0 B=0 C=11 D=11 {'kind': 'proto', 'id': 2}
+00020 [L33] GSET     A=0 B=0 C=12 D=12 'speed_add_bytes'
+00021 [L44] FNEW     A=0 B=0 C=13 D=13 {'kind': 'proto', 'id': 3}
+00022 [L41] GSET     A=0 B=0 C=14 D=14 'speed_get_speed'
+00023 [L53] FNEW     A=0 B=0 C=15 D=15 {'kind': 'proto', 'id': 4}
+00024 [L46] GSET     A=0 B=0 C=16 D=16 'speed_reset'
+00025 [L72] FNEW     A=0 B=0 C=17 D=17 {'kind': 'proto', 'id': 5}
+00026 [L55] GSET     A=0 B=0 C=18 D=18 'speed_make_sample_uptodate'
+00027 [L72] RET0     A=0 B=0 C=1 D=1 

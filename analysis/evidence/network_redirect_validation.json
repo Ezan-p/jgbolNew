@@ -1,0 +1,84 @@
+{
+  "verified_at": "2026-10-24T00:03:30+08:00",
+  "device": "emulator-5562",
+  "android": "6.0 / API 23 / ARM32",
+  "package": "com.sygame.jingubang.p360",
+  "frida": "16.2.1",
+  "method": "process-local Bionic name resolution + TCP connect hook + ADB reverse",
+  "local_endpoint": "127.0.0.1:18770",
+  "session": ".runtime/redirect/sessions/20261023T160139Z-6e5c0f77",
+  "live_probe": {
+    "dns": 0,
+    "resolved": "127.0.0.1",
+    "ipv4": {
+      "connect": 0,
+      "ok": true,
+      "caller_port_unchanged": true
+    },
+    "ipv6": {
+      "connect": 0,
+      "ok": true,
+      "caller_port_unchanged": true
+    }
+  },
+  "real_game_server_list": {
+    "time": "2026-10-23T16:01:54.102+00:00",
+    "host": "jgbupdate02.shangyoo.com",
+    "path": "/update/jgb/p360_a/server_list.txt",
+    "status": 200,
+    "response_bytes": 59531,
+    "sha256": "6a5d287310fa50f535d4f20f794fd50b80b3645701579a68d9912d8fe6d5f0ce"
+  },
+  "attached_processes": [
+    {
+      "pid": 11073,
+      "name": "com.sygame.jingubang.p360"
+    },
+    {
+      "pid": 11111,
+      "name": "com.sygame.jingubang.p360:QLocal"
+    },
+    {
+      "pid": 11156,
+      "name": "com.sygame.jingubang.p360:QRemote"
+    }
+  ],
+  "other_received_http": [
+    {
+      "host": "api.gamebox.360.cn",
+      "path": "/10/popup/activity",
+      "status": 501
+    },
+    {
+      "host": "mgs.syyx.com",
+      "path": "/stat.php",
+      "status": 501
+    }
+  ],
+  "lifecycle": {
+    "background_start": true,
+    "duplicate_start_kept_same_pid": true,
+    "stop_reported_running_false": true,
+    "adb_reverse_list_empty_after_stop": true,
+    "hook_errors": 0
+  },
+  "tests": {
+    "command": ".runtime/venv/bin/python -m unittest discover -s tests -v",
+    "passed": 11,
+    "new_network_tests": 6
+  },
+  "apk_sha256": "de41eb0cb4155704c950428a1eaa2465c5046fe45160e415a10878993aee1155",
+  "limits": [
+    "No TLS handshake or certificate changes",
+    "No channel login or game protocol emulation",
+    "No UDP/direct-syscall/system-service coverage",
+    "SDK child discovery has an early-start attachment window"
+  ],
+  "sources_sha256": {
+    "network_redirect/__init__.py": "72fc18cd7029757583f45b64e758fd2ba74945c36c8473ff9a8ebc5035491e4c",
+    "network_redirect/cli.py": "6aa41d37262dd82e008881851f5bd3fb7e93392454c43498920e941889cde88a",
+    "network_redirect/hooks.js": "be36759357882351e0b204f24cf59d0f3f49b4068b4f40f7e55660f41b22505f",
+    "network_redirect/probe.js": "d43a609b9e8173290b2b4c61521e29e8990c8bbdbdad4a0f76a67d93e936e646",
+    "network_redirect/server.py": "e4788d8bc91ea48834903ca8cd7f7250bb3bade6c1c21993b43bdceff29ab71d"
+  }
+}

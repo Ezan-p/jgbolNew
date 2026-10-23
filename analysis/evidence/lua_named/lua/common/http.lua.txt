@@ -1,0 +1,163 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\648aa52f6d682b5e849ea944815e3b21.data'; root=proto5
+
+FUNCTION proto0 offset=0x4a source_lines=19-21 params=0
+UPVALUES ['CCLuaLog', 'string']
+00001 [L20] UGET     A=0 B=0 C=0 D=0 CCLuaLog
+00002 [L20] UGET     A=1 B=0 C=1 D=1 string
+00003 [L20] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L20] VARG     A=2 B=0 C=0 D=0 
+00005 [L20] CALLM    A=1 B=0 C=0 D=0 
+00006 [L20] CALLM    A=0 B=1 C=0 D=256 
+00007 [L21] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x95 source_lines=31-34 params=3
+UPVALUES ['cclog', 'main_server']
+00001 [L32] UGET     A=3 B=0 C=0 D=0 cclog
+00002 [L32] KSTR     A=4 B=0 C=0 D=0 'call http download='
+00003 [L32] MOV      A=5 B=0 C=0 D=0 
+00004 [L32] CAT      A=4 B=4 C=5 D=1029 
+00005 [L32] CALL     A=3 B=1 C=2 D=258 
+00006 [L33] UGET     A=3 B=0 C=1 D=1 main_server
+00007 [L33] TGETS    A=3 B=3 C=1 D=769 'update_files'
+00008 [L33] MOV      A=4 B=0 C=0 D=0 
+00009 [L33] MOV      A=5 B=0 C=1 D=1 
+00010 [L33] MOV      A=6 B=0 C=2 D=2 
+00011 [L33] KSHORT   A=7 B=0 C=1 D=1 1
+00012 [L33] KSHORT   A=8 B=0 C=15 D=15 15
+00013 [L33] CALL     A=3 B=1 C=6 D=262 
+00014 [L34] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto2 offset=0x138 source_lines=39-55 params=3
+UPVALUES ['cclog', 'CCFileUtils', 'd_file']
+00001 [L40] UGET     A=3 B=0 C=0 D=0 cclog
+00002 [L40] KSTR     A=4 B=0 C=0 D=0 'call try_download'
+00003 [L40] CALL     A=3 B=1 C=2 D=258 
+00004 [L41] TDUP     A=3 B=0 C=1 D=1 {'kind': 'table', 'value': {'try_time': 0}}
+00005 [L43] TSETS    A=0 B=3 C=2 D=770 'url'
+00006 [L44] TSETS    A=1 B=3 C=3 D=771 'file_name'
+00007 [L45] TSETS    A=2 B=3 C=4 D=772 'path_'
+00008 [L50] UGET     A=4 B=0 C=1 D=1 CCFileUtils
+00009 [L50] MOV      A=5 B=0 C=4 D=4 
+00010 [L50] TGETS    A=4 B=4 C=5 D=1029 'sharedFileUtils'
+00011 [L50] CALL     A=4 B=2 C=2 D=514 
+00012 [L50] MOV      A=5 B=0 C=4 D=4 
+00013 [L50] TGETS    A=4 B=4 C=6 D=1030 'getWriteablePath'
+00014 [L50] CALL     A=4 B=2 C=2 D=514 
+00015 [L50] KSTR     A=5 B=0 C=7 D=7 'setting_w/__try__'
+00016 [L50] MOV      A=6 B=0 C=1 D=1 
+00017 [L50] KSTR     A=7 B=0 C=8 D=8 '.html'
+00018 [L50] CAT      A=4 B=4 C=7 D=1031 
+00019 [L51] UGET     A=5 B=0 C=2 D=2 d_file
+00020 [L51] TGETS    A=5 B=5 C=9 D=1289 'saveTable'
+00021 [L51] MOV      A=6 B=0 C=3 D=3 
+00022 [L51] MOV      A=7 B=0 C=4 D=4 
+00023 [L51] CALL     A=5 B=1 C=3 D=259 
+00024 [L54] GGET     A=5 B=0 C=10 D=10 'check_unsend_url'
+00025 [L54] MOV      A=6 B=0 C=1 D=1 
+00026 [L54] CALL     A=5 B=1 C=2 D=258 
+00027 [L55] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto3 offset=0x2a7 source_lines=60-75 params=1
+UPVALUES ['CCFileUtils', 'd_file', 'cclog', 'main_server']
+00001 [L61] UGET     A=1 B=0 C=0 D=0 CCFileUtils
+00002 [L61] MOV      A=2 B=0 C=1 D=1 
+00003 [L61] TGETS    A=1 B=1 C=0 D=256 'sharedFileUtils'
+00004 [L61] CALL     A=1 B=2 C=2 D=514 
+00005 [L61] MOV      A=2 B=0 C=1 D=1 
+00006 [L61] TGETS    A=1 B=1 C=1 D=257 'getWriteablePath'
+00007 [L61] CALL     A=1 B=2 C=2 D=514 
+00008 [L61] KSTR     A=2 B=0 C=2 D=2 'setting_w/__try__'
+00009 [L61] MOV      A=3 B=0 C=0 D=0 
+00010 [L61] KSTR     A=4 B=0 C=3 D=3 '.html'
+00011 [L61] CAT      A=1 B=1 C=4 D=260 
+00012 [L62] UGET     A=2 B=0 C=1 D=1 d_file
+00013 [L62] TGETS    A=2 B=2 C=4 D=516 'readTable'
+00014 [L62] MOV      A=3 B=0 C=1 D=1 
+00015 [L62] CALL     A=2 B=2 C=2 D=514 
+00016 [L64] ISF      A=0 B=0 C=2 D=2 
+00017 [L64] JMP      A=3 B=128 C=30 D=32798 target=48
+00018 [L64] TGETS    A=3 B=2 C=5 D=517 'try_time'
+00019 [L64] ISF      A=0 B=0 C=3 D=3 
+00020 [L64] JMP      A=4 B=128 C=27 D=32795 target=48
+00021 [L65] TGETS    A=3 B=2 C=5 D=517 'try_time'
+00022 [L65] ADDVN    A=3 B=3 C=0 D=768 
+00023 [L65] TSETS    A=3 B=2 C=5 D=517 'try_time'
+00024 [L66] TGETS    A=3 B=2 C=5 D=517 'try_time'
+00025 [L66] KSHORT   A=4 B=0 C=5 D=5 5
+00026 [L66] ISGE     A=4 B=0 C=3 D=3 
+00027 [L66] JMP      A=3 B=128 C=10 D=32778 target=38
+00028 [L68] UGET     A=3 B=0 C=2 D=2 cclog
+00029 [L68] KSTR     A=4 B=0 C=6 D=6 'ERROR: download file_name 5 times all fail, name='
+00030 [L68] MOV      A=5 B=0 C=0 D=0 
+00031 [L68] CAT      A=4 B=4 C=5 D=1029 
+00032 [L68] CALL     A=3 B=1 C=2 D=258 
+00033 [L69] UGET     A=3 B=0 C=3 D=3 main_server
+00034 [L69] TGETS    A=3 B=3 C=7 D=775 'delfile_file'
+00035 [L69] MOV      A=4 B=0 C=1 D=1 
+00036 [L69] CALL     A=3 B=1 C=2 D=258 
+00037 [L69] JMP      A=3 B=128 C=10 D=32778 target=48
+00038 [L71] UGET     A=3 B=0 C=1 D=1 d_file
+00039 [L71] TGETS    A=3 B=3 C=8 D=776 'saveTable'
+00040 [L71] MOV      A=4 B=0 C=2 D=2 
+00041 [L71] MOV      A=5 B=0 C=1 D=1 
+00042 [L71] CALL     A=3 B=1 C=3 D=259 
+00043 [L72] GGET     A=3 B=0 C=9 D=9 'download'
+00044 [L72] TGETS    A=4 B=2 C=10 D=522 'url'
+00045 [L72] TGETS    A=5 B=2 C=11 D=523 'file_name'
+00046 [L72] TGETS    A=6 B=2 C=12 D=524 'path'
+00047 [L72] CALL     A=3 B=1 C=4 D=260 
+00048 [L75] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto4 offset=0x4ac source_lines=80-85 params=1
+UPVALUES ['CCFileUtils', 'cclog', 'main_server']
+00001 [L82] UGET     A=1 B=0 C=0 D=0 CCFileUtils
+00002 [L82] MOV      A=2 B=0 C=1 D=1 
+00003 [L82] TGETS    A=1 B=1 C=0 D=256 'sharedFileUtils'
+00004 [L82] CALL     A=1 B=2 C=2 D=514 
+00005 [L82] MOV      A=2 B=0 C=1 D=1 
+00006 [L82] TGETS    A=1 B=1 C=1 D=257 'getWriteablePath'
+00007 [L82] CALL     A=1 B=2 C=2 D=514 
+00008 [L82] KSTR     A=2 B=0 C=2 D=2 'setting_w/__try__'
+00009 [L82] MOV      A=3 B=0 C=0 D=0 
+00010 [L82] KSTR     A=4 B=0 C=3 D=3 '.html'
+00011 [L82] CAT      A=1 B=1 C=4 D=260 
+00012 [L83] UGET     A=2 B=0 C=1 D=1 cclog
+00013 [L83] KSTR     A=3 B=0 C=4 D=4 'download file_name OK, name='
+00014 [L83] MOV      A=4 B=0 C=0 D=0 
+00015 [L83] CAT      A=3 B=3 C=4 D=772 
+00016 [L83] CALL     A=2 B=1 C=2 D=258 
+00017 [L84] UGET     A=2 B=0 C=2 D=2 main_server
+00018 [L84] TGETS    A=2 B=2 C=5 D=517 'delfile_file'
+00019 [L84] MOV      A=3 B=0 C=1 D=1 
+00020 [L84] CALL     A=2 B=1 C=2 D=258 
+00021 [L85] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto5 offset=0x5c6 source_lines=0-88 params=0
+UPVALUES []
+00001 [L7] GGET     A=0 B=0 C=0 D=0 'CCLuaLog'
+00002 [L8] GGET     A=1 B=0 C=1 D=1 'CCString'
+00003 [L9] GGET     A=2 B=0 C=2 D=2 'string'
+00004 [L10] GGET     A=3 B=0 C=3 D=3 'main_server'
+00005 [L11] GGET     A=4 B=0 C=4 D=4 'CCFileUtils'
+00006 [L12] GGET     A=5 B=0 C=5 D=5 'table'
+00007 [L13] GGET     A=6 B=0 C=6 D=6 'pairs'
+00008 [L14] GGET     A=7 B=0 C=7 D=7 'io'
+00009 [L15] GGET     A=8 B=0 C=8 D=8 'CCApplication'
+00010 [L16] GGET     A=9 B=0 C=9 D=9 'tostring'
+00011 [L21] FNEW     A=10 B=0 C=10 D=10 {'kind': 'proto', 'id': 0}
+00012 [L23] GGET     A=11 B=0 C=11 D=11 'require'
+00013 [L23] KSTR     A=12 B=0 C=12 D=12 'common.file'
+00014 [L23] CALL     A=11 B=2 C=2 D=514 
+00015 [L26] GGET     A=12 B=0 C=13 D=13 'module'
+00016 [L26] KSTR     A=13 B=0 C=14 D=14 'common.http'
+00017 [L26] CALL     A=12 B=1 C=2 D=258 
+00018 [L34] FNEW     A=12 B=0 C=15 D=15 {'kind': 'proto', 'id': 1}
+00019 [L31] GSET     A=12 B=0 C=16 D=16 'download'
+00020 [L55] FNEW     A=12 B=0 C=17 D=17 {'kind': 'proto', 'id': 2}
+00021 [L39] GSET     A=12 B=0 C=18 D=18 'try_download'
+00022 [L75] FNEW     A=12 B=0 C=19 D=19 {'kind': 'proto', 'id': 3}
+00023 [L60] GSET     A=12 B=0 C=20 D=20 'check_unsend_url'
+00024 [L85] FNEW     A=12 B=0 C=21 D=21 {'kind': 'proto', 'id': 4}
+00025 [L80] GSET     A=12 B=0 C=22 D=22 'callback_gm_download'
+00026 [L85] UCLO     A=0 B=128 C=0 D=32768 target=27
+00027 [L85] RET0     A=0 B=0 C=1 D=1 

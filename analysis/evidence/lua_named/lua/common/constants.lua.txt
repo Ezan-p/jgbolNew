@@ -1,0 +1,345 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\f6c34efb6a6a13f6dcaa7e5c86bbdfc2.data'; root=proto5
+
+FUNCTION proto0 offset=0x4a source_lines=39-41 params=0
+UPVALUES ['CCLuaLog', 'string']
+00001 [L40] UGET     A=0 B=0 C=0 D=0 CCLuaLog
+00002 [L40] UGET     A=1 B=0 C=1 D=1 string
+00003 [L40] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L40] VARG     A=2 B=0 C=0 D=0 
+00005 [L40] CALLM    A=1 B=0 C=0 D=0 
+00006 [L40] CALLM    A=0 B=1 C=0 D=256 
+00007 [L41] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x95 source_lines=45-65 params=1
+UPVALUES ['type', 'pairs']
+00001 [L46] UGET     A=1 B=0 C=0 D=0 type
+00002 [L46] MOV      A=2 B=0 C=0 D=0 
+00003 [L46] CALL     A=1 B=2 C=2 D=514 
+00004 [L46] ISEQS    A=1 B=0 C=0 D=0 'table'
+00005 [L46] JMP      A=1 B=128 C=2 D=32770 target=8
+00006 [L47] KPRI     A=1 B=0 C=0 D=0 
+00007 [L47] RET1     A=1 B=0 C=2 D=2 
+00008 [L49] TNEW     A=1 B=0 C=0 D=0 
+00009 [L50] UGET     A=2 B=0 C=1 D=1 pairs
+00010 [L50] MOV      A=3 B=0 C=0 D=0 
+00011 [L50] CALL     A=2 B=4 C=2 D=1026 
+00012 [L50] ISNEXT   A=5 B=128 C=19 D=32787 target=32
+00013 [L51] UGET     A=7 B=0 C=0 D=0 type
+00014 [L51] MOV      A=8 B=0 C=6 D=6 
+00015 [L51] CALL     A=7 B=2 C=2 D=514 
+00016 [L52] ISNES    A=7 B=0 C=0 D=0 'table'
+00017 [L52] JMP      A=8 B=128 C=5 D=32773 target=23
+00018 [L53] GGET     A=8 B=0 C=1 D=1 'table_copy'
+00019 [L53] MOV      A=9 B=0 C=6 D=6 
+00020 [L53] CALL     A=8 B=2 C=2 D=514 
+00021 [L53] TSETV    A=8 B=1 C=5 D=261 
+00022 [L53] JMP      A=8 B=128 C=9 D=32777 target=32
+00023 [L54] ISNES    A=7 B=0 C=2 D=2 'thread'
+00024 [L54] JMP      A=8 B=128 C=2 D=32770 target=27
+00025 [L56] TSETV    A=6 B=1 C=5 D=261 
+00026 [L56] JMP      A=8 B=128 C=5 D=32773 target=32
+00027 [L57] ISNES    A=7 B=0 C=3 D=3 'userdata'
+00028 [L57] JMP      A=8 B=128 C=2 D=32770 target=31
+00029 [L59] TSETV    A=6 B=1 C=5 D=261 
+00030 [L59] JMP      A=8 B=128 C=1 D=32769 target=32
+00031 [L61] TSETV    A=6 B=1 C=5 D=261 
+00032 [L50] ITERN    A=5 B=3 C=3 D=771 
+00033 [L50] ITERL    A=5 B=127 C=235 D=32747 target=13
+00034 [L64] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto2 offset=0x1a8 source_lines=148-155 params=1
+UPVALUES ['cclog']
+00001 [L149] GGET     A=1 B=0 C=0 D=0 'g_fight_pos'
+00002 [L149] TGETV    A=1 B=1 C=0 D=256 
+00003 [L149] ISF      A=0 B=0 C=1 D=1 
+00004 [L149] JMP      A=2 B=128 C=5 D=32773 target=10
+00005 [L150] GGET     A=1 B=0 C=1 D=1 'table_copy'
+00006 [L150] GGET     A=2 B=0 C=0 D=0 'g_fight_pos'
+00007 [L150] TGETV    A=2 B=2 C=0 D=512 
+00008 [L150] CALLT    A=1 B=0 C=2 D=2 
+00009 [L150] JMP      A=1 B=128 C=7 D=32775 target=17
+00010 [L152] UGET     A=1 B=0 C=0 D=0 cclog
+00011 [L152] KSTR     A=2 B=0 C=2 D=2 'ERROR: posName=%s'
+00012 [L152] MOV      A=3 B=0 C=0 D=0 
+00013 [L152] CALL     A=1 B=1 C=3 D=259 
+00014 [L153] GGET     A=1 B=0 C=1 D=1 'table_copy'
+00015 [L153] GGET     A=2 B=0 C=3 D=3 'posEmpt'
+00016 [L153] CALLT    A=1 B=0 C=2 D=2 
+00017 [L155] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto3 offset=0x251 source_lines=184-192 params=0
+UPVALUES []
+00001 [L185] GGET     A=0 B=0 C=0 D=0 'g_kfight_pos'
+00002 [L185] IST      A=0 B=0 C=0 D=0 
+00003 [L185] JMP      A=0 B=128 C=21 D=32789 target=25
+00004 [L186] TNEW     A=0 B=0 C=0 D=0 
+00005 [L186] GSET     A=0 B=0 C=0 D=0 'g_kfight_pos'
+00006 [L187] KSHORT   A=0 B=0 C=1 D=1 1
+00007 [L187] KSHORT   A=1 B=0 C=9 D=9 9
+00008 [L187] KSHORT   A=2 B=0 C=1 D=1 1
+00009 [L187] FORI     A=0 B=128 C=15 D=32783 target=25
+00010 [L188] GGET     A=4 B=0 C=0 D=0 'g_kfight_pos'
+00011 [L188] KSTR     A=5 B=0 C=1 D=1 'o'
+00012 [L188] MOV      A=6 B=0 C=3 D=3 
+00013 [L188] CAT      A=5 B=5 C=6 D=1286 
+00014 [L188] GGET     A=6 B=0 C=2 D=2 'o_pos'
+00015 [L188] TGETV    A=6 B=6 C=3 D=1539 
+00016 [L188] TSETV    A=6 B=4 C=5 D=1029 
+00017 [L189] GGET     A=4 B=0 C=0 D=0 'g_kfight_pos'
+00018 [L189] KSTR     A=5 B=0 C=3 D=3 'e'
+00019 [L189] MOV      A=6 B=0 C=3 D=3 
+00020 [L189] CAT      A=5 B=5 C=6 D=1286 
+00021 [L189] GGET     A=6 B=0 C=4 D=4 'e_pos'
+00022 [L189] TGETV    A=6 B=6 C=3 D=1539 
+00023 [L189] TSETV    A=6 B=4 C=5 D=1029 
+00024 [L187] FORL     A=0 B=127 C=241 D=32753 target=10
+00025 [L192] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto4 offset=0x306 source_lines=195-203 params=1
+UPVALUES ['cclog']
+00001 [L196] GGET     A=1 B=0 C=0 D=0 'initPos'
+00002 [L196] CALL     A=1 B=1 C=1 D=257 
+00003 [L197] GGET     A=1 B=0 C=1 D=1 'g_kfight_pos'
+00004 [L197] TGETV    A=1 B=1 C=0 D=256 
+00005 [L197] ISF      A=0 B=0 C=1 D=1 
+00006 [L197] JMP      A=2 B=128 C=5 D=32773 target=12
+00007 [L198] GGET     A=1 B=0 C=2 D=2 'table_copy'
+00008 [L198] GGET     A=2 B=0 C=1 D=1 'g_kfight_pos'
+00009 [L198] TGETV    A=2 B=2 C=0 D=512 
+00010 [L198] CALLT    A=1 B=0 C=2 D=2 
+00011 [L198] JMP      A=1 B=128 C=7 D=32775 target=19
+00012 [L200] UGET     A=1 B=0 C=0 D=0 cclog
+00013 [L200] KSTR     A=2 B=0 C=3 D=3 'ERROR: posName=%s'
+00014 [L200] MOV      A=3 B=0 C=0 D=0 
+00015 [L200] CALL     A=1 B=1 C=3 D=259 
+00016 [L201] GGET     A=1 B=0 C=2 D=2 'table_copy'
+00017 [L201] GGET     A=2 B=0 C=4 D=4 'posEmpt'
+00018 [L201] CALLT    A=1 B=0 C=2 D=2 
+00019 [L203] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto5 offset=0x3c2 source_lines=0-222 params=0
+UPVALUES []
+00001 [L6] GGET     A=0 B=0 C=0 D=0 'require'
+00002 [L7] GGET     A=1 B=0 C=1 D=1 'type'
+00003 [L8] GGET     A=2 B=0 C=2 D=2 'print'
+00004 [L9] GGET     A=3 B=0 C=3 D=3 'tostring'
+00005 [L10] GGET     A=4 B=0 C=4 D=4 'pairs'
+00006 [L11] GGET     A=5 B=0 C=5 D=5 'string'
+00007 [L12] GGET     A=6 B=0 C=6 D=6 'CCLuaLog'
+00008 [L13] GGET     A=7 B=0 C=7 D=7 'module'
+00009 [L13] KSTR     A=8 B=0 C=8 D=8 'common.constants'
+00010 [L13] CALL     A=7 B=1 C=2 D=258 
+00011 [L16] KSTR     A=7 B=0 C=9 D=9 'sx01-mxybs01.shangyoo.com'
+00012 [L16] GSET     A=7 B=0 C=10 D=10 'LS_DOMAIN'
+00013 [L17] KSTR     A=7 B=0 C=11 D=11 '192.168.4.143'
+00014 [L17] GSET     A=7 B=0 C=10 D=10 'LS_DOMAIN'
+00015 [L21] KSHORT   A=7 B=35 C=56 D=9016 9016
+00016 [L21] GSET     A=7 B=0 C=12 D=12 'LS_PORT'
+00017 [L24] KPRI     A=7 B=0 C=1 D=1 
+00018 [L24] GSET     A=7 B=0 C=13 D=13 'g_local_test'
+00019 [L25] KSTR     A=7 B=0 C=14 D=14 '127.0.0.1'
+00020 [L25] GSET     A=7 B=0 C=15 D=15 'LOCAL_IP'
+00021 [L26] KSHORT   A=7 B=35 C=56 D=9016 9016
+00022 [L26] GSET     A=7 B=0 C=16 D=16 'LOCAL_PORT'
+00023 [L28] KPRI     A=7 B=0 C=1 D=1 
+00024 [L28] GSET     A=7 B=0 C=17 D=17 'g_test'
+00025 [L29] KPRI     A=7 B=0 C=2 D=2 
+00026 [L29] GSET     A=7 B=0 C=18 D=18 'g_canAccLogin'
+00027 [L30] KPRI     A=7 B=0 C=1 D=1 
+00028 [L30] GSET     A=7 B=0 C=19 D=19 'g_fight_log'
+00029 [L33] KPRI     A=7 B=0 C=2 D=2 
+00030 [L33] GSET     A=7 B=0 C=20 D=20 'g_can_recharge'
+00031 [L35] KSTR     A=7 B=0 C=21 D=21 ''
+00032 [L35] GSET     A=7 B=0 C=22 D=22 'g_device_id'
+00033 [L41] FNEW     A=7 B=0 C=23 D=23 {'kind': 'proto', 'id': 0}
+00034 [L65] FNEW     A=8 B=0 C=24 D=24 {'kind': 'proto', 'id': 1}
+00035 [L45] GSET     A=8 B=0 C=25 D=25 'table_copy'
+00036 [L70] TDUP     A=8 B=0 C=26 D=26 {'kind': 'table', 'value': {'MaxCharactors': 8}}
+00037 [L73] GSET     A=8 B=0 C=27 D=27 'g_contants'
+00038 [L76] TDUP     A=8 B=0 C=28 D=28 {'kind': 'table', 'value': {'TAG_alter': 990013, 'TAG_newbieManualUI': 990021, 'TAG_tongtiantaUI': 990027, 'TAG_goFightUI': 990005, 'TAG_downloadTink': 990012, 'TAG_noticeUI': 990020, 'TAG_prize': 990015, 'TAG_goMapUI': 990003, 'TAG_info': 990014, 'TAG_turntableUI': 990026, 'TAG_godBlessUI': 990022, 'TAG_goFightEndUI': 990006, 'TAG_goMainUI': 990002, 'TAG_twoYearsCelebrateUI': 990025, 'TAG_achieveGot': 990017, 'TAG_actNoticeUI': 990024, 'TAG_checkinUI': 990010, 'TAG_goPackageUI': 990004, 'TAG_hll': 990011, 'TAG_monthCardUI': 990016, 'TAG_goLoginUI': 990001}}
+00039 [L100] GSET     A=8 B=0 C=29 D=29 'g_tags'
+00040 [L105] TDUP     A=8 B=0 C=30 D=30 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y': 0.2, 'y_head': 0.9, 'x': 0.1}}
+00041 [L105] GSET     A=8 B=0 C=31 D=31 'o_l'
+00042 [L106] TDUP     A=8 B=0 C=32 D=32 {'kind': 'table', 'value': {'x_head': 0.34, 'z': 1200, 'y': 0.2, 'y_head': 0.9, 'x': 0.35}}
+00043 [L106] GSET     A=8 B=0 C=33 D=33 'o_r'
+00044 [L108] TDUP     A=8 B=0 C=34 D=34 {'kind': 'table', 'value': {'x_head': 0.23, 'z': 1100, 'y': 0.35, 'y_head': 0.9, 'x': 0.23}}
+00045 [L108] GSET     A=8 B=0 C=35 D=35 'o_u'
+00046 [L109] TDUP     A=8 B=0 C=36 D=36 {'kind': 'table', 'value': {'x_head': 0.18, 'z': 1300, 'y': 0.05, 'y_head': 0.9, 'x': 0.22}}
+00047 [L109] GSET     A=8 B=0 C=37 D=37 'o_d'
+00048 [L112] TDUP     A=8 B=0 C=38 D=38 {'kind': 'table', 'value': {'x_head': 0.66, 'z': 1200, 'y': 0.2, 'y_head': 0.9, 'x': 0.65}}
+00049 [L112] GSET     A=8 B=0 C=39 D=39 'e_l'
+00050 [L113] TDUP     A=8 B=0 C=40 D=40 {'kind': 'table', 'value': {'x_head': 0.93, 'z': 1200, 'y': 0.2, 'y_head': 0.9, 'x': 0.9}}
+00051 [L113] GSET     A=8 B=0 C=41 D=41 'e_r'
+00052 [L115] TDUP     A=8 B=0 C=42 D=42 {'kind': 'table', 'value': {'x_head': 0.77, 'z': 1100, 'y': 0.35, 'y_head': 0.9, 'x': 0.77}}
+00053 [L115] GSET     A=8 B=0 C=43 D=43 'e_u'
+00054 [L116] TDUP     A=8 B=0 C=44 D=44 {'kind': 'table', 'value': {'x_head': 0.8200000000000001, 'z': 1300, 'y': 0.05, 'y_head': 0.9, 'x': 0.78}}
+00055 [L116] GSET     A=8 B=0 C=45 D=45 'e_d'
+00056 [L120] TDUP     A=8 B=0 C=46 D=46 {'kind': 'table', 'value': {}}
+00057 [L122] GGET     A=9 B=0 C=31 D=31 'o_l'
+00058 [L122] TSETS    A=9 B=8 C=47 D=2095 'o1'
+00059 [L123] GGET     A=9 B=0 C=33 D=33 'o_r'
+00060 [L123] TSETS    A=9 B=8 C=48 D=2096 'o2'
+00061 [L124] GGET     A=9 B=0 C=35 D=35 'o_u'
+00062 [L124] TSETS    A=9 B=8 C=49 D=2097 'o3'
+00063 [L125] GGET     A=9 B=0 C=37 D=37 'o_d'
+00064 [L125] TSETS    A=9 B=8 C=50 D=2098 'o4'
+00065 [L127] GGET     A=9 B=0 C=31 D=31 'o_l'
+00066 [L127] TSETS    A=9 B=8 C=51 D=2099 'o5'
+00067 [L128] GGET     A=9 B=0 C=33 D=33 'o_r'
+00068 [L128] TSETS    A=9 B=8 C=52 D=2100 'o6'
+00069 [L129] GGET     A=9 B=0 C=35 D=35 'o_u'
+00070 [L129] TSETS    A=9 B=8 C=53 D=2101 'o7'
+00071 [L130] GGET     A=9 B=0 C=37 D=37 'o_d'
+00072 [L130] TSETS    A=9 B=8 C=54 D=2102 'o8'
+00073 [L132] GGET     A=9 B=0 C=41 D=41 'e_r'
+00074 [L132] TSETS    A=9 B=8 C=55 D=2103 'e1'
+00075 [L133] GGET     A=9 B=0 C=39 D=39 'e_l'
+00076 [L133] TSETS    A=9 B=8 C=56 D=2104 'e2'
+00077 [L134] GGET     A=9 B=0 C=43 D=43 'e_u'
+00078 [L134] TSETS    A=9 B=8 C=57 D=2105 'e3'
+00079 [L135] GGET     A=9 B=0 C=45 D=45 'e_d'
+00080 [L135] TSETS    A=9 B=8 C=58 D=2106 'e4'
+00081 [L137] GGET     A=9 B=0 C=41 D=41 'e_r'
+00082 [L137] TSETS    A=9 B=8 C=59 D=2107 'e5'
+00083 [L138] GGET     A=9 B=0 C=39 D=39 'e_l'
+00084 [L138] TSETS    A=9 B=8 C=60 D=2108 'e6'
+00085 [L139] GGET     A=9 B=0 C=43 D=43 'e_u'
+00086 [L139] TSETS    A=9 B=8 C=61 D=2109 'e7'
+00087 [L140] GGET     A=9 B=0 C=45 D=45 'e_d'
+00088 [L140] TSETS    A=9 B=8 C=62 D=2110 'e8'
+00089 [L141] GSET     A=8 B=0 C=63 D=63 'g_fight_pos'
+00090 [L143] TDUP     A=8 B=0 C=64 D=64 {'kind': 'table', 'value': {'x_head': 0.5, 'z': 9999, 'y': 0.5, 'y_head': 0.5, 'x': 0.5}}
+00091 [L143] GSET     A=8 B=0 C=65 D=65 'posEmpty'
+00092 [L155] FNEW     A=8 B=0 C=66 D=66 {'kind': 'proto', 'id': 2}
+00093 [L148] GSET     A=8 B=0 C=67 D=67 'getPosByPosName'
+00094 [L157] TDUP     A=8 B=0 C=68 D=68 {'kind': 'table', 'value': {1: 0.09, 2: 0.21, 3: 0.33}}
+00095 [L158] TDUP     A=9 B=0 C=69 D=69 {'kind': 'table', 'value': {1: 0.05, 2: 0.2, 3: 0.35}}
+00096 [L160] TNEW     A=10 B=0 C=10 D=10 
+00097 [L160] TDUP     A=11 B=0 C=70 D=70 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00098 [L161] TGETB    A=12 B=8 C=3 D=2051 
+00099 [L161] TSETS    A=12 B=11 C=71 D=2887 'x'
+00100 [L161] TGETB    A=12 B=9 C=3 D=2307 
+00101 [L161] TSETS    A=12 B=11 C=72 D=2888 'y'
+00102 [L161] TSETB    A=11 B=10 C=1 D=2561 
+00103 [L161] TDUP     A=11 B=0 C=73 D=73 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00104 [L162] TGETB    A=12 B=8 C=3 D=2051 
+00105 [L162] TSETS    A=12 B=11 C=71 D=2887 'x'
+00106 [L162] TGETB    A=12 B=9 C=2 D=2306 
+00107 [L162] TSETS    A=12 B=11 C=72 D=2888 'y'
+00108 [L162] TSETB    A=11 B=10 C=2 D=2562 
+00109 [L162] TDUP     A=11 B=0 C=74 D=74 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00110 [L163] TGETB    A=12 B=8 C=3 D=2051 
+00111 [L163] TSETS    A=12 B=11 C=71 D=2887 'x'
+00112 [L163] TGETB    A=12 B=9 C=1 D=2305 
+00113 [L163] TSETS    A=12 B=11 C=72 D=2888 'y'
+00114 [L163] TSETB    A=11 B=10 C=3 D=2563 
+00115 [L163] TDUP     A=11 B=0 C=75 D=75 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00116 [L164] TGETB    A=12 B=8 C=2 D=2050 
+00117 [L164] TSETS    A=12 B=11 C=71 D=2887 'x'
+00118 [L164] TGETB    A=12 B=9 C=3 D=2307 
+00119 [L164] TSETS    A=12 B=11 C=72 D=2888 'y'
+00120 [L164] TSETB    A=11 B=10 C=4 D=2564 
+00121 [L164] TDUP     A=11 B=0 C=76 D=76 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00122 [L165] TGETB    A=12 B=8 C=2 D=2050 
+00123 [L165] TSETS    A=12 B=11 C=71 D=2887 'x'
+00124 [L165] TGETB    A=12 B=9 C=2 D=2306 
+00125 [L165] TSETS    A=12 B=11 C=72 D=2888 'y'
+00126 [L165] TSETB    A=11 B=10 C=5 D=2565 
+00127 [L165] TDUP     A=11 B=0 C=77 D=77 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00128 [L166] TGETB    A=12 B=8 C=2 D=2050 
+00129 [L166] TSETS    A=12 B=11 C=71 D=2887 'x'
+00130 [L166] TGETB    A=12 B=9 C=1 D=2305 
+00131 [L166] TSETS    A=12 B=11 C=72 D=2888 'y'
+00132 [L166] TSETB    A=11 B=10 C=6 D=2566 
+00133 [L166] TDUP     A=11 B=0 C=78 D=78 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00134 [L167] TGETB    A=12 B=8 C=1 D=2049 
+00135 [L167] TSETS    A=12 B=11 C=71 D=2887 'x'
+00136 [L167] TGETB    A=12 B=9 C=3 D=2307 
+00137 [L167] TSETS    A=12 B=11 C=72 D=2888 'y'
+00138 [L167] TSETB    A=11 B=10 C=7 D=2567 
+00139 [L167] TDUP     A=11 B=0 C=79 D=79 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00140 [L168] TGETB    A=12 B=8 C=1 D=2049 
+00141 [L168] TSETS    A=12 B=11 C=71 D=2887 'x'
+00142 [L168] TGETB    A=12 B=9 C=2 D=2306 
+00143 [L168] TSETS    A=12 B=11 C=72 D=2888 'y'
+00144 [L168] TSETB    A=11 B=10 C=8 D=2568 
+00145 [L168] TDUP     A=11 B=0 C=80 D=80 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00146 [L169] TGETB    A=12 B=8 C=1 D=2049 
+00147 [L169] TSETS    A=12 B=11 C=71 D=2887 'x'
+00148 [L169] TGETB    A=12 B=9 C=1 D=2305 
+00149 [L169] TSETS    A=12 B=11 C=72 D=2888 'y'
+00150 [L169] TSETB    A=11 B=10 C=9 D=2569 
+00151 [L170] GSET     A=10 B=0 C=81 D=81 'o_pos'
+00152 [L172] TNEW     A=10 B=0 C=10 D=10 
+00153 [L172] TDUP     A=11 B=0 C=82 D=82 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00154 [L173] TGETB    A=12 B=8 C=3 D=2051 
+00155 [L173] SUBNV    A=12 B=12 C=0 D=3072 
+00156 [L173] TSETS    A=12 B=11 C=71 D=2887 'x'
+00157 [L173] TGETB    A=12 B=9 C=3 D=2307 
+00158 [L173] TSETS    A=12 B=11 C=72 D=2888 'y'
+00159 [L173] TSETB    A=11 B=10 C=1 D=2561 
+00160 [L173] TDUP     A=11 B=0 C=83 D=83 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00161 [L174] TGETB    A=12 B=8 C=3 D=2051 
+00162 [L174] SUBNV    A=12 B=12 C=0 D=3072 
+00163 [L174] TSETS    A=12 B=11 C=71 D=2887 'x'
+00164 [L174] TGETB    A=12 B=9 C=2 D=2306 
+00165 [L174] TSETS    A=12 B=11 C=72 D=2888 'y'
+00166 [L174] TSETB    A=11 B=10 C=2 D=2562 
+00167 [L174] TDUP     A=11 B=0 C=84 D=84 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00168 [L175] TGETB    A=12 B=8 C=3 D=2051 
+00169 [L175] SUBNV    A=12 B=12 C=0 D=3072 
+00170 [L175] TSETS    A=12 B=11 C=71 D=2887 'x'
+00171 [L175] TGETB    A=12 B=9 C=1 D=2305 
+00172 [L175] TSETS    A=12 B=11 C=72 D=2888 'y'
+00173 [L175] TSETB    A=11 B=10 C=3 D=2563 
+00174 [L175] TDUP     A=11 B=0 C=85 D=85 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00175 [L176] TGETB    A=12 B=8 C=2 D=2050 
+00176 [L176] SUBNV    A=12 B=12 C=0 D=3072 
+00177 [L176] TSETS    A=12 B=11 C=71 D=2887 'x'
+00178 [L176] TGETB    A=12 B=9 C=3 D=2307 
+00179 [L176] TSETS    A=12 B=11 C=72 D=2888 'y'
+00180 [L176] TSETB    A=11 B=10 C=4 D=2564 
+00181 [L176] TDUP     A=11 B=0 C=86 D=86 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00182 [L177] TGETB    A=12 B=8 C=2 D=2050 
+00183 [L177] SUBNV    A=12 B=12 C=0 D=3072 
+00184 [L177] TSETS    A=12 B=11 C=71 D=2887 'x'
+00185 [L177] TGETB    A=12 B=9 C=2 D=2306 
+00186 [L177] TSETS    A=12 B=11 C=72 D=2888 'y'
+00187 [L177] TSETB    A=11 B=10 C=5 D=2565 
+00188 [L177] TDUP     A=11 B=0 C=87 D=87 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00189 [L178] TGETB    A=12 B=8 C=2 D=2050 
+00190 [L178] SUBNV    A=12 B=12 C=0 D=3072 
+00191 [L178] TSETS    A=12 B=11 C=71 D=2887 'x'
+00192 [L178] TGETB    A=12 B=9 C=1 D=2305 
+00193 [L178] TSETS    A=12 B=11 C=72 D=2888 'y'
+00194 [L178] TSETB    A=11 B=10 C=6 D=2566 
+00195 [L178] TDUP     A=11 B=0 C=88 D=88 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00196 [L179] TGETB    A=12 B=8 C=1 D=2049 
+00197 [L179] SUBNV    A=12 B=12 C=0 D=3072 
+00198 [L179] TSETS    A=12 B=11 C=71 D=2887 'x'
+00199 [L179] TGETB    A=12 B=9 C=3 D=2307 
+00200 [L179] TSETS    A=12 B=11 C=72 D=2888 'y'
+00201 [L179] TSETB    A=11 B=10 C=7 D=2567 
+00202 [L179] TDUP     A=11 B=0 C=89 D=89 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00203 [L180] TGETB    A=12 B=8 C=1 D=2049 
+00204 [L180] SUBNV    A=12 B=12 C=0 D=3072 
+00205 [L180] TSETS    A=12 B=11 C=71 D=2887 'x'
+00206 [L180] TGETB    A=12 B=9 C=2 D=2306 
+00207 [L180] TSETS    A=12 B=11 C=72 D=2888 'y'
+00208 [L180] TSETB    A=11 B=10 C=8 D=2568 
+00209 [L180] TDUP     A=11 B=0 C=90 D=90 {'kind': 'table', 'value': {'x_head': 0.07, 'z': 1200, 'y_head': 0.9}}
+00210 [L181] TGETB    A=12 B=8 C=1 D=2049 
+00211 [L181] SUBNV    A=12 B=12 C=0 D=3072 
+00212 [L181] TSETS    A=12 B=11 C=71 D=2887 'x'
+00213 [L181] TGETB    A=12 B=9 C=1 D=2305 
+00214 [L181] TSETS    A=12 B=11 C=72 D=2888 'y'
+00215 [L181] TSETB    A=11 B=10 C=9 D=2569 
+00216 [L182] GSET     A=10 B=0 C=91 D=91 'e_pos'
+00217 [L192] FNEW     A=10 B=0 C=92 D=92 {'kind': 'proto', 'id': 3}
+00218 [L184] GSET     A=10 B=0 C=93 D=93 'initPos'
+00219 [L203] FNEW     A=10 B=0 C=94 D=94 {'kind': 'proto', 'id': 4}
+00220 [L195] GSET     A=10 B=0 C=95 D=95 'getKfightPosByPosName'
+00221 [L206] TDUP     A=10 B=0 C=96 D=96 {'kind': 'table', 'value': {'damage_scale': 0.012, 'char_fs_ccbi': 0.2, 'blood_scale': 0.1, 'blood_offx': 0.048, 'font_size': 22, 'ext_bg_scale': 0.18, 'crit_scale': 0.05, 'char_scaleH': 0.3, 'add_offy': 0.07, 'damage_offy': 0.25, 'add_scale': 0.07, 'ext_name_offy': 0.16, 'blood_h': 0.01, 'ext_name_scale': 0.06}}
+00222 [L221] GSET     A=10 B=0 C=97 D=97 'k_params'
+00223 [L221] UCLO     A=0 B=128 C=0 D=32768 target=224
+00224 [L221] RET0     A=0 B=0 C=1 D=1 

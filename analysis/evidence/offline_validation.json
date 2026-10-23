@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-24",
+  "device": "emulator-5562",
+  "platform": "Android 6 API 23 ARM32 / macOS Python 3.9 LibreSSL 2.8.3",
+  "mode": "local-offline",
+  "session": ".runtime/redirect/sessions/20261023T164108Z-97c74952",
+  "lua_observation": ".runtime/observations/20261023T164119Z-11c3c58f",
+  "checks": {
+    "probe_result": {
+      "dns": 0,
+      "resolved": "127.0.0.1",
+      "ipv4": {
+        "connect": 0,
+        "ok": true,
+        "caller_port_unchanged": true
+      },
+      "ipv6": {
+        "connect": 0,
+        "ok": true,
+        "caller_port_unchanged": true
+      }
+    },
+    "tls_probe_result": {
+      "status": 200,
+      "cipher": "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+    },
+    "native_tls_probe_result": {
+      "curl_result": 0,
+      "http_status": 200,
+      "response_bytes": 24
+    }
+  },
+  "tls_negotiated": [
+    {
+      "version": "TLSv1.2",
+      "cipher": "ECDHE-RSA-AES256-GCM-SHA384"
+    },
+    {
+      "version": "TLSv1",
+      "cipher": "ECDHE-RSA-AES256-SHA"
+    }
+  ],
+  "game_login_ok": true,
+  "responses_seen": [
+    1002,
+    1017,
+    1020,
+    1023,
+    1034,
+    2998,
+    3002
+  ],
+  "lua_first_inside_game_ok": true,
+  "lua_errors_in_final_observation": [],
+  "screenshots": {
+    "main": "analysis/evidence/offline_main.png",
+    "map": "analysis/evidence/offline_map.png",
+    "map_session": ".runtime/redirect/sessions/20261023T163120Z-7db2598e"
+  },
+  "unit_tests": {
+    "command": ".runtime/venv/bin/python -m unittest tests.test_offline_backend tests.test_network_redirect tests.test_server_list -v",
+    "passed": 23
+  },
+  "cleanup": {
+    "stop_success": true,
+    "adb_reverse_list_after_stop": "",
+    "restarted_final_service": true
+  },
+  "sha256": {
+    "build/jgbol3.87-360-list.apk": "de41eb0cb4155704c950428a1eaa2465c5046fe45160e415a10878993aee1155",
+    "jgbol3.87/lib/armeabi/libxiyoujilua.so": "1ea4ed769527deae3ee79c60d2c749c6f4834b9c321f012d5784318d3112fe86",
+    "network_redirect/server.py": "0d6ecbec5538c91087d3981dd906826d6d6347280f893aad0180cf9284d502dd",
+    "network_redirect/backend.py": "3338015dfa237df222602ce82820fec73e5e3bac717560de8cb0f2c7b67a2758",
+    "network_redirect/offline.js": "805d44a056fdaddd9102da413f1de74f9703dd130783d3197291d868d1ddbe2a",
+    "network_redirect/hooks.js": "df7d8a661564480c5f20cf1e679a73810297a6ed3c57b2e0327c2b6220204cfe",
+    "network_redirect/protocol.py": "f2291405f156d24f0808af34f2bfac8707e9cfe7d8792759a69d4b39897e3de6",
+    "network_redirect/__init__.py": "72fc18cd7029757583f45b64e758fd2ba74945c36c8473ff9a8ebc5035491e4c",
+    "network_redirect/native_tls_probe.js": "91535ea066afe72ce6f54bc5adadb116c1970aa3130c90577039ef61d25dd629",
+    "network_redirect/tls.py": "90e8a8eb9f53d3520876a5fb8b0a5579aa2e7a42f86b21297111ea7637d98012",
+    "network_redirect/cli.py": "f45ecf19a058b26f9e160f19362352fa352aafb68d2e6dc076d456b693f50057",
+    "network_redirect/probe.js": "d43a609b9e8173290b2b4c61521e29e8990c8bbdbdad4a0f76a67d93e936e646"
+  },
+  "limits": [
+    "Single local test account; no real 360 authentication",
+    "Minimal partial common configuration; tutorial skipped",
+    "Initial map and companion only; combat, growth, inventory, commerce and activities unimplemented",
+    "Local TLS 1.0 required for bundled native OpenSSL; Java negotiated TLS 1.2",
+    "Process-scoped hooks, not whole-device network isolation"
+  ],
+  "lua_first_inside_game_ok_observation": ".runtime/observations/20261023T163734Z-521debc8",
+  "lua_roster_sorted": true,
+  "support_error_fix": "Unknown offline HTTP endpoints return HTTP 501 plus valid JSON {ok:0}; covered by regression test.",
+  "screenshots_sha256": {
+    "analysis/evidence/offline_main.png": "e99cb34715d716f27fe9f057137be1bf72f72fc99cc5fc2bfbfc0b93908062e6",
+    "analysis/evidence/offline_map.png": "5342fcd430f383e63b51d08fc4da4288c14c1465b929857ca055b3045fd2ffdb"
+  }
+}

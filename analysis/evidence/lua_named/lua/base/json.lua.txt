@@ -1,0 +1,1218 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\b5e2d3c3ad8436e3ab71d184c6e2b89b.data'; root=proto23
+
+FUNCTION proto0 offset=0x4b source_lines=66-113 params=1
+UPVALUES ['base', 'encodeString', 'isArray', 'table', 'isEncodable']
+00001 [L68] ISNEP    A=0 B=0 C=0 D=0 
+00002 [L68] JMP      A=1 B=128 C=2 D=32770 target=5
+00003 [L69] KSTR     A=1 B=0 C=0 D=0 'null'
+00004 [L69] RET1     A=1 B=0 C=2 D=2 
+00005 [L72] UGET     A=1 B=0 C=0 D=0 base
+00006 [L72] TGETS    A=1 B=1 C=1 D=257 'type'
+00007 [L72] MOV      A=2 B=0 C=0 D=0 
+00008 [L72] CALL     A=1 B=2 C=2 D=514 
+00009 [L75] ISNES    A=1 B=0 C=2 D=2 'string'
+00010 [L75] JMP      A=2 B=128 C=7 D=32775 target=18
+00011 [L76] KSTR     A=2 B=0 C=3 D=3 '"'
+00012 [L76] UGET     A=3 B=0 C=1 D=1 encodeString
+00013 [L76] MOV      A=4 B=0 C=0 D=0 
+00014 [L76] CALL     A=3 B=2 C=2 D=514 
+00015 [L76] KSTR     A=4 B=0 C=3 D=3 '"'
+00016 [L76] CAT      A=2 B=2 C=4 D=516 
+00017 [L76] RET1     A=2 B=0 C=2 D=2 
+00018 [L80] ISEQS    A=1 B=0 C=4 D=4 'number'
+00019 [L80] JMP      A=2 B=128 C=2 D=32770 target=22
+00020 [L80] ISNES    A=1 B=0 C=5 D=5 'boolean'
+00021 [L80] JMP      A=2 B=128 C=4 D=32772 target=26
+00022 [L81] UGET     A=2 B=0 C=0 D=0 base
+00023 [L81] TGETS    A=2 B=2 C=6 D=518 'tostring'
+00024 [L81] MOV      A=3 B=0 C=0 D=0 
+00025 [L81] CALLT    A=2 B=0 C=2 D=2 
+00026 [L85] ISNES    A=1 B=0 C=7 D=7 'table'
+00027 [L85] JMP      A=2 B=128 C=70 D=32838 target=98
+00028 [L86] TNEW     A=2 B=0 C=0 D=0 
+00029 [L88] UGET     A=3 B=0 C=2 D=2 isArray
+00030 [L88] MOV      A=4 B=0 C=0 D=0 
+00031 [L88] CALL     A=3 B=3 C=2 D=770 
+00032 [L89] ISF      A=0 B=0 C=3 D=3 
+00033 [L89] JMP      A=5 B=128 C=13 D=32781 target=47
+00034 [L90] KSHORT   A=5 B=0 C=1 D=1 1
+00035 [L90] MOV      A=6 B=0 C=4 D=4 
+00036 [L90] KSHORT   A=7 B=0 C=1 D=1 1
+00037 [L90] FORI     A=5 B=128 C=8 D=32776 target=46
+00038 [L91] UGET     A=9 B=0 C=3 D=3 table
+00039 [L91] TGETS    A=9 B=9 C=8 D=2312 'insert'
+00040 [L91] MOV      A=10 B=0 C=2 D=2 
+00041 [L91] GGET     A=11 B=0 C=9 D=9 'encode'
+00042 [L91] TGETV    A=12 B=0 C=8 D=8 
+00043 [L91] CALL     A=11 B=0 C=2 D=2 
+00044 [L91] CALLM    A=9 B=1 C=1 D=257 
+00045 [L90] FORL     A=5 B=127 C=248 D=32760 target=38
+00046 [L92] JMP      A=5 B=128 C=30 D=32798 target=77
+00047 [L94] UGET     A=5 B=0 C=0 D=0 base
+00048 [L94] TGETS    A=5 B=5 C=10 D=1290 'pairs'
+00049 [L94] MOV      A=6 B=0 C=0 D=0 
+00050 [L94] CALL     A=5 B=4 C=2 D=1026 
+00051 [L94] JMP      A=8 B=128 C=23 D=32791 target=75
+00052 [L95] UGET     A=10 B=0 C=4 D=4 isEncodable
+00053 [L95] MOV      A=11 B=0 C=8 D=8 
+00054 [L95] CALL     A=10 B=2 C=2 D=514 
+00055 [L95] ISF      A=0 B=0 C=10 D=10 
+00056 [L95] JMP      A=11 B=128 C=18 D=32786 target=75
+00057 [L95] UGET     A=10 B=0 C=4 D=4 isEncodable
+00058 [L95] MOV      A=11 B=0 C=9 D=9 
+00059 [L95] CALL     A=10 B=2 C=2 D=514 
+00060 [L95] ISF      A=0 B=0 C=10 D=10 
+00061 [L95] JMP      A=11 B=128 C=13 D=32781 target=75
+00062 [L96] UGET     A=10 B=0 C=3 D=3 table
+00063 [L96] TGETS    A=10 B=10 C=8 D=2568 'insert'
+00064 [L96] MOV      A=11 B=0 C=2 D=2 
+00065 [L96] KSTR     A=12 B=0 C=3 D=3 '"'
+00066 [L96] UGET     A=13 B=0 C=1 D=1 encodeString
+00067 [L96] MOV      A=14 B=0 C=8 D=8 
+00068 [L96] CALL     A=13 B=2 C=2 D=514 
+00069 [L96] KSTR     A=14 B=0 C=11 D=11 '":'
+00070 [L96] GGET     A=15 B=0 C=9 D=9 'encode'
+00071 [L96] MOV      A=16 B=0 C=9 D=9 
+00072 [L96] CALL     A=15 B=2 C=2 D=514 
+00073 [L96] CAT      A=12 B=12 C=15 D=3087 
+00074 [L96] CALL     A=10 B=1 C=3 D=259 
+00075 [L94] ITERC    A=8 B=3 C=3 D=771 
+00076 [L94] ITERL    A=8 B=127 C=231 D=32743 target=52
+00077 [L100] ISF      A=0 B=0 C=3 D=3 
+00078 [L100] JMP      A=5 B=128 C=10 D=32778 target=89
+00079 [L101] KSTR     A=5 B=0 C=12 D=12 '['
+00080 [L101] UGET     A=6 B=0 C=3 D=3 table
+00081 [L101] TGETS    A=6 B=6 C=13 D=1549 'concat'
+00082 [L101] MOV      A=7 B=0 C=2 D=2 
+00083 [L101] KSTR     A=8 B=0 C=14 D=14 ','
+00084 [L101] CALL     A=6 B=2 C=3 D=515 
+00085 [L101] KSTR     A=7 B=0 C=15 D=15 ']'
+00086 [L101] CAT      A=5 B=5 C=7 D=1287 
+00087 [L101] RET1     A=5 B=0 C=2 D=2 
+00088 [L101] JMP      A=5 B=128 C=9 D=32777 target=98
+00089 [L103] KSTR     A=5 B=0 C=16 D=16 '{'
+00090 [L103] UGET     A=6 B=0 C=3 D=3 table
+00091 [L103] TGETS    A=6 B=6 C=13 D=1549 'concat'
+00092 [L103] MOV      A=7 B=0 C=2 D=2 
+00093 [L103] KSTR     A=8 B=0 C=14 D=14 ','
+00094 [L103] CALL     A=6 B=2 C=3 D=515 
+00095 [L103] KSTR     A=7 B=0 C=17 D=17 '}'
+00096 [L103] CAT      A=5 B=5 C=7 D=1287 
+00097 [L103] RET1     A=5 B=0 C=2 D=2 
+00098 [L108] ISNES    A=1 B=0 C=18 D=18 'function'
+00099 [L108] JMP      A=2 B=128 C=5 D=32773 target=105
+00100 [L108] GGET     A=2 B=0 C=0 D=0 'null'
+00101 [L108] ISNEV    A=0 B=0 C=2 D=2 
+00102 [L108] JMP      A=2 B=128 C=2 D=32770 target=105
+00103 [L109] KSTR     A=2 B=0 C=0 D=0 'null'
+00104 [L109] RET1     A=2 B=0 C=2 D=2 
+00105 [L112] UGET     A=2 B=0 C=0 D=0 base
+00106 [L112] TGETS    A=2 B=2 C=19 D=531 'assert'
+00107 [L112] KPRI     A=3 B=0 C=1 D=1 
+00108 [L112] KSTR     A=4 B=0 C=20 D=20 'encode attempt to encode unsupported type '
+00109 [L112] MOV      A=5 B=0 C=1 D=1 
+00110 [L112] KSTR     A=6 B=0 C=21 D=21 ':'
+00111 [L112] UGET     A=7 B=0 C=0 D=0 base
+00112 [L112] TGETS    A=7 B=7 C=6 D=1798 'tostring'
+00113 [L112] MOV      A=8 B=0 C=0 D=0 
+00114 [L112] CALL     A=7 B=2 C=2 D=514 
+00115 [L112] CAT      A=4 B=4 C=7 D=1031 
+00116 [L112] CALL     A=2 B=1 C=3 D=259 
+00117 [L113] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x3b2 source_lines=119-123 params=1
+UPVALUES []
+00001 [L122] GGET     A=1 B=0 C=0 D=0 'null'
+00002 [L122] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto2 offset=0x3d1 source_lines=127-129 params=0
+UPVALUES []
+00001 [L128] GGET     A=0 B=0 C=0 D=0 'null'
+00002 [L128] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto3 offset=0x3ec source_lines=140-142 params=1
+UPVALUES ['tostring', 'qrep']
+00001 [L141] UGET     A=1 B=0 C=0 D=0 tostring
+00002 [L141] MOV      A=2 B=0 C=0 D=0 
+00003 [L141] CALL     A=1 B=2 C=2 D=514 
+00004 [L141] MOV      A=2 B=0 C=1 D=1 
+00005 [L141] TGETS    A=1 B=1 C=0 D=256 'gsub'
+00006 [L141] KSTR     A=3 B=0 C=1 D=1 '["\\\n\t]'
+00007 [L141] UGET     A=4 B=0 C=1 D=1 qrep
+00008 [L141] CALLT    A=1 B=0 C=4 D=4 
+
+FUNCTION proto4 offset=0x444 source_lines=152-169 params=1
+UPVALUES ['base', 'math', 'isEncodable', 'table']
+00001 [L155] KSHORT   A=1 B=0 C=0 D=0 0
+00002 [L156] UGET     A=2 B=0 C=0 D=0 base
+00003 [L156] TGETS    A=2 B=2 C=0 D=512 'pairs'
+00004 [L156] MOV      A=3 B=0 C=0 D=0 
+00005 [L156] CALL     A=2 B=4 C=2 D=1026 
+00006 [L156] JMP      A=5 B=128 C=47 D=32815 target=54
+00007 [L157] UGET     A=7 B=0 C=0 D=0 base
+00008 [L157] TGETS    A=7 B=7 C=1 D=1793 'type'
+00009 [L157] MOV      A=8 B=0 C=5 D=5 
+00010 [L157] CALL     A=7 B=2 C=2 D=514 
+00011 [L157] ISNES    A=7 B=0 C=2 D=2 'number'
+00012 [L157] JMP      A=7 B=128 C=23 D=32791 target=36
+00013 [L157] UGET     A=7 B=0 C=1 D=1 math
+00014 [L157] TGETS    A=7 B=7 C=3 D=1795 'floor'
+00015 [L157] MOV      A=8 B=0 C=5 D=5 
+00016 [L157] CALL     A=7 B=2 C=2 D=514 
+00017 [L157] ISNEV    A=7 B=0 C=5 D=5 
+00018 [L157] JMP      A=7 B=128 C=17 D=32785 target=36
+00019 [L157] KSHORT   A=7 B=0 C=1 D=1 1
+00020 [L157] ISGT     A=7 B=0 C=5 D=5 
+00021 [L157] JMP      A=7 B=128 C=14 D=32782 target=36
+00022 [L158] UGET     A=7 B=0 C=2 D=2 isEncodable
+00023 [L158] MOV      A=8 B=0 C=6 D=6 
+00024 [L158] CALL     A=7 B=2 C=2 D=514 
+00025 [L158] IST      A=0 B=0 C=7 D=7 
+00026 [L158] JMP      A=7 B=128 C=2 D=32770 target=29
+00027 [L158] KPRI     A=7 B=0 C=1 D=1 
+00028 [L158] RET1     A=7 B=0 C=2 D=2 
+00029 [L159] UGET     A=7 B=0 C=1 D=1 math
+00030 [L159] TGETS    A=7 B=7 C=4 D=1796 'max'
+00031 [L159] MOV      A=8 B=0 C=1 D=1 
+00032 [L159] MOV      A=9 B=0 C=5 D=5 
+00033 [L159] CALL     A=7 B=2 C=3 D=515 
+00034 [L159] MOV      A=1 B=0 C=7 D=7 
+00035 [L159] JMP      A=7 B=128 C=18 D=32786 target=54
+00036 [L161] ISNES    A=5 B=0 C=5 D=5 'n'
+00037 [L161] JMP      A=7 B=128 C=9 D=32777 target=47
+00038 [L162] UGET     A=7 B=0 C=3 D=3 table
+00039 [L162] TGETS    A=7 B=7 C=6 D=1798 'getn'
+00040 [L162] MOV      A=8 B=0 C=0 D=0 
+00041 [L162] CALL     A=7 B=2 C=2 D=514 
+00042 [L162] ISEQV    A=6 B=0 C=7 D=7 
+00043 [L162] JMP      A=7 B=128 C=10 D=32778 target=54
+00044 [L162] KPRI     A=7 B=0 C=1 D=1 
+00045 [L162] RET1     A=7 B=0 C=2 D=2 
+00046 [L162] JMP      A=7 B=128 C=7 D=32775 target=54
+00047 [L164] UGET     A=7 B=0 C=2 D=2 isEncodable
+00048 [L164] MOV      A=8 B=0 C=6 D=6 
+00049 [L164] CALL     A=7 B=2 C=2 D=514 
+00050 [L164] ISF      A=0 B=0 C=7 D=7 
+00051 [L164] JMP      A=8 B=128 C=2 D=32770 target=54
+00052 [L164] KPRI     A=7 B=0 C=1 D=1 
+00053 [L164] RET1     A=7 B=0 C=2 D=2 
+00054 [L156] ITERC    A=5 B=3 C=3 D=771 
+00055 [L156] ITERL    A=5 B=127 C=207 D=32719 target=7
+00056 [L168] KPRI     A=2 B=0 C=2 D=2 
+00057 [L168] MOV      A=3 B=0 C=1 D=1 
+00058 [L168] RET      A=2 B=0 C=3 D=3 
+
+FUNCTION proto5 offset=0x5db source_lines=176-179 params=1
+UPVALUES ['base']
+00001 [L177] UGET     A=1 B=0 C=0 D=0 base
+00002 [L177] TGETS    A=1 B=1 C=0 D=256 'type'
+00003 [L177] MOV      A=2 B=0 C=0 D=0 
+00004 [L177] CALL     A=1 B=2 C=2 D=514 
+00005 [L178] ISEQS    A=1 B=0 C=1 D=1 'string'
+00006 [L178] JMP      A=2 B=128 C=15 D=32783 target=22
+00007 [L178] ISEQS    A=1 B=0 C=2 D=2 'boolean'
+00008 [L178] JMP      A=2 B=128 C=13 D=32781 target=22
+00009 [L178] ISEQS    A=1 B=0 C=3 D=3 'number'
+00010 [L178] JMP      A=2 B=128 C=11 D=32779 target=22
+00011 [L178] ISEQS    A=1 B=0 C=4 D=4 'nil'
+00012 [L178] JMP      A=2 B=128 C=9 D=32777 target=22
+00013 [L178] ISEQS    A=1 B=0 C=5 D=5 'table'
+00014 [L178] JMP      A=2 B=128 C=7 D=32775 target=22
+00015 [L178] ISNES    A=1 B=0 C=6 D=6 'function'
+00016 [L178] JMP      A=2 B=128 C=3 D=32771 target=20
+00017 [L178] GGET     A=2 B=0 C=7 D=7 'null'
+00018 [L178] ISEQV    A=0 B=0 C=2 D=2 
+00019 [L178] JMP      A=2 B=128 C=2 D=32770 target=22
+00020 [L178] KPRI     A=2 B=0 C=1 D=1 
+00021 [L178] JMP      A=3 B=128 C=1 D=32769 target=23
+00022 [L178] KPRI     A=2 B=0 C=2 D=2 
+00023 [L178] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto6 offset=0x69d source_lines=200-203 params=2
+UPVALUES ['value', 'struct']
+00001 [L201] USETV    A=0 B=0 C=1 D=1 value
+00002 [L202] UGET     A=2 B=0 C=1 D=1 struct
+00003 [L202] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto7 offset=0x6dd source_lines=204-209 params=2
+UPVALUES ['tt', 'value', 'struct']
+00001 [L205] KSHORT   A=2 B=0 C=1 D=1 1
+00002 [L205] LEN      A=3 B=0 C=1 D=1 
+00003 [L205] KSHORT   A=4 B=0 C=1 D=1 1
+00004 [L205] FORI     A=2 B=128 C=8 D=32776 target=13
+00005 [L206] UGET     A=6 B=0 C=0 D=0 tt
+00006 [L206] MOV      A=8 B=0 C=1 D=1 
+00007 [L206] TGETS    A=7 B=1 C=0 D=256 'byte'
+00008 [L206] MOV      A=9 B=0 C=5 D=5 
+00009 [L206] CALL     A=7 B=2 C=3 D=515 
+00010 [L206] UGET     A=8 B=0 C=1 D=1 value
+00011 [L206] TSETV    A=8 B=6 C=7 D=1543 
+00012 [L205] FORL     A=2 B=127 C=248 D=32760 target=5
+00013 [L208] UGET     A=2 B=0 C=2 D=2 struct
+00014 [L208] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto8 offset=0x767 source_lines=210-213 params=1
+UPVALUES ['tt', 'struct']
+00001 [L211] UGET     A=1 B=0 C=0 D=0 tt
+00002 [L211] TSETS    A=0 B=1 C=0 D=256 'name'
+00003 [L212] UGET     A=1 B=0 C=1 D=1 struct
+00004 [L212] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto9 offset=0x7a2 source_lines=197-214 params=1
+UPVALUES []
+00001 [L198] TNEW     A=1 B=0 C=0 D=0 
+00002 [L199] KPRI     A=2 B=0 C=0 D=0 
+00003 [L203] FNEW     A=3 B=0 C=1 D=1 {'kind': 'proto', 'id': 6}
+00004 [L200] TSETS    A=3 B=1 C=0 D=256 'link'
+00005 [L209] FNEW     A=3 B=0 C=3 D=3 {'kind': 'proto', 'id': 7}
+00006 [L204] TSETS    A=3 B=1 C=2 D=258 'to'
+00007 [L213] FNEW     A=3 B=0 C=4 D=4 {'kind': 'proto', 'id': 8}
+00008 [L213] UCLO     A=0 B=128 C=0 D=32768 target=9
+00009 [L213] RET1     A=3 B=0 C=2 D=2 
+
+FUNCTION proto10 offset=0x7fd source_lines=339-339 params=0
+UPVALUES ['pos', 'js_string']
+00001 [L339] UGET     A=0 B=0 C=0 D=0 pos
+00002 [L339] ADDVN    A=0 B=0 C=0 D=0 
+00003 [L339] USETV    A=0 B=0 C=0 D=0 pos
+00004 [L339] UGET     A=0 B=0 C=1 D=1 js_string
+00005 [L339] MOV      A=1 B=0 C=0 D=0 
+00006 [L339] TGETS    A=0 B=0 C=0 D=0 'byte'
+00007 [L339] UGET     A=2 B=0 C=0 D=0 pos
+00008 [L339] SUBVN    A=2 B=2 C=0 D=512 
+00009 [L339] CALLT    A=0 B=0 C=3 D=3 
+
+FUNCTION proto11 offset=0x850 source_lines=342-353 params=0
+UPVALUES ['pos', 'js_string']
+00001 [L343] KSTR     A=0 B=0 C=0 D=0 '\n'
+00002 [L343] MOV      A=1 B=0 C=0 D=0 
+00003 [L343] TGETS    A=0 B=0 C=1 D=1 'byte'
+00004 [L343] CALL     A=0 B=2 C=2 D=514 
+00005 [L344] KSHORT   A=1 B=0 C=1 D=1 1
+00006 [L344] KSHORT   A=2 B=0 C=0 D=0 0
+00007 [L345] KSHORT   A=3 B=0 C=1 D=1 1
+00008 [L345] UGET     A=4 B=0 C=0 D=0 pos
+00009 [L345] KSHORT   A=5 B=0 C=1 D=1 1
+00010 [L345] FORI     A=3 B=128 C=13 D=32781 target=24
+00011 [L346] UGET     A=7 B=0 C=1 D=1 js_string
+00012 [L346] MOV      A=8 B=0 C=7 D=7 
+00013 [L346] TGETS    A=7 B=7 C=1 D=1793 'byte'
+00014 [L346] MOV      A=9 B=0 C=6 D=6 
+00015 [L346] CALL     A=7 B=2 C=3 D=515 
+00016 [L346] ISNEV    A=7 B=0 C=0 D=0 
+00017 [L346] JMP      A=7 B=128 C=4 D=32772 target=22
+00018 [L347] ADDVN    A=7 B=1 C=0 D=256 
+00019 [L347] KSHORT   A=2 B=0 C=1 D=1 1
+00020 [L347] MOV      A=1 B=0 C=7 D=7 
+00021 [L347] JMP      A=7 B=128 C=1 D=32769 target=23
+00022 [L349] ADDVN    A=2 B=2 C=0 D=512 
+00023 [L345] FORL     A=3 B=127 C=243 D=32755 target=11
+00024 [L352] KSTR     A=3 B=0 C=2 D=2 'Line '
+00025 [L352] MOV      A=4 B=0 C=1 D=1 
+00026 [L352] KSTR     A=5 B=0 C=3 D=3 ' character '
+00027 [L352] MOV      A=6 B=0 C=2 D=2 
+00028 [L352] CAT      A=3 B=3 C=6 D=774 
+00029 [L352] RET1     A=3 B=0 C=2 D=2 
+
+FUNCTION proto12 offset=0x93a source_lines=361-374 params=1
+UPVALUES ['pos', 'js_string', 'error', 'location', 'string', 'math', 'tt_ignore']
+00001 [L362] UGET     A=1 B=0 C=0 D=0 pos
+00002 [L362] UGET     A=2 B=0 C=1 D=1 js_string
+00003 [L362] LEN      A=2 B=0 C=2 D=2 
+00004 [L362] ISGT     A=1 B=0 C=2 D=2 
+00005 [L362] JMP      A=1 B=128 C=59 D=32827 target=65
+00006 [L362] LOOP     A=1 B=128 C=58 D=32826 target=65
+00007 [L363] UGET     A=1 B=0 C=1 D=1 js_string
+00008 [L363] MOV      A=2 B=0 C=1 D=1 
+00009 [L363] TGETS    A=1 B=1 C=0 D=256 'byte'
+00010 [L363] UGET     A=3 B=0 C=0 D=0 pos
+00011 [L363] CALL     A=1 B=2 C=3 D=515 
+00012 [L364] TGETV    A=2 B=0 C=1 D=1 
+00013 [L365] IST      A=0 B=0 C=2 D=2 
+00014 [L365] JMP      A=3 B=128 C=42 D=32810 target=57
+00015 [L366] UGET     A=3 B=0 C=2 D=2 error
+00016 [L366] KSTR     A=4 B=0 C=1 D=1 'Unexpected character at '
+00017 [L366] UGET     A=5 B=0 C=3 D=3 location
+00018 [L366] CALL     A=5 B=2 C=1 D=513 
+00019 [L366] KSTR     A=6 B=0 C=2 D=2 ': '
+00020 [L367] UGET     A=7 B=0 C=4 D=4 string
+00021 [L367] TGETS    A=7 B=7 C=3 D=1795 'char'
+00022 [L367] MOV      A=8 B=0 C=1 D=1 
+00023 [L367] CALL     A=7 B=2 C=2 D=514 
+00024 [L367] KSTR     A=8 B=0 C=4 D=4 ' ('
+00025 [L367] MOV      A=9 B=0 C=1 D=1 
+00026 [L367] KSTR     A=10 B=0 C=5 D=5 ') when reading '
+00027 [L367] TGETS    A=11 B=0 C=6 D=6 'name'
+00028 [L367] KSTR     A=12 B=0 C=7 D=7 '\nContext: \n'
+00029 [L368] UGET     A=13 B=0 C=1 D=1 js_string
+00030 [L368] MOV      A=14 B=0 C=13 D=13 
+00031 [L368] TGETS    A=13 B=13 C=8 D=3336 'sub'
+00032 [L368] UGET     A=15 B=0 C=5 D=5 math
+00033 [L368] TGETS    A=15 B=15 C=9 D=3849 'max'
+00034 [L368] KSHORT   A=16 B=0 C=1 D=1 1
+00035 [L368] UGET     A=17 B=0 C=0 D=0 pos
+00036 [L368] SUBVN    A=17 B=17 C=0 D=4352 
+00037 [L368] CALL     A=15 B=2 C=3 D=515 
+00038 [L368] UGET     A=16 B=0 C=0 D=0 pos
+00039 [L368] ADDVN    A=16 B=16 C=0 D=4096 
+00040 [L368] CALL     A=13 B=2 C=4 D=516 
+00041 [L368] KSTR     A=14 B=0 C=10 D=10 '\n'
+00042 [L368] KSTR     A=15 B=0 C=11 D=11 ' '
+00043 [L368] MOV      A=16 B=0 C=15 D=15 
+00044 [L368] TGETS    A=15 B=15 C=12 D=3852 'rep'
+00045 [L368] UGET     A=17 B=0 C=0 D=0 pos
+00046 [L368] UGET     A=18 B=0 C=5 D=5 math
+00047 [L368] TGETS    A=18 B=18 C=13 D=4621 'min'
+00048 [L368] KSHORT   A=19 B=255 C=255 D=65535 -1
+00049 [L368] UGET     A=20 B=0 C=0 D=0 pos
+00050 [L368] SUBNV    A=20 B=20 C=0 D=5120 
+00051 [L368] CALL     A=18 B=2 C=3 D=515 
+00052 [L368] ADDVV    A=17 B=17 C=18 D=4370 
+00053 [L368] CALL     A=15 B=2 C=3 D=515 
+00054 [L368] KSTR     A=16 B=0 C=14 D=14 '^'
+00055 [L368] CAT      A=4 B=4 C=16 D=1040 
+00056 [L366] CALL     A=3 B=1 C=2 D=258 
+00057 [L370] UGET     A=3 B=0 C=0 D=0 pos
+00058 [L370] ADDVN    A=3 B=3 C=1 D=769 
+00059 [L370] USETV    A=0 B=0 C=3 D=3 pos
+00060 [L371] UGET     A=3 B=0 C=6 D=6 tt_ignore
+00061 [L371] ISEQV    A=2 B=0 C=3 D=3 
+00062 [L371] JMP      A=3 B=127 C=194 D=32706 target=1
+00063 [L371] RET1     A=2 B=0 C=2 D=2 
+00064 [L371] JMP      A=1 B=127 C=192 D=32704 target=1
+00065 [L373] UGET     A=1 B=0 C=2 D=2 error
+00066 [L373] KSTR     A=2 B=0 C=15 D=15 'unexpected termination of JSON while looking for '
+00067 [L373] TGETS    A=3 B=0 C=6 D=6 'name'
+00068 [L373] CAT      A=2 B=2 C=3 D=515 
+00069 [L373] CALL     A=1 B=1 C=2 D=258 
+00070 [L374] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto13 offset=0xb8a source_lines=377-401 params=1
+UPVALUES ['pos', 'next_token', 'c_esc', 'base', 'js_string']
+00001 [L378] UGET     A=1 B=0 C=0 D=0 pos
+00002 [L380] LOOP     A=2 B=128 C=11 D=32779 target=14
+00003 [L381] UGET     A=2 B=0 C=1 D=1 next_token
+00004 [L381] MOV      A=3 B=0 C=0 D=0 
+00005 [L381] CALL     A=2 B=2 C=2 D=514 
+00006 [L382] UGET     A=3 B=0 C=2 D=2 c_esc
+00007 [L382] ISNEV    A=2 B=0 C=3 D=3 
+00008 [L382] JMP      A=3 B=128 C=3 D=32771 target=12
+00009 [L385] UGET     A=3 B=0 C=0 D=0 pos
+00010 [L385] ADDVN    A=3 B=3 C=0 D=768 
+00011 [L385] USETV    A=0 B=0 C=3 D=3 pos
+00012 [L388] ISNEP    A=2 B=0 C=2 D=2 
+00013 [L388] JMP      A=3 B=127 C=244 D=32756 target=2
+00014 [L389] UGET     A=2 B=0 C=3 D=3 base
+00015 [L389] TGETS    A=2 B=2 C=0 D=512 'loadstring'
+00016 [L389] KSTR     A=3 B=0 C=1 D=1 'return '
+00017 [L389] UGET     A=4 B=0 C=4 D=4 js_string
+00018 [L389] MOV      A=5 B=0 C=4 D=4 
+00019 [L389] TGETS    A=4 B=4 C=2 D=1026 'sub'
+00020 [L389] SUBVN    A=6 B=1 C=0 D=256 
+00021 [L389] UGET     A=7 B=0 C=0 D=0 pos
+00022 [L389] SUBVN    A=7 B=7 C=0 D=1792 
+00023 [L389] CALL     A=4 B=2 C=4 D=516 
+00024 [L389] CAT      A=3 B=3 C=4 D=772 
+00025 [L389] CALL     A=2 B=2 C=2 D=514 
+00026 [L389] CALL     A=2 B=2 C=1 D=513 
+00027 [L389] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto14 offset=0xc77 source_lines=403-411 params=0
+UPVALUES ['pos', 'js_string', 'tt_numeric', 'tonumber']
+00001 [L404] UGET     A=0 B=0 C=0 D=0 pos
+00002 [L405] UGET     A=1 B=0 C=0 D=0 pos
+00003 [L405] UGET     A=2 B=0 C=1 D=1 js_string
+00004 [L405] LEN      A=2 B=0 C=2 D=2 
+00005 [L405] ISGT     A=1 B=0 C=2 D=2 
+00006 [L405] JMP      A=1 B=128 C=15 D=32783 target=22
+00007 [L405] LOOP     A=1 B=128 C=14 D=32782 target=22
+00008 [L406] UGET     A=1 B=0 C=1 D=1 js_string
+00009 [L406] MOV      A=2 B=0 C=1 D=1 
+00010 [L406] TGETS    A=1 B=1 C=0 D=256 'byte'
+00011 [L406] UGET     A=3 B=0 C=0 D=0 pos
+00012 [L406] CALL     A=1 B=2 C=3 D=515 
+00013 [L407] UGET     A=2 B=0 C=2 D=2 tt_numeric
+00014 [L407] TGETV    A=2 B=2 C=1 D=513 
+00015 [L407] IST      A=0 B=0 C=2 D=2 
+00016 [L407] JMP      A=2 B=128 C=1 D=32769 target=18
+00017 [L407] JMP      A=1 B=128 C=4 D=32772 target=22
+00018 [L408] UGET     A=2 B=0 C=0 D=0 pos
+00019 [L408] ADDVN    A=2 B=2 C=0 D=512 
+00020 [L408] USETV    A=0 B=0 C=2 D=2 pos
+00021 [L408] JMP      A=1 B=127 C=236 D=32748 target=2
+00022 [L410] UGET     A=1 B=0 C=3 D=3 tonumber
+00023 [L410] UGET     A=2 B=0 C=1 D=1 js_string
+00024 [L410] MOV      A=3 B=0 C=2 D=2 
+00025 [L410] TGETS    A=2 B=2 C=1 D=513 'sub'
+00026 [L410] SUBVN    A=4 B=0 C=0 D=0 
+00027 [L410] UGET     A=5 B=0 C=0 D=0 pos
+00028 [L410] SUBVN    A=5 B=5 C=0 D=1280 
+00029 [L410] CALL     A=2 B=0 C=4 D=4 
+00030 [L410] CALLMT   A=1 B=0 C=0 D=0 
+
+FUNCTION proto15 offset=0xd5b source_lines=416-425 params=0
+UPVALUES ['pos', 'js_string', 'c_r', 'c_u', 'c_e', 'c_a', 'c_l', 'c_s', 'error', 'math']
+00001 [L417] UGET     A=0 B=0 C=0 D=0 pos
+00002 [L417] ADDVN    A=0 B=0 C=0 D=0 
+00003 [L417] USETV    A=0 B=0 C=0 D=0 pos
+00004 [L418] UGET     A=0 B=0 C=1 D=1 js_string
+00005 [L418] MOV      A=1 B=0 C=0 D=0 
+00006 [L418] TGETS    A=0 B=0 C=0 D=0 'byte'
+00007 [L418] UGET     A=2 B=0 C=0 D=0 pos
+00008 [L418] SUBVN    A=2 B=2 C=0 D=512 
+00009 [L418] UGET     A=3 B=0 C=0 D=0 pos
+00010 [L418] CALL     A=0 B=5 C=4 D=1284 
+00011 [L419] UGET     A=4 B=0 C=2 D=2 c_r
+00012 [L419] ISNEV    A=0 B=0 C=4 D=4 
+00013 [L419] JMP      A=4 B=128 C=8 D=32776 target=22
+00014 [L419] UGET     A=4 B=0 C=3 D=3 c_u
+00015 [L419] ISNEV    A=1 B=0 C=4 D=4 
+00016 [L419] JMP      A=4 B=128 C=5 D=32773 target=22
+00017 [L419] UGET     A=4 B=0 C=4 D=4 c_e
+00018 [L419] ISNEV    A=2 B=0 C=4 D=4 
+00019 [L419] JMP      A=4 B=128 C=2 D=32770 target=22
+00020 [L419] KPRI     A=4 B=0 C=2 D=2 
+00021 [L419] RET1     A=4 B=0 C=2 D=2 
+00022 [L420] UGET     A=4 B=0 C=0 D=0 pos
+00023 [L420] ADDVN    A=4 B=4 C=1 D=1025 
+00024 [L420] USETV    A=0 B=0 C=4 D=4 pos
+00025 [L421] UGET     A=4 B=0 C=5 D=5 c_a
+00026 [L421] ISNEV    A=0 B=0 C=4 D=4 
+00027 [L421] JMP      A=4 B=128 C=9 D=32777 target=37
+00028 [L421] UGET     A=4 B=0 C=6 D=6 c_l
+00029 [L421] ISNEV    A=1 B=0 C=4 D=4 
+00030 [L421] JMP      A=4 B=128 C=6 D=32774 target=37
+00031 [L421] UGET     A=4 B=0 C=7 D=7 c_s
+00032 [L421] ISNEV    A=2 B=0 C=4 D=4 
+00033 [L421] JMP      A=4 B=128 C=3 D=32771 target=37
+00034 [L421] UGET     A=4 B=0 C=4 D=4 c_e
+00035 [L421] ISEQV    A=3 B=0 C=4 D=4 
+00036 [L421] JMP      A=4 B=128 C=16 D=32784 target=53
+00037 [L422] UGET     A=4 B=0 C=8 D=8 error
+00038 [L422] KSTR     A=5 B=0 C=1 D=1 'Invalid boolean: '
+00039 [L422] UGET     A=6 B=0 C=1 D=1 js_string
+00040 [L422] MOV      A=7 B=0 C=6 D=6 
+00041 [L422] TGETS    A=6 B=6 C=2 D=1538 'sub'
+00042 [L422] UGET     A=8 B=0 C=9 D=9 math
+00043 [L422] TGETS    A=8 B=8 C=3 D=2051 'max'
+00044 [L422] KSHORT   A=9 B=0 C=1 D=1 1
+00045 [L422] UGET     A=10 B=0 C=0 D=0 pos
+00046 [L422] SUBVN    A=10 B=10 C=2 D=2562 
+00047 [L422] CALL     A=8 B=2 C=3 D=515 
+00048 [L422] UGET     A=9 B=0 C=0 D=0 pos
+00049 [L422] ADDVN    A=9 B=9 C=2 D=2306 
+00050 [L422] CALL     A=6 B=2 C=4 D=516 
+00051 [L422] CAT      A=5 B=5 C=6 D=1286 
+00052 [L422] CALL     A=4 B=1 C=2 D=258 
+00053 [L424] KPRI     A=4 B=0 C=1 D=1 
+00054 [L424] RET1     A=4 B=0 C=2 D=2 
+
+FUNCTION proto16 offset=0xeee source_lines=428-434 params=0
+UPVALUES ['pos', 'js_string', 'c_u', 'c_l', 'error']
+00001 [L429] UGET     A=0 B=0 C=0 D=0 pos
+00002 [L429] ADDVN    A=0 B=0 C=0 D=0 
+00003 [L429] USETV    A=0 B=0 C=0 D=0 pos
+00004 [L430] UGET     A=0 B=0 C=1 D=1 js_string
+00005 [L430] MOV      A=1 B=0 C=0 D=0 
+00006 [L430] TGETS    A=0 B=0 C=0 D=0 'byte'
+00007 [L430] UGET     A=2 B=0 C=0 D=0 pos
+00008 [L430] SUBVN    A=2 B=2 C=0 D=512 
+00009 [L430] UGET     A=3 B=0 C=0 D=0 pos
+00010 [L430] SUBVN    A=3 B=3 C=1 D=769 
+00011 [L430] CALL     A=0 B=4 C=4 D=1028 
+00012 [L431] UGET     A=3 B=0 C=2 D=2 c_u
+00013 [L431] ISNEV    A=0 B=0 C=3 D=3 
+00014 [L431] JMP      A=3 B=128 C=8 D=32776 target=23
+00015 [L431] UGET     A=3 B=0 C=3 D=3 c_l
+00016 [L431] ISNEV    A=1 B=0 C=3 D=3 
+00017 [L431] JMP      A=3 B=128 C=5 D=32773 target=23
+00018 [L431] UGET     A=3 B=0 C=3 D=3 c_l
+00019 [L431] ISNEV    A=2 B=0 C=3 D=3 
+00020 [L431] JMP      A=3 B=128 C=2 D=32770 target=23
+00021 [L431] KPRI     A=3 B=0 C=0 D=0 
+00022 [L431] RET1     A=3 B=0 C=2 D=2 
+00023 [L432] UGET     A=3 B=0 C=4 D=4 error
+00024 [L432] KSTR     A=4 B=0 C=1 D=1 'Invalid value (expected null):'
+00025 [L432] UGET     A=5 B=0 C=1 D=1 js_string
+00026 [L432] MOV      A=6 B=0 C=5 D=5 
+00027 [L432] TGETS    A=5 B=5 C=2 D=1282 'sub'
+00028 [L432] UGET     A=7 B=0 C=0 D=0 pos
+00029 [L432] SUBVN    A=7 B=7 C=2 D=1794 
+00030 [L432] UGET     A=8 B=0 C=0 D=0 pos
+00031 [L432] SUBVN    A=8 B=8 C=1 D=2049 
+00032 [L432] CALL     A=5 B=2 C=4 D=516 
+00033 [L433] KSTR     A=6 B=0 C=3 D=3 ' ('
+00034 [L433] UGET     A=7 B=0 C=1 D=1 js_string
+00035 [L433] MOV      A=8 B=0 C=7 D=7 
+00036 [L433] TGETS    A=7 B=7 C=0 D=1792 'byte'
+00037 [L433] UGET     A=9 B=0 C=0 D=0 pos
+00038 [L433] SUBVN    A=9 B=9 C=1 D=2305 
+00039 [L433] CALL     A=7 B=2 C=3 D=515 
+00040 [L433] KSTR     A=8 B=0 C=4 D=4 '='
+00041 [L433] UGET     A=9 B=0 C=1 D=1 js_string
+00042 [L433] MOV      A=10 B=0 C=9 D=9 
+00043 [L433] TGETS    A=9 B=9 C=2 D=2306 'sub'
+00044 [L433] UGET     A=11 B=0 C=0 D=0 pos
+00045 [L433] SUBVN    A=11 B=11 C=1 D=2817 
+00046 [L433] UGET     A=12 B=0 C=0 D=0 pos
+00047 [L433] SUBVN    A=12 B=12 C=1 D=3073 
+00048 [L433] CALL     A=9 B=2 C=4 D=516 
+00049 [L433] KSTR     A=10 B=0 C=5 D=5 ' / '
+00050 [L433] UGET     A=11 B=0 C=3 D=3 c_l
+00051 [L433] KSTR     A=12 B=0 C=6 D=6 ')'
+00052 [L433] CAT      A=4 B=4 C=12 D=1036 
+00053 [L432] CALL     A=3 B=1 C=2 D=258 
+00054 [L434] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto17 offset=0x1074 source_lines=439-449 params=2
+UPVALUES ['tt_object_key', 'read_object_key', 'tt_array_seperator', 'read_array', 'tt_singlequote_string', 'tt_doublequote_string', 'read_string', 'tt_numeric', 'read_num', 'tt_boolean', 'read_bool', 'tt_null', 'read_null', 'tt_comment_start', 'read_value', 'read_comment', 'error', 'js_string', 'math', 'pos']
+00001 [L440] UGET     A=2 B=0 C=0 D=0 tt_object_key
+00002 [L440] ISNEV    A=0 B=0 C=2 D=2 
+00003 [L440] JMP      A=2 B=128 C=3 D=32771 target=7
+00004 [L440] UGET     A=2 B=0 C=1 D=1 read_object_key
+00005 [L440] TNEW     A=3 B=0 C=0 D=0 
+00006 [L440] CALLT    A=2 B=0 C=2 D=2 
+00007 [L441] UGET     A=2 B=0 C=2 D=2 tt_array_seperator
+00008 [L441] ISNEV    A=0 B=0 C=2 D=2 
+00009 [L441] JMP      A=2 B=128 C=3 D=32771 target=13
+00010 [L441] UGET     A=2 B=0 C=3 D=3 read_array
+00011 [L441] TNEW     A=3 B=0 C=0 D=0 
+00012 [L441] CALLT    A=2 B=0 C=2 D=2 
+00013 [L442] UGET     A=2 B=0 C=4 D=4 tt_singlequote_string
+00014 [L442] ISEQV    A=0 B=0 C=2 D=2 
+00015 [L442] JMP      A=2 B=128 C=3 D=32771 target=19
+00016 [L443] UGET     A=2 B=0 C=5 D=5 tt_doublequote_string
+00017 [L443] ISNEV    A=0 B=0 C=2 D=2 
+00018 [L443] JMP      A=2 B=128 C=3 D=32771 target=22
+00019 [L443] UGET     A=2 B=0 C=6 D=6 read_string
+00020 [L443] MOV      A=3 B=0 C=0 D=0 
+00021 [L443] CALLT    A=2 B=0 C=2 D=2 
+00022 [L444] UGET     A=2 B=0 C=7 D=7 tt_numeric
+00023 [L444] ISNEV    A=0 B=0 C=2 D=2 
+00024 [L444] JMP      A=2 B=128 C=2 D=32770 target=27
+00025 [L444] UGET     A=2 B=0 C=8 D=8 read_num
+00026 [L444] CALLT    A=2 B=0 C=1 D=1 
+00027 [L445] UGET     A=2 B=0 C=9 D=9 tt_boolean
+00028 [L445] ISNEV    A=0 B=0 C=2 D=2 
+00029 [L445] JMP      A=2 B=128 C=2 D=32770 target=32
+00030 [L445] UGET     A=2 B=0 C=10 D=10 read_bool
+00031 [L445] CALLT    A=2 B=0 C=1 D=1 
+00032 [L446] UGET     A=2 B=0 C=11 D=11 tt_null
+00033 [L446] ISNEV    A=0 B=0 C=2 D=2 
+00034 [L446] JMP      A=2 B=128 C=2 D=32770 target=37
+00035 [L446] UGET     A=2 B=0 C=12 D=12 read_null
+00036 [L446] CALLT    A=2 B=0 C=1 D=1 
+00037 [L447] UGET     A=2 B=0 C=13 D=13 tt_comment_start
+00038 [L447] ISNEV    A=0 B=0 C=2 D=2 
+00039 [L447] JMP      A=2 B=128 C=5 D=32773 target=45
+00040 [L447] UGET     A=2 B=0 C=14 D=14 read_value
+00041 [L447] UGET     A=3 B=0 C=15 D=15 read_comment
+00042 [L447] MOV      A=4 B=0 C=1 D=1 
+00043 [L447] CALL     A=3 B=0 C=2 D=2 
+00044 [L447] CALLMT   A=2 B=0 C=0 D=0 
+00045 [L448] UGET     A=2 B=0 C=16 D=16 error
+00046 [L448] KSTR     A=3 B=0 C=0 D=0 'unexpected termination - '
+00047 [L448] UGET     A=4 B=0 C=17 D=17 js_string
+00048 [L448] MOV      A=5 B=0 C=4 D=4 
+00049 [L448] TGETS    A=4 B=4 C=1 D=1025 'sub'
+00050 [L448] UGET     A=6 B=0 C=18 D=18 math
+00051 [L448] TGETS    A=6 B=6 C=2 D=1538 'max'
+00052 [L448] KSHORT   A=7 B=0 C=1 D=1 1
+00053 [L448] UGET     A=8 B=0 C=19 D=19 pos
+00054 [L448] SUBVN    A=8 B=8 C=0 D=2048 
+00055 [L448] CALL     A=6 B=2 C=3 D=515 
+00056 [L448] UGET     A=7 B=0 C=19 D=19 pos
+00057 [L448] ADDVN    A=7 B=7 C=0 D=1792 
+00058 [L448] CALL     A=4 B=2 C=4 D=516 
+00059 [L448] CAT      A=3 B=3 C=4 D=772 
+00060 [L448] CALL     A=2 B=1 C=2 D=258 
+00061 [L449] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto18 offset=0x12fc source_lines=453-465 params=1
+UPVALUES ['next_token', 'tt_comment_start', 'tt_comment_middle', 'next_byte', 'c_slash']
+00001 [L454] LOOP     A=1 B=128 C=22 D=32790 target=24
+00002 [L455] UGET     A=1 B=0 C=0 D=0 next_token
+00003 [L455] UGET     A=2 B=0 C=1 D=1 tt_comment_start
+00004 [L455] CALL     A=1 B=1 C=2 D=258 
+00005 [L456] LOOP     A=1 B=128 C=17 D=32785 target=23
+00006 [L457] UGET     A=1 B=0 C=0 D=0 next_token
+00007 [L457] UGET     A=2 B=0 C=2 D=2 tt_comment_middle
+00008 [L457] CALL     A=1 B=2 C=2 D=514 
+00009 [L458] UGET     A=2 B=0 C=3 D=3 next_byte
+00010 [L458] CALL     A=2 B=2 C=1 D=513 
+00011 [L458] UGET     A=3 B=0 C=4 D=4 c_slash
+00012 [L458] ISNEV    A=2 B=0 C=3 D=3 
+00013 [L458] JMP      A=2 B=127 C=247 D=32759 target=5
+00014 [L459] UGET     A=2 B=0 C=0 D=0 next_token
+00015 [L459] MOV      A=3 B=0 C=0 D=0 
+00016 [L459] CALL     A=2 B=2 C=2 D=514 
+00017 [L460] UGET     A=3 B=0 C=1 D=1 tt_comment_start
+00018 [L460] ISEQV    A=2 B=0 C=3 D=3 
+00019 [L460] JMP      A=3 B=127 C=237 D=32749 target=1
+00020 [L460] RET1     A=2 B=0 C=2 D=2 
+00021 [L461] JMP      A=1 B=127 C=235 D=32747 target=1
+00022 [L462] JMP      A=1 B=127 C=238 D=32750 target=5
+00023 [L463] JMP      A=1 B=127 C=233 D=32745 target=1
+00024 [L465] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto19 offset=0x13dc source_lines=468-484 params=2
+UPVALUES ['read_value', 'next_token', 'tt_array_seperator', 'tt_array_value', 'tt_comment_start', 'read_comment']
+00001 [L470] IST      A=0 B=0 C=1 D=1 
+00002 [L470] JMP      A=2 B=128 C=1 D=32769 target=4
+00003 [L470] KSHORT   A=1 B=0 C=1 D=1 1
+00004 [L472] LOOP     A=2 B=128 C=22 D=32790 target=27
+00005 [L473] UGET     A=2 B=0 C=0 D=0 read_value
+00006 [L473] UGET     A=3 B=0 C=1 D=1 next_token
+00007 [L473] UGET     A=4 B=0 C=2 D=2 tt_array_seperator
+00008 [L473] CALL     A=3 B=2 C=2 D=514 
+00009 [L473] UGET     A=4 B=0 C=2 D=2 tt_array_seperator
+00010 [L473] CALL     A=2 B=2 C=3 D=515 
+00011 [L473] TSETV    A=2 B=0 C=1 D=1 
+00012 [L474] UGET     A=2 B=0 C=1 D=1 next_token
+00013 [L474] UGET     A=3 B=0 C=3 D=3 tt_array_value
+00014 [L474] CALL     A=2 B=2 C=2 D=514 
+00015 [L475] UGET     A=3 B=0 C=4 D=4 tt_comment_start
+00016 [L475] ISNEV    A=2 B=0 C=3 D=3 
+00017 [L475] JMP      A=3 B=128 C=4 D=32772 target=22
+00018 [L476] UGET     A=3 B=0 C=5 D=5 read_comment
+00019 [L476] UGET     A=4 B=0 C=3 D=3 tt_array_value
+00020 [L476] CALL     A=3 B=2 C=2 D=514 
+00021 [L476] MOV      A=2 B=0 C=3 D=3 
+00022 [L478] ISNEP    A=2 B=0 C=2 D=2 
+00023 [L478] JMP      A=3 B=128 C=1 D=32769 target=25
+00024 [L480] RET1     A=0 B=0 C=2 D=2 
+00025 [L482] ADDVN    A=1 B=1 C=0 D=256 
+00026 [L482] JMP      A=2 B=127 C=233 D=32745 target=4
+00027 [L484] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto20 offset=0x14df source_lines=487-490 params=1
+UPVALUES ['next_token', 'tt_object_value', 'read_value']
+00001 [L488] UGET     A=1 B=0 C=0 D=0 next_token
+00002 [L488] UGET     A=2 B=0 C=1 D=1 tt_object_value
+00003 [L488] CALL     A=1 B=2 C=2 D=514 
+00004 [L489] UGET     A=2 B=0 C=2 D=2 read_value
+00005 [L489] MOV      A=3 B=0 C=1 D=1 
+00006 [L489] UGET     A=4 B=0 C=1 D=1 tt_object_value
+00007 [L489] CALLT    A=2 B=0 C=3 D=3 
+
+FUNCTION proto21 offset=0x1544 source_lines=493-510 params=1
+UPVALUES ['next_token', 'tt_object_key', 'tt_comment_start', 'read_comment', 'read_object_key', 'read_string', 'tt_object_colon', 'read_object_value']
+00001 [L494] LOOP     A=1 B=128 C=37 D=32805 target=39
+00002 [L495] UGET     A=1 B=0 C=0 D=0 next_token
+00003 [L495] UGET     A=2 B=0 C=1 D=1 tt_object_key
+00004 [L495] CALL     A=1 B=2 C=2 D=514 
+00005 [L496] UGET     A=2 B=0 C=2 D=2 tt_comment_start
+00006 [L496] ISNEV    A=1 B=0 C=2 D=2 
+00007 [L496] JMP      A=2 B=128 C=4 D=32772 target=12
+00008 [L497] UGET     A=2 B=0 C=3 D=3 read_comment
+00009 [L497] UGET     A=3 B=0 C=1 D=1 tt_object_key
+00010 [L497] CALL     A=2 B=2 C=2 D=514 
+00011 [L497] MOV      A=1 B=0 C=2 D=2 
+00012 [L499] ISNEP    A=1 B=0 C=2 D=2 
+00013 [L499] JMP      A=2 B=128 C=1 D=32769 target=15
+00014 [L499] RET1     A=0 B=0 C=2 D=2 
+00015 [L500] UGET     A=2 B=0 C=1 D=1 tt_object_key
+00016 [L500] ISNEV    A=1 B=0 C=2 D=2 
+00017 [L500] JMP      A=2 B=128 C=3 D=32771 target=21
+00018 [L500] UGET     A=2 B=0 C=4 D=4 read_object_key
+00019 [L500] MOV      A=3 B=0 C=0 D=0 
+00020 [L500] CALLT    A=2 B=0 C=2 D=2 
+00021 [L501] UGET     A=2 B=0 C=5 D=5 read_string
+00022 [L501] MOV      A=3 B=0 C=1 D=1 
+00023 [L501] CALL     A=2 B=2 C=2 D=514 
+00024 [L503] UGET     A=3 B=0 C=0 D=0 next_token
+00025 [L503] UGET     A=4 B=0 C=6 D=6 tt_object_colon
+00026 [L503] CALL     A=3 B=2 C=2 D=514 
+00027 [L503] UGET     A=4 B=0 C=2 D=2 tt_comment_start
+00028 [L503] ISNEV    A=3 B=0 C=4 D=4 
+00029 [L503] JMP      A=3 B=128 C=4 D=32772 target=34
+00030 [L504] UGET     A=3 B=0 C=3 D=3 read_comment
+00031 [L504] UGET     A=4 B=0 C=6 D=6 tt_object_colon
+00032 [L504] CALL     A=3 B=2 C=2 D=514 
+00033 [L504] MOV      A=1 B=0 C=3 D=3 
+00034 [L507] UGET     A=3 B=0 C=7 D=7 read_object_value
+00035 [L507] MOV      A=4 B=0 C=0 D=0 
+00036 [L507] CALL     A=3 B=2 C=2 D=514 
+00037 [L508] TSETV    A=3 B=0 C=2 D=2 
+00038 [L508] JMP      A=1 B=127 C=218 D=32730 target=1
+00039 [L510] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto22 offset=0x16ab source_lines=335-520 params=1
+UPVALUES ['error', 'string', 'math', 'tt_ignore', 'c_esc', 'base', 'tt_numeric', 'tonumber', 'c_r', 'c_u', 'c_e', 'c_a', 'c_l', 'c_s', 'tt_object_key', 'tt_array_seperator', 'tt_singlequote_string', 'tt_doublequote_string', 'tt_boolean', 'tt_null', 'tt_comment_start', 'tt_comment_middle', 'c_slash', 'tt_array_value', 'tt_object_value', 'tt_object_colon']
+00001 [L336] KSHORT   A=1 B=0 C=1 D=1 1
+00002 [L339] FNEW     A=2 B=0 C=0 D=0 {'kind': 'proto', 'id': 10}
+00003 [L353] FNEW     A=3 B=0 C=1 D=1 {'kind': 'proto', 'id': 11}
+00004 [L374] FNEW     A=4 B=0 C=2 D=2 {'kind': 'proto', 'id': 12}
+00005 [L401] FNEW     A=5 B=0 C=3 D=3 {'kind': 'proto', 'id': 13}
+00006 [L411] FNEW     A=6 B=0 C=4 D=4 {'kind': 'proto', 'id': 14}
+00007 [L425] FNEW     A=7 B=0 C=5 D=5 {'kind': 'proto', 'id': 15}
+00008 [L434] FNEW     A=8 B=0 C=6 D=6 {'kind': 'proto', 'id': 16}
+00009 [L436] KNIL     A=9 B=0 C=13 D=13 
+00010 [L439] FNEW     A=12 B=0 C=7 D=7 {'kind': 'proto', 'id': 17}
+00011 [L453] FNEW     A=13 B=0 C=8 D=8 {'kind': 'proto', 'id': 18}
+00012 [L468] FNEW     A=11 B=0 C=9 D=9 {'kind': 'proto', 'id': 19}
+00013 [L487] FNEW     A=9 B=0 C=10 D=10 {'kind': 'proto', 'id': 20}
+00014 [L493] FNEW     A=10 B=0 C=11 D=11 {'kind': 'proto', 'id': 21}
+00015 [L513] MOV      A=14 B=0 C=9 D=9 
+00016 [L513] CALL     A=14 B=2 C=1 D=513 
+00017 [L514] LEN      A=15 B=0 C=0 D=0 
+00018 [L514] ISGT     A=1 B=0 C=15 D=15 
+00019 [L514] JMP      A=15 B=128 C=0 D=32768 target=20
+00020 [L519] UCLO     A=0 B=128 C=0 D=32768 target=21
+00021 [L519] RET1     A=14 B=0 C=2 D=2 
+
+FUNCTION proto23 offset=0x192b source_lines=0-522 params=0
+UPVALUES []
+00001 [L34] GGET     A=0 B=0 C=0 D=0 'require'
+00002 [L34] KSTR     A=1 B=0 C=1 D=1 'math'
+00003 [L34] CALL     A=0 B=2 C=2 D=514 
+00004 [L35] GGET     A=1 B=0 C=0 D=0 'require'
+00005 [L35] KSTR     A=2 B=0 C=2 D=2 'string'
+00006 [L35] CALL     A=1 B=2 C=2 D=514 
+00007 [L36] GGET     A=2 B=0 C=0 D=0 'require'
+00008 [L36] KSTR     A=3 B=0 C=3 D=3 'table'
+00009 [L36] CALL     A=2 B=2 C=2 D=514 
+00010 [L37] GGET     A=3 B=0 C=4 D=4 'tostring'
+00011 [L39] GGET     A=4 B=0 C=5 D=5 '_G'
+00012 [L44] GGET     A=5 B=0 C=6 D=6 'module'
+00013 [L44] KSTR     A=6 B=0 C=7 D=7 'base.json'
+00014 [L44] CALL     A=5 B=1 C=2 D=258 
+00015 [L49] KNIL     A=5 B=0 C=14 D=14 
+00016 [L113] FNEW     A=15 B=0 C=8 D=8 {'kind': 'proto', 'id': 0}
+00017 [L66] GSET     A=15 B=0 C=9 D=9 'encode'
+00018 [L123] FNEW     A=15 B=0 C=10 D=10 {'kind': 'proto', 'id': 1}
+00019 [L119] GSET     A=15 B=0 C=11 D=11 'decode'
+00020 [L129] FNEW     A=15 B=0 C=12 D=12 {'kind': 'proto', 'id': 2}
+00021 [L127] GSET     A=15 B=0 C=13 D=13 'null'
+00022 [L139] TDUP     A=15 B=0 C=14 D=14 {'kind': 'table', 'value': {'\n': '\\n', '\\': '\\\\', '\t': '\\t', '"': '\\"'}}
+00023 [L140] FNEW     A=12 B=0 C=15 D=15 {'kind': 'proto', 'id': 3}
+00024 [L152] FNEW     A=13 B=0 C=16 D=16 {'kind': 'proto', 'id': 4}
+00025 [L176] FNEW     A=14 B=0 C=17 D=17 {'kind': 'proto', 'id': 5}
+00026 [L183] TGETS    A=16 B=4 C=18 D=1042 'type'
+00027 [L184] TGETS    A=17 B=4 C=19 D=1043 'error'
+00028 [L185] TGETS    A=18 B=4 C=20 D=1044 'assert'
+00029 [L186] TGETS    A=19 B=4 C=21 D=1045 'print'
+00030 [L187] TGETS    A=20 B=4 C=22 D=1046 'tonumber'
+00031 [L214] FNEW     A=21 B=0 C=23 D=23 {'kind': 'proto', 'id': 9}
+00032 [L226] KSTR     A=22 B=0 C=24 D=24 '\\elrufas/'
+00033 [L226] MOV      A=23 B=0 C=22 D=22 
+00034 [L226] TGETS    A=22 B=22 C=25 D=5657 'byte'
+00035 [L226] KSHORT   A=24 B=0 C=1 D=1 1
+00036 [L226] KSHORT   A=25 B=0 C=9 D=9 9
+00037 [L226] CALL     A=22 B=10 C=4 D=2564 
+00038 [L243] TNEW     A=31 B=0 C=0 D=0 
+00039 [L243] TNEW     A=32 B=0 C=0 D=0 
+00040 [L243] TNEW     A=33 B=0 C=0 D=0 
+00041 [L243] TNEW     A=34 B=0 C=0 D=0 
+00042 [L243] TNEW     A=35 B=0 C=0 D=0 
+00043 [L243] TNEW     A=36 B=0 C=0 D=0 
+00044 [L243] TNEW     A=37 B=0 C=0 D=0 
+00045 [L243] TNEW     A=38 B=0 C=0 D=0 
+00046 [L243] TNEW     A=39 B=0 C=0 D=0 
+00047 [L243] TNEW     A=40 B=0 C=0 D=0 
+00048 [L243] TNEW     A=41 B=0 C=0 D=0 
+00049 [L243] TNEW     A=42 B=0 C=0 D=0 
+00050 [L243] TNEW     A=43 B=0 C=0 D=0 
+00051 [L246] KSTR     A=44 B=0 C=26 D=26 ''
+00052 [L247] KSTR     A=45 B=0 C=26 D=26 ''
+00053 [L249] KSHORT   A=46 B=0 C=0 D=0 0
+00054 [L249] KSHORT   A=47 B=0 C=255 D=255 255
+00055 [L249] KSHORT   A=48 B=0 C=1 D=1 1
+00056 [L249] FORI     A=46 B=128 C=14 D=32782 target=71
+00057 [L250] TGETS    A=50 B=1 C=27 D=283 'char'
+00058 [L250] MOV      A=51 B=0 C=49 D=49 
+00059 [L250] CALL     A=50 B=2 C=2 D=514 
+00060 [L251] ISEQS    A=50 B=0 C=28 D=28 '\n'
+00061 [L251] JMP      A=51 B=128 C=5 D=32773 target=67
+00062 [L251] ISEQS    A=50 B=0 C=29 D=29 '\r'
+00063 [L251] JMP      A=51 B=128 C=3 D=32771 target=67
+00064 [L251] MOV      A=51 B=0 C=44 D=44 
+00065 [L251] MOV      A=52 B=0 C=50 D=50 
+00066 [L251] CAT      A=44 B=51 C=52 D=13108 
+00067 [L252] MOV      A=51 B=0 C=45 D=45 
+00068 [L252] MOV      A=52 B=0 C=50 D=50 
+00069 [L252] CAT      A=45 B=51 C=52 D=13108 
+00070 [L249] FORL     A=46 B=127 C=242 D=32754 target=57
+00071 [L265] MOV      A=46 B=0 C=21 D=21 
+00072 [L265] MOV      A=47 B=0 C=31 D=31 
+00073 [L265] CALL     A=46 B=2 C=2 D=514 
+00074 [L265] KSTR     A=47 B=0 C=30 D=30 'object (\' or " or } or , expected)'
+00075 [L265] CALL     A=46 B=2 C=2 D=514 
+00076 [L266] MOV      A=47 B=0 C=46 D=46 
+00077 [L266] TGETS    A=46 B=46 C=31 D=11807 'link'
+00078 [L266] MOV      A=48 B=0 C=35 D=35 
+00079 [L266] CALL     A=46 B=2 C=3 D=515 
+00080 [L266] MOV      A=47 B=0 C=46 D=46 
+00081 [L266] TGETS    A=46 B=46 C=32 D=11808 'to'
+00082 [L266] KSTR     A=48 B=0 C=33 D=33 "'"
+00083 [L266] CALL     A=46 B=2 C=3 D=515 
+00084 [L267] MOV      A=47 B=0 C=46 D=46 
+00085 [L267] TGETS    A=46 B=46 C=31 D=11807 'link'
+00086 [L267] MOV      A=48 B=0 C=34 D=34 
+00087 [L267] CALL     A=46 B=2 C=3 D=515 
+00088 [L267] MOV      A=47 B=0 C=46 D=46 
+00089 [L267] TGETS    A=46 B=46 C=32 D=11808 'to'
+00090 [L267] KSTR     A=48 B=0 C=34 D=34 '"'
+00091 [L267] CALL     A=46 B=2 C=3 D=515 
+00092 [L268] MOV      A=47 B=0 C=46 D=46 
+00093 [L268] TGETS    A=46 B=46 C=31 D=11807 'link'
+00094 [L268] KPRI     A=48 B=0 C=2 D=2 
+00095 [L268] CALL     A=46 B=2 C=3 D=515 
+00096 [L268] MOV      A=47 B=0 C=46 D=46 
+00097 [L268] TGETS    A=46 B=46 C=32 D=11808 'to'
+00098 [L268] KSTR     A=48 B=0 C=35 D=35 '}'
+00099 [L268] CALL     A=46 B=2 C=3 D=515 
+00100 [L269] MOV      A=47 B=0 C=46 D=46 
+00101 [L269] TGETS    A=46 B=46 C=31 D=11807 'link'
+00102 [L269] MOV      A=48 B=0 C=31 D=31 
+00103 [L269] CALL     A=46 B=2 C=3 D=515 
+00104 [L269] MOV      A=47 B=0 C=46 D=46 
+00105 [L269] TGETS    A=46 B=46 C=32 D=11808 'to'
+00106 [L269] KSTR     A=48 B=0 C=36 D=36 ','
+00107 [L269] CALL     A=46 B=2 C=3 D=515 
+00108 [L270] MOV      A=47 B=0 C=46 D=46 
+00109 [L270] TGETS    A=46 B=46 C=31 D=11807 'link'
+00110 [L270] MOV      A=48 B=0 C=41 D=41 
+00111 [L270] CALL     A=46 B=2 C=3 D=515 
+00112 [L270] MOV      A=47 B=0 C=46 D=46 
+00113 [L270] TGETS    A=46 B=46 C=32 D=11808 'to'
+00114 [L270] KSTR     A=48 B=0 C=37 D=37 '/'
+00115 [L270] CALL     A=46 B=2 C=3 D=515 
+00116 [L271] MOV      A=47 B=0 C=46 D=46 
+00117 [L271] TGETS    A=46 B=46 C=31 D=11807 'link'
+00118 [L271] MOV      A=48 B=0 C=43 D=43 
+00119 [L271] CALL     A=46 B=2 C=3 D=515 
+00120 [L271] MOV      A=47 B=0 C=46 D=46 
+00121 [L271] TGETS    A=46 B=46 C=32 D=11808 'to'
+00122 [L271] KSTR     A=48 B=0 C=38 D=38 ' \t\r\n'
+00123 [L271] CALL     A=46 B=1 C=3 D=259 
+00124 [L275] MOV      A=46 B=0 C=21 D=21 
+00125 [L275] MOV      A=47 B=0 C=32 D=32 
+00126 [L275] CALL     A=46 B=2 C=2 D=514 
+00127 [L275] KSTR     A=47 B=0 C=39 D=39 'object (: expected)'
+00128 [L275] CALL     A=46 B=2 C=2 D=514 
+00129 [L276] MOV      A=47 B=0 C=46 D=46 
+00130 [L276] TGETS    A=46 B=46 C=31 D=11807 'link'
+00131 [L276] MOV      A=48 B=0 C=33 D=33 
+00132 [L276] CALL     A=46 B=2 C=3 D=515 
+00133 [L276] MOV      A=47 B=0 C=46 D=46 
+00134 [L276] TGETS    A=46 B=46 C=32 D=11808 'to'
+00135 [L276] KSTR     A=48 B=0 C=40 D=40 ':'
+00136 [L276] CALL     A=46 B=2 C=3 D=515 
+00137 [L277] MOV      A=47 B=0 C=46 D=46 
+00138 [L277] TGETS    A=46 B=46 C=31 D=11807 'link'
+00139 [L277] MOV      A=48 B=0 C=41 D=41 
+00140 [L277] CALL     A=46 B=2 C=3 D=515 
+00141 [L277] MOV      A=47 B=0 C=46 D=46 
+00142 [L277] TGETS    A=46 B=46 C=32 D=11808 'to'
+00143 [L277] KSTR     A=48 B=0 C=37 D=37 '/'
+00144 [L277] CALL     A=46 B=2 C=3 D=515 
+00145 [L278] MOV      A=47 B=0 C=46 D=46 
+00146 [L278] TGETS    A=46 B=46 C=31 D=11807 'link'
+00147 [L278] MOV      A=48 B=0 C=43 D=43 
+00148 [L278] CALL     A=46 B=2 C=3 D=515 
+00149 [L278] MOV      A=47 B=0 C=46 D=46 
+00150 [L278] TGETS    A=46 B=46 C=32 D=11808 'to'
+00151 [L278] KSTR     A=48 B=0 C=38 D=38 ' \t\r\n'
+00152 [L278] CALL     A=46 B=1 C=3 D=259 
+00153 [L281] MOV      A=46 B=0 C=21 D=21 
+00154 [L281] MOV      A=47 B=0 C=33 D=33 
+00155 [L281] CALL     A=46 B=2 C=2 D=514 
+00156 [L281] KSTR     A=47 B=0 C=41 D=41 'object ({ or [ or \' or " or number or boolean or null expected)'
+00157 [L281] CALL     A=46 B=2 C=2 D=514 
+00158 [L282] MOV      A=47 B=0 C=46 D=46 
+00159 [L282] TGETS    A=46 B=46 C=31 D=11807 'link'
+00160 [L282] MOV      A=48 B=0 C=31 D=31 
+00161 [L282] CALL     A=46 B=2 C=3 D=515 
+00162 [L282] MOV      A=47 B=0 C=46 D=46 
+00163 [L282] TGETS    A=46 B=46 C=32 D=11808 'to'
+00164 [L282] KSTR     A=48 B=0 C=42 D=42 '{'
+00165 [L282] CALL     A=46 B=2 C=3 D=515 
+00166 [L283] MOV      A=47 B=0 C=46 D=46 
+00167 [L283] TGETS    A=46 B=46 C=31 D=11807 'link'
+00168 [L283] MOV      A=48 B=0 C=37 D=37 
+00169 [L283] CALL     A=46 B=2 C=3 D=515 
+00170 [L283] MOV      A=47 B=0 C=46 D=46 
+00171 [L283] TGETS    A=46 B=46 C=32 D=11808 'to'
+00172 [L283] KSTR     A=48 B=0 C=43 D=43 '['
+00173 [L283] CALL     A=46 B=2 C=3 D=515 
+00174 [L284] MOV      A=47 B=0 C=46 D=46 
+00175 [L284] TGETS    A=46 B=46 C=31 D=11807 'link'
+00176 [L284] MOV      A=48 B=0 C=35 D=35 
+00177 [L284] CALL     A=46 B=2 C=3 D=515 
+00178 [L284] MOV      A=47 B=0 C=46 D=46 
+00179 [L284] TGETS    A=46 B=46 C=32 D=11808 'to'
+00180 [L284] KSTR     A=48 B=0 C=33 D=33 "'"
+00181 [L284] CALL     A=46 B=2 C=3 D=515 
+00182 [L285] MOV      A=47 B=0 C=46 D=46 
+00183 [L285] TGETS    A=46 B=46 C=31 D=11807 'link'
+00184 [L285] MOV      A=48 B=0 C=34 D=34 
+00185 [L285] CALL     A=46 B=2 C=3 D=515 
+00186 [L285] MOV      A=47 B=0 C=46 D=46 
+00187 [L285] TGETS    A=46 B=46 C=32 D=11808 'to'
+00188 [L285] KSTR     A=48 B=0 C=34 D=34 '"'
+00189 [L285] CALL     A=46 B=2 C=3 D=515 
+00190 [L286] MOV      A=47 B=0 C=46 D=46 
+00191 [L286] TGETS    A=46 B=46 C=31 D=11807 'link'
+00192 [L286] MOV      A=48 B=0 C=38 D=38 
+00193 [L286] CALL     A=46 B=2 C=3 D=515 
+00194 [L286] MOV      A=47 B=0 C=46 D=46 
+00195 [L286] TGETS    A=46 B=46 C=32 D=11808 'to'
+00196 [L286] KSTR     A=48 B=0 C=44 D=44 '0123456789.-'
+00197 [L286] CALL     A=46 B=2 C=3 D=515 
+00198 [L287] MOV      A=47 B=0 C=46 D=46 
+00199 [L287] TGETS    A=46 B=46 C=31 D=11807 'link'
+00200 [L287] MOV      A=48 B=0 C=39 D=39 
+00201 [L287] CALL     A=46 B=2 C=3 D=515 
+00202 [L287] MOV      A=47 B=0 C=46 D=46 
+00203 [L287] TGETS    A=46 B=46 C=32 D=11808 'to'
+00204 [L287] KSTR     A=48 B=0 C=45 D=45 'tf'
+00205 [L287] CALL     A=46 B=2 C=3 D=515 
+00206 [L288] MOV      A=47 B=0 C=46 D=46 
+00207 [L288] TGETS    A=46 B=46 C=31 D=11807 'link'
+00208 [L288] MOV      A=48 B=0 C=40 D=40 
+00209 [L288] CALL     A=46 B=2 C=3 D=515 
+00210 [L288] MOV      A=47 B=0 C=46 D=46 
+00211 [L288] TGETS    A=46 B=46 C=32 D=11808 'to'
+00212 [L288] KSTR     A=48 B=0 C=46 D=46 'n'
+00213 [L288] CALL     A=46 B=2 C=3 D=515 
+00214 [L289] MOV      A=47 B=0 C=46 D=46 
+00215 [L289] TGETS    A=46 B=46 C=31 D=11807 'link'
+00216 [L289] MOV      A=48 B=0 C=41 D=41 
+00217 [L289] CALL     A=46 B=2 C=3 D=515 
+00218 [L289] MOV      A=47 B=0 C=46 D=46 
+00219 [L289] TGETS    A=46 B=46 C=32 D=11808 'to'
+00220 [L289] KSTR     A=48 B=0 C=37 D=37 '/'
+00221 [L289] CALL     A=46 B=2 C=3 D=515 
+00222 [L290] MOV      A=47 B=0 C=46 D=46 
+00223 [L290] TGETS    A=46 B=46 C=31 D=11807 'link'
+00224 [L290] MOV      A=48 B=0 C=43 D=43 
+00225 [L290] CALL     A=46 B=2 C=3 D=515 
+00226 [L290] MOV      A=47 B=0 C=46 D=46 
+00227 [L290] TGETS    A=46 B=46 C=32 D=11808 'to'
+00228 [L290] KSTR     A=48 B=0 C=38 D=38 ' \t\r\n'
+00229 [L290] CALL     A=46 B=1 C=3 D=259 
+00230 [L293] MOV      A=46 B=0 C=21 D=21 
+00231 [L293] MOV      A=47 B=0 C=34 D=34 
+00232 [L293] CALL     A=46 B=2 C=2 D=514 
+00233 [L293] KSTR     A=47 B=0 C=47 D=47 'double quoted string'
+00234 [L293] CALL     A=46 B=2 C=2 D=514 
+00235 [L294] MOV      A=47 B=0 C=46 D=46 
+00236 [L294] TGETS    A=46 B=46 C=31 D=11807 'link'
+00237 [L294] MOV      A=48 B=0 C=43 D=43 
+00238 [L294] CALL     A=46 B=2 C=3 D=515 
+00239 [L294] MOV      A=47 B=0 C=46 D=46 
+00240 [L294] TGETS    A=46 B=46 C=32 D=11808 'to'
+00241 [L294] MOV      A=48 B=0 C=44 D=44 
+00242 [L294] CALL     A=46 B=2 C=3 D=515 
+00243 [L295] MOV      A=47 B=0 C=46 D=46 
+00244 [L295] TGETS    A=46 B=46 C=31 D=11807 'link'
+00245 [L295] MOV      A=48 B=0 C=22 D=22 
+00246 [L295] CALL     A=46 B=2 C=3 D=515 
+00247 [L295] MOV      A=47 B=0 C=46 D=46 
+00248 [L295] TGETS    A=46 B=46 C=32 D=11808 'to'
+00249 [L295] KSTR     A=48 B=0 C=48 D=48 '\\'
+00250 [L295] CALL     A=46 B=2 C=3 D=515 
+00251 [L296] MOV      A=47 B=0 C=46 D=46 
+00252 [L296] TGETS    A=46 B=46 C=31 D=11807 'link'
+00253 [L296] KPRI     A=48 B=0 C=2 D=2 
+00254 [L296] CALL     A=46 B=2 C=3 D=515 
+00255 [L296] MOV      A=47 B=0 C=46 D=46 
+00256 [L296] TGETS    A=46 B=46 C=32 D=11808 'to'
+00257 [L296] KSTR     A=48 B=0 C=34 D=34 '"'
+00258 [L296] CALL     A=46 B=1 C=3 D=259 
+00259 [L298] MOV      A=46 B=0 C=21 D=21 
+00260 [L298] MOV      A=47 B=0 C=35 D=35 
+00261 [L298] CALL     A=46 B=2 C=2 D=514 
+00262 [L298] KSTR     A=47 B=0 C=49 D=49 'single quoted string'
+00263 [L298] CALL     A=46 B=2 C=2 D=514 
+00264 [L299] MOV      A=47 B=0 C=46 D=46 
+00265 [L299] TGETS    A=46 B=46 C=31 D=11807 'link'
+00266 [L299] MOV      A=48 B=0 C=43 D=43 
+00267 [L299] CALL     A=46 B=2 C=3 D=515 
+00268 [L299] MOV      A=47 B=0 C=46 D=46 
+00269 [L299] TGETS    A=46 B=46 C=32 D=11808 'to'
+00270 [L299] MOV      A=48 B=0 C=44 D=44 
+00271 [L299] CALL     A=46 B=2 C=3 D=515 
+00272 [L300] MOV      A=47 B=0 C=46 D=46 
+00273 [L300] TGETS    A=46 B=46 C=31 D=11807 'link'
+00274 [L300] MOV      A=48 B=0 C=22 D=22 
+00275 [L300] CALL     A=46 B=2 C=3 D=515 
+00276 [L300] MOV      A=47 B=0 C=46 D=46 
+00277 [L300] TGETS    A=46 B=46 C=32 D=11808 'to'
+00278 [L300] KSTR     A=48 B=0 C=48 D=48 '\\'
+00279 [L300] CALL     A=46 B=2 C=3 D=515 
+00280 [L301] MOV      A=47 B=0 C=46 D=46 
+00281 [L301] TGETS    A=46 B=46 C=31 D=11807 'link'
+00282 [L301] KPRI     A=48 B=0 C=2 D=2 
+00283 [L301] CALL     A=46 B=2 C=3 D=515 
+00284 [L301] MOV      A=47 B=0 C=46 D=46 
+00285 [L301] TGETS    A=46 B=46 C=32 D=11808 'to'
+00286 [L301] KSTR     A=48 B=0 C=33 D=33 "'"
+00287 [L301] CALL     A=46 B=1 C=3 D=259 
+00288 [L304] MOV      A=46 B=0 C=21 D=21 
+00289 [L304] MOV      A=47 B=0 C=36 D=36 
+00290 [L304] CALL     A=46 B=2 C=2 D=514 
+00291 [L304] KSTR     A=47 B=0 C=50 D=50 'array (, or ] expected)'
+00292 [L304] CALL     A=46 B=2 C=2 D=514 
+00293 [L305] MOV      A=47 B=0 C=46 D=46 
+00294 [L305] TGETS    A=46 B=46 C=31 D=11807 'link'
+00295 [L305] MOV      A=48 B=0 C=37 D=37 
+00296 [L305] CALL     A=46 B=2 C=3 D=515 
+00297 [L305] MOV      A=47 B=0 C=46 D=46 
+00298 [L305] TGETS    A=46 B=46 C=32 D=11808 'to'
+00299 [L305] KSTR     A=48 B=0 C=36 D=36 ','
+00300 [L305] CALL     A=46 B=2 C=3 D=515 
+00301 [L306] MOV      A=47 B=0 C=46 D=46 
+00302 [L306] TGETS    A=46 B=46 C=31 D=11807 'link'
+00303 [L306] KPRI     A=48 B=0 C=2 D=2 
+00304 [L306] CALL     A=46 B=2 C=3 D=515 
+00305 [L306] MOV      A=47 B=0 C=46 D=46 
+00306 [L306] TGETS    A=46 B=46 C=32 D=11808 'to'
+00307 [L306] KSTR     A=48 B=0 C=51 D=51 ']'
+00308 [L306] CALL     A=46 B=2 C=3 D=515 
+00309 [L307] MOV      A=47 B=0 C=46 D=46 
+00310 [L307] TGETS    A=46 B=46 C=31 D=11807 'link'
+00311 [L307] MOV      A=48 B=0 C=41 D=41 
+00312 [L307] CALL     A=46 B=2 C=3 D=515 
+00313 [L307] MOV      A=47 B=0 C=46 D=46 
+00314 [L307] TGETS    A=46 B=46 C=32 D=11808 'to'
+00315 [L307] KSTR     A=48 B=0 C=37 D=37 '/'
+00316 [L307] CALL     A=46 B=2 C=3 D=515 
+00317 [L308] MOV      A=47 B=0 C=46 D=46 
+00318 [L308] TGETS    A=46 B=46 C=31 D=11807 'link'
+00319 [L308] MOV      A=48 B=0 C=43 D=43 
+00320 [L308] CALL     A=46 B=2 C=3 D=515 
+00321 [L308] MOV      A=47 B=0 C=46 D=46 
+00322 [L308] TGETS    A=46 B=46 C=32 D=11808 'to'
+00323 [L308] KSTR     A=48 B=0 C=38 D=38 ' \t\r\n'
+00324 [L308] CALL     A=46 B=1 C=3 D=259 
+00325 [L311] MOV      A=46 B=0 C=21 D=21 
+00326 [L311] MOV      A=47 B=0 C=37 D=37 
+00327 [L311] CALL     A=46 B=2 C=2 D=514 
+00328 [L311] KSTR     A=47 B=0 C=52 D=52 'array ({ or [ or \' or " or number or boolean or null expected)'
+00329 [L311] CALL     A=46 B=2 C=2 D=514 
+00330 [L312] MOV      A=47 B=0 C=46 D=46 
+00331 [L312] TGETS    A=46 B=46 C=31 D=11807 'link'
+00332 [L312] MOV      A=48 B=0 C=31 D=31 
+00333 [L312] CALL     A=46 B=2 C=3 D=515 
+00334 [L312] MOV      A=47 B=0 C=46 D=46 
+00335 [L312] TGETS    A=46 B=46 C=32 D=11808 'to'
+00336 [L312] KSTR     A=48 B=0 C=42 D=42 '{'
+00337 [L312] CALL     A=46 B=2 C=3 D=515 
+00338 [L313] MOV      A=47 B=0 C=46 D=46 
+00339 [L313] TGETS    A=46 B=46 C=31 D=11807 'link'
+00340 [L313] MOV      A=48 B=0 C=37 D=37 
+00341 [L313] CALL     A=46 B=2 C=3 D=515 
+00342 [L313] MOV      A=47 B=0 C=46 D=46 
+00343 [L313] TGETS    A=46 B=46 C=32 D=11808 'to'
+00344 [L313] KSTR     A=48 B=0 C=43 D=43 '['
+00345 [L313] CALL     A=46 B=2 C=3 D=515 
+00346 [L314] MOV      A=47 B=0 C=46 D=46 
+00347 [L314] TGETS    A=46 B=46 C=31 D=11807 'link'
+00348 [L314] MOV      A=48 B=0 C=35 D=35 
+00349 [L314] CALL     A=46 B=2 C=3 D=515 
+00350 [L314] MOV      A=47 B=0 C=46 D=46 
+00351 [L314] TGETS    A=46 B=46 C=32 D=11808 'to'
+00352 [L314] KSTR     A=48 B=0 C=33 D=33 "'"
+00353 [L314] CALL     A=46 B=2 C=3 D=515 
+00354 [L315] MOV      A=47 B=0 C=46 D=46 
+00355 [L315] TGETS    A=46 B=46 C=31 D=11807 'link'
+00356 [L315] MOV      A=48 B=0 C=34 D=34 
+00357 [L315] CALL     A=46 B=2 C=3 D=515 
+00358 [L315] MOV      A=47 B=0 C=46 D=46 
+00359 [L315] TGETS    A=46 B=46 C=32 D=11808 'to'
+00360 [L315] KSTR     A=48 B=0 C=34 D=34 '"'
+00361 [L315] CALL     A=46 B=2 C=3 D=515 
+00362 [L316] MOV      A=47 B=0 C=46 D=46 
+00363 [L316] TGETS    A=46 B=46 C=31 D=11807 'link'
+00364 [L316] MOV      A=48 B=0 C=41 D=41 
+00365 [L316] CALL     A=46 B=2 C=3 D=515 
+00366 [L316] MOV      A=47 B=0 C=46 D=46 
+00367 [L316] TGETS    A=46 B=46 C=32 D=11808 'to'
+00368 [L316] KSTR     A=48 B=0 C=37 D=37 '/'
+00369 [L316] CALL     A=46 B=2 C=3 D=515 
+00370 [L317] MOV      A=47 B=0 C=46 D=46 
+00371 [L317] TGETS    A=46 B=46 C=31 D=11807 'link'
+00372 [L317] MOV      A=48 B=0 C=38 D=38 
+00373 [L317] CALL     A=46 B=2 C=3 D=515 
+00374 [L317] MOV      A=47 B=0 C=46 D=46 
+00375 [L317] TGETS    A=46 B=46 C=32 D=11808 'to'
+00376 [L317] KSTR     A=48 B=0 C=44 D=44 '0123456789.-'
+00377 [L317] CALL     A=46 B=2 C=3 D=515 
+00378 [L318] MOV      A=47 B=0 C=46 D=46 
+00379 [L318] TGETS    A=46 B=46 C=31 D=11807 'link'
+00380 [L318] MOV      A=48 B=0 C=39 D=39 
+00381 [L318] CALL     A=46 B=2 C=3 D=515 
+00382 [L318] MOV      A=47 B=0 C=46 D=46 
+00383 [L318] TGETS    A=46 B=46 C=32 D=11808 'to'
+00384 [L318] KSTR     A=48 B=0 C=45 D=45 'tf'
+00385 [L318] CALL     A=46 B=2 C=3 D=515 
+00386 [L319] MOV      A=47 B=0 C=46 D=46 
+00387 [L319] TGETS    A=46 B=46 C=31 D=11807 'link'
+00388 [L319] MOV      A=48 B=0 C=40 D=40 
+00389 [L319] CALL     A=46 B=2 C=3 D=515 
+00390 [L319] MOV      A=47 B=0 C=46 D=46 
+00391 [L319] TGETS    A=46 B=46 C=32 D=11808 'to'
+00392 [L319] KSTR     A=48 B=0 C=46 D=46 'n'
+00393 [L319] CALL     A=46 B=2 C=3 D=515 
+00394 [L320] MOV      A=47 B=0 C=46 D=46 
+00395 [L320] TGETS    A=46 B=46 C=31 D=11807 'link'
+00396 [L320] MOV      A=48 B=0 C=43 D=43 
+00397 [L320] CALL     A=46 B=2 C=3 D=515 
+00398 [L320] MOV      A=47 B=0 C=46 D=46 
+00399 [L320] TGETS    A=46 B=46 C=32 D=11808 'to'
+00400 [L320] KSTR     A=48 B=0 C=38 D=38 ' \t\r\n'
+00401 [L320] CALL     A=46 B=1 C=3 D=259 
+00402 [L323] MOV      A=46 B=0 C=21 D=21 
+00403 [L323] MOV      A=47 B=0 C=38 D=38 
+00404 [L323] CALL     A=46 B=2 C=2 D=514 
+00405 [L323] KSTR     A=47 B=0 C=53 D=53 'number'
+00406 [L323] CALL     A=46 B=2 C=2 D=514 
+00407 [L324] MOV      A=47 B=0 C=46 D=46 
+00408 [L324] TGETS    A=46 B=46 C=31 D=11807 'link'
+00409 [L324] MOV      A=48 B=0 C=43 D=43 
+00410 [L324] CALL     A=46 B=2 C=3 D=515 
+00411 [L324] MOV      A=47 B=0 C=46 D=46 
+00412 [L324] TGETS    A=46 B=46 C=32 D=11808 'to'
+00413 [L324] KSTR     A=48 B=0 C=54 D=54 '0123456789.-Ee'
+00414 [L324] CALL     A=46 B=1 C=3 D=259 
+00415 [L327] MOV      A=46 B=0 C=21 D=21 
+00416 [L327] MOV      A=47 B=0 C=41 D=41 
+00417 [L327] CALL     A=46 B=2 C=2 D=514 
+00418 [L327] KSTR     A=47 B=0 C=55 D=55 'comment start (* expected)'
+00419 [L327] CALL     A=46 B=2 C=2 D=514 
+00420 [L328] MOV      A=47 B=0 C=46 D=46 
+00421 [L328] TGETS    A=46 B=46 C=31 D=11807 'link'
+00422 [L328] MOV      A=48 B=0 C=42 D=42 
+00423 [L328] CALL     A=46 B=2 C=3 D=515 
+00424 [L328] MOV      A=47 B=0 C=46 D=46 
+00425 [L328] TGETS    A=46 B=46 C=32 D=11808 'to'
+00426 [L328] KSTR     A=48 B=0 C=56 D=56 '*'
+00427 [L328] CALL     A=46 B=1 C=3 D=259 
+00428 [L331] MOV      A=46 B=0 C=21 D=21 
+00429 [L331] MOV      A=47 B=0 C=42 D=42 
+00430 [L331] CALL     A=46 B=2 C=2 D=514 
+00431 [L331] KSTR     A=47 B=0 C=57 D=57 'comment end'
+00432 [L331] CALL     A=46 B=2 C=2 D=514 
+00433 [L332] MOV      A=47 B=0 C=46 D=46 
+00434 [L332] TGETS    A=46 B=46 C=31 D=11807 'link'
+00435 [L332] MOV      A=48 B=0 C=43 D=43 
+00436 [L332] CALL     A=46 B=2 C=3 D=515 
+00437 [L332] MOV      A=47 B=0 C=46 D=46 
+00438 [L332] TGETS    A=46 B=46 C=32 D=11808 'to'
+00439 [L332] MOV      A=48 B=0 C=45 D=45 
+00440 [L332] CALL     A=46 B=2 C=3 D=515 
+00441 [L333] MOV      A=47 B=0 C=46 D=46 
+00442 [L333] TGETS    A=46 B=46 C=31 D=11807 'link'
+00443 [L333] KPRI     A=48 B=0 C=2 D=2 
+00444 [L333] CALL     A=46 B=2 C=3 D=515 
+00445 [L333] MOV      A=47 B=0 C=46 D=46 
+00446 [L333] TGETS    A=46 B=46 C=32 D=11808 'to'
+00447 [L333] KSTR     A=48 B=0 C=56 D=56 '*'
+00448 [L333] CALL     A=46 B=1 C=3 D=259 
+00449 [L520] FNEW     A=46 B=0 C=58 D=58 {'kind': 'proto', 'id': 22}
+00450 [L335] GSET     A=46 B=0 C=11 D=11 'decode'
+00451 [L520] UCLO     A=16 B=128 C=0 D=32768 target=452
+00452 [L521] UCLO     A=0 B=128 C=0 D=32768 target=453
+00453 [L521] RET0     A=0 B=0 C=1 D=1 

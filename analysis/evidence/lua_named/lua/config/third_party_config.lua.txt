@@ -1,0 +1,320 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\43f3c72a00e9e80b7c2b5aeec690e0e6.data'; root=proto12
+
+FUNCTION proto0 offset=0x4a source_lines=25-28 params=0
+UPVALUES ['CCLuaLog', 'string']
+00001 [L27] UGET     A=0 B=0 C=0 D=0 CCLuaLog
+00002 [L27] UGET     A=1 B=0 C=1 D=1 string
+00003 [L27] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L27] VARG     A=2 B=0 C=0 D=0 
+00005 [L27] CALLM    A=1 B=0 C=0 D=0 
+00006 [L27] CALLM    A=0 B=1 C=0 D=256 
+00007 [L28] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x95 source_lines=36-56 params=0
+UPVALUES ['main_server', 'pairs']
+00001 [L37] GGET     A=0 B=0 C=0 D=0 'getThirdPartyFlag'
+00002 [L37] CALL     A=0 B=1 C=1 D=257 
+00003 [L39] KSTR     A=0 B=0 C=1 D=1 ''
+00004 [L42] UGET     A=1 B=0 C=0 D=0 main_server
+00005 [L42] TGETS    A=1 B=1 C=2 D=258 'getTPValue'
+00006 [L42] ISF      A=0 B=0 C=1 D=1 
+00007 [L42] JMP      A=2 B=128 C=10 D=32778 target=18
+00008 [L43] UGET     A=1 B=0 C=0 D=0 main_server
+00009 [L43] TGETS    A=1 B=1 C=2 D=258 'getTPValue'
+00010 [L43] KSTR     A=2 B=0 C=3 D=3 'third_party_name'
+00011 [L43] CALL     A=1 B=2 C=2 D=514 
+00012 [L43] MOV      A=0 B=0 C=1 D=1 
+00013 [L44] LEN      A=1 B=0 C=0 D=0 
+00014 [L44] KSHORT   A=2 B=0 C=1 D=1 1
+00015 [L44] ISGE     A=2 B=0 C=1 D=1 
+00016 [L44] JMP      A=1 B=128 C=1 D=32769 target=18
+00017 [L45] RET1     A=0 B=0 C=2 D=2 
+00018 [L50] UGET     A=1 B=0 C=1 D=1 pairs
+00019 [L50] GGET     A=2 B=0 C=4 D=4 'ThirdPlatformDef'
+00020 [L50] CALL     A=1 B=4 C=2 D=1026 
+00021 [L50] ISNEXT   A=4 B=128 C=4 D=32772 target=26
+00022 [L51] GGET     A=6 B=0 C=5 D=5 'g_third_party_flag'
+00023 [L51] ISNEV    A=5 B=0 C=6 D=6 
+00024 [L51] JMP      A=6 B=128 C=1 D=32769 target=26
+00025 [L52] RET1     A=4 B=0 C=2 D=2 
+00026 [L50] ITERN    A=4 B=3 C=3 D=771 
+00027 [L50] ITERL    A=4 B=127 C=250 D=32762 target=22
+00028 [L55] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto2 offset=0x1ae source_lines=58-75 params=0
+UPVALUES ['d_common_def', 'cclog']
+00001 [L59] GGET     A=0 B=0 C=0 D=0 'getThirdPartyFlag'
+00002 [L59] CALL     A=0 B=1 C=1 D=257 
+00003 [L62] GGET     A=0 B=0 C=1 D=1 'isWin32'
+00004 [L62] CALL     A=0 B=2 C=1 D=513 
+00005 [L62] ISF      A=0 B=0 C=0 D=0 
+00006 [L62] JMP      A=1 B=128 C=2 D=32770 target=9
+00007 [L63] KPRI     A=0 B=0 C=1 D=1 
+00008 [L63] RET1     A=0 B=0 C=2 D=2 
+00009 [L65] UGET     A=0 B=0 C=0 D=0 d_common_def
+00010 [L65] TGETS    A=0 B=0 C=2 D=2 'official_platform'
+00011 [L65] GGET     A=1 B=0 C=3 D=3 'g_third_party_flag'
+00012 [L65] TGETV    A=0 B=0 C=1 D=1 
+00013 [L65] ISEQP    A=0 B=0 C=0 D=0 
+00014 [L65] JMP      A=0 B=128 C=11 D=32779 target=26
+00015 [L66] UGET     A=0 B=0 C=0 D=0 d_common_def
+00016 [L66] TGETS    A=0 B=0 C=2 D=2 'official_platform'
+00017 [L66] GGET     A=1 B=0 C=3 D=3 'g_third_party_flag'
+00018 [L66] TGETV    A=0 B=0 C=1 D=1 
+00019 [L66] ISNEP    A=0 B=0 C=2 D=2 
+00020 [L66] JMP      A=0 B=128 C=3 D=32771 target=24
+00021 [L67] KPRI     A=0 B=0 C=1 D=1 
+00022 [L67] RET1     A=0 B=0 C=2 D=2 
+00023 [L67] JMP      A=0 B=128 C=2 D=32770 target=26
+00024 [L69] KPRI     A=0 B=0 C=2 D=2 
+00025 [L69] RET1     A=0 B=0 C=2 D=2 
+00026 [L73] UGET     A=0 B=0 C=1 D=1 cclog
+00027 [L73] KSTR     A=1 B=0 C=4 D=4 'ERROR: comm_layer config error. check platform_type and official_platform.'
+00028 [L73] CALL     A=0 B=1 C=2 D=258 
+00029 [L74] KPRI     A=0 B=0 C=2 D=2 
+00030 [L74] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto3 offset=0x2f2 source_lines=79-109 params=0
+UPVALUES ['cclog', 'main_server']
+00001 [L83] GGET     A=0 B=0 C=0 D=0 'g_third_party_flag'
+00002 [L83] ISF      A=0 B=0 C=0 D=0 
+00003 [L83] JMP      A=1 B=128 C=22 D=32790 target=26
+00004 [L84] GGET     A=0 B=0 C=0 D=0 'g_third_party_flag'
+00005 [L84] GGET     A=1 B=0 C=1 D=1 'ThirdPlatformDef'
+00006 [L84] TGETS    A=1 B=1 C=2 D=258 'yyb_qq_a'
+00007 [L84] ISEQV    A=0 B=0 C=1 D=1 
+00008 [L84] JMP      A=0 B=128 C=17 D=32785 target=26
+00009 [L85] GGET     A=0 B=0 C=0 D=0 'g_third_party_flag'
+00010 [L85] GGET     A=1 B=0 C=1 D=1 'ThirdPlatformDef'
+00011 [L85] TGETS    A=1 B=1 C=3 D=259 'yyb_wx_a'
+00012 [L85] ISEQV    A=0 B=0 C=1 D=1 
+00013 [L85] JMP      A=0 B=128 C=12 D=32780 target=26
+00014 [L86] GGET     A=0 B=0 C=4 D=4 'checkVivoFlag'
+00015 [L86] CALL     A=0 B=1 C=1 D=257 
+00016 [L87] UGET     A=0 B=0 C=0 D=0 cclog
+00017 [L87] KSTR     A=1 B=0 C=5 D=5 'call getThirdPartyFlag='
+00018 [L87] GGET     A=2 B=0 C=0 D=0 'g_third_party_flag'
+00019 [L87] IST      A=0 B=0 C=2 D=2 
+00020 [L87] JMP      A=3 B=128 C=1 D=32769 target=22
+00021 [L87] KSHORT   A=2 B=0 C=0 D=0 0
+00022 [L87] CAT      A=1 B=1 C=2 D=258 
+00023 [L87] CALL     A=0 B=1 C=2 D=258 
+00024 [L88] GGET     A=0 B=0 C=0 D=0 'g_third_party_flag'
+00025 [L88] RET1     A=0 B=0 C=2 D=2 
+00026 [L91] GGET     A=0 B=0 C=6 D=6 'isWin32'
+00027 [L91] CALL     A=0 B=2 C=1 D=513 
+00028 [L91] ISF      A=0 B=0 C=0 D=0 
+00029 [L91] JMP      A=1 B=128 C=4 D=32772 target=34
+00030 [L92] KSHORT   A=0 B=0 C=11 D=11 11
+00031 [L92] GSET     A=0 B=0 C=0 D=0 'g_third_party_flag'
+00032 [L93] GGET     A=0 B=0 C=0 D=0 'g_third_party_flag'
+00033 [L93] RET1     A=0 B=0 C=2 D=2 
+00034 [L96] UGET     A=0 B=0 C=1 D=1 main_server
+00035 [L96] TGETS    A=0 B=0 C=7 D=7 'getThirdPartyFlag'
+00036 [L96] IST      A=0 B=0 C=0 D=0 
+00037 [L96] JMP      A=0 B=128 C=3 D=32771 target=41
+00038 [L97] KSHORT   A=0 B=0 C=1 D=1 1
+00039 [L97] GSET     A=0 B=0 C=0 D=0 'g_third_party_flag'
+00040 [L97] JMP      A=0 B=128 C=11 D=32779 target=52
+00041 [L99] UGET     A=0 B=0 C=1 D=1 main_server
+00042 [L99] TGETS    A=0 B=0 C=7 D=7 'getThirdPartyFlag'
+00043 [L99] CALL     A=0 B=2 C=1 D=513 
+00044 [L99] GSET     A=0 B=0 C=0 D=0 'g_third_party_flag'
+00045 [L100] GGET     A=0 B=0 C=0 D=0 'g_third_party_flag'
+00046 [L100] KSHORT   A=1 B=39 C=16 D=10000 10000
+00047 [L100] ISGT     A=1 B=0 C=0 D=0 
+00048 [L100] JMP      A=0 B=128 C=3 D=32771 target=52
+00049 [L101] GGET     A=0 B=0 C=0 D=0 'g_third_party_flag'
+00050 [L101] SUBVN    A=0 B=0 C=0 D=0 
+00051 [L101] GSET     A=0 B=0 C=0 D=0 'g_third_party_flag'
+00052 [L105] GGET     A=0 B=0 C=4 D=4 'checkVivoFlag'
+00053 [L105] CALL     A=0 B=1 C=1 D=257 
+00054 [L107] UGET     A=0 B=0 C=0 D=0 cclog
+00055 [L107] KSTR     A=1 B=0 C=5 D=5 'call getThirdPartyFlag='
+00056 [L107] GGET     A=2 B=0 C=0 D=0 'g_third_party_flag'
+00057 [L107] IST      A=0 B=0 C=2 D=2 
+00058 [L107] JMP      A=3 B=128 C=1 D=32769 target=60
+00059 [L107] KSHORT   A=2 B=0 C=0 D=0 0
+00060 [L107] CAT      A=1 B=1 C=2 D=258 
+00061 [L107] CALL     A=0 B=1 C=2 D=258 
+00062 [L108] GGET     A=0 B=0 C=0 D=0 'g_third_party_flag'
+00063 [L108] IST      A=0 B=0 C=0 D=0 
+00064 [L108] JMP      A=1 B=128 C=1 D=32769 target=66
+00065 [L108] KSHORT   A=0 B=0 C=0 D=0 0
+00066 [L108] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto4 offset=0x4d8 source_lines=112-121 params=0
+UPVALUES ['d_file']
+00001 [L113] UGET     A=0 B=0 C=0 D=0 d_file
+00002 [L113] TGETS    A=0 B=0 C=0 D=0 'get'
+00003 [L113] KSTR     A=1 B=0 C=1 D=1 'g_last_server_id'
+00004 [L113] CALL     A=0 B=2 C=2 D=514 
+00005 [L113] GSET     A=0 B=0 C=1 D=1 'g_last_server_id'
+00006 [L114] GGET     A=0 B=0 C=1 D=1 'g_last_server_id'
+00007 [L114] ISF      A=0 B=0 C=0 D=0 
+00008 [L114] JMP      A=1 B=128 C=20 D=32788 target=29
+00009 [L114] GGET     A=0 B=0 C=2 D=2 'g_third_party_flag'
+00010 [L114] GGET     A=1 B=0 C=3 D=3 'ThirdPlatformDef'
+00011 [L114] TGETS    A=1 B=1 C=4 D=260 'vivo'
+00012 [L114] ISEQV    A=0 B=0 C=1 D=1 
+00013 [L114] JMP      A=0 B=128 C=5 D=32773 target=19
+00014 [L114] GGET     A=0 B=0 C=2 D=2 'g_third_party_flag'
+00015 [L114] GGET     A=1 B=0 C=3 D=3 'ThirdPlatformDef'
+00016 [L114] TGETS    A=1 B=1 C=5 D=261 'vivo_a'
+00017 [L114] ISNEV    A=0 B=0 C=1 D=1 
+00018 [L114] JMP      A=0 B=128 C=10 D=32778 target=29
+00019 [L115] GGET     A=0 B=0 C=1 D=1 'g_last_server_id'
+00020 [L115] ISNEN    A=0 B=0 C=0 D=0 129
+00021 [L115] JMP      A=0 B=128 C=4 D=32772 target=26
+00022 [L116] GGET     A=0 B=0 C=3 D=3 'ThirdPlatformDef'
+00023 [L116] TGETS    A=0 B=0 C=4 D=4 'vivo'
+00024 [L116] GSET     A=0 B=0 C=2 D=2 'g_third_party_flag'
+00025 [L116] JMP      A=0 B=128 C=3 D=32771 target=29
+00026 [L118] GGET     A=0 B=0 C=3 D=3 'ThirdPlatformDef'
+00027 [L118] TGETS    A=0 B=0 C=5 D=5 'vivo_a'
+00028 [L118] GSET     A=0 B=0 C=2 D=2 'g_third_party_flag'
+00029 [L121] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto5 offset=0x5c5 source_lines=124-130 params=0
+UPVALUES []
+00001 [L125] KSTR     A=0 B=0 C=0 D=0 'unknown'
+00002 [L126] GGET     A=1 B=0 C=1 D=1 'isWin32'
+00003 [L126] CALL     A=1 B=2 C=1 D=513 
+00004 [L126] ISF      A=0 B=0 C=1 D=1 
+00005 [L126] JMP      A=2 B=128 C=4 D=32772 target=10
+00006 [L127] KSHORT   A=1 B=0 C=0 D=0 0
+00007 [L127] GSET     A=1 B=0 C=2 D=2 'g_third_party_flag'
+00008 [L128] GGET     A=1 B=0 C=2 D=2 'g_third_party_flag'
+00009 [L128] RET1     A=1 B=0 C=2 D=2 
+00010 [L130] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x62d source_lines=135-137 params=0
+UPVALUES ['CCApplication']
+00001 [L136] UGET     A=0 B=0 C=0 D=0 CCApplication
+00002 [L136] MOV      A=1 B=0 C=0 D=0 
+00003 [L136] TGETS    A=0 B=0 C=0 D=0 'sharedApplication'
+00004 [L136] CALL     A=0 B=2 C=2 D=514 
+00005 [L136] MOV      A=1 B=0 C=0 D=0 
+00006 [L136] TGETS    A=0 B=0 C=1 D=1 'getTargetPlatform'
+00007 [L136] CALLT    A=0 B=0 C=2 D=2 
+
+FUNCTION proto7 offset=0x691 source_lines=140-148 params=0
+UPVALUES []
+00001 [L142] GGET     A=0 B=0 C=0 D=0 'getOS'
+00002 [L142] CALL     A=0 B=2 C=1 D=513 
+00003 [L143] ISNEN    A=0 B=0 C=0 D=0 0
+00004 [L143] JMP      A=1 B=128 C=3 D=32771 target=8
+00005 [L144] KPRI     A=1 B=0 C=2 D=2 
+00006 [L144] RET1     A=1 B=0 C=2 D=2 
+00007 [L144] JMP      A=1 B=128 C=2 D=32770 target=10
+00008 [L146] KPRI     A=1 B=0 C=1 D=1 
+00009 [L146] RET1     A=1 B=0 C=2 D=2 
+00010 [L148] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto8 offset=0x6e1 source_lines=150-157 params=0
+UPVALUES []
+00001 [L151] GGET     A=0 B=0 C=0 D=0 'getOS'
+00002 [L151] CALL     A=0 B=2 C=1 D=513 
+00003 [L152] ISEQN    A=0 B=0 C=0 D=0 2
+00004 [L152] JMP      A=1 B=128 C=4 D=32772 target=9
+00005 [L152] ISEQN    A=0 B=0 C=1 D=1 4
+00006 [L152] JMP      A=1 B=128 C=2 D=32770 target=9
+00007 [L152] ISNEN    A=0 B=0 C=2 D=2 5
+00008 [L152] JMP      A=1 B=128 C=3 D=32771 target=12
+00009 [L153] KPRI     A=1 B=0 C=2 D=2 
+00010 [L153] RET1     A=1 B=0 C=2 D=2 
+00011 [L153] JMP      A=1 B=128 C=2 D=32770 target=14
+00012 [L155] KPRI     A=1 B=0 C=1 D=1 
+00013 [L155] RET1     A=1 B=0 C=2 D=2 
+00014 [L157] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto9 offset=0x747 source_lines=159-166 params=0
+UPVALUES []
+00001 [L160] GGET     A=0 B=0 C=0 D=0 'getOS'
+00002 [L160] CALL     A=0 B=2 C=1 D=513 
+00003 [L161] ISNEN    A=0 B=0 C=0 D=0 3
+00004 [L161] JMP      A=1 B=128 C=3 D=32771 target=8
+00005 [L162] KPRI     A=1 B=0 C=2 D=2 
+00006 [L162] RET1     A=1 B=0 C=2 D=2 
+00007 [L162] JMP      A=1 B=128 C=2 D=32770 target=10
+00008 [L164] KPRI     A=1 B=0 C=1 D=1 
+00009 [L164] RET1     A=1 B=0 C=2 D=2 
+00010 [L166] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto10 offset=0x797 source_lines=171-177 params=0
+UPVALUES ['d_file']
+00001 [L172] GGET     A=0 B=0 C=0 D=0 'g_channel_string'
+00002 [L172] ISNEP    A=0 B=0 C=0 D=0 
+00003 [L172] JMP      A=0 B=128 C=5 D=32773 target=9
+00004 [L173] UGET     A=0 B=0 C=0 D=0 d_file
+00005 [L173] TGETS    A=0 B=0 C=1 D=1 'readAPKFile'
+00006 [L173] KSTR     A=1 B=0 C=2 D=2 '_config.txt'
+00007 [L173] CALL     A=0 B=2 C=2 D=514 
+00008 [L173] GSET     A=0 B=0 C=0 D=0 'g_channel_string'
+00009 [L176] GGET     A=0 B=0 C=0 D=0 'g_channel_string'
+00010 [L176] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto11 offset=0x808 source_lines=181-186 params=0
+UPVALUES []
+00001 [L182] GGET     A=0 B=0 C=0 D=0 'g_ad_channel'
+00002 [L182] IST      A=0 B=0 C=0 D=0 
+00003 [L182] JMP      A=0 B=128 C=3 D=32771 target=7
+00004 [L183] GGET     A=0 B=0 C=1 D=1 'readChannelConfigFile'
+00005 [L183] CALL     A=0 B=2 C=1 D=513 
+00006 [L183] GSET     A=0 B=0 C=0 D=0 'g_ad_channel'
+00007 [L185] GGET     A=0 B=0 C=0 D=0 'g_ad_channel'
+00008 [L185] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto12 offset=0x861 source_lines=0-188 params=0
+UPVALUES []
+00001 [L4] GGET     A=0 B=0 C=0 D=0 'CCApplication'
+00002 [L5] GGET     A=1 B=0 C=1 D=1 'module'
+00003 [L6] GGET     A=2 B=0 C=2 D=2 'require'
+00004 [L7] GGET     A=3 B=0 C=3 D=3 'CCLuaLog'
+00005 [L8] GGET     A=4 B=0 C=4 D=4 'main_server'
+00006 [L9] GGET     A=5 B=0 C=5 D=5 'pairs'
+00007 [L10] GGET     A=6 B=0 C=6 D=6 'string'
+00008 [L11] MOV      A=7 B=0 C=1 D=1 
+00009 [L11] KSTR     A=8 B=0 C=7 D=7 'config.third_party_config'
+00010 [L11] CALL     A=7 B=1 C=2 D=258 
+00011 [L20] MOV      A=7 B=0 C=2 D=2 
+00012 [L20] KSTR     A=8 B=0 C=8 D=8 'common.common_def'
+00013 [L20] CALL     A=7 B=2 C=2 D=514 
+00014 [L21] TGETS    A=8 B=7 C=9 D=1801 'platform_type'
+00015 [L21] GSET     A=8 B=0 C=10 D=10 'ThirdPlatformDef'
+00016 [L23] MOV      A=8 B=0 C=2 D=2 
+00017 [L23] KSTR     A=9 B=0 C=11 D=11 'common.file'
+00018 [L23] CALL     A=8 B=2 C=2 D=514 
+00019 [L28] FNEW     A=9 B=0 C=12 D=12 {'kind': 'proto', 'id': 0}
+00020 [L31] KPRI     A=10 B=0 C=0 D=0 
+00021 [L31] GSET     A=10 B=0 C=13 D=13 'g_third_party_flag'
+00022 [L32] KPRI     A=10 B=0 C=0 D=0 
+00023 [L32] GSET     A=10 B=0 C=14 D=14 'g_last_server_id'
+00024 [L33] KPRI     A=10 B=0 C=0 D=0 
+00025 [L33] GSET     A=10 B=0 C=15 D=15 'g_channel_string'
+00026 [L56] FNEW     A=10 B=0 C=16 D=16 {'kind': 'proto', 'id': 1}
+00027 [L36] GSET     A=10 B=0 C=17 D=17 'getThirdPartyName'
+00028 [L75] FNEW     A=10 B=0 C=18 D=18 {'kind': 'proto', 'id': 2}
+00029 [L58] GSET     A=10 B=0 C=19 D=19 'useThirdPartySdk'
+00030 [L109] FNEW     A=10 B=0 C=20 D=20 {'kind': 'proto', 'id': 3}
+00031 [L79] GSET     A=10 B=0 C=21 D=21 'getThirdPartyFlag'
+00032 [L121] FNEW     A=10 B=0 C=22 D=22 {'kind': 'proto', 'id': 4}
+00033 [L112] GSET     A=10 B=0 C=23 D=23 'checkVivoFlag'
+00034 [L130] FNEW     A=10 B=0 C=24 D=24 {'kind': 'proto', 'id': 5}
+00035 [L124] GSET     A=10 B=0 C=25 D=25 'getSystemName'
+00036 [L137] FNEW     A=10 B=0 C=26 D=26 {'kind': 'proto', 'id': 6}
+00037 [L135] GSET     A=10 B=0 C=27 D=27 'getOS'
+00038 [L148] FNEW     A=10 B=0 C=28 D=28 {'kind': 'proto', 'id': 7}
+00039 [L140] GSET     A=10 B=0 C=29 D=29 'isWin32'
+00040 [L157] FNEW     A=10 B=0 C=30 D=30 {'kind': 'proto', 'id': 8}
+00041 [L150] GSET     A=10 B=0 C=31 D=31 'isIOS'
+00042 [L166] FNEW     A=10 B=0 C=32 D=32 {'kind': 'proto', 'id': 9}
+00043 [L159] GSET     A=10 B=0 C=33 D=33 'isADR'
+00044 [L177] FNEW     A=10 B=0 C=34 D=34 {'kind': 'proto', 'id': 10}
+00045 [L171] GSET     A=10 B=0 C=35 D=35 'readChannelConfigFile'
+00046 [L180] KPRI     A=10 B=0 C=0 D=0 
+00047 [L180] GSET     A=10 B=0 C=36 D=36 'g_ad_channel'
+00048 [L186] FNEW     A=10 B=0 C=37 D=37 {'kind': 'proto', 'id': 11}
+00049 [L181] GSET     A=10 B=0 C=38 D=38 'getAdChannel'
+00050 [L186] UCLO     A=0 B=128 C=0 D=32768 target=51
+00051 [L186] RET0     A=0 B=0 C=1 D=1 

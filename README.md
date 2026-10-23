@@ -1,0 +1,87 @@
+# 金箍棒 3.87 模拟器接入
+
+## 当前版本：3.87 游戏内容 + 3.79 的 360 渠道登录
+
+默认启动已切换到 `build/jgbol3.87-360-list.apk`。游戏内容和 native 库使用 3.87，渠道 SDK、配置和登录桥接使用 3.79 的 360 实现（`p360_na=107`）；列表下载函数单独修正为仍可访问的旧 360 目录。原始两个解压目录及之前安装包均保留。
+
+已直接获取 258 条服务器记录，无需渠道登录。双击 `获取服务器列表.command` 可更新并打开列表；详见 [免登录获取列表说明](docs/免登录获取服务器列表.md)。列表文件最后修改于 2018 年，区服当前在线情况及真实账号认证未验证。最初渠道移植过程见 [360 渠道移植记录](docs/360渠道移植.md)。
+
+登录链路的进一步静态分析见 [从渠道登录到主场景](analysis/登录到主场景静态分析.md)：包含图片流程对照、360/UC 参数差异、3001/3002 与 1001/1002/1017 调用链、新手引导和重连分支，以及可复核证据。
+
+## 基础服务端：监听、接收请求、记录日志
+
+双击 **`启动基础服务端.command`**，或执行 `python3 game_server.py --probe`，即可独立启动基础接收端，无需先启动模拟器。默认监听 `127.0.0.1:18770`；终端显示连接和请求，日志保存到 `.runtime/server/sessions/`。支持 HTTP 健康检查、服务器列表响应、TLS/TCP 到达记录，以及连接编号、关闭原因和读写字节统计。按 Ctrl+C 停止。
+
+要接入原游戏客户端，使用下面的本地重定向启动器，它已经包含同一个接收端。两种启动方式共用默认端口，不要同时启动；需要并行检查时，独立服务可运行 `python3 game_server.py --port 18771 --probe`。完整使用、curl 验证和日志说明见 [基础服务端](docs/基础服务端.md)。
+
+## 本地流量重定向
+
+双击 **`启动本地离线游戏.command`**，启用 DNS／TCP 重定向、本地 TLS、SDK 测试账号和原二进制协议服务，然后点击游戏内“进入游戏”。已实测进入原主界面和旅途地图，显示持久化的“本地行者”及初始伙伴。Java HTTPS 与 native libcurl HTTPS 自检均返回 200。战斗、商城和活动等完整玩法尚未实现，详见 [本地离线服务](docs/本地离线服务.md)。
+
+阵容与包裹的显示问题已修复：阵容可查看初始伙伴沙悟净，包裹可打开并切换物品分类；当前存档包裹为空。查询完成通知与重连重传已补齐，旧角色数据保留。装备和物品操作尚未实现，验证截图与记录见 [本地离线服务](docs/本地离线服务.md#验证与后续定位)。
+
+`启动本地重定向.command` 保留为仅接入流量的模式；两种模式都由 `停止本地重定向.command` 停止。接收端监听 Mac 回环地址 `127.0.0.1:18770`，经 `adb reverse` 与模拟器连接。寻址层覆盖范围见 [本地重定向说明](docs/本地重定向.md)。
+
+## 统一日志观测
+
+游戏启动后双击 `启动观测.command`，即可把引擎、已有 Lua 与游戏进程日志统一输出到终端，并保存到 `.runtime/observations/`。按 Ctrl+C 停止观测，游戏继续运行。
+
+```sh
+python3 observe_game.py doctor
+python3 observe_game.py collect --history
+python3 observe_game.py snapshot
+# 可选 Lua print / 脚本加载 / 错误钩子，需要启动匹配的 Frida 服务端
+.runtime/venv/bin/python observe_game.py collect --hook
+```
+
+完整安装、筛选、回放、输出格式与覆盖范围：[观测工具说明](docs/观测工具.md)。验证结果：[观测验证](docs/观测验证.md)。
+
+## 启动与停止
+
+双击 `启动游戏.command`。脚本会启动本目录的独立模拟器，等待 Android 启动，首次安装游戏，随后打开 <http://127.0.0.1:8768>。在网页中连接画面即可操作。首次冷启动和安装可能需要几分钟，请保留终端窗口等待完成。
+
+双击 `停止游戏.command` 关闭本项目的模拟器和网页服务。关闭浏览器不会停止模拟器。后续启动保留应用数据，不重复安装。
+
+也可以在本目录运行：
+
+```sh
+python3 start_game.py
+python3 android_emulator/run.py --config game.json doctor
+python3 android_emulator/run.py --config game.json stop
+```
+
+## 接入配置
+
+- 游戏：`jgbol3.87/` 中的已编译 APK 解压内容，版本 3.87（versionCode 87）。
+- 安装包：`build/jgbol3.87-360-list.apk`，使用本地测试证书重新签名。
+- 包名：`com.sygame.jingubang.p360`。
+- 入口：`com.sygame.jingubang.uc.xiyoujilua`。
+- 兼容环境：Apple Silicon 原生宿主引擎，软件仿真 ARM32，Android 6.0 / API 23。
+- 独立设备：`jgbol379`，ADB serial `emulator-5562`。
+- 端口：控制 5562、ADB 5563、gRPC 8562、网页 8768。
+- 配置：`game.json`；引擎、SDK、AVD、存档、日志均位于 `.runtime/`。
+
+运行组件复制自本机已有 SDK，当前项目运行不依赖旁边项目的目录、服务或存档。ARM32 引擎已针对本目录重新签名。此配置禁用音频以避免旧 ARM32 引擎的音频死锁。
+
+## 还原安装包与排查
+
+```sh
+# 根据 game.json 重建当前渠道移植包并验证新签名
+python3 build_apk.py
+# 重新安装并启动（adb install -r，保留应用数据）
+python3 android_emulator/run.py --config game.json install
+# 启动已安装游戏
+python3 android_emulator/run.py --config game.json launch
+```
+
+日志位于 `.runtime/logs/emulator.log` 和 `.runtime/logs/gateway.log`。若刚启动时 doctor 显示 `booted: false`，应等待 Android 冷启动完成。不要删除 `.runtime/avd/`，其中包含应用与存档。
+
+当前客户端包含 360 渠道登录和远端游戏服务；能安装、启动并显示客户端，不代表旧渠道账号服务和游戏服务器仍然可用。
+
+原始 3.87 为 UC 渠道版，恢复配置保存在 `game.uc.json`。当前 360 移植包与 UC 包并存。AVD 的内部标识 `jgbol379` 沿用最初创建的设备名，与当前游戏版本无关。打包脚本通过 `game.json` 的 `apk_variant` 选择移植构建；无此字段时按 `apk_source` 和 `apk` 还原原始签名包。
+
+2026-10-23 原始 UC 版升级验证（历史记录）：原始 v1 签名和 ZIP 对齐检查通过；模拟器确认 `versionName=3.87`、`versionCode=87`，启动返回 `Status: ok`。核验记录位于 `.runtime/verification-3.87/`。当前 `jgbol3.79/` 存在，作为 360 移植的只读输入保留。
+
+日志观测跟随 `game.json`，现已切换到 360 包并完成快照采集；观测工具 13 项测试通过。可选 Lua Frida 观测钩子此次未重测。
+
+移动整个目录后，AVD 和本地签名引擎内的绝对路径需要重新配置；请先停止模拟器，再参照 `android_emulator/README.md` 部署运行环境。

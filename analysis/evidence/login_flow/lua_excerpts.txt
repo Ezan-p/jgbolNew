@@ -1,0 +1,2731 @@
+
+===== lua/base/setting.lua =====
+FUNCTION proto1 offset=0x95 source_lines=36-65 params=0
+UPVALUES ['CCUserDefault']
+00001 [L38] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00002 [L38] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00003 [L38] MOV      A=2 B=0 C=1 D=1 
+00004 [L38] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00005 [L38] CALL     A=1 B=2 C=2 D=514 
+00006 [L38] MOV      A=2 B=0 C=1 D=1 
+00007 [L38] TGETS    A=1 B=1 C=3 D=259 'getIntegerForKey'
+00008 [L38] KSTR     A=3 B=0 C=1 D=1 'volume'
+00009 [L38] CALL     A=1 B=2 C=3 D=515 
+00010 [L38] TSETS    A=1 B=0 C=1 D=1 'volume'
+00011 [L39] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00012 [L39] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00013 [L39] MOV      A=2 B=0 C=1 D=1 
+00014 [L39] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00015 [L39] CALL     A=1 B=2 C=2 D=514 
+00016 [L39] MOV      A=2 B=0 C=1 D=1 
+00017 [L39] TGETS    A=1 B=1 C=3 D=259 'getIntegerForKey'
+00018 [L39] KSTR     A=3 B=0 C=4 D=4 'openMusic'
+00019 [L39] CALL     A=1 B=2 C=3 D=515 
+00020 [L39] TSETS    A=1 B=0 C=4 D=4 'openMusic'
+00021 [L40] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00022 [L40] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00023 [L40] MOV      A=2 B=0 C=1 D=1 
+00024 [L40] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00025 [L40] CALL     A=1 B=2 C=2 D=514 
+00026 [L40] MOV      A=2 B=0 C=1 D=1 
+00027 [L40] TGETS    A=1 B=1 C=3 D=259 'getIntegerForKey'
+00028 [L40] KSTR     A=3 B=0 C=5 D=5 'openEffect'
+00029 [L40] CALL     A=1 B=2 C=3 D=515 
+00030 [L40] TSETS    A=1 B=0 C=5 D=5 'openEffect'
+00031 [L41] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00032 [L41] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00033 [L41] MOV      A=2 B=0 C=1 D=1 
+00034 [L41] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00035 [L41] CALL     A=1 B=2 C=2 D=514 
+00036 [L41] MOV      A=2 B=0 C=1 D=1 
+00037 [L41] TGETS    A=1 B=1 C=3 D=259 'getIntegerForKey'
+00038 [L41] KSTR     A=3 B=0 C=6 D=6 'openMsgBubble'
+00039 [L41] CALL     A=1 B=2 C=3 D=515 
+00040 [L41] TSETS    A=1 B=0 C=6 D=6 'openMsgBubble'
+00041 [L42] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00042 [L42] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00043 [L42] MOV      A=2 B=0 C=1 D=1 
+00044 [L42] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00045 [L42] CALL     A=1 B=2 C=2 D=514 
+00046 [L42] MOV      A=2 B=0 C=1 D=1 
+00047 [L42] TGETS    A=1 B=1 C=3 D=259 'getIntegerForKey'
+00048 [L42] KSTR     A=3 B=0 C=7 D=7 'simpleFight'
+00049 [L42] CALL     A=1 B=2 C=3 D=515 
+00050 [L42] TSETS    A=1 B=0 C=7 D=7 'simpleFight'
+00051 [L44] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00052 [L44] TNEW     A=1 B=0 C=0 D=0 
+00053 [L44] TSETS    A=1 B=0 C=8 D=8 'last_area'
+00054 [L45] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00055 [L45] TGETS    A=0 B=0 C=8 D=8 'last_area'
+00056 [L45] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00057 [L45] MOV      A=2 B=0 C=1 D=1 
+00058 [L45] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00059 [L45] CALL     A=1 B=2 C=2 D=514 
+00060 [L45] MOV      A=2 B=0 C=1 D=1 
+00061 [L45] TGETS    A=1 B=1 C=3 D=259 'getIntegerForKey'
+00062 [L45] KSTR     A=3 B=0 C=9 D=9 'last_area_1'
+00063 [L45] CALL     A=1 B=2 C=3 D=515 
+00064 [L45] TSETB    A=1 B=0 C=1 D=1 
+00065 [L46] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00066 [L46] TGETS    A=0 B=0 C=8 D=8 'last_area'
+00067 [L46] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00068 [L46] MOV      A=2 B=0 C=1 D=1 
+00069 [L46] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00070 [L46] CALL     A=1 B=2 C=2 D=514 
+00071 [L46] MOV      A=2 B=0 C=1 D=1 
+00072 [L46] TGETS    A=1 B=1 C=3 D=259 'getIntegerForKey'
+00073 [L46] KSTR     A=3 B=0 C=10 D=10 'last_area_2'
+00074 [L46] CALL     A=1 B=2 C=3 D=515 
+00075 [L46] TSETB    A=1 B=0 C=2 D=2 
+00076 [L47] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00077 [L47] TGETS    A=0 B=0 C=8 D=8 'last_area'
+00078 [L47] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00079 [L47] MOV      A=2 B=0 C=1 D=1 
+00080 [L47] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00081 [L47] CALL     A=1 B=2 C=2 D=514 
+00082 [L47] MOV      A=2 B=0 C=1 D=1 
+00083 [L47] TGETS    A=1 B=1 C=3 D=259 'getIntegerForKey'
+00084 [L47] KSTR     A=3 B=0 C=11 D=11 'last_area_3'
+00085 [L47] CALL     A=1 B=2 C=3 D=515 
+00086 [L47] TSETB    A=1 B=0 C=3 D=3 
+00087 [L49] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00088 [L49] TNEW     A=1 B=0 C=0 D=0 
+00089 [L49] TSETS    A=1 B=0 C=12 D=12 'role_name'
+00090 [L50] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00091 [L50] TGETS    A=0 B=0 C=12 D=12 'role_name'
+00092 [L50] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00093 [L50] MOV      A=2 B=0 C=1 D=1 
+00094 [L50] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00095 [L50] CALL     A=1 B=2 C=2 D=514 
+00096 [L50] MOV      A=2 B=0 C=1 D=1 
+00097 [L50] TGETS    A=1 B=1 C=13 D=269 'getStringForKey'
+00098 [L50] KSTR     A=3 B=0 C=14 D=14 'role_name_1'
+00099 [L50] CALL     A=1 B=2 C=3 D=515 
+00100 [L50] TSETB    A=1 B=0 C=1 D=1 
+00101 [L51] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00102 [L51] TGETS    A=0 B=0 C=12 D=12 'role_name'
+00103 [L51] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00104 [L51] MOV      A=2 B=0 C=1 D=1 
+00105 [L51] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00106 [L51] CALL     A=1 B=2 C=2 D=514 
+00107 [L51] MOV      A=2 B=0 C=1 D=1 
+00108 [L51] TGETS    A=1 B=1 C=13 D=269 'getStringForKey'
+00109 [L51] KSTR     A=3 B=0 C=15 D=15 'role_name_2'
+00110 [L51] CALL     A=1 B=2 C=3 D=515 
+00111 [L51] TSETB    A=1 B=0 C=2 D=2 
+00112 [L52] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00113 [L52] TGETS    A=0 B=0 C=12 D=12 'role_name'
+00114 [L52] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00115 [L52] MOV      A=2 B=0 C=1 D=1 
+00116 [L52] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00117 [L52] CALL     A=1 B=2 C=2 D=514 
+00118 [L52] MOV      A=2 B=0 C=1 D=1 
+00119 [L52] TGETS    A=1 B=1 C=13 D=269 'getStringForKey'
+00120 [L52] KSTR     A=3 B=0 C=16 D=16 'role_name_3'
+00121 [L52] CALL     A=1 B=2 C=3 D=515 
+00122 [L52] TSETB    A=1 B=0 C=3 D=3 
+00123 [L54] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00124 [L54] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00125 [L54] MOV      A=2 B=0 C=1 D=1 
+00126 [L54] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00127 [L54] CALL     A=1 B=2 C=2 D=514 
+00128 [L54] MOV      A=2 B=0 C=1 D=1 
+00129 [L54] TGETS    A=1 B=1 C=13 D=269 'getStringForKey'
+00130 [L54] KSTR     A=3 B=0 C=17 D=17 'username'
+00131 [L54] CALL     A=1 B=2 C=3 D=515 
+00132 [L54] TSETS    A=1 B=0 C=17 D=17 'username'
+00133 [L55] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00134 [L55] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00135 [L55] MOV      A=2 B=0 C=1 D=1 
+00136 [L55] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00137 [L55] CALL     A=1 B=2 C=2 D=514 
+00138 [L55] MOV      A=2 B=0 C=1 D=1 
+00139 [L55] TGETS    A=1 B=1 C=13 D=269 'getStringForKey'
+00140 [L55] KSTR     A=3 B=0 C=18 D=18 'password'
+00141 [L55] CALL     A=1 B=2 C=3 D=515 
+00142 [L55] TSETS    A=1 B=0 C=18 D=18 'password'
+00143 [L56] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00144 [L56] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00145 [L56] MOV      A=2 B=0 C=1 D=1 
+00146 [L56] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00147 [L56] CALL     A=1 B=2 C=2 D=514 
+00148 [L56] MOV      A=2 B=0 C=1 D=1 
+00149 [L56] TGETS    A=1 B=1 C=20 D=276 'setStringForKey'
+00150 [L56] KSTR     A=3 B=0 C=19 D=19 'md5_password'
+00151 [L56] GGET     A=4 B=0 C=0 D=0 'g_setting'
+00152 [L56] TGETS    A=4 B=4 C=19 D=1043 'md5_password'
+00153 [L56] CALL     A=1 B=2 C=4 D=516 
+00154 [L56] TSETS    A=1 B=0 C=19 D=19 'md5_password'
+00155 [L57] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00156 [L57] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00157 [L57] MOV      A=2 B=0 C=1 D=1 
+00158 [L57] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00159 [L57] CALL     A=1 B=2 C=2 D=514 
+00160 [L57] MOV      A=2 B=0 C=1 D=1 
+00161 [L57] TGETS    A=1 B=1 C=13 D=269 'getStringForKey'
+00162 [L57] KSTR     A=3 B=0 C=21 D=21 'role_id'
+00163 [L57] CALL     A=1 B=2 C=3 D=515 
+00164 [L57] TSETS    A=1 B=0 C=21 D=21 'role_id'
+00165 [L60] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00166 [L60] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00167 [L60] MOV      A=2 B=0 C=1 D=1 
+00168 [L60] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00169 [L60] CALL     A=1 B=2 C=2 D=514 
+00170 [L60] MOV      A=2 B=0 C=1 D=1 
+00171 [L60] TGETS    A=1 B=1 C=3 D=259 'getIntegerForKey'
+00172 [L60] KSTR     A=3 B=0 C=22 D=22 'server_id'
+00173 [L60] CALL     A=1 B=2 C=3 D=515 
+00174 [L60] TSETS    A=1 B=0 C=22 D=22 'server_id'
+00175 [L61] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00176 [L61] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00177 [L61] MOV      A=2 B=0 C=1 D=1 
+00178 [L61] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00179 [L61] CALL     A=1 B=2 C=2 D=514 
+00180 [L61] MOV      A=2 B=0 C=1 D=1 
+00181 [L61] TGETS    A=1 B=1 C=3 D=259 'getIntegerForKey'
+00182 [L61] KSTR     A=3 B=0 C=23 D=23 'ready_login_area'
+00183 [L61] CALL     A=1 B=2 C=3 D=515 
+00184 [L61] TSETS    A=1 B=0 C=23 D=23 'ready_login_area'
+00185 [L62] GGET     A=0 B=0 C=0 D=0 'g_setting'
+00186 [L62] UGET     A=1 B=0 C=0 D=0 CCUserDefault
+00187 [L62] MOV      A=2 B=0 C=1 D=1 
+00188 [L62] TGETS    A=1 B=1 C=2 D=258 'sharedUserDefault'
+00189 [L62] CALL     A=1 B=2 C=2 D=514 
+00190 [L62] MOV      A=2 B=0 C=1 D=1 
+00191 [L62] TGETS    A=1 B=1 C=13 D=269 'getStringForKey'
+00192 [L62] KSTR     A=3 B=0 C=24 D=24 'ready_login_action'
+00193 [L62] CALL     A=1 B=2 C=3 D=515 
+00194 [L62] TSETS    A=1 B=0 C=24 D=24 'ready_login_action'
+00195 [L64] GGET     A=0 B=0 C=25 D=25 'setDefaultSetting'
+00196 [L64] CALL     A=0 B=1 C=1 D=257 
+00197 [L65] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/base/setting.lua =====
+FUNCTION proto4 offset=0xf09 source_lines=132-162 params=6
+UPVALUES ['CCUserDefault', 'table', 'main_server']
+00001 [L133] UGET     A=6 B=0 C=0 D=0 CCUserDefault
+00002 [L133] MOV      A=7 B=0 C=6 D=6 
+00003 [L133] TGETS    A=6 B=6 C=0 D=1536 'sharedUserDefault'
+00004 [L133] CALL     A=6 B=2 C=2 D=514 
+00005 [L133] MOV      A=7 B=0 C=6 D=6 
+00006 [L133] TGETS    A=6 B=6 C=1 D=1537 'setIntegerForKey'
+00007 [L133] KSTR     A=8 B=0 C=2 D=2 'last_area_1'
+00008 [L133] GGET     A=9 B=0 C=3 D=3 'g_setting'
+00009 [L133] TGETS    A=9 B=9 C=4 D=2308 'ready_login_area'
+00010 [L133] CALL     A=6 B=1 C=4 D=260 
+00011 [L135] UGET     A=6 B=0 C=1 D=1 table
+00012 [L135] TGETS    A=6 B=6 C=5 D=1541 'insert'
+00013 [L135] GGET     A=7 B=0 C=3 D=3 'g_setting'
+00014 [L135] TGETS    A=7 B=7 C=6 D=1798 'last_area'
+00015 [L135] KSHORT   A=8 B=0 C=1 D=1 1
+00016 [L135] GGET     A=9 B=0 C=3 D=3 'g_setting'
+00017 [L135] TGETS    A=9 B=9 C=4 D=2308 'ready_login_area'
+00018 [L135] CALL     A=6 B=1 C=4 D=260 
+00019 [L136] UGET     A=6 B=0 C=1 D=1 table
+00020 [L136] TGETS    A=6 B=6 C=5 D=1541 'insert'
+00021 [L136] GGET     A=7 B=0 C=3 D=3 'g_setting'
+00022 [L136] TGETS    A=7 B=7 C=7 D=1799 'role_name'
+00023 [L136] KSHORT   A=8 B=0 C=1 D=1 1
+00024 [L136] MOV      A=9 B=0 C=3 D=3 
+00025 [L136] CALL     A=6 B=1 C=4 D=260 
+00026 [L139] KSHORT   A=6 B=0 C=2 D=2 2
+00027 [L139] GGET     A=7 B=0 C=3 D=3 'g_setting'
+00028 [L139] TGETS    A=7 B=7 C=6 D=1798 'last_area'
+00029 [L139] LEN      A=7 B=0 C=7 D=7 
+00030 [L139] KSHORT   A=8 B=0 C=1 D=1 1
+00031 [L139] FORI     A=6 B=128 C=25 D=32793 target=57
+00032 [L140] GGET     A=10 B=0 C=3 D=3 'g_setting'
+00033 [L140] TGETS    A=10 B=10 C=6 D=2566 'last_area'
+00034 [L140] TGETV    A=10 B=10 C=9 D=2569 
+00035 [L140] ISEQN    A=10 B=0 C=0 D=0 0
+00036 [L140] JMP      A=10 B=128 C=19 D=32787 target=56
+00037 [L140] GGET     A=10 B=0 C=3 D=3 'g_setting'
+00038 [L140] TGETS    A=10 B=10 C=6 D=2566 'last_area'
+00039 [L140] TGETV    A=10 B=10 C=9 D=2569 
+00040 [L140] GGET     A=11 B=0 C=3 D=3 'g_setting'
+00041 [L140] TGETS    A=11 B=11 C=4 D=2820 'ready_login_area'
+00042 [L140] ISNEV    A=10 B=0 C=11 D=11 
+00043 [L140] JMP      A=10 B=128 C=12 D=32780 target=56
+00044 [L141] UGET     A=10 B=0 C=1 D=1 table
+00045 [L141] TGETS    A=10 B=10 C=8 D=2568 'remove'
+00046 [L141] GGET     A=11 B=0 C=3 D=3 'g_setting'
+00047 [L141] TGETS    A=11 B=11 C=6 D=2822 'last_area'
+00048 [L141] MOV      A=12 B=0 C=9 D=9 
+00049 [L141] CALL     A=10 B=1 C=3 D=259 
+00050 [L142] UGET     A=10 B=0 C=1 D=1 table
+00051 [L142] TGETS    A=10 B=10 C=8 D=2568 'remove'
+00052 [L142] GGET     A=11 B=0 C=3 D=3 'g_setting'
+00053 [L142] TGETS    A=11 B=11 C=7 D=2823 'role_name'
+00054 [L142] MOV      A=12 B=0 C=9 D=9 
+00055 [L142] CALL     A=10 B=1 C=3 D=259 
+00056 [L139] FORL     A=6 B=127 C=231 D=32743 target=32
+00057 [L147] ISF      A=0 B=0 C=1 D=1 
+00058 [L147] JMP      A=6 B=128 C=14 D=32782 target=73
+00059 [L147] ISF      A=0 B=0 C=2 D=2 
+00060 [L147] JMP      A=6 B=128 C=12 D=32780 target=73
+00061 [L147] LEN      A=6 B=0 C=2 D=2 
+00062 [L147] KSHORT   A=7 B=0 C=0 D=0 0
+00063 [L147] ISGE     A=7 B=0 C=6 D=6 
+00064 [L147] JMP      A=6 B=128 C=8 D=32776 target=73
+00065 [L147] LEN      A=6 B=0 C=1 D=1 
+00066 [L147] KSHORT   A=7 B=0 C=0 D=0 0
+00067 [L147] ISGE     A=7 B=0 C=6 D=6 
+00068 [L147] JMP      A=6 B=128 C=4 D=32772 target=73
+00069 [L148] GGET     A=6 B=0 C=3 D=3 'g_setting'
+00070 [L148] TSETS    A=1 B=6 C=9 D=1545 'username'
+00071 [L149] GGET     A=6 B=0 C=3 D=3 'g_setting'
+00072 [L149] TSETS    A=2 B=6 C=10 D=1546 'password'
+00073 [L152] GGET     A=6 B=0 C=3 D=3 'g_setting'
+00074 [L152] KSTR     A=7 B=0 C=12 D=12 ''
+00075 [L152] MOV      A=8 B=0 C=4 D=4 
+00076 [L152] CAT      A=7 B=7 C=8 D=1800 
+00077 [L152] TSETS    A=7 B=6 C=11 D=1547 'role_id'
+00078 [L153] GGET     A=6 B=0 C=3 D=3 'g_setting'
+00079 [L153] TSETS    A=5 B=6 C=13 D=1549 'server_id'
+00080 [L156] GGET     A=6 B=0 C=14 D=14 'saveSetting'
+00081 [L156] CALL     A=6 B=1 C=1 D=257 
+00082 [L159] UGET     A=6 B=0 C=2 D=2 main_server
+00083 [L159] TGETS    A=6 B=6 C=15 D=1551 'doTPAction'
+00084 [L159] ISF      A=0 B=0 C=6 D=6 
+00085 [L159] JMP      A=7 B=128 C=5 D=32773 target=91
+00086 [L160] UGET     A=6 B=0 C=2 D=2 main_server
+00087 [L160] TGETS    A=6 B=6 C=15 D=1551 'doTPAction'
+00088 [L160] KSTR     A=7 B=0 C=16 D=16 'chooseServer'
+00089 [L160] MOV      A=8 B=0 C=0 D=0 
+00090 [L160] CALL     A=6 B=1 C=3 D=259 
+00091 [L162] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/event_mgr.lua =====
+FUNCTION proto15 offset=0xf53 source_lines=288-298 params=3
+UPVALUES ['cclog']
+00001 [L289] TGETS    A=3 B=1 C=0 D=256 'result'
+00002 [L289] GGET     A=4 B=0 C=1 D=1 'd_ms'
+00003 [L289] TGETS    A=4 B=4 C=2 D=1026 'd_common_def'
+00004 [L289] TGETS    A=4 B=4 C=3 D=1027 'login_code'
+00005 [L289] TGETS    A=4 B=4 C=4 D=1028 'success'
+00006 [L289] ISNEV    A=3 B=0 C=4 D=4 
+00007 [L289] JMP      A=3 B=128 C=4 D=32772 target=12
+00008 [L290] UGET     A=3 B=0 C=0 D=0 cclog
+00009 [L290] KSTR     A=4 B=0 C=5 D=5 'call msg_login_rsp_1002 ok.'
+00010 [L290] CALL     A=3 B=1 C=2 D=258 
+00011 [L290] JMP      A=3 B=128 C=25 D=32793 target=37
+00012 [L292] UGET     A=3 B=0 C=0 D=0 cclog
+00013 [L292] KSTR     A=4 B=0 C=6 D=6 'call msg_login_rsp_1002, ret=%d'
+00014 [L292] TGETS    A=5 B=1 C=0 D=256 'result'
+00015 [L292] CALL     A=3 B=1 C=3 D=259 
+00016 [L294] GGET     A=3 B=0 C=1 D=1 'd_ms'
+00017 [L294] TGETS    A=3 B=3 C=7 D=775 'd_alert'
+00018 [L294] TGETS    A=3 B=3 C=8 D=776 'stop_wait'
+00019 [L294] CALL     A=3 B=1 C=1 D=257 
+00020 [L295] GGET     A=3 B=0 C=1 D=1 'd_ms'
+00021 [L295] TGETS    A=3 B=3 C=9 D=777 'd_info'
+00022 [L295] TGETS    A=3 B=3 C=10 D=778 'show'
+00023 [L295] GGET     A=4 B=0 C=1 D=1 'd_ms'
+00024 [L295] TGETS    A=4 B=4 C=11 D=1035 'd_hz'
+00025 [L295] TGETS    A=4 B=4 C=12 D=1036 'gethz'
+00026 [L295] KSTR     A=5 B=0 C=13 D=13 'login_code_'
+00027 [L295] TGETS    A=6 B=1 C=0 D=256 'result'
+00028 [L295] CAT      A=5 B=5 C=6 D=1286 
+00029 [L295] CALL     A=4 B=2 C=2 D=514 
+00030 [L295] KSHORT   A=5 B=0 C=5 D=5 5
+00031 [L295] KNUM     A=6 B=0 C=0 D=0 0.35
+00032 [L295] CALL     A=3 B=1 C=4 D=260 
+00033 [L296] GGET     A=3 B=0 C=1 D=1 'd_ms'
+00034 [L296] TGETS    A=3 B=3 C=14 D=782 'd_net'
+00035 [L296] TGETS    A=3 B=3 C=15 D=783 'kick'
+00036 [L296] CALL     A=3 B=1 C=1 D=257 
+00037 [L298] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/event_mgr.lua =====
+FUNCTION proto16 offset=0x10ee source_lines=300-312 params=3
+UPVALUES []
+00001 [L311] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00002 [L311] TGETS    A=3 B=3 C=1 D=769 'd_net'
+00003 [L311] TGETS    A=3 B=3 C=2 D=770 'inside_game_1017'
+00004 [L311] MOV      A=4 B=0 C=0 D=0 
+00005 [L311] MOV      A=5 B=0 C=1 D=1 
+00006 [L311] MOV      A=6 B=0 C=2 D=2 
+00007 [L311] CALL     A=3 B=1 C=4 D=260 
+00008 [L312] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/event_mgr.lua =====
+FUNCTION proto17 offset=0x115b source_lines=316-322 params=3
+UPVALUES ['cclog']
+00001 [L317] UGET     A=3 B=0 C=0 D=0 cclog
+00002 [L317] KSTR     A=4 B=0 C=0 D=0 'call msg_reconnect_notify_2996'
+00003 [L317] CALL     A=3 B=1 C=2 D=258 
+00004 [L318] GGET     A=3 B=0 C=1 D=1 'd_ms'
+00005 [L318] TGETS    A=3 B=3 C=2 D=770 'd_net'
+00006 [L318] TGETS    A=3 B=3 C=3 D=771 'set_net_status'
+00007 [L318] KSTR     A=4 B=0 C=4 D=4 'INSIDE_GAME'
+00008 [L318] CALL     A=3 B=1 C=2 D=258 
+00009 [L319] GGET     A=3 B=0 C=1 D=1 'd_ms'
+00010 [L319] TGETS    A=3 B=3 C=2 D=770 'd_net'
+00011 [L319] KSHORT   A=4 B=0 C=0 D=0 0
+00012 [L319] TSETS    A=4 B=3 C=5 D=773 'g_try_reconnect_begin'
+00013 [L320] GGET     A=3 B=0 C=1 D=1 'd_ms'
+00014 [L320] TGETS    A=3 B=3 C=2 D=770 'd_net'
+00015 [L320] KPRI     A=4 B=0 C=2 D=2 
+00016 [L320] TSETS    A=4 B=3 C=6 D=774 'g_has_inside_game'
+00017 [L321] GGET     A=3 B=0 C=1 D=1 'd_ms'
+00018 [L321] TGETS    A=3 B=3 C=7 D=775 'd_u'
+00019 [L321] TGETS    A=3 B=3 C=8 D=776 'tryRetranReq'
+00020 [L321] CALL     A=3 B=1 C=1 D=257 
+00021 [L322] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/event_mgr.lua =====
+FUNCTION proto18 offset=0x1273 source_lines=325-330 params=3
+UPVALUES ['cclog', 'os']
+00001 [L327] UGET     A=3 B=0 C=0 D=0 cclog
+00002 [L327] KSTR     A=4 B=0 C=0 D=0 'recv msg_keep_alive_2999, t=%d, r=%d, t=%d'
+00003 [L327] TGETS    A=5 B=1 C=1 D=257 'time'
+00004 [L327] TGETS    A=6 B=1 C=2 D=258 'random_key'
+00005 [L327] TGETS    A=7 B=1 C=3 D=259 'delay_time'
+00006 [L327] CALL     A=3 B=1 C=5 D=261 
+00007 [L328] GGET     A=3 B=0 C=4 D=4 'd_ms'
+00008 [L328] TGETS    A=3 B=3 C=5 D=773 'd_net'
+00009 [L328] TGETS    A=3 B=3 C=6 D=774 'g_self'
+00010 [L328] UGET     A=4 B=0 C=1 D=1 os
+00011 [L328] TGETS    A=4 B=4 C=1 D=1025 'time'
+00012 [L328] CALL     A=4 B=2 C=1 D=513 
+00013 [L328] TGETS    A=5 B=1 C=1 D=257 'time'
+00014 [L328] SUBVV    A=4 B=4 C=5 D=1029 
+00015 [L328] TSETS    A=4 B=3 C=3 D=771 'delay_time'
+00016 [L329] GGET     A=3 B=0 C=4 D=4 'd_ms'
+00017 [L329] TGETS    A=3 B=3 C=5 D=773 'd_net'
+00018 [L329] TGETS    A=3 B=3 C=6 D=774 'g_self'
+00019 [L329] TGETS    A=4 B=1 C=2 D=258 'random_key'
+00020 [L329] TSETS    A=4 B=3 C=2 D=770 'random_key'
+00021 [L330] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/net/network.lua =====
+FUNCTION proto5 offset=0x9f8 source_lines=178-199 params=0
+UPVALUES ['main_server', 'cclog']
+00001 [L180] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L180] TGETS    A=0 B=0 C=1 D=1 'd_stat'
+00003 [L180] TGETS    A=0 B=0 C=2 D=2 'login_begin'
+00004 [L180] CALL     A=0 B=1 C=1 D=257 
+00005 [L181] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00006 [L181] TGETS    A=0 B=0 C=3 D=3 'd_loginUI'
+00007 [L181] TGETS    A=0 B=0 C=4 D=4 'getLoginIPPort'
+00008 [L181] CALL     A=0 B=3 C=1 D=769 
+00009 [L183] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00010 [L183] TGETS    A=2 B=2 C=5 D=517 'd_u'
+00011 [L183] TGETS    A=2 B=2 C=6 D=518 'isWin32'
+00012 [L183] CALL     A=2 B=2 C=1 D=513 
+00013 [L183] ISF      A=0 B=0 C=2 D=2 
+00014 [L183] JMP      A=3 B=128 C=13 D=32781 target=28
+00015 [L183] UGET     A=2 B=0 C=0 D=0 main_server
+00016 [L183] TGETS    A=2 B=2 C=7 D=519 'get_host_by_name'
+00017 [L183] ISF      A=0 B=0 C=2 D=2 
+00018 [L183] JMP      A=3 B=128 C=9 D=32777 target=28
+00019 [L184] UGET     A=2 B=0 C=0 D=0 main_server
+00020 [L184] TGETS    A=2 B=2 C=7 D=519 'get_host_by_name'
+00021 [L184] MOV      A=3 B=0 C=0 D=0 
+00022 [L184] CALL     A=2 B=2 C=2 D=514 
+00023 [L184] MOV      A=0 B=0 C=2 D=2 
+00024 [L185] UGET     A=2 B=0 C=1 D=1 cclog
+00025 [L185] KSTR     A=3 B=0 C=8 D=8 'call get_host_by_name, ret=%s'
+00026 [L185] MOV      A=4 B=0 C=0 D=0 
+00027 [L185] CALL     A=2 B=1 C=3 D=259 
+00028 [L189] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00029 [L189] TGETS    A=2 B=2 C=5 D=517 'd_u'
+00030 [L189] TGETS    A=2 B=2 C=9 D=521 'isWP8'
+00031 [L189] CALL     A=2 B=2 C=1 D=513 
+00032 [L189] ISF      A=0 B=0 C=2 D=2 
+00033 [L189] JMP      A=3 B=128 C=19 D=32787 target=53
+00034 [L189] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00035 [L189] TGETS    A=2 B=2 C=1 D=513 'd_stat'
+00036 [L189] TGETS    A=2 B=2 C=10 D=522 'getDedugEvnFlag'
+00037 [L189] CALL     A=2 B=2 C=1 D=513 
+00038 [L189] ISNEN    A=2 B=0 C=0 D=0 1
+00039 [L189] JMP      A=2 B=128 C=13 D=32781 target=53
+00040 [L189] UGET     A=2 B=0 C=0 D=0 main_server
+00041 [L189] TGETS    A=2 B=2 C=7 D=519 'get_host_by_name'
+00042 [L189] ISF      A=0 B=0 C=2 D=2 
+00043 [L189] JMP      A=3 B=128 C=9 D=32777 target=53
+00044 [L190] UGET     A=2 B=0 C=0 D=0 main_server
+00045 [L190] TGETS    A=2 B=2 C=7 D=519 'get_host_by_name'
+00046 [L190] MOV      A=3 B=0 C=0 D=0 
+00047 [L190] CALL     A=2 B=2 C=2 D=514 
+00048 [L190] MOV      A=0 B=0 C=2 D=2 
+00049 [L191] UGET     A=2 B=0 C=1 D=1 cclog
+00050 [L191] KSTR     A=3 B=0 C=11 D=11 'call get_host_by_name in wpppppppppp8, ret=%s'
+00051 [L191] MOV      A=4 B=0 C=0 D=0 
+00052 [L191] CALL     A=2 B=1 C=3 D=259 
+00053 [L195] GGET     A=2 B=0 C=12 D=12 'g_ls'
+00054 [L195] UGET     A=3 B=0 C=0 D=0 main_server
+00055 [L195] TGETS    A=3 B=3 C=14 D=782 'connect_server'
+00056 [L195] MOV      A=4 B=0 C=0 D=0 
+00057 [L195] MOV      A=5 B=0 C=1 D=1 
+00058 [L195] KSTR     A=6 B=0 C=15 D=15 'LS'
+00059 [L195] CALL     A=3 B=2 C=4 D=516 
+00060 [L195] TSETS    A=3 B=2 C=13 D=525 'socket'
+00061 [L196] UGET     A=2 B=0 C=1 D=1 cclog
+00062 [L196] KSTR     A=3 B=0 C=16 D=16 'connect_server return ls socket=%d'
+00063 [L196] GGET     A=4 B=0 C=12 D=12 'g_ls'
+00064 [L196] TGETS    A=4 B=4 C=13 D=1037 'socket'
+00065 [L196] CALL     A=2 B=1 C=3 D=259 
+00066 [L198] GGET     A=2 B=0 C=17 D=17 'set_net_status'
+00067 [L198] KSTR     A=3 B=0 C=18 D=18 'CONNECTING_LS'
+00068 [L198] CALL     A=2 B=1 C=2 D=258 
+00069 [L199] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/net/network.lua =====
+FUNCTION proto6 offset=0xc90 source_lines=203-225 params=0
+UPVALUES ['main_server', 'cclog']
+00001 [L204] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L204] TGETS    A=0 B=0 C=1 D=1 'd_alert'
+00003 [L204] TGETS    A=0 B=0 C=2 D=2 'start_wait'
+00004 [L204] KPRI     A=1 B=0 C=0 D=0 
+00005 [L204] KSHORT   A=2 B=0 C=30 D=30 30
+00006 [L204] CALL     A=0 B=1 C=3 D=259 
+00007 [L205] GGET     A=0 B=0 C=3 D=3 'g_self'
+00008 [L205] TGETS    A=0 B=0 C=4 D=4 'msg_3002'
+00009 [L205] TGETS    A=0 B=0 C=5 D=5 'server_ip'
+00010 [L207] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00011 [L207] TGETS    A=1 B=1 C=6 D=262 'd_u'
+00012 [L207] TGETS    A=1 B=1 C=7 D=263 'isWin32'
+00013 [L207] CALL     A=1 B=2 C=1 D=513 
+00014 [L207] ISF      A=0 B=0 C=1 D=1 
+00015 [L207] JMP      A=2 B=128 C=15 D=32783 target=31
+00016 [L207] UGET     A=1 B=0 C=0 D=0 main_server
+00017 [L207] TGETS    A=1 B=1 C=8 D=264 'get_host_by_name'
+00018 [L207] ISF      A=0 B=0 C=1 D=1 
+00019 [L207] JMP      A=2 B=128 C=11 D=32779 target=31
+00020 [L208] UGET     A=1 B=0 C=0 D=0 main_server
+00021 [L208] TGETS    A=1 B=1 C=8 D=264 'get_host_by_name'
+00022 [L208] GGET     A=2 B=0 C=3 D=3 'g_self'
+00023 [L208] TGETS    A=2 B=2 C=4 D=516 'msg_3002'
+00024 [L208] TGETS    A=2 B=2 C=5 D=517 'server_ip'
+00025 [L208] CALL     A=1 B=2 C=2 D=514 
+00026 [L208] MOV      A=0 B=0 C=1 D=1 
+00027 [L209] UGET     A=1 B=0 C=1 D=1 cclog
+00028 [L209] KSTR     A=2 B=0 C=9 D=9 'call get_host_by_name, ret=%s'
+00029 [L209] MOV      A=3 B=0 C=0 D=0 
+00030 [L209] CALL     A=1 B=1 C=3 D=259 
+00031 [L212] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00032 [L212] TGETS    A=1 B=1 C=6 D=262 'd_u'
+00033 [L212] TGETS    A=1 B=1 C=10 D=266 'isWP8'
+00034 [L212] CALL     A=1 B=2 C=1 D=513 
+00035 [L212] ISF      A=0 B=0 C=1 D=1 
+00036 [L212] JMP      A=2 B=128 C=21 D=32789 target=58
+00037 [L212] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00038 [L212] TGETS    A=1 B=1 C=11 D=267 'd_stat'
+00039 [L212] TGETS    A=1 B=1 C=12 D=268 'getDedugEvnFlag'
+00040 [L212] CALL     A=1 B=2 C=1 D=513 
+00041 [L212] ISNEN    A=1 B=0 C=0 D=0 1
+00042 [L212] JMP      A=1 B=128 C=15 D=32783 target=58
+00043 [L212] UGET     A=1 B=0 C=0 D=0 main_server
+00044 [L212] TGETS    A=1 B=1 C=8 D=264 'get_host_by_name'
+00045 [L212] ISF      A=0 B=0 C=1 D=1 
+00046 [L212] JMP      A=2 B=128 C=11 D=32779 target=58
+00047 [L213] UGET     A=1 B=0 C=0 D=0 main_server
+00048 [L213] TGETS    A=1 B=1 C=8 D=264 'get_host_by_name'
+00049 [L213] GGET     A=2 B=0 C=3 D=3 'g_self'
+00050 [L213] TGETS    A=2 B=2 C=4 D=516 'msg_3002'
+00051 [L213] TGETS    A=2 B=2 C=5 D=517 'server_ip'
+00052 [L213] CALL     A=1 B=2 C=2 D=514 
+00053 [L213] MOV      A=0 B=0 C=1 D=1 
+00054 [L214] UGET     A=1 B=0 C=1 D=1 cclog
+00055 [L214] KSTR     A=2 B=0 C=13 D=13 'call get_host_by_name in wppppppppppppppp8, ret=%s'
+00056 [L214] MOV      A=3 B=0 C=0 D=0 
+00057 [L214] CALL     A=1 B=1 C=3 D=259 
+00058 [L218] ISF      A=0 B=0 C=0 D=0 
+00059 [L218] JMP      A=1 B=128 C=4 D=32772 target=64
+00060 [L218] LEN      A=1 B=0 C=0 D=0 
+00061 [L218] KSHORT   A=2 B=0 C=0 D=0 0
+00062 [L218] ISGT     A=1 B=0 C=2 D=2 
+00063 [L218] JMP      A=1 B=128 C=9 D=32777 target=73
+00064 [L219] UGET     A=1 B=0 C=1 D=1 cclog
+00065 [L219] KSTR     A=2 B=0 C=14 D=14 'ERROR: LS return ip [%s]'
+00066 [L219] GGET     A=3 B=0 C=3 D=3 'g_self'
+00067 [L219] TGETS    A=3 B=3 C=4 D=772 'msg_3002'
+00068 [L219] TGETS    A=3 B=3 C=5 D=773 'server_ip'
+00069 [L219] CALL     A=1 B=1 C=3 D=259 
+00070 [L220] GGET     A=1 B=0 C=3 D=3 'g_self'
+00071 [L220] TGETS    A=1 B=1 C=4 D=260 'msg_3002'
+00072 [L220] TGETS    A=0 B=1 C=5 D=261 'server_ip'
+00073 [L223] GGET     A=1 B=0 C=15 D=15 'g_bs'
+00074 [L223] UGET     A=2 B=0 C=0 D=0 main_server
+00075 [L223] TGETS    A=2 B=2 C=17 D=529 'connect_server'
+00076 [L223] MOV      A=3 B=0 C=0 D=0 
+00077 [L223] GGET     A=4 B=0 C=3 D=3 'g_self'
+00078 [L223] TGETS    A=4 B=4 C=4 D=1028 'msg_3002'
+00079 [L223] TGETS    A=4 B=4 C=18 D=1042 'server_port'
+00080 [L223] KSTR     A=5 B=0 C=19 D=19 'BS'
+00081 [L223] CALL     A=2 B=2 C=4 D=516 
+00082 [L223] TSETS    A=2 B=1 C=16 D=272 'socket'
+00083 [L224] GGET     A=1 B=0 C=20 D=20 'set_net_status'
+00084 [L224] KSTR     A=2 B=0 C=21 D=21 'CONNECTING_BS'
+00085 [L224] CALL     A=1 B=1 C=2 D=258 
+00086 [L225] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/net/network.lua =====
+FUNCTION proto17 offset=0x3467 source_lines=710-717 params=0
+UPVALUES ['cclog']
+00001 [L711] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L711] TGETS    A=0 B=0 C=1 D=1 'd_u'
+00003 [L711] TGETS    A=0 B=0 C=2 D=2 'codeForUrl'
+00004 [L711] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00005 [L711] TGETS    A=1 B=1 C=3 D=259 'd_stat'
+00006 [L711] TGETS    A=1 B=1 C=4 D=260 'g_self'
+00007 [L711] TGETS    A=1 B=1 C=5 D=261 'stat'
+00008 [L711] TGETS    A=1 B=1 C=6 D=262 'mac'
+00009 [L711] CALL     A=0 B=2 C=2 D=514 
+00010 [L712] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00011 [L712] TGETS    A=1 B=1 C=1 D=257 'd_u'
+00012 [L712] TGETS    A=1 B=1 C=2 D=258 'codeForUrl'
+00013 [L712] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00014 [L712] TGETS    A=2 B=2 C=3 D=515 'd_stat'
+00015 [L712] TGETS    A=2 B=2 C=4 D=516 'g_self'
+00016 [L712] TGETS    A=2 B=2 C=5 D=517 'stat'
+00017 [L712] TGETS    A=2 B=2 C=7 D=519 'app_id'
+00018 [L712] CALL     A=1 B=2 C=2 D=514 
+00019 [L713] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00020 [L713] TGETS    A=2 B=2 C=1 D=513 'd_u'
+00021 [L713] TGETS    A=2 B=2 C=2 D=514 'codeForUrl'
+00022 [L713] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00023 [L713] TGETS    A=3 B=3 C=8 D=776 'd_tp_config'
+00024 [L713] TGETS    A=3 B=3 C=9 D=777 'getAdChannel'
+00025 [L713] CALL     A=3 B=0 C=1 D=1 
+00026 [L713] CALLM    A=2 B=2 C=0 D=512 
+00027 [L714] MOV      A=3 B=0 C=0 D=0 
+00028 [L714] KSTR     A=4 B=0 C=10 D=10 '&'
+00029 [L714] MOV      A=5 B=0 C=1 D=1 
+00030 [L714] KSTR     A=6 B=0 C=10 D=10 '&'
+00031 [L714] MOV      A=7 B=0 C=2 D=2 
+00032 [L714] CAT      A=3 B=3 C=7 D=775 
+00033 [L715] UGET     A=4 B=0 C=0 D=0 cclog
+00034 [L715] KSTR     A=5 B=0 C=11 D=11 'getLoginFeatures, ret='
+00035 [L715] MOV      A=6 B=0 C=3 D=3 
+00036 [L715] CAT      A=5 B=5 C=6 D=1286 
+00037 [L715] CALL     A=4 B=1 C=2 D=258 
+00038 [L716] RET1     A=3 B=0 C=2 D=2 
+
+
+===== lua/net/network.lua =====
+FUNCTION proto35 offset=0x7794 source_lines=1246-1278 params=0
+UPVALUES ['tonumber', 'CCLuaLog', 'table', 'cclog']
+00001 [L1247] TNEW     A=0 B=0 C=0 D=0 
+00002 [L1256] UGET     A=1 B=0 C=0 D=0 tonumber
+00003 [L1256] GGET     A=2 B=0 C=1 D=1 'main_server_get_ver'
+00004 [L1256] CALL     A=2 B=0 C=1 D=1 
+00005 [L1256] CALLM    A=1 B=2 C=0 D=512 
+00006 [L1256] TSETS    A=1 B=0 C=0 D=0 'version'
+00007 [L1257] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00008 [L1257] TGETS    A=1 B=1 C=4 D=260 'd_common_def'
+00009 [L1257] TGETS    A=1 B=1 C=5 D=261 'client_common_event'
+00010 [L1257] TGETS    A=1 B=1 C=6 D=262 'p360_na_account_login'
+00011 [L1257] TSETS    A=1 B=0 C=2 D=2 'client_event'
+00012 [L1258] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00013 [L1258] TGETS    A=1 B=1 C=8 D=264 'd_loginUI'
+00014 [L1258] TGETS    A=1 B=1 C=9 D=265 'getLoginServerId'
+00015 [L1258] CALL     A=1 B=2 C=1 D=513 
+00016 [L1258] TSETS    A=1 B=0 C=7 D=7 'select_area'
+00017 [L1259] KSHORT   A=1 B=0 C=107 D=107 107
+00018 [L1259] TSETS    A=1 B=0 C=10 D=10 'platform'
+00019 [L1260] KSTR     A=1 B=0 C=12 D=12 ''
+00020 [L1260] TSETS    A=1 B=0 C=11 D=11 'account_id'
+00021 [L1261] KSTR     A=1 B=0 C=12 D=12 ''
+00022 [L1261] TSETS    A=1 B=0 C=13 D=13 'account_name'
+00023 [L1262] GGET     A=1 B=0 C=15 D=15 'g_third_param'
+00024 [L1262] TGETS    A=1 B=1 C=14 D=270 'access_token'
+00025 [L1262] TSETS    A=1 B=0 C=14 D=14 'access_token'
+00026 [L1264] GGET     A=1 B=0 C=16 D=16 'checkSDKToken'
+00027 [L1264] TGETS    A=2 B=0 C=14 D=14 'access_token'
+00028 [L1264] CALL     A=1 B=2 C=2 D=514 
+00029 [L1264] ISF      A=0 B=0 C=1 D=1 
+00030 [L1264] JMP      A=2 B=128 C=10 D=32778 target=41
+00031 [L1265] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00032 [L1265] TGETS    A=1 B=1 C=17 D=273 'd_info'
+00033 [L1265] TGETS    A=1 B=1 C=18 D=274 'show'
+00034 [L1265] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00035 [L1265] TGETS    A=2 B=2 C=19 D=531 'd_hz'
+00036 [L1265] TGETS    A=2 B=2 C=20 D=532 'gethz'
+00037 [L1265] KSTR     A=3 B=0 C=21 D=21 'tokenIsNil'
+00038 [L1265] CALL     A=2 B=0 C=2 D=2 
+00039 [L1265] CALLM    A=1 B=1 C=0 D=256 
+00040 [L1266] RET0     A=0 B=0 C=1 D=1 
+00041 [L1269] UGET     A=1 B=0 C=1 D=1 CCLuaLog
+00042 [L1269] KSTR     A=2 B=0 C=22 D=22 'send_third_login_req_p360_na, access_token: '
+00043 [L1269] GGET     A=3 B=0 C=15 D=15 'g_third_param'
+00044 [L1269] TGETS    A=3 B=3 C=14 D=782 'access_token'
+00045 [L1269] CAT      A=2 B=2 C=3 D=515 
+00046 [L1269] CALL     A=1 B=1 C=2 D=258 
+00047 [L1271] TNEW     A=1 B=0 C=0 D=0 
+00048 [L1272] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00049 [L1272] TGETS    A=2 B=2 C=4 D=516 'd_common_def'
+00050 [L1272] TGETS    A=2 B=2 C=24 D=536 'common_event_type'
+00051 [L1272] TGETS    A=2 B=2 C=25 D=537 'login_request'
+00052 [L1272] TSETS    A=2 B=1 C=23 D=279 'id'
+00053 [L1273] GGET     A=2 B=0 C=27 D=27 'getLoginFeatures'
+00054 [L1273] CALL     A=2 B=2 C=1 D=513 
+00055 [L1273] TSETS    A=2 B=0 C=26 D=26 'feature'
+00056 [L1274] UGET     A=2 B=0 C=2 D=2 table
+00057 [L1274] TGETS    A=2 B=2 C=29 D=541 'tostring'
+00058 [L1274] MOV      A=3 B=0 C=0 D=0 
+00059 [L1274] CALL     A=2 B=2 C=2 D=514 
+00060 [L1274] TSETS    A=2 B=1 C=28 D=284 'data'
+00061 [L1276] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00062 [L1276] TGETS    A=2 B=2 C=30 D=542 'd_u'
+00063 [L1276] TGETS    A=2 B=2 C=31 D=543 'main_server_send_msg_server'
+00064 [L1276] GGET     A=3 B=0 C=3 D=3 'd_ms'
+00065 [L1276] TGETS    A=3 B=3 C=32 D=800 'd_msg_def'
+00066 [L1276] TGETS    A=3 B=3 C=33 D=801 'lscl_msg_id'
+00067 [L1276] TGETS    A=3 B=3 C=34 D=802 'msg_common_event'
+00068 [L1276] MOV      A=4 B=0 C=1 D=1 
+00069 [L1276] GGET     A=5 B=0 C=35 D=35 'g_ls'
+00070 [L1276] TGETS    A=5 B=5 C=36 D=1316 'socket'
+00071 [L1276] CALL     A=2 B=1 C=4 D=260 
+00072 [L1277] UGET     A=2 B=0 C=3 D=3 cclog
+00073 [L1277] KSTR     A=3 B=0 C=37 D=37 'send third platform login request p360_na'
+00074 [L1277] CALL     A=2 B=1 C=2 D=258 
+00075 [L1278] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/net/network.lua =====
+FUNCTION proto66 offset=0xee1a source_lines=2236-2272 params=0
+UPVALUES ['tonumber', 'CCLuaLog', 'table', 'cclog']
+00001 [L2237] TNEW     A=0 B=0 C=0 D=0 
+00002 [L2248] UGET     A=1 B=0 C=0 D=0 tonumber
+00003 [L2248] GGET     A=2 B=0 C=1 D=1 'main_server_get_ver'
+00004 [L2248] CALL     A=2 B=0 C=1 D=1 
+00005 [L2248] CALLM    A=1 B=2 C=0 D=512 
+00006 [L2248] TSETS    A=1 B=0 C=0 D=0 'version'
+00007 [L2249] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00008 [L2249] TGETS    A=1 B=1 C=4 D=260 'd_loginUI'
+00009 [L2249] TGETS    A=1 B=1 C=5 D=261 'getLoginServerId'
+00010 [L2249] CALL     A=1 B=2 C=1 D=513 
+00011 [L2249] TSETS    A=1 B=0 C=2 D=2 'select_area'
+00012 [L2250] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00013 [L2250] TGETS    A=1 B=1 C=7 D=263 'd_common_def'
+00014 [L2250] TGETS    A=1 B=1 C=8 D=264 'platform_type'
+00015 [L2250] TGETS    A=1 B=1 C=9 D=265 'wdj_a2'
+00016 [L2250] TSETS    A=1 B=0 C=6 D=6 'platform'
+00017 [L2251] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00018 [L2251] TGETS    A=1 B=1 C=7 D=263 'd_common_def'
+00019 [L2251] TGETS    A=1 B=1 C=11 D=267 'client_common_event'
+00020 [L2251] TGETS    A=1 B=1 C=12 D=268 'wdj_new_login'
+00021 [L2251] TSETS    A=1 B=0 C=10 D=10 'client_event'
+00022 [L2254] GGET     A=1 B=0 C=14 D=14 'g_third_param'
+00023 [L2254] TGETS    A=1 B=1 C=15 D=271 'token'
+00024 [L2254] TSETS    A=1 B=0 C=13 D=13 'sid'
+00025 [L2257] GGET     A=1 B=0 C=16 D=16 'checkSDKToken'
+00026 [L2257] TGETS    A=2 B=0 C=13 D=13 'sid'
+00027 [L2257] CALL     A=1 B=2 C=2 D=514 
+00028 [L2257] ISF      A=0 B=0 C=1 D=1 
+00029 [L2257] JMP      A=2 B=128 C=10 D=32778 target=40
+00030 [L2258] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00031 [L2258] TGETS    A=1 B=1 C=17 D=273 'd_info'
+00032 [L2258] TGETS    A=1 B=1 C=18 D=274 'show'
+00033 [L2258] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00034 [L2258] TGETS    A=2 B=2 C=19 D=531 'd_hz'
+00035 [L2258] TGETS    A=2 B=2 C=20 D=532 'gethz'
+00036 [L2258] KSTR     A=3 B=0 C=21 D=21 'tokenIsNil'
+00037 [L2258] CALL     A=2 B=0 C=2 D=2 
+00038 [L2258] CALLM    A=1 B=1 C=0 D=256 
+00039 [L2259] RET0     A=0 B=0 C=1 D=1 
+00040 [L2262] UGET     A=1 B=0 C=1 D=1 CCLuaLog
+00041 [L2263] KSTR     A=2 B=0 C=22 D=22 'send_third_login_req_wdj_a2,'
+00042 [L2263] KSTR     A=3 B=0 C=23 D=23 ', sid: '
+00043 [L2263] TGETS    A=4 B=0 C=13 D=13 'sid'
+00044 [L2263] CAT      A=2 B=2 C=4 D=516 
+00045 [L2262] CALL     A=1 B=1 C=2 D=258 
+00046 [L2265] TNEW     A=1 B=0 C=0 D=0 
+00047 [L2266] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00048 [L2266] TGETS    A=2 B=2 C=7 D=519 'd_common_def'
+00049 [L2266] TGETS    A=2 B=2 C=25 D=537 'common_event_type'
+00050 [L2266] TGETS    A=2 B=2 C=26 D=538 'login_request'
+00051 [L2266] TSETS    A=2 B=1 C=24 D=280 'id'
+00052 [L2267] GGET     A=2 B=0 C=28 D=28 'getLoginFeatures'
+00053 [L2267] CALL     A=2 B=2 C=1 D=513 
+00054 [L2267] TSETS    A=2 B=0 C=27 D=27 'feature'
+00055 [L2268] UGET     A=2 B=0 C=2 D=2 table
+00056 [L2268] TGETS    A=2 B=2 C=30 D=542 'tostring'
+00057 [L2268] MOV      A=3 B=0 C=0 D=0 
+00058 [L2268] CALL     A=2 B=2 C=2 D=514 
+00059 [L2268] TSETS    A=2 B=1 C=29 D=285 'data'
+00060 [L2270] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00061 [L2270] TGETS    A=2 B=2 C=31 D=543 'd_u'
+00062 [L2270] TGETS    A=2 B=2 C=32 D=544 'main_server_send_msg_server'
+00063 [L2270] GGET     A=3 B=0 C=3 D=3 'd_ms'
+00064 [L2270] TGETS    A=3 B=3 C=33 D=801 'd_msg_def'
+00065 [L2270] TGETS    A=3 B=3 C=34 D=802 'lscl_msg_id'
+00066 [L2270] TGETS    A=3 B=3 C=35 D=803 'msg_common_event'
+00067 [L2270] MOV      A=4 B=0 C=1 D=1 
+00068 [L2270] GGET     A=5 B=0 C=36 D=36 'g_ls'
+00069 [L2270] TGETS    A=5 B=5 C=37 D=1317 'socket'
+00070 [L2270] CALL     A=2 B=1 C=4 D=260 
+00071 [L2271] UGET     A=2 B=0 C=3 D=3 cclog
+00072 [L2271] KSTR     A=3 B=0 C=38 D=38 'send third platform login request wdja2'
+00073 [L2271] CALL     A=2 B=1 C=2 D=258 
+00074 [L2272] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/net/network.lua =====
+FUNCTION proto67 offset=0xf1a9 source_lines=2277-2340 params=3
+UPVALUES ['cclog', 'string', 'main_server']
+00001 [L2278] UGET     A=3 B=0 C=0 D=0 cclog
+00002 [L2278] KSTR     A=4 B=0 C=0 D=0 'call msg_login_rsp_3002'
+00003 [L2278] CALL     A=3 B=1 C=2 D=258 
+00004 [L2279] GGET     A=3 B=0 C=1 D=1 'd_ms'
+00005 [L2279] TGETS    A=3 B=3 C=2 D=770 'd_alert'
+00006 [L2279] TGETS    A=3 B=3 C=3 D=771 'stop_wait'
+00007 [L2279] KPRI     A=4 B=0 C=2 D=2 
+00008 [L2279] CALL     A=3 B=1 C=2 D=258 
+00009 [L2281] TGETS    A=3 B=1 C=4 D=260 'server_ip'
+00010 [L2281] ISF      A=0 B=0 C=3 D=3 
+00011 [L2281] JMP      A=3 B=128 C=13 D=32781 target=25
+00012 [L2281] TGETS    A=3 B=1 C=5 D=261 'auth_key'
+00013 [L2281] KSHORT   A=4 B=3 C=232 D=1000 1000
+00014 [L2281] ISLT     A=3 B=0 C=4 D=4 
+00015 [L2281] JMP      A=3 B=128 C=9 D=32777 target=25
+00016 [L2281] TGETS    A=3 B=1 C=4 D=260 'server_ip'
+00017 [L2281] LEN      A=3 B=0 C=3 D=3 
+00018 [L2281] KSHORT   A=4 B=0 C=0 D=0 0
+00019 [L2281] ISLE     A=3 B=0 C=4 D=4 
+00020 [L2281] JMP      A=3 B=128 C=4 D=32772 target=25
+00021 [L2281] TGETS    A=3 B=1 C=6 D=262 'server_port'
+00022 [L2281] KSHORT   A=4 B=0 C=100 D=100 100
+00023 [L2281] ISGT     A=3 B=0 C=4 D=4 
+00024 [L2281] JMP      A=3 B=128 C=164 D=32932 target=189
+00025 [L2282] TGETS    A=3 B=1 C=5 D=261 'auth_key'
+00026 [L2282] ISF      A=0 B=0 C=3 D=3 
+00027 [L2282] JMP      A=4 B=128 C=158 D=32926 target=186
+00028 [L2283] UGET     A=3 B=0 C=0 D=0 cclog
+00029 [L2283] KSTR     A=4 B=0 C=7 D=7 'auth_key is %d'
+00030 [L2283] TGETS    A=5 B=1 C=5 D=261 'auth_key'
+00031 [L2283] CALL     A=3 B=1 C=3 D=259 
+00032 [L2284] GGET     A=3 B=0 C=1 D=1 'd_ms'
+00033 [L2284] TGETS    A=3 B=3 C=8 D=776 'd_hz'
+00034 [L2284] TGETS    A=3 B=3 C=9 D=777 'gethz'
+00035 [L2284] UGET     A=4 B=0 C=1 D=1 string
+00036 [L2284] TGETS    A=4 B=4 C=10 D=1034 'format'
+00037 [L2284] KSTR     A=5 B=0 C=11 D=11 'login_code_%d'
+00038 [L2284] TGETS    A=6 B=1 C=5 D=261 'auth_key'
+00039 [L2284] CALL     A=4 B=0 C=3 D=3 
+00040 [L2284] CALLM    A=3 B=2 C=0 D=512 
+00041 [L2286] TGETS    A=4 B=1 C=5 D=261 'auth_key'
+00042 [L2286] GGET     A=5 B=0 C=12 D=12 'l_c'
+00043 [L2286] TGETS    A=5 B=5 C=13 D=1293 'register_timeout'
+00044 [L2286] ISGT     A=5 B=0 C=4 D=4 
+00045 [L2286] JMP      A=4 B=128 C=75 D=32843 target=121
+00046 [L2286] TGETS    A=4 B=1 C=5 D=261 'auth_key'
+00047 [L2286] GGET     A=5 B=0 C=12 D=12 'l_c'
+00048 [L2286] TGETS    A=5 B=5 C=14 D=1294 'register_too_much'
+00049 [L2286] ISGT     A=4 B=0 C=5 D=5 
+00050 [L2286] JMP      A=4 B=128 C=70 D=32838 target=121
+00051 [L2287] GGET     A=4 B=0 C=1 D=1 'd_ms'
+00052 [L2287] TGETS    A=4 B=4 C=15 D=1039 'd_registerUI'
+00053 [L2287] TGETS    A=4 B=4 C=16 D=1040 'g_dataTable'
+00054 [L2287] TGETS    A=4 B=4 C=17 D=1041 'isInThisPage'
+00055 [L2287] ISF      A=0 B=0 C=4 D=4 
+00056 [L2287] JMP      A=5 B=128 C=55 D=32823 target=112
+00057 [L2288] GGET     A=4 B=0 C=18 D=18 'set_net_status'
+00058 [L2288] KSTR     A=5 B=0 C=19 D=19 'INIT'
+00059 [L2288] KPRI     A=6 B=0 C=2 D=2 
+00060 [L2288] CALL     A=4 B=1 C=3 D=259 
+00061 [L2289] TGETS    A=4 B=1 C=5 D=261 'auth_key'
+00062 [L2289] GGET     A=5 B=0 C=12 D=12 'l_c'
+00063 [L2289] TGETS    A=5 B=5 C=20 D=1300 'register_success'
+00064 [L2289] ISNEV    A=4 B=0 C=5 D=5 
+00065 [L2289] JMP      A=4 B=128 C=46 D=32814 target=112
+00066 [L2290] GGET     A=4 B=0 C=1 D=1 'd_ms'
+00067 [L2290] TGETS    A=4 B=4 C=21 D=1045 'd_setting'
+00068 [L2290] TGETS    A=4 B=4 C=22 D=1046 'g_setting'
+00069 [L2290] GGET     A=5 B=0 C=1 D=1 'd_ms'
+00070 [L2290] TGETS    A=5 B=5 C=15 D=1295 'd_registerUI'
+00071 [L2290] TGETS    A=5 B=5 C=24 D=1304 'g_registerInfo'
+00072 [L2290] TGETS    A=5 B=5 C=23 D=1303 'username'
+00073 [L2290] TSETS    A=5 B=4 C=23 D=1047 'username'
+00074 [L2291] GGET     A=4 B=0 C=1 D=1 'd_ms'
+00075 [L2291] TGETS    A=4 B=4 C=21 D=1045 'd_setting'
+00076 [L2291] TGETS    A=4 B=4 C=25 D=1049 'saveSetting'
+00077 [L2291] CALL     A=4 B=1 C=1 D=257 
+00078 [L2293] UGET     A=4 B=0 C=2 D=2 main_server
+00079 [L2293] TGETS    A=4 B=4 C=26 D=1050 'get_read_md5'
+00080 [L2293] GGET     A=5 B=0 C=1 D=1 'd_ms'
+00081 [L2293] TGETS    A=5 B=5 C=15 D=1295 'd_registerUI'
+00082 [L2293] TGETS    A=5 B=5 C=24 D=1304 'g_registerInfo'
+00083 [L2293] TGETS    A=5 B=5 C=27 D=1307 'password'
+00084 [L2293] CALL     A=4 B=2 C=2 D=514 
+00085 [L2294] GGET     A=5 B=0 C=1 D=1 'd_ms'
+00086 [L2294] TGETS    A=5 B=5 C=15 D=1295 'd_registerUI'
+00087 [L2294] TGETS    A=5 B=5 C=24 D=1304 'g_registerInfo'
+00088 [L2294] TGETS    A=5 B=5 C=23 D=1303 'username'
+00089 [L2295] GGET     A=6 B=0 C=1 D=1 'd_ms'
+00090 [L2295] TGETS    A=6 B=6 C=28 D=1564 'd_file'
+00091 [L2295] TGETS    A=6 B=6 C=29 D=1565 'set'
+00092 [L2295] KSTR     A=7 B=0 C=23 D=23 'username'
+00093 [L2295] MOV      A=8 B=0 C=5 D=5 
+00094 [L2295] CALL     A=6 B=1 C=3 D=259 
+00095 [L2296] GGET     A=6 B=0 C=1 D=1 'd_ms'
+00096 [L2296] TGETS    A=6 B=6 C=28 D=1564 'd_file'
+00097 [L2296] TGETS    A=6 B=6 C=29 D=1565 'set'
+00098 [L2296] KSTR     A=7 B=0 C=30 D=30 'mpwd'
+00099 [L2296] MOV      A=8 B=0 C=4 D=4 
+00100 [L2296] CALL     A=6 B=1 C=3 D=259 
+00101 [L2297] GGET     A=6 B=0 C=1 D=1 'd_ms'
+00102 [L2297] TGETS    A=6 B=6 C=31 D=1567 'd_event_mgr'
+00103 [L2297] TGETS    A=6 B=6 C=32 D=1568 'jumpLoginUI'
+00104 [L2297] KSHORT   A=7 B=0 C=0 D=0 0
+00105 [L2297] CALL     A=6 B=1 C=2 D=258 
+00106 [L2298] GGET     A=6 B=0 C=1 D=1 'd_ms'
+00107 [L2298] TGETS    A=6 B=6 C=28 D=1564 'd_file'
+00108 [L2298] TGETS    A=6 B=6 C=29 D=1565 'set'
+00109 [L2298] KSTR     A=7 B=0 C=33 D=33 'isMobileLogin'
+00110 [L2298] KSHORT   A=8 B=0 C=2 D=2 2
+00111 [L2298] CALL     A=6 B=1 C=3 D=259 
+00112 [L2301] GGET     A=4 B=0 C=1 D=1 'd_ms'
+00113 [L2301] TGETS    A=4 B=4 C=34 D=1058 'd_info'
+00114 [L2301] TGETS    A=4 B=4 C=35 D=1059 'show'
+00115 [L2301] MOV      A=5 B=0 C=3 D=3 
+00116 [L2301] KSHORT   A=6 B=0 C=5 D=5 5
+00117 [L2301] KNUM     A=7 B=0 C=0 D=0 0.6
+00118 [L2301] CALL     A=4 B=1 C=4 D=260 
+00119 [L2302] RET0     A=0 B=0 C=1 D=1 
+00120 [L2302] JMP      A=4 B=128 C=65 D=32833 target=186
+00121 [L2303] TGETS    A=4 B=1 C=5 D=261 'auth_key'
+00122 [L2303] GGET     A=5 B=0 C=12 D=12 'l_c'
+00123 [L2303] TGETS    A=5 B=5 C=36 D=1316 'mobile_bind_to_account'
+00124 [L2303] ISNEV    A=4 B=0 C=5 D=5 
+00125 [L2303] JMP      A=4 B=128 C=28 D=32796 target=154
+00126 [L2304] TGETS    A=4 B=1 C=37 D=293 'account'
+00127 [L2304] ISF      A=0 B=0 C=4 D=4 
+00128 [L2304] JMP      A=5 B=128 C=4 D=32772 target=133
+00129 [L2305] MOV      A=4 B=0 C=3 D=3 
+00130 [L2305] KSTR     A=5 B=0 C=38 D=38 '  '
+00131 [L2305] TGETS    A=6 B=1 C=37 D=293 'account'
+00132 [L2305] CAT      A=3 B=4 C=6 D=1030 
+00133 [L2307] GGET     A=4 B=0 C=1 D=1 'd_ms'
+00134 [L2307] TGETS    A=4 B=4 C=34 D=1058 'd_info'
+00135 [L2307] TGETS    A=4 B=4 C=35 D=1059 'show'
+00136 [L2307] MOV      A=5 B=0 C=3 D=3 
+00137 [L2307] CALL     A=4 B=1 C=2 D=258 
+00138 [L2308] GGET     A=4 B=0 C=18 D=18 'set_net_status'
+00139 [L2308] KSTR     A=5 B=0 C=19 D=19 'INIT'
+00140 [L2308] KPRI     A=6 B=0 C=2 D=2 
+00141 [L2308] CALL     A=4 B=1 C=3 D=259 
+00142 [L2309] GGET     A=4 B=0 C=1 D=1 'd_ms'
+00143 [L2309] TGETS    A=4 B=4 C=39 D=1063 'd_loginUI'
+00144 [L2309] TGETS    A=4 B=4 C=40 D=1064 'g_isInAccLoginLayer'
+00145 [L2309] IST      A=0 B=0 C=4 D=4 
+00146 [L2309] JMP      A=4 B=128 C=5 D=32773 target=152
+00147 [L2310] GGET     A=4 B=0 C=1 D=1 'd_ms'
+00148 [L2310] TGETS    A=4 B=4 C=31 D=1055 'd_event_mgr'
+00149 [L2310] TGETS    A=4 B=4 C=32 D=1056 'jumpLoginUI'
+00150 [L2310] KSHORT   A=5 B=0 C=2 D=2 2
+00151 [L2310] CALL     A=4 B=1 C=2 D=258 
+00152 [L2312] RET0     A=0 B=0 C=1 D=1 
+00153 [L2312] JMP      A=4 B=128 C=32 D=32800 target=186
+00154 [L2314] ISF      A=0 B=0 C=3 D=3 
+00155 [L2314] JMP      A=4 B=128 C=30 D=32798 target=186
+00156 [L2314] LEN      A=4 B=0 C=3 D=3 
+00157 [L2314] KSHORT   A=5 B=0 C=0 D=0 0
+00158 [L2314] ISGE     A=5 B=0 C=4 D=4 
+00159 [L2314] JMP      A=4 B=128 C=26 D=32794 target=186
+00160 [L2315] GGET     A=4 B=0 C=1 D=1 'd_ms'
+00161 [L2315] TGETS    A=4 B=4 C=34 D=1058 'd_info'
+00162 [L2315] TGETS    A=4 B=4 C=35 D=1059 'show'
+00163 [L2315] MOV      A=5 B=0 C=3 D=3 
+00164 [L2315] KSHORT   A=6 B=0 C=5 D=5 5
+00165 [L2315] KNUM     A=7 B=0 C=0 D=0 0.6
+00166 [L2315] CALL     A=4 B=1 C=4 D=260 
+00167 [L2317] GGET     A=4 B=0 C=1 D=1 'd_ms'
+00168 [L2317] TGETS    A=4 B=4 C=39 D=1063 'd_loginUI'
+00169 [L2317] TGETS    A=4 B=4 C=40 D=1064 'g_isInAccLoginLayer'
+00170 [L2317] ISF      A=0 B=0 C=4 D=4 
+00171 [L2317] JMP      A=5 B=128 C=11 D=32779 target=183
+00172 [L2317] GGET     A=4 B=0 C=1 D=1 'd_ms'
+00173 [L2317] TGETS    A=4 B=4 C=41 D=1065 'd_tp_config'
+00174 [L2317] TGETS    A=4 B=4 C=42 D=1066 'useThirdPartySdk'
+00175 [L2317] CALL     A=4 B=2 C=1 D=513 
+00176 [L2317] ISNEP    A=4 B=0 C=1 D=1 
+00177 [L2317] JMP      A=4 B=128 C=5 D=32773 target=183
+00178 [L2318] GGET     A=4 B=0 C=18 D=18 'set_net_status'
+00179 [L2318] KSTR     A=5 B=0 C=19 D=19 'INIT'
+00180 [L2318] KPRI     A=6 B=0 C=2 D=2 
+00181 [L2318] CALL     A=4 B=1 C=3 D=259 
+00182 [L2318] JMP      A=4 B=128 C=2 D=32770 target=185
+00183 [L2320] GGET     A=4 B=0 C=43 D=43 'kick'
+00184 [L2320] CALL     A=4 B=1 C=1 D=257 
+00185 [L2322] RET0     A=0 B=0 C=1 D=1 
+00186 [L2327] GGET     A=3 B=0 C=43 D=43 'kick'
+00187 [L2327] CALL     A=3 B=1 C=1 D=257 
+00188 [L2327] JMP      A=3 B=128 C=21 D=32789 target=210
+00189 [L2330] GGET     A=3 B=0 C=1 D=1 'd_ms'
+00190 [L2330] TGETS    A=3 B=3 C=34 D=802 'd_info'
+00191 [L2330] TGETS    A=3 B=3 C=35 D=803 'show'
+00192 [L2330] GGET     A=4 B=0 C=1 D=1 'd_ms'
+00193 [L2330] TGETS    A=4 B=4 C=8 D=1032 'd_hz'
+00194 [L2330] TGETS    A=4 B=4 C=9 D=1033 'gethz'
+00195 [L2330] KSTR     A=5 B=0 C=44 D=44 'acc_check_ok'
+00196 [L2330] CALL     A=4 B=0 C=2 D=2 
+00197 [L2330] CALLM    A=3 B=1 C=0 D=256 
+00198 [L2334] GGET     A=3 B=0 C=45 D=45 'g_self'
+00199 [L2334] TSETS    A=1 B=3 C=46 D=814 'msg_3002'
+00200 [L2335] GGET     A=3 B=0 C=47 D=47 'g_ls'
+00201 [L2335] TGETS    A=4 B=1 C=37 D=293 'account'
+00202 [L2335] TSETS    A=4 B=3 C=23 D=791 'username'
+00203 [L2337] UGET     A=3 B=0 C=0 D=0 cclog
+00204 [L2337] KSTR     A=4 B=0 C=48 D=48 'auth_key: %d, seed: %d'
+00205 [L2337] TGETS    A=5 B=1 C=5 D=261 'auth_key'
+00206 [L2337] TGETS    A=6 B=1 C=49 D=305 'seed'
+00207 [L2337] CALL     A=3 B=1 C=4 D=260 
+00208 [L2338] GGET     A=3 B=0 C=50 D=50 'connect_to_bs'
+00209 [L2338] CALL     A=3 B=1 C=1 D=257 
+00210 [L2340] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/net/network.lua =====
+FUNCTION proto68 offset=0xf86e source_lines=2346-2391 params=0
+UPVALUES ['main_server', 'cclog']
+00001 [L2348] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L2348] TGETS    A=0 B=0 C=1 D=1 'd_tp_config'
+00003 [L2348] TGETS    A=0 B=0 C=2 D=2 'getThirdPartyFlag'
+00004 [L2348] CALL     A=0 B=2 C=1 D=513 
+00005 [L2349] KSTR     A=1 B=0 C=3 D=3 ''
+00006 [L2350] ISNEN    A=0 B=0 C=0 D=0 8
+00007 [L2350] JMP      A=2 B=128 C=1 D=32769 target=9
+00008 [L2351] KSTR     A=1 B=0 C=4 D=4 '@@8'
+00009 [L2354] GGET     A=2 B=0 C=5 D=5 'g_has_inside_game'
+00010 [L2354] ISNEP    A=2 B=0 C=1 D=1 
+00011 [L2354] JMP      A=2 B=128 C=55 D=32823 target=67
+00012 [L2360] TNEW     A=2 B=0 C=0 D=0 
+00013 [L2361] UGET     A=3 B=0 C=0 D=0 main_server
+00014 [L2361] TGETS    A=3 B=3 C=7 D=775 'get_hash_account'
+00015 [L2361] GGET     A=4 B=0 C=8 D=8 'g_self'
+00016 [L2361] TGETS    A=4 B=4 C=9 D=1033 'msg_3002'
+00017 [L2361] TGETS    A=4 B=4 C=10 D=1034 'account'
+00018 [L2361] KSTR     A=5 B=0 C=11 D=11 '@@'
+00019 [L2361] GGET     A=6 B=0 C=0 D=0 'd_ms'
+00020 [L2361] TGETS    A=6 B=6 C=12 D=1548 'd_setting'
+00021 [L2361] TGETS    A=6 B=6 C=13 D=1549 'g_setting'
+00022 [L2361] TGETS    A=6 B=6 C=14 D=1550 'ready_login_area'
+00023 [L2361] MOV      A=7 B=0 C=1 D=1 
+00024 [L2361] CAT      A=4 B=4 C=7 D=1031 
+00025 [L2361] CALL     A=3 B=2 C=2 D=514 
+00026 [L2361] TSETS    A=3 B=2 C=6 D=518 'hash_account'
+00027 [L2362] GGET     A=3 B=0 C=8 D=8 'g_self'
+00028 [L2362] TGETS    A=3 B=3 C=9 D=777 'msg_3002'
+00029 [L2362] TGETS    A=3 B=3 C=15 D=783 'auth_key'
+00030 [L2362] TSETS    A=3 B=2 C=15 D=527 'auth_key'
+00031 [L2363] UGET     A=3 B=0 C=1 D=1 cclog
+00032 [L2363] KSTR     A=4 B=0 C=16 D=16 'g_self.msg_3002.auth_key is %d'
+00033 [L2363] GGET     A=5 B=0 C=8 D=8 'g_self'
+00034 [L2363] TGETS    A=5 B=5 C=9 D=1289 'msg_3002'
+00035 [L2363] TGETS    A=5 B=5 C=15 D=1295 'auth_key'
+00036 [L2363] CALL     A=3 B=1 C=3 D=259 
+00037 [L2364] GGET     A=3 B=0 C=8 D=8 'g_self'
+00038 [L2364] TGETS    A=3 B=3 C=9 D=777 'msg_3002'
+00039 [L2364] TGETS    A=3 B=3 C=17 D=785 'seed'
+00040 [L2364] TSETS    A=3 B=2 C=17 D=529 'seed'
+00041 [L2365] UGET     A=3 B=0 C=1 D=1 cclog
+00042 [L2365] KSTR     A=4 B=0 C=18 D=18 'tmp_req.seed %d'
+00043 [L2365] TGETS    A=5 B=2 C=17 D=529 'seed'
+00044 [L2365] CALL     A=3 B=1 C=3 D=259 
+00045 [L2366] KSTR     A=3 B=0 C=20 D=20 '172.0.0.168'
+00046 [L2366] TSETS    A=3 B=2 C=19 D=531 'client_ip'
+00047 [L2367] GGET     A=3 B=0 C=21 D=21 'g_ls'
+00048 [L2367] TGETS    A=3 B=3 C=22 D=790 'username'
+00049 [L2367] TSETS    A=3 B=2 C=10 D=522 'account'
+00050 [L2369] UGET     A=3 B=0 C=1 D=1 cclog
+00051 [L2369] KSTR     A=4 B=0 C=23 D=23 'try send 1001 to bs, acc=[%s], hash_acc=[%u]'
+00052 [L2369] TGETS    A=5 B=2 C=10 D=522 'account'
+00053 [L2369] TGETS    A=6 B=2 C=6 D=518 'hash_account'
+00054 [L2369] CALL     A=3 B=1 C=4 D=260 
+00055 [L2370] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00056 [L2370] TGETS    A=3 B=3 C=24 D=792 'd_u'
+00057 [L2370] TGETS    A=3 B=3 C=25 D=793 'main_server_send_msg_server'
+00058 [L2370] GGET     A=4 B=0 C=0 D=0 'd_ms'
+00059 [L2370] TGETS    A=4 B=4 C=26 D=1050 'd_msg_def'
+00060 [L2370] TGETS    A=4 B=4 C=27 D=1051 'gscl_msg_id'
+00061 [L2370] TGETS    A=4 B=4 C=28 D=1052 'msg_login_req'
+00062 [L2370] MOV      A=5 B=0 C=2 D=2 
+00063 [L2370] GGET     A=6 B=0 C=29 D=29 'g_bs'
+00064 [L2370] TGETS    A=6 B=6 C=30 D=1566 'socket'
+00065 [L2370] CALL     A=3 B=1 C=4 D=260 
+00066 [L2370] JMP      A=2 B=128 C=38 D=32806 target=105
+00067 [L2381] TNEW     A=2 B=0 C=0 D=0 
+00068 [L2382] UGET     A=3 B=0 C=0 D=0 main_server
+00069 [L2382] TGETS    A=3 B=3 C=7 D=775 'get_hash_account'
+00070 [L2382] GGET     A=4 B=0 C=8 D=8 'g_self'
+00071 [L2382] TGETS    A=4 B=4 C=9 D=1033 'msg_3002'
+00072 [L2382] TGETS    A=4 B=4 C=10 D=1034 'account'
+00073 [L2382] KSTR     A=5 B=0 C=11 D=11 '@@'
+00074 [L2382] GGET     A=6 B=0 C=0 D=0 'd_ms'
+00075 [L2382] TGETS    A=6 B=6 C=12 D=1548 'd_setting'
+00076 [L2382] TGETS    A=6 B=6 C=13 D=1549 'g_setting'
+00077 [L2382] TGETS    A=6 B=6 C=14 D=1550 'ready_login_area'
+00078 [L2382] MOV      A=7 B=0 C=1 D=1 
+00079 [L2382] CAT      A=4 B=4 C=7 D=1031 
+00080 [L2382] CALL     A=3 B=2 C=2 D=514 
+00081 [L2382] TSETS    A=3 B=2 C=6 D=518 'hash_account'
+00082 [L2384] GGET     A=3 B=0 C=8 D=8 'g_self'
+00083 [L2384] TGETS    A=3 B=3 C=31 D=799 'random_key'
+00084 [L2384] TSETS    A=3 B=2 C=31 D=543 'random_key'
+00085 [L2385] GGET     A=3 B=0 C=8 D=8 'g_self'
+00086 [L2385] TGETS    A=3 B=3 C=9 D=777 'msg_3002'
+00087 [L2385] TGETS    A=3 B=3 C=10 D=778 'account'
+00088 [L2385] TSETS    A=3 B=2 C=10 D=522 'account'
+00089 [L2387] UGET     A=3 B=0 C=1 D=1 cclog
+00090 [L2387] KSTR     A=4 B=0 C=32 D=32 'try send 1016 to bs, hash_acc=%u'
+00091 [L2387] TGETS    A=5 B=2 C=6 D=518 'hash_account'
+00092 [L2387] CALL     A=3 B=1 C=3 D=259 
+00093 [L2388] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00094 [L2388] TGETS    A=3 B=3 C=24 D=792 'd_u'
+00095 [L2388] TGETS    A=3 B=3 C=25 D=793 'main_server_send_msg_server'
+00096 [L2388] GGET     A=4 B=0 C=0 D=0 'd_ms'
+00097 [L2388] TGETS    A=4 B=4 C=26 D=1050 'd_msg_def'
+00098 [L2388] TGETS    A=4 B=4 C=27 D=1051 'gscl_msg_id'
+00099 [L2388] TGETS    A=4 B=4 C=33 D=1057 'msg_reconnect'
+00100 [L2388] MOV      A=5 B=0 C=2 D=2 
+00101 [L2388] GGET     A=6 B=0 C=29 D=29 'g_bs'
+00102 [L2388] TGETS    A=6 B=6 C=30 D=1566 'socket'
+00103 [L2388] KSHORT   A=7 B=0 C=0 D=0 0
+00104 [L2388] CALL     A=3 B=1 C=5 D=261 
+00105 [L2391] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/net/network.lua =====
+FUNCTION proto69 offset=0xfc76 source_lines=2394-2556 params=3
+UPVALUES ['cclog', 'tostring', 'main_server']
+00001 [L2395] UGET     A=3 B=0 C=0 D=0 cclog
+00002 [L2395] KSTR     A=4 B=0 C=0 D=0 'call inside_game_1017, time=%d'
+00003 [L2395] MOV      A=5 B=0 C=2 D=2 
+00004 [L2395] CALL     A=3 B=1 C=3 D=259 
+00005 [L2398] UGET     A=3 B=0 C=0 D=0 cclog
+00006 [L2398] KSTR     A=4 B=0 C=1 D=1 'area_id=%d, role_id=%f, role_name=%s'
+00007 [L2398] TGETS    A=5 B=1 C=2 D=258 'area_id'
+00008 [L2398] TGETS    A=6 B=1 C=3 D=259 'role_id'
+00009 [L2398] TGETS    A=7 B=1 C=4 D=260 'role_name'
+00010 [L2398] CALL     A=3 B=1 C=5 D=261 
+00011 [L2404] GGET     A=3 B=0 C=5 D=5 'set_net_status'
+00012 [L2404] KSTR     A=4 B=0 C=6 D=6 'INSIDE_GAME'
+00013 [L2404] CALL     A=3 B=1 C=2 D=258 
+00014 [L2405] KSHORT   A=3 B=0 C=0 D=0 0
+00015 [L2405] GSET     A=3 B=0 C=7 D=7 'g_try_reconnect_begin'
+00016 [L2408] GGET     A=3 B=0 C=8 D=8 'g_self'
+00017 [L2408] TGETS    A=4 B=1 C=9 D=265 'random_key'
+00018 [L2408] TSETS    A=4 B=3 C=9 D=777 'random_key'
+00019 [L2411] TGETS    A=3 B=1 C=10 D=266 'server_time'
+00020 [L2411] ISF      A=0 B=0 C=3 D=3 
+00021 [L2411] JMP      A=4 B=128 C=5 D=32773 target=27
+00022 [L2412] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00023 [L2412] TGETS    A=3 B=3 C=12 D=780 'd_time'
+00024 [L2412] TGETS    A=3 B=3 C=13 D=781 'setTime'
+00025 [L2412] TGETS    A=4 B=1 C=10 D=266 'server_time'
+00026 [L2412] CALL     A=3 B=1 C=2 D=258 
+00027 [L2416] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00028 [L2416] TGETS    A=3 B=3 C=14 D=782 'd_u'
+00029 [L2416] KPRI     A=4 B=0 C=1 D=1 
+00030 [L2416] TSETS    A=4 B=3 C=15 D=783 'g_is_waiting_1106'
+00031 [L2419] GGET     A=3 B=0 C=16 D=16 'g_has_inside_game'
+00032 [L2419] ISF      A=0 B=0 C=3 D=3 
+00033 [L2419] JMP      A=4 B=128 C=166 D=32934 target=200
+00034 [L2421] UGET     A=3 B=0 C=0 D=0 cclog
+00035 [L2421] KSTR     A=4 B=0 C=17 D=17 'inside_game_1017 reconnect ok.'
+00036 [L2421] CALL     A=3 B=1 C=2 D=258 
+00037 [L2422] KPRI     A=3 B=0 C=2 D=2 
+00038 [L2422] GSET     A=3 B=0 C=16 D=16 'g_has_inside_game'
+00039 [L2423] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00040 [L2423] TGETS    A=3 B=3 C=18 D=786 'd_mainUI'
+00041 [L2423] TSETS    A=1 B=3 C=19 D=787 'g_playerInfo'
+00042 [L2426] GGET     A=3 B=0 C=20 D=20 'reportLoginStatus'
+00043 [L2426] KSTR     A=4 B=0 C=21 D=21 're_inside_game_1017_ok'
+00044 [L2426] CALL     A=3 B=1 C=2 D=258 
+00045 [L2429] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00046 [L2429] TGETS    A=3 B=3 C=18 D=786 'd_mainUI'
+00047 [L2429] TGETS    A=3 B=3 C=22 D=790 'updateStrength'
+00048 [L2429] CALL     A=3 B=1 C=1 D=257 
+00049 [L2430] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00050 [L2430] TGETS    A=3 B=3 C=18 D=786 'd_mainUI'
+00051 [L2430] TGETS    A=3 B=3 C=23 D=791 'updateEnergy'
+00052 [L2430] CALL     A=3 B=1 C=1 D=257 
+00053 [L2433] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00054 [L2433] TGETS    A=3 B=3 C=24 D=792 'd_loginUI'
+00055 [L2433] TGETS    A=3 B=3 C=25 D=793 'g_currentSence'
+00056 [L2433] GGET     A=4 B=0 C=11 D=11 'd_ms'
+00057 [L2433] TGETS    A=4 B=4 C=24 D=1048 'd_loginUI'
+00058 [L2433] TGETS    A=4 B=4 C=26 D=1050 'senceID'
+00059 [L2433] TGETS    A=4 B=4 C=27 D=1051 'mainUI'
+00060 [L2433] ISNEV    A=3 B=0 C=4 D=4 
+00061 [L2433] JMP      A=3 B=128 C=15 D=32783 target=77
+00062 [L2434] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00063 [L2434] TGETS    A=3 B=3 C=18 D=786 'd_mainUI'
+00064 [L2434] TGETS    A=3 B=3 C=28 D=796 'g_mainUI'
+00065 [L2434] TGETS    A=3 B=3 C=29 D=797 'playerInfoTab'
+00066 [L2434] TGETS    A=3 B=3 C=30 D=798 'gold_label'
+00067 [L2434] MOV      A=4 B=0 C=3 D=3 
+00068 [L2434] TGETS    A=3 B=3 C=31 D=799 'setString'
+00069 [L2434] UGET     A=5 B=0 C=1 D=1 tostring
+00070 [L2434] GGET     A=6 B=0 C=11 D=11 'd_ms'
+00071 [L2434] TGETS    A=6 B=6 C=18 D=1554 'd_mainUI'
+00072 [L2434] TGETS    A=6 B=6 C=19 D=1555 'g_playerInfo'
+00073 [L2434] TGETS    A=6 B=6 C=32 D=1568 'gold_coin'
+00074 [L2434] CALL     A=5 B=0 C=2 D=2 
+00075 [L2434] CALLM    A=3 B=1 C=1 D=257 
+00076 [L2434] JMP      A=3 B=128 C=37 D=32805 target=114
+00077 [L2435] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00078 [L2435] TGETS    A=3 B=3 C=24 D=792 'd_loginUI'
+00079 [L2435] TGETS    A=3 B=3 C=25 D=793 'g_currentSence'
+00080 [L2435] GGET     A=4 B=0 C=11 D=11 'd_ms'
+00081 [L2435] TGETS    A=4 B=4 C=24 D=1048 'd_loginUI'
+00082 [L2435] TGETS    A=4 B=4 C=26 D=1050 'senceID'
+00083 [L2435] TGETS    A=4 B=4 C=33 D=1057 'mapUI'
+00084 [L2435] ISNEV    A=3 B=0 C=4 D=4 
+00085 [L2435] JMP      A=3 B=128 C=15 D=32783 target=101
+00086 [L2436] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00087 [L2436] TGETS    A=3 B=3 C=34 D=802 'd_mapUI'
+00088 [L2436] TGETS    A=3 B=3 C=35 D=803 'g_mapUI'
+00089 [L2436] TGETS    A=3 B=3 C=29 D=797 'playerInfoTab'
+00090 [L2436] TGETS    A=3 B=3 C=30 D=798 'gold_label'
+00091 [L2436] MOV      A=4 B=0 C=3 D=3 
+00092 [L2436] TGETS    A=3 B=3 C=31 D=799 'setString'
+00093 [L2436] UGET     A=5 B=0 C=1 D=1 tostring
+00094 [L2436] GGET     A=6 B=0 C=11 D=11 'd_ms'
+00095 [L2436] TGETS    A=6 B=6 C=18 D=1554 'd_mainUI'
+00096 [L2436] TGETS    A=6 B=6 C=19 D=1555 'g_playerInfo'
+00097 [L2436] TGETS    A=6 B=6 C=32 D=1568 'gold_coin'
+00098 [L2436] CALL     A=5 B=0 C=2 D=2 
+00099 [L2436] CALLM    A=3 B=1 C=1 D=257 
+00100 [L2436] JMP      A=3 B=128 C=13 D=32781 target=114
+00101 [L2437] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00102 [L2437] TGETS    A=3 B=3 C=24 D=792 'd_loginUI'
+00103 [L2437] TGETS    A=3 B=3 C=25 D=793 'g_currentSence'
+00104 [L2437] GGET     A=4 B=0 C=11 D=11 'd_ms'
+00105 [L2437] TGETS    A=4 B=4 C=24 D=1048 'd_loginUI'
+00106 [L2437] TGETS    A=4 B=4 C=26 D=1050 'senceID'
+00107 [L2437] TGETS    A=4 B=4 C=36 D=1060 'adventure'
+00108 [L2437] ISNEV    A=3 B=0 C=4 D=4 
+00109 [L2437] JMP      A=3 B=128 C=4 D=32772 target=114
+00110 [L2438] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00111 [L2438] TGETS    A=3 B=3 C=37 D=805 'd_activityUI'
+00112 [L2438] TGETS    A=3 B=3 C=38 D=806 'updateGold'
+00113 [L2438] CALL     A=3 B=1 C=1 D=257 
+00114 [L2443] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00115 [L2443] TGETS    A=3 B=3 C=18 D=786 'd_mainUI'
+00116 [L2443] TGETS    A=3 B=3 C=19 D=787 'g_playerInfo'
+00117 [L2443] TGETS    A=3 B=3 C=39 D=807 'silver_coin'
+00118 [L2443] KSHORT   A=4 B=0 C=0 D=0 0
+00119 [L2443] ISGE     A=3 B=0 C=4 D=4 
+00120 [L2443] JMP      A=3 B=128 C=5 D=32773 target=126
+00121 [L2444] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00122 [L2444] TGETS    A=3 B=3 C=18 D=786 'd_mainUI'
+00123 [L2444] TGETS    A=3 B=3 C=19 D=787 'g_playerInfo'
+00124 [L2444] KNUM     A=4 B=0 C=0 D=0 2000000000
+00125 [L2444] TSETS    A=4 B=3 C=39 D=807 'silver_coin'
+00126 [L2447] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00127 [L2447] TGETS    A=3 B=3 C=24 D=792 'd_loginUI'
+00128 [L2447] TGETS    A=3 B=3 C=25 D=793 'g_currentSence'
+00129 [L2447] GGET     A=4 B=0 C=11 D=11 'd_ms'
+00130 [L2447] TGETS    A=4 B=4 C=24 D=1048 'd_loginUI'
+00131 [L2447] TGETS    A=4 B=4 C=26 D=1050 'senceID'
+00132 [L2447] TGETS    A=4 B=4 C=27 D=1051 'mainUI'
+00133 [L2447] ISNEV    A=3 B=0 C=4 D=4 
+00134 [L2447] JMP      A=3 B=128 C=15 D=32783 target=150
+00135 [L2448] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00136 [L2448] TGETS    A=3 B=3 C=18 D=786 'd_mainUI'
+00137 [L2448] TGETS    A=3 B=3 C=28 D=796 'g_mainUI'
+00138 [L2448] TGETS    A=3 B=3 C=29 D=797 'playerInfoTab'
+00139 [L2448] TGETS    A=3 B=3 C=40 D=808 'money_label'
+00140 [L2448] MOV      A=4 B=0 C=3 D=3 
+00141 [L2448] TGETS    A=3 B=3 C=31 D=799 'setString'
+00142 [L2448] UGET     A=5 B=0 C=1 D=1 tostring
+00143 [L2448] GGET     A=6 B=0 C=11 D=11 'd_ms'
+00144 [L2448] TGETS    A=6 B=6 C=18 D=1554 'd_mainUI'
+00145 [L2448] TGETS    A=6 B=6 C=19 D=1555 'g_playerInfo'
+00146 [L2448] TGETS    A=6 B=6 C=39 D=1575 'silver_coin'
+00147 [L2448] CALL     A=5 B=0 C=2 D=2 
+00148 [L2448] CALLM    A=3 B=1 C=1 D=257 
+00149 [L2448] JMP      A=3 B=128 C=37 D=32805 target=187
+00150 [L2449] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00151 [L2449] TGETS    A=3 B=3 C=24 D=792 'd_loginUI'
+00152 [L2449] TGETS    A=3 B=3 C=25 D=793 'g_currentSence'
+00153 [L2449] GGET     A=4 B=0 C=11 D=11 'd_ms'
+00154 [L2449] TGETS    A=4 B=4 C=24 D=1048 'd_loginUI'
+00155 [L2449] TGETS    A=4 B=4 C=26 D=1050 'senceID'
+00156 [L2449] TGETS    A=4 B=4 C=33 D=1057 'mapUI'
+00157 [L2449] ISNEV    A=3 B=0 C=4 D=4 
+00158 [L2449] JMP      A=3 B=128 C=15 D=32783 target=174
+00159 [L2450] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00160 [L2450] TGETS    A=3 B=3 C=34 D=802 'd_mapUI'
+00161 [L2450] TGETS    A=3 B=3 C=35 D=803 'g_mapUI'
+00162 [L2450] TGETS    A=3 B=3 C=29 D=797 'playerInfoTab'
+00163 [L2450] TGETS    A=3 B=3 C=40 D=808 'money_label'
+00164 [L2450] MOV      A=4 B=0 C=3 D=3 
+00165 [L2450] TGETS    A=3 B=3 C=31 D=799 'setString'
+00166 [L2450] UGET     A=5 B=0 C=1 D=1 tostring
+00167 [L2450] GGET     A=6 B=0 C=11 D=11 'd_ms'
+00168 [L2450] TGETS    A=6 B=6 C=18 D=1554 'd_mainUI'
+00169 [L2450] TGETS    A=6 B=6 C=19 D=1555 'g_playerInfo'
+00170 [L2450] TGETS    A=6 B=6 C=39 D=1575 'silver_coin'
+00171 [L2450] CALL     A=5 B=0 C=2 D=2 
+00172 [L2450] CALLM    A=3 B=1 C=1 D=257 
+00173 [L2450] JMP      A=3 B=128 C=13 D=32781 target=187
+00174 [L2451] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00175 [L2451] TGETS    A=3 B=3 C=24 D=792 'd_loginUI'
+00176 [L2451] TGETS    A=3 B=3 C=25 D=793 'g_currentSence'
+00177 [L2451] GGET     A=4 B=0 C=11 D=11 'd_ms'
+00178 [L2451] TGETS    A=4 B=4 C=24 D=1048 'd_loginUI'
+00179 [L2451] TGETS    A=4 B=4 C=26 D=1050 'senceID'
+00180 [L2451] TGETS    A=4 B=4 C=36 D=1060 'adventure'
+00181 [L2451] ISNEV    A=3 B=0 C=4 D=4 
+00182 [L2451] JMP      A=3 B=128 C=4 D=32772 target=187
+00183 [L2452] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00184 [L2452] TGETS    A=3 B=3 C=37 D=805 'd_activityUI'
+00185 [L2452] TGETS    A=3 B=3 C=41 D=809 'updateMoney'
+00186 [L2452] CALL     A=3 B=1 C=1 D=257 
+00187 [L2455] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00188 [L2455] TGETS    A=3 B=3 C=18 D=786 'd_mainUI'
+00189 [L2455] TGETS    A=3 B=3 C=42 D=810 'unScheduleCountTime'
+00190 [L2455] CALL     A=3 B=1 C=1 D=257 
+00191 [L2456] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00192 [L2456] TGETS    A=3 B=3 C=18 D=786 'd_mainUI'
+00193 [L2456] TGETS    A=3 B=3 C=43 D=811 'scheduleCountTime'
+00194 [L2456] CALL     A=3 B=1 C=1 D=257 
+00195 [L2463] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00196 [L2463] TGETS    A=3 B=3 C=14 D=782 'd_u'
+00197 [L2463] TGETS    A=3 B=3 C=44 D=812 'tryRetranReq'
+00198 [L2463] CALL     A=3 B=1 C=1 D=257 
+00199 [L2463] JMP      A=3 B=129 C=61 D=33085 target=517
+00200 [L2466] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00201 [L2466] TGETS    A=3 B=3 C=14 D=782 'd_u'
+00202 [L2466] KSHORT   A=4 B=0 C=0 D=0 0
+00203 [L2466] TSETS    A=4 B=3 C=45 D=813 'g_server_ret_serial_num'
+00204 [L2467] KPRI     A=3 B=0 C=2 D=2 
+00205 [L2467] GSET     A=3 B=0 C=16 D=16 'g_has_inside_game'
+00206 [L2468] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00207 [L2468] TGETS    A=3 B=3 C=18 D=786 'd_mainUI'
+00208 [L2468] TSETS    A=1 B=3 C=19 D=787 'g_playerInfo'
+00209 [L2470] GGET     A=3 B=0 C=20 D=20 'reportLoginStatus'
+00210 [L2470] KSTR     A=4 B=0 C=46 D=46 'first_inside_game_1017_ok'
+00211 [L2470] CALL     A=3 B=1 C=2 D=258 
+00212 [L2473] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00213 [L2473] TGETS    A=3 B=3 C=18 D=786 'd_mainUI'
+00214 [L2473] TGETS    A=3 B=3 C=19 D=787 'g_playerInfo'
+00215 [L2473] TGETS    A=3 B=3 C=39 D=807 'silver_coin'
+00216 [L2473] KSHORT   A=4 B=0 C=0 D=0 0
+00217 [L2473] ISGE     A=3 B=0 C=4 D=4 
+00218 [L2473] JMP      A=3 B=128 C=5 D=32773 target=224
+00219 [L2474] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00220 [L2474] TGETS    A=3 B=3 C=18 D=786 'd_mainUI'
+00221 [L2474] TGETS    A=3 B=3 C=19 D=787 'g_playerInfo'
+00222 [L2474] KNUM     A=4 B=0 C=0 D=0 2000000000
+00223 [L2474] TSETS    A=4 B=3 C=39 D=807 'silver_coin'
+00224 [L2477] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00225 [L2477] TGETS    A=3 B=3 C=47 D=815 'd_followUI'
+00226 [L2477] TGETS    A=3 B=3 C=48 D=816 'retryFriendList'
+00227 [L2477] CALL     A=3 B=1 C=1 D=257 
+00228 [L2480] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00229 [L2480] TGETS    A=3 B=3 C=49 D=817 'd_stat'
+00230 [L2480] TGETS    A=3 B=3 C=50 D=818 'login_end'
+00231 [L2480] CALL     A=3 B=1 C=1 D=257 
+00232 [L2483] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00233 [L2483] TGETS    A=3 B=3 C=51 D=819 'd_messageUI'
+00234 [L2483] TGETS    A=3 B=3 C=52 D=820 'initSystemMsg'
+00235 [L2483] CALL     A=3 B=1 C=1 D=257 
+00236 [L2484] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00237 [L2484] TGETS    A=3 B=3 C=51 D=819 'd_messageUI'
+00238 [L2484] TGETS    A=3 B=3 C=53 D=821 'readFightMsgToFile'
+00239 [L2484] CALL     A=3 B=1 C=1 D=257 
+00240 [L2485] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00241 [L2485] TGETS    A=3 B=3 C=51 D=819 'd_messageUI'
+00242 [L2485] TGETS    A=3 B=3 C=54 D=822 'readPlayerMsgToFile'
+00243 [L2485] CALL     A=3 B=1 C=1 D=257 
+00244 [L2486] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00245 [L2486] TGETS    A=3 B=3 C=51 D=819 'd_messageUI'
+00246 [L2486] TGETS    A=3 B=3 C=55 D=823 'readSpecialMsgToFile'
+00247 [L2486] CALL     A=3 B=1 C=1 D=257 
+00248 [L2488] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00249 [L2488] TGETS    A=3 B=3 C=18 D=786 'd_mainUI'
+00250 [L2488] TGETS    A=3 B=3 C=43 D=811 'scheduleCountTime'
+00251 [L2488] CALL     A=3 B=1 C=1 D=257 
+00252 [L2489] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00253 [L2489] TGETS    A=3 B=3 C=56 D=824 'd_guideUI'
+00254 [L2489] TGETS    A=3 B=3 C=57 D=825 'getGuideState'
+00255 [L2489] CALL     A=3 B=1 C=1 D=257 
+00256 [L2492] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00257 [L2492] TGETS    A=3 B=3 C=58 D=826 'd_tp_config'
+00258 [L2492] TGETS    A=3 B=3 C=59 D=827 'useThirdPartySdk'
+00259 [L2492] CALL     A=3 B=2 C=1 D=513 
+00260 [L2492] ISNEP    A=3 B=0 C=1 D=1 
+00261 [L2492] JMP      A=3 B=128 C=55 D=32823 target=317
+00262 [L2494] KSHORT   A=3 B=0 C=0 D=0 0
+00263 [L2495] TGETS    A=4 B=1 C=60 D=316 'pf_account'
+00264 [L2495] ISF      A=0 B=0 C=4 D=4 
+00265 [L2495] JMP      A=5 B=128 C=10 D=32778 target=276
+00266 [L2495] TGETS    A=4 B=1 C=61 D=317 'mobile_account'
+00267 [L2495] ISF      A=0 B=0 C=4 D=4 
+00268 [L2495] JMP      A=5 B=128 C=7 D=32775 target=276
+00269 [L2496] TGETS    A=4 B=1 C=60 D=316 'pf_account'
+00270 [L2496] TGETS    A=5 B=1 C=61 D=317 'mobile_account'
+00271 [L2496] ISNEV    A=4 B=0 C=5 D=5 
+00272 [L2496] JMP      A=4 B=128 C=2 D=32770 target=275
+00273 [L2497] KSHORT   A=3 B=0 C=1 D=1 1
+00274 [L2497] JMP      A=4 B=128 C=1 D=32769 target=276
+00275 [L2499] KSHORT   A=3 B=0 C=2 D=2 2
+00276 [L2502] GGET     A=4 B=0 C=11 D=11 'd_ms'
+00277 [L2502] TGETS    A=4 B=4 C=62 D=1086 'd_file'
+00278 [L2502] TGETS    A=4 B=4 C=63 D=1087 'set'
+00279 [L2502] KSTR     A=5 B=0 C=64 D=64 'isMobileLogin'
+00280 [L2502] MOV      A=6 B=0 C=3 D=3 
+00281 [L2502] CALL     A=4 B=1 C=3 D=259 
+00282 [L2504] GGET     A=4 B=0 C=11 D=11 'd_ms'
+00283 [L2504] TGETS    A=4 B=4 C=24 D=1048 'd_loginUI'
+00284 [L2504] TGETS    A=4 B=4 C=65 D=1089 'g_loginUI'
+00285 [L2504] TGETS    A=4 B=4 C=66 D=1090 'password'
+00286 [L2504] ISF      A=0 B=0 C=4 D=4 
+00287 [L2504] JMP      A=5 B=128 C=13 D=32781 target=301
+00288 [L2505] UGET     A=4 B=0 C=2 D=2 main_server
+00289 [L2505] TGETS    A=4 B=4 C=67 D=1091 'get_read_md5'
+00290 [L2505] GGET     A=5 B=0 C=11 D=11 'd_ms'
+00291 [L2505] TGETS    A=5 B=5 C=24 D=1304 'd_loginUI'
+00292 [L2505] TGETS    A=5 B=5 C=65 D=1345 'g_loginUI'
+00293 [L2505] TGETS    A=5 B=5 C=66 D=1346 'password'
+00294 [L2505] CALL     A=4 B=2 C=2 D=514 
+00295 [L2506] GGET     A=5 B=0 C=11 D=11 'd_ms'
+00296 [L2506] TGETS    A=5 B=5 C=62 D=1342 'd_file'
+00297 [L2506] TGETS    A=5 B=5 C=63 D=1343 'set'
+00298 [L2506] KSTR     A=6 B=0 C=68 D=68 'mpwd'
+00299 [L2506] MOV      A=7 B=0 C=4 D=4 
+00300 [L2506] CALL     A=5 B=1 C=3 D=259 
+00301 [L2509] GGET     A=4 B=0 C=11 D=11 'd_ms'
+00302 [L2509] TGETS    A=4 B=4 C=24 D=1048 'd_loginUI'
+00303 [L2509] TGETS    A=4 B=4 C=65 D=1089 'g_loginUI'
+00304 [L2509] TGETS    A=4 B=4 C=69 D=1093 'username'
+00305 [L2509] ISF      A=0 B=0 C=4 D=4 
+00306 [L2509] JMP      A=5 B=128 C=10 D=32778 target=317
+00307 [L2510] GGET     A=4 B=0 C=11 D=11 'd_ms'
+00308 [L2510] TGETS    A=4 B=4 C=24 D=1048 'd_loginUI'
+00309 [L2510] TGETS    A=4 B=4 C=65 D=1089 'g_loginUI'
+00310 [L2510] TGETS    A=4 B=4 C=69 D=1093 'username'
+00311 [L2511] GGET     A=5 B=0 C=11 D=11 'd_ms'
+00312 [L2511] TGETS    A=5 B=5 C=62 D=1342 'd_file'
+00313 [L2511] TGETS    A=5 B=5 C=63 D=1343 'set'
+00314 [L2511] KSTR     A=6 B=0 C=69 D=69 'username'
+00315 [L2511] MOV      A=7 B=0 C=4 D=4 
+00316 [L2511] CALL     A=5 B=1 C=3 D=259 
+00317 [L2515] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00318 [L2515] TGETS    A=3 B=3 C=70 D=838 'd_setting'
+00319 [L2515] TGETS    A=3 B=3 C=71 D=839 'saveLastMobileLoginInfo'
+00320 [L2515] GGET     A=4 B=0 C=11 D=11 'd_ms'
+00321 [L2515] TGETS    A=4 B=4 C=70 D=1094 'd_setting'
+00322 [L2515] TGETS    A=4 B=4 C=72 D=1096 'g_setting'
+00323 [L2515] TGETS    A=4 B=4 C=73 D=1097 'ready_login_area'
+00324 [L2515] GGET     A=5 B=0 C=11 D=11 'd_ms'
+00325 [L2515] TGETS    A=5 B=5 C=24 D=1304 'd_loginUI'
+00326 [L2515] TGETS    A=5 B=5 C=65 D=1345 'g_loginUI'
+00327 [L2515] TGETS    A=5 B=5 C=69 D=1349 'username'
+00328 [L2515] GGET     A=6 B=0 C=11 D=11 'd_ms'
+00329 [L2515] TGETS    A=6 B=6 C=24 D=1560 'd_loginUI'
+00330 [L2515] TGETS    A=6 B=6 C=65 D=1601 'g_loginUI'
+00331 [L2515] TGETS    A=6 B=6 C=66 D=1602 'password'
+00332 [L2515] TGETS    A=7 B=1 C=4 D=260 'role_name'
+00333 [L2515] TGETS    A=8 B=1 C=3 D=259 'role_id'
+00334 [L2515] TGETS    A=9 B=1 C=2 D=258 'area_id'
+00335 [L2515] CALL     A=3 B=1 C=7 D=263 
+00336 [L2517] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00337 [L2517] TGETS    A=3 B=3 C=24 D=792 'd_loginUI'
+00338 [L2517] TGETS    A=3 B=3 C=65 D=833 'g_loginUI'
+00339 [L2517] TGETS    A=3 B=3 C=66 D=834 'password'
+00340 [L2517] ISF      A=0 B=0 C=3 D=3 
+00341 [L2517] JMP      A=4 B=128 C=13 D=32781 target=355
+00342 [L2518] UGET     A=3 B=0 C=2 D=2 main_server
+00343 [L2518] TGETS    A=3 B=3 C=67 D=835 'get_read_md5'
+00344 [L2518] GGET     A=4 B=0 C=11 D=11 'd_ms'
+00345 [L2518] TGETS    A=4 B=4 C=24 D=1048 'd_loginUI'
+00346 [L2518] TGETS    A=4 B=4 C=65 D=1089 'g_loginUI'
+00347 [L2518] TGETS    A=4 B=4 C=66 D=1090 'password'
+00348 [L2518] CALL     A=3 B=2 C=2 D=514 
+00349 [L2519] GGET     A=4 B=0 C=11 D=11 'd_ms'
+00350 [L2519] TGETS    A=4 B=4 C=62 D=1086 'd_file'
+00351 [L2519] TGETS    A=4 B=4 C=63 D=1087 'set'
+00352 [L2519] KSTR     A=5 B=0 C=68 D=68 'mpwd'
+00353 [L2519] MOV      A=6 B=0 C=3 D=3 
+00354 [L2519] CALL     A=4 B=1 C=3 D=259 
+00355 [L2521] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00356 [L2521] TGETS    A=3 B=3 C=18 D=786 'd_mainUI'
+00357 [L2521] TGETS    A=3 B=3 C=74 D=842 'show'
+00358 [L2521] CALL     A=3 B=1 C=1 D=257 
+00359 [L2523] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00360 [L2523] TGETS    A=3 B=3 C=58 D=826 'd_tp_config'
+00361 [L2523] TGETS    A=3 B=3 C=75 D=843 'getThirdPartyFlag'
+00362 [L2523] CALL     A=3 B=2 C=1 D=513 
+00363 [L2524] GGET     A=4 B=0 C=11 D=11 'd_ms'
+00364 [L2524] TGETS    A=4 B=4 C=58 D=1082 'd_tp_config'
+00365 [L2524] TGETS    A=4 B=4 C=76 D=1100 'ThirdPlatformDef'
+00366 [L2525] TGETS    A=5 B=4 C=77 D=1101 'ios'
+00367 [L2525] ISEQV    A=3 B=0 C=5 D=5 
+00368 [L2525] JMP      A=5 B=128 C=6 D=32774 target=375
+00369 [L2525] TGETS    A=5 B=4 C=78 D=1102 'ios_tw'
+00370 [L2525] ISEQV    A=3 B=0 C=5 D=5 
+00371 [L2525] JMP      A=5 B=128 C=3 D=32771 target=375
+00372 [L2525] TGETS    A=5 B=4 C=79 D=1103 'tw_i'
+00373 [L2525] ISNEV    A=3 B=0 C=5 D=5 
+00374 [L2525] JMP      A=5 B=128 C=14 D=32782 target=389
+00375 [L2525] UGET     A=5 B=0 C=2 D=2 main_server
+00376 [L2525] TGETS    A=5 B=5 C=80 D=1360 'thirdPartyIOSPurchaseResult'
+00377 [L2525] ISF      A=0 B=0 C=5 D=5 
+00378 [L2525] JMP      A=6 B=128 C=10 D=32778 target=389
+00379 [L2526] GGET     A=5 B=0 C=11 D=11 'd_ms'
+00380 [L2526] TGETS    A=5 B=5 C=18 D=1298 'd_mainUI'
+00381 [L2526] TGETS    A=5 B=5 C=81 D=1361 'g_isNeedGuide'
+00382 [L2526] ISF      A=0 B=0 C=5 D=5 
+00383 [L2526] JMP      A=6 B=128 C=1 D=32769 target=385
+00384 [L2526] JMP      A=5 B=128 C=4 D=32772 target=389
+00385 [L2529] UGET     A=5 B=0 C=2 D=2 main_server
+00386 [L2529] TGETS    A=5 B=5 C=80 D=1360 'thirdPartyIOSPurchaseResult'
+00387 [L2529] KSTR     A=6 B=0 C=82 D=82 ''
+00388 [L2529] CALL     A=5 B=1 C=2 D=258 
+00389 [L2533] TGETS    A=5 B=4 C=83 D=1107 'p37wan_a'
+00390 [L2533] ISNEV    A=3 B=0 C=5 D=5 
+00391 [L2533] JMP      A=5 B=128 C=87 D=32855 target=479
+00392 [L2534] UGET     A=5 B=0 C=2 D=2 main_server
+00393 [L2534] TGETS    A=5 B=5 C=84 D=1364 'setTPValue'
+00394 [L2534] KSTR     A=6 B=0 C=85 D=85 'serverId'
+00395 [L2534] GGET     A=7 B=0 C=11 D=11 'd_ms'
+00396 [L2534] TGETS    A=7 B=7 C=70 D=1862 'd_setting'
+00397 [L2534] TGETS    A=7 B=7 C=72 D=1864 'g_setting'
+00398 [L2534] TGETS    A=7 B=7 C=86 D=1878 'server_id'
+00399 [L2534] KSTR     A=8 B=0 C=82 D=82 ''
+00400 [L2534] CAT      A=7 B=7 C=8 D=1800 
+00401 [L2534] CALL     A=5 B=1 C=3 D=259 
+00402 [L2535] UGET     A=5 B=0 C=2 D=2 main_server
+00403 [L2535] TGETS    A=5 B=5 C=84 D=1364 'setTPValue'
+00404 [L2535] KSTR     A=6 B=0 C=87 D=87 'ServerName'
+00405 [L2535] GGET     A=7 B=0 C=11 D=11 'd_ms'
+00406 [L2535] TGETS    A=7 B=7 C=70 D=1862 'd_setting'
+00407 [L2535] TGETS    A=7 B=7 C=72 D=1864 'g_setting'
+00408 [L2535] TGETS    A=7 B=7 C=86 D=1878 'server_id'
+00409 [L2535] KSTR     A=8 B=0 C=82 D=82 ''
+00410 [L2535] CAT      A=7 B=7 C=8 D=1800 
+00411 [L2535] CALL     A=5 B=1 C=3 D=259 
+00412 [L2536] UGET     A=5 B=0 C=2 D=2 main_server
+00413 [L2536] TGETS    A=5 B=5 C=84 D=1364 'setTPValue'
+00414 [L2536] KSTR     A=6 B=0 C=88 D=88 'roleId'
+00415 [L2536] GGET     A=7 B=0 C=11 D=11 'd_ms'
+00416 [L2536] TGETS    A=7 B=7 C=70 D=1862 'd_setting'
+00417 [L2536] TGETS    A=7 B=7 C=72 D=1864 'g_setting'
+00418 [L2536] TGETS    A=7 B=7 C=3 D=1795 'role_id'
+00419 [L2536] KSTR     A=8 B=0 C=82 D=82 ''
+00420 [L2536] CAT      A=7 B=7 C=8 D=1800 
+00421 [L2536] CALL     A=5 B=1 C=3 D=259 
+00422 [L2537] UGET     A=5 B=0 C=2 D=2 main_server
+00423 [L2537] TGETS    A=5 B=5 C=84 D=1364 'setTPValue'
+00424 [L2537] KSTR     A=6 B=0 C=89 D=89 'roleName'
+00425 [L2537] GGET     A=7 B=0 C=11 D=11 'd_ms'
+00426 [L2537] TGETS    A=7 B=7 C=70 D=1862 'd_setting'
+00427 [L2537] TGETS    A=7 B=7 C=72 D=1864 'g_setting'
+00428 [L2537] TGETS    A=7 B=7 C=4 D=1796 'role_name'
+00429 [L2537] TGETB    A=7 B=7 C=1 D=1793 
+00430 [L2537] KSTR     A=8 B=0 C=82 D=82 ''
+00431 [L2537] CAT      A=7 B=7 C=8 D=1800 
+00432 [L2537] CALL     A=5 B=1 C=3 D=259 
+00433 [L2538] UGET     A=5 B=0 C=2 D=2 main_server
+00434 [L2538] TGETS    A=5 B=5 C=84 D=1364 'setTPValue'
+00435 [L2538] KSTR     A=6 B=0 C=90 D=90 'roleLevel'
+00436 [L2538] GGET     A=7 B=0 C=11 D=11 'd_ms'
+00437 [L2538] TGETS    A=7 B=7 C=18 D=1810 'd_mainUI'
+00438 [L2538] TGETS    A=7 B=7 C=19 D=1811 'g_playerInfo'
+00439 [L2538] TGETS    A=7 B=7 C=91 D=1883 'level'
+00440 [L2538] KSTR     A=8 B=0 C=82 D=82 ''
+00441 [L2538] CAT      A=7 B=7 C=8 D=1800 
+00442 [L2538] CALL     A=5 B=1 C=3 D=259 
+00443 [L2540] UGET     A=5 B=0 C=2 D=2 main_server
+00444 [L2540] TGETS    A=5 B=5 C=84 D=1364 'setTPValue'
+00445 [L2540] KSTR     A=6 B=0 C=92 D=92 'cur_system_gold'
+00446 [L2540] GGET     A=7 B=0 C=11 D=11 'd_ms'
+00447 [L2540] TGETS    A=7 B=7 C=18 D=1810 'd_mainUI'
+00448 [L2540] TGETS    A=7 B=7 C=19 D=1811 'g_playerInfo'
+00449 [L2540] TGETS    A=7 B=7 C=92 D=1884 'cur_system_gold'
+00450 [L2540] KSTR     A=8 B=0 C=82 D=82 ''
+00451 [L2540] CAT      A=7 B=7 C=8 D=1800 
+00452 [L2540] CALL     A=5 B=1 C=3 D=259 
+00453 [L2541] UGET     A=5 B=0 C=2 D=2 main_server
+00454 [L2541] TGETS    A=5 B=5 C=84 D=1364 'setTPValue'
+00455 [L2541] KSTR     A=6 B=0 C=93 D=93 'union_id'
+00456 [L2541] GGET     A=7 B=0 C=11 D=11 'd_ms'
+00457 [L2541] TGETS    A=7 B=7 C=18 D=1810 'd_mainUI'
+00458 [L2541] TGETS    A=7 B=7 C=19 D=1811 'g_playerInfo'
+00459 [L2541] TGETS    A=7 B=7 C=93 D=1885 'union_id'
+00460 [L2541] KSTR     A=8 B=0 C=82 D=82 ''
+00461 [L2541] CAT      A=7 B=7 C=8 D=1800 
+00462 [L2541] CALL     A=5 B=1 C=3 D=259 
+00463 [L2542] UGET     A=5 B=0 C=2 D=2 main_server
+00464 [L2542] TGETS    A=5 B=5 C=84 D=1364 'setTPValue'
+00465 [L2542] KSTR     A=6 B=0 C=94 D=94 'vip_level'
+00466 [L2542] GGET     A=7 B=0 C=11 D=11 'd_ms'
+00467 [L2542] TGETS    A=7 B=7 C=18 D=1810 'd_mainUI'
+00468 [L2542] TGETS    A=7 B=7 C=19 D=1811 'g_playerInfo'
+00469 [L2542] TGETS    A=7 B=7 C=94 D=1886 'vip_level'
+00470 [L2542] KSTR     A=8 B=0 C=82 D=82 ''
+00471 [L2542] CAT      A=7 B=7 C=8 D=1800 
+00472 [L2542] CALL     A=5 B=1 C=3 D=259 
+00473 [L2544] UGET     A=5 B=0 C=2 D=2 main_server
+00474 [L2544] TGETS    A=5 B=5 C=95 D=1375 'doTPAction'
+00475 [L2544] KSTR     A=6 B=0 C=96 D=96 'inside_game'
+00476 [L2544] KSTR     A=7 B=0 C=82 D=82 ''
+00477 [L2544] CALL     A=5 B=1 C=3 D=259 
+00478 [L2544] JMP      A=5 B=128 C=38 D=32806 target=517
+00479 [L2545] TGETS    A=5 B=4 C=97 D=1121 'oppo_new2_a'
+00480 [L2545] ISNEV    A=3 B=0 C=5 D=5 
+00481 [L2545] JMP      A=5 B=128 C=35 D=32803 target=517
+00482 [L2546] UGET     A=5 B=0 C=2 D=2 main_server
+00483 [L2546] TGETS    A=5 B=5 C=84 D=1364 'setTPValue'
+00484 [L2546] KSTR     A=6 B=0 C=98 D=98 'oppoService'
+00485 [L2546] GGET     A=7 B=0 C=11 D=11 'd_ms'
+00486 [L2546] TGETS    A=7 B=7 C=70 D=1862 'd_setting'
+00487 [L2546] TGETS    A=7 B=7 C=72 D=1864 'g_setting'
+00488 [L2546] TGETS    A=7 B=7 C=86 D=1878 'server_id'
+00489 [L2546] KSTR     A=8 B=0 C=82 D=82 ''
+00490 [L2546] CAT      A=7 B=7 C=8 D=1800 
+00491 [L2546] CALL     A=5 B=1 C=3 D=259 
+00492 [L2547] UGET     A=5 B=0 C=2 D=2 main_server
+00493 [L2547] TGETS    A=5 B=5 C=84 D=1364 'setTPValue'
+00494 [L2547] KSTR     A=6 B=0 C=99 D=99 'oppoRole'
+00495 [L2547] GGET     A=7 B=0 C=11 D=11 'd_ms'
+00496 [L2547] TGETS    A=7 B=7 C=70 D=1862 'd_setting'
+00497 [L2547] TGETS    A=7 B=7 C=72 D=1864 'g_setting'
+00498 [L2547] TGETS    A=7 B=7 C=3 D=1795 'role_id'
+00499 [L2547] KSTR     A=8 B=0 C=82 D=82 ''
+00500 [L2547] CAT      A=7 B=7 C=8 D=1800 
+00501 [L2547] CALL     A=5 B=1 C=3 D=259 
+00502 [L2548] UGET     A=5 B=0 C=2 D=2 main_server
+00503 [L2548] TGETS    A=5 B=5 C=84 D=1364 'setTPValue'
+00504 [L2548] KSTR     A=6 B=0 C=100 D=100 'oppoGrade'
+00505 [L2548] GGET     A=7 B=0 C=11 D=11 'd_ms'
+00506 [L2548] TGETS    A=7 B=7 C=18 D=1810 'd_mainUI'
+00507 [L2548] TGETS    A=7 B=7 C=19 D=1811 'g_playerInfo'
+00508 [L2548] TGETS    A=7 B=7 C=91 D=1883 'level'
+00509 [L2548] KSTR     A=8 B=0 C=82 D=82 ''
+00510 [L2548] CAT      A=7 B=7 C=8 D=1800 
+00511 [L2548] CALL     A=5 B=1 C=3 D=259 
+00512 [L2550] UGET     A=5 B=0 C=2 D=2 main_server
+00513 [L2550] TGETS    A=5 B=5 C=95 D=1375 'doTPAction'
+00514 [L2550] KSTR     A=6 B=0 C=101 D=101 'sendRoleInfo'
+00515 [L2550] KSTR     A=7 B=0 C=82 D=82 ''
+00516 [L2550] CALL     A=5 B=1 C=3 D=259 
+00517 [L2554] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00518 [L2554] TGETS    A=3 B=3 C=102 D=870 'd_fightUI'
+00519 [L2554] TGETS    A=3 B=3 C=103 D=871 'intFightSpeed'
+00520 [L2554] CALL     A=3 B=1 C=1 D=257 
+00521 [L2556] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/net/network.lua =====
+FUNCTION proto72 offset=0x10f06 source_lines=2593-2604 params=1
+UPVALUES ['cclog']
+00001 [L2594] KPRI     A=1 B=0 C=2 D=2 
+00002 [L2595] ISEQP    A=0 B=0 C=0 D=0 
+00003 [L2595] JMP      A=2 B=128 C=4 D=32772 target=8
+00004 [L2595] LEN      A=2 B=0 C=0 D=0 
+00005 [L2595] KSHORT   A=3 B=0 C=0 D=0 0
+00006 [L2595] ISGT     A=2 B=0 C=3 D=3 
+00007 [L2595] JMP      A=2 B=128 C=5 D=32773 target=13
+00008 [L2596] KPRI     A=1 B=0 C=2 D=2 
+00009 [L2597] GGET     A=2 B=0 C=0 D=0 'reportLoginStatus'
+00010 [L2597] KSTR     A=3 B=0 C=1 D=1 'ERROR: sdk return token is nil'
+00011 [L2597] CALL     A=2 B=1 C=2 D=258 
+00012 [L2597] JMP      A=2 B=128 C=4 D=32772 target=17
+00013 [L2599] KPRI     A=1 B=0 C=1 D=1 
+00014 [L2600] UGET     A=2 B=0 C=0 D=0 cclog
+00015 [L2600] KSTR     A=3 B=0 C=2 D=2 'checkSDKToken lenght ok.'
+00016 [L2600] CALL     A=2 B=1 C=2 D=258 
+00017 [L2603] RET1     A=1 B=0 C=2 D=2 
+
+
+===== lua/ui/guideUI.lua =====
+FUNCTION proto2 offset=0x13b source_lines=205-230 params=0
+UPVALUES ['table']
+00001 [L206] TDUP     A=0 B=0 C=0 D=0 {'kind': 'table', 'value': {}}
+00002 [L206] TNEW     A=1 B=0 C=0 D=0 
+00003 [L206] TSETS    A=1 B=0 C=1 D=1 'data32'
+00004 [L206] GSET     A=0 B=0 C=2 D=2 'bit'
+00005 [L207] KSHORT   A=0 B=0 C=1 D=1 1
+00006 [L207] KSHORT   A=1 B=0 C=32 D=32 32
+00007 [L207] KSHORT   A=2 B=0 C=1 D=1 1
+00008 [L207] FORI     A=0 B=128 C=7 D=32775 target=16
+00009 [L208] GGET     A=4 B=0 C=2 D=2 'bit'
+00010 [L208] TGETS    A=4 B=4 C=1 D=1025 'data32'
+00011 [L208] SUBNV    A=5 B=3 C=0 D=768 
+00012 [L208] KSHORT   A=6 B=0 C=2 D=2 2
+00013 [L208] POW      A=5 B=6 C=5 D=1541 
+00014 [L208] TSETV    A=5 B=4 C=3 D=1027 
+00015 [L207] FORL     A=0 B=127 C=249 D=32761 target=9
+00016 [L211] GGET     A=0 B=0 C=2 D=2 'bit'
+00017 [L224] FNEW     A=1 B=0 C=4 D=4 {'kind': 'proto', 'id': 1}
+00018 [L211] TSETS    A=1 B=0 C=3 D=3 'd2b'
+00019 [L226] GGET     A=0 B=0 C=2 D=2 'bit'
+00020 [L226] MOV      A=1 B=0 C=0 D=0 
+00021 [L226] TGETS    A=0 B=0 C=3 D=3 'd2b'
+00022 [L226] GGET     A=2 B=0 C=5 D=5 'd_ms'
+00023 [L226] TGETS    A=2 B=2 C=6 D=518 'd_mainUI'
+00024 [L226] TGETS    A=2 B=2 C=7 D=519 'g_playerInfo'
+00025 [L226] TGETS    A=2 B=2 C=8 D=520 'guide_progress'
+00026 [L226] CALL     A=0 B=2 C=3 D=515 
+00027 [L227] UGET     A=1 B=0 C=0 D=0 table
+00028 [L227] TGETS    A=1 B=1 C=9 D=265 'remove'
+00029 [L227] MOV      A=2 B=0 C=0 D=0 
+00030 [L227] KSHORT   A=3 B=0 C=1 D=1 1
+00031 [L227] CALL     A=1 B=1 C=3 D=259 
+00032 [L229] UCLO     A=0 B=128 C=0 D=32768 target=33
+00033 [L229] RET1     A=0 B=0 C=2 D=2 
+
+
+===== lua/ui/guideUI.lua =====
+FUNCTION proto3 offset=0x251 source_lines=274-352 params=0
+UPVALUES ['cclog']
+00001 [L275] UGET     A=0 B=0 C=0 D=0 cclog
+00002 [L275] KSTR     A=1 B=0 C=0 D=0 '-----> get guide state <-------'
+00003 [L275] CALL     A=0 B=1 C=2 D=258 
+00004 [L276] GGET     A=0 B=0 C=1 D=1 'getBitInGuideIndex'
+00005 [L276] CALL     A=0 B=2 C=1 D=513 
+00006 [L277] KSHORT   A=1 B=0 C=32 D=32 32
+00007 [L278] KSHORT   A=2 B=0 C=1 D=1 1
+00008 [L278] LEN      A=3 B=0 C=0 D=0 
+00009 [L278] KSHORT   A=4 B=0 C=1 D=1 1
+00010 [L278] FORI     A=2 B=128 C=6 D=32774 target=17
+00011 [L279] TGETV    A=6 B=0 C=5 D=5 
+00012 [L279] ISNEN    A=6 B=0 C=0 D=0 0
+00013 [L279] JMP      A=6 B=128 C=2 D=32770 target=16
+00014 [L280] MOV      A=1 B=0 C=5 D=5 
+00015 [L281] JMP      A=2 B=128 C=1 D=32769 target=17
+00016 [L278] FORL     A=2 B=127 C=250 D=32762 target=11
+00017 [L285] GGET     A=2 B=0 C=2 D=2 'd_ms'
+00018 [L285] TGETS    A=2 B=2 C=3 D=515 'd_activityUI'
+00019 [L285] TGETS    A=2 B=2 C=4 D=516 'getActivityGuideState'
+00020 [L285] MOV      A=3 B=0 C=0 D=0 
+00021 [L285] CALL     A=2 B=1 C=2 D=258 
+00022 [L287] GGET     A=2 B=0 C=2 D=2 'd_ms'
+00023 [L287] TGETS    A=2 B=2 C=5 D=517 'd_common_def'
+00024 [L287] TGETS    A=2 B=2 C=6 D=518 'new_role_guide'
+00025 [L288] TGETS    A=3 B=2 C=7 D=519 'take_task_prize'
+00026 [L288] ISGE     A=3 B=0 C=1 D=1 
+00027 [L288] JMP      A=3 B=128 C=24 D=32792 target=52
+00028 [L289] GGET     A=3 B=0 C=2 D=2 'd_ms'
+00029 [L289] TGETS    A=3 B=3 C=8 D=776 'd_mainUI'
+00030 [L289] KPRI     A=4 B=0 C=1 D=1 
+00031 [L289] TSETS    A=4 B=3 C=9 D=777 'g_isNeedGuide'
+00032 [L290] GGET     A=3 B=0 C=2 D=2 'd_ms'
+00033 [L290] TGETS    A=3 B=3 C=8 D=776 'd_mainUI'
+00034 [L290] TGETS    A=3 B=3 C=10 D=778 'g_playerInfo'
+00035 [L290] TGETS    A=3 B=3 C=11 D=779 'level'
+00036 [L290] KSHORT   A=4 B=0 C=5 D=5 5
+00037 [L290] ISGE     A=3 B=0 C=4 D=4 
+00038 [L290] JMP      A=3 B=128 C=5 D=32773 target=44
+00039 [L291] GGET     A=3 B=0 C=2 D=2 'd_ms'
+00040 [L291] TGETS    A=3 B=3 C=8 D=776 'd_mainUI'
+00041 [L291] KPRI     A=4 B=0 C=2 D=2 
+00042 [L291] TSETS    A=4 B=3 C=12 D=780 'g_isNeedHint'
+00043 [L291] JMP      A=3 B=128 C=4 D=32772 target=48
+00044 [L293] GGET     A=3 B=0 C=2 D=2 'd_ms'
+00045 [L293] TGETS    A=3 B=3 C=8 D=776 'd_mainUI'
+00046 [L293] KPRI     A=4 B=0 C=1 D=1 
+00047 [L293] TSETS    A=4 B=3 C=12 D=780 'g_isNeedHint'
+00048 [L295] UGET     A=3 B=0 C=0 D=0 cclog
+00049 [L295] KSTR     A=4 B=0 C=13 D=13 '-----> no guide state <-------'
+00050 [L295] CALL     A=3 B=1 C=2 D=258 
+00051 [L296] RET0     A=0 B=0 C=1 D=1 
+00052 [L299] GGET     A=3 B=0 C=2 D=2 'd_ms'
+00053 [L299] TGETS    A=3 B=3 C=8 D=776 'd_mainUI'
+00054 [L299] KPRI     A=4 B=0 C=2 D=2 
+00055 [L299] TSETS    A=4 B=3 C=9 D=777 'g_isNeedGuide'
+00056 [L301] UGET     A=3 B=0 C=0 D=0 cclog
+00057 [L301] KSTR     A=4 B=0 C=14 D=14 '-----> guide state %d <-------'
+00058 [L301] MOV      A=5 B=0 C=1 D=1 
+00059 [L301] CALL     A=3 B=1 C=3 D=259 
+00060 [L303] TGETS    A=3 B=2 C=15 D=527 'modify_name'
+00061 [L303] ISNEV    A=1 B=0 C=3 D=3 
+00062 [L303] JMP      A=3 B=128 C=4 D=32772 target=67
+00063 [L304] GGET     A=3 B=0 C=16 D=16 'guideState'
+00064 [L304] TGETS    A=3 B=3 C=17 D=785 'playMoive'
+00065 [L304] GSET     A=3 B=0 C=18 D=18 'g_currentGuide'
+00066 [L304] JMP      A=3 B=128 C=87 D=32855 target=154
+00067 [L306] TGETS    A=3 B=2 C=19 D=531 'pick_cortege_one'
+00068 [L306] ISNEV    A=1 B=0 C=3 D=3 
+00069 [L306] JMP      A=3 B=128 C=4 D=32772 target=74
+00070 [L307] GGET     A=3 B=0 C=16 D=16 'guideState'
+00071 [L307] TGETS    A=3 B=3 C=20 D=788 'beforeSummon'
+00072 [L307] GSET     A=3 B=0 C=18 D=18 'g_currentGuide'
+00073 [L307] JMP      A=3 B=128 C=80 D=32848 target=154
+00074 [L309] TGETS    A=3 B=2 C=21 D=533 'fight_round_one'
+00075 [L309] ISNEV    A=1 B=0 C=3 D=3 
+00076 [L309] JMP      A=3 B=128 C=4 D=32772 target=81
+00077 [L310] GGET     A=3 B=0 C=16 D=16 'guideState'
+00078 [L310] TGETS    A=3 B=3 C=22 D=790 'guideJourney'
+00079 [L310] GSET     A=3 B=0 C=18 D=18 'g_currentGuide'
+00080 [L310] JMP      A=3 B=128 C=73 D=32841 target=154
+00081 [L312] TGETS    A=3 B=2 C=23 D=535 'fight_round_two'
+00082 [L312] ISNEV    A=1 B=0 C=3 D=3 
+00083 [L312] JMP      A=3 B=128 C=4 D=32772 target=88
+00084 [L314] GGET     A=3 B=0 C=16 D=16 'guideState'
+00085 [L314] TGETS    A=3 B=3 C=24 D=792 'guideSummon'
+00086 [L314] GSET     A=3 B=0 C=18 D=18 'g_currentGuide'
+00087 [L314] JMP      A=3 B=128 C=66 D=32834 target=154
+00088 [L316] TGETS    A=3 B=2 C=25 D=537 'pick_cortege_two'
+00089 [L316] ISNEV    A=1 B=0 C=3 D=3 
+00090 [L316] JMP      A=3 B=128 C=4 D=32772 target=95
+00091 [L317] GGET     A=3 B=0 C=16 D=16 'guideState'
+00092 [L317] TGETS    A=3 B=3 C=24 D=792 'guideSummon'
+00093 [L317] GSET     A=3 B=0 C=18 D=18 'g_currentGuide'
+00094 [L317] JMP      A=3 B=128 C=59 D=32827 target=154
+00095 [L319] TGETS    A=3 B=2 C=26 D=538 'change_cortege'
+00096 [L319] ISNEV    A=1 B=0 C=3 D=3 
+00097 [L319] JMP      A=3 B=128 C=4 D=32772 target=102
+00098 [L320] GGET     A=3 B=0 C=16 D=16 'guideState'
+00099 [L320] TGETS    A=3 B=3 C=27 D=795 'guideChgChar'
+00100 [L320] GSET     A=3 B=0 C=18 D=18 'g_currentGuide'
+00101 [L320] JMP      A=3 B=128 C=52 D=32820 target=154
+00102 [L322] TGETS    A=3 B=2 C=28 D=540 'fight_round_three'
+00103 [L322] ISNEV    A=1 B=0 C=3 D=3 
+00104 [L322] JMP      A=3 B=128 C=4 D=32772 target=109
+00105 [L323] GGET     A=3 B=0 C=16 D=16 'guideState'
+00106 [L323] TGETS    A=3 B=3 C=29 D=797 'guideJourney3'
+00107 [L323] GSET     A=3 B=0 C=18 D=18 'g_currentGuide'
+00108 [L323] JMP      A=3 B=128 C=45 D=32813 target=154
+00109 [L325] TGETS    A=3 B=2 C=30 D=542 'fight_round_four'
+00110 [L325] ISNEV    A=1 B=0 C=3 D=3 
+00111 [L325] JMP      A=3 B=128 C=4 D=32772 target=116
+00112 [L326] GGET     A=3 B=0 C=16 D=16 'guideState'
+00113 [L326] TGETS    A=3 B=3 C=31 D=799 'guideJourney4'
+00114 [L326] GSET     A=3 B=0 C=18 D=18 'g_currentGuide'
+00115 [L326] JMP      A=3 B=128 C=38 D=32806 target=154
+00116 [L328] TGETS    A=3 B=2 C=32 D=544 'change_equip'
+00117 [L328] ISNEV    A=1 B=0 C=3 D=3 
+00118 [L328] JMP      A=3 B=128 C=4 D=32772 target=123
+00119 [L329] GGET     A=3 B=0 C=16 D=16 'guideState'
+00120 [L329] TGETS    A=3 B=3 C=33 D=801 'guideChgItem'
+00121 [L329] GSET     A=3 B=0 C=18 D=18 'g_currentGuide'
+00122 [L329] JMP      A=3 B=128 C=31 D=32799 target=154
+00123 [L331] TGETS    A=3 B=2 C=34 D=546 'fight_round_five'
+00124 [L331] ISNEV    A=1 B=0 C=3 D=3 
+00125 [L331] JMP      A=3 B=128 C=4 D=32772 target=130
+00126 [L332] GGET     A=3 B=0 C=16 D=16 'guideState'
+00127 [L332] TGETS    A=3 B=3 C=35 D=803 'guideJourney5'
+00128 [L332] GSET     A=3 B=0 C=18 D=18 'g_currentGuide'
+00129 [L332] JMP      A=3 B=128 C=24 D=32792 target=154
+00130 [L334] TGETS    A=3 B=2 C=36 D=548 'fight_round_six'
+00131 [L334] ISNEV    A=1 B=0 C=3 D=3 
+00132 [L334] JMP      A=3 B=128 C=4 D=32772 target=137
+00133 [L335] GGET     A=3 B=0 C=16 D=16 'guideState'
+00134 [L335] TGETS    A=3 B=3 C=37 D=805 'guideJourney6'
+00135 [L335] GSET     A=3 B=0 C=18 D=18 'g_currentGuide'
+00136 [L335] JMP      A=3 B=128 C=17 D=32785 target=154
+00137 [L337] TGETS    A=3 B=2 C=38 D=550 'guide_to_fight'
+00138 [L337] ISNEV    A=1 B=0 C=3 D=3 
+00139 [L337] JMP      A=3 B=128 C=4 D=32772 target=144
+00140 [L338] GGET     A=3 B=0 C=16 D=16 'guideState'
+00141 [L338] TGETS    A=3 B=3 C=39 D=807 'guideViewQuest'
+00142 [L338] GSET     A=3 B=0 C=18 D=18 'g_currentGuide'
+00143 [L338] JMP      A=3 B=128 C=10 D=32778 target=154
+00144 [L340] TGETS    A=3 B=2 C=7 D=519 'take_task_prize'
+00145 [L340] ISNEV    A=1 B=0 C=3 D=3 
+00146 [L340] JMP      A=3 B=128 C=4 D=32772 target=151
+00147 [L341] GGET     A=3 B=0 C=16 D=16 'guideState'
+00148 [L341] TGETS    A=3 B=3 C=40 D=808 'guideViewQuest2'
+00149 [L341] GSET     A=3 B=0 C=18 D=18 'g_currentGuide'
+00150 [L341] JMP      A=3 B=128 C=3 D=32771 target=154
+00151 [L348] UGET     A=3 B=0 C=0 D=0 cclog
+00152 [L348] KSTR     A=4 B=0 C=41 D=41 '！！！！！！！无法映射服务器的新手步骤！！！！！！  in guideUI show'
+00153 [L348] CALL     A=3 B=1 C=2 D=258 
+00154 [L351] UGET     A=3 B=0 C=0 D=0 cclog
+00155 [L351] KSTR     A=4 B=0 C=42 D=42 '-----> current gudie in client %d <-------'
+00156 [L351] GGET     A=5 B=0 C=18 D=18 'g_currentGuide'
+00157 [L351] CALL     A=3 B=1 C=3 D=259 
+00158 [L352] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/ui/guideUI.lua =====
+FUNCTION proto25 offset=0x5d6e source_lines=1320-1338 params=1
+UPVALUES ['tonumber', 'cclog']
+00001 [L1328] TNEW     A=1 B=0 C=0 D=0 
+00002 [L1329] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00003 [L1329] TGETS    A=2 B=2 C=2 D=514 'd_common_def'
+00004 [L1329] TGETS    A=2 B=2 C=3 D=515 'new_role_guide'
+00005 [L1329] TGETS    A=2 B=2 C=4 D=516 'pick_cortege_one'
+00006 [L1329] TSETS    A=2 B=1 C=0 D=256 'stage'
+00007 [L1330] GGET     A=2 B=0 C=5 D=5 'g_startChar'
+00008 [L1330] IST      A=0 B=0 C=2 D=2 
+00009 [L1330] JMP      A=3 B=128 C=1 D=32769 target=11
+00010 [L1330] KSHORT   A=2 B=0 C=1 D=1 1
+00011 [L1331] UGET     A=3 B=0 C=0 D=0 tonumber
+00012 [L1331] MOV      A=4 B=0 C=2 D=2 
+00013 [L1331] CALL     A=3 B=2 C=2 D=514 
+00014 [L1331] TSETS    A=3 B=1 C=6 D=262 'name'
+00015 [L1332] KSHORT   A=3 B=0 C=0 D=0 0
+00016 [L1332] TSETS    A=3 B=1 C=7 D=263 'head_type'
+00017 [L1335] UGET     A=3 B=0 C=1 D=1 cclog
+00018 [L1335] KSTR     A=4 B=0 C=8 D=8 '获得首个的神仙'
+00019 [L1335] CALL     A=3 B=1 C=2 D=258 
+00020 [L1336] GGET     A=3 B=0 C=1 D=1 'd_ms'
+00021 [L1336] TGETS    A=3 B=3 C=9 D=777 'd_u'
+00022 [L1336] TGETS    A=3 B=3 C=10 D=778 'main_server_send_msg'
+00023 [L1336] GGET     A=4 B=0 C=1 D=1 'd_ms'
+00024 [L1336] TGETS    A=4 B=4 C=11 D=1035 'd_msg_def'
+00025 [L1336] TGETS    A=4 B=4 C=12 D=1036 'gscl_msg_id'
+00026 [L1336] TGETS    A=4 B=4 C=13 D=1037 'msg_new_role_guide'
+00027 [L1336] MOV      A=5 B=0 C=1 D=1 
+00028 [L1336] CALL     A=3 B=1 C=3 D=259 
+00029 [L1338] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/ui/guideUI.lua =====
+FUNCTION proto65 offset=0xc0d1 source_lines=2477-2506 params=0
+UPVALUES ['string', 'cclog']
+00001 [L2479] GGET     A=0 B=0 C=0 D=0 'g_inputNameBox'
+00002 [L2479] MOV      A=1 B=0 C=0 D=0 
+00003 [L2479] TGETS    A=0 B=0 C=1 D=1 'getString'
+00004 [L2479] CALL     A=0 B=2 C=2 D=514 
+00005 [L2480] UGET     A=1 B=0 C=0 D=0 string
+00006 [L2480] TGETS    A=1 B=1 C=2 D=258 'gsub'
+00007 [L2480] MOV      A=2 B=0 C=0 D=0 
+00008 [L2480] KSTR     A=3 B=0 C=3 D=3 ' '
+00009 [L2480] KSTR     A=4 B=0 C=4 D=4 ''
+00010 [L2480] CALL     A=1 B=2 C=4 D=516 
+00011 [L2481] LEN      A=2 B=0 C=1 D=1 
+00012 [L2481] KSHORT   A=3 B=0 C=0 D=0 0
+00013 [L2481] ISGT     A=2 B=0 C=3 D=3 
+00014 [L2481] JMP      A=2 B=128 C=10 D=32778 target=25
+00015 [L2482] GGET     A=2 B=0 C=5 D=5 'd_ms'
+00016 [L2482] TGETS    A=2 B=2 C=6 D=518 'd_info'
+00017 [L2482] TGETS    A=2 B=2 C=7 D=519 'show'
+00018 [L2482] GGET     A=3 B=0 C=5 D=5 'd_ms'
+00019 [L2482] TGETS    A=3 B=3 C=8 D=776 'd_hz'
+00020 [L2482] TGETS    A=3 B=3 C=9 D=777 'gethz'
+00021 [L2482] KSTR     A=4 B=0 C=10 D=10 'nameCantBeNull'
+00022 [L2482] CALL     A=3 B=0 C=2 D=2 
+00023 [L2482] CALLM    A=2 B=1 C=0 D=256 
+00024 [L2483] RET0     A=0 B=0 C=1 D=1 
+00025 [L2485] GGET     A=2 B=0 C=5 D=5 'd_ms'
+00026 [L2485] TGETS    A=2 B=2 C=8 D=520 'd_hz'
+00027 [L2485] TGETS    A=2 B=2 C=11 D=523 'filter'
+00028 [L2485] MOV      A=3 B=0 C=0 D=0 
+00029 [L2485] CALL     A=2 B=3 C=2 D=770 
+00030 [L2486] KSHORT   A=4 B=0 C=0 D=0 0
+00031 [L2486] ISGE     A=4 B=0 C=3 D=3 
+00032 [L2486] JMP      A=4 B=128 C=10 D=32778 target=43
+00033 [L2487] GGET     A=4 B=0 C=5 D=5 'd_ms'
+00034 [L2487] TGETS    A=4 B=4 C=6 D=1030 'd_info'
+00035 [L2487] TGETS    A=4 B=4 C=7 D=1031 'show'
+00036 [L2487] GGET     A=5 B=0 C=5 D=5 'd_ms'
+00037 [L2487] TGETS    A=5 B=5 C=8 D=1288 'd_hz'
+00038 [L2487] TGETS    A=5 B=5 C=9 D=1289 'gethz'
+00039 [L2487] KSTR     A=6 B=0 C=12 D=12 'mingganzi'
+00040 [L2487] CALL     A=5 B=0 C=2 D=2 
+00041 [L2487] CALLM    A=4 B=1 C=0 D=256 
+00042 [L2488] RET0     A=0 B=0 C=1 D=1 
+00043 [L2497] TNEW     A=4 B=0 C=0 D=0 
+00044 [L2498] GGET     A=5 B=0 C=5 D=5 'd_ms'
+00045 [L2498] TGETS    A=5 B=5 C=14 D=1294 'd_common_def'
+00046 [L2498] TGETS    A=5 B=5 C=15 D=1295 'new_role_guide'
+00047 [L2498] TGETS    A=5 B=5 C=16 D=1296 'modify_name'
+00048 [L2498] TSETS    A=5 B=4 C=13 D=1037 'stage'
+00049 [L2499] TSETS    A=0 B=4 C=17 D=1041 'name'
+00050 [L2500] GGET     A=5 B=0 C=19 D=19 'g_head_type'
+00051 [L2500] TSETS    A=5 B=4 C=18 D=1042 'head_type'
+00052 [L2503] UGET     A=5 B=0 C=1 D=1 cclog
+00053 [L2503] KSTR     A=6 B=0 C=20 D=20 '取名'
+00054 [L2503] CALL     A=5 B=1 C=2 D=258 
+00055 [L2504] GGET     A=5 B=0 C=5 D=5 'd_ms'
+00056 [L2504] TGETS    A=5 B=5 C=21 D=1301 'd_lineupUI'
+00057 [L2504] TGETS    A=5 B=5 C=22 D=1302 'saveLastFightLevel'
+00058 [L2504] CALL     A=5 B=1 C=1 D=257 
+00059 [L2505] GGET     A=5 B=0 C=5 D=5 'd_ms'
+00060 [L2505] TGETS    A=5 B=5 C=23 D=1303 'd_u'
+00061 [L2505] TGETS    A=5 B=5 C=24 D=1304 'main_server_send_msg'
+00062 [L2505] GGET     A=6 B=0 C=5 D=5 'd_ms'
+00063 [L2505] TGETS    A=6 B=6 C=25 D=1561 'd_msg_def'
+00064 [L2505] TGETS    A=6 B=6 C=26 D=1562 'gscl_msg_id'
+00065 [L2505] TGETS    A=6 B=6 C=27 D=1563 'msg_new_role_guide'
+00066 [L2505] MOV      A=7 B=0 C=4 D=4 
+00067 [L2505] CALL     A=5 B=1 C=3 D=259 
+00068 [L2506] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/ui/loginUI.lua =====
+FUNCTION proto1 offset=0x95 source_lines=76-120 params=0
+UPVALUES ['tonumber', 'pairs', 'type']
+00001 [L100] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L100] TGETS    A=0 B=0 C=1 D=1 'd_setting'
+00003 [L100] TGETS    A=0 B=0 C=2 D=2 'g_setting'
+00004 [L100] TGETS    A=0 B=0 C=3 D=3 'ready_login_area'
+00005 [L100] KSHORT   A=1 B=0 C=100 D=100 100
+00006 [L100] ISGE     A=0 B=0 C=1 D=1 
+00007 [L100] JMP      A=0 B=128 C=37 D=32805 target=45
+00008 [L101] UGET     A=0 B=0 C=0 D=0 tonumber
+00009 [L101] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00010 [L101] TGETS    A=1 B=1 C=1 D=257 'd_setting'
+00011 [L101] TGETS    A=1 B=1 C=2 D=258 'g_setting'
+00012 [L101] TGETS    A=1 B=1 C=4 D=260 'server_id'
+00013 [L101] CALL     A=0 B=2 C=2 D=514 
+00014 [L101] KSHORT   A=1 B=0 C=100 D=100 100
+00015 [L101] ISGE     A=1 B=0 C=0 D=0 
+00016 [L101] JMP      A=0 B=128 C=11 D=32779 target=28
+00017 [L102] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00018 [L102] TGETS    A=0 B=0 C=1 D=1 'd_setting'
+00019 [L102] TGETS    A=0 B=0 C=2 D=2 'g_setting'
+00020 [L102] UGET     A=1 B=0 C=0 D=0 tonumber
+00021 [L102] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00022 [L102] TGETS    A=2 B=2 C=1 D=513 'd_setting'
+00023 [L102] TGETS    A=2 B=2 C=2 D=514 'g_setting'
+00024 [L102] TGETS    A=2 B=2 C=4 D=516 'server_id'
+00025 [L102] CALL     A=1 B=2 C=2 D=514 
+00026 [L102] TSETS    A=1 B=0 C=3 D=3 'ready_login_area'
+00027 [L102] JMP      A=0 B=128 C=17 D=32785 target=45
+00028 [L105] GGET     A=0 B=0 C=5 D=5 'g_loginUI'
+00029 [L105] TGETS    A=0 B=0 C=6 D=6 'server_infos'
+00030 [L105] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00031 [L105] TGETS    A=1 B=1 C=1 D=257 'd_setting'
+00032 [L105] TGETS    A=1 B=1 C=2 D=258 'g_setting'
+00033 [L105] TGETS    A=1 B=1 C=3 D=259 'ready_login_area'
+00034 [L105] TGETV    A=0 B=0 C=1 D=1 
+00035 [L106] ISF      A=0 B=0 C=0 D=0 
+00036 [L106] JMP      A=1 B=128 C=8 D=32776 target=45
+00037 [L106] TGETS    A=1 B=0 C=7 D=7 'id'
+00038 [L106] ISF      A=0 B=0 C=1 D=1 
+00039 [L106] JMP      A=2 B=128 C=5 D=32773 target=45
+00040 [L107] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00041 [L107] TGETS    A=1 B=1 C=1 D=257 'd_setting'
+00042 [L107] TGETS    A=1 B=1 C=2 D=258 'g_setting'
+00043 [L107] TGETS    A=2 B=0 C=7 D=7 'id'
+00044 [L107] TSETS    A=2 B=1 C=3 D=259 'ready_login_area'
+00045 [L113] UGET     A=0 B=0 C=1 D=1 pairs
+00046 [L113] GGET     A=1 B=0 C=5 D=5 'g_loginUI'
+00047 [L113] TGETS    A=1 B=1 C=6 D=262 'server_infos'
+00048 [L113] CALL     A=0 B=4 C=2 D=1026 
+00049 [L113] ISNEXT   A=3 B=128 C=18 D=32786 target=68
+00050 [L114] ISF      A=0 B=0 C=4 D=4 
+00051 [L114] JMP      A=5 B=128 C=16 D=32784 target=68
+00052 [L114] UGET     A=5 B=0 C=2 D=2 type
+00053 [L114] MOV      A=6 B=0 C=4 D=4 
+00054 [L114] CALL     A=5 B=2 C=2 D=514 
+00055 [L114] ISNES    A=5 B=0 C=8 D=8 'table'
+00056 [L114] JMP      A=5 B=128 C=11 D=32779 target=68
+00057 [L114] TGETS    A=5 B=4 C=7 D=1031 'id'
+00058 [L114] ISF      A=0 B=0 C=5 D=5 
+00059 [L114] JMP      A=6 B=128 C=8 D=32776 target=68
+00060 [L114] TGETS    A=5 B=4 C=7 D=1031 'id'
+00061 [L114] GGET     A=6 B=0 C=0 D=0 'd_ms'
+00062 [L114] TGETS    A=6 B=6 C=1 D=1537 'd_setting'
+00063 [L114] TGETS    A=6 B=6 C=2 D=1538 'g_setting'
+00064 [L114] TGETS    A=6 B=6 C=3 D=1539 'ready_login_area'
+00065 [L114] ISNEV    A=5 B=0 C=6 D=6 
+00066 [L114] JMP      A=5 B=128 C=1 D=32769 target=68
+00067 [L115] RET1     A=4 B=0 C=2 D=2 
+00068 [L113] ITERN    A=3 B=3 C=3 D=771 
+00069 [L113] ITERL    A=3 B=127 C=236 D=32748 target=50
+00070 [L119] KPRI     A=0 B=0 C=0 D=0 
+00071 [L119] RET1     A=0 B=0 C=2 D=2 
+
+
+===== lua/ui/loginUI.lua =====
+FUNCTION proto2 offset=0x296 source_lines=124-138 params=0
+UPVALUES []
+00001 [L125] GGET     A=0 B=0 C=0 D=0 'g_loginUI'
+00002 [L125] TGETS    A=0 B=0 C=1 D=1 'server_infos'
+00003 [L125] ISF      A=0 B=0 C=0 D=0 
+00004 [L125] JMP      A=0 B=128 C=6 D=32774 target=11
+00005 [L125] GGET     A=0 B=0 C=0 D=0 'g_loginUI'
+00006 [L125] TGETS    A=0 B=0 C=1 D=1 'server_infos'
+00007 [L125] LEN      A=0 B=0 C=0 D=0 
+00008 [L125] KSHORT   A=1 B=0 C=0 D=0 0
+00009 [L125] ISGT     A=0 B=0 C=1 D=1 
+00010 [L125] JMP      A=0 B=128 C=2 D=32770 target=13
+00011 [L126] GGET     A=0 B=0 C=2 D=2 'readServerListFile'
+00012 [L126] CALL     A=0 B=1 C=1 D=257 
+00013 [L129] KSTR     A=0 B=0 C=3 D=3 ''
+00014 [L130] KSHORT   A=1 B=0 C=0 D=0 0
+00015 [L132] GGET     A=2 B=0 C=4 D=4 'getLoginServerInfo'
+00016 [L132] CALL     A=2 B=2 C=1 D=513 
+00017 [L133] ISF      A=0 B=0 C=2 D=2 
+00018 [L133] JMP      A=3 B=128 C=2 D=32770 target=21
+00019 [L134] TGETS    A=0 B=2 C=5 D=517 'ip'
+00020 [L135] TGETS    A=1 B=2 C=6 D=518 'port'
+00021 [L137] MOV      A=3 B=0 C=0 D=0 
+00022 [L137] MOV      A=4 B=0 C=1 D=1 
+00023 [L137] RET      A=3 B=0 C=3 D=3 
+
+
+===== lua/ui/loginUI.lua =====
+FUNCTION proto23 offset=0x2e2e source_lines=599-631 params=0
+UPVALUES ['cclog', 'CCDirector', 'main_server']
+00001 [L600] UGET     A=0 B=0 C=0 D=0 cclog
+00002 [L600] KSTR     A=1 B=0 C=0 D=0 'onTouchLoginMobile,  current platform'
+00003 [L600] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00004 [L600] TGETS    A=2 B=2 C=2 D=514 'd_tp_config'
+00005 [L600] TGETS    A=2 B=2 C=3 D=515 'getThirdPartyFlag'
+00006 [L600] CALL     A=2 B=2 C=1 D=513 
+00007 [L600] CAT      A=1 B=1 C=2 D=258 
+00008 [L600] CALL     A=0 B=1 C=2 D=258 
+00009 [L601] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00010 [L601] TGETS    A=0 B=0 C=2 D=2 'd_tp_config'
+00011 [L601] TGETS    A=0 B=0 C=4 D=4 'useThirdPartySdk'
+00012 [L601] CALL     A=0 B=2 C=1 D=513 
+00013 [L601] ISNEP    A=0 B=0 C=2 D=2 
+00014 [L601] JMP      A=0 B=128 C=22 D=32790 target=37
+00015 [L603] UGET     A=0 B=0 C=0 D=0 cclog
+00016 [L603] KSTR     A=1 B=0 C=5 D=5 'request login third platform   ----->>>>, current platform '
+00017 [L603] CALL     A=0 B=1 C=2 D=258 
+00018 [L604] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00019 [L604] TGETS    A=0 B=0 C=6 D=6 'd_music_mgr'
+00020 [L604] TGETS    A=0 B=0 C=7 D=7 'playClickEffect'
+00021 [L604] CALL     A=0 B=1 C=1 D=257 
+00022 [L605] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00023 [L605] TGETS    A=0 B=0 C=8 D=8 'd_net'
+00024 [L605] KPRI     A=1 B=0 C=2 D=2 
+00025 [L605] TSETS    A=1 B=0 C=9 D=9 'g_thirdLogin'
+00026 [L606] UGET     A=0 B=0 C=1 D=1 CCDirector
+00027 [L606] MOV      A=1 B=0 C=0 D=0 
+00028 [L606] TGETS    A=0 B=0 C=10 D=10 'sharedDirector'
+00029 [L606] CALL     A=0 B=2 C=2 D=514 
+00030 [L606] MOV      A=1 B=0 C=0 D=0 
+00031 [L606] TGETS    A=0 B=0 C=11 D=11 'pause'
+00032 [L606] CALL     A=0 B=1 C=2 D=258 
+00033 [L607] UGET     A=0 B=0 C=2 D=2 main_server
+00034 [L607] TGETS    A=0 B=0 C=12 D=12 'thirdPartyPlatformLogin'
+00035 [L607] CALL     A=0 B=1 C=1 D=257 
+00036 [L608] RET0     A=0 B=0 C=1 D=1 
+00037 [L611] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00038 [L611] TGETS    A=0 B=0 C=6 D=6 'd_music_mgr'
+00039 [L611] TGETS    A=0 B=0 C=7 D=7 'playClickEffect'
+00040 [L611] CALL     A=0 B=1 C=1 D=257 
+00041 [L616] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00042 [L616] TGETS    A=0 B=0 C=13 D=13 'd_alert'
+00043 [L616] TGETS    A=0 B=0 C=14 D=14 'is_sys_busy'
+00044 [L616] CALL     A=0 B=2 C=1 D=513 
+00045 [L616] ISF      A=0 B=0 C=0 D=0 
+00046 [L616] JMP      A=1 B=128 C=10 D=32778 target=57
+00047 [L617] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00048 [L617] TGETS    A=0 B=0 C=15 D=15 'd_info'
+00049 [L617] TGETS    A=0 B=0 C=16 D=16 'show'
+00050 [L617] GGET     A=1 B=0 C=1 D=1 'd_ms'
+00051 [L617] TGETS    A=1 B=1 C=17 D=273 'd_hz'
+00052 [L617] TGETS    A=1 B=1 C=18 D=274 'gethz'
+00053 [L617] KSTR     A=2 B=0 C=19 D=19 'login_waiting'
+00054 [L617] CALL     A=1 B=0 C=2 D=2 
+00055 [L617] CALLM    A=0 B=1 C=0 D=256 
+00056 [L618] RET0     A=0 B=0 C=1 D=1 
+00057 [L622] GGET     A=0 B=0 C=20 D=20 'g_loginUI'
+00058 [L622] KSTR     A=1 B=0 C=22 D=22 ''
+00059 [L622] TSETS    A=1 B=0 C=21 D=21 'username'
+00060 [L625] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00061 [L625] TGETS    A=0 B=0 C=23 D=23 'd_c'
+00062 [L625] TGETS    A=0 B=0 C=24 D=24 'g_device_id'
+00063 [L625] LEN      A=0 B=0 C=0 D=0 
+00064 [L625] KSHORT   A=1 B=0 C=10 D=10 10
+00065 [L625] ISGE     A=1 B=0 C=0 D=0 
+00066 [L625] JMP      A=0 B=128 C=7 D=32775 target=74
+00067 [L627] GGET     A=0 B=0 C=25 D=25 'lua_start_login'
+00068 [L627] KSTR     A=1 B=0 C=22 D=22 ''
+00069 [L627] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00070 [L627] TGETS    A=2 B=2 C=23 D=535 'd_c'
+00071 [L627] TGETS    A=2 B=2 C=24 D=536 'g_device_id'
+00072 [L627] CALL     A=0 B=1 C=3 D=259 
+00073 [L627] JMP      A=0 B=128 C=6 D=32774 target=80
+00074 [L629] UGET     A=0 B=0 C=0 D=0 cclog
+00075 [L629] KSTR     A=1 B=0 C=26 D=26 'ERROR: start_login, d_ms.d_c.g_device_id=[%s]'
+00076 [L629] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00077 [L629] TGETS    A=2 B=2 C=23 D=535 'd_c'
+00078 [L629] TGETS    A=2 B=2 C=24 D=536 'g_device_id'
+00079 [L629] CALL     A=0 B=1 C=3 D=259 
+00080 [L631] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/ui/loginUI.lua =====
+FUNCTION proto24 offset=0x317c source_lines=635-657 params=1
+UPVALUES ['CCFileUtils', 'CCString', 'cclog']
+00001 [L637] GGET     A=1 B=0 C=0 D=0 'g_loginUI'
+00002 [L637] TGETS    A=1 B=1 C=1 D=257 'server_infos'
+00003 [L637] ISF      A=0 B=0 C=1 D=1 
+00004 [L637] JMP      A=1 B=128 C=8 D=32776 target=13
+00005 [L637] GGET     A=1 B=0 C=0 D=0 'g_loginUI'
+00006 [L637] TGETS    A=1 B=1 C=1 D=257 'server_infos'
+00007 [L637] LEN      A=1 B=0 C=1 D=1 
+00008 [L637] KSHORT   A=2 B=0 C=0 D=0 0
+00009 [L637] ISLE     A=1 B=0 C=2 D=2 
+00010 [L637] JMP      A=1 B=128 C=2 D=32770 target=13
+00011 [L637] ISNEP    A=0 B=0 C=2 D=2 
+00012 [L637] JMP      A=1 B=128 C=57 D=32825 target=70
+00013 [L639] UGET     A=1 B=0 C=0 D=0 CCFileUtils
+00014 [L639] MOV      A=2 B=0 C=1 D=1 
+00015 [L639] TGETS    A=1 B=1 C=2 D=258 'sharedFileUtils'
+00016 [L639] CALL     A=1 B=2 C=2 D=514 
+00017 [L639] MOV      A=2 B=0 C=1 D=1 
+00018 [L639] TGETS    A=1 B=1 C=3 D=259 'getWriteablePath'
+00019 [L639] CALL     A=1 B=2 C=2 D=514 
+00020 [L639] KSTR     A=2 B=0 C=4 D=4 '/update_w/server_list.txt'
+00021 [L639] CAT      A=1 B=1 C=2 D=258 
+00022 [L640] UGET     A=2 B=0 C=1 D=1 CCString
+00023 [L640] MOV      A=3 B=0 C=2 D=2 
+00024 [L640] TGETS    A=2 B=2 C=5 D=517 'createWithContentsOfFile'
+00025 [L640] MOV      A=4 B=0 C=1 D=1 
+00026 [L640] CALL     A=2 B=2 C=3 D=515 
+00027 [L641] MOV      A=4 B=0 C=2 D=2 
+00028 [L641] TGETS    A=3 B=2 C=6 D=518 'getCString'
+00029 [L641] CALL     A=3 B=2 C=2 D=514 
+00030 [L644] GGET     A=4 B=0 C=7 D=7 'd_ms'
+00031 [L644] TGETS    A=4 B=4 C=8 D=1032 'd_u'
+00032 [L644] TGETS    A=4 B=4 C=9 D=1033 'loadstring_config_new'
+00033 [L644] MOV      A=5 B=0 C=3 D=3 
+00034 [L644] CALL     A=4 B=2 C=2 D=514 
+00035 [L645] ISF      A=0 B=0 C=4 D=4 
+00036 [L645] JMP      A=5 B=128 C=30 D=32798 target=67
+00037 [L645] TGETB    A=5 B=4 C=1 D=1025 
+00038 [L645] ISF      A=0 B=0 C=5 D=5 
+00039 [L645] JMP      A=6 B=128 C=27 D=32795 target=67
+00040 [L645] TGETB    A=5 B=4 C=1 D=1025 
+00041 [L645] LEN      A=5 B=0 C=5 D=5 
+00042 [L645] KSHORT   A=6 B=0 C=0 D=0 0
+00043 [L645] ISGE     A=6 B=0 C=5 D=5 
+00044 [L645] JMP      A=5 B=128 C=22 D=32790 target=67
+00045 [L645] TGETS    A=5 B=4 C=10 D=1034 'version'
+00046 [L645] ISF      A=0 B=0 C=5 D=5 
+00047 [L645] JMP      A=6 B=128 C=19 D=32787 target=67
+00048 [L646] GGET     A=5 B=0 C=0 D=0 'g_loginUI'
+00049 [L646] TNEW     A=6 B=0 C=0 D=0 
+00050 [L646] TSETS    A=6 B=5 C=1 D=1281 'server_infos'
+00051 [L647] GGET     A=5 B=0 C=0 D=0 'g_loginUI'
+00052 [L647] TGETB    A=6 B=4 C=1 D=1025 
+00053 [L647] TSETS    A=6 B=5 C=1 D=1281 'server_infos'
+00054 [L648] GGET     A=5 B=0 C=0 D=0 'g_loginUI'
+00055 [L648] TGETS    A=5 B=5 C=1 D=1281 'server_infos'
+00056 [L648] TGETS    A=6 B=4 C=10 D=1034 'version'
+00057 [L648] TSETS    A=6 B=5 C=10 D=1290 'version'
+00058 [L649] GGET     A=5 B=0 C=0 D=0 'g_loginUI'
+00059 [L649] TGETS    A=5 B=5 C=1 D=1281 'server_infos'
+00060 [L649] TGETS    A=6 B=4 C=11 D=1035 'cpp_version'
+00061 [L649] TSETS    A=6 B=5 C=11 D=1291 'cpp_version'
+00062 [L650] GGET     A=5 B=0 C=0 D=0 'g_loginUI'
+00063 [L650] TGETS    A=5 B=5 C=1 D=1281 'server_infos'
+00064 [L650] TGETS    A=6 B=4 C=12 D=1036 'name'
+00065 [L650] TSETS    A=6 B=5 C=12 D=1292 'name'
+00066 [L650] JMP      A=5 B=128 C=3 D=32771 target=70
+00067 [L652] UGET     A=5 B=0 C=2 D=2 cclog
+00068 [L652] KSTR     A=6 B=0 C=13 D=13 'ERROR: server list read error.'
+00069 [L652] CALL     A=5 B=1 C=2 D=258 
+00070 [L656] GGET     A=1 B=0 C=0 D=0 'g_loginUI'
+00071 [L656] TGETS    A=1 B=1 C=1 D=257 'server_infos'
+00072 [L656] IST      A=0 B=0 C=1 D=1 
+00073 [L656] JMP      A=2 B=128 C=1 D=32769 target=75
+00074 [L656] TNEW     A=1 B=0 C=0 D=0 
+00075 [L656] RET1     A=1 B=0 C=2 D=2 
+
+
+===== lua/ui/loginUI.lua =====
+FUNCTION proto40 offset=0x7c3e source_lines=1381-1414 params=1
+UPVALUES ['cclog', 'CCDirector', 'main_server']
+00001 [L1382] TGETS    A=1 B=0 C=0 D=0 'eventID'
+00002 [L1382] IST      A=0 B=0 C=1 D=1 
+00003 [L1382] JMP      A=2 B=128 C=1 D=32769 target=5
+00004 [L1382] KSTR     A=1 B=0 C=1 D=1 'nil'
+00005 [L1383] TGETS    A=2 B=0 C=2 D=2 'status'
+00006 [L1383] IST      A=0 B=0 C=2 D=2 
+00007 [L1383] JMP      A=3 B=128 C=1 D=32769 target=9
+00008 [L1383] KSTR     A=2 B=0 C=1 D=1 'nil'
+00009 [L1384] UGET     A=3 B=0 C=0 D=0 cclog
+00010 [L1384] KSTR     A=4 B=0 C=3 D=3 'callback requestLoginP360_na, e_id='
+00011 [L1384] MOV      A=5 B=0 C=1 D=1 
+00012 [L1384] KSTR     A=6 B=0 C=4 D=4 ', status='
+00013 [L1384] MOV      A=7 B=0 C=2 D=2 
+00014 [L1384] CAT      A=4 B=4 C=7 D=1031 
+00015 [L1384] CALL     A=3 B=1 C=2 D=258 
+00016 [L1386] GGET     A=3 B=0 C=5 D=5 'g_thirdPlatformEvent'
+00017 [L1386] TGETS    A=3 B=3 C=6 D=774 'LOGIN_EVENT'
+00018 [L1386] ISNEV    A=1 B=0 C=3 D=3 
+00019 [L1386] JMP      A=3 B=128 C=40 D=32808 target=60
+00020 [L1388] GGET     A=3 B=0 C=7 D=7 'g_p360_a_code'
+00021 [L1388] TGETS    A=3 B=3 C=8 D=776 'GLOBAL_CODE_OK'
+00022 [L1388] ISNEV    A=2 B=0 C=3 D=3 
+00023 [L1388] JMP      A=3 B=128 C=36 D=32804 target=60
+00024 [L1389] UGET     A=3 B=0 C=1 D=1 CCDirector
+00025 [L1389] MOV      A=4 B=0 C=3 D=3 
+00026 [L1389] TGETS    A=3 B=3 C=9 D=777 'sharedDirector'
+00027 [L1389] CALL     A=3 B=2 C=2 D=514 
+00028 [L1389] MOV      A=4 B=0 C=3 D=3 
+00029 [L1389] TGETS    A=3 B=3 C=10 D=778 'resume'
+00030 [L1389] CALL     A=3 B=1 C=2 D=258 
+00031 [L1398] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00032 [L1398] TGETS    A=3 B=3 C=12 D=780 'd_net'
+00033 [L1398] TGETS    A=3 B=3 C=13 D=781 'g_third_param'
+00034 [L1398] UGET     A=4 B=0 C=2 D=2 main_server
+00035 [L1398] TGETS    A=4 B=4 C=15 D=1039 'getTPValue'
+00036 [L1398] KSTR     A=5 B=0 C=14 D=14 'access_token'
+00037 [L1398] CALL     A=4 B=2 C=2 D=514 
+00038 [L1398] TSETS    A=4 B=3 C=14 D=782 'access_token'
+00039 [L1400] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00040 [L1400] TGETS    A=3 B=3 C=12 D=780 'd_net'
+00041 [L1400] TGETS    A=3 B=3 C=13 D=781 'g_third_param'
+00042 [L1400] TGETS    A=3 B=3 C=14 D=782 'access_token'
+00043 [L1400] LEN      A=3 B=0 C=3 D=3 
+00044 [L1400] KSHORT   A=4 B=0 C=0 D=0 0
+00045 [L1400] ISGT     A=3 B=0 C=4 D=4 
+00046 [L1400] JMP      A=3 B=128 C=8 D=32776 target=55
+00047 [L1401] UGET     A=3 B=0 C=0 D=0 cclog
+00048 [L1401] KSTR     A=4 B=0 C=16 D=16 'ERROR: access_token length <=0.'
+00049 [L1401] CALL     A=3 B=1 C=2 D=258 
+00050 [L1402] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00051 [L1402] TGETS    A=3 B=3 C=17 D=785 'd_event_mgr'
+00052 [L1402] TGETS    A=3 B=3 C=18 D=786 'jumpLoginUI'
+00053 [L1402] CALL     A=3 B=1 C=1 D=257 
+00054 [L1403] RET0     A=0 B=0 C=1 D=1 
+00055 [L1406] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00056 [L1406] TGETS    A=3 B=3 C=12 D=780 'd_net'
+00057 [L1406] TGETS    A=3 B=3 C=19 D=787 'login_ls_thirdPlatform'
+00058 [L1406] CALL     A=3 B=1 C=1 D=257 
+00059 [L1407] RET0     A=0 B=0 C=1 D=1 
+00060 [L1413] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00061 [L1413] TGETS    A=3 B=3 C=17 D=785 'd_event_mgr'
+00062 [L1413] TGETS    A=3 B=3 C=18 D=786 'jumpLoginUI'
+00063 [L1413] CALL     A=3 B=1 C=1 D=257 
+00064 [L1414] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/ui/mainUI.lua =====
+FUNCTION proto3 offset=0x20b source_lines=203-285 params=0
+UPVALUES ['cclog', 'string']
+00001 [L206] UGET     A=0 B=0 C=0 D=0 cclog
+00002 [L206] KSTR     A=1 B=0 C=0 D=0 'show function in mainUI'
+00003 [L206] CALL     A=0 B=1 C=2 D=258 
+00004 [L207] GGET     A=0 B=0 C=1 D=1 'g_isNeedGuide'
+00005 [L207] ISF      A=0 B=0 C=0 D=0 
+00006 [L207] JMP      A=1 B=128 C=20 D=32788 target=27
+00007 [L208] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00008 [L208] TGETS    A=0 B=0 C=3 D=3 'd_guideUI'
+00009 [L208] TGETS    A=0 B=0 C=4 D=4 'g_currentGuide'
+00010 [L209] GGET     A=1 B=0 C=2 D=2 'd_ms'
+00011 [L209] TGETS    A=1 B=1 C=3 D=259 'd_guideUI'
+00012 [L209] TGETS    A=1 B=1 C=5 D=261 'g_lastGuide'
+00013 [L210] GGET     A=2 B=0 C=2 D=2 'd_ms'
+00014 [L210] TGETS    A=2 B=2 C=3 D=515 'd_guideUI'
+00015 [L210] TGETS    A=2 B=2 C=6 D=518 'guideState'
+00016 [L211] TGETS    A=3 B=2 C=7 D=519 'playMoive'
+00017 [L211] ISGT     A=0 B=0 C=3 D=3 
+00018 [L211] JMP      A=3 B=128 C=8 D=32776 target=27
+00019 [L213] UGET     A=3 B=0 C=0 D=0 cclog
+00020 [L213] KSTR     A=4 B=0 C=8 D=8 'guide beginnerSummon'
+00021 [L213] CALL     A=3 B=1 C=2 D=258 
+00022 [L214] GGET     A=3 B=0 C=2 D=2 'd_ms'
+00023 [L214] TGETS    A=3 B=3 C=3 D=771 'd_guideUI'
+00024 [L214] TGETS    A=3 B=3 C=9 D=777 'show'
+00025 [L214] CALL     A=3 B=1 C=1 D=257 
+00026 [L215] UCLO     A=0 B=128 C=106 D=32874 target=133
+00027 [L219] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00028 [L219] TGETS    A=0 B=0 C=10 D=10 'd_loginUI'
+00029 [L219] TGETS    A=0 B=0 C=11 D=11 'g_currentSence'
+00030 [L219] GGET     A=1 B=0 C=2 D=2 'd_ms'
+00031 [L219] TGETS    A=1 B=1 C=10 D=266 'd_loginUI'
+00032 [L219] TGETS    A=1 B=1 C=12 D=268 'senceID'
+00033 [L219] TGETS    A=1 B=1 C=13 D=269 'mainUI'
+00034 [L219] ISNEV    A=0 B=0 C=1 D=1 
+00035 [L219] JMP      A=0 B=128 C=1 D=32769 target=37
+00036 [L220] UCLO     A=0 B=128 C=97 D=32865 target=134
+00037 [L223] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00038 [L223] TGETS    A=0 B=0 C=10 D=10 'd_loginUI'
+00039 [L223] GGET     A=1 B=0 C=2 D=2 'd_ms'
+00040 [L223] TGETS    A=1 B=1 C=10 D=266 'd_loginUI'
+00041 [L223] TGETS    A=1 B=1 C=12 D=268 'senceID'
+00042 [L223] TGETS    A=1 B=1 C=13 D=269 'mainUI'
+00043 [L223] TSETS    A=1 B=0 C=11 D=11 'g_currentSence'
+00044 [L225] GGET     A=0 B=0 C=14 D=14 'preLoadCSV'
+00045 [L225] CALL     A=0 B=1 C=1 D=257 
+00046 [L226] TNEW     A=0 B=0 C=0 D=0 
+00047 [L226] GSET     A=0 B=0 C=15 D=15 'g_mainUI'
+00048 [L227] GGET     A=0 B=0 C=16 D=16 'boardID'
+00049 [L227] TGETS    A=0 B=0 C=17 D=17 'none'
+00050 [L227] GSET     A=0 B=0 C=18 D=18 'g_currentBoard'
+00051 [L228] TNEW     A=0 B=0 C=0 D=0 
+00052 [L228] GSET     A=0 B=0 C=19 D=19 'g_boardlayer'
+00053 [L229] TNEW     A=0 B=0 C=0 D=0 
+00054 [L229] GSET     A=0 B=0 C=20 D=20 'g_allBoardlayer'
+00055 [L230] GGET     A=0 B=0 C=21 D=21 'create'
+00056 [L230] CALL     A=0 B=1 C=1 D=257 
+00057 [L233] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00058 [L233] TGETS    A=0 B=0 C=22 D=22 'd_music_mgr'
+00059 [L233] TGETS    A=0 B=0 C=23 D=23 'playUIMusic'
+00060 [L233] CALL     A=0 B=1 C=1 D=257 
+00061 [L236] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00062 [L236] TGETS    A=0 B=0 C=24 D=24 'd_u'
+00063 [L236] TGETS    A=0 B=0 C=25 D=25 'runScene'
+00064 [L236] GGET     A=1 B=0 C=15 D=15 'g_mainUI'
+00065 [L236] TGETS    A=1 B=1 C=26 D=282 'main_scene'
+00066 [L236] CALL     A=0 B=1 C=2 D=258 
+00067 [L239] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00068 [L239] TGETS    A=0 B=0 C=27 D=27 'd_mapUI'
+00069 [L239] TGETS    A=0 B=0 C=28 D=28 'getMapData'
+00070 [L239] CALL     A=0 B=1 C=1 D=257 
+00071 [L241] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00072 [L241] TGETS    A=0 B=0 C=29 D=29 'd_data'
+00073 [L241] TGETS    A=0 B=0 C=30 D=30 'loadingBaseData'
+00074 [L241] CALL     A=0 B=1 C=1 D=257 
+00075 [L246] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00076 [L246] TGETS    A=0 B=0 C=31 D=31 'd_tianShuUI'
+00077 [L246] TGETS    A=0 B=0 C=32 D=32 'showHint'
+00078 [L246] GGET     A=1 B=0 C=15 D=15 'g_mainUI'
+00079 [L246] TGETS    A=1 B=1 C=33 D=289 'main_layer'
+00080 [L246] CALL     A=0 B=1 C=2 D=258 
+00081 [L248] GGET     A=0 B=0 C=1 D=1 'g_isNeedGuide'
+00082 [L248] ISF      A=0 B=0 C=0 D=0 
+00083 [L248] JMP      A=1 B=128 C=11 D=32779 target=95
+00084 [L249] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00085 [L249] TGETS    A=0 B=0 C=3 D=3 'd_guideUI'
+00086 [L249] TGETS    A=0 B=0 C=34 D=34 'isNeedShowGuideOnMain'
+00087 [L249] CALL     A=0 B=2 C=1 D=513 
+00088 [L249] ISF      A=0 B=0 C=0 D=0 
+00089 [L249] JMP      A=1 B=128 C=14 D=32782 target=104
+00090 [L250] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00091 [L250] TGETS    A=0 B=0 C=3 D=3 'd_guideUI'
+00092 [L250] TGETS    A=0 B=0 C=9 D=9 'show'
+00093 [L250] CALL     A=0 B=1 C=1 D=257 
+00094 [L251] JMP      A=0 B=128 C=9 D=32777 target=104
+00095 [L253] GGET     A=0 B=0 C=35 D=35 'createBelowSwallowLayer'
+00096 [L253] CALL     A=0 B=1 C=1 D=257 
+00097 [L255] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00098 [L255] TGETS    A=0 B=0 C=36 D=36 'd_followUI'
+00099 [L255] TGETS    A=0 B=0 C=37 D=37 'g_has_receive_black'
+00100 [L255] ISF      A=0 B=0 C=0 D=0 
+00101 [L255] JMP      A=1 B=128 C=2 D=32770 target=104
+00102 [L256] GGET     A=0 B=0 C=38 D=38 'showUnreadMsg'
+00103 [L256] CALL     A=0 B=1 C=1 D=257 
+00104 [L264] GGET     A=0 B=0 C=39 D=39 'submitVersion'
+00105 [L264] CALL     A=0 B=1 C=1 D=257 
+00106 [L265] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00107 [L265] TGETS    A=0 B=0 C=40 D=40 'd_messageUI'
+00108 [L265] TGETS    A=0 B=0 C=41 D=41 'getMoreSysMail'
+00109 [L265] CALL     A=0 B=1 C=1 D=257 
+00110 [L268] FNEW     A=0 B=0 C=42 D=42 {'kind': 'proto', 'id': 1}
+00111 [L269] GGET     A=1 B=0 C=2 D=2 'd_ms'
+00112 [L269] TGETS    A=1 B=1 C=24 D=280 'd_u'
+00113 [L269] TGETS    A=1 B=1 C=43 D=299 'delay'
+00114 [L269] GGET     A=2 B=0 C=15 D=15 'g_mainUI'
+00115 [L269] TGETS    A=2 B=2 C=33 D=545 'main_layer'
+00116 [L269] KNUM     A=3 B=0 C=0 D=0 0.1
+00117 [L269] MOV      A=4 B=0 C=0 D=0 
+00118 [L269] CALL     A=1 B=1 C=4 D=260 
+00119 [L272] GGET     A=1 B=0 C=1 D=1 'g_isNeedGuide'
+00120 [L272] ISF      A=0 B=0 C=1 D=1 
+00121 [L272] JMP      A=2 B=128 C=1 D=32769 target=123
+00122 [L272] JMP      A=1 B=128 C=9 D=32777 target=132
+00123 [L280] FNEW     A=1 B=0 C=44 D=44 {'kind': 'proto', 'id': 2}
+00124 [L282] GGET     A=2 B=0 C=2 D=2 'd_ms'
+00125 [L282] TGETS    A=2 B=2 C=24 D=536 'd_u'
+00126 [L282] TGETS    A=2 B=2 C=43 D=555 'delay'
+00127 [L282] GGET     A=3 B=0 C=15 D=15 'g_mainUI'
+00128 [L282] TGETS    A=3 B=3 C=33 D=801 'main_layer'
+00129 [L282] KNUM     A=4 B=0 C=1 D=1 0.2
+00130 [L282] MOV      A=5 B=0 C=1 D=1 
+00131 [L282] CALL     A=2 B=1 C=4 D=260 
+00132 [L285] RET0     A=0 B=0 C=1 D=1 
+00133 [L285] RET0     A=0 B=0 C=1 D=1 
+00134 [L285] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/ui/mapUI.lua =====
+FUNCTION proto6 offset=0x1405 source_lines=341-352 params=0
+UPVALUES ['cclog']
+00001 [L342] GGET     A=0 B=0 C=0 D=0 'g_mapUI'
+00002 [L342] TGETS    A=0 B=0 C=1 D=1 'maps'
+00003 [L342] LEN      A=0 B=0 C=0 D=0 
+00004 [L342] KSHORT   A=1 B=0 C=0 D=0 0
+00005 [L342] ISGT     A=0 B=0 C=1 D=1 
+00006 [L342] JMP      A=0 B=128 C=19 D=32787 target=26
+00007 [L344] GGET     A=0 B=0 C=2 D=2 'initMapCsv'
+00008 [L344] CALL     A=0 B=1 C=1 D=257 
+00009 [L346] TNEW     A=0 B=0 C=0 D=0 
+00010 [L348] KSHORT   A=1 B=0 C=0 D=0 0
+00011 [L348] TSETS    A=1 B=0 C=3 D=3 'flag'
+00012 [L349] UGET     A=1 B=0 C=0 D=0 cclog
+00013 [L349] KSTR     A=2 B=0 C=4 D=4 'send msg_query_map_list_1018 to BS. flag='
+00014 [L349] TGETS    A=3 B=0 C=3 D=3 'flag'
+00015 [L349] CALL     A=1 B=1 C=3 D=259 
+00016 [L350] GGET     A=1 B=0 C=5 D=5 'd_ms'
+00017 [L350] TGETS    A=1 B=1 C=6 D=262 'd_u'
+00018 [L350] TGETS    A=1 B=1 C=7 D=263 'main_server_send_msg'
+00019 [L350] GGET     A=2 B=0 C=5 D=5 'd_ms'
+00020 [L350] TGETS    A=2 B=2 C=8 D=520 'd_msg_def'
+00021 [L350] TGETS    A=2 B=2 C=9 D=521 'gscl_msg_id'
+00022 [L350] TGETS    A=2 B=2 C=10 D=522 'msg_query_map_list'
+00023 [L350] MOV      A=3 B=0 C=0 D=0 
+00024 [L350] KSHORT   A=4 B=0 C=0 D=0 0
+00025 [L350] CALL     A=1 B=1 C=4 D=260 
+00026 [L352] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/ui/systemSetUI.lua =====
+FUNCTION proto12 offset=0x1c7d source_lines=334-368 params=2
+UPVALUES ['cclog', 'CCFileUtils', 'main_server']
+00001 [L335] UGET     A=2 B=0 C=0 D=0 cclog
+00002 [L335] KSTR     A=3 B=0 C=0 D=0 'call replyGm: '
+00003 [L335] MOV      A=4 B=0 C=0 D=0 
+00004 [L335] KSTR     A=5 B=0 C=1 D=1 ', problem_id='
+00005 [L335] MOV      A=6 B=0 C=1 D=1 
+00006 [L335] CAT      A=3 B=3 C=6 D=774 
+00007 [L335] CALL     A=2 B=1 C=2 D=258 
+00008 [L338] ISNES    A=1 B=0 C=2 D=2 'restart_86400'
+00009 [L338] JMP      A=2 B=128 C=4 D=32772 target=14
+00010 [L339] GGET     A=2 B=0 C=3 D=3 'pressReportAdvice'
+00011 [L339] MOV      A=3 B=0 C=0 D=0 
+00012 [L339] CALL     A=2 B=1 C=2 D=258 
+00013 [L340] RET0     A=0 B=0 C=1 D=1 
+00014 [L344] GGET     A=2 B=0 C=4 D=4 'd_ms'
+00015 [L344] TGETS    A=2 B=2 C=5 D=517 'd_str'
+00016 [L344] TGETS    A=2 B=2 C=6 D=518 'strip'
+00017 [L344] MOV      A=3 B=0 C=0 D=0 
+00018 [L344] CALL     A=2 B=2 C=2 D=514 
+00019 [L344] MOV      A=0 B=0 C=2 D=2 
+00020 [L346] LEN      A=2 B=0 C=0 D=0 
+00021 [L346] KSHORT   A=3 B=0 C=0 D=0 0
+00022 [L346] ISGT     A=2 B=0 C=3 D=3 
+00023 [L346] JMP      A=2 B=128 C=10 D=32778 target=34
+00024 [L347] GGET     A=2 B=0 C=4 D=4 'd_ms'
+00025 [L347] TGETS    A=2 B=2 C=7 D=519 'd_info'
+00026 [L347] TGETS    A=2 B=2 C=8 D=520 'show'
+00027 [L347] GGET     A=3 B=0 C=4 D=4 'd_ms'
+00028 [L347] TGETS    A=3 B=3 C=9 D=777 'd_hz'
+00029 [L347] TGETS    A=3 B=3 C=10 D=778 'gethz'
+00030 [L347] KSTR     A=4 B=0 C=11 D=11 'send_advice_empty'
+00031 [L347] CALL     A=3 B=0 C=2 D=2 
+00032 [L347] CALLM    A=2 B=1 C=0 D=256 
+00033 [L348] RET0     A=0 B=0 C=1 D=1 
+00034 [L351] GGET     A=2 B=0 C=4 D=4 'd_ms'
+00035 [L351] TGETS    A=2 B=2 C=7 D=519 'd_info'
+00036 [L351] TGETS    A=2 B=2 C=8 D=520 'show'
+00037 [L351] GGET     A=3 B=0 C=4 D=4 'd_ms'
+00038 [L351] TGETS    A=3 B=3 C=9 D=777 'd_hz'
+00039 [L351] TGETS    A=3 B=3 C=10 D=778 'gethz'
+00040 [L351] KSTR     A=4 B=0 C=12 D=12 'send_advice_ok'
+00041 [L351] CALL     A=3 B=0 C=2 D=2 
+00042 [L351] CALLM    A=2 B=1 C=0 D=256 
+00043 [L355] UGET     A=2 B=0 C=1 D=1 CCFileUtils
+00044 [L355] MOV      A=3 B=0 C=2 D=2 
+00045 [L355] TGETS    A=2 B=2 C=13 D=525 'sharedFileUtils'
+00046 [L355] CALL     A=2 B=2 C=2 D=514 
+00047 [L355] MOV      A=3 B=0 C=2 D=2 
+00048 [L355] TGETS    A=2 B=2 C=14 D=526 'getWriteablePath'
+00049 [L355] CALL     A=2 B=2 C=2 D=514 
+00050 [L355] KSTR     A=3 B=0 C=15 D=15 '/update_w/create_user_reply_tmp'
+00051 [L355] CAT      A=2 B=2 C=3 D=515 
+00052 [L356] UGET     A=3 B=0 C=2 D=2 main_server
+00053 [L356] TGETS    A=3 B=3 C=16 D=784 'delfile_file'
+00054 [L356] MOV      A=4 B=0 C=2 D=2 
+00055 [L356] CALL     A=3 B=1 C=2 D=258 
+00056 [L357] UGET     A=3 B=0 C=1 D=1 CCFileUtils
+00057 [L357] MOV      A=4 B=0 C=3 D=3 
+00058 [L357] TGETS    A=3 B=3 C=13 D=781 'sharedFileUtils'
+00059 [L357] CALL     A=3 B=2 C=2 D=514 
+00060 [L357] MOV      A=4 B=0 C=3 D=3 
+00061 [L357] TGETS    A=3 B=3 C=14 D=782 'getWriteablePath'
+00062 [L357] CALL     A=3 B=2 C=2 D=514 
+00063 [L357] KSTR     A=4 B=0 C=17 D=17 '/update_w/create_user_reply'
+00064 [L357] CAT      A=3 B=3 C=4 D=772 
+00065 [L358] UGET     A=4 B=0 C=2 D=2 main_server
+00066 [L358] TGETS    A=4 B=4 C=16 D=1040 'delfile_file'
+00067 [L358] MOV      A=5 B=0 C=3 D=3 
+00068 [L358] CALL     A=4 B=1 C=2 D=258 
+00069 [L360] KSTR     A=4 B=0 C=18 D=18 '?problem_id='
+00070 [L360] MOV      A=5 B=0 C=1 D=1 
+00071 [L360] KSTR     A=6 B=0 C=19 D=19 '&content='
+00072 [L360] GGET     A=7 B=0 C=4 D=4 'd_ms'
+00073 [L360] TGETS    A=7 B=7 C=20 D=1812 'd_u'
+00074 [L360] TGETS    A=7 B=7 C=21 D=1813 'codeCharBase64'
+00075 [L360] MOV      A=8 B=0 C=0 D=0 
+00076 [L360] CALL     A=7 B=2 C=2 D=514 
+00077 [L360] CAT      A=4 B=4 C=7 D=1031 
+00078 [L363] GGET     A=5 B=0 C=4 D=4 'd_ms'
+00079 [L363] TGETS    A=5 B=5 C=22 D=1302 'd_config'
+00080 [L363] TGETS    A=5 B=5 C=23 D=1303 'g_bug_report_root_url'
+00081 [L363] KSTR     A=6 B=0 C=24 D=24 'replies/create_user_reply'
+00082 [L363] MOV      A=7 B=0 C=4 D=4 
+00083 [L363] CAT      A=5 B=5 C=7 D=1287 
+00084 [L364] GGET     A=6 B=0 C=4 D=4 'd_ms'
+00085 [L364] TGETS    A=6 B=6 C=25 D=1561 'd_http'
+00086 [L364] TGETS    A=6 B=6 C=26 D=1562 'try_download'
+00087 [L364] MOV      A=7 B=0 C=5 D=5 
+00088 [L364] KSTR     A=8 B=0 C=27 D=27 'create_user_reply'
+00089 [L364] GGET     A=9 B=0 C=28 D=28 'g_path_update_w'
+00090 [L364] CALL     A=6 B=1 C=4 D=260 
+00091 [L368] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/ui/systemSetUI.lua =====
+FUNCTION proto21 offset=0x344e source_lines=630-665 params=0
+UPVALUES ['cclog', 'CCFileUtils']
+00001 [L631] UGET     A=0 B=0 C=0 D=0 cclog
+00002 [L631] KSTR     A=1 B=0 C=0 D=0 'callbackCreateUserReply'
+00003 [L631] CALL     A=0 B=1 C=2 D=258 
+00004 [L632] UGET     A=0 B=0 C=1 D=1 CCFileUtils
+00005 [L632] MOV      A=1 B=0 C=0 D=0 
+00006 [L632] TGETS    A=0 B=0 C=1 D=1 'sharedFileUtils'
+00007 [L632] CALL     A=0 B=2 C=2 D=514 
+00008 [L632] MOV      A=1 B=0 C=0 D=0 
+00009 [L632] TGETS    A=0 B=0 C=2 D=2 'getWriteablePath'
+00010 [L632] CALL     A=0 B=2 C=2 D=514 
+00011 [L632] KSTR     A=1 B=0 C=3 D=3 '/update_w/create_user_reply'
+00012 [L632] CAT      A=0 B=0 C=1 D=1 
+00013 [L633] GGET     A=1 B=0 C=4 D=4 'd_ms'
+00014 [L633] TGETS    A=1 B=1 C=5 D=261 'd_file'
+00015 [L633] TGETS    A=1 B=1 C=6 D=262 'readFile'
+00016 [L633] MOV      A=2 B=0 C=0 D=0 
+00017 [L633] CALL     A=1 B=2 C=2 D=514 
+00018 [L635] ISF      A=0 B=0 C=1 D=1 
+00019 [L635] JMP      A=2 B=128 C=4 D=32772 target=24
+00020 [L635] LEN      A=2 B=0 C=1 D=1 
+00021 [L635] KSHORT   A=3 B=0 C=0 D=0 0
+00022 [L635] ISGT     A=2 B=0 C=3 D=3 
+00023 [L635] JMP      A=2 B=128 C=1 D=32769 target=25
+00024 [L637] RET0     A=0 B=0 C=1 D=1 
+00025 [L641] GGET     A=2 B=0 C=4 D=4 'd_ms'
+00026 [L641] TGETS    A=2 B=2 C=7 D=519 'd_u'
+00027 [L641] TGETS    A=2 B=2 C=8 D=520 'isHttp404'
+00028 [L641] MOV      A=3 B=0 C=1 D=1 
+00029 [L641] CALL     A=2 B=2 C=2 D=514 
+00030 [L641] ISF      A=0 B=0 C=2 D=2 
+00031 [L641] JMP      A=3 B=128 C=1 D=32769 target=33
+00032 [L642] RET0     A=0 B=0 C=1 D=1 
+00033 [L645] GGET     A=2 B=0 C=4 D=4 'd_ms'
+00034 [L645] TGETS    A=2 B=2 C=9 D=521 'd_json'
+00035 [L645] TGETS    A=2 B=2 C=10 D=522 'decode'
+00036 [L645] MOV      A=3 B=0 C=1 D=1 
+00037 [L645] CALL     A=2 B=2 C=2 D=514 
+00038 [L647] KPRI     A=3 B=0 C=0 D=0 
+00039 [L648] ISF      A=0 B=0 C=2 D=2 
+00040 [L648] JMP      A=4 B=128 C=17 D=32785 target=58
+00041 [L649] TGETS    A=3 B=2 C=11 D=523 'msg'
+00042 [L650] TGETS    A=4 B=2 C=12 D=524 'ok'
+00043 [L650] ISNEN    A=4 B=0 C=0 D=0 1
+00044 [L650] JMP      A=4 B=128 C=1 D=32769 target=46
+00045 [L650] JMP      A=4 B=128 C=12 D=32780 target=58
+00046 [L654] ISF      A=0 B=0 C=3 D=3 
+00047 [L654] JMP      A=4 B=128 C=4 D=32772 target=52
+00048 [L654] LEN      A=4 B=0 C=3 D=3 
+00049 [L654] KSHORT   A=5 B=0 C=0 D=0 0
+00050 [L654] ISGT     A=4 B=0 C=5 D=5 
+00051 [L654] JMP      A=4 B=128 C=6 D=32774 target=58
+00052 [L655] GGET     A=4 B=0 C=4 D=4 'd_ms'
+00053 [L655] TGETS    A=4 B=4 C=13 D=1037 'd_hz'
+00054 [L655] TGETS    A=4 B=4 C=14 D=1038 'gethz'
+00055 [L655] KSTR     A=5 B=0 C=15 D=15 'send_advice_fail'
+00056 [L655] CALL     A=4 B=2 C=2 D=514 
+00057 [L655] MOV      A=3 B=0 C=4 D=4 
+00058 [L660] ISF      A=0 B=0 C=3 D=3 
+00059 [L660] JMP      A=4 B=128 C=11 D=32779 target=71
+00060 [L660] LEN      A=4 B=0 C=3 D=3 
+00061 [L660] KSHORT   A=5 B=0 C=1 D=1 1
+00062 [L660] ISGE     A=5 B=0 C=4 D=4 
+00063 [L660] JMP      A=4 B=128 C=7 D=32775 target=71
+00064 [L661] GGET     A=4 B=0 C=4 D=4 'd_ms'
+00065 [L661] TGETS    A=4 B=4 C=16 D=1040 'd_info'
+00066 [L661] TGETS    A=4 B=4 C=17 D=1041 'show'
+00067 [L661] MOV      A=5 B=0 C=3 D=3 
+00068 [L661] CALL     A=4 B=1 C=2 D=258 
+00069 [L662] GGET     A=4 B=0 C=18 D=18 'insertFindProblemEvent'
+00070 [L662] CALL     A=4 B=1 C=1 D=257 
+00071 [L665] RET0     A=0 B=0 C=1 D=1 
+
+
+===== lua/update/update_mgr.lua =====
+FUNCTION proto4 offset=0x4fc source_lines=158-190 params=0
+UPVALUES ['cclog', 'os', 'main_server']
+00001 [L159] UGET     A=0 B=0 C=0 D=0 cclog
+00002 [L159] KSTR     A=1 B=0 C=0 D=0 'call downloadServerList'
+00003 [L159] CALL     A=0 B=1 C=2 D=258 
+00004 [L162] UGET     A=0 B=0 C=1 D=1 os
+00005 [L162] TGETS    A=0 B=0 C=1 D=1 'time'
+00006 [L162] CALL     A=0 B=2 C=1 D=513 
+00007 [L163] GGET     A=1 B=0 C=2 D=2 'g_last_down_load_time'
+00008 [L163] SUBVV    A=1 B=0 C=1 D=1 
+00009 [L163] KSHORT   A=2 B=0 C=15 D=15 15
+00010 [L163] ISGE     A=2 B=0 C=1 D=1 
+00011 [L163] JMP      A=1 B=128 C=2 D=32770 target=14
+00012 [L164] GSET     A=0 B=0 C=2 D=2 'g_last_down_load_time'
+00013 [L164] JMP      A=1 B=128 C=1 D=32769 target=15
+00014 [L167] RET0     A=0 B=0 C=1 D=1 
+00015 [L172] UGET     A=0 B=0 C=2 D=2 main_server
+00016 [L172] TGETS    A=0 B=0 C=3 D=3 'delfile_file'
+00017 [L172] GGET     A=1 B=0 C=4 D=4 'g_path_update_w'
+00018 [L172] GGET     A=2 B=0 C=5 D=5 'g_self'
+00019 [L172] TGETS    A=2 B=2 C=6 D=518 'server_list_file_name'
+00020 [L172] CAT      A=1 B=1 C=2 D=258 
+00021 [L172] CALL     A=0 B=1 C=2 D=258 
+00022 [L173] UGET     A=0 B=0 C=2 D=2 main_server
+00023 [L173] TGETS    A=0 B=0 C=3 D=3 'delfile_file'
+00024 [L173] GGET     A=1 B=0 C=4 D=4 'g_path_update_w'
+00025 [L173] GGET     A=2 B=0 C=5 D=5 'g_self'
+00026 [L173] TGETS    A=2 B=2 C=6 D=518 'server_list_file_name'
+00027 [L173] KSTR     A=3 B=0 C=7 D=7 '_tmp'
+00028 [L173] CAT      A=1 B=1 C=3 D=259 
+00029 [L173] CALL     A=0 B=1 C=2 D=258 
+00030 [L176] KSTR     A=0 B=0 C=8 D=8 ''
+00031 [L177] GGET     A=1 B=0 C=9 D=9 'd_ms'
+00032 [L177] TGETS    A=1 B=1 C=10 D=266 'd_config'
+00033 [L177] TGETS    A=1 B=1 C=11 D=267 'getForceUseDebugFlag'
+00034 [L177] CALL     A=1 B=2 C=1 D=513 
+00035 [L178] GGET     A=2 B=0 C=9 D=9 'd_ms'
+00036 [L178] TGETS    A=2 B=2 C=10 D=522 'd_config'
+00037 [L178] TGETS    A=2 B=2 C=12 D=524 'g_env_flag'
+00038 [L178] ISEQP    A=2 B=0 C=1 D=1 
+00039 [L178] JMP      A=2 B=128 C=2 D=32770 target=42
+00040 [L178] ISNEP    A=1 B=0 C=2 D=2 
+00041 [L178] JMP      A=2 B=128 C=12 D=32780 target=54
+00042 [L179] GGET     A=2 B=0 C=9 D=9 'd_ms'
+00043 [L179] TGETS    A=2 B=2 C=13 D=525 'd_tp_config'
+00044 [L179] TGETS    A=2 B=2 C=14 D=526 'getThirdPartyName'
+00045 [L179] CALL     A=2 B=2 C=1 D=513 
+00046 [L179] MOV      A=0 B=0 C=2 D=2 
+00047 [L180] LEN      A=2 B=0 C=0 D=0 
+00048 [L180] KSHORT   A=3 B=0 C=0 D=0 0
+00049 [L180] ISGE     A=3 B=0 C=2 D=2 
+00050 [L180] JMP      A=2 B=128 C=3 D=32771 target=54
+00051 [L181] MOV      A=2 B=0 C=0 D=0 
+00052 [L181] KSTR     A=3 B=0 C=15 D=15 '/'
+00053 [L181] CAT      A=0 B=2 C=3 D=515 
+00054 [L184] GGET     A=2 B=0 C=9 D=9 'd_ms'
+00055 [L184] TGETS    A=2 B=2 C=10 D=522 'd_config'
+00056 [L184] TGETS    A=2 B=2 C=16 D=528 'getServerListRootUrl'
+00057 [L184] CALL     A=2 B=2 C=1 D=513 
+00058 [L184] MOV      A=3 B=0 C=0 D=0 
+00059 [L184] GGET     A=4 B=0 C=5 D=5 'g_self'
+00060 [L184] TGETS    A=4 B=4 C=6 D=1030 'server_list_file_name'
+00061 [L184] KSTR     A=5 B=0 C=17 D=17 '?t='
+00062 [L184] UGET     A=6 B=0 C=1 D=1 os
+00063 [L184] TGETS    A=6 B=6 C=1 D=1537 'time'
+00064 [L184] CALL     A=6 B=2 C=1 D=513 
+00065 [L184] CAT      A=2 B=2 C=6 D=518 
+00066 [L185] UGET     A=3 B=0 C=0 D=0 cclog
+00067 [L185] KSTR     A=4 B=0 C=18 D=18 'update url=[%s]'
+00068 [L185] MOV      A=5 B=0 C=2 D=2 
+00069 [L185] CALL     A=3 B=1 C=3 D=259 
+00070 [L186] GGET     A=3 B=0 C=9 D=9 'd_ms'
+00071 [L186] TGETS    A=3 B=3 C=19 D=787 'd_alert'
+00072 [L186] TGETS    A=3 B=3 C=20 D=788 'start_wait'
+00073 [L186] KPRI     A=4 B=0 C=0 D=0 
+00074 [L186] KSHORT   A=5 B=0 C=20 D=20 20
+00075 [L186] CALL     A=3 B=1 C=3 D=259 
+00076 [L187] UGET     A=3 B=0 C=2 D=2 main_server
+00077 [L187] TGETS    A=3 B=3 C=21 D=789 'update_files'
+00078 [L187] MOV      A=4 B=0 C=2 D=2 
+00079 [L187] GGET     A=5 B=0 C=5 D=5 'g_self'
+00080 [L187] TGETS    A=5 B=5 C=6 D=1286 'server_list_file_name'
+00081 [L187] GGET     A=6 B=0 C=4 D=4 'g_path_update_w'
+00082 [L187] KSHORT   A=7 B=0 C=1 D=1 1
+00083 [L187] KSHORT   A=8 B=0 C=10 D=10 10
+00084 [L187] CALL     A=3 B=1 C=6 D=262 
+00085 [L188] GGET     A=3 B=0 C=9 D=9 'd_ms'
+00086 [L188] TGETS    A=3 B=3 C=22 D=790 'd_updateUI'
+00087 [L188] TGETS    A=3 B=3 C=23 D=791 'info'
+00088 [L188] GGET     A=4 B=0 C=9 D=9 'd_ms'
+00089 [L188] TGETS    A=4 B=4 C=24 D=1048 'd_hz'
+00090 [L188] TGETS    A=4 B=4 C=25 D=1049 'gethz'
+00091 [L188] KSTR     A=5 B=0 C=26 D=26 'down_server_list_begin'
+00092 [L188] CALL     A=4 B=0 C=2 D=2 
+00093 [L188] CALLM    A=3 B=1 C=0 D=256 
+00094 [L190] RET0     A=0 B=0 C=1 D=1 

@@ -1,0 +1,811 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\420adb95c79d76eb451bcb018577162e.data'; root=proto18
+
+FUNCTION proto0 offset=0x4a source_lines=32-34 params=0
+UPVALUES ['CCLuaLog', 'string']
+00001 [L33] UGET     A=0 B=0 C=0 D=0 CCLuaLog
+00002 [L33] UGET     A=1 B=0 C=1 D=1 string
+00003 [L33] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L33] VARG     A=2 B=0 C=0 D=0 
+00005 [L33] CALLM    A=1 B=0 C=0 D=0 
+00006 [L33] CALLM    A=0 B=1 C=0 D=256 
+00007 [L34] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x94 source_lines=46-50 params=1
+UPVALUES ['os']
+00001 [L47] GGET     A=1 B=0 C=0 D=0 'g_self'
+00002 [L47] TSETS    A=0 B=1 C=1 D=257 'server_time'
+00003 [L48] GGET     A=1 B=0 C=0 D=0 'g_self'
+00004 [L48] UGET     A=2 B=0 C=0 D=0 os
+00005 [L48] TGETS    A=2 B=2 C=3 D=515 'time'
+00006 [L48] CALL     A=2 B=2 C=1 D=513 
+00007 [L48] SUBVV    A=2 B=2 C=0 D=512 
+00008 [L48] TSETS    A=2 B=1 C=2 D=258 'time_interval'
+00009 [L50] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto2 offset=0x100 source_lines=54-64 params=0
+UPVALUES ['os']
+00001 [L55] UGET     A=0 B=0 C=0 D=0 os
+00002 [L55] TGETS    A=0 B=0 C=0 D=0 'date'
+00003 [L55] KSTR     A=1 B=0 C=1 D=1 '*t'
+00004 [L55] CALL     A=0 B=2 C=2 D=514 
+00005 [L56] UGET     A=1 B=0 C=0 D=0 os
+00006 [L56] TGETS    A=1 B=1 C=0 D=256 'date'
+00007 [L56] KSTR     A=2 B=0 C=2 D=2 '!*t'
+00008 [L56] CALL     A=1 B=2 C=2 D=514 
+00009 [L57] UGET     A=2 B=0 C=0 D=0 os
+00010 [L57] TGETS    A=2 B=2 C=3 D=515 'difftime'
+00011 [L57] UGET     A=3 B=0 C=0 D=0 os
+00012 [L57] TGETS    A=3 B=3 C=4 D=772 'time'
+00013 [L57] MOV      A=4 B=0 C=0 D=0 
+00014 [L57] CALL     A=3 B=2 C=2 D=514 
+00015 [L57] UGET     A=4 B=0 C=0 D=0 os
+00016 [L57] TGETS    A=4 B=4 C=4 D=1028 'time'
+00017 [L57] MOV      A=5 B=0 C=1 D=1 
+00018 [L57] CALL     A=4 B=0 C=2 D=2 
+00019 [L57] CALLM    A=2 B=2 C=1 D=513 
+00020 [L57] SUBVN    A=2 B=2 C=0 D=512 
+00021 [L60] TGETS    A=3 B=0 C=5 D=5 'isdst'
+00022 [L60] ISNEP    A=3 B=0 C=2 D=2 
+00023 [L60] JMP      A=3 B=128 C=1 D=32769 target=25
+00024 [L61] ADDVN    A=2 B=2 C=1 D=513 
+00025 [L63] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto3 offset=0x1d0 source_lines=69-71 params=0
+UPVALUES ['os']
+00001 [L70] UGET     A=0 B=0 C=0 D=0 os
+00002 [L70] TGETS    A=0 B=0 C=0 D=0 'time'
+00003 [L70] CALL     A=0 B=2 C=1 D=513 
+00004 [L70] GGET     A=1 B=0 C=1 D=1 'g_self'
+00005 [L70] TGETS    A=1 B=1 C=2 D=258 'time_interval'
+00006 [L70] SUBVV    A=0 B=0 C=1 D=1 
+00007 [L70] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto4 offset=0x21e source_lines=73-75 params=0
+UPVALUES []
+00001 [L74] GGET     A=0 B=0 C=0 D=0 'getTime'
+00002 [L74] CALL     A=0 B=2 C=1 D=513 
+00003 [L74] GGET     A=1 B=0 C=1 D=1 'getTimeZoneInterval'
+00004 [L74] CALL     A=1 B=2 C=1 D=513 
+00005 [L74] SUBVV    A=0 B=0 C=1 D=1 
+00006 [L74] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto5 offset=0x265 source_lines=80-100 params=1
+UPVALUES ['math', 'os']
+00001 [L81] GGET     A=1 B=0 C=0 D=0 'getTime'
+00002 [L81] CALL     A=1 B=2 C=1 D=513 
+00003 [L82] UGET     A=2 B=0 C=0 D=0 math
+00004 [L82] TGETS    A=2 B=2 C=1 D=513 'abs'
+00005 [L82] SUBVV    A=3 B=1 C=0 D=256 
+00006 [L82] CALL     A=2 B=2 C=2 D=514 
+00007 [L82] KNUM     A=3 B=0 C=0 D=0 86400
+00008 [L82] ISGE     A=3 B=0 C=2 D=2 
+00009 [L82] JMP      A=2 B=128 C=2 D=32770 target=12
+00010 [L83] KPRI     A=2 B=0 C=2 D=2 
+00011 [L83] RET1     A=2 B=0 C=2 D=2 
+00012 [L91] GGET     A=2 B=0 C=2 D=2 'getTimeZoneInterval'
+00013 [L91] CALL     A=2 B=2 C=1 D=513 
+00014 [L92] UGET     A=3 B=0 C=1 D=1 os
+00015 [L92] TGETS    A=3 B=3 C=3 D=771 'date'
+00016 [L92] KSTR     A=4 B=0 C=4 D=4 '*t'
+00017 [L92] SUBVV    A=5 B=0 C=2 D=2 
+00018 [L92] CALL     A=3 B=2 C=3 D=515 
+00019 [L93] UGET     A=4 B=0 C=1 D=1 os
+00020 [L93] TGETS    A=4 B=4 C=3 D=1027 'date'
+00021 [L93] KSTR     A=5 B=0 C=4 D=4 '*t'
+00022 [L93] SUBVV    A=6 B=1 C=2 D=258 
+00023 [L93] CALL     A=4 B=2 C=3 D=515 
+00024 [L95] TGETS    A=5 B=4 C=5 D=1029 'wday'
+00025 [L95] TGETS    A=6 B=3 C=5 D=773 'wday'
+00026 [L95] ISNEV    A=5 B=0 C=6 D=6 
+00027 [L95] JMP      A=5 B=128 C=3 D=32771 target=31
+00028 [L96] KPRI     A=5 B=0 C=1 D=1 
+00029 [L96] RET1     A=5 B=0 C=2 D=2 
+00030 [L96] JMP      A=5 B=128 C=2 D=32770 target=33
+00031 [L98] KPRI     A=5 B=0 C=2 D=2 
+00032 [L98] RET1     A=5 B=0 C=2 D=2 
+00033 [L100] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x38d source_lines=104-108 params=0
+UPVALUES ['os', 'tonumber']
+00001 [L105] GGET     A=0 B=0 C=0 D=0 'getShowTime'
+00002 [L105] CALL     A=0 B=2 C=1 D=513 
+00003 [L106] UGET     A=1 B=0 C=0 D=0 os
+00004 [L106] TGETS    A=1 B=1 C=1 D=257 'date'
+00005 [L106] KSTR     A=2 B=0 C=2 D=2 '%H'
+00006 [L106] MOV      A=3 B=0 C=0 D=0 
+00007 [L106] CALL     A=1 B=2 C=3 D=515 
+00008 [L107] UGET     A=2 B=0 C=1 D=1 tonumber
+00009 [L107] MOV      A=3 B=0 C=1 D=1 
+00010 [L107] CALLT    A=2 B=0 C=2 D=2 
+
+FUNCTION proto7 offset=0x405 source_lines=112-116 params=0
+UPVALUES ['os', 'tonumber']
+00001 [L113] GGET     A=0 B=0 C=0 D=0 'getShowTime'
+00002 [L113] CALL     A=0 B=2 C=1 D=513 
+00003 [L114] UGET     A=1 B=0 C=0 D=0 os
+00004 [L114] TGETS    A=1 B=1 C=1 D=257 'date'
+00005 [L114] KSTR     A=2 B=0 C=2 D=2 '%M'
+00006 [L114] MOV      A=3 B=0 C=0 D=0 
+00007 [L114] CALL     A=1 B=2 C=3 D=515 
+00008 [L115] UGET     A=2 B=0 C=1 D=1 tonumber
+00009 [L115] MOV      A=3 B=0 C=1 D=1 
+00010 [L115] CALLT    A=2 B=0 C=2 D=2 
+
+FUNCTION proto8 offset=0x47e source_lines=130-142 params=0
+UPVALUES []
+00001 [L131] GGET     A=0 B=0 C=0 D=0 'g_restTime'
+00002 [L131] ISF      A=0 B=0 C=0 D=0 
+00003 [L131] JMP      A=0 B=128 C=4 D=32772 target=8
+00004 [L131] GGET     A=0 B=0 C=0 D=0 'g_restTime'
+00005 [L131] LEN      A=0 B=0 C=0 D=0 
+00006 [L131] ISNEN    A=0 B=0 C=0 D=0 0
+00007 [L131] JMP      A=0 B=128 C=62 D=32830 target=70
+00008 [L132] TNEW     A=0 B=0 C=0 D=0 
+00009 [L132] GSET     A=0 B=0 C=0 D=0 'g_restTime'
+00010 [L133] GGET     A=0 B=0 C=0 D=0 'g_restTime'
+00011 [L133] TNEW     A=1 B=0 C=0 D=0 
+00012 [L133] TSETS    A=1 B=0 C=1 D=1 'day'
+00013 [L134] GGET     A=0 B=0 C=0 D=0 'g_restTime'
+00014 [L134] TGETS    A=0 B=0 C=1 D=1 'day'
+00015 [L134] TDUP     A=1 B=0 C=6 D=6 {'kind': 'table', 'value': {2: ':'}}
+00016 [L134] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00017 [L134] TGETS    A=2 B=2 C=4 D=516 'd_hz'
+00018 [L134] TGETS    A=2 B=2 C=5 D=517 'gethz'
+00019 [L134] KSTR     A=3 B=0 C=1 D=1 'day'
+00020 [L134] CALL     A=2 B=2 C=2 D=514 
+00021 [L134] TSETB    A=2 B=1 C=1 D=257 
+00022 [L134] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00023 [L134] TGETS    A=2 B=2 C=4 D=516 'd_hz'
+00024 [L134] TGETS    A=2 B=2 C=5 D=517 'gethz'
+00025 [L134] KSTR     A=3 B=0 C=1 D=1 'day'
+00026 [L134] CALL     A=2 B=2 C=2 D=514 
+00027 [L134] KSTR     A=3 B=0 C=7 D=7 '  '
+00028 [L134] CAT      A=2 B=2 C=3 D=515 
+00029 [L134] TSETB    A=2 B=1 C=3 D=259 
+00030 [L134] TSETS    A=1 B=0 C=2 D=2 'suffix'
+00031 [L135] GGET     A=0 B=0 C=0 D=0 'g_restTime'
+00032 [L135] TNEW     A=1 B=0 C=0 D=0 
+00033 [L135] TSETS    A=1 B=0 C=8 D=8 'hour'
+00034 [L136] GGET     A=0 B=0 C=0 D=0 'g_restTime'
+00035 [L136] TGETS    A=0 B=0 C=8 D=8 'hour'
+00036 [L136] TDUP     A=1 B=0 C=9 D=9 {'kind': 'table', 'value': {2: ':', 3: ':'}}
+00037 [L136] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00038 [L136] TGETS    A=2 B=2 C=4 D=516 'd_hz'
+00039 [L136] TGETS    A=2 B=2 C=5 D=517 'gethz'
+00040 [L136] KSTR     A=3 B=0 C=8 D=8 'hour'
+00041 [L136] CALL     A=2 B=2 C=2 D=514 
+00042 [L136] TSETB    A=2 B=1 C=1 D=257 
+00043 [L136] TSETS    A=1 B=0 C=2 D=2 'suffix'
+00044 [L137] GGET     A=0 B=0 C=0 D=0 'g_restTime'
+00045 [L137] TNEW     A=1 B=0 C=0 D=0 
+00046 [L137] TSETS    A=1 B=0 C=10 D=10 'minutes'
+00047 [L138] GGET     A=0 B=0 C=0 D=0 'g_restTime'
+00048 [L138] TGETS    A=0 B=0 C=10 D=10 'minutes'
+00049 [L138] TDUP     A=1 B=0 C=11 D=11 {'kind': 'table', 'value': {2: ':', 3: ':'}}
+00050 [L138] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00051 [L138] TGETS    A=2 B=2 C=4 D=516 'd_hz'
+00052 [L138] TGETS    A=2 B=2 C=5 D=517 'gethz'
+00053 [L138] KSTR     A=3 B=0 C=10 D=10 'minutes'
+00054 [L138] CALL     A=2 B=2 C=2 D=514 
+00055 [L138] TSETB    A=2 B=1 C=1 D=257 
+00056 [L138] TSETS    A=1 B=0 C=2 D=2 'suffix'
+00057 [L139] GGET     A=0 B=0 C=0 D=0 'g_restTime'
+00058 [L139] TNEW     A=1 B=0 C=0 D=0 
+00059 [L139] TSETS    A=1 B=0 C=12 D=12 'second'
+00060 [L140] GGET     A=0 B=0 C=0 D=0 'g_restTime'
+00061 [L140] TGETS    A=0 B=0 C=12 D=12 'second'
+00062 [L140] TDUP     A=1 B=0 C=13 D=13 {'kind': 'table', 'value': {2: '', 3: ''}}
+00063 [L140] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00064 [L140] TGETS    A=2 B=2 C=4 D=516 'd_hz'
+00065 [L140] TGETS    A=2 B=2 C=5 D=517 'gethz'
+00066 [L140] KSTR     A=3 B=0 C=12 D=12 'second'
+00067 [L140] CALL     A=2 B=2 C=2 D=514 
+00068 [L140] TSETB    A=2 B=1 C=1 D=257 
+00069 [L140] TSETS    A=1 B=0 C=2 D=2 'suffix'
+00070 [L142] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto9 offset=0x648 source_lines=145-189 params=1
+UPVALUES ['string']
+00001 [L146] GGET     A=1 B=0 C=0 D=0 'g_format'
+00002 [L146] TGETS    A=1 B=1 C=1 D=257 'colon'
+00003 [L146] ISNEV    A=0 B=0 C=1 D=1 
+00004 [L146] JMP      A=1 B=128 C=59 D=32827 target=64
+00005 [L147] GGET     A=1 B=0 C=2 D=2 'g_restTime'
+00006 [L147] TGETS    A=1 B=1 C=3 D=259 'hour'
+00007 [L147] UGET     A=2 B=0 C=0 D=0 string
+00008 [L147] TGETS    A=2 B=2 C=5 D=517 'format'
+00009 [L147] KSTR     A=3 B=0 C=6 D=6 '%02d'
+00010 [L147] GGET     A=4 B=0 C=2 D=2 'g_restTime'
+00011 [L147] TGETS    A=4 B=4 C=3 D=1027 'hour'
+00012 [L147] TGETS    A=4 B=4 C=4 D=1028 'num'
+00013 [L147] GGET     A=5 B=0 C=2 D=2 'g_restTime'
+00014 [L147] TGETS    A=5 B=5 C=7 D=1287 'day'
+00015 [L147] TGETS    A=5 B=5 C=4 D=1284 'num'
+00016 [L147] MULVN    A=5 B=5 C=0 D=1280 
+00017 [L147] ADDVV    A=4 B=4 C=5 D=1029 
+00018 [L147] CALL     A=2 B=2 C=3 D=515 
+00019 [L147] TSETS    A=2 B=1 C=4 D=260 'num'
+00020 [L148] GGET     A=1 B=0 C=2 D=2 'g_restTime'
+00021 [L148] TGETS    A=1 B=1 C=8 D=264 'minutes'
+00022 [L148] UGET     A=2 B=0 C=0 D=0 string
+00023 [L148] TGETS    A=2 B=2 C=5 D=517 'format'
+00024 [L148] KSTR     A=3 B=0 C=6 D=6 '%02d'
+00025 [L148] GGET     A=4 B=0 C=2 D=2 'g_restTime'
+00026 [L148] TGETS    A=4 B=4 C=8 D=1032 'minutes'
+00027 [L148] TGETS    A=4 B=4 C=4 D=1028 'num'
+00028 [L148] CALL     A=2 B=2 C=3 D=515 
+00029 [L148] TSETS    A=2 B=1 C=4 D=260 'num'
+00030 [L149] GGET     A=1 B=0 C=2 D=2 'g_restTime'
+00031 [L149] TGETS    A=1 B=1 C=9 D=265 'second'
+00032 [L149] UGET     A=2 B=0 C=0 D=0 string
+00033 [L149] TGETS    A=2 B=2 C=5 D=517 'format'
+00034 [L149] KSTR     A=3 B=0 C=6 D=6 '%02d'
+00035 [L149] GGET     A=4 B=0 C=2 D=2 'g_restTime'
+00036 [L149] TGETS    A=4 B=4 C=9 D=1033 'second'
+00037 [L149] TGETS    A=4 B=4 C=4 D=1028 'num'
+00038 [L149] CALL     A=2 B=2 C=3 D=515 
+00039 [L149] TSETS    A=2 B=1 C=4 D=260 'num'
+00040 [L150] GGET     A=1 B=0 C=2 D=2 'g_restTime'
+00041 [L150] TGETS    A=1 B=1 C=3 D=259 'hour'
+00042 [L150] TGETS    A=1 B=1 C=4 D=260 'num'
+00043 [L150] GGET     A=2 B=0 C=2 D=2 'g_restTime'
+00044 [L150] TGETS    A=2 B=2 C=3 D=515 'hour'
+00045 [L150] TGETS    A=2 B=2 C=10 D=522 'suffix'
+00046 [L150] GGET     A=3 B=0 C=0 D=0 'g_format'
+00047 [L150] TGETS    A=3 B=3 C=1 D=769 'colon'
+00048 [L150] TGETV    A=2 B=2 C=3 D=515 
+00049 [L150] GGET     A=3 B=0 C=2 D=2 'g_restTime'
+00050 [L150] TGETS    A=3 B=3 C=8 D=776 'minutes'
+00051 [L150] TGETS    A=3 B=3 C=4 D=772 'num'
+00052 [L150] GGET     A=4 B=0 C=2 D=2 'g_restTime'
+00053 [L150] TGETS    A=4 B=4 C=8 D=1032 'minutes'
+00054 [L150] TGETS    A=4 B=4 C=10 D=1034 'suffix'
+00055 [L150] GGET     A=5 B=0 C=0 D=0 'g_format'
+00056 [L150] TGETS    A=5 B=5 C=1 D=1281 'colon'
+00057 [L150] TGETV    A=4 B=4 C=5 D=1029 
+00058 [L150] GGET     A=5 B=0 C=2 D=2 'g_restTime'
+00059 [L150] TGETS    A=5 B=5 C=9 D=1289 'second'
+00060 [L150] TGETS    A=5 B=5 C=4 D=1284 'num'
+00061 [L150] CAT      A=1 B=1 C=5 D=261 
+00062 [L150] RET1     A=1 B=0 C=2 D=2 
+00063 [L150] JMP      A=1 B=128 C=180 D=32948 target=244
+00064 [L151] GGET     A=1 B=0 C=0 D=0 'g_format'
+00065 [L151] TGETS    A=1 B=1 C=11 D=267 'hz'
+00066 [L151] ISNEV    A=0 B=0 C=1 D=1 
+00067 [L151] JMP      A=1 B=128 C=84 D=32852 target=152
+00068 [L152] KSTR     A=1 B=0 C=12 D=12 ''
+00069 [L153] KPRI     A=2 B=0 C=1 D=1 
+00070 [L154] GGET     A=3 B=0 C=2 D=2 'g_restTime'
+00071 [L154] TGETS    A=3 B=3 C=7 D=775 'day'
+00072 [L154] TGETS    A=3 B=3 C=4 D=772 'num'
+00073 [L154] KSHORT   A=4 B=0 C=0 D=0 0
+00074 [L154] ISLT     A=4 B=0 C=3 D=3 
+00075 [L154] JMP      A=3 B=128 C=2 D=32770 target=78
+00076 [L154] ISF      A=0 B=0 C=2 D=2 
+00077 [L154] JMP      A=3 B=128 C=12 D=32780 target=90
+00078 [L155] MOV      A=3 B=0 C=1 D=1 
+00079 [L155] GGET     A=4 B=0 C=2 D=2 'g_restTime'
+00080 [L155] TGETS    A=4 B=4 C=7 D=1031 'day'
+00081 [L155] TGETS    A=4 B=4 C=4 D=1028 'num'
+00082 [L155] GGET     A=5 B=0 C=2 D=2 'g_restTime'
+00083 [L155] TGETS    A=5 B=5 C=7 D=1287 'day'
+00084 [L155] TGETS    A=5 B=5 C=10 D=1290 'suffix'
+00085 [L155] GGET     A=6 B=0 C=0 D=0 'g_format'
+00086 [L155] TGETS    A=6 B=6 C=11 D=1547 'hz'
+00087 [L155] TGETV    A=5 B=5 C=6 D=1286 
+00088 [L155] CAT      A=1 B=3 C=5 D=773 
+00089 [L156] KPRI     A=2 B=0 C=2 D=2 
+00090 [L158] GGET     A=3 B=0 C=2 D=2 'g_restTime'
+00091 [L158] TGETS    A=3 B=3 C=3 D=771 'hour'
+00092 [L158] TGETS    A=3 B=3 C=4 D=772 'num'
+00093 [L158] KSHORT   A=4 B=0 C=0 D=0 0
+00094 [L158] ISLT     A=4 B=0 C=3 D=3 
+00095 [L158] JMP      A=3 B=128 C=2 D=32770 target=98
+00096 [L158] ISF      A=0 B=0 C=2 D=2 
+00097 [L158] JMP      A=3 B=128 C=12 D=32780 target=110
+00098 [L159] MOV      A=3 B=0 C=1 D=1 
+00099 [L159] GGET     A=4 B=0 C=2 D=2 'g_restTime'
+00100 [L159] TGETS    A=4 B=4 C=3 D=1027 'hour'
+00101 [L159] TGETS    A=4 B=4 C=4 D=1028 'num'
+00102 [L159] GGET     A=5 B=0 C=2 D=2 'g_restTime'
+00103 [L159] TGETS    A=5 B=5 C=3 D=1283 'hour'
+00104 [L159] TGETS    A=5 B=5 C=10 D=1290 'suffix'
+00105 [L159] GGET     A=6 B=0 C=0 D=0 'g_format'
+00106 [L159] TGETS    A=6 B=6 C=11 D=1547 'hz'
+00107 [L159] TGETV    A=5 B=5 C=6 D=1286 
+00108 [L159] CAT      A=1 B=3 C=5 D=773 
+00109 [L160] KPRI     A=2 B=0 C=2 D=2 
+00110 [L162] GGET     A=3 B=0 C=2 D=2 'g_restTime'
+00111 [L162] TGETS    A=3 B=3 C=8 D=776 'minutes'
+00112 [L162] TGETS    A=3 B=3 C=4 D=772 'num'
+00113 [L162] KSHORT   A=4 B=0 C=0 D=0 0
+00114 [L162] ISLT     A=4 B=0 C=3 D=3 
+00115 [L162] JMP      A=3 B=128 C=2 D=32770 target=118
+00116 [L162] ISF      A=0 B=0 C=2 D=2 
+00117 [L162] JMP      A=3 B=128 C=12 D=32780 target=130
+00118 [L163] MOV      A=3 B=0 C=1 D=1 
+00119 [L163] GGET     A=4 B=0 C=2 D=2 'g_restTime'
+00120 [L163] TGETS    A=4 B=4 C=8 D=1032 'minutes'
+00121 [L163] TGETS    A=4 B=4 C=4 D=1028 'num'
+00122 [L163] GGET     A=5 B=0 C=2 D=2 'g_restTime'
+00123 [L163] TGETS    A=5 B=5 C=8 D=1288 'minutes'
+00124 [L163] TGETS    A=5 B=5 C=10 D=1290 'suffix'
+00125 [L163] GGET     A=6 B=0 C=0 D=0 'g_format'
+00126 [L163] TGETS    A=6 B=6 C=11 D=1547 'hz'
+00127 [L163] TGETV    A=5 B=5 C=6 D=1286 
+00128 [L163] CAT      A=1 B=3 C=5 D=773 
+00129 [L164] KPRI     A=2 B=0 C=2 D=2 
+00130 [L166] GGET     A=3 B=0 C=2 D=2 'g_restTime'
+00131 [L166] TGETS    A=3 B=3 C=9 D=777 'second'
+00132 [L166] TGETS    A=3 B=3 C=4 D=772 'num'
+00133 [L166] KSHORT   A=4 B=0 C=0 D=0 0
+00134 [L166] ISLT     A=4 B=0 C=3 D=3 
+00135 [L166] JMP      A=3 B=128 C=2 D=32770 target=138
+00136 [L166] ISF      A=0 B=0 C=2 D=2 
+00137 [L166] JMP      A=3 B=128 C=12 D=32780 target=150
+00138 [L167] MOV      A=3 B=0 C=1 D=1 
+00139 [L167] GGET     A=4 B=0 C=2 D=2 'g_restTime'
+00140 [L167] TGETS    A=4 B=4 C=9 D=1033 'second'
+00141 [L167] TGETS    A=4 B=4 C=4 D=1028 'num'
+00142 [L167] GGET     A=5 B=0 C=2 D=2 'g_restTime'
+00143 [L167] TGETS    A=5 B=5 C=9 D=1289 'second'
+00144 [L167] TGETS    A=5 B=5 C=10 D=1290 'suffix'
+00145 [L167] GGET     A=6 B=0 C=0 D=0 'g_format'
+00146 [L167] TGETS    A=6 B=6 C=11 D=1547 'hz'
+00147 [L167] TGETV    A=5 B=5 C=6 D=1286 
+00148 [L167] CAT      A=1 B=3 C=5 D=773 
+00149 [L168] KPRI     A=2 B=0 C=2 D=2 
+00150 [L170] RET1     A=1 B=0 C=2 D=2 
+00151 [L170] JMP      A=1 B=128 C=92 D=32860 target=244
+00152 [L171] GGET     A=1 B=0 C=0 D=0 'g_format'
+00153 [L171] TGETS    A=1 B=1 C=13 D=269 'mix'
+00154 [L171] ISNEV    A=0 B=0 C=1 D=1 
+00155 [L171] JMP      A=1 B=128 C=63 D=32831 target=219
+00156 [L172] GGET     A=1 B=0 C=2 D=2 'g_restTime'
+00157 [L172] TGETS    A=1 B=1 C=3 D=259 'hour'
+00158 [L172] UGET     A=2 B=0 C=0 D=0 string
+00159 [L172] TGETS    A=2 B=2 C=5 D=517 'format'
+00160 [L172] KSTR     A=3 B=0 C=6 D=6 '%02d'
+00161 [L172] GGET     A=4 B=0 C=2 D=2 'g_restTime'
+00162 [L172] TGETS    A=4 B=4 C=3 D=1027 'hour'
+00163 [L172] TGETS    A=4 B=4 C=4 D=1028 'num'
+00164 [L172] CALL     A=2 B=2 C=3 D=515 
+00165 [L172] TSETS    A=2 B=1 C=4 D=260 'num'
+00166 [L173] GGET     A=1 B=0 C=2 D=2 'g_restTime'
+00167 [L173] TGETS    A=1 B=1 C=8 D=264 'minutes'
+00168 [L173] UGET     A=2 B=0 C=0 D=0 string
+00169 [L173] TGETS    A=2 B=2 C=5 D=517 'format'
+00170 [L173] KSTR     A=3 B=0 C=6 D=6 '%02d'
+00171 [L173] GGET     A=4 B=0 C=2 D=2 'g_restTime'
+00172 [L173] TGETS    A=4 B=4 C=8 D=1032 'minutes'
+00173 [L173] TGETS    A=4 B=4 C=4 D=1028 'num'
+00174 [L173] CALL     A=2 B=2 C=3 D=515 
+00175 [L173] TSETS    A=2 B=1 C=4 D=260 'num'
+00176 [L174] GGET     A=1 B=0 C=2 D=2 'g_restTime'
+00177 [L174] TGETS    A=1 B=1 C=9 D=265 'second'
+00178 [L174] UGET     A=2 B=0 C=0 D=0 string
+00179 [L174] TGETS    A=2 B=2 C=5 D=517 'format'
+00180 [L174] KSTR     A=3 B=0 C=6 D=6 '%02d'
+00181 [L174] GGET     A=4 B=0 C=2 D=2 'g_restTime'
+00182 [L174] TGETS    A=4 B=4 C=9 D=1033 'second'
+00183 [L174] TGETS    A=4 B=4 C=4 D=1028 'num'
+00184 [L174] CALL     A=2 B=2 C=3 D=515 
+00185 [L174] TSETS    A=2 B=1 C=4 D=260 'num'
+00186 [L175] GGET     A=1 B=0 C=2 D=2 'g_restTime'
+00187 [L175] TGETS    A=1 B=1 C=7 D=263 'day'
+00188 [L175] TGETS    A=1 B=1 C=4 D=260 'num'
+00189 [L175] GGET     A=2 B=0 C=2 D=2 'g_restTime'
+00190 [L175] TGETS    A=2 B=2 C=7 D=519 'day'
+00191 [L175] TGETS    A=2 B=2 C=10 D=522 'suffix'
+00192 [L175] GGET     A=3 B=0 C=0 D=0 'g_format'
+00193 [L175] TGETS    A=3 B=3 C=13 D=781 'mix'
+00194 [L176] TGETV    A=2 B=2 C=3 D=515 
+00195 [L176] GGET     A=3 B=0 C=2 D=2 'g_restTime'
+00196 [L176] TGETS    A=3 B=3 C=3 D=771 'hour'
+00197 [L176] TGETS    A=3 B=3 C=4 D=772 'num'
+00198 [L176] GGET     A=4 B=0 C=2 D=2 'g_restTime'
+00199 [L176] TGETS    A=4 B=4 C=3 D=1027 'hour'
+00200 [L176] TGETS    A=4 B=4 C=10 D=1034 'suffix'
+00201 [L176] GGET     A=5 B=0 C=0 D=0 'g_format'
+00202 [L176] TGETS    A=5 B=5 C=13 D=1293 'mix'
+00203 [L177] TGETV    A=4 B=4 C=5 D=1029 
+00204 [L177] GGET     A=5 B=0 C=2 D=2 'g_restTime'
+00205 [L177] TGETS    A=5 B=5 C=8 D=1288 'minutes'
+00206 [L177] TGETS    A=5 B=5 C=4 D=1284 'num'
+00207 [L177] GGET     A=6 B=0 C=2 D=2 'g_restTime'
+00208 [L177] TGETS    A=6 B=6 C=8 D=1544 'minutes'
+00209 [L177] TGETS    A=6 B=6 C=10 D=1546 'suffix'
+00210 [L177] GGET     A=7 B=0 C=0 D=0 'g_format'
+00211 [L177] TGETS    A=7 B=7 C=13 D=1805 'mix'
+00212 [L178] TGETV    A=6 B=6 C=7 D=1543 
+00213 [L178] GGET     A=7 B=0 C=2 D=2 'g_restTime'
+00214 [L178] TGETS    A=7 B=7 C=9 D=1801 'second'
+00215 [L178] TGETS    A=7 B=7 C=4 D=1796 'num'
+00216 [L178] CAT      A=1 B=1 C=7 D=263 
+00217 [L178] RET1     A=1 B=0 C=2 D=2 
+00218 [L178] JMP      A=1 B=128 C=25 D=32793 target=244
+00219 [L179] GGET     A=1 B=0 C=0 D=0 'g_format'
+00220 [L179] TGETS    A=1 B=1 C=14 D=270 'table'
+00221 [L179] ISNEV    A=0 B=0 C=1 D=1 
+00222 [L179] JMP      A=1 B=128 C=19 D=32787 target=242
+00223 [L180] TNEW     A=1 B=0 C=0 D=0 
+00224 [L181] GGET     A=2 B=0 C=2 D=2 'g_restTime'
+00225 [L181] TGETS    A=2 B=2 C=7 D=519 'day'
+00226 [L181] TGETS    A=2 B=2 C=4 D=516 'num'
+00227 [L181] TSETS    A=2 B=1 C=7 D=263 'day'
+00228 [L182] GGET     A=2 B=0 C=2 D=2 'g_restTime'
+00229 [L182] TGETS    A=2 B=2 C=3 D=515 'hour'
+00230 [L182] TGETS    A=2 B=2 C=4 D=516 'num'
+00231 [L182] TSETS    A=2 B=1 C=3 D=259 'hour'
+00232 [L183] GGET     A=2 B=0 C=2 D=2 'g_restTime'
+00233 [L183] TGETS    A=2 B=2 C=8 D=520 'minutes'
+00234 [L183] TGETS    A=2 B=2 C=4 D=516 'num'
+00235 [L183] TSETS    A=2 B=1 C=15 D=271 'minute'
+00236 [L184] GGET     A=2 B=0 C=2 D=2 'g_restTime'
+00237 [L184] TGETS    A=2 B=2 C=9 D=521 'second'
+00238 [L184] TGETS    A=2 B=2 C=4 D=516 'num'
+00239 [L184] TSETS    A=2 B=1 C=9 D=265 'second'
+00240 [L185] RET1     A=1 B=0 C=2 D=2 
+00241 [L185] JMP      A=1 B=128 C=2 D=32770 target=244
+00242 [L187] KPRI     A=1 B=0 C=0 D=0 
+00243 [L187] RET1     A=1 B=0 C=2 D=2 
+00244 [L189] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto10 offset=0xba3 source_lines=190-194 params=1
+UPVALUES ['math']
+00001 [L191] GGET     A=1 B=0 C=0 D=0 'getTime'
+00002 [L191] CALL     A=1 B=2 C=1 D=513 
+00003 [L191] SUBVV    A=1 B=0 C=1 D=1 
+00004 [L192] UGET     A=2 B=0 C=0 D=0 math
+00005 [L192] TGETS    A=2 B=2 C=1 D=513 'floor'
+00006 [L192] DIVVN    A=3 B=1 C=0 D=256 
+00007 [L192] CALL     A=2 B=2 C=2 D=514 
+00008 [L193] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto11 offset=0xc0e source_lines=195-220 params=2
+UPVALUES ['math']
+00001 [L196] GGET     A=2 B=0 C=0 D=0 'initRestTimeStruct'
+00002 [L196] CALL     A=2 B=1 C=1 D=257 
+00003 [L197] IST      A=0 B=0 C=0 D=0 
+00004 [L197] JMP      A=2 B=128 C=1 D=32769 target=6
+00005 [L197] KSHORT   A=0 B=0 C=0 D=0 0
+00006 [L198] GGET     A=2 B=0 C=1 D=1 'getTime'
+00007 [L198] CALL     A=2 B=2 C=1 D=513 
+00008 [L198] SUBVV    A=2 B=0 C=2 D=2 
+00009 [L199] KSHORT   A=3 B=0 C=0 D=0 0
+00010 [L199] ISGT     A=2 B=0 C=3 D=3 
+00011 [L199] JMP      A=3 B=128 C=2 D=32770 target=14
+00012 [L200] RET0     A=0 B=0 C=1 D=1 
+00013 [L200] JMP      A=3 B=128 C=3 D=32771 target=17
+00014 [L201] IST      A=0 B=0 C=1 D=1 
+00015 [L201] JMP      A=3 B=128 C=1 D=32769 target=17
+00016 [L202] RET1     A=2 B=0 C=2 D=2 
+00017 [L204] UGET     A=3 B=0 C=0 D=0 math
+00018 [L204] TGETS    A=3 B=3 C=2 D=770 'floor'
+00019 [L204] DIVVN    A=4 B=2 C=0 D=512 
+00020 [L204] CALL     A=3 B=2 C=2 D=514 
+00021 [L205] GGET     A=4 B=0 C=3 D=3 'g_restTime'
+00022 [L205] TGETS    A=4 B=4 C=4 D=1028 'day'
+00023 [L205] TSETS    A=3 B=4 C=5 D=1029 'num'
+00024 [L206] MULVN    A=4 B=3 C=1 D=769 
+00025 [L206] MULVN    A=4 B=4 C=2 D=1026 
+00026 [L206] SUBVV    A=2 B=2 C=4 D=516 
+00027 [L208] UGET     A=4 B=0 C=0 D=0 math
+00028 [L208] TGETS    A=4 B=4 C=2 D=1026 'floor'
+00029 [L208] DIVVN    A=5 B=2 C=1 D=513 
+00030 [L208] CALL     A=4 B=2 C=2 D=514 
+00031 [L209] GGET     A=5 B=0 C=3 D=3 'g_restTime'
+00032 [L209] TGETS    A=5 B=5 C=6 D=1286 'hour'
+00033 [L209] TSETS    A=4 B=5 C=5 D=1285 'num'
+00034 [L210] MULVN    A=5 B=4 C=1 D=1025 
+00035 [L210] SUBVV    A=2 B=2 C=5 D=517 
+00036 [L212] UGET     A=5 B=0 C=0 D=0 math
+00037 [L212] TGETS    A=5 B=5 C=2 D=1282 'floor'
+00038 [L212] DIVVN    A=6 B=2 C=3 D=515 
+00039 [L212] CALL     A=5 B=2 C=2 D=514 
+00040 [L213] GGET     A=6 B=0 C=3 D=3 'g_restTime'
+00041 [L213] TGETS    A=6 B=6 C=7 D=1543 'minutes'
+00042 [L213] TSETS    A=5 B=6 C=5 D=1541 'num'
+00043 [L214] MULVN    A=6 B=5 C=3 D=1283 
+00044 [L214] SUBVV    A=2 B=2 C=6 D=518 
+00045 [L216] UGET     A=6 B=0 C=0 D=0 math
+00046 [L216] TGETS    A=6 B=6 C=2 D=1538 'floor'
+00047 [L216] DIVVN    A=7 B=2 C=4 D=516 
+00048 [L216] CALL     A=6 B=2 C=2 D=514 
+00049 [L217] GGET     A=7 B=0 C=3 D=3 'g_restTime'
+00050 [L217] TGETS    A=7 B=7 C=8 D=1800 'second'
+00051 [L217] TSETS    A=6 B=7 C=5 D=1797 'num'
+00052 [L219] GGET     A=7 B=0 C=9 D=9 'strRestTime'
+00053 [L219] MOV      A=8 B=0 C=1 D=1 
+00054 [L219] CALLT    A=7 B=0 C=2 D=2 
+
+FUNCTION proto12 offset=0xdcd source_lines=222-225 params=1
+UPVALUES ['os', 'string']
+00001 [L223] UGET     A=1 B=0 C=0 D=0 os
+00002 [L223] TGETS    A=1 B=1 C=0 D=256 'date'
+00003 [L223] KSTR     A=2 B=0 C=1 D=1 '*t'
+00004 [L223] MOV      A=3 B=0 C=0 D=0 
+00005 [L223] CALL     A=1 B=2 C=3 D=515 
+00006 [L224] TGETS    A=2 B=1 C=2 D=258 'year'
+00007 [L224] KSTR     A=3 B=0 C=3 D=3 '-'
+00008 [L224] UGET     A=4 B=0 C=1 D=1 string
+00009 [L224] TGETS    A=4 B=4 C=4 D=1028 'format'
+00010 [L224] KSTR     A=5 B=0 C=5 D=5 '%02d'
+00011 [L224] TGETS    A=6 B=1 C=6 D=262 'month'
+00012 [L224] CALL     A=4 B=2 C=3 D=515 
+00013 [L224] KSTR     A=5 B=0 C=3 D=3 '-'
+00014 [L224] UGET     A=6 B=0 C=1 D=1 string
+00015 [L224] TGETS    A=6 B=6 C=4 D=1540 'format'
+00016 [L224] KSTR     A=7 B=0 C=5 D=5 '%02d'
+00017 [L224] TGETS    A=8 B=1 C=7 D=263 'day'
+00018 [L224] CALL     A=6 B=2 C=3 D=515 
+00019 [L224] KSTR     A=7 B=0 C=8 D=8 ' '
+00020 [L224] UGET     A=8 B=0 C=1 D=1 string
+00021 [L224] TGETS    A=8 B=8 C=4 D=2052 'format'
+00022 [L224] KSTR     A=9 B=0 C=5 D=5 '%02d'
+00023 [L224] TGETS    A=10 B=1 C=9 D=265 'hour'
+00024 [L224] CALL     A=8 B=2 C=3 D=515 
+00025 [L224] KSTR     A=9 B=0 C=10 D=10 ':'
+00026 [L224] UGET     A=10 B=0 C=1 D=1 string
+00027 [L224] TGETS    A=10 B=10 C=4 D=2564 'format'
+00028 [L224] KSTR     A=11 B=0 C=5 D=5 '%02d'
+00029 [L224] TGETS    A=12 B=1 C=11 D=267 'min'
+00030 [L224] CALL     A=10 B=2 C=3 D=515 
+00031 [L224] CAT      A=2 B=2 C=10 D=522 
+00032 [L224] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto13 offset=0xecd source_lines=235-247 params=1
+UPVALUES ['main_server', 'os']
+00001 [L236] ISF      A=0 B=0 C=0 D=0 
+00002 [L236] JMP      A=1 B=128 C=4 D=32772 target=7
+00003 [L236] LEN      A=1 B=0 C=0 D=0 
+00004 [L236] KSHORT   A=2 B=0 C=0 D=0 0
+00005 [L236] ISGT     A=1 B=0 C=2 D=2 
+00006 [L236] JMP      A=1 B=128 C=1 D=32769 target=8
+00007 [L237] RET0     A=0 B=0 C=1 D=1 
+00008 [L240] GGET     A=1 B=0 C=0 D=0 'g_time_costs'
+00009 [L240] TNEW     A=2 B=0 C=0 D=0 
+00010 [L240] TSETV    A=2 B=1 C=0 D=256 
+00011 [L241] UGET     A=1 B=0 C=0 D=0 main_server
+00012 [L241] TGETS    A=1 B=1 C=1 D=257 'time_us'
+00013 [L241] ISF      A=0 B=0 C=1 D=1 
+00014 [L241] JMP      A=2 B=128 C=10 D=32778 target=25
+00015 [L242] GGET     A=1 B=0 C=0 D=0 'g_time_costs'
+00016 [L242] TGETV    A=1 B=1 C=0 D=256 
+00017 [L242] GGET     A=2 B=0 C=0 D=0 'g_time_costs'
+00018 [L242] TGETV    A=2 B=2 C=0 D=512 
+00019 [L242] UGET     A=3 B=0 C=0 D=0 main_server
+00020 [L242] TGETS    A=3 B=3 C=1 D=769 'time_us'
+00021 [L242] CALL     A=3 B=3 C=1 D=769 
+00022 [L242] TSETS    A=4 B=2 C=3 D=515 'usec'
+00023 [L242] TSETS    A=3 B=1 C=2 D=258 'sec'
+00024 [L242] JMP      A=1 B=128 C=10 D=32778 target=35
+00025 [L244] GGET     A=1 B=0 C=0 D=0 'g_time_costs'
+00026 [L244] TGETV    A=1 B=1 C=0 D=256 
+00027 [L244] UGET     A=2 B=0 C=1 D=1 os
+00028 [L244] TGETS    A=2 B=2 C=4 D=516 'time'
+00029 [L244] CALL     A=2 B=2 C=1 D=513 
+00030 [L244] TSETS    A=2 B=1 C=2 D=258 'sec'
+00031 [L245] GGET     A=1 B=0 C=0 D=0 'g_time_costs'
+00032 [L245] TGETV    A=1 B=1 C=0 D=256 
+00033 [L245] KSHORT   A=2 B=0 C=0 D=0 0
+00034 [L245] TSETS    A=2 B=1 C=3 D=259 'usec'
+00035 [L247] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto14 offset=0xfc7 source_lines=250-271 params=1
+UPVALUES ['cclog', 'main_server', 'os']
+00001 [L251] ISF      A=0 B=0 C=0 D=0 
+00002 [L251] JMP      A=1 B=128 C=4 D=32772 target=7
+00003 [L251] LEN      A=1 B=0 C=0 D=0 
+00004 [L251] KSHORT   A=2 B=0 C=0 D=0 0
+00005 [L251] ISGT     A=1 B=0 C=2 D=2 
+00006 [L251] JMP      A=1 B=128 C=1 D=32769 target=8
+00007 [L252] RET0     A=0 B=0 C=1 D=1 
+00008 [L255] GGET     A=1 B=0 C=0 D=0 'g_time_costs'
+00009 [L255] TGETV    A=1 B=1 C=0 D=256 
+00010 [L255] IST      A=0 B=0 C=1 D=1 
+00011 [L255] JMP      A=1 B=128 C=6 D=32774 target=18
+00012 [L256] UGET     A=1 B=0 C=0 D=0 cclog
+00013 [L256] KSTR     A=2 B=0 C=1 D=1 'ERROR, not time cost name find, name='
+00014 [L256] MOV      A=3 B=0 C=0 D=0 
+00015 [L256] CAT      A=2 B=2 C=3 D=515 
+00016 [L256] CALL     A=1 B=1 C=2 D=258 
+00017 [L257] RET0     A=0 B=0 C=1 D=1 
+00018 [L261] UGET     A=1 B=0 C=1 D=1 main_server
+00019 [L261] TGETS    A=1 B=1 C=2 D=258 'time_us'
+00020 [L261] ISF      A=0 B=0 C=1 D=1 
+00021 [L261] JMP      A=2 B=128 C=10 D=32778 target=32
+00022 [L262] GGET     A=1 B=0 C=0 D=0 'g_time_costs'
+00023 [L262] TGETV    A=1 B=1 C=0 D=256 
+00024 [L262] GGET     A=2 B=0 C=0 D=0 'g_time_costs'
+00025 [L262] TGETV    A=2 B=2 C=0 D=512 
+00026 [L262] UGET     A=3 B=0 C=1 D=1 main_server
+00027 [L262] TGETS    A=3 B=3 C=2 D=770 'time_us'
+00028 [L262] CALL     A=3 B=3 C=1 D=769 
+00029 [L262] TSETS    A=4 B=2 C=4 D=516 'usec2'
+00030 [L262] TSETS    A=3 B=1 C=3 D=259 'sec2'
+00031 [L262] JMP      A=1 B=128 C=10 D=32778 target=42
+00032 [L264] GGET     A=1 B=0 C=0 D=0 'g_time_costs'
+00033 [L264] TGETV    A=1 B=1 C=0 D=256 
+00034 [L264] UGET     A=2 B=0 C=2 D=2 os
+00035 [L264] TGETS    A=2 B=2 C=5 D=517 'time'
+00036 [L264] CALL     A=2 B=2 C=1 D=513 
+00037 [L264] TSETS    A=2 B=1 C=3 D=259 'sec2'
+00038 [L265] GGET     A=1 B=0 C=0 D=0 'g_time_costs'
+00039 [L265] TGETV    A=1 B=1 C=0 D=256 
+00040 [L265] KSHORT   A=2 B=0 C=0 D=0 0
+00041 [L265] TSETS    A=2 B=1 C=4 D=260 'usec2'
+00042 [L268] GGET     A=1 B=0 C=0 D=0 'g_time_costs'
+00043 [L268] TGETV    A=1 B=1 C=0 D=256 
+00044 [L268] TGETS    A=1 B=1 C=3 D=259 'sec2'
+00045 [L268] GGET     A=2 B=0 C=0 D=0 'g_time_costs'
+00046 [L268] TGETV    A=2 B=2 C=0 D=512 
+00047 [L268] TGETS    A=2 B=2 C=6 D=518 'sec'
+00048 [L268] SUBVV    A=1 B=1 C=2 D=258 
+00049 [L269] GGET     A=2 B=0 C=0 D=0 'g_time_costs'
+00050 [L269] TGETV    A=2 B=2 C=0 D=512 
+00051 [L269] TGETS    A=2 B=2 C=4 D=516 'usec2'
+00052 [L269] GGET     A=3 B=0 C=0 D=0 'g_time_costs'
+00053 [L269] TGETV    A=3 B=3 C=0 D=768 
+00054 [L269] TGETS    A=3 B=3 C=7 D=775 'usec'
+00055 [L269] SUBVV    A=2 B=2 C=3 D=515 
+00056 [L270] UGET     A=3 B=0 C=0 D=0 cclog
+00057 [L270] MOV      A=4 B=0 C=0 D=0 
+00058 [L270] KSTR     A=5 B=0 C=8 D=8 '========time_int=['
+00059 [L270] MULVN    A=6 B=1 C=0 D=256 
+00060 [L270] ADDVV    A=6 B=6 C=2 D=1538 
+00061 [L270] KSTR     A=7 B=0 C=9 D=9 ']'
+00062 [L270] CAT      A=4 B=4 C=7 D=1031 
+00063 [L270] CALL     A=3 B=1 C=2 D=258 
+00064 [L271] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto15 offset=0x11b7 source_lines=274-281 params=0
+UPVALUES ['os']
+00001 [L275] UGET     A=0 B=0 C=0 D=0 os
+00002 [L275] TGETS    A=0 B=0 C=0 D=0 'date'
+00003 [L275] KSTR     A=1 B=0 C=1 D=1 '%w'
+00004 [L275] GGET     A=2 B=0 C=2 D=2 'getTime'
+00005 [L275] CALL     A=2 B=0 C=1 D=1 
+00006 [L275] CALLM    A=0 B=2 C=1 D=513 
+00007 [L276] ISEQS    A=0 B=0 C=3 D=3 '6'
+00008 [L276] JMP      A=1 B=128 C=2 D=32770 target=11
+00009 [L276] ISNES    A=0 B=0 C=4 D=4 '0'
+00010 [L276] JMP      A=1 B=128 C=3 D=32771 target=14
+00011 [L277] KPRI     A=1 B=0 C=2 D=2 
+00012 [L277] RET1     A=1 B=0 C=2 D=2 
+00013 [L277] JMP      A=1 B=128 C=2 D=32770 target=16
+00014 [L279] KPRI     A=1 B=0 C=1 D=1 
+00015 [L279] RET1     A=1 B=0 C=2 D=2 
+00016 [L281] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto16 offset=0x1232 source_lines=284-292 params=1
+UPVALUES ['os']
+00001 [L285] ISTC     A=1 B=0 C=0 D=0 
+00002 [L285] JMP      A=1 B=128 C=2 D=32770 target=5
+00003 [L285] GGET     A=1 B=0 C=0 D=0 'getTime'
+00004 [L285] CALL     A=1 B=2 C=1 D=513 
+00005 [L286] UGET     A=2 B=0 C=0 D=0 os
+00006 [L286] TGETS    A=2 B=2 C=1 D=513 'date'
+00007 [L286] KSTR     A=3 B=0 C=2 D=2 '%w'
+00008 [L286] MOV      A=4 B=0 C=1 D=1 
+00009 [L286] CALL     A=2 B=2 C=3 D=515 
+00010 [L287] ISNES    A=2 B=0 C=3 D=3 '0'
+00011 [L287] JMP      A=3 B=128 C=3 D=32771 target=15
+00012 [L288] KSTR     A=3 B=0 C=4 D=4 '7'
+00013 [L288] RET1     A=3 B=0 C=2 D=2 
+00014 [L288] JMP      A=3 B=128 C=1 D=32769 target=16
+00015 [L290] RET1     A=2 B=0 C=2 D=2 
+00016 [L292] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto17 offset=0x12bb source_lines=295-302 params=1
+UPVALUES []
+00001 [L296] GGET     A=1 B=0 C=0 D=0 'getWeekIndex'
+00002 [L296] MOV      A=2 B=0 C=0 D=0 
+00003 [L296] CALL     A=1 B=2 C=2 D=514 
+00004 [L297] ISNES    A=1 B=0 C=1 D=1 '7'
+00005 [L297] JMP      A=2 B=128 C=13 D=32781 target=19
+00006 [L298] GGET     A=2 B=0 C=2 D=2 'd_ms'
+00007 [L298] TGETS    A=2 B=2 C=3 D=515 'd_hz'
+00008 [L298] TGETS    A=2 B=2 C=4 D=516 'gethz'
+00009 [L298] KSTR     A=3 B=0 C=5 D=5 'number_hz_zhou'
+00010 [L298] CALL     A=2 B=2 C=2 D=514 
+00011 [L298] GGET     A=3 B=0 C=2 D=2 'd_ms'
+00012 [L298] TGETS    A=3 B=3 C=3 D=771 'd_hz'
+00013 [L298] TGETS    A=3 B=3 C=4 D=772 'gethz'
+00014 [L298] KSTR     A=4 B=0 C=6 D=6 'number_hz_day'
+00015 [L298] CALL     A=3 B=2 C=2 D=514 
+00016 [L298] CAT      A=2 B=2 C=3 D=515 
+00017 [L298] RET1     A=2 B=0 C=2 D=2 
+00018 [L298] JMP      A=2 B=128 C=14 D=32782 target=33
+00019 [L300] GGET     A=2 B=0 C=2 D=2 'd_ms'
+00020 [L300] TGETS    A=2 B=2 C=3 D=515 'd_hz'
+00021 [L300] TGETS    A=2 B=2 C=4 D=516 'gethz'
+00022 [L300] KSTR     A=3 B=0 C=5 D=5 'number_hz_zhou'
+00023 [L300] CALL     A=2 B=2 C=2 D=514 
+00024 [L300] GGET     A=3 B=0 C=2 D=2 'd_ms'
+00025 [L300] TGETS    A=3 B=3 C=3 D=771 'd_hz'
+00026 [L300] TGETS    A=3 B=3 C=4 D=772 'gethz'
+00027 [L300] KSTR     A=4 B=0 C=7 D=7 'number_hz'
+00028 [L300] MOV      A=5 B=0 C=1 D=1 
+00029 [L300] CAT      A=4 B=4 C=5 D=1029 
+00030 [L300] CALL     A=3 B=2 C=2 D=514 
+00031 [L300] CAT      A=2 B=2 C=3 D=515 
+00032 [L300] RET1     A=2 B=0 C=2 D=2 
+00033 [L302] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto18 offset=0x13bf source_lines=0-308 params=0
+UPVALUES []
+00001 [L7] GGET     A=0 B=0 C=0 D=0 'require'
+00002 [L8] GGET     A=1 B=0 C=1 D=1 'bits'
+00003 [L9] GGET     A=2 B=0 C=2 D=2 'sqlite'
+00004 [L10] GGET     A=3 B=0 C=3 D=3 'type'
+00005 [L11] GGET     A=4 B=0 C=4 D=4 'print'
+00006 [L12] GGET     A=5 B=0 C=5 D=5 'tostring'
+00007 [L13] GGET     A=6 B=0 C=6 D=6 'pairs'
+00008 [L14] GGET     A=7 B=0 C=7 D=7 'string'
+00009 [L15] GGET     A=8 B=0 C=8 D=8 'os'
+00010 [L16] GGET     A=9 B=0 C=9 D=9 'math'
+00011 [L17] GGET     A=10 B=0 C=10 D=10 'tonumber'
+00012 [L18] GGET     A=11 B=0 C=11 D=11 'CCLuaLog'
+00013 [L19] GGET     A=12 B=0 C=12 D=12 'main_server'
+00014 [L22] GGET     A=13 B=0 C=13 D=13 'module'
+00015 [L22] KSTR     A=14 B=0 C=14 D=14 'common.time'
+00016 [L22] CALL     A=13 B=1 C=2 D=258 
+00017 [L25] MOV      A=13 B=0 C=0 D=0 
+00018 [L25] KSTR     A=14 B=0 C=15 D=15 'ms'
+00019 [L25] CALL     A=13 B=2 C=2 D=514 
+00020 [L25] GSET     A=13 B=0 C=16 D=16 'd_ms'
+00021 [L27] GGET     A=13 B=0 C=16 D=16 'd_ms'
+00022 [L27] IST      A=0 B=0 C=13 D=13 
+00023 [L27] JMP      A=13 B=128 C=3 D=32771 target=27
+00024 [L28] MOV      A=13 B=0 C=11 D=11 
+00025 [L28] KSTR     A=14 B=0 C=17 D=17 'time load d_ms fail.'
+00026 [L28] CALL     A=13 B=1 C=2 D=258 
+00027 [L34] FNEW     A=13 B=0 C=18 D=18 {'kind': 'proto', 'id': 0}
+00028 [L38] TDUP     A=14 B=0 C=20 D=20 {'kind': 'table', 'value': {'time_interval': 0}}
+00029 [L40] TGETS    A=15 B=8 C=19 D=2067 'time'
+00030 [L40] CALL     A=15 B=2 C=1 D=513 
+00031 [L40] TSETS    A=15 B=14 C=21 D=3605 'last_server_time'
+00032 [L42] GSET     A=14 B=0 C=22 D=22 'g_self'
+00033 [L50] FNEW     A=14 B=0 C=23 D=23 {'kind': 'proto', 'id': 1}
+00034 [L46] GSET     A=14 B=0 C=24 D=24 'setTime'
+00035 [L64] FNEW     A=14 B=0 C=25 D=25 {'kind': 'proto', 'id': 2}
+00036 [L54] GSET     A=14 B=0 C=26 D=26 'getTimeZoneInterval'
+00037 [L71] FNEW     A=14 B=0 C=27 D=27 {'kind': 'proto', 'id': 3}
+00038 [L69] GSET     A=14 B=0 C=28 D=28 'getTime'
+00039 [L75] FNEW     A=14 B=0 C=29 D=29 {'kind': 'proto', 'id': 4}
+00040 [L73] GSET     A=14 B=0 C=30 D=30 'getShowTime'
+00041 [L100] FNEW     A=14 B=0 C=31 D=31 {'kind': 'proto', 'id': 5}
+00042 [L80] GSET     A=14 B=0 C=32 D=32 'isCrossDay'
+00043 [L108] FNEW     A=14 B=0 C=33 D=33 {'kind': 'proto', 'id': 6}
+00044 [L104] GSET     A=14 B=0 C=34 D=34 'getHour'
+00045 [L116] FNEW     A=14 B=0 C=35 D=35 {'kind': 'proto', 'id': 7}
+00046 [L112] GSET     A=14 B=0 C=36 D=36 'getMin'
+00047 [L121] TDUP     A=14 B=0 C=37 D=37 {'kind': 'table', 'value': {'table': 4, 'hz': 1, 'colon': 2, 'mix': 3}}
+00048 [L127] GSET     A=14 B=0 C=38 D=38 'g_format'
+00049 [L128] KPRI     A=14 B=0 C=0 D=0 
+00050 [L128] GSET     A=14 B=0 C=39 D=39 'g_restTime'
+00051 [L142] FNEW     A=14 B=0 C=40 D=40 {'kind': 'proto', 'id': 8}
+00052 [L130] GSET     A=14 B=0 C=41 D=41 'initRestTimeStruct'
+00053 [L189] FNEW     A=14 B=0 C=42 D=42 {'kind': 'proto', 'id': 9}
+00054 [L145] GSET     A=14 B=0 C=43 D=43 'strRestTime'
+00055 [L194] FNEW     A=14 B=0 C=44 D=44 {'kind': 'proto', 'id': 10}
+00056 [L190] GSET     A=14 B=0 C=45 D=45 'getRestDay'
+00057 [L220] FNEW     A=14 B=0 C=46 D=46 {'kind': 'proto', 'id': 11}
+00058 [L195] GSET     A=14 B=0 C=47 D=47 'getRestTime'
+00059 [L225] FNEW     A=14 B=0 C=48 D=48 {'kind': 'proto', 'id': 12}
+00060 [L222] GSET     A=14 B=0 C=49 D=49 'formatTime'
+00061 [L234] TNEW     A=14 B=0 C=0 D=0 
+00062 [L234] GSET     A=14 B=0 C=50 D=50 'g_time_costs'
+00063 [L247] FNEW     A=14 B=0 C=51 D=51 {'kind': 'proto', 'id': 13}
+00064 [L235] GSET     A=14 B=0 C=52 D=52 't_begin'
+00065 [L271] FNEW     A=14 B=0 C=53 D=53 {'kind': 'proto', 'id': 14}
+00066 [L250] GSET     A=14 B=0 C=54 D=54 't_end'
+00067 [L281] FNEW     A=14 B=0 C=55 D=55 {'kind': 'proto', 'id': 15}
+00068 [L274] GSET     A=14 B=0 C=56 D=56 'is_weekend'
+00069 [L292] FNEW     A=14 B=0 C=57 D=57 {'kind': 'proto', 'id': 16}
+00070 [L284] GSET     A=14 B=0 C=58 D=58 'getWeekIndex'
+00071 [L302] FNEW     A=14 B=0 C=59 D=59 {'kind': 'proto', 'id': 17}
+00072 [L295] GSET     A=14 B=0 C=60 D=60 'getWeekHz'
+00073 [L302] UCLO     A=0 B=128 C=0 D=32768 target=74
+00074 [L302] RET0     A=0 B=0 C=1 D=1 

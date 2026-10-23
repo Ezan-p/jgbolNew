@@ -1,0 +1,299 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\fcd9df1cc2378aebbdc62e580cbaf7be.data'; root=proto8
+
+FUNCTION proto0 offset=0x4a source_lines=31-33 params=0
+UPVALUES ['print', 'string']
+00001 [L32] UGET     A=0 B=0 C=0 D=0 print
+00002 [L32] UGET     A=1 B=0 C=1 D=1 string
+00003 [L32] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L32] VARG     A=2 B=0 C=0 D=0 
+00005 [L32] CALLM    A=1 B=0 C=0 D=0 
+00006 [L32] CALLM    A=0 B=1 C=0 D=256 
+00007 [L33] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x92 source_lines=65-71 params=3
+UPVALUES ['canTouchRect', 'CCPointMake']
+00001 [L66] UGET     A=3 B=0 C=0 D=0 canTouchRect
+00002 [L66] ISF      A=0 B=0 C=3 D=3 
+00003 [L66] JMP      A=4 B=128 C=12 D=32780 target=16
+00004 [L66] UGET     A=3 B=0 C=0 D=0 canTouchRect
+00005 [L66] MOV      A=4 B=0 C=3 D=3 
+00006 [L66] TGETS    A=3 B=3 C=0 D=768 'containsPoint'
+00007 [L66] UGET     A=5 B=0 C=1 D=1 CCPointMake
+00008 [L66] MOV      A=6 B=0 C=1 D=1 
+00009 [L66] MOV      A=7 B=0 C=2 D=2 
+00010 [L66] CALL     A=5 B=0 C=3 D=3 
+00011 [L66] CALLM    A=3 B=2 C=1 D=513 
+00012 [L66] ISF      A=0 B=0 C=3 D=3 
+00013 [L66] JMP      A=4 B=128 C=2 D=32770 target=16
+00014 [L67] KPRI     A=3 B=0 C=1 D=1 
+00015 [L67] RET1     A=3 B=0 C=2 D=2 
+00016 [L70] KPRI     A=3 B=0 C=2 D=2 
+00017 [L70] RET1     A=3 B=0 C=2 D=2 
+
+FUNCTION proto2 offset=0x132 source_lines=76-78 params=0
+UPVALUES ['parent']
+00001 [L77] UGET     A=0 B=0 C=0 D=0 parent
+00002 [L77] MOV      A=1 B=0 C=0 D=0 
+00003 [L77] TGETS    A=0 B=0 C=0 D=0 'removeChildByTag'
+00004 [L77] GGET     A=2 B=0 C=1 D=1 'guideLayerTag'
+00005 [L77] KPRI     A=3 B=0 C=2 D=2 
+00006 [L77] CALL     A=0 B=1 C=4 D=260 
+00007 [L78] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto3 offset=0x189 source_lines=80-84 params=1
+UPVALUES []
+00001 [L81] TGETS    A=1 B=0 C=0 D=0 'name'
+00002 [L81] ISNES    A=1 B=0 C=1 D=1 'exit'
+00003 [L81] JMP      A=1 B=128 C=2 D=32770 target=6
+00004 [L82] KPRI     A=1 B=0 C=0 D=0 
+00005 [L82] GSET     A=1 B=0 C=2 D=2 'removeGuideLayerFunc'
+00006 [L84] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto4 offset=0x1df source_lines=54-90 params=2
+UPVALUES ['CCLayer', 'CCPointMake']
+00001 [L55] MOV      A=3 B=0 C=0 D=0 
+00002 [L55] TGETS    A=2 B=0 C=0 D=0 'getChildByTag'
+00003 [L55] GGET     A=4 B=0 C=1 D=1 'guideLayerTag'
+00004 [L55] CALL     A=2 B=2 C=3 D=515 
+00005 [L56] KSHORT   A=3 B=0 C=50 D=50 50
+00006 [L57] ISF      A=0 B=0 C=2 D=2 
+00007 [L57] JMP      A=4 B=128 C=5 D=32773 target=13
+00008 [L58] MOV      A=5 B=0 C=0 D=0 
+00009 [L58] TGETS    A=4 B=0 C=2 D=2 'removeChild'
+00010 [L58] MOV      A=6 B=0 C=2 D=2 
+00011 [L58] KPRI     A=7 B=0 C=2 D=2 
+00012 [L58] CALL     A=4 B=1 C=4 D=260 
+00013 [L61] UGET     A=4 B=0 C=0 D=0 CCLayer
+00014 [L61] MOV      A=5 B=0 C=4 D=4 
+00015 [L61] TGETS    A=4 B=4 C=3 D=1027 'create'
+00016 [L61] CALL     A=4 B=2 C=2 D=514 
+00017 [L62] MOV      A=6 B=0 C=0 D=0 
+00018 [L62] TGETS    A=5 B=0 C=4 D=4 'addChild'
+00019 [L62] MOV      A=7 B=0 C=4 D=4 
+00020 [L62] MOV      A=8 B=0 C=3 D=3 
+00021 [L62] CALL     A=5 B=1 C=4 D=260 
+00022 [L63] MOV      A=6 B=0 C=4 D=4 
+00023 [L63] TGETS    A=5 B=4 C=5 D=1029 'setTag'
+00024 [L63] GGET     A=7 B=0 C=1 D=1 'guideLayerTag'
+00025 [L63] CALL     A=5 B=1 C=3 D=259 
+00026 [L71] FNEW     A=5 B=0 C=6 D=6 {'kind': 'proto', 'id': 1}
+00027 [L72] MOV      A=7 B=0 C=4 D=4 
+00028 [L72] TGETS    A=6 B=4 C=7 D=1031 'registerScriptTouchHandler'
+00029 [L72] MOV      A=8 B=0 C=5 D=5 
+00030 [L72] KPRI     A=9 B=0 C=1 D=1 
+00031 [L72] KSHORT   A=10 B=255 C=127 D=65407 -129
+00032 [L72] KPRI     A=11 B=0 C=2 D=2 
+00033 [L72] CALL     A=6 B=1 C=6 D=262 
+00034 [L73] MOV      A=7 B=0 C=4 D=4 
+00035 [L73] TGETS    A=6 B=4 C=8 D=1032 'setTouchEnabled'
+00036 [L73] KPRI     A=8 B=0 C=2 D=2 
+00037 [L73] CALL     A=6 B=1 C=3 D=259 
+00038 [L78] FNEW     A=6 B=0 C=9 D=9 {'kind': 'proto', 'id': 2}
+00039 [L78] GSET     A=6 B=0 C=10 D=10 'removeGuideLayerFunc'
+00040 [L84] FNEW     A=6 B=0 C=11 D=11 {'kind': 'proto', 'id': 3}
+00041 [L86] MOV      A=8 B=0 C=4 D=4 
+00042 [L86] TGETS    A=7 B=4 C=12 D=1036 'registerScriptHandler'
+00043 [L86] MOV      A=9 B=0 C=6 D=6 
+00044 [L86] CALL     A=7 B=1 C=3 D=259 
+00045 [L89] UCLO     A=0 B=128 C=0 D=32768 target=46
+00046 [L89] RET1     A=4 B=0 C=2 D=2 
+
+FUNCTION proto5 offset=0x3d7 source_lines=92-111 params=1
+UPVALUES ['CCRectMake', 'createGuideLayer']
+00001 [L93] GGET     A=1 B=0 C=0 D=0 'g_targetMenu'
+00002 [L93] GGET     A=2 B=0 C=1 D=1 'g_currentStage'
+00003 [L93] TGETV    A=1 B=1 C=2 D=258 
+00004 [L94] KPRI     A=2 B=0 C=0 D=0 
+00005 [L96] GGET     A=3 B=0 C=1 D=1 'g_currentStage'
+00006 [L96] GGET     A=4 B=0 C=2 D=2 'stage'
+00007 [L96] TGETS    A=4 B=4 C=3 D=1027 'enhance3'
+00008 [L96] ISNEV    A=3 B=0 C=4 D=4 
+00009 [L96] JMP      A=3 B=128 C=20 D=32788 target=30
+00010 [L97] GGET     A=3 B=0 C=4 D=4 'd_ms'
+00011 [L97] TGETS    A=3 B=3 C=5 D=773 'd_charPositionUI'
+00012 [L97] TGETS    A=3 B=3 C=6 D=774 'g_enhanceMenuItemPos'
+00013 [L98] MOV      A=5 B=0 C=1 D=1 
+00014 [L98] TGETS    A=4 B=1 C=7 D=263 'getContentSize'
+00015 [L98] CALL     A=4 B=2 C=2 D=514 
+00016 [L99] UGET     A=5 B=0 C=0 D=0 CCRectMake
+00017 [L99] TGETS    A=6 B=3 C=8 D=776 'x'
+00018 [L99] TGETS    A=7 B=4 C=9 D=1033 'width'
+00019 [L99] DIVVN    A=7 B=7 C=0 D=1792 
+00020 [L99] SUBVV    A=6 B=6 C=7 D=1543 
+00021 [L99] TGETS    A=7 B=3 C=10 D=778 'y'
+00022 [L99] TGETS    A=8 B=4 C=11 D=1035 'height'
+00023 [L99] DIVVN    A=8 B=8 C=0 D=2048 
+00024 [L99] SUBVV    A=7 B=7 C=8 D=1800 
+00025 [L99] TGETS    A=8 B=4 C=9 D=1033 'width'
+00026 [L99] TGETS    A=9 B=4 C=11 D=1035 'height'
+00027 [L99] CALL     A=5 B=2 C=5 D=517 
+00028 [L99] MOV      A=2 B=0 C=5 D=5 
+00029 [L99] JMP      A=3 B=128 C=4 D=32772 target=34
+00030 [L101] MOV      A=4 B=0 C=1 D=1 
+00031 [L101] TGETS    A=3 B=1 C=12 D=268 'boundingBox'
+00032 [L101] CALL     A=3 B=2 C=2 D=514 
+00033 [L101] MOV      A=2 B=0 C=3 D=3 
+00034 [L104] UGET     A=3 B=0 C=1 D=1 createGuideLayer
+00035 [L104] MOV      A=4 B=0 C=0 D=0 
+00036 [L104] MOV      A=5 B=0 C=2 D=2 
+00037 [L104] CALL     A=3 B=2 C=3 D=515 
+00038 [L105] GGET     A=4 B=0 C=4 D=4 'd_ms'
+00039 [L105] TGETS    A=4 B=4 C=13 D=1037 'd_guideUI'
+00040 [L105] TGETS    A=4 B=4 C=14 D=1038 'showHintArrow'
+00041 [L105] MOV      A=5 B=0 C=3 D=3 
+00042 [L105] GGET     A=6 B=0 C=15 D=15 'g_hintPos'
+00043 [L105] GGET     A=7 B=0 C=1 D=1 'g_currentStage'
+00044 [L105] TGETV    A=6 B=6 C=7 D=1543 
+00045 [L105] GGET     A=7 B=0 C=4 D=4 'd_ms'
+00046 [L105] TGETS    A=7 B=7 C=13 D=1805 'd_guideUI'
+00047 [L105] TGETS    A=7 B=7 C=16 D=1808 'HintDir'
+00048 [L105] TGETS    A=7 B=7 C=17 D=1809 'right'
+00049 [L105] CALL     A=4 B=1 C=4 D=260 
+00050 [L106] GGET     A=4 B=0 C=4 D=4 'd_ms'
+00051 [L106] TGETS    A=4 B=4 C=13 D=1037 'd_guideUI'
+00052 [L106] TGETS    A=4 B=4 C=18 D=1042 'showHintFrame'
+00053 [L106] MOV      A=5 B=0 C=3 D=3 
+00054 [L106] MOV      A=6 B=0 C=2 D=2 
+00055 [L106] CALL     A=4 B=1 C=3 D=259 
+00056 [L108] GGET     A=4 B=0 C=4 D=4 'd_ms'
+00057 [L108] TGETS    A=4 B=4 C=13 D=1037 'd_guideUI'
+00058 [L108] TGETS    A=4 B=4 C=19 D=1043 'showHighLightRect'
+00059 [L108] MOV      A=5 B=0 C=3 D=3 
+00060 [L108] MOV      A=6 B=0 C=2 D=2 
+00061 [L108] CALL     A=4 B=1 C=3 D=259 
+00062 [L110] GGET     A=4 B=0 C=1 D=1 'g_currentStage'
+00063 [L110] ADDVN    A=4 B=4 C=1 D=1025 
+00064 [L110] GSET     A=4 B=0 C=1 D=1 'g_currentStage'
+00065 [L111] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x65b source_lines=113-132 params=0
+UPVALUES ['enhanceGuide']
+00001 [L114] KPRI     A=0 B=0 C=2 D=2 
+00002 [L114] GSET     A=0 B=0 C=0 D=0 'g_isEnhanceGuide'
+00003 [L116] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00004 [L116] TGETS    A=0 B=0 C=2 D=2 'd_mainUI'
+00005 [L116] TGETS    A=0 B=0 C=3 D=3 'g_mainUI'
+00006 [L116] TGETS    A=0 B=0 C=4 D=4 'main_layer'
+00007 [L117] TNEW     A=1 B=16 C=0 D=4096 
+00008 [L118] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00009 [L118] TGETS    A=2 B=2 C=2 D=514 'd_mainUI'
+00010 [L118] TGETS    A=2 B=2 C=5 D=517 'g_menuList'
+00011 [L118] TGETB    A=2 B=2 C=2 D=514 
+00012 [L118] TSETB    A=2 B=1 C=1 D=257 
+00013 [L119] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00014 [L119] TGETS    A=2 B=2 C=6 D=518 'd_charPositionUI'
+00015 [L119] TGETS    A=2 B=2 C=7 D=519 'g_guideChangeItem'
+00016 [L119] TSETB    A=2 B=1 C=2 D=258 
+00017 [L120] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00018 [L120] TGETS    A=2 B=2 C=6 D=518 'd_charPositionUI'
+00019 [L120] TGETS    A=2 B=2 C=8 D=520 'g_enhanceMenuItem'
+00020 [L120] TSETB    A=2 B=1 C=3 D=259 
+00021 [L121] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00022 [L121] TGETS    A=2 B=2 C=9 D=521 'd_equipmentUpgradeUI'
+00023 [L121] TGETS    A=2 B=2 C=10 D=522 'g_enhanceButtons'
+00024 [L121] TGETB    A=2 B=2 C=2 D=514 
+00025 [L121] TSETB    A=2 B=1 C=4 D=260 
+00026 [L122] GSET     A=1 B=0 C=11 D=11 'g_targetMenu'
+00027 [L124] TNEW     A=1 B=16 C=0 D=4096 
+00028 [L125] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00029 [L125] TGETS    A=2 B=2 C=12 D=524 'd_u'
+00030 [L125] TGETS    A=2 B=2 C=13 D=525 'makePoint'
+00031 [L125] KNUM     A=3 B=0 C=0 D=0 0.6
+00032 [L125] KNUM     A=4 B=0 C=1 D=1 0.05
+00033 [L125] CALL     A=2 B=2 C=3 D=515 
+00034 [L125] TSETB    A=2 B=1 C=1 D=257 
+00035 [L126] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00036 [L126] TGETS    A=2 B=2 C=12 D=524 'd_u'
+00037 [L126] TGETS    A=2 B=2 C=13 D=525 'makePoint'
+00038 [L126] KNUM     A=3 B=0 C=2 D=2 0.66
+00039 [L126] KNUM     A=4 B=0 C=3 D=3 0.69
+00040 [L126] CALL     A=2 B=2 C=3 D=515 
+00041 [L126] TSETB    A=2 B=1 C=2 D=258 
+00042 [L127] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00043 [L127] TGETS    A=2 B=2 C=12 D=524 'd_u'
+00044 [L127] TGETS    A=2 B=2 C=13 D=525 'makePoint'
+00045 [L127] KNUM     A=3 B=0 C=4 D=4 0.48
+00046 [L127] KNUM     A=4 B=0 C=5 D=5 0.55
+00047 [L127] CALL     A=2 B=2 C=3 D=515 
+00048 [L127] TSETB    A=2 B=1 C=3 D=259 
+00049 [L128] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00050 [L128] TGETS    A=2 B=2 C=12 D=524 'd_u'
+00051 [L128] TGETS    A=2 B=2 C=13 D=525 'makePoint'
+00052 [L128] KNUM     A=3 B=0 C=6 D=6 0.46
+00053 [L128] KNUM     A=4 B=0 C=7 D=7 0.23
+00054 [L128] CALL     A=2 B=2 C=3 D=515 
+00055 [L128] TSETB    A=2 B=1 C=4 D=260 
+00056 [L129] GSET     A=1 B=0 C=14 D=14 'g_hintPos'
+00057 [L131] UGET     A=1 B=0 C=0 D=0 enhanceGuide
+00058 [L131] MOV      A=2 B=0 C=0 D=0 
+00059 [L131] CALL     A=1 B=1 C=2 D=258 
+00060 [L132] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto7 offset=0x8b9 source_lines=134-139 params=0
+UPVALUES []
+00001 [L135] GGET     A=0 B=0 C=0 D=0 'removeGuideLayerFunc'
+00002 [L135] ISF      A=0 B=0 C=0 D=0 
+00003 [L135] JMP      A=1 B=128 C=2 D=32770 target=6
+00004 [L136] GGET     A=0 B=0 C=0 D=0 'removeGuideLayerFunc'
+00005 [L136] CALL     A=0 B=1 C=1 D=257 
+00006 [L138] KPRI     A=0 B=0 C=1 D=1 
+00007 [L138] GSET     A=0 B=0 C=1 D=1 'g_isEnhanceGuide'
+00008 [L139] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto8 offset=0x915 source_lines=0-140 params=0
+UPVALUES []
+00001 [L1] GGET     A=0 B=0 C=0 D=0 'require'
+00002 [L2] GGET     A=1 B=0 C=1 D=1 'bits'
+00003 [L3] GGET     A=2 B=0 C=2 D=2 'sqlite'
+00004 [L4] GGET     A=3 B=0 C=3 D=3 'type'
+00005 [L5] GGET     A=4 B=0 C=4 D=4 'print'
+00006 [L6] GGET     A=5 B=0 C=5 D=5 'tostring'
+00007 [L7] GGET     A=6 B=0 C=6 D=6 'pairs'
+00008 [L8] GGET     A=7 B=0 C=7 D=7 'string'
+00009 [L9] GGET     A=8 B=0 C=8 D=8 'table'
+00010 [L10] GGET     A=9 B=0 C=9 D=9 'math'
+00011 [L12] GGET     A=10 B=0 C=10 D=10 'main_server'
+00012 [L13] GGET     A=11 B=0 C=11 D=11 '_G'
+00013 [L14] MOV      A=12 B=0 C=1 D=1 
+00014 [L15] GGET     A=13 B=0 C=12 D=12 'tonumber'
+00015 [L16] GGET     A=14 B=0 C=13 D=13 'tolua'
+00016 [L18] GGET     A=15 B=0 C=14 D=14 'CCRectMake'
+00017 [L19] GGET     A=16 B=0 C=15 D=15 'CCLayer'
+00018 [L20] GGET     A=17 B=0 C=16 D=16 'CCPointMake'
+00019 [L22] GGET     A=18 B=0 C=17 D=17 'module'
+00020 [L22] KSTR     A=19 B=0 C=18 D=18 'ui.enGuideUI'
+00021 [L22] CALL     A=18 B=1 C=2 D=258 
+00022 [L25] MOV      A=18 B=0 C=0 D=0 
+00023 [L25] KSTR     A=19 B=0 C=19 D=19 'ms'
+00024 [L25] CALL     A=18 B=2 C=2 D=514 
+00025 [L25] GSET     A=18 B=0 C=20 D=20 'd_ms'
+00026 [L26] GGET     A=18 B=0 C=20 D=20 'd_ms'
+00027 [L26] IST      A=0 B=0 C=18 D=18 
+00028 [L26] JMP      A=18 B=128 C=3 D=32771 target=32
+00029 [L27] MOV      A=18 B=0 C=4 D=4 
+00030 [L27] KSTR     A=19 B=0 C=21 D=21 'enGuideUI load d_ms fail.\n'
+00031 [L27] CALL     A=18 B=1 C=2 D=258 
+00032 [L33] FNEW     A=18 B=0 C=22 D=22 {'kind': 'proto', 'id': 0}
+00033 [L37] KPRI     A=19 B=0 C=1 D=1 
+00034 [L37] GSET     A=19 B=0 C=23 D=23 'g_isEnhanceGuide'
+00035 [L39] TDUP     A=19 B=0 C=24 D=24 {'kind': 'table', 'value': {'enhance2': 2, 'enhance4': 4, 'enhance1': 1, 'enhance3': 3}}
+00036 [L44] GSET     A=19 B=0 C=25 D=25 'stage'
+00037 [L46] TNEW     A=19 B=0 C=0 D=0 
+00038 [L46] GSET     A=19 B=0 C=26 D=26 'g_targetMenu'
+00039 [L47] TNEW     A=19 B=0 C=0 D=0 
+00040 [L47] GSET     A=19 B=0 C=27 D=27 'g_hintPos'
+00041 [L49] GGET     A=19 B=0 C=25 D=25 'stage'
+00042 [L49] TGETS    A=19 B=19 C=28 D=4892 'enhance1'
+00043 [L49] GSET     A=19 B=0 C=29 D=29 'g_currentStage'
+00044 [L50] KSHORT   A=19 B=1 C=145 D=401 401
+00045 [L50] GSET     A=19 B=0 C=30 D=30 'guideLayerTag'
+00046 [L52] KPRI     A=19 B=0 C=0 D=0 
+00047 [L52] GSET     A=19 B=0 C=31 D=31 'removeGuideLayerFunc'
+00048 [L90] FNEW     A=19 B=0 C=32 D=32 {'kind': 'proto', 'id': 4}
+00049 [L111] FNEW     A=20 B=0 C=33 D=33 {'kind': 'proto', 'id': 5}
+00050 [L132] FNEW     A=21 B=0 C=34 D=34 {'kind': 'proto', 'id': 6}
+00051 [L113] GSET     A=21 B=0 C=35 D=35 'show'
+00052 [L139] FNEW     A=21 B=0 C=36 D=36 {'kind': 'proto', 'id': 7}
+00053 [L134] GSET     A=21 B=0 C=37 D=37 'removeGuideLayer'
+00054 [L139] UCLO     A=0 B=128 C=0 D=32768 target=55
+00055 [L139] RET0     A=0 B=0 C=1 D=1 

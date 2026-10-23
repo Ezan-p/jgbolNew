@@ -1,0 +1,2404 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\6a2eef9bafb8298a0146dc9bb9e7c514.data'; root=proto17
+
+FUNCTION proto0 offset=0x4a source_lines=33-35 params=0
+UPVALUES ['CCLuaLog', 'string']
+00001 [L34] UGET     A=0 B=0 C=0 D=0 CCLuaLog
+00002 [L34] UGET     A=1 B=0 C=1 D=1 string
+00003 [L34] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L34] VARG     A=2 B=0 C=0 D=0 
+00005 [L34] CALLM    A=1 B=0 C=0 D=0 
+00006 [L34] CALLM    A=0 B=1 C=0 D=256 
+00007 [L35] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x95 source_lines=40-48 params=1
+UPVALUES ['cclog', 'main_server']
+00001 [L41] UGET     A=1 B=0 C=0 D=0 cclog
+00002 [L41] KSTR     A=2 B=0 C=0 D=0 'try send msg_order_request to bs recharge_For_IOS-- goodsID:'
+00003 [L41] MOV      A=3 B=0 C=0 D=0 
+00004 [L41] CAT      A=2 B=2 C=3 D=515 
+00005 [L41] CALL     A=1 B=1 C=2 D=258 
+00006 [L42] UGET     A=1 B=0 C=1 D=1 main_server
+00007 [L42] TGETS    A=1 B=1 C=1 D=257 'thirdPartyPlatformPurchase'
+00008 [L42] ISF      A=0 B=0 C=1 D=1 
+00009 [L42] JMP      A=2 B=128 C=22 D=32790 target=32
+00010 [L43] GGET     A=1 B=0 C=2 D=2 'd_ms'
+00011 [L43] TGETS    A=1 B=1 C=3 D=259 'd_alert'
+00012 [L43] TGETS    A=1 B=1 C=4 D=260 'start_wait'
+00013 [L43] KPRI     A=2 B=0 C=0 D=0 
+00014 [L43] KSHORT   A=3 B=0 C=120 D=120 120
+00015 [L43] CALL     A=1 B=2 C=3 D=515 
+00016 [L43] GSET     A=1 B=0 C=5 D=5 'g_last_alter_id'
+00017 [L44] UGET     A=1 B=0 C=1 D=1 main_server
+00018 [L44] TGETS    A=1 B=1 C=1 D=257 'thirdPartyPlatformPurchase'
+00019 [L44] KSTR     A=2 B=0 C=6 D=6 ''
+00020 [L44] MOV      A=3 B=0 C=0 D=0 
+00021 [L44] KSTR     A=4 B=0 C=6 D=6 ''
+00022 [L44] KSHORT   A=5 B=0 C=0 D=0 0
+00023 [L44] KSHORT   A=6 B=0 C=1 D=1 1
+00024 [L44] KSTR     A=7 B=0 C=6 D=6 ''
+00025 [L44] KSTR     A=8 B=0 C=6 D=6 ''
+00026 [L44] CALL     A=1 B=1 C=8 D=264 
+00027 [L45] GGET     A=1 B=0 C=7 D=7 'checkUnfinished_ios4'
+00028 [L45] CALL     A=1 B=1 C=1 D=257 
+00029 [L46] UGET     A=1 B=0 C=0 D=0 cclog
+00030 [L46] KSTR     A=2 B=0 C=8 D=8 'lua send ThirdPlatformDef.ios Purchase ok.'
+00031 [L46] CALL     A=1 B=1 C=2 D=258 
+00032 [L48] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto2 offset=0x225 source_lines=61-70 params=0
+UPVALUES ['cclog']
+00001 [L62] GGET     A=0 B=0 C=0 D=0 'g_lipr_4_has_return'
+00002 [L62] ISF      A=0 B=0 C=0 D=0 
+00003 [L62] JMP      A=1 B=128 C=4 D=32772 target=8
+00004 [L64] UGET     A=0 B=0 C=0 D=0 cclog
+00005 [L64] KSTR     A=1 B=0 C=1 D=1 'checkUnfinished_ios4 delay 2, find unfinished tread 2.'
+00006 [L64] CALL     A=0 B=1 C=2 D=258 
+00007 [L64] JMP      A=0 B=128 C=14 D=32782 target=22
+00008 [L67] UGET     A=0 B=0 C=0 D=0 cclog
+00009 [L67] KSTR     A=1 B=0 C=2 D=2 'checkUnfinished_ios4, record new pay_role_id'
+00010 [L67] CALL     A=0 B=1 C=2 D=258 
+00011 [L68] GGET     A=0 B=0 C=3 D=3 'd_ms'
+00012 [L68] TGETS    A=0 B=0 C=4 D=4 'd_file'
+00013 [L68] TGETS    A=0 B=0 C=5 D=5 'set'
+00014 [L68] KSTR     A=1 B=0 C=6 D=6 'LIPR'
+00015 [L68] KSTR     A=2 B=0 C=7 D=7 ''
+00016 [L68] GGET     A=3 B=0 C=3 D=3 'd_ms'
+00017 [L68] TGETS    A=3 B=3 C=8 D=776 'd_mainUI'
+00018 [L68] TGETS    A=3 B=3 C=9 D=777 'g_playerInfo'
+00019 [L68] TGETS    A=3 B=3 C=10 D=778 'role_id'
+00020 [L68] CAT      A=2 B=2 C=3 D=515 
+00021 [L68] CALL     A=0 B=1 C=3 D=259 
+00022 [L70] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto3 offset=0x354 source_lines=53-72 params=0
+UPVALUES ['cclog']
+00001 [L54] UGET     A=0 B=0 C=0 D=0 cclog
+00002 [L54] KSTR     A=1 B=0 C=0 D=0 'call checkUnfinished_ios4'
+00003 [L54] CALL     A=0 B=1 C=2 D=258 
+00004 [L56] GGET     A=0 B=0 C=1 D=1 'g_lipr_4_has_return'
+00005 [L56] ISF      A=0 B=0 C=0 D=0 
+00006 [L56] JMP      A=1 B=128 C=4 D=32772 target=11
+00007 [L57] UGET     A=0 B=0 C=0 D=0 cclog
+00008 [L57] KSTR     A=1 B=0 C=2 D=2 'checkUnfinished_ios4, find unfinished tread 1.'
+00009 [L57] CALL     A=0 B=1 C=2 D=258 
+00010 [L58] UCLO     A=0 B=128 C=8 D=32776 target=19
+00011 [L70] FNEW     A=0 B=0 C=3 D=3 {'kind': 'proto', 'id': 2}
+00012 [L71] GGET     A=1 B=0 C=4 D=4 'd_ms'
+00013 [L71] TGETS    A=1 B=1 C=5 D=261 'd_u'
+00014 [L71] TGETS    A=1 B=1 C=6 D=262 'delay_node'
+00015 [L71] KSHORT   A=2 B=0 C=2 D=2 2
+00016 [L71] MOV      A=3 B=0 C=0 D=0 
+00017 [L71] CALL     A=1 B=1 C=3 D=259 
+00018 [L72] RET0     A=0 B=0 C=1 D=1 
+00019 [L72] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto4 offset=0x44b source_lines=76-106 params=1
+UPVALUES ['cclog', 'main_server', 'ThirdPlatformDef', 'table']
+00001 [L77] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00002 [L77] TGETS    A=1 B=1 C=1 D=257 'd_c'
+00003 [L77] TGETS    A=1 B=1 C=2 D=258 'g_can_recharge'
+00004 [L77] ISNEP    A=1 B=0 C=1 D=1 
+00005 [L77] JMP      A=1 B=128 C=13 D=32781 target=19
+00006 [L78] UGET     A=1 B=0 C=0 D=0 cclog
+00007 [L78] KSTR     A=2 B=0 C=3 D=3 'tmp_not_open'
+00008 [L78] CALL     A=1 B=1 C=2 D=258 
+00009 [L79] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00010 [L79] TGETS    A=1 B=1 C=4 D=260 'd_info'
+00011 [L79] TGETS    A=1 B=1 C=5 D=261 'show'
+00012 [L79] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00013 [L79] TGETS    A=2 B=2 C=6 D=518 'd_hz'
+00014 [L79] TGETS    A=2 B=2 C=7 D=519 'gethz'
+00015 [L79] KSTR     A=3 B=0 C=3 D=3 'tmp_not_open'
+00016 [L79] CALL     A=2 B=0 C=2 D=2 
+00017 [L79] CALLM    A=1 B=1 C=0 D=256 
+00018 [L80] RET0     A=0 B=0 C=1 D=1 
+00019 [L82] GSET     A=0 B=0 C=8 D=8 'g_YYBTag'
+00020 [L83] UGET     A=1 B=0 C=0 D=0 cclog
+00021 [L83] KSTR     A=2 B=0 C=9 D=9 'query yyb balance, tag = '
+00022 [L83] MOV      A=3 B=0 C=0 D=0 
+00023 [L83] CAT      A=2 B=2 C=3 D=515 
+00024 [L83] CALL     A=1 B=1 C=2 D=258 
+00025 [L84] TNEW     A=1 B=0 C=0 D=0 
+00026 [L85] KSHORT   A=2 B=255 C=255 D=65535 -1
+00027 [L85] TSETS    A=2 B=1 C=10 D=266 'item_id'
+00028 [L86] TSETS    A=0 B=1 C=11 D=267 'order_id'
+00029 [L87] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00030 [L87] TGETS    A=2 B=2 C=13 D=525 'd_mainUI'
+00031 [L87] TGETS    A=2 B=2 C=14 D=526 'g_playerInfo'
+00032 [L87] TGETS    A=2 B=2 C=12 D=524 'role_id'
+00033 [L87] TSETS    A=2 B=1 C=12 D=268 'role_id'
+00034 [L88] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00035 [L88] TGETS    A=2 B=2 C=16 D=528 'd_tp_config'
+00036 [L88] TGETS    A=2 B=2 C=17 D=529 'getThirdPartyFlag'
+00037 [L88] CALL     A=2 B=2 C=1 D=513 
+00038 [L88] TSETS    A=2 B=1 C=15 D=271 'pf_type'
+00039 [L89] UGET     A=2 B=0 C=1 D=1 main_server
+00040 [L89] TGETS    A=2 B=2 C=19 D=531 'getTPValue'
+00041 [L89] KSTR     A=3 B=0 C=20 D=20 'openID'
+00042 [L89] CALL     A=2 B=2 C=2 D=514 
+00043 [L89] TSETS    A=2 B=1 C=18 D=274 'openid'
+00044 [L90] UGET     A=2 B=0 C=1 D=1 main_server
+00045 [L90] TGETS    A=2 B=2 C=19 D=531 'getTPValue'
+00046 [L90] KSTR     A=3 B=0 C=21 D=21 'pf'
+00047 [L90] CALL     A=2 B=2 C=2 D=514 
+00048 [L90] TSETS    A=2 B=1 C=21 D=277 'pf'
+00049 [L91] UGET     A=2 B=0 C=1 D=1 main_server
+00050 [L91] TGETS    A=2 B=2 C=19 D=531 'getTPValue'
+00051 [L91] KSTR     A=3 B=0 C=22 D=22 'pf_key'
+00052 [L91] CALL     A=2 B=2 C=2 D=514 
+00053 [L91] TSETS    A=2 B=1 C=22 D=278 'pf_key'
+00054 [L92] TGETS    A=2 B=1 C=15 D=271 'pf_type'
+00055 [L92] UGET     A=3 B=0 C=2 D=2 ThirdPlatformDef
+00056 [L92] TGETS    A=3 B=3 C=23 D=791 'yyb_qq_a'
+00057 [L92] ISNEV    A=2 B=0 C=3 D=3 
+00058 [L92] JMP      A=2 B=128 C=11 D=32779 target=70
+00059 [L93] UGET     A=2 B=0 C=1 D=1 main_server
+00060 [L93] TGETS    A=2 B=2 C=19 D=531 'getTPValue'
+00061 [L93] KSTR     A=3 B=0 C=25 D=25 'eToken_QQ_Access'
+00062 [L93] CALL     A=2 B=2 C=2 D=514 
+00063 [L93] TSETS    A=2 B=1 C=24 D=280 'access_token'
+00064 [L94] UGET     A=2 B=0 C=1 D=1 main_server
+00065 [L94] TGETS    A=2 B=2 C=19 D=531 'getTPValue'
+00066 [L94] KSTR     A=3 B=0 C=27 D=27 'eToken_QQ_Pay'
+00067 [L94] CALL     A=2 B=2 C=2 D=514 
+00068 [L94] TSETS    A=2 B=1 C=26 D=282 'pay_token'
+00069 [L94] JMP      A=2 B=128 C=7 D=32775 target=77
+00070 [L96] UGET     A=2 B=0 C=1 D=1 main_server
+00071 [L96] TGETS    A=2 B=2 C=19 D=531 'getTPValue'
+00072 [L96] KSTR     A=3 B=0 C=28 D=28 'eToken_WX_Access'
+00073 [L96] CALL     A=2 B=2 C=2 D=514 
+00074 [L96] TSETS    A=2 B=1 C=24 D=280 'access_token'
+00075 [L97] TGETS    A=2 B=1 C=24 D=280 'access_token'
+00076 [L97] TSETS    A=2 B=1 C=26 D=282 'pay_token'
+00077 [L100] TNEW     A=2 B=0 C=0 D=0 
+00078 [L101] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00079 [L101] TGETS    A=3 B=3 C=30 D=798 'd_common_def'
+00080 [L101] TGETS    A=3 B=3 C=31 D=799 'client_order_event'
+00081 [L101] TGETS    A=3 B=3 C=32 D=800 'order_prebuy'
+00082 [L101] TSETS    A=3 B=2 C=29 D=541 'event_id'
+00083 [L102] UGET     A=3 B=0 C=3 D=3 table
+00084 [L102] TGETS    A=3 B=3 C=34 D=802 'tostring'
+00085 [L102] MOV      A=4 B=0 C=1 D=1 
+00086 [L102] CALL     A=3 B=2 C=2 D=514 
+00087 [L102] TSETS    A=3 B=2 C=33 D=545 'data'
+00088 [L104] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00089 [L104] TGETS    A=3 B=3 C=4 D=772 'd_info'
+00090 [L104] TGETS    A=3 B=3 C=5 D=773 'show'
+00091 [L104] GGET     A=4 B=0 C=0 D=0 'd_ms'
+00092 [L104] TGETS    A=4 B=4 C=6 D=1030 'd_hz'
+00093 [L104] TGETS    A=4 B=4 C=7 D=1031 'gethz'
+00094 [L104] KSTR     A=5 B=0 C=35 D=35 'yyb1'
+00095 [L104] CALL     A=4 B=0 C=2 D=2 
+00096 [L104] CALLM    A=3 B=1 C=0 D=256 
+00097 [L105] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00098 [L105] TGETS    A=3 B=3 C=36 D=804 'd_u'
+00099 [L105] TGETS    A=3 B=3 C=37 D=805 'main_server_send_msg'
+00100 [L105] GGET     A=4 B=0 C=0 D=0 'd_ms'
+00101 [L105] TGETS    A=4 B=4 C=38 D=1062 'd_msg_def'
+00102 [L105] TGETS    A=4 B=4 C=39 D=1063 'gscl_msg_id'
+00103 [L105] TGETS    A=4 B=4 C=40 D=1064 'msg_order_prebuy'
+00104 [L105] MOV      A=5 B=0 C=2 D=2 
+00105 [L105] KSHORT   A=6 B=0 C=30 D=30 30
+00106 [L105] CALL     A=3 B=1 C=4 D=260 
+00107 [L106] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto5 offset=0x86c source_lines=108-135 params=1
+UPVALUES ['cclog', 'main_server', 'ThirdPlatformDef', 'table']
+00001 [L109] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00002 [L109] TGETS    A=1 B=1 C=1 D=257 'd_c'
+00003 [L109] TGETS    A=1 B=1 C=2 D=258 'g_can_recharge'
+00004 [L109] ISNEP    A=1 B=0 C=1 D=1 
+00005 [L109] JMP      A=1 B=128 C=13 D=32781 target=19
+00006 [L110] UGET     A=1 B=0 C=0 D=0 cclog
+00007 [L110] KSTR     A=2 B=0 C=3 D=3 'tmp_not_open'
+00008 [L110] CALL     A=1 B=1 C=2 D=258 
+00009 [L111] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00010 [L111] TGETS    A=1 B=1 C=4 D=260 'd_info'
+00011 [L111] TGETS    A=1 B=1 C=5 D=261 'show'
+00012 [L111] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00013 [L111] TGETS    A=2 B=2 C=6 D=518 'd_hz'
+00014 [L111] TGETS    A=2 B=2 C=7 D=519 'gethz'
+00015 [L111] KSTR     A=3 B=0 C=3 D=3 'tmp_not_open'
+00016 [L111] CALL     A=2 B=0 C=2 D=2 
+00017 [L111] CALLM    A=1 B=1 C=0 D=256 
+00018 [L112] RET0     A=0 B=0 C=1 D=1 
+00019 [L114] TNEW     A=1 B=0 C=0 D=0 
+00020 [L115] TSETS    A=0 B=1 C=8 D=264 'item_id'
+00021 [L116] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00022 [L116] TGETS    A=2 B=2 C=10 D=522 'd_mainUI'
+00023 [L116] TGETS    A=2 B=2 C=11 D=523 'g_playerInfo'
+00024 [L116] TGETS    A=2 B=2 C=9 D=521 'role_id'
+00025 [L116] TSETS    A=2 B=1 C=9 D=265 'role_id'
+00026 [L117] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00027 [L117] TGETS    A=2 B=2 C=13 D=525 'd_tp_config'
+00028 [L117] TGETS    A=2 B=2 C=14 D=526 'getThirdPartyFlag'
+00029 [L117] CALL     A=2 B=2 C=1 D=513 
+00030 [L117] TSETS    A=2 B=1 C=12 D=268 'pf_type'
+00031 [L118] UGET     A=2 B=0 C=1 D=1 main_server
+00032 [L118] TGETS    A=2 B=2 C=16 D=528 'getTPValue'
+00033 [L118] KSTR     A=3 B=0 C=17 D=17 'openID'
+00034 [L118] CALL     A=2 B=2 C=2 D=514 
+00035 [L118] TSETS    A=2 B=1 C=15 D=271 'openid'
+00036 [L119] UGET     A=2 B=0 C=1 D=1 main_server
+00037 [L119] TGETS    A=2 B=2 C=16 D=528 'getTPValue'
+00038 [L119] KSTR     A=3 B=0 C=18 D=18 'pf'
+00039 [L119] CALL     A=2 B=2 C=2 D=514 
+00040 [L119] TSETS    A=2 B=1 C=18 D=274 'pf'
+00041 [L120] UGET     A=2 B=0 C=1 D=1 main_server
+00042 [L120] TGETS    A=2 B=2 C=16 D=528 'getTPValue'
+00043 [L120] KSTR     A=3 B=0 C=19 D=19 'pf_key'
+00044 [L120] CALL     A=2 B=2 C=2 D=514 
+00045 [L120] TSETS    A=2 B=1 C=19 D=275 'pf_key'
+00046 [L121] TGETS    A=2 B=1 C=12 D=268 'pf_type'
+00047 [L121] UGET     A=3 B=0 C=2 D=2 ThirdPlatformDef
+00048 [L121] TGETS    A=3 B=3 C=20 D=788 'yyb_qq_a'
+00049 [L121] ISNEV    A=2 B=0 C=3 D=3 
+00050 [L121] JMP      A=2 B=128 C=11 D=32779 target=62
+00051 [L122] UGET     A=2 B=0 C=1 D=1 main_server
+00052 [L122] TGETS    A=2 B=2 C=16 D=528 'getTPValue'
+00053 [L122] KSTR     A=3 B=0 C=22 D=22 'eToken_QQ_Access'
+00054 [L122] CALL     A=2 B=2 C=2 D=514 
+00055 [L122] TSETS    A=2 B=1 C=21 D=277 'access_token'
+00056 [L123] UGET     A=2 B=0 C=1 D=1 main_server
+00057 [L123] TGETS    A=2 B=2 C=16 D=528 'getTPValue'
+00058 [L123] KSTR     A=3 B=0 C=24 D=24 'eToken_QQ_Pay'
+00059 [L123] CALL     A=2 B=2 C=2 D=514 
+00060 [L123] TSETS    A=2 B=1 C=23 D=279 'pay_token'
+00061 [L123] JMP      A=2 B=128 C=7 D=32775 target=69
+00062 [L125] UGET     A=2 B=0 C=1 D=1 main_server
+00063 [L125] TGETS    A=2 B=2 C=16 D=528 'getTPValue'
+00064 [L125] KSTR     A=3 B=0 C=25 D=25 'eToken_WX_Access'
+00065 [L125] CALL     A=2 B=2 C=2 D=514 
+00066 [L125] TSETS    A=2 B=1 C=21 D=277 'access_token'
+00067 [L126] TGETS    A=2 B=1 C=21 D=277 'access_token'
+00068 [L126] TSETS    A=2 B=1 C=23 D=279 'pay_token'
+00069 [L129] TNEW     A=2 B=0 C=0 D=0 
+00070 [L130] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00071 [L130] TGETS    A=3 B=3 C=27 D=795 'd_common_def'
+00072 [L130] TGETS    A=3 B=3 C=28 D=796 'client_order_event'
+00073 [L130] TGETS    A=3 B=3 C=29 D=797 'order_request'
+00074 [L130] TSETS    A=3 B=2 C=26 D=538 'event_id'
+00075 [L131] UGET     A=3 B=0 C=3 D=3 table
+00076 [L131] TGETS    A=3 B=3 C=31 D=799 'tostring'
+00077 [L131] MOV      A=4 B=0 C=1 D=1 
+00078 [L131] CALL     A=3 B=2 C=2 D=514 
+00079 [L131] TSETS    A=3 B=2 C=30 D=542 'data'
+00080 [L134] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00081 [L134] TGETS    A=3 B=3 C=32 D=800 'd_u'
+00082 [L134] TGETS    A=3 B=3 C=33 D=801 'main_server_send_msg'
+00083 [L134] GGET     A=4 B=0 C=0 D=0 'd_ms'
+00084 [L134] TGETS    A=4 B=4 C=34 D=1058 'd_msg_def'
+00085 [L134] TGETS    A=4 B=4 C=35 D=1059 'gscl_msg_id'
+00086 [L134] TGETS    A=4 B=4 C=36 D=1060 'msg_order_prebuy'
+00087 [L134] MOV      A=5 B=0 C=2 D=2 
+00088 [L134] KSHORT   A=6 B=0 C=30 D=30 30
+00089 [L134] CALL     A=3 B=1 C=4 D=260 
+00090 [L135] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0xc08 source_lines=138-147 params=1
+UPVALUES ['cclog', 'table']
+00001 [L139] UGET     A=1 B=0 C=0 D=0 cclog
+00002 [L139] KSTR     A=2 B=0 C=0 D=0 'try recharge_order_request-- goodsID:'
+00003 [L139] MOV      A=3 B=0 C=0 D=0 
+00004 [L139] CAT      A=2 B=2 C=3 D=515 
+00005 [L139] CALL     A=1 B=1 C=2 D=258 
+00006 [L140] TNEW     A=1 B=0 C=0 D=0 
+00007 [L141] TSETS    A=0 B=1 C=1 D=257 'item_id'
+00008 [L142] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00009 [L142] TGETS    A=2 B=2 C=4 D=516 'd_tp_config'
+00010 [L142] TGETS    A=2 B=2 C=5 D=517 'getThirdPartyFlag'
+00011 [L142] CALL     A=2 B=2 C=1 D=513 
+00012 [L142] TSETS    A=2 B=1 C=2 D=258 'pf_type'
+00013 [L143] TNEW     A=2 B=0 C=0 D=0 
+00014 [L144] GGET     A=3 B=0 C=3 D=3 'd_ms'
+00015 [L144] TGETS    A=3 B=3 C=7 D=775 'd_common_def'
+00016 [L144] TGETS    A=3 B=3 C=8 D=776 'client_order_event'
+00017 [L144] TGETS    A=3 B=3 C=9 D=777 'order_request'
+00018 [L144] TSETS    A=3 B=2 C=6 D=518 'event_id'
+00019 [L145] UGET     A=3 B=0 C=1 D=1 table
+00020 [L145] TGETS    A=3 B=3 C=11 D=779 'tostring'
+00021 [L145] MOV      A=4 B=0 C=1 D=1 
+00022 [L145] CALL     A=3 B=2 C=2 D=514 
+00023 [L145] TSETS    A=3 B=2 C=10 D=522 'data'
+00024 [L146] GGET     A=3 B=0 C=3 D=3 'd_ms'
+00025 [L146] TGETS    A=3 B=3 C=12 D=780 'd_u'
+00026 [L146] TGETS    A=3 B=3 C=13 D=781 'main_server_send_msg'
+00027 [L146] GGET     A=4 B=0 C=3 D=3 'd_ms'
+00028 [L146] TGETS    A=4 B=4 C=14 D=1038 'd_msg_def'
+00029 [L146] TGETS    A=4 B=4 C=15 D=1039 'gscl_msg_id'
+00030 [L146] TGETS    A=4 B=4 C=16 D=1040 'msg_order_request'
+00031 [L146] MOV      A=5 B=0 C=2 D=2 
+00032 [L146] KSHORT   A=6 B=0 C=30 D=30 30
+00033 [L146] CALL     A=3 B=1 C=4 D=260 
+00034 [L147] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto7 offset=0xdd0 source_lines=157-173 params=0
+UPVALUES ['receipt', 'productID', 'table', 'timeout']
+00001 [L159] TNEW     A=0 B=0 C=0 D=0 
+00002 [L160] UGET     A=1 B=0 C=0 D=0 receipt
+00003 [L160] TSETS    A=1 B=0 C=0 D=0 'receipt_data'
+00004 [L161] UGET     A=1 B=0 C=1 D=1 productID
+00005 [L161] TSETS    A=1 B=0 C=1 D=1 'product_id'
+00006 [L162] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00007 [L162] TGETS    A=1 B=1 C=4 D=260 'd_tp_config'
+00008 [L162] TGETS    A=1 B=1 C=5 D=261 'getThirdPartyFlag'
+00009 [L162] CALL     A=1 B=2 C=1 D=513 
+00010 [L162] TSETS    A=1 B=0 C=2 D=2 'pf_type'
+00011 [L163] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00012 [L163] TGETS    A=1 B=1 C=4 D=260 'd_tp_config'
+00013 [L163] TGETS    A=1 B=1 C=7 D=263 'getAdChannel'
+00014 [L163] CALL     A=1 B=2 C=1 D=513 
+00015 [L163] TSETS    A=1 B=0 C=6 D=6 'ad_channel'
+00016 [L165] TNEW     A=1 B=0 C=0 D=0 
+00017 [L166] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00018 [L166] TGETS    A=2 B=2 C=9 D=521 'd_common_def'
+00019 [L166] TGETS    A=2 B=2 C=10 D=522 'client_order_event'
+00020 [L166] TGETS    A=2 B=2 C=11 D=523 'order_query'
+00021 [L166] TSETS    A=2 B=1 C=8 D=264 'event_id'
+00022 [L167] UGET     A=2 B=0 C=2 D=2 table
+00023 [L167] TGETS    A=2 B=2 C=13 D=525 'tostring'
+00024 [L167] MOV      A=3 B=0 C=0 D=0 
+00025 [L167] CALL     A=2 B=2 C=2 D=514 
+00026 [L167] TSETS    A=2 B=1 C=12 D=268 'data'
+00027 [L169] UGET     A=2 B=0 C=3 D=3 timeout
+00028 [L169] IST      A=0 B=0 C=2 D=2 
+00029 [L169] JMP      A=2 B=128 C=1 D=32769 target=31
+00030 [L170] USETN    A=3 B=0 C=0 D=0 30
+00031 [L172] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00032 [L172] TGETS    A=2 B=2 C=14 D=526 'd_u'
+00033 [L172] TGETS    A=2 B=2 C=15 D=527 'main_server_send_msg'
+00034 [L172] GGET     A=3 B=0 C=3 D=3 'd_ms'
+00035 [L172] TGETS    A=3 B=3 C=16 D=784 'd_msg_def'
+00036 [L172] TGETS    A=3 B=3 C=17 D=785 'gscl_msg_id'
+00037 [L172] TGETS    A=3 B=3 C=18 D=786 'msg_order_request'
+00038 [L172] MOV      A=4 B=0 C=1 D=1 
+00039 [L172] UGET     A=5 B=0 C=3 D=3 timeout
+00040 [L172] CALL     A=2 B=1 C=4 D=260 
+00041 [L173] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto8 offset=0xfc8 source_lines=151-193 params=3
+UPVALUES ['cclog', 'table', 'CCDirector']
+00001 [L152] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00002 [L152] TGETS    A=3 B=3 C=1 D=769 'd_mainUI'
+00003 [L152] TGETS    A=3 B=3 C=2 D=770 'g_isNeedGuide'
+00004 [L152] ISF      A=0 B=0 C=3 D=3 
+00005 [L152] JMP      A=4 B=128 C=4 D=32772 target=10
+00006 [L153] UGET     A=3 B=0 C=0 D=0 cclog
+00007 [L153] KSTR     A=4 B=0 C=3 D=3 'call recharge_order_query, but g_isNeedGuide=true, ignored'
+00008 [L153] CALL     A=3 B=1 C=2 D=258 
+00009 [L154] UCLO     A=0 B=128 C=62 D=32830 target=72
+00010 [L173] FNEW     A=3 B=0 C=4 D=4 {'kind': 'proto', 'id': 7}
+00011 [L176] GGET     A=4 B=0 C=0 D=0 'd_ms'
+00012 [L176] TGETS    A=4 B=4 C=5 D=1029 'd_file'
+00013 [L176] TGETS    A=4 B=4 C=6 D=1030 'get'
+00014 [L176] KSTR     A=5 B=0 C=7 D=7 'LIPR'
+00015 [L176] CALL     A=4 B=2 C=2 D=514 
+00016 [L176] IST      A=0 B=0 C=4 D=4 
+00017 [L176] JMP      A=5 B=128 C=1 D=32769 target=19
+00018 [L176] KSTR     A=4 B=0 C=8 D=8 'nil'
+00019 [L177] KSTR     A=5 B=0 C=9 D=9 ''
+00020 [L177] MOV      A=6 B=0 C=4 D=4 
+00021 [L177] CAT      A=4 B=5 C=6 D=1286 
+00022 [L178] UGET     A=5 B=0 C=0 D=0 cclog
+00023 [L178] KSTR     A=6 B=0 C=10 D=10 'LIPR='
+00024 [L178] MOV      A=7 B=0 C=4 D=4 
+00025 [L178] CAT      A=6 B=6 C=7 D=1543 
+00026 [L178] CALL     A=5 B=1 C=2 D=258 
+00027 [L179] LEN      A=5 B=0 C=4 D=4 
+00028 [L179] KSHORT   A=6 B=0 C=0 D=0 0
+00029 [L179] ISGE     A=6 B=0 C=5 D=5 
+00030 [L179] JMP      A=5 B=128 C=37 D=32805 target=68
+00031 [L180] KSTR     A=5 B=0 C=9 D=9 ''
+00032 [L180] GGET     A=6 B=0 C=0 D=0 'd_ms'
+00033 [L180] TGETS    A=6 B=6 C=1 D=1537 'd_mainUI'
+00034 [L180] TGETS    A=6 B=6 C=11 D=1547 'g_playerInfo'
+00035 [L180] TGETS    A=6 B=6 C=12 D=1548 'role_id'
+00036 [L180] CAT      A=5 B=5 C=6 D=1286 
+00037 [L180] ISNEV    A=5 B=0 C=4 D=4 
+00038 [L180] JMP      A=5 B=128 C=4 D=32772 target=43
+00039 [L181] UGET     A=5 B=0 C=0 D=0 cclog
+00040 [L181] KSTR     A=6 B=0 C=13 D=13 'LIPR match role_id.'
+00041 [L181] CALL     A=5 B=1 C=2 D=258 
+00042 [L181] JMP      A=5 B=128 C=25 D=32793 target=68
+00043 [L184] UGET     A=5 B=0 C=0 D=0 cclog
+00044 [L184] KSTR     A=6 B=0 C=14 D=14 'LIPR unmatch role_id, please select.'
+00045 [L184] CALL     A=5 B=1 C=2 D=258 
+00046 [L185] TDUP     A=5 B=0 C=18 D=18 {'kind': 'table', 'value': {}}
+00047 [L185] GGET     A=6 B=0 C=0 D=0 'd_ms'
+00048 [L185] TGETS    A=6 B=6 C=15 D=1551 'd_hz'
+00049 [L185] TGETS    A=6 B=6 C=16 D=1552 'gethz'
+00050 [L185] KSTR     A=7 B=0 C=17 D=17 'recharge_order_query_ios'
+00051 [L185] CALL     A=6 B=2 C=2 D=514 
+00052 [L185] TSETS    A=6 B=5 C=19 D=1299 'string'
+00053 [L186] GGET     A=6 B=0 C=0 D=0 'd_ms'
+00054 [L186] TGETS    A=6 B=6 C=20 D=1556 'd_quitUI'
+00055 [L186] TGETS    A=6 B=6 C=21 D=1557 'createYesNoByStyle'
+00056 [L186] UGET     A=7 B=0 C=2 D=2 CCDirector
+00057 [L186] MOV      A=8 B=0 C=7 D=7 
+00058 [L186] TGETS    A=7 B=7 C=22 D=1814 'sharedDirector'
+00059 [L186] CALL     A=7 B=2 C=2 D=514 
+00060 [L186] MOV      A=8 B=0 C=7 D=7 
+00061 [L186] TGETS    A=7 B=7 C=23 D=1815 'getRunningScene'
+00062 [L186] CALL     A=7 B=2 C=2 D=514 
+00063 [L186] MOV      A=8 B=0 C=5 D=5 
+00064 [L186] MOV      A=9 B=0 C=3 D=3 
+00065 [L186] CALL     A=6 B=1 C=4 D=260 
+00066 [L187] UCLO     A=0 B=128 C=0 D=32768 target=67
+00067 [L187] RET0     A=0 B=0 C=1 D=1 
+00068 [L192] MOV      A=5 B=0 C=3 D=3 
+00069 [L192] CALL     A=5 B=1 C=1 D=257 
+00070 [L193] UCLO     A=0 B=128 C=0 D=32768 target=71
+00071 [L193] RET0     A=0 B=0 C=1 D=1 
+00072 [L193] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto9 offset=0x12d4 source_lines=340-343 params=2
+UPVALUES ['main_server', 'cclog']
+00001 [L341] UGET     A=2 B=0 C=0 D=0 main_server
+00002 [L341] TGETS    A=2 B=2 C=0 D=512 'setTPValue'
+00003 [L341] MOV      A=3 B=0 C=0 D=0 
+00004 [L341] KSTR     A=4 B=0 C=1 D=1 ''
+00005 [L341] MOV      A=5 B=0 C=1 D=1 
+00006 [L341] CAT      A=4 B=4 C=5 D=1029 
+00007 [L341] CALL     A=2 B=1 C=3 D=259 
+00008 [L342] UGET     A=2 B=0 C=1 D=1 cclog
+00009 [L342] KSTR     A=3 B=0 C=2 D=2 'call main_server_setTPValue, k=['
+00010 [L342] MOV      A=4 B=0 C=0 D=0 
+00011 [L342] KSTR     A=5 B=0 C=3 D=3 '], v=['
+00012 [L342] MOV      A=6 B=0 C=1 D=1 
+00013 [L342] KSTR     A=7 B=0 C=4 D=4 ']'
+00014 [L342] CAT      A=3 B=3 C=7 D=775 
+00015 [L342] CALL     A=2 B=1 C=2 D=258 
+00016 [L343] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto10 offset=0x1386 source_lines=367-370 params=2
+UPVALUES ['main_server', 'cclog']
+00001 [L368] UGET     A=2 B=0 C=0 D=0 main_server
+00002 [L368] TGETS    A=2 B=2 C=0 D=512 'setTPValue'
+00003 [L368] MOV      A=3 B=0 C=0 D=0 
+00004 [L368] KSTR     A=4 B=0 C=1 D=1 ''
+00005 [L368] MOV      A=5 B=0 C=1 D=1 
+00006 [L368] CAT      A=4 B=4 C=5 D=1029 
+00007 [L368] CALL     A=2 B=1 C=3 D=259 
+00008 [L369] UGET     A=2 B=0 C=1 D=1 cclog
+00009 [L369] KSTR     A=3 B=0 C=2 D=2 'call main_server_setTPValue, k=['
+00010 [L369] MOV      A=4 B=0 C=0 D=0 
+00011 [L369] KSTR     A=5 B=0 C=3 D=3 '], v=['
+00012 [L369] MOV      A=6 B=0 C=1 D=1 
+00013 [L369] KSTR     A=7 B=0 C=4 D=4 ']'
+00014 [L369] CAT      A=3 B=3 C=7 D=775 
+00015 [L369] CALL     A=2 B=1 C=2 D=258 
+00016 [L370] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto11 offset=0x1438 source_lines=394-397 params=2
+UPVALUES ['main_server', 'cclog']
+00001 [L395] UGET     A=2 B=0 C=0 D=0 main_server
+00002 [L395] TGETS    A=2 B=2 C=0 D=512 'setTPValue'
+00003 [L395] MOV      A=3 B=0 C=0 D=0 
+00004 [L395] KSTR     A=4 B=0 C=1 D=1 ''
+00005 [L395] MOV      A=5 B=0 C=1 D=1 
+00006 [L395] CAT      A=4 B=4 C=5 D=1029 
+00007 [L395] CALL     A=2 B=1 C=3 D=259 
+00008 [L396] UGET     A=2 B=0 C=1 D=1 cclog
+00009 [L396] KSTR     A=3 B=0 C=2 D=2 'call main_server_setTPValue, k=['
+00010 [L396] MOV      A=4 B=0 C=0 D=0 
+00011 [L396] KSTR     A=5 B=0 C=3 D=3 '], v=['
+00012 [L396] MOV      A=6 B=0 C=1 D=1 
+00013 [L396] KSTR     A=7 B=0 C=4 D=4 ']'
+00014 [L396] CAT      A=3 B=3 C=7 D=775 
+00015 [L396] CALL     A=2 B=1 C=2 D=258 
+00016 [L397] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto12 offset=0x14ea source_lines=601-620 params=0
+UPVALUES ['data_table', 'tonumber', 'main_server', 'tostring']
+00001 [L603] TDUP     A=0 B=0 C=0 D=0 {'kind': 'table', 'value': {1: 'Y10000729', 2: 'Y10000730', 3: 'Y10000731', 4: 'Y10000732', 5: 'Y10000733', 6: 'Y10000734', 7: 'Y10000735', 8: 'Y10000736'}}
+00002 [L613] GSET     A=0 B=0 C=1 D=1 'g_wp8_product'
+00003 [L615] UGET     A=0 B=0 C=0 D=0 data_table
+00004 [L615] KSTR     A=1 B=0 C=3 D=3 ''
+00005 [L615] GGET     A=2 B=0 C=4 D=4 'd_ms'
+00006 [L615] TGETS    A=2 B=2 C=5 D=517 'd_rechargeUI'
+00007 [L615] TGETS    A=2 B=2 C=6 D=518 'g_wp8_openxlive_pay_way'
+00008 [L615] CAT      A=1 B=1 C=2 D=258 
+00009 [L615] TSETS    A=1 B=0 C=2 D=2 'item_desc'
+00010 [L616] GGET     A=0 B=0 C=1 D=1 'g_wp8_product'
+00011 [L616] UGET     A=1 B=0 C=1 D=1 tonumber
+00012 [L616] UGET     A=2 B=0 C=0 D=0 data_table
+00013 [L616] TGETS    A=2 B=2 C=7 D=519 'product_id'
+00014 [L616] CALL     A=1 B=2 C=2 D=514 
+00015 [L616] TGETV    A=0 B=0 C=1 D=1 
+00016 [L616] IST      A=0 B=0 C=0 D=0 
+00017 [L616] JMP      A=1 B=128 C=1 D=32769 target=19
+00018 [L616] KSTR     A=0 B=0 C=8 D=8 'Y10000729'
+00019 [L617] UGET     A=1 B=0 C=2 D=2 main_server
+00020 [L617] TGETS    A=1 B=1 C=9 D=265 'thirdPartyPlatformPurchase'
+00021 [L617] ISF      A=0 B=0 C=1 D=1 
+00022 [L617] JMP      A=2 B=128 C=16 D=32784 target=39
+00023 [L618] UGET     A=1 B=0 C=2 D=2 main_server
+00024 [L618] TGETS    A=1 B=1 C=9 D=265 'thirdPartyPlatformPurchase'
+00025 [L618] UGET     A=2 B=0 C=3 D=3 tostring
+00026 [L618] UGET     A=3 B=0 C=0 D=0 data_table
+00027 [L618] TGETS    A=3 B=3 C=10 D=778 'order_id'
+00028 [L618] CALL     A=2 B=2 C=2 D=514 
+00029 [L618] MOV      A=3 B=0 C=0 D=0 
+00030 [L618] UGET     A=4 B=0 C=0 D=0 data_table
+00031 [L618] TGETS    A=4 B=4 C=2 D=1026 'item_desc'
+00032 [L618] UGET     A=5 B=0 C=0 D=0 data_table
+00033 [L618] TGETS    A=5 B=5 C=11 D=1291 'total_price'
+00034 [L618] UGET     A=6 B=0 C=0 D=0 data_table
+00035 [L618] TGETS    A=6 B=6 C=12 D=1548 'item_count'
+00036 [L618] KSTR     A=7 B=0 C=3 D=3 ''
+00037 [L618] KSTR     A=8 B=0 C=3 D=3 ''
+00038 [L618] CALL     A=1 B=1 C=8 D=264 
+00039 [L620] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto13 offset=0x16e2 source_lines=199-644 params=1
+UPVALUES ['cclog', 'ThirdPlatformDef', 'main_server', 'tostring', 'tonumber', 'table', 'string', 'os', 'CCDirector']
+00001 [L200] UGET     A=1 B=0 C=0 D=0 cclog
+00002 [L200] KSTR     A=2 B=0 C=0 D=0 'callback_send_order_id'
+00003 [L200] CALL     A=1 B=1 C=2 D=258 
+00004 [L201] GGET     A=1 B=0 C=1 D=1 'd_ms'
+00005 [L201] TGETS    A=1 B=1 C=2 D=258 'd_tp_config'
+00006 [L201] TGETS    A=1 B=1 C=3 D=259 'getThirdPartyFlag'
+00007 [L201] CALL     A=1 B=2 C=1 D=513 
+00008 [L202] TGETS    A=2 B=0 C=4 D=4 'result'
+00009 [L202] GGET     A=3 B=0 C=1 D=1 'd_ms'
+00010 [L202] TGETS    A=3 B=3 C=5 D=773 'd_common_def'
+00011 [L202] TGETS    A=3 B=3 C=6 D=774 'client_order_result'
+00012 [L202] TGETS    A=3 B=3 C=7 D=775 'order_id_success'
+00013 [L202] ISNEV    A=2 B=0 C=3 D=3 
+00014 [L202] JMP      A=2 B=133 C=98 D=34146 target=1393
+00015 [L203] TGETS    A=2 B=0 C=8 D=8 'gold_count'
+00016 [L203] KSTR     A=3 B=0 C=9 D=9 '元宝'
+00017 [L203] CAT      A=2 B=2 C=3 D=515 
+00018 [L218] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00019 [L218] TGETS    A=3 B=3 C=10 D=778 'oppo'
+00020 [L218] ISNEV    A=1 B=0 C=3 D=3 
+00021 [L218] JMP      A=3 B=128 C=6 D=32774 target=28
+00022 [L219] TGETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00023 [L219] IST      A=0 B=0 C=3 D=3 
+00024 [L219] JMP      A=3 B=128 C=75 D=32843 target=100
+00025 [L220] KSTR     A=3 B=0 C=12 D=12 'http://di.syyx.com/oppo/buy_result'
+00026 [L220] TSETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00027 [L221] JMP      A=3 B=128 C=72 D=32840 target=100
+00028 [L222] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00029 [L222] TGETS    A=3 B=3 C=13 D=781 'oppo_new2_a'
+00030 [L222] ISNEV    A=1 B=0 C=3 D=3 
+00031 [L222] JMP      A=3 B=128 C=6 D=32774 target=38
+00032 [L223] TGETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00033 [L223] IST      A=0 B=0 C=3 D=3 
+00034 [L223] JMP      A=3 B=128 C=65 D=32833 target=100
+00035 [L224] KSTR     A=3 B=0 C=14 D=14 'http://di.syyx.com/oppo_new2_a/buy_result'
+00036 [L224] TSETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00037 [L225] JMP      A=3 B=128 C=62 D=32830 target=100
+00038 [L227] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00039 [L227] TGETS    A=3 B=3 C=15 D=783 'tb_i'
+00040 [L227] ISNEV    A=1 B=0 C=3 D=3 
+00041 [L227] JMP      A=3 B=128 C=6 D=32774 target=48
+00042 [L228] TGETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00043 [L228] IST      A=0 B=0 C=3 D=3 
+00044 [L228] JMP      A=3 B=128 C=55 D=32823 target=100
+00045 [L229] KSTR     A=3 B=0 C=16 D=16 'http://di.syyx.com/tongbu/buy_result'
+00046 [L229] TSETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00047 [L230] JMP      A=3 B=128 C=52 D=32820 target=100
+00048 [L231] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00049 [L231] TGETS    A=3 B=3 C=17 D=785 'pp_i'
+00050 [L231] ISNEV    A=1 B=0 C=3 D=3 
+00051 [L231] JMP      A=3 B=128 C=6 D=32774 target=58
+00052 [L232] TGETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00053 [L232] IST      A=0 B=0 C=3 D=3 
+00054 [L232] JMP      A=3 B=128 C=45 D=32813 target=100
+00055 [L233] KSTR     A=3 B=0 C=18 D=18 'http://di.syyx.com/pp/buy_result'
+00056 [L233] TSETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00057 [L234] JMP      A=3 B=128 C=42 D=32810 target=100
+00058 [L235] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00059 [L235] TGETS    A=3 B=3 C=19 D=787 'p91_a'
+00060 [L235] ISNEV    A=1 B=0 C=3 D=3 
+00061 [L235] JMP      A=3 B=128 C=6 D=32774 target=68
+00062 [L236] TGETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00063 [L236] IST      A=0 B=0 C=3 D=3 
+00064 [L236] JMP      A=3 B=128 C=35 D=32803 target=100
+00065 [L237] KSTR     A=3 B=0 C=20 D=20 'http://di.syyx.com/p91_a/buy_result'
+00066 [L237] TSETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00067 [L238] JMP      A=3 B=128 C=32 D=32800 target=100
+00068 [L239] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00069 [L239] TGETS    A=3 B=3 C=21 D=789 'p91n_a'
+00070 [L239] ISNEV    A=1 B=0 C=3 D=3 
+00071 [L239] JMP      A=3 B=128 C=6 D=32774 target=78
+00072 [L240] TGETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00073 [L240] IST      A=0 B=0 C=3 D=3 
+00074 [L240] JMP      A=3 B=128 C=25 D=32793 target=100
+00075 [L241] KSTR     A=3 B=0 C=22 D=22 'http://di.syyx.com/p91n_a/buy_result'
+00076 [L241] TSETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00077 [L242] JMP      A=3 B=128 C=22 D=32790 target=100
+00078 [L243] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00079 [L243] TGETS    A=3 B=3 C=23 D=791 'p360_a'
+00080 [L243] ISNEV    A=1 B=0 C=3 D=3 
+00081 [L243] JMP      A=3 B=128 C=6 D=32774 target=88
+00082 [L244] TGETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00083 [L244] IST      A=0 B=0 C=3 D=3 
+00084 [L244] JMP      A=3 B=128 C=15 D=32783 target=100
+00085 [L245] KSTR     A=3 B=0 C=24 D=24 'http://di.syyx.com/p360_a/buy_result'
+00086 [L245] TSETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00087 [L246] JMP      A=3 B=128 C=12 D=32780 target=100
+00088 [L247] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00089 [L247] TGETS    A=3 B=3 C=25 D=793 'p360_na'
+00090 [L247] ISNEV    A=1 B=0 C=3 D=3 
+00091 [L247] JMP      A=3 B=128 C=8 D=32776 target=100
+00092 [L248] TGETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00093 [L248] IST      A=0 B=0 C=3 D=3 
+00094 [L248] JMP      A=3 B=128 C=5 D=32773 target=100
+00095 [L249] UGET     A=3 B=0 C=0 D=0 cclog
+00096 [L249] KSTR     A=4 B=0 C=26 D=26 'data_table.order_cb_host = http://119.145.5.182:8089/p360_na/buy_result'
+00097 [L249] CALL     A=3 B=1 C=2 D=258 
+00098 [L250] KSTR     A=3 B=0 C=27 D=27 'http://di.syyx.com/p360_na/buy_result'
+00099 [L250] TSETS    A=3 B=0 C=11 D=11 'order_cb_host'
+00100 [L257] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00101 [L257] TGETS    A=3 B=3 C=10 D=778 'oppo'
+00102 [L257] ISNEV    A=1 B=0 C=3 D=3 
+00103 [L257] JMP      A=3 B=128 C=20 D=32788 target=124
+00104 [L260] UGET     A=3 B=0 C=2 D=2 main_server
+00105 [L260] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00106 [L260] ISF      A=0 B=0 C=3 D=3 
+00107 [L260] JMP      A=4 B=133 C=57 D=34105 target=1445
+00108 [L261] UGET     A=3 B=0 C=2 D=2 main_server
+00109 [L261] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00110 [L261] UGET     A=4 B=0 C=3 D=3 tostring
+00111 [L261] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00112 [L261] CALL     A=4 B=2 C=2 D=514 
+00113 [L261] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00114 [L261] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00115 [L261] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00116 [L261] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00117 [L261] TGETS    A=9 B=0 C=11 D=11 'order_cb_host'
+00118 [L261] TGETS    A=10 B=0 C=34 D=34 'order_commit_cb_host'
+00119 [L261] CALL     A=3 B=1 C=8 D=264 
+00120 [L262] UGET     A=3 B=0 C=0 D=0 cclog
+00121 [L262] KSTR     A=4 B=0 C=35 D=35 'lua send thirdPartyPlatformPurchase ok.'
+00122 [L262] CALL     A=3 B=1 C=2 D=258 
+00123 [L263] JMP      A=3 B=133 C=41 D=34089 target=1445
+00124 [L264] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00125 [L264] TGETS    A=3 B=3 C=36 D=804 'oppo_new_a'
+00126 [L264] ISNEV    A=1 B=0 C=3 D=3 
+00127 [L264] JMP      A=3 B=128 C=20 D=32788 target=148
+00128 [L267] UGET     A=3 B=0 C=2 D=2 main_server
+00129 [L267] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00130 [L267] ISF      A=0 B=0 C=3 D=3 
+00131 [L267] JMP      A=4 B=133 C=33 D=34081 target=1445
+00132 [L268] UGET     A=3 B=0 C=2 D=2 main_server
+00133 [L268] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00134 [L268] UGET     A=4 B=0 C=3 D=3 tostring
+00135 [L268] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00136 [L268] CALL     A=4 B=2 C=2 D=514 
+00137 [L268] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00138 [L268] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00139 [L268] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00140 [L268] TGETS    A=8 B=0 C=8 D=8 'gold_count'
+00141 [L268] TGETS    A=9 B=0 C=11 D=11 'order_cb_host'
+00142 [L268] TGETS    A=10 B=0 C=34 D=34 'order_commit_cb_host'
+00143 [L268] CALL     A=3 B=1 C=8 D=264 
+00144 [L269] UGET     A=3 B=0 C=0 D=0 cclog
+00145 [L269] KSTR     A=4 B=0 C=37 D=37 'lua send ThirdPlatformDef.oppo_new_a Purchase ok.'
+00146 [L269] CALL     A=3 B=1 C=2 D=258 
+00147 [L270] JMP      A=3 B=133 C=17 D=34065 target=1445
+00148 [L271] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00149 [L271] TGETS    A=3 B=3 C=13 D=781 'oppo_new2_a'
+00150 [L271] ISNEV    A=1 B=0 C=3 D=3 
+00151 [L271] JMP      A=3 B=128 C=20 D=32788 target=172
+00152 [L274] UGET     A=3 B=0 C=2 D=2 main_server
+00153 [L274] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00154 [L274] ISF      A=0 B=0 C=3 D=3 
+00155 [L274] JMP      A=4 B=133 C=9 D=34057 target=1445
+00156 [L275] UGET     A=3 B=0 C=2 D=2 main_server
+00157 [L275] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00158 [L275] UGET     A=4 B=0 C=3 D=3 tostring
+00159 [L275] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00160 [L275] CALL     A=4 B=2 C=2 D=514 
+00161 [L275] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00162 [L275] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00163 [L275] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00164 [L275] TGETS    A=8 B=0 C=8 D=8 'gold_count'
+00165 [L275] TGETS    A=9 B=0 C=11 D=11 'order_cb_host'
+00166 [L275] TGETS    A=10 B=0 C=34 D=34 'order_commit_cb_host'
+00167 [L275] CALL     A=3 B=1 C=8 D=264 
+00168 [L276] UGET     A=3 B=0 C=0 D=0 cclog
+00169 [L276] KSTR     A=4 B=0 C=38 D=38 'lua send ThirdPlatformDef.oppo_new2_a Purchase ok.'
+00170 [L276] CALL     A=3 B=1 C=2 D=258 
+00171 [L277] JMP      A=3 B=132 C=249 D=34041 target=1445
+00172 [L278] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00173 [L278] TGETS    A=3 B=3 C=15 D=783 'tb_i'
+00174 [L278] ISNEV    A=1 B=0 C=3 D=3 
+00175 [L278] JMP      A=3 B=128 C=20 D=32788 target=196
+00176 [L281] UGET     A=3 B=0 C=2 D=2 main_server
+00177 [L281] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00178 [L281] ISF      A=0 B=0 C=3 D=3 
+00179 [L281] JMP      A=4 B=132 C=241 D=34033 target=1445
+00180 [L282] UGET     A=3 B=0 C=2 D=2 main_server
+00181 [L282] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00182 [L282] UGET     A=4 B=0 C=3 D=3 tostring
+00183 [L282] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00184 [L282] CALL     A=4 B=2 C=2 D=514 
+00185 [L282] TGETS    A=5 B=0 C=39 D=39 'pf_item_name'
+00186 [L282] TGETS    A=6 B=0 C=40 D=40 'pf_item_desc'
+00187 [L282] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00188 [L282] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00189 [L282] TGETS    A=9 B=0 C=11 D=11 'order_cb_host'
+00190 [L282] KSTR     A=10 B=0 C=41 D=41 ''
+00191 [L282] CALL     A=3 B=1 C=8 D=264 
+00192 [L283] UGET     A=3 B=0 C=0 D=0 cclog
+00193 [L283] KSTR     A=4 B=0 C=42 D=42 'lua send ThirdPlatformDef.tb_i Purchase ok.'
+00194 [L283] CALL     A=3 B=1 C=2 D=258 
+00195 [L284] JMP      A=3 B=132 C=225 D=34017 target=1445
+00196 [L285] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00197 [L285] TGETS    A=3 B=3 C=17 D=785 'pp_i'
+00198 [L285] ISNEV    A=1 B=0 C=3 D=3 
+00199 [L285] JMP      A=3 B=128 C=20 D=32788 target=220
+00200 [L287] UGET     A=3 B=0 C=2 D=2 main_server
+00201 [L287] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00202 [L287] ISF      A=0 B=0 C=3 D=3 
+00203 [L287] JMP      A=4 B=132 C=217 D=34009 target=1445
+00204 [L288] UGET     A=3 B=0 C=2 D=2 main_server
+00205 [L288] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00206 [L288] UGET     A=4 B=0 C=3 D=3 tostring
+00207 [L288] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00208 [L288] CALL     A=4 B=2 C=2 D=514 
+00209 [L288] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00210 [L288] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00211 [L288] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00212 [L288] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00213 [L288] TGETS    A=9 B=0 C=11 D=11 'order_cb_host'
+00214 [L288] KSTR     A=10 B=0 C=41 D=41 ''
+00215 [L288] CALL     A=3 B=1 C=8 D=264 
+00216 [L289] UGET     A=3 B=0 C=0 D=0 cclog
+00217 [L289] KSTR     A=4 B=0 C=43 D=43 'lua send ThirdPlatformDef.PP Purchase ok.'
+00218 [L289] CALL     A=3 B=1 C=2 D=258 
+00219 [L290] JMP      A=3 B=132 C=201 D=33993 target=1445
+00220 [L291] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00221 [L291] TGETS    A=3 B=3 C=44 D=812 'vivo_a'
+00222 [L291] ISNEV    A=1 B=0 C=3 D=3 
+00223 [L291] JMP      A=3 B=128 C=18 D=32786 target=242
+00224 [L293] UGET     A=3 B=0 C=2 D=2 main_server
+00225 [L293] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00226 [L293] ISF      A=0 B=0 C=3 D=3 
+00227 [L293] JMP      A=4 B=132 C=193 D=33985 target=1445
+00228 [L294] UGET     A=3 B=0 C=2 D=2 main_server
+00229 [L294] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00230 [L294] TGETS    A=4 B=0 C=45 D=45 'vivoOrder'
+00231 [L294] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00232 [L294] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00233 [L294] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00234 [L294] KSTR     A=8 B=0 C=41 D=41 ''
+00235 [L294] TGETS    A=9 B=0 C=46 D=46 'accessKey'
+00236 [L294] TGETS    A=10 B=0 C=47 D=47 'vivoSignature'
+00237 [L294] CALL     A=3 B=1 C=8 D=264 
+00238 [L295] UGET     A=3 B=0 C=0 D=0 cclog
+00239 [L295] KSTR     A=4 B=0 C=48 D=48 'lua send ThirdPlatformDef.vivo2 Purchase ok.'
+00240 [L295] CALL     A=3 B=1 C=2 D=258 
+00241 [L296] JMP      A=3 B=132 C=179 D=33971 target=1445
+00242 [L297] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00243 [L297] TGETS    A=3 B=3 C=49 D=817 'uc_i'
+00244 [L297] ISNEV    A=1 B=0 C=3 D=3 
+00245 [L297] JMP      A=3 B=128 C=20 D=32788 target=266
+00246 [L299] UGET     A=3 B=0 C=2 D=2 main_server
+00247 [L299] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00248 [L299] ISF      A=0 B=0 C=3 D=3 
+00249 [L299] JMP      A=4 B=132 C=171 D=33963 target=1445
+00250 [L300] UGET     A=3 B=0 C=2 D=2 main_server
+00251 [L300] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00252 [L300] UGET     A=4 B=0 C=3 D=3 tostring
+00253 [L300] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00254 [L300] CALL     A=4 B=2 C=2 D=514 
+00255 [L300] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00256 [L300] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00257 [L300] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00258 [L300] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00259 [L300] KSTR     A=9 B=0 C=41 D=41 ''
+00260 [L300] KSTR     A=10 B=0 C=41 D=41 ''
+00261 [L300] CALL     A=3 B=1 C=8 D=264 
+00262 [L301] UGET     A=3 B=0 C=0 D=0 cclog
+00263 [L301] KSTR     A=4 B=0 C=50 D=50 'lua send ThirdPlatformDef.uc_i Purchase ok.'
+00264 [L301] CALL     A=3 B=1 C=2 D=258 
+00265 [L302] JMP      A=3 B=132 C=155 D=33947 target=1445
+00266 [L303] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00267 [L303] TGETS    A=3 B=3 C=51 D=819 'p91_i'
+00268 [L303] ISNEV    A=1 B=0 C=3 D=3 
+00269 [L303] JMP      A=3 B=128 C=20 D=32788 target=290
+00270 [L305] UGET     A=3 B=0 C=2 D=2 main_server
+00271 [L305] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00272 [L305] ISF      A=0 B=0 C=3 D=3 
+00273 [L305] JMP      A=4 B=132 C=147 D=33939 target=1445
+00274 [L306] UGET     A=3 B=0 C=2 D=2 main_server
+00275 [L306] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00276 [L306] UGET     A=4 B=0 C=3 D=3 tostring
+00277 [L306] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00278 [L306] CALL     A=4 B=2 C=2 D=514 
+00279 [L306] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00280 [L306] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00281 [L306] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00282 [L306] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00283 [L306] KSTR     A=9 B=0 C=41 D=41 ''
+00284 [L306] KSTR     A=10 B=0 C=41 D=41 ''
+00285 [L306] CALL     A=3 B=1 C=8 D=264 
+00286 [L307] UGET     A=3 B=0 C=0 D=0 cclog
+00287 [L307] KSTR     A=4 B=0 C=52 D=52 'lua send ThirdPlatformDef.p91_i Purchase ok.'
+00288 [L307] CALL     A=3 B=1 C=2 D=258 
+00289 [L308] JMP      A=3 B=132 C=131 D=33923 target=1445
+00290 [L309] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00291 [L309] TGETS    A=3 B=3 C=53 D=821 'p91n_i'
+00292 [L309] ISNEV    A=1 B=0 C=3 D=3 
+00293 [L309] JMP      A=3 B=128 C=20 D=32788 target=314
+00294 [L311] UGET     A=3 B=0 C=2 D=2 main_server
+00295 [L311] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00296 [L311] ISF      A=0 B=0 C=3 D=3 
+00297 [L311] JMP      A=4 B=132 C=123 D=33915 target=1445
+00298 [L312] UGET     A=3 B=0 C=2 D=2 main_server
+00299 [L312] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00300 [L312] UGET     A=4 B=0 C=3 D=3 tostring
+00301 [L312] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00302 [L312] CALL     A=4 B=2 C=2 D=514 
+00303 [L312] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00304 [L312] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00305 [L312] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00306 [L312] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00307 [L312] KSTR     A=9 B=0 C=41 D=41 ''
+00308 [L312] KSTR     A=10 B=0 C=41 D=41 ''
+00309 [L312] CALL     A=3 B=1 C=8 D=264 
+00310 [L313] UGET     A=3 B=0 C=0 D=0 cclog
+00311 [L313] KSTR     A=4 B=0 C=54 D=54 'lua send ThirdPlatformDef.p91n_i Purchase ok.'
+00312 [L313] CALL     A=3 B=1 C=2 D=258 
+00313 [L314] JMP      A=3 B=132 C=107 D=33899 target=1445
+00314 [L315] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00315 [L315] TGETS    A=3 B=3 C=21 D=789 'p91n_a'
+00316 [L315] ISEQV    A=1 B=0 C=3 D=3 
+00317 [L315] JMP      A=3 B=128 C=4 D=32772 target=322
+00318 [L315] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00319 [L315] TGETS    A=3 B=3 C=19 D=787 'p91_a'
+00320 [L315] ISNEV    A=1 B=0 C=3 D=3 
+00321 [L315] JMP      A=3 B=128 C=20 D=32788 target=342
+00322 [L317] UGET     A=3 B=0 C=2 D=2 main_server
+00323 [L317] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00324 [L317] ISF      A=0 B=0 C=3 D=3 
+00325 [L317] JMP      A=4 B=132 C=95 D=33887 target=1445
+00326 [L318] UGET     A=3 B=0 C=2 D=2 main_server
+00327 [L318] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00328 [L318] UGET     A=4 B=0 C=3 D=3 tostring
+00329 [L318] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00330 [L318] CALL     A=4 B=2 C=2 D=514 
+00331 [L318] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00332 [L318] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00333 [L319] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00334 [L319] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00335 [L320] TGETS    A=9 B=0 C=11 D=11 'order_cb_host'
+00336 [L320] TGETS    A=10 B=0 C=55 D=55 'product_id'
+00337 [L318] CALL     A=3 B=1 C=8 D=264 
+00338 [L321] UGET     A=3 B=0 C=0 D=0 cclog
+00339 [L321] KSTR     A=4 B=0 C=56 D=56 'lua send ThirdPlatformDef.p91n_a or p91_a Purchase ok.'
+00340 [L321] CALL     A=3 B=1 C=2 D=258 
+00341 [L322] JMP      A=3 B=132 C=79 D=33871 target=1445
+00342 [L323] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00343 [L323] TGETS    A=3 B=3 C=57 D=825 'itools_i'
+00344 [L323] ISNEV    A=1 B=0 C=3 D=3 
+00345 [L323] JMP      A=3 B=128 C=20 D=32788 target=366
+00346 [L325] UGET     A=3 B=0 C=2 D=2 main_server
+00347 [L325] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00348 [L325] ISF      A=0 B=0 C=3 D=3 
+00349 [L325] JMP      A=4 B=132 C=71 D=33863 target=1445
+00350 [L326] UGET     A=3 B=0 C=2 D=2 main_server
+00351 [L326] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00352 [L326] UGET     A=4 B=0 C=3 D=3 tostring
+00353 [L326] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00354 [L326] CALL     A=4 B=2 C=2 D=514 
+00355 [L326] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00356 [L326] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00357 [L326] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00358 [L326] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00359 [L326] KSTR     A=9 B=0 C=41 D=41 ''
+00360 [L326] KSTR     A=10 B=0 C=41 D=41 ''
+00361 [L326] CALL     A=3 B=1 C=8 D=264 
+00362 [L327] UGET     A=3 B=0 C=0 D=0 cclog
+00363 [L327] KSTR     A=4 B=0 C=58 D=58 'lua send ThirdPlatformDef.itools_i Purchase ok.'
+00364 [L327] CALL     A=3 B=1 C=2 D=258 
+00365 [L328] JMP      A=3 B=132 C=55 D=33847 target=1445
+00366 [L329] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00367 [L329] TGETS    A=3 B=3 C=59 D=827 'qmdy'
+00368 [L329] ISNEV    A=1 B=0 C=3 D=3 
+00369 [L329] JMP      A=3 B=128 C=18 D=32786 target=388
+00370 [L331] UGET     A=3 B=0 C=2 D=2 main_server
+00371 [L331] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00372 [L331] ISF      A=0 B=0 C=3 D=3 
+00373 [L331] JMP      A=4 B=132 C=47 D=33839 target=1445
+00374 [L332] UGET     A=3 B=0 C=2 D=2 main_server
+00375 [L332] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00376 [L332] TGETS    A=4 B=0 C=29 D=29 'order_id'
+00377 [L332] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00378 [L332] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00379 [L332] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00380 [L332] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00381 [L332] KSTR     A=9 B=0 C=41 D=41 ''
+00382 [L332] KSTR     A=10 B=0 C=41 D=41 ''
+00383 [L332] CALL     A=3 B=1 C=8 D=264 
+00384 [L333] UGET     A=3 B=0 C=0 D=0 cclog
+00385 [L333] KSTR     A=4 B=0 C=60 D=60 'lua send ThirdPlatformDef.qmdy Purchase ok.'
+00386 [L333] CALL     A=3 B=1 C=2 D=258 
+00387 [L334] JMP      A=3 B=132 C=33 D=33825 target=1445
+00388 [L335] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00389 [L335] TGETS    A=3 B=3 C=23 D=791 'p360_a'
+00390 [L335] ISNEV    A=1 B=0 C=3 D=3 
+00391 [L335] JMP      A=3 B=128 C=64 D=32832 target=456
+00392 [L337] UGET     A=3 B=0 C=2 D=2 main_server
+00393 [L337] TGETS    A=3 B=3 C=61 D=829 'doTPAction'
+00394 [L337] ISF      A=0 B=0 C=3 D=3 
+00395 [L337] JMP      A=4 B=132 C=25 D=33817 target=1445
+00396 [L343] FNEW     A=3 B=0 C=62 D=62 {'kind': 'proto', 'id': 9}
+00397 [L345] MOV      A=4 B=0 C=3 D=3 
+00398 [L345] KSTR     A=5 B=0 C=63 D=63 'ACCESS_TOKEN'
+00399 [L345] TGETS    A=6 B=0 C=64 D=64 'access_token'
+00400 [L345] CALL     A=4 B=1 C=3 D=259 
+00401 [L346] MOV      A=4 B=0 C=3 D=3 
+00402 [L346] KSTR     A=5 B=0 C=65 D=65 'QIHOO_USER_ID'
+00403 [L346] TGETS    A=6 B=0 C=66 D=66 'account_id'
+00404 [L346] CALL     A=4 B=1 C=3 D=259 
+00405 [L347] MOV      A=4 B=0 C=3 D=3 
+00406 [L347] KSTR     A=5 B=0 C=67 D=67 'RATE'
+00407 [L347] TGETS    A=6 B=0 C=68 D=68 'rate'
+00408 [L347] CALL     A=4 B=1 C=3 D=259 
+00409 [L348] MOV      A=4 B=0 C=3 D=3 
+00410 [L348] KSTR     A=5 B=0 C=69 D=69 'APP_NAME'
+00411 [L348] KSTR     A=6 B=0 C=70 D=70 'jingubang'
+00412 [L348] CALL     A=4 B=1 C=3 D=259 
+00413 [L350] MOV      A=4 B=0 C=3 D=3 
+00414 [L350] KSTR     A=5 B=0 C=71 D=71 'AMOUNT'
+00415 [L350] TGETS    A=6 B=0 C=32 D=32 'total_price'
+00416 [L350] CALL     A=4 B=1 C=3 D=259 
+00417 [L351] MOV      A=4 B=0 C=3 D=3 
+00418 [L351] KSTR     A=5 B=0 C=72 D=72 'PRODUCT_NAME'
+00419 [L351] TGETS    A=6 B=0 C=30 D=30 'item_name'
+00420 [L351] CALL     A=4 B=1 C=3 D=259 
+00421 [L352] MOV      A=4 B=0 C=3 D=3 
+00422 [L352] KSTR     A=5 B=0 C=73 D=73 'PRODUCT_ID'
+00423 [L352] TGETS    A=6 B=0 C=55 D=55 'product_id'
+00424 [L352] CALL     A=4 B=1 C=3 D=259 
+00425 [L353] MOV      A=4 B=0 C=3 D=3 
+00426 [L353] KSTR     A=5 B=0 C=74 D=74 'NOTIFY_URI'
+00427 [L353] TGETS    A=6 B=0 C=11 D=11 'order_cb_host'
+00428 [L353] CALL     A=4 B=1 C=3 D=259 
+00429 [L354] MOV      A=4 B=0 C=3 D=3 
+00430 [L354] KSTR     A=5 B=0 C=75 D=75 'APP_ORDER_ID'
+00431 [L354] TGETS    A=6 B=0 C=29 D=29 'order_id'
+00432 [L354] CALL     A=4 B=1 C=3 D=259 
+00433 [L356] MOV      A=4 B=0 C=3 D=3 
+00434 [L356] KSTR     A=5 B=0 C=76 D=76 'APP_USER_NAME'
+00435 [L356] GGET     A=6 B=0 C=1 D=1 'd_ms'
+00436 [L356] TGETS    A=6 B=6 C=77 D=1613 'd_mainUI'
+00437 [L356] TGETS    A=6 B=6 C=78 D=1614 'g_playerInfo'
+00438 [L356] TGETS    A=6 B=6 C=79 D=1615 'role_name'
+00439 [L356] CALL     A=4 B=1 C=3 D=259 
+00440 [L357] MOV      A=4 B=0 C=3 D=3 
+00441 [L357] KSTR     A=5 B=0 C=80 D=80 'APP_USER_ID'
+00442 [L357] GGET     A=6 B=0 C=1 D=1 'd_ms'
+00443 [L357] TGETS    A=6 B=6 C=77 D=1613 'd_mainUI'
+00444 [L357] TGETS    A=6 B=6 C=78 D=1614 'g_playerInfo'
+00445 [L357] TGETS    A=6 B=6 C=81 D=1617 'role_id'
+00446 [L357] CALL     A=4 B=1 C=3 D=259 
+00447 [L359] UGET     A=4 B=0 C=2 D=2 main_server
+00448 [L359] TGETS    A=4 B=4 C=61 D=1085 'doTPAction'
+00449 [L359] KSTR     A=5 B=0 C=82 D=82 'pay'
+00450 [L359] KSTR     A=6 B=0 C=83 D=83 '360'
+00451 [L359] CALL     A=4 B=1 C=3 D=259 
+00452 [L360] UGET     A=4 B=0 C=0 D=0 cclog
+00453 [L360] KSTR     A=5 B=0 C=84 D=84 'lua send ThirdPlatformDef.p360_i Purchase ok.'
+00454 [L360] CALL     A=4 B=1 C=2 D=258 
+00455 [L361] JMP      A=3 B=131 C=221 D=33757 target=1445
+00456 [L362] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00457 [L362] TGETS    A=3 B=3 C=25 D=793 'p360_na'
+00458 [L362] ISNEV    A=1 B=0 C=3 D=3 
+00459 [L362] JMP      A=3 B=128 C=64 D=32832 target=524
+00460 [L364] UGET     A=3 B=0 C=2 D=2 main_server
+00461 [L364] TGETS    A=3 B=3 C=61 D=829 'doTPAction'
+00462 [L364] ISF      A=0 B=0 C=3 D=3 
+00463 [L364] JMP      A=4 B=131 C=213 D=33749 target=1445
+00464 [L370] FNEW     A=3 B=0 C=85 D=85 {'kind': 'proto', 'id': 10}
+00465 [L372] MOV      A=4 B=0 C=3 D=3 
+00466 [L372] KSTR     A=5 B=0 C=63 D=63 'ACCESS_TOKEN'
+00467 [L372] TGETS    A=6 B=0 C=64 D=64 'access_token'
+00468 [L372] CALL     A=4 B=1 C=3 D=259 
+00469 [L373] MOV      A=4 B=0 C=3 D=3 
+00470 [L373] KSTR     A=5 B=0 C=65 D=65 'QIHOO_USER_ID'
+00471 [L373] TGETS    A=6 B=0 C=66 D=66 'account_id'
+00472 [L373] CALL     A=4 B=1 C=3 D=259 
+00473 [L374] MOV      A=4 B=0 C=3 D=3 
+00474 [L374] KSTR     A=5 B=0 C=67 D=67 'RATE'
+00475 [L374] TGETS    A=6 B=0 C=68 D=68 'rate'
+00476 [L374] CALL     A=4 B=1 C=3 D=259 
+00477 [L375] MOV      A=4 B=0 C=3 D=3 
+00478 [L375] KSTR     A=5 B=0 C=69 D=69 'APP_NAME'
+00479 [L375] KSTR     A=6 B=0 C=70 D=70 'jingubang'
+00480 [L375] CALL     A=4 B=1 C=3 D=259 
+00481 [L377] MOV      A=4 B=0 C=3 D=3 
+00482 [L377] KSTR     A=5 B=0 C=71 D=71 'AMOUNT'
+00483 [L377] TGETS    A=6 B=0 C=32 D=32 'total_price'
+00484 [L377] CALL     A=4 B=1 C=3 D=259 
+00485 [L378] MOV      A=4 B=0 C=3 D=3 
+00486 [L378] KSTR     A=5 B=0 C=72 D=72 'PRODUCT_NAME'
+00487 [L378] TGETS    A=6 B=0 C=30 D=30 'item_name'
+00488 [L378] CALL     A=4 B=1 C=3 D=259 
+00489 [L379] MOV      A=4 B=0 C=3 D=3 
+00490 [L379] KSTR     A=5 B=0 C=73 D=73 'PRODUCT_ID'
+00491 [L379] TGETS    A=6 B=0 C=55 D=55 'product_id'
+00492 [L379] CALL     A=4 B=1 C=3 D=259 
+00493 [L380] MOV      A=4 B=0 C=3 D=3 
+00494 [L380] KSTR     A=5 B=0 C=74 D=74 'NOTIFY_URI'
+00495 [L380] TGETS    A=6 B=0 C=11 D=11 'order_cb_host'
+00496 [L380] CALL     A=4 B=1 C=3 D=259 
+00497 [L381] MOV      A=4 B=0 C=3 D=3 
+00498 [L381] KSTR     A=5 B=0 C=75 D=75 'APP_ORDER_ID'
+00499 [L381] TGETS    A=6 B=0 C=29 D=29 'order_id'
+00500 [L381] CALL     A=4 B=1 C=3 D=259 
+00501 [L383] MOV      A=4 B=0 C=3 D=3 
+00502 [L383] KSTR     A=5 B=0 C=76 D=76 'APP_USER_NAME'
+00503 [L383] GGET     A=6 B=0 C=1 D=1 'd_ms'
+00504 [L383] TGETS    A=6 B=6 C=77 D=1613 'd_mainUI'
+00505 [L383] TGETS    A=6 B=6 C=78 D=1614 'g_playerInfo'
+00506 [L383] TGETS    A=6 B=6 C=79 D=1615 'role_name'
+00507 [L383] CALL     A=4 B=1 C=3 D=259 
+00508 [L384] MOV      A=4 B=0 C=3 D=3 
+00509 [L384] KSTR     A=5 B=0 C=80 D=80 'APP_USER_ID'
+00510 [L384] GGET     A=6 B=0 C=1 D=1 'd_ms'
+00511 [L384] TGETS    A=6 B=6 C=77 D=1613 'd_mainUI'
+00512 [L384] TGETS    A=6 B=6 C=78 D=1614 'g_playerInfo'
+00513 [L384] TGETS    A=6 B=6 C=81 D=1617 'role_id'
+00514 [L384] CALL     A=4 B=1 C=3 D=259 
+00515 [L386] UGET     A=4 B=0 C=2 D=2 main_server
+00516 [L386] TGETS    A=4 B=4 C=61 D=1085 'doTPAction'
+00517 [L386] KSTR     A=5 B=0 C=82 D=82 'pay'
+00518 [L386] KSTR     A=6 B=0 C=83 D=83 '360'
+00519 [L386] CALL     A=4 B=1 C=3 D=259 
+00520 [L387] UGET     A=4 B=0 C=0 D=0 cclog
+00521 [L387] KSTR     A=5 B=0 C=84 D=84 'lua send ThirdPlatformDef.p360_i Purchase ok.'
+00522 [L387] CALL     A=4 B=1 C=2 D=258 
+00523 [L388] JMP      A=3 B=131 C=153 D=33689 target=1445
+00524 [L389] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00525 [L389] TGETS    A=3 B=3 C=86 D=854 'yyh_a'
+00526 [L389] ISNEV    A=1 B=0 C=3 D=3 
+00527 [L389] JMP      A=3 B=128 C=26 D=32794 target=554
+00528 [L391] UGET     A=3 B=0 C=2 D=2 main_server
+00529 [L391] TGETS    A=3 B=3 C=61 D=829 'doTPAction'
+00530 [L391] ISF      A=0 B=0 C=3 D=3 
+00531 [L391] JMP      A=4 B=131 C=145 D=33681 target=1445
+00532 [L397] FNEW     A=3 B=0 C=87 D=87 {'kind': 'proto', 'id': 11}
+00533 [L403] MOV      A=4 B=0 C=3 D=3 
+00534 [L403] KSTR     A=5 B=0 C=88 D=88 'waresid'
+00535 [L403] TGETS    A=6 B=0 C=55 D=55 'product_id'
+00536 [L403] CALL     A=4 B=1 C=3 D=259 
+00537 [L404] MOV      A=4 B=0 C=3 D=3 
+00538 [L404] KSTR     A=5 B=0 C=89 D=89 'exorderno'
+00539 [L404] TGETS    A=6 B=0 C=29 D=29 'order_id'
+00540 [L404] CALL     A=4 B=1 C=3 D=259 
+00541 [L405] MOV      A=4 B=0 C=3 D=3 
+00542 [L405] KSTR     A=5 B=0 C=90 D=90 'price'
+00543 [L405] TGETS    A=6 B=0 C=32 D=32 'total_price'
+00544 [L405] CALL     A=4 B=1 C=3 D=259 
+00545 [L407] UGET     A=4 B=0 C=2 D=2 main_server
+00546 [L407] TGETS    A=4 B=4 C=61 D=1085 'doTPAction'
+00547 [L407] KSTR     A=5 B=0 C=82 D=82 'pay'
+00548 [L407] KSTR     A=6 B=0 C=86 D=86 'yyh_a'
+00549 [L407] CALL     A=4 B=1 C=3 D=259 
+00550 [L408] UGET     A=4 B=0 C=0 D=0 cclog
+00551 [L408] KSTR     A=5 B=0 C=91 D=91 'lua send ThirdPlatformDef.yyh_a Purchase ok.'
+00552 [L408] CALL     A=4 B=1 C=2 D=258 
+00553 [L409] JMP      A=3 B=131 C=123 D=33659 target=1445
+00554 [L410] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00555 [L410] TGETS    A=3 B=3 C=92 D=860 'dj_i'
+00556 [L410] ISNEV    A=1 B=0 C=3 D=3 
+00557 [L410] JMP      A=3 B=128 C=21 D=32789 target=579
+00558 [L411] UGET     A=3 B=0 C=2 D=2 main_server
+00559 [L411] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00560 [L411] ISF      A=0 B=0 C=3 D=3 
+00561 [L411] JMP      A=4 B=131 C=115 D=33651 target=1445
+00562 [L412] UGET     A=3 B=0 C=0 D=0 cclog
+00563 [L412] KSTR     A=4 B=0 C=93 D=93 'data_table.item_name, data_table.item_desc'
+00564 [L412] CALL     A=3 B=1 C=2 D=258 
+00565 [L413] UGET     A=3 B=0 C=2 D=2 main_server
+00566 [L413] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00567 [L413] TGETS    A=4 B=0 C=29 D=29 'order_id'
+00568 [L413] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00569 [L413] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00570 [L413] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00571 [L413] KSHORT   A=8 B=0 C=1 D=1 1
+00572 [L413] TGETS    A=9 B=0 C=11 D=11 'order_cb_host'
+00573 [L413] KSTR     A=10 B=0 C=41 D=41 ''
+00574 [L413] CALL     A=3 B=1 C=8 D=264 
+00575 [L414] UGET     A=3 B=0 C=0 D=0 cclog
+00576 [L414] KSTR     A=4 B=0 C=94 D=94 'lua send ThirdPlatformDef.dj_i Purchase ok.'
+00577 [L414] CALL     A=3 B=1 C=2 D=258 
+00578 [L415] JMP      A=3 B=131 C=98 D=33634 target=1445
+00579 [L416] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00580 [L416] TGETS    A=3 B=3 C=95 D=863 'ky_i'
+00581 [L416] ISNEV    A=1 B=0 C=3 D=3 
+00582 [L416] JMP      A=3 B=128 C=24 D=32792 target=607
+00583 [L418] UGET     A=3 B=0 C=2 D=2 main_server
+00584 [L418] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00585 [L418] ISF      A=0 B=0 C=3 D=3 
+00586 [L418] JMP      A=4 B=131 C=90 D=33626 target=1445
+00587 [L419] TGETS    A=3 B=0 C=66 D=66 'account_id'
+00588 [L420] UGET     A=4 B=0 C=2 D=2 main_server
+00589 [L420] TGETS    A=4 B=4 C=28 D=1052 'thirdPartyPlatformPurchase'
+00590 [L420] UGET     A=5 B=0 C=3 D=3 tostring
+00591 [L420] TGETS    A=6 B=0 C=29 D=29 'order_id'
+00592 [L420] CALL     A=5 B=2 C=2 D=514 
+00593 [L420] TGETS    A=6 B=0 C=30 D=30 'item_name'
+00594 [L420] TGETS    A=7 B=0 C=31 D=31 'item_desc'
+00595 [L420] TGETS    A=8 B=0 C=32 D=32 'total_price'
+00596 [L420] TGETS    A=9 B=0 C=33 D=33 'item_count'
+00597 [L420] GGET     A=10 B=0 C=1 D=1 'd_ms'
+00598 [L420] TGETS    A=10 B=10 C=96 D=2656 'd_loginUI'
+00599 [L420] TGETS    A=10 B=10 C=97 D=2657 'getLoginServerId'
+00600 [L420] CALL     A=10 B=2 C=1 D=513 
+00601 [L420] KSTR     A=11 B=0 C=41 D=41 ''
+00602 [L420] CALL     A=4 B=1 C=8 D=264 
+00603 [L421] UGET     A=4 B=0 C=0 D=0 cclog
+00604 [L421] KSTR     A=5 B=0 C=98 D=98 'lua send ThirdPlatformDef.ky_i Purchase'
+00605 [L421] CALL     A=4 B=1 C=2 D=258 
+00606 [L422] JMP      A=3 B=131 C=70 D=33606 target=1445
+00607 [L423] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00608 [L423] TGETS    A=3 B=3 C=99 D=867 'uc_a'
+00609 [L423] ISNEV    A=1 B=0 C=3 D=3 
+00610 [L423] JMP      A=3 B=128 C=20 D=32788 target=631
+00611 [L425] UGET     A=3 B=0 C=2 D=2 main_server
+00612 [L425] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00613 [L425] ISF      A=0 B=0 C=3 D=3 
+00614 [L425] JMP      A=4 B=131 C=62 D=33598 target=1445
+00615 [L426] UGET     A=3 B=0 C=2 D=2 main_server
+00616 [L426] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00617 [L426] UGET     A=4 B=0 C=3 D=3 tostring
+00618 [L426] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00619 [L426] CALL     A=4 B=2 C=2 D=514 
+00620 [L426] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00621 [L426] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00622 [L426] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00623 [L426] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00624 [L426] TGETS    A=9 B=0 C=11 D=11 'order_cb_host'
+00625 [L426] KSTR     A=10 B=0 C=41 D=41 ''
+00626 [L426] CALL     A=3 B=1 C=8 D=264 
+00627 [L427] UGET     A=3 B=0 C=0 D=0 cclog
+00628 [L427] KSTR     A=4 B=0 C=100 D=100 'lua send ThirdPlatformDef.uc_a Purchase ok.'
+00629 [L427] CALL     A=3 B=1 C=2 D=258 
+00630 [L428] JMP      A=3 B=131 C=46 D=33582 target=1445
+00631 [L429] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00632 [L429] TGETS    A=3 B=3 C=101 D=869 'xm_a'
+00633 [L429] ISNEV    A=1 B=0 C=3 D=3 
+00634 [L429] JMP      A=3 B=128 C=20 D=32788 target=655
+00635 [L431] UGET     A=3 B=0 C=2 D=2 main_server
+00636 [L431] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00637 [L431] ISF      A=0 B=0 C=3 D=3 
+00638 [L431] JMP      A=4 B=131 C=38 D=33574 target=1445
+00639 [L432] UGET     A=3 B=0 C=2 D=2 main_server
+00640 [L432] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00641 [L432] UGET     A=4 B=0 C=3 D=3 tostring
+00642 [L432] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00643 [L432] CALL     A=4 B=2 C=2 D=514 
+00644 [L432] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00645 [L432] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00646 [L432] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00647 [L432] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00648 [L432] KSTR     A=9 B=0 C=41 D=41 ''
+00649 [L432] KSTR     A=10 B=0 C=41 D=41 ''
+00650 [L432] CALL     A=3 B=1 C=8 D=264 
+00651 [L433] UGET     A=3 B=0 C=0 D=0 cclog
+00652 [L433] KSTR     A=4 B=0 C=102 D=102 'lua send ThirdPlatformDef.xm_a Purchase ok.'
+00653 [L433] CALL     A=3 B=1 C=2 D=258 
+00654 [L434] JMP      A=3 B=131 C=22 D=33558 target=1445
+00655 [L435] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00656 [L435] TGETS    A=3 B=3 C=103 D=871 'bd_a'
+00657 [L435] ISNEV    A=1 B=0 C=3 D=3 
+00658 [L435] JMP      A=3 B=128 C=20 D=32788 target=679
+00659 [L437] UGET     A=3 B=0 C=2 D=2 main_server
+00660 [L437] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00661 [L437] ISF      A=0 B=0 C=3 D=3 
+00662 [L437] JMP      A=4 B=131 C=14 D=33550 target=1445
+00663 [L438] UGET     A=3 B=0 C=2 D=2 main_server
+00664 [L438] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00665 [L438] UGET     A=4 B=0 C=3 D=3 tostring
+00666 [L438] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00667 [L438] CALL     A=4 B=2 C=2 D=514 
+00668 [L438] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00669 [L438] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00670 [L438] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00671 [L438] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00672 [L438] KSTR     A=9 B=0 C=41 D=41 ''
+00673 [L438] KSTR     A=10 B=0 C=41 D=41 ''
+00674 [L438] CALL     A=3 B=1 C=8 D=264 
+00675 [L439] UGET     A=3 B=0 C=0 D=0 cclog
+00676 [L439] KSTR     A=4 B=0 C=104 D=104 'lua send ThirdPlatformDef.bd_a Purchase ok.'
+00677 [L439] CALL     A=3 B=1 C=2 D=258 
+00678 [L440] JMP      A=3 B=130 C=254 D=33534 target=1445
+00679 [L441] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00680 [L441] TGETS    A=3 B=3 C=105 D=873 'lnv_a'
+00681 [L441] ISNEV    A=1 B=0 C=3 D=3 
+00682 [L441] JMP      A=3 B=128 C=20 D=32788 target=703
+00683 [L443] UGET     A=3 B=0 C=2 D=2 main_server
+00684 [L443] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00685 [L443] ISF      A=0 B=0 C=3 D=3 
+00686 [L443] JMP      A=4 B=130 C=246 D=33526 target=1445
+00687 [L444] UGET     A=3 B=0 C=2 D=2 main_server
+00688 [L444] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00689 [L444] UGET     A=4 B=0 C=3 D=3 tostring
+00690 [L444] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00691 [L444] CALL     A=4 B=2 C=2 D=514 
+00692 [L444] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00693 [L444] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00694 [L444] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00695 [L444] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00696 [L444] KSTR     A=9 B=0 C=41 D=41 ''
+00697 [L444] TGETS    A=10 B=0 C=55 D=55 'product_id'
+00698 [L444] CALL     A=3 B=1 C=8 D=264 
+00699 [L445] UGET     A=3 B=0 C=0 D=0 cclog
+00700 [L445] KSTR     A=4 B=0 C=106 D=106 'lua send ThirdPlatformDef.lnv_a Purchase ok.'
+00701 [L445] CALL     A=3 B=1 C=2 D=258 
+00702 [L446] JMP      A=3 B=130 C=230 D=33510 target=1445
+00703 [L447] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00704 [L447] TGETS    A=3 B=3 C=107 D=875 'lnv_new_a'
+00705 [L447] ISNEV    A=1 B=0 C=3 D=3 
+00706 [L447] JMP      A=3 B=128 C=45 D=32813 target=752
+00707 [L449] TNEW     A=3 B=0 C=0 D=0 
+00708 [L450] KSHORT   A=4 B=8 C=176 D=2224 2224
+00709 [L450] TSETS    A=4 B=3 C=108 D=876 '8'
+00710 [L451] KSHORT   A=4 B=7 C=166 D=1958 1958
+00711 [L451] TSETS    A=4 B=3 C=109 D=877 '7'
+00712 [L452] KSHORT   A=4 B=7 C=167 D=1959 1959
+00713 [L452] TSETS    A=4 B=3 C=110 D=878 '1'
+00714 [L453] KSHORT   A=4 B=7 C=168 D=1960 1960
+00715 [L453] TSETS    A=4 B=3 C=111 D=879 '2'
+00716 [L454] KSHORT   A=4 B=7 C=169 D=1961 1961
+00717 [L454] TSETS    A=4 B=3 C=112 D=880 '3'
+00718 [L455] KSHORT   A=4 B=7 C=170 D=1962 1962
+00719 [L455] TSETS    A=4 B=3 C=113 D=881 '4'
+00720 [L456] KSHORT   A=4 B=7 C=171 D=1963 1963
+00721 [L456] TSETS    A=4 B=3 C=114 D=882 '5'
+00722 [L457] KSHORT   A=4 B=7 C=172 D=1964 1964
+00723 [L457] TSETS    A=4 B=3 C=115 D=883 '6'
+00724 [L458] TGETS    A=4 B=0 C=55 D=55 'product_id'
+00725 [L458] TGETV    A=4 B=3 C=4 D=772 
+00726 [L459] IST      A=0 B=0 C=4 D=4 
+00727 [L459] JMP      A=5 B=128 C=4 D=32772 target=732
+00728 [L460] KSHORT   A=4 B=7 C=167 D=1959 1959
+00729 [L461] UGET     A=5 B=0 C=0 D=0 cclog
+00730 [L461] KSTR     A=6 B=0 C=116 D=116 'lnv_new_a Purchase fail in lua,productID transform fail! '
+00731 [L461] CALL     A=5 B=1 C=2 D=258 
+00732 [L463] UGET     A=5 B=0 C=2 D=2 main_server
+00733 [L463] TGETS    A=5 B=5 C=28 D=1308 'thirdPartyPlatformPurchase'
+00734 [L463] ISF      A=0 B=0 C=5 D=5 
+00735 [L463] JMP      A=6 B=130 C=197 D=33477 target=1445
+00736 [L464] UGET     A=5 B=0 C=2 D=2 main_server
+00737 [L464] TGETS    A=5 B=5 C=28 D=1308 'thirdPartyPlatformPurchase'
+00738 [L464] UGET     A=6 B=0 C=3 D=3 tostring
+00739 [L464] TGETS    A=7 B=0 C=29 D=29 'order_id'
+00740 [L464] CALL     A=6 B=2 C=2 D=514 
+00741 [L464] TGETS    A=7 B=0 C=30 D=30 'item_name'
+00742 [L464] TGETS    A=8 B=0 C=31 D=31 'item_desc'
+00743 [L464] TGETS    A=9 B=0 C=32 D=32 'total_price'
+00744 [L464] TGETS    A=10 B=0 C=33 D=33 'item_count'
+00745 [L464] KSTR     A=11 B=0 C=41 D=41 ''
+00746 [L464] MOV      A=12 B=0 C=4 D=4 
+00747 [L464] CALL     A=5 B=1 C=8 D=264 
+00748 [L465] UGET     A=5 B=0 C=0 D=0 cclog
+00749 [L465] KSTR     A=6 B=0 C=117 D=117 'lua send ThirdPlatformDef.lnv_new_a Purchase ok.'
+00750 [L465] CALL     A=5 B=1 C=2 D=258 
+00751 [L466] JMP      A=3 B=130 C=181 D=33461 target=1445
+00752 [L467] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00753 [L467] TGETS    A=3 B=3 C=118 D=886 'dj_a'
+00754 [L467] ISNEV    A=1 B=0 C=3 D=3 
+00755 [L467] JMP      A=3 B=128 C=20 D=32788 target=776
+00756 [L468] UGET     A=3 B=0 C=2 D=2 main_server
+00757 [L468] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00758 [L468] ISF      A=0 B=0 C=3 D=3 
+00759 [L468] JMP      A=4 B=130 C=173 D=33453 target=1445
+00760 [L469] UGET     A=3 B=0 C=2 D=2 main_server
+00761 [L469] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00762 [L469] UGET     A=4 B=0 C=3 D=3 tostring
+00763 [L469] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00764 [L469] CALL     A=4 B=2 C=2 D=514 
+00765 [L469] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00766 [L469] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00767 [L469] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00768 [L469] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00769 [L469] KSTR     A=9 B=0 C=41 D=41 ''
+00770 [L469] KSTR     A=10 B=0 C=41 D=41 ''
+00771 [L469] CALL     A=3 B=1 C=8 D=264 
+00772 [L470] UGET     A=3 B=0 C=0 D=0 cclog
+00773 [L470] KSTR     A=4 B=0 C=119 D=119 'lua send ThirdPlatformDef.dj_a Purchase ok.'
+00774 [L470] CALL     A=3 B=1 C=2 D=258 
+00775 [L471] JMP      A=3 B=130 C=157 D=33437 target=1445
+00776 [L472] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00777 [L472] TGETS    A=3 B=3 C=120 D=888 'wdj_a'
+00778 [L472] ISNEV    A=1 B=0 C=3 D=3 
+00779 [L472] JMP      A=3 B=128 C=20 D=32788 target=800
+00780 [L473] UGET     A=3 B=0 C=2 D=2 main_server
+00781 [L473] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00782 [L473] ISF      A=0 B=0 C=3 D=3 
+00783 [L473] JMP      A=4 B=130 C=149 D=33429 target=1445
+00784 [L474] UGET     A=3 B=0 C=2 D=2 main_server
+00785 [L474] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00786 [L474] UGET     A=4 B=0 C=3 D=3 tostring
+00787 [L474] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00788 [L474] CALL     A=4 B=2 C=2 D=514 
+00789 [L474] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00790 [L474] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00791 [L474] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00792 [L474] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00793 [L474] KSTR     A=9 B=0 C=41 D=41 ''
+00794 [L474] KSTR     A=10 B=0 C=41 D=41 ''
+00795 [L474] CALL     A=3 B=1 C=8 D=264 
+00796 [L475] UGET     A=3 B=0 C=0 D=0 cclog
+00797 [L475] KSTR     A=4 B=0 C=121 D=121 'lua send ThirdPlatformDef.wdj_a Purchase ok.'
+00798 [L475] CALL     A=3 B=1 C=2 D=258 
+00799 [L476] JMP      A=3 B=130 C=133 D=33413 target=1445
+00800 [L477] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00801 [L477] TGETS    A=3 B=3 C=122 D=890 'wdj_a2'
+00802 [L477] ISNEV    A=1 B=0 C=3 D=3 
+00803 [L477] JMP      A=3 B=128 C=20 D=32788 target=824
+00804 [L478] UGET     A=3 B=0 C=2 D=2 main_server
+00805 [L478] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00806 [L478] ISF      A=0 B=0 C=3 D=3 
+00807 [L478] JMP      A=4 B=130 C=125 D=33405 target=1445
+00808 [L479] UGET     A=3 B=0 C=2 D=2 main_server
+00809 [L479] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00810 [L479] UGET     A=4 B=0 C=3 D=3 tostring
+00811 [L479] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00812 [L479] CALL     A=4 B=2 C=2 D=514 
+00813 [L479] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00814 [L479] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00815 [L479] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00816 [L479] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00817 [L479] TGETS    A=9 B=0 C=123 D=123 'sign'
+00818 [L479] TGETS    A=10 B=0 C=66 D=66 'account_id'
+00819 [L479] CALL     A=3 B=1 C=8 D=264 
+00820 [L480] UGET     A=3 B=0 C=0 D=0 cclog
+00821 [L480] KSTR     A=4 B=0 C=124 D=124 'lua send ThirdPlatformDef.wdj_a2 Purchase ok.'
+00822 [L480] CALL     A=3 B=1 C=2 D=258 
+00823 [L481] JMP      A=3 B=130 C=109 D=33389 target=1445
+00824 [L482] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00825 [L482] TGETS    A=3 B=3 C=125 D=893 'az_a'
+00826 [L482] ISNEV    A=1 B=0 C=3 D=3 
+00827 [L482] JMP      A=3 B=128 C=20 D=32788 target=848
+00828 [L483] UGET     A=3 B=0 C=2 D=2 main_server
+00829 [L483] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00830 [L483] ISF      A=0 B=0 C=3 D=3 
+00831 [L483] JMP      A=4 B=130 C=101 D=33381 target=1445
+00832 [L484] UGET     A=3 B=0 C=2 D=2 main_server
+00833 [L484] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00834 [L484] UGET     A=4 B=0 C=3 D=3 tostring
+00835 [L484] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00836 [L484] CALL     A=4 B=2 C=2 D=514 
+00837 [L484] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00838 [L484] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00839 [L484] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00840 [L484] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00841 [L484] KSTR     A=9 B=0 C=41 D=41 ''
+00842 [L484] KSTR     A=10 B=0 C=41 D=41 ''
+00843 [L484] CALL     A=3 B=1 C=8 D=264 
+00844 [L485] UGET     A=3 B=0 C=0 D=0 cclog
+00845 [L485] KSTR     A=4 B=0 C=126 D=126 'lua send ThirdPlatformDef.az_a Purchase ok.'
+00846 [L485] CALL     A=3 B=1 C=2 D=258 
+00847 [L486] JMP      A=3 B=130 C=85 D=33365 target=1445
+00848 [L487] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00849 [L487] TGETS    A=3 B=3 C=127 D=895 'gfan_a'
+00850 [L487] ISNEV    A=1 B=0 C=3 D=3 
+00851 [L487] JMP      A=3 B=128 C=20 D=32788 target=872
+00852 [L488] UGET     A=3 B=0 C=2 D=2 main_server
+00853 [L488] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00854 [L488] ISF      A=0 B=0 C=3 D=3 
+00855 [L488] JMP      A=4 B=130 C=77 D=33357 target=1445
+00856 [L489] UGET     A=3 B=0 C=2 D=2 main_server
+00857 [L489] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00858 [L489] UGET     A=4 B=0 C=3 D=3 tostring
+00859 [L489] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00860 [L489] CALL     A=4 B=2 C=2 D=514 
+00861 [L489] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00862 [L489] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00863 [L489] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00864 [L489] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00865 [L489] KSTR     A=9 B=0 C=41 D=41 ''
+00866 [L489] KSTR     A=10 B=0 C=41 D=41 ''
+00867 [L489] CALL     A=3 B=1 C=8 D=264 
+00868 [L490] UGET     A=3 B=0 C=0 D=0 cclog
+00869 [L490] KSTR     A=4 B=0 C=128 D=128 'lua send ThirdPlatformDef.gfan_a Purchase ok.'
+00870 [L490] CALL     A=3 B=1 C=2 D=258 
+00871 [L491] JMP      A=3 B=130 C=61 D=33341 target=1445
+00872 [L492] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00873 [L492] TGETS    A=3 B=3 C=129 D=897 'hw_a'
+00874 [L492] ISNEV    A=1 B=0 C=3 D=3 
+00875 [L492] JMP      A=3 B=128 C=20 D=32788 target=896
+00876 [L493] UGET     A=3 B=0 C=2 D=2 main_server
+00877 [L493] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00878 [L493] ISF      A=0 B=0 C=3 D=3 
+00879 [L493] JMP      A=4 B=130 C=53 D=33333 target=1445
+00880 [L494] UGET     A=3 B=0 C=2 D=2 main_server
+00881 [L494] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00882 [L494] UGET     A=4 B=0 C=3 D=3 tostring
+00883 [L494] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00884 [L494] CALL     A=4 B=2 C=2 D=514 
+00885 [L494] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00886 [L494] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00887 [L494] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00888 [L494] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00889 [L494] TGETS    A=9 B=0 C=11 D=11 'order_cb_host'
+00890 [L494] KSTR     A=10 B=0 C=41 D=41 ''
+00891 [L494] CALL     A=3 B=1 C=8 D=264 
+00892 [L495] UGET     A=3 B=0 C=0 D=0 cclog
+00893 [L495] KSTR     A=4 B=0 C=130 D=130 'lua send ThirdPlatformDef.hw_a Purchase ok.'
+00894 [L495] CALL     A=3 B=1 C=2 D=258 
+00895 [L496] JMP      A=3 B=130 C=37 D=33317 target=1445
+00896 [L497] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00897 [L497] TGETS    A=3 B=3 C=131 D=899 'mzw_a'
+00898 [L497] ISNEV    A=1 B=0 C=3 D=3 
+00899 [L497] JMP      A=3 B=128 C=20 D=32788 target=920
+00900 [L499] UGET     A=3 B=0 C=2 D=2 main_server
+00901 [L499] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00902 [L499] ISF      A=0 B=0 C=3 D=3 
+00903 [L499] JMP      A=4 B=130 C=29 D=33309 target=1445
+00904 [L500] UGET     A=3 B=0 C=2 D=2 main_server
+00905 [L500] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00906 [L500] UGET     A=4 B=0 C=3 D=3 tostring
+00907 [L500] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00908 [L500] CALL     A=4 B=2 C=2 D=514 
+00909 [L500] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00910 [L500] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00911 [L500] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00912 [L500] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00913 [L500] KSTR     A=9 B=0 C=41 D=41 ''
+00914 [L500] KSTR     A=10 B=0 C=41 D=41 ''
+00915 [L500] CALL     A=3 B=1 C=8 D=264 
+00916 [L501] UGET     A=3 B=0 C=0 D=0 cclog
+00917 [L501] KSTR     A=4 B=0 C=132 D=132 'lua send ThirdPlatformDef.mzw_a Purchase ok.'
+00918 [L501] CALL     A=3 B=1 C=2 D=258 
+00919 [L502] JMP      A=3 B=130 C=13 D=33293 target=1445
+00920 [L503] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00921 [L503] TGETS    A=3 B=3 C=133 D=901 'yj_a'
+00922 [L503] ISNEV    A=1 B=0 C=3 D=3 
+00923 [L503] JMP      A=3 B=128 C=23 D=32791 target=947
+00924 [L504] UGET     A=3 B=0 C=2 D=2 main_server
+00925 [L504] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00926 [L504] ISF      A=0 B=0 C=3 D=3 
+00927 [L504] JMP      A=4 B=130 C=5 D=33285 target=1445
+00928 [L505] UGET     A=3 B=0 C=2 D=2 main_server
+00929 [L505] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00930 [L505] UGET     A=4 B=0 C=3 D=3 tostring
+00931 [L505] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00932 [L505] CALL     A=4 B=2 C=2 D=514 
+00933 [L505] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00934 [L505] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00935 [L505] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00936 [L505] GGET     A=8 B=0 C=1 D=1 'd_ms'
+00937 [L505] TGETS    A=8 B=8 C=96 D=2144 'd_loginUI'
+00938 [L505] TGETS    A=8 B=8 C=97 D=2145 'getLoginServerId'
+00939 [L505] CALL     A=8 B=2 C=1 D=513 
+00940 [L505] TGETS    A=9 B=0 C=11 D=11 'order_cb_host'
+00941 [L505] KSTR     A=10 B=0 C=41 D=41 ''
+00942 [L505] CALL     A=3 B=1 C=8 D=264 
+00943 [L506] UGET     A=3 B=0 C=0 D=0 cclog
+00944 [L506] KSTR     A=4 B=0 C=134 D=134 'lua send ThirdPlatformDef.yj_a Purchase ok.'
+00945 [L506] CALL     A=3 B=1 C=2 D=258 
+00946 [L507] JMP      A=3 B=129 C=242 D=33266 target=1445
+00947 [L508] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00948 [L508] TGETS    A=3 B=3 C=135 D=903 'yx_a'
+00949 [L508] ISNEV    A=1 B=0 C=3 D=3 
+00950 [L508] JMP      A=3 B=128 C=22 D=32790 target=973
+00951 [L509] UGET     A=3 B=0 C=2 D=2 main_server
+00952 [L509] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00953 [L509] ISF      A=0 B=0 C=3 D=3 
+00954 [L509] JMP      A=4 B=129 C=234 D=33258 target=1445
+00955 [L510] UGET     A=3 B=0 C=2 D=2 main_server
+00956 [L510] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00957 [L510] UGET     A=4 B=0 C=3 D=3 tostring
+00958 [L510] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00959 [L510] CALL     A=4 B=2 C=2 D=514 
+00960 [L510] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00961 [L510] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00962 [L510] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00963 [L510] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00964 [L510] TGETS    A=9 B=0 C=11 D=11 'order_cb_host'
+00965 [L510] UGET     A=10 B=0 C=3 D=3 tostring
+00966 [L510] TGETS    A=11 B=0 C=136 D=136 'order_time'
+00967 [L510] CALL     A=10 B=0 C=2 D=2 
+00968 [L510] CALLM    A=3 B=1 C=6 D=262 
+00969 [L511] UGET     A=3 B=0 C=0 D=0 cclog
+00970 [L511] KSTR     A=4 B=0 C=137 D=137 'lua send ThirdPlatformDef.yx_a Purchase ok.'
+00971 [L511] CALL     A=3 B=1 C=2 D=258 
+00972 [L512] JMP      A=3 B=129 C=216 D=33240 target=1445
+00973 [L513] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+00974 [L513] TGETS    A=3 B=3 C=138 D=906 'jl_a'
+00975 [L513] ISNEV    A=1 B=0 C=3 D=3 
+00976 [L513] JMP      A=3 B=128 C=22 D=32790 target=999
+00977 [L514] UGET     A=3 B=0 C=2 D=2 main_server
+00978 [L514] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00979 [L514] ISF      A=0 B=0 C=3 D=3 
+00980 [L514] JMP      A=4 B=129 C=208 D=33232 target=1445
+00981 [L515] UGET     A=3 B=0 C=2 D=2 main_server
+00982 [L515] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+00983 [L515] UGET     A=4 B=0 C=3 D=3 tostring
+00984 [L515] TGETS    A=5 B=0 C=29 D=29 'order_id'
+00985 [L515] CALL     A=4 B=2 C=2 D=514 
+00986 [L515] TGETS    A=5 B=0 C=30 D=30 'item_name'
+00987 [L515] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+00988 [L515] TGETS    A=7 B=0 C=32 D=32 'total_price'
+00989 [L515] TGETS    A=8 B=0 C=33 D=33 'item_count'
+00990 [L515] TGETS    A=9 B=0 C=11 D=11 'order_cb_host'
+00991 [L515] UGET     A=10 B=0 C=3 D=3 tostring
+00992 [L515] TGETS    A=11 B=0 C=136 D=136 'order_time'
+00993 [L515] CALL     A=10 B=0 C=2 D=2 
+00994 [L515] CALLM    A=3 B=1 C=6 D=262 
+00995 [L516] UGET     A=3 B=0 C=0 D=0 cclog
+00996 [L516] KSTR     A=4 B=0 C=139 D=139 'lua send ThirdPlatformDef.jl_a Purchase ok.'
+00997 [L516] CALL     A=3 B=1 C=2 D=258 
+00998 [L517] JMP      A=3 B=129 C=190 D=33214 target=1445
+00999 [L518] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+01000 [L518] TGETS    A=3 B=3 C=140 D=908 'yy_a'
+01001 [L518] ISNEV    A=1 B=0 C=3 D=3 
+01002 [L518] JMP      A=3 B=128 C=23 D=32791 target=1026
+01003 [L519] UGET     A=3 B=0 C=2 D=2 main_server
+01004 [L519] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01005 [L519] ISF      A=0 B=0 C=3 D=3 
+01006 [L519] JMP      A=4 B=129 C=182 D=33206 target=1445
+01007 [L520] UGET     A=3 B=0 C=2 D=2 main_server
+01008 [L520] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01009 [L520] UGET     A=4 B=0 C=3 D=3 tostring
+01010 [L520] TGETS    A=5 B=0 C=29 D=29 'order_id'
+01011 [L520] CALL     A=4 B=2 C=2 D=514 
+01012 [L520] TGETS    A=5 B=0 C=30 D=30 'item_name'
+01013 [L520] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+01014 [L520] TGETS    A=7 B=0 C=32 D=32 'total_price'
+01015 [L520] GGET     A=8 B=0 C=1 D=1 'd_ms'
+01016 [L520] TGETS    A=8 B=8 C=96 D=2144 'd_loginUI'
+01017 [L520] TGETS    A=8 B=8 C=97 D=2145 'getLoginServerId'
+01018 [L520] CALL     A=8 B=2 C=1 D=513 
+01019 [L520] TGETS    A=9 B=0 C=11 D=11 'order_cb_host'
+01020 [L520] KSTR     A=10 B=0 C=41 D=41 ''
+01021 [L520] CALL     A=3 B=1 C=8 D=264 
+01022 [L521] UGET     A=3 B=0 C=0 D=0 cclog
+01023 [L521] KSTR     A=4 B=0 C=141 D=141 'lua send ThirdPlatformDef.yy_a Purchase ok.'
+01024 [L521] CALL     A=3 B=1 C=2 D=258 
+01025 [L522] JMP      A=3 B=129 C=163 D=33187 target=1445
+01026 [L523] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+01027 [L523] TGETS    A=3 B=3 C=142 D=910 'tw_a'
+01028 [L523] ISNEV    A=1 B=0 C=3 D=3 
+01029 [L523] JMP      A=3 B=128 C=26 D=32794 target=1056
+01030 [L524] UGET     A=3 B=0 C=2 D=2 main_server
+01031 [L524] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01032 [L524] ISF      A=0 B=0 C=3 D=3 
+01033 [L524] JMP      A=4 B=129 C=155 D=33179 target=1445
+01034 [L525] UGET     A=3 B=0 C=2 D=2 main_server
+01035 [L525] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01036 [L525] UGET     A=4 B=0 C=3 D=3 tostring
+01037 [L525] TGETS    A=5 B=0 C=29 D=29 'order_id'
+01038 [L525] CALL     A=4 B=2 C=2 D=514 
+01039 [L525] TGETS    A=5 B=0 C=55 D=55 'product_id'
+01040 [L525] TGETS    A=6 B=0 C=143 D=143 'account_name'
+01041 [L525] TGETS    A=7 B=0 C=32 D=32 'total_price'
+01042 [L525] TGETS    A=8 B=0 C=33 D=33 'item_count'
+01043 [L525] GGET     A=9 B=0 C=1 D=1 'd_ms'
+01044 [L525] TGETS    A=9 B=9 C=77 D=2381 'd_mainUI'
+01045 [L525] TGETS    A=9 B=9 C=78 D=2382 'g_playerInfo'
+01046 [L525] TGETS    A=9 B=9 C=79 D=2383 'role_name'
+01047 [L525] GGET     A=10 B=0 C=1 D=1 'd_ms'
+01048 [L525] TGETS    A=10 B=10 C=96 D=2656 'd_loginUI'
+01049 [L525] TGETS    A=10 B=10 C=144 D=2704 'getLoginServerName'
+01050 [L525] CALL     A=10 B=0 C=1 D=1 
+01051 [L525] CALLM    A=3 B=1 C=6 D=262 
+01052 [L526] UGET     A=3 B=0 C=0 D=0 cclog
+01053 [L526] KSTR     A=4 B=0 C=145 D=145 'lua send ThirdPlatformDef.tw_a Purchase ok.'
+01054 [L526] CALL     A=3 B=1 C=2 D=258 
+01055 [L527] JMP      A=3 B=129 C=133 D=33157 target=1445
+01056 [L528] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+01057 [L528] TGETS    A=3 B=3 C=146 D=914 'p37wan_a'
+01058 [L528] ISNEV    A=1 B=0 C=3 D=3 
+01059 [L528] JMP      A=3 B=128 C=20 D=32788 target=1080
+01060 [L530] UGET     A=3 B=0 C=2 D=2 main_server
+01061 [L530] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01062 [L530] ISF      A=0 B=0 C=3 D=3 
+01063 [L530] JMP      A=4 B=129 C=125 D=33149 target=1445
+01064 [L531] UGET     A=3 B=0 C=2 D=2 main_server
+01065 [L531] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01066 [L531] UGET     A=4 B=0 C=3 D=3 tostring
+01067 [L531] TGETS    A=5 B=0 C=29 D=29 'order_id'
+01068 [L531] CALL     A=4 B=2 C=2 D=514 
+01069 [L531] TGETS    A=5 B=0 C=30 D=30 'item_name'
+01070 [L531] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+01071 [L531] TGETS    A=7 B=0 C=32 D=32 'total_price'
+01072 [L531] TGETS    A=8 B=0 C=33 D=33 'item_count'
+01073 [L531] KSTR     A=9 B=0 C=41 D=41 ''
+01074 [L531] KSTR     A=10 B=0 C=41 D=41 ''
+01075 [L531] CALL     A=3 B=1 C=8 D=264 
+01076 [L532] UGET     A=3 B=0 C=0 D=0 cclog
+01077 [L532] KSTR     A=4 B=0 C=147 D=147 'lua send ThirdPlatformDef.p37wan_a Purchase ok.'
+01078 [L532] CALL     A=3 B=1 C=2 D=258 
+01079 [L533] JMP      A=3 B=129 C=109 D=33133 target=1445
+01080 [L534] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+01081 [L534] TGETS    A=3 B=3 C=148 D=916 'meizu_a'
+01082 [L534] ISNEV    A=1 B=0 C=3 D=3 
+01083 [L534] JMP      A=3 B=128 C=34 D=32802 target=1118
+01084 [L536] UGET     A=3 B=0 C=2 D=2 main_server
+01085 [L536] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01086 [L536] ISF      A=0 B=0 C=3 D=3 
+01087 [L536] JMP      A=4 B=129 C=101 D=33125 target=1445
+01088 [L537] UGET     A=3 B=0 C=2 D=2 main_server
+01089 [L537] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01090 [L537] UGET     A=4 B=0 C=3 D=3 tostring
+01091 [L537] TGETS    A=5 B=0 C=29 D=29 'order_id'
+01092 [L537] CALL     A=4 B=2 C=2 D=514 
+01093 [L537] UGET     A=5 B=0 C=3 D=3 tostring
+01094 [L537] TGETS    A=6 B=0 C=149 D=149 'product_subject'
+01095 [L537] CALL     A=5 B=2 C=2 D=514 
+01096 [L537] UGET     A=6 B=0 C=3 D=3 tostring
+01097 [L537] TGETS    A=7 B=0 C=136 D=136 'order_time'
+01098 [L537] CALL     A=6 B=2 C=2 D=514 
+01099 [L537] TGETS    A=7 B=0 C=32 D=32 'total_price'
+01100 [L537] UGET     A=8 B=0 C=4 D=4 tonumber
+01101 [L537] TGETS    A=9 B=0 C=55 D=55 'product_id'
+01102 [L537] CALL     A=8 B=2 C=2 D=514 
+01103 [L537] TGETS    A=9 B=0 C=123 D=123 'sign'
+01104 [L537] TGETS    A=10 B=0 C=66 D=66 'account_id'
+01105 [L537] CALL     A=3 B=1 C=8 D=264 
+01106 [L538] UGET     A=3 B=0 C=5 D=5 table
+01107 [L538] TGETS    A=3 B=3 C=150 D=918 'tostring'
+01108 [L538] MOV      A=4 B=0 C=0 D=0 
+01109 [L538] CALL     A=3 B=2 C=2 D=514 
+01110 [L539] UGET     A=4 B=0 C=0 D=0 cclog
+01111 [L539] KSTR     A=5 B=0 C=151 D=151 'meizu_a Purchase print data_table=%s'
+01112 [L539] MOV      A=6 B=0 C=3 D=3 
+01113 [L539] CALL     A=4 B=1 C=3 D=259 
+01114 [L540] UGET     A=4 B=0 C=0 D=0 cclog
+01115 [L540] KSTR     A=5 B=0 C=152 D=152 'lua send ThirdPlatformDef.meizu_a Purchase ok.'
+01116 [L540] CALL     A=4 B=1 C=2 D=258 
+01117 [L541] JMP      A=3 B=129 C=71 D=33095 target=1445
+01118 [L542] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+01119 [L542] TGETS    A=3 B=3 C=153 D=921 'xunlei_a'
+01120 [L542] ISNEV    A=1 B=0 C=3 D=3 
+01121 [L542] JMP      A=3 B=128 C=20 D=32788 target=1142
+01122 [L544] UGET     A=3 B=0 C=2 D=2 main_server
+01123 [L544] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01124 [L544] ISF      A=0 B=0 C=3 D=3 
+01125 [L544] JMP      A=4 B=129 C=63 D=33087 target=1445
+01126 [L545] UGET     A=3 B=0 C=2 D=2 main_server
+01127 [L545] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01128 [L545] UGET     A=4 B=0 C=3 D=3 tostring
+01129 [L545] TGETS    A=5 B=0 C=29 D=29 'order_id'
+01130 [L545] CALL     A=4 B=2 C=2 D=514 
+01131 [L545] TGETS    A=5 B=0 C=30 D=30 'item_name'
+01132 [L545] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+01133 [L545] TGETS    A=7 B=0 C=32 D=32 'total_price'
+01134 [L545] TGETS    A=8 B=0 C=33 D=33 'item_count'
+01135 [L545] KSTR     A=9 B=0 C=41 D=41 ''
+01136 [L545] KSTR     A=10 B=0 C=41 D=41 ''
+01137 [L545] CALL     A=3 B=1 C=8 D=264 
+01138 [L546] UGET     A=3 B=0 C=0 D=0 cclog
+01139 [L546] KSTR     A=4 B=0 C=154 D=154 'lua send ThirdPlatformDef.xunlei_a Purchase ok.'
+01140 [L546] CALL     A=3 B=1 C=2 D=258 
+01141 [L547] JMP      A=3 B=129 C=47 D=33071 target=1445
+01142 [L548] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+01143 [L548] TGETS    A=3 B=3 C=155 D=923 'kp_a'
+01144 [L548] ISNEV    A=1 B=0 C=3 D=3 
+01145 [L548] JMP      A=3 B=128 C=20 D=32788 target=1166
+01146 [L550] UGET     A=3 B=0 C=2 D=2 main_server
+01147 [L550] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01148 [L550] ISF      A=0 B=0 C=3 D=3 
+01149 [L550] JMP      A=4 B=129 C=39 D=33063 target=1445
+01150 [L551] UGET     A=3 B=0 C=2 D=2 main_server
+01151 [L551] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01152 [L551] UGET     A=4 B=0 C=3 D=3 tostring
+01153 [L551] TGETS    A=5 B=0 C=29 D=29 'order_id'
+01154 [L551] CALL     A=4 B=2 C=2 D=514 
+01155 [L551] TGETS    A=5 B=0 C=55 D=55 'product_id'
+01156 [L551] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+01157 [L551] TGETS    A=7 B=0 C=32 D=32 'total_price'
+01158 [L551] TGETS    A=8 B=0 C=33 D=33 'item_count'
+01159 [L551] KSTR     A=9 B=0 C=41 D=41 ''
+01160 [L551] KSTR     A=10 B=0 C=41 D=41 ''
+01161 [L551] CALL     A=3 B=1 C=8 D=264 
+01162 [L552] UGET     A=3 B=0 C=0 D=0 cclog
+01163 [L552] KSTR     A=4 B=0 C=156 D=156 'lua send ThirdPlatformDef.kp_a Purchase ok.'
+01164 [L552] CALL     A=3 B=1 C=2 D=258 
+01165 [L553] JMP      A=3 B=129 C=23 D=33047 target=1445
+01166 [L554] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+01167 [L554] TGETS    A=3 B=3 C=157 D=925 'haima_i'
+01168 [L554] ISNEV    A=1 B=0 C=3 D=3 
+01169 [L554] JMP      A=3 B=128 C=20 D=32788 target=1190
+01170 [L556] UGET     A=3 B=0 C=2 D=2 main_server
+01171 [L556] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01172 [L556] ISF      A=0 B=0 C=3 D=3 
+01173 [L556] JMP      A=4 B=129 C=15 D=33039 target=1445
+01174 [L557] UGET     A=3 B=0 C=2 D=2 main_server
+01175 [L557] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01176 [L557] UGET     A=4 B=0 C=3 D=3 tostring
+01177 [L557] TGETS    A=5 B=0 C=29 D=29 'order_id'
+01178 [L557] CALL     A=4 B=2 C=2 D=514 
+01179 [L557] TGETS    A=5 B=0 C=55 D=55 'product_id'
+01180 [L557] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+01181 [L557] TGETS    A=7 B=0 C=32 D=32 'total_price'
+01182 [L557] TGETS    A=8 B=0 C=33 D=33 'item_count'
+01183 [L557] KSTR     A=9 B=0 C=41 D=41 ''
+01184 [L557] KSTR     A=10 B=0 C=41 D=41 ''
+01185 [L557] CALL     A=3 B=1 C=8 D=264 
+01186 [L558] UGET     A=3 B=0 C=0 D=0 cclog
+01187 [L558] KSTR     A=4 B=0 C=158 D=158 'lua send ThirdPlatformDef.haima_i Purchase ok.'
+01188 [L558] CALL     A=3 B=1 C=2 D=258 
+01189 [L559] JMP      A=3 B=128 C=255 D=33023 target=1445
+01190 [L560] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+01191 [L560] TGETS    A=3 B=3 C=159 D=927 'lengjing'
+01192 [L560] ISNEV    A=1 B=0 C=3 D=3 
+01193 [L560] JMP      A=3 B=128 C=20 D=32788 target=1214
+01194 [L562] UGET     A=3 B=0 C=2 D=2 main_server
+01195 [L562] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01196 [L562] ISF      A=0 B=0 C=3 D=3 
+01197 [L562] JMP      A=4 B=128 C=247 D=33015 target=1445
+01198 [L563] UGET     A=3 B=0 C=2 D=2 main_server
+01199 [L563] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01200 [L563] UGET     A=4 B=0 C=3 D=3 tostring
+01201 [L563] TGETS    A=5 B=0 C=29 D=29 'order_id'
+01202 [L563] CALL     A=4 B=2 C=2 D=514 
+01203 [L563] TGETS    A=5 B=0 C=55 D=55 'product_id'
+01204 [L563] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+01205 [L563] TGETS    A=7 B=0 C=32 D=32 'total_price'
+01206 [L563] TGETS    A=8 B=0 C=33 D=33 'item_count'
+01207 [L563] KSTR     A=9 B=0 C=160 D=160 'http://di.syyx.com/lengjing/buy_result'
+01208 [L563] KSTR     A=10 B=0 C=41 D=41 ''
+01209 [L563] CALL     A=3 B=1 C=8 D=264 
+01210 [L564] UGET     A=3 B=0 C=0 D=0 cclog
+01211 [L564] KSTR     A=4 B=0 C=161 D=161 'lua send ThirdPlatformDef.lengjing Purchase ok.'
+01212 [L564] CALL     A=3 B=1 C=2 D=258 
+01213 [L565] JMP      A=3 B=128 C=231 D=32999 target=1445
+01214 [L566] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+01215 [L566] TGETS    A=3 B=3 C=162 D=930 'p91bn_a'
+01216 [L566] ISNEV    A=1 B=0 C=3 D=3 
+01217 [L566] JMP      A=3 B=128 C=20 D=32788 target=1238
+01218 [L568] UGET     A=3 B=0 C=2 D=2 main_server
+01219 [L568] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01220 [L568] ISF      A=0 B=0 C=3 D=3 
+01221 [L568] JMP      A=4 B=128 C=223 D=32991 target=1445
+01222 [L569] UGET     A=3 B=0 C=2 D=2 main_server
+01223 [L569] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01224 [L569] UGET     A=4 B=0 C=3 D=3 tostring
+01225 [L569] TGETS    A=5 B=0 C=29 D=29 'order_id'
+01226 [L569] CALL     A=4 B=2 C=2 D=514 
+01227 [L569] TGETS    A=5 B=0 C=30 D=30 'item_name'
+01228 [L569] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+01229 [L569] TGETS    A=7 B=0 C=32 D=32 'total_price'
+01230 [L569] TGETS    A=8 B=0 C=33 D=33 'item_count'
+01231 [L569] KSTR     A=9 B=0 C=22 D=22 'http://di.syyx.com/p91n_a/buy_result'
+01232 [L569] KSTR     A=10 B=0 C=41 D=41 ''
+01233 [L569] CALL     A=3 B=1 C=8 D=264 
+01234 [L570] UGET     A=3 B=0 C=0 D=0 cclog
+01235 [L570] KSTR     A=4 B=0 C=132 D=132 'lua send ThirdPlatformDef.mzw_a Purchase ok.'
+01236 [L570] CALL     A=3 B=1 C=2 D=258 
+01237 [L571] JMP      A=3 B=128 C=207 D=32975 target=1445
+01238 [L572] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+01239 [L572] TGETS    A=3 B=3 C=163 D=931 'bdn_a'
+01240 [L572] ISNEV    A=1 B=0 C=3 D=3 
+01241 [L572] JMP      A=3 B=128 C=20 D=32788 target=1262
+01242 [L574] UGET     A=3 B=0 C=2 D=2 main_server
+01243 [L574] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01244 [L574] ISF      A=0 B=0 C=3 D=3 
+01245 [L574] JMP      A=4 B=128 C=199 D=32967 target=1445
+01246 [L575] UGET     A=3 B=0 C=2 D=2 main_server
+01247 [L575] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01248 [L575] UGET     A=4 B=0 C=3 D=3 tostring
+01249 [L575] TGETS    A=5 B=0 C=29 D=29 'order_id'
+01250 [L575] CALL     A=4 B=2 C=2 D=514 
+01251 [L575] TGETS    A=5 B=0 C=30 D=30 'item_name'
+01252 [L575] TGETS    A=6 B=0 C=31 D=31 'item_desc'
+01253 [L575] TGETS    A=7 B=0 C=32 D=32 'total_price'
+01254 [L575] TGETS    A=8 B=0 C=33 D=33 'item_count'
+01255 [L575] KSTR     A=9 B=0 C=41 D=41 ''
+01256 [L575] KSTR     A=10 B=0 C=41 D=41 ''
+01257 [L575] CALL     A=3 B=1 C=8 D=264 
+01258 [L576] UGET     A=3 B=0 C=0 D=0 cclog
+01259 [L576] KSTR     A=4 B=0 C=104 D=104 'lua send ThirdPlatformDef.bd_a Purchase ok.'
+01260 [L576] CALL     A=3 B=1 C=2 D=258 
+01261 [L577] JMP      A=3 B=128 C=183 D=32951 target=1445
+01262 [L579] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+01263 [L579] TGETS    A=3 B=3 C=164 D=932 'amigo_a'
+01264 [L579] ISNEV    A=1 B=0 C=3 D=3 
+01265 [L579] JMP      A=3 B=128 C=60 D=32828 target=1326
+01266 [L581] UGET     A=3 B=0 C=2 D=2 main_server
+01267 [L581] TGETS    A=3 B=3 C=28 D=796 'thirdPartyPlatformPurchase'
+01268 [L581] ISF      A=0 B=0 C=3 D=3 
+01269 [L581] JMP      A=4 B=128 C=175 D=32943 target=1445
+01270 [L582] UGET     A=3 B=0 C=6 D=6 string
+01271 [L582] TGETS    A=3 B=3 C=165 D=933 'format'
+01272 [L582] KSTR     A=4 B=0 C=166 D=166 '%04d%02d%02d%02d%02d%02d'
+01273 [L582] UGET     A=5 B=0 C=7 D=7 os
+01274 [L582] TGETS    A=5 B=5 C=167 D=1447 'date'
+01275 [L582] KSTR     A=6 B=0 C=168 D=168 '*t'
+01276 [L582] TGETS    A=7 B=0 C=136 D=136 'order_time'
+01277 [L582] CALL     A=5 B=2 C=3 D=515 
+01278 [L582] TGETS    A=5 B=5 C=169 D=1449 'year'
+01279 [L582] UGET     A=6 B=0 C=7 D=7 os
+01280 [L582] TGETS    A=6 B=6 C=167 D=1703 'date'
+01281 [L582] KSTR     A=7 B=0 C=168 D=168 '*t'
+01282 [L582] TGETS    A=8 B=0 C=136 D=136 'order_time'
+01283 [L582] CALL     A=6 B=2 C=3 D=515 
+01284 [L582] TGETS    A=6 B=6 C=170 D=1706 'month'
+01285 [L582] UGET     A=7 B=0 C=7 D=7 os
+01286 [L582] TGETS    A=7 B=7 C=167 D=1959 'date'
+01287 [L582] KSTR     A=8 B=0 C=168 D=168 '*t'
+01288 [L582] TGETS    A=9 B=0 C=136 D=136 'order_time'
+01289 [L582] CALL     A=7 B=2 C=3 D=515 
+01290 [L582] TGETS    A=7 B=7 C=171 D=1963 'day'
+01291 [L583] UGET     A=8 B=0 C=7 D=7 os
+01292 [L583] TGETS    A=8 B=8 C=167 D=2215 'date'
+01293 [L583] KSTR     A=9 B=0 C=168 D=168 '*t'
+01294 [L583] TGETS    A=10 B=0 C=136 D=136 'order_time'
+01295 [L583] CALL     A=8 B=2 C=3 D=515 
+01296 [L583] TGETS    A=8 B=8 C=172 D=2220 'hour'
+01297 [L583] UGET     A=9 B=0 C=7 D=7 os
+01298 [L583] TGETS    A=9 B=9 C=167 D=2471 'date'
+01299 [L583] KSTR     A=10 B=0 C=168 D=168 '*t'
+01300 [L583] TGETS    A=11 B=0 C=136 D=136 'order_time'
+01301 [L583] CALL     A=9 B=2 C=3 D=515 
+01302 [L583] TGETS    A=9 B=9 C=173 D=2477 'min'
+01303 [L583] UGET     A=10 B=0 C=7 D=7 os
+01304 [L583] TGETS    A=10 B=10 C=167 D=2727 'date'
+01305 [L583] KSTR     A=11 B=0 C=168 D=168 '*t'
+01306 [L583] TGETS    A=12 B=0 C=136 D=136 'order_time'
+01307 [L583] CALL     A=10 B=2 C=3 D=515 
+01308 [L583] TGETS    A=10 B=10 C=174 D=2734 'sec'
+01309 [L582] CALL     A=3 B=2 C=8 D=520 
+01310 [L585] UGET     A=4 B=0 C=2 D=2 main_server
+01311 [L585] TGETS    A=4 B=4 C=28 D=1052 'thirdPartyPlatformPurchase'
+01312 [L585] UGET     A=5 B=0 C=3 D=3 tostring
+01313 [L585] TGETS    A=6 B=0 C=29 D=29 'order_id'
+01314 [L585] CALL     A=5 B=2 C=2 D=514 
+01315 [L585] TGETS    A=6 B=0 C=55 D=55 'product_id'
+01316 [L585] MOV      A=7 B=0 C=3 D=3 
+01317 [L585] TGETS    A=8 B=0 C=32 D=32 'total_price'
+01318 [L585] TGETS    A=9 B=0 C=33 D=33 'item_count'
+01319 [L585] KSTR     A=10 B=0 C=41 D=41 ''
+01320 [L585] KSTR     A=11 B=0 C=41 D=41 ''
+01321 [L585] CALL     A=4 B=1 C=8 D=264 
+01322 [L587] UGET     A=4 B=0 C=0 D=0 cclog
+01323 [L587] KSTR     A=5 B=0 C=175 D=175 'lua send ThirdPlatformDef.amigo_a Purchase ok.'
+01324 [L587] CALL     A=4 B=1 C=2 D=258 
+01325 [L588] JMP      A=3 B=128 C=119 D=32887 target=1445
+01326 [L590] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+01327 [L590] TGETS    A=3 B=3 C=176 D=944 'yyb_qq_a'
+01328 [L590] ISEQV    A=1 B=0 C=3 D=3 
+01329 [L590] JMP      A=3 B=128 C=4 D=32772 target=1334
+01330 [L590] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+01331 [L590] TGETS    A=3 B=3 C=177 D=945 'yyb_wx_a'
+01332 [L590] ISNEV    A=1 B=0 C=3 D=3 
+01333 [L590] JMP      A=3 B=128 C=10 D=32778 target=1344
+01334 [L598] GGET     A=3 B=0 C=1 D=1 'd_ms'
+01335 [L598] TGETS    A=3 B=3 C=178 D=946 'd_info'
+01336 [L598] TGETS    A=3 B=3 C=179 D=947 'show'
+01337 [L598] GGET     A=4 B=0 C=1 D=1 'd_ms'
+01338 [L598] TGETS    A=4 B=4 C=180 D=1204 'd_hz'
+01339 [L598] TGETS    A=4 B=4 C=181 D=1205 'gethz'
+01340 [L598] KSTR     A=5 B=0 C=182 D=182 'yyb6'
+01341 [L598] CALL     A=4 B=0 C=2 D=2 
+01342 [L598] CALLM    A=3 B=1 C=0 D=256 
+01343 [L598] JMP      A=3 B=128 C=101 D=32869 target=1445
+01344 [L599] UGET     A=3 B=0 C=1 D=1 ThirdPlatformDef
+01345 [L599] TGETS    A=3 B=3 C=183 D=951 'openxlive_wp'
+01346 [L599] ISNEV    A=1 B=0 C=3 D=3 
+01347 [L599] JMP      A=3 B=128 C=21 D=32789 target=1369
+01348 [L600] UGET     A=3 B=0 C=0 D=0 cclog
+01349 [L600] KSTR     A=4 B=0 C=184 D=184 'wp88888888888888 first orderid===============%s'
+01350 [L600] UGET     A=5 B=0 C=3 D=3 tostring
+01351 [L600] TGETS    A=6 B=0 C=29 D=29 'order_id'
+01352 [L600] CALL     A=5 B=0 C=2 D=2 
+01353 [L600] CALLM    A=3 B=1 C=1 D=257 
+01354 [L620] FNEW     A=3 B=0 C=185 D=185 {'kind': 'proto', 'id': 12}
+01355 [L621] UGET     A=4 B=0 C=8 D=8 CCDirector
+01356 [L621] MOV      A=5 B=0 C=4 D=4 
+01357 [L621] TGETS    A=4 B=4 C=186 D=1210 'sharedDirector'
+01358 [L621] CALL     A=4 B=2 C=2 D=514 
+01359 [L621] MOV      A=5 B=0 C=4 D=4 
+01360 [L621] TGETS    A=4 B=4 C=187 D=1211 'getRunningScene'
+01361 [L621] CALL     A=4 B=2 C=2 D=514 
+01362 [L622] GGET     A=5 B=0 C=1 D=1 'd_ms'
+01363 [L622] TGETS    A=5 B=5 C=188 D=1468 'd_rechargeUI'
+01364 [L622] TGETS    A=5 B=5 C=189 D=1469 'createWPSelectPayWay'
+01365 [L622] MOV      A=6 B=0 C=4 D=4 
+01366 [L622] MOV      A=7 B=0 C=3 D=3 
+01367 [L622] CALL     A=5 B=1 C=3 D=259 
+01368 [L622] JMP      A=3 B=128 C=76 D=32844 target=1445
+01369 [L625] GGET     A=3 B=0 C=1 D=1 'd_ms'
+01370 [L625] TGETS    A=3 B=3 C=2 D=770 'd_tp_config'
+01371 [L625] TGETS    A=3 B=3 C=190 D=958 'useThirdPartySdk'
+01372 [L625] CALL     A=3 B=2 C=1 D=513 
+01373 [L625] ISNEP    A=3 B=0 C=1 D=1 
+01374 [L625] JMP      A=3 B=128 C=12 D=32780 target=1387
+01375 [L628] TGETS    A=3 B=0 C=191 D=191 'shangyoo_cb_host'
+01376 [L628] KSTR     A=4 B=0 C=192 D=192 '?order_id='
+01377 [L628] TGETS    A=5 B=0 C=29 D=29 'order_id'
+01378 [L628] CAT      A=3 B=3 C=5 D=773 
+01379 [L629] UGET     A=4 B=0 C=2 D=2 main_server
+01380 [L629] TGETS    A=4 B=4 C=193 D=1217 'performWebview'
+01381 [L629] MOV      A=5 B=0 C=3 D=3 
+01382 [L629] CALL     A=4 B=1 C=2 D=258 
+01383 [L630] UGET     A=4 B=0 C=0 D=0 cclog
+01384 [L630] KSTR     A=5 B=0 C=194 D=194 'lua send performWebview Purchase ok.'
+01385 [L630] CALL     A=4 B=1 C=2 D=258 
+01386 [L630] JMP      A=3 B=128 C=58 D=32826 target=1445
+01387 [L632] UGET     A=3 B=0 C=0 D=0 cclog
+01388 [L632] KSTR     A=4 B=0 C=195 D=195 'ERROR: unhandle platform='
+01389 [L632] MOV      A=5 B=0 C=1 D=1 
+01390 [L632] CAT      A=4 B=4 C=5 D=1029 
+01391 [L632] CALL     A=3 B=1 C=2 D=258 
+01392 [L634] JMP      A=2 B=128 C=52 D=32820 target=1445
+01393 [L635] UGET     A=2 B=0 C=1 D=1 ThirdPlatformDef
+01394 [L635] TGETS    A=2 B=2 C=176 D=688 'yyb_qq_a'
+01395 [L635] ISEQV    A=1 B=0 C=2 D=2 
+01396 [L635] JMP      A=2 B=128 C=4 D=32772 target=1401
+01397 [L635] UGET     A=2 B=0 C=1 D=1 ThirdPlatformDef
+01398 [L635] TGETS    A=2 B=2 C=177 D=689 'yyb_wx_a'
+01399 [L635] ISNEV    A=1 B=0 C=2 D=2 
+01400 [L635] JMP      A=2 B=128 C=10 D=32778 target=1411
+01401 [L636] GGET     A=2 B=0 C=1 D=1 'd_ms'
+01402 [L636] TGETS    A=2 B=2 C=178 D=690 'd_info'
+01403 [L636] TGETS    A=2 B=2 C=179 D=691 'show'
+01404 [L636] GGET     A=3 B=0 C=1 D=1 'd_ms'
+01405 [L636] TGETS    A=3 B=3 C=180 D=948 'd_hz'
+01406 [L636] TGETS    A=3 B=3 C=181 D=949 'gethz'
+01407 [L636] KSTR     A=4 B=0 C=196 D=196 'yyb7'
+01408 [L636] CALL     A=3 B=0 C=2 D=2 
+01409 [L636] CALLM    A=2 B=1 C=0 D=256 
+01410 [L636] JMP      A=2 B=128 C=34 D=32802 target=1445
+01411 [L637] TGETS    A=2 B=0 C=4 D=4 'result'
+01412 [L637] GGET     A=3 B=0 C=1 D=1 'd_ms'
+01413 [L637] TGETS    A=3 B=3 C=5 D=773 'd_common_def'
+01414 [L637] TGETS    A=3 B=3 C=6 D=774 'client_order_result'
+01415 [L637] TGETS    A=3 B=3 C=197 D=965 'order_frequently'
+01416 [L637] ISNEV    A=2 B=0 C=3 D=3 
+01417 [L637] JMP      A=2 B=128 C=13 D=32781 target=1431
+01418 [L638] UGET     A=2 B=0 C=0 D=0 cclog
+01419 [L638] KSTR     A=3 B=0 C=198 D=198 'ERROR:data_table order_frequently'
+01420 [L638] CALL     A=2 B=1 C=2 D=258 
+01421 [L639] GGET     A=2 B=0 C=1 D=1 'd_ms'
+01422 [L639] TGETS    A=2 B=2 C=178 D=690 'd_info'
+01423 [L639] TGETS    A=2 B=2 C=179 D=691 'show'
+01424 [L639] GGET     A=3 B=0 C=1 D=1 'd_ms'
+01425 [L639] TGETS    A=3 B=3 C=180 D=948 'd_hz'
+01426 [L639] TGETS    A=3 B=3 C=181 D=949 'gethz'
+01427 [L639] KSTR     A=4 B=0 C=199 D=199 'get_order_frequently'
+01428 [L639] CALL     A=3 B=0 C=2 D=2 
+01429 [L639] CALLM    A=2 B=1 C=0 D=256 
+01430 [L639] JMP      A=2 B=128 C=14 D=32782 target=1445
+01431 [L641] UGET     A=2 B=0 C=0 D=0 cclog
+01432 [L641] KSTR     A=3 B=0 C=200 D=200 'ERROR: callback_send_order_id ret='
+01433 [L641] TGETS    A=4 B=0 C=4 D=4 'result'
+01434 [L641] CAT      A=3 B=3 C=4 D=772 
+01435 [L641] CALL     A=2 B=1 C=2 D=258 
+01436 [L642] GGET     A=2 B=0 C=1 D=1 'd_ms'
+01437 [L642] TGETS    A=2 B=2 C=178 D=690 'd_info'
+01438 [L642] TGETS    A=2 B=2 C=179 D=691 'show'
+01439 [L642] GGET     A=3 B=0 C=1 D=1 'd_ms'
+01440 [L642] TGETS    A=3 B=3 C=180 D=948 'd_hz'
+01441 [L642] TGETS    A=3 B=3 C=181 D=949 'gethz'
+01442 [L642] KSTR     A=4 B=0 C=201 D=201 'txt_get_order_fail'
+01443 [L642] CALL     A=3 B=0 C=2 D=2 
+01444 [L642] CALLM    A=2 B=1 C=0 D=256 
+01445 [L644] UCLO     A=0 B=128 C=0 D=32768 target=1446
+01446 [L644] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto14 offset=0x4908 source_lines=648-711 params=1
+UPVALUES ['cclog', 'main_server', 'tonumber', 'string']
+00001 [L649] UGET     A=1 B=0 C=0 D=0 cclog
+00002 [L649] KSTR     A=2 B=0 C=0 D=0 '-----------------callbackx_send_order_result------------------'
+00003 [L649] CALL     A=1 B=1 C=2 D=258 
+00004 [L651] ISF      A=0 B=0 C=0 D=0 
+00005 [L651] JMP      A=1 B=128 C=40 D=32808 target=46
+00006 [L652] UGET     A=1 B=0 C=0 D=0 cclog
+00007 [L652] KSTR     A=2 B=0 C=1 D=1 '------result          ='
+00008 [L652] TGETS    A=3 B=0 C=2 D=2 'result'
+00009 [L652] IST      A=0 B=0 C=3 D=3 
+00010 [L652] JMP      A=4 B=128 C=1 D=32769 target=12
+00011 [L652] KSTR     A=3 B=0 C=3 D=3 'nil'
+00012 [L652] CAT      A=2 B=2 C=3 D=515 
+00013 [L652] CALL     A=1 B=1 C=2 D=258 
+00014 [L653] UGET     A=1 B=0 C=0 D=0 cclog
+00015 [L653] KSTR     A=2 B=0 C=4 D=4 '------order_id        ='
+00016 [L653] TGETS    A=3 B=0 C=5 D=5 'order_id'
+00017 [L653] IST      A=0 B=0 C=3 D=3 
+00018 [L653] JMP      A=4 B=128 C=1 D=32769 target=20
+00019 [L653] KSTR     A=3 B=0 C=3 D=3 'nil'
+00020 [L653] CAT      A=2 B=2 C=3 D=515 
+00021 [L653] CALL     A=1 B=1 C=2 D=258 
+00022 [L654] UGET     A=1 B=0 C=0 D=0 cclog
+00023 [L654] KSTR     A=2 B=0 C=6 D=6 '------gold_count      ='
+00024 [L654] TGETS    A=3 B=0 C=7 D=7 'gold_count'
+00025 [L654] IST      A=0 B=0 C=3 D=3 
+00026 [L654] JMP      A=4 B=128 C=1 D=32769 target=28
+00027 [L654] KSTR     A=3 B=0 C=3 D=3 'nil'
+00028 [L654] CAT      A=2 B=2 C=3 D=515 
+00029 [L654] CALL     A=1 B=1 C=2 D=258 
+00030 [L655] UGET     A=1 B=0 C=0 D=0 cclog
+00031 [L655] KSTR     A=2 B=0 C=8 D=8 '------plus_count      ='
+00032 [L655] TGETS    A=3 B=0 C=9 D=9 'plus_count'
+00033 [L655] IST      A=0 B=0 C=3 D=3 
+00034 [L655] JMP      A=4 B=128 C=1 D=32769 target=36
+00035 [L655] KSTR     A=3 B=0 C=3 D=3 'nil'
+00036 [L655] CAT      A=2 B=2 C=3 D=515 
+00037 [L655] CALL     A=1 B=1 C=2 D=258 
+00038 [L656] UGET     A=1 B=0 C=0 D=0 cclog
+00039 [L656] KSTR     A=2 B=0 C=10 D=10 '------summary         ='
+00040 [L656] TGETS    A=3 B=0 C=11 D=11 'receipt_summary'
+00041 [L656] IST      A=0 B=0 C=3 D=3 
+00042 [L656] JMP      A=4 B=128 C=1 D=32769 target=44
+00043 [L656] KSTR     A=3 B=0 C=3 D=3 'nil'
+00044 [L656] CAT      A=2 B=2 C=3 D=515 
+00045 [L656] CALL     A=1 B=1 C=2 D=258 
+00046 [L659] GGET     A=1 B=0 C=12 D=12 'd_ms'
+00047 [L659] TGETS    A=1 B=1 C=13 D=269 'd_tp_config'
+00048 [L659] TGETS    A=1 B=1 C=14 D=270 'getThirdPartyFlag'
+00049 [L659] CALL     A=1 B=2 C=1 D=513 
+00050 [L660] GGET     A=2 B=0 C=12 D=12 'd_ms'
+00051 [L660] TGETS    A=2 B=2 C=13 D=525 'd_tp_config'
+00052 [L660] TGETS    A=2 B=2 C=15 D=527 'ThirdPlatformDef'
+00053 [L661] TGETS    A=3 B=2 C=16 D=528 'ios'
+00054 [L661] ISEQV    A=1 B=0 C=3 D=3 
+00055 [L661] JMP      A=3 B=128 C=6 D=32774 target=62
+00056 [L661] TGETS    A=3 B=2 C=17 D=529 'ios_tw'
+00057 [L661] ISEQV    A=1 B=0 C=3 D=3 
+00058 [L661] JMP      A=3 B=128 C=3 D=32771 target=62
+00059 [L661] TGETS    A=3 B=2 C=18 D=530 'tw_i'
+00060 [L661] ISNEV    A=1 B=0 C=3 D=3 
+00061 [L661] JMP      A=3 B=128 C=133 D=32901 target=195
+00062 [L662] ISF      A=0 B=0 C=0 D=0 
+00063 [L662] JMP      A=3 B=128 C=131 D=32899 target=195
+00064 [L662] TGETS    A=3 B=0 C=2 D=2 'result'
+00065 [L662] ISF      A=0 B=0 C=3 D=3 
+00066 [L662] JMP      A=4 B=128 C=128 D=32896 target=195
+00067 [L662] TGETS    A=3 B=0 C=11 D=11 'receipt_summary'
+00068 [L662] ISF      A=0 B=0 C=3 D=3 
+00069 [L662] JMP      A=4 B=128 C=125 D=32893 target=195
+00070 [L663] TGETS    A=3 B=0 C=2 D=2 'result'
+00071 [L663] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00072 [L663] TGETS    A=4 B=4 C=19 D=1043 'd_common_def'
+00073 [L663] TGETS    A=4 B=4 C=20 D=1044 'client_order_result'
+00074 [L663] TGETS    A=4 B=4 C=21 D=1045 'order_gold_success'
+00075 [L663] ISEQV    A=3 B=0 C=4 D=4 
+00076 [L663] JMP      A=3 B=128 C=7 D=32775 target=84
+00077 [L663] TGETS    A=3 B=0 C=2 D=2 'result'
+00078 [L663] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00079 [L663] TGETS    A=4 B=4 C=19 D=1043 'd_common_def'
+00080 [L663] TGETS    A=4 B=4 C=20 D=1044 'client_order_result'
+00081 [L663] TGETS    A=4 B=4 C=22 D=1046 'order_finished'
+00082 [L663] ISNEV    A=3 B=0 C=4 D=4 
+00083 [L663] JMP      A=3 B=128 C=13 D=32781 target=97
+00084 [L664] UGET     A=3 B=0 C=1 D=1 main_server
+00085 [L664] TGETS    A=3 B=3 C=23 D=791 'thirdPartyIOSPurchaseResult'
+00086 [L664] TGETS    A=4 B=0 C=11 D=11 'receipt_summary'
+00087 [L664] CALL     A=3 B=1 C=2 D=258 
+00088 [L665] GGET     A=3 B=0 C=12 D=12 'd_ms'
+00089 [L665] TGETS    A=3 B=3 C=24 D=792 'd_file'
+00090 [L665] TGETS    A=3 B=3 C=25 D=793 'set'
+00091 [L665] KSTR     A=4 B=0 C=26 D=26 'LIPR'
+00092 [L665] KSTR     A=5 B=0 C=27 D=27 ''
+00093 [L665] CALL     A=3 B=1 C=3 D=259 
+00094 [L666] KPRI     A=3 B=0 C=1 D=1 
+00095 [L666] GSET     A=3 B=0 C=28 D=28 'g_lipr_4_has_return'
+00096 [L666] JMP      A=3 B=128 C=98 D=32866 target=195
+00097 [L667] TGETS    A=3 B=0 C=2 D=2 'result'
+00098 [L667] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00099 [L667] TGETS    A=4 B=4 C=19 D=1043 'd_common_def'
+00100 [L667] TGETS    A=4 B=4 C=20 D=1044 'client_order_result'
+00101 [L667] TGETS    A=4 B=4 C=29 D=1053 'order_server_error'
+00102 [L667] ISNEV    A=3 B=0 C=4 D=4 
+00103 [L667] JMP      A=3 B=128 C=11 D=32779 target=115
+00104 [L668] GGET     A=3 B=0 C=12 D=12 'd_ms'
+00105 [L668] TGETS    A=3 B=3 C=30 D=798 'd_info'
+00106 [L668] TGETS    A=3 B=3 C=31 D=799 'show'
+00107 [L668] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00108 [L668] TGETS    A=4 B=4 C=32 D=1056 'd_hz'
+00109 [L668] TGETS    A=4 B=4 C=33 D=1057 'gethz'
+00110 [L668] KSTR     A=5 B=0 C=29 D=29 'order_server_error'
+00111 [L668] CALL     A=4 B=0 C=2 D=2 
+00112 [L668] CALLM    A=3 B=1 C=0 D=256 
+00113 [L669] RET0     A=0 B=0 C=1 D=1 
+00114 [L669] JMP      A=3 B=128 C=80 D=32848 target=195
+00115 [L670] TGETS    A=3 B=0 C=2 D=2 'result'
+00116 [L670] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00117 [L670] TGETS    A=4 B=4 C=19 D=1043 'd_common_def'
+00118 [L670] TGETS    A=4 B=4 C=20 D=1044 'client_order_result'
+00119 [L670] TGETS    A=4 B=4 C=34 D=1058 'order_status_error'
+00120 [L670] ISNEV    A=3 B=0 C=4 D=4 
+00121 [L670] JMP      A=3 B=128 C=11 D=32779 target=133
+00122 [L671] GGET     A=3 B=0 C=12 D=12 'd_ms'
+00123 [L671] TGETS    A=3 B=3 C=30 D=798 'd_info'
+00124 [L671] TGETS    A=3 B=3 C=31 D=799 'show'
+00125 [L671] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00126 [L671] TGETS    A=4 B=4 C=32 D=1056 'd_hz'
+00127 [L671] TGETS    A=4 B=4 C=33 D=1057 'gethz'
+00128 [L671] KSTR     A=5 B=0 C=34 D=34 'order_status_error'
+00129 [L671] CALL     A=4 B=0 C=2 D=2 
+00130 [L671] CALLM    A=3 B=1 C=0 D=256 
+00131 [L672] RET0     A=0 B=0 C=1 D=1 
+00132 [L672] JMP      A=3 B=128 C=62 D=32830 target=195
+00133 [L673] TGETS    A=3 B=0 C=2 D=2 'result'
+00134 [L673] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00135 [L673] TGETS    A=4 B=4 C=19 D=1043 'd_common_def'
+00136 [L673] TGETS    A=4 B=4 C=20 D=1044 'client_order_result'
+00137 [L673] TGETS    A=4 B=4 C=35 D=1059 'order_data_error'
+00138 [L673] ISEQV    A=3 B=0 C=4 D=4 
+00139 [L673] JMP      A=3 B=128 C=7 D=32775 target=147
+00140 [L673] TGETS    A=3 B=0 C=2 D=2 'result'
+00141 [L673] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00142 [L673] TGETS    A=4 B=4 C=19 D=1043 'd_common_def'
+00143 [L673] TGETS    A=4 B=4 C=20 D=1044 'client_order_result'
+00144 [L673] TGETS    A=4 B=4 C=36 D=1060 'order_input_error'
+00145 [L673] ISNEV    A=3 B=0 C=4 D=4 
+00146 [L673] JMP      A=3 B=128 C=11 D=32779 target=158
+00147 [L674] GGET     A=3 B=0 C=12 D=12 'd_ms'
+00148 [L674] TGETS    A=3 B=3 C=30 D=798 'd_info'
+00149 [L674] TGETS    A=3 B=3 C=31 D=799 'show'
+00150 [L674] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00151 [L674] TGETS    A=4 B=4 C=32 D=1056 'd_hz'
+00152 [L674] TGETS    A=4 B=4 C=33 D=1057 'gethz'
+00153 [L674] KSTR     A=5 B=0 C=35 D=35 'order_data_error'
+00154 [L674] CALL     A=4 B=0 C=2 D=2 
+00155 [L674] CALLM    A=3 B=1 C=0 D=256 
+00156 [L675] RET0     A=0 B=0 C=1 D=1 
+00157 [L675] JMP      A=3 B=128 C=37 D=32805 target=195
+00158 [L676] TGETS    A=3 B=0 C=2 D=2 'result'
+00159 [L676] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00160 [L676] TGETS    A=4 B=4 C=19 D=1043 'd_common_def'
+00161 [L676] TGETS    A=4 B=4 C=20 D=1044 'client_order_result'
+00162 [L676] TGETS    A=4 B=4 C=37 D=1061 'order_processing'
+00163 [L676] ISNEV    A=3 B=0 C=4 D=4 
+00164 [L676] JMP      A=3 B=128 C=11 D=32779 target=176
+00165 [L677] GGET     A=3 B=0 C=12 D=12 'd_ms'
+00166 [L677] TGETS    A=3 B=3 C=30 D=798 'd_info'
+00167 [L677] TGETS    A=3 B=3 C=31 D=799 'show'
+00168 [L677] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00169 [L677] TGETS    A=4 B=4 C=32 D=1056 'd_hz'
+00170 [L677] TGETS    A=4 B=4 C=33 D=1057 'gethz'
+00171 [L677] KSTR     A=5 B=0 C=37 D=37 'order_processing'
+00172 [L677] CALL     A=4 B=0 C=2 D=2 
+00173 [L677] CALLM    A=3 B=1 C=0 D=256 
+00174 [L678] RET0     A=0 B=0 C=1 D=1 
+00175 [L678] JMP      A=3 B=128 C=19 D=32787 target=195
+00176 [L679] TGETS    A=3 B=0 C=2 D=2 'result'
+00177 [L679] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00178 [L679] TGETS    A=4 B=4 C=19 D=1043 'd_common_def'
+00179 [L679] TGETS    A=4 B=4 C=20 D=1044 'client_order_result'
+00180 [L679] TGETS    A=4 B=4 C=38 D=1062 'order_frequently'
+00181 [L679] ISNEV    A=3 B=0 C=4 D=4 
+00182 [L679] JMP      A=3 B=128 C=11 D=32779 target=194
+00183 [L680] GGET     A=3 B=0 C=12 D=12 'd_ms'
+00184 [L680] TGETS    A=3 B=3 C=30 D=798 'd_info'
+00185 [L680] TGETS    A=3 B=3 C=31 D=799 'show'
+00186 [L680] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00187 [L680] TGETS    A=4 B=4 C=32 D=1056 'd_hz'
+00188 [L680] TGETS    A=4 B=4 C=33 D=1057 'gethz'
+00189 [L680] KSTR     A=5 B=0 C=38 D=38 'order_frequently'
+00190 [L680] CALL     A=4 B=0 C=2 D=2 
+00191 [L680] CALLM    A=3 B=1 C=0 D=256 
+00192 [L681] RET0     A=0 B=0 C=1 D=1 
+00193 [L681] JMP      A=3 B=128 C=1 D=32769 target=195
+00194 [L683] RET0     A=0 B=0 C=1 D=1 
+00195 [L689] TGETS    A=3 B=0 C=2 D=2 'result'
+00196 [L689] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00197 [L689] TGETS    A=4 B=4 C=19 D=1043 'd_common_def'
+00198 [L689] TGETS    A=4 B=4 C=20 D=1044 'client_order_result'
+00199 [L689] TGETS    A=4 B=4 C=21 D=1045 'order_gold_success'
+00200 [L689] ISEQV    A=3 B=0 C=4 D=4 
+00201 [L689] JMP      A=3 B=128 C=7 D=32775 target=209
+00202 [L689] TGETS    A=3 B=0 C=2 D=2 'result'
+00203 [L689] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00204 [L689] TGETS    A=4 B=4 C=19 D=1043 'd_common_def'
+00205 [L689] TGETS    A=4 B=4 C=20 D=1044 'client_order_result'
+00206 [L689] TGETS    A=4 B=4 C=22 D=1046 'order_finished'
+00207 [L689] ISNEV    A=3 B=0 C=4 D=4 
+00208 [L689] JMP      A=3 B=128 C=68 D=32836 target=277
+00209 [L690] TGETS    A=3 B=0 C=39 D=39 'item_type'
+00210 [L690] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00211 [L690] TGETS    A=4 B=4 C=19 D=1043 'd_common_def'
+00212 [L690] TGETS    A=4 B=4 C=40 D=1064 'order_item_type'
+00213 [L690] TGETS    A=4 B=4 C=41 D=1065 'charge_month_card'
+00214 [L690] ISNEV    A=3 B=0 C=4 D=4 
+00215 [L690] JMP      A=3 B=128 C=10 D=32778 target=226
+00216 [L691] GGET     A=3 B=0 C=12 D=12 'd_ms'
+00217 [L691] TGETS    A=3 B=3 C=30 D=798 'd_info'
+00218 [L691] TGETS    A=3 B=3 C=31 D=799 'show'
+00219 [L691] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00220 [L691] TGETS    A=4 B=4 C=32 D=1056 'd_hz'
+00221 [L691] TGETS    A=4 B=4 C=33 D=1057 'gethz'
+00222 [L691] KSTR     A=5 B=0 C=42 D=42 'buyMonthCardSucc'
+00223 [L691] CALL     A=4 B=0 C=2 D=2 
+00224 [L691] CALLM    A=3 B=1 C=0 D=256 
+00225 [L691] JMP      A=3 B=128 C=83 D=32851 target=309
+00226 [L692] TGETS    A=3 B=0 C=39 D=39 'item_type'
+00227 [L692] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00228 [L692] TGETS    A=4 B=4 C=19 D=1043 'd_common_def'
+00229 [L692] TGETS    A=4 B=4 C=40 D=1064 'order_item_type'
+00230 [L692] TGETS    A=4 B=4 C=43 D=1067 'charge_gold'
+00231 [L692] ISNEV    A=3 B=0 C=4 D=4 
+00232 [L692] JMP      A=3 B=128 C=38 D=32806 target=271
+00233 [L692] ISF      A=0 B=0 C=0 D=0 
+00234 [L692] JMP      A=3 B=128 C=36 D=32804 target=271
+00235 [L692] TGETS    A=3 B=0 C=7 D=7 'gold_count'
+00236 [L692] ISF      A=0 B=0 C=3 D=3 
+00237 [L692] JMP      A=4 B=128 C=33 D=32801 target=271
+00238 [L692] TGETS    A=3 B=0 C=9 D=9 'plus_count'
+00239 [L692] ISF      A=0 B=0 C=3 D=3 
+00240 [L692] JMP      A=4 B=128 C=30 D=32798 target=271
+00241 [L693] UGET     A=3 B=0 C=2 D=2 tonumber
+00242 [L693] TGETS    A=4 B=0 C=7 D=7 'gold_count'
+00243 [L693] CALL     A=3 B=2 C=2 D=514 
+00244 [L694] UGET     A=4 B=0 C=2 D=2 tonumber
+00245 [L694] TGETS    A=5 B=0 C=9 D=9 'plus_count'
+00246 [L694] CALL     A=4 B=2 C=2 D=514 
+00247 [L695] GGET     A=5 B=0 C=12 D=12 'd_ms'
+00248 [L695] TGETS    A=5 B=5 C=30 D=1310 'd_info'
+00249 [L695] TGETS    A=5 B=5 C=31 D=1311 'show'
+00250 [L695] UGET     A=6 B=0 C=3 D=3 string
+00251 [L695] TGETS    A=6 B=6 C=44 D=1580 'format'
+00252 [L695] GGET     A=7 B=0 C=12 D=12 'd_ms'
+00253 [L695] TGETS    A=7 B=7 C=32 D=1824 'd_hz'
+00254 [L695] TGETS    A=7 B=7 C=33 D=1825 'gethz'
+00255 [L695] KSTR     A=8 B=0 C=45 D=45 'recharge_amount'
+00256 [L695] CALL     A=7 B=2 C=2 D=514 
+00257 [L695] ADDVV    A=8 B=3 C=4 D=772 
+00258 [L695] CALL     A=6 B=0 C=3 D=3 
+00259 [L695] CALLM    A=5 B=1 C=0 D=256 
+00260 [L697] GGET     A=5 B=0 C=12 D=12 'd_ms'
+00261 [L697] TGETS    A=5 B=5 C=46 D=1326 'd_rechargeUI'
+00262 [L697] TGETS    A=5 B=5 C=47 D=1327 'g_self'
+00263 [L697] TGETS    A=5 B=5 C=48 D=1328 'main_layer'
+00264 [L697] ISF      A=0 B=0 C=5 D=5 
+00265 [L697] JMP      A=6 B=128 C=43 D=32811 target=309
+00266 [L698] GGET     A=5 B=0 C=12 D=12 'd_ms'
+00267 [L698] TGETS    A=5 B=5 C=46 D=1326 'd_rechargeUI'
+00268 [L698] TGETS    A=5 B=5 C=49 D=1329 'onReceiveRechargeResult'
+00269 [L698] CALL     A=5 B=1 C=1 D=257 
+00270 [L699] JMP      A=3 B=128 C=38 D=32806 target=309
+00271 [L701] UGET     A=3 B=0 C=0 D=0 cclog
+00272 [L701] KSTR     A=4 B=0 C=50 D=50 'ERROR: send_order_result item_type error='
+00273 [L701] TGETS    A=5 B=0 C=39 D=39 'item_type'
+00274 [L701] CAT      A=4 B=4 C=5 D=1029 
+00275 [L701] CALL     A=3 B=1 C=2 D=258 
+00276 [L702] JMP      A=3 B=128 C=32 D=32800 target=309
+00277 [L703] TGETS    A=3 B=0 C=2 D=2 'result'
+00278 [L703] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00279 [L703] TGETS    A=4 B=4 C=19 D=1043 'd_common_def'
+00280 [L703] TGETS    A=4 B=4 C=20 D=1044 'client_order_result'
+00281 [L703] TGETS    A=4 B=4 C=38 D=1062 'order_frequently'
+00282 [L703] ISNEV    A=3 B=0 C=4 D=4 
+00283 [L703] JMP      A=3 B=128 C=13 D=32781 target=297
+00284 [L704] UGET     A=3 B=0 C=0 D=0 cclog
+00285 [L704] KSTR     A=4 B=0 C=51 D=51 'ERROR:data_table order_frequently'
+00286 [L704] CALL     A=3 B=1 C=2 D=258 
+00287 [L705] GGET     A=3 B=0 C=12 D=12 'd_ms'
+00288 [L705] TGETS    A=3 B=3 C=30 D=798 'd_info'
+00289 [L705] TGETS    A=3 B=3 C=31 D=799 'show'
+00290 [L705] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00291 [L705] TGETS    A=4 B=4 C=32 D=1056 'd_hz'
+00292 [L705] TGETS    A=4 B=4 C=33 D=1057 'gethz'
+00293 [L705] KSTR     A=5 B=0 C=52 D=52 'get_order_frequently'
+00294 [L705] CALL     A=4 B=0 C=2 D=2 
+00295 [L705] CALLM    A=3 B=1 C=0 D=256 
+00296 [L705] JMP      A=3 B=128 C=12 D=32780 target=309
+00297 [L707] UGET     A=3 B=0 C=0 D=0 cclog
+00298 [L707] KSTR     A=4 B=0 C=53 D=53 'ERROR:data_table null'
+00299 [L707] CALL     A=3 B=1 C=2 D=258 
+00300 [L708] GGET     A=3 B=0 C=12 D=12 'd_ms'
+00301 [L708] TGETS    A=3 B=3 C=30 D=798 'd_info'
+00302 [L708] TGETS    A=3 B=3 C=31 D=799 'show'
+00303 [L708] GGET     A=4 B=0 C=12 D=12 'd_ms'
+00304 [L708] TGETS    A=4 B=4 C=32 D=1056 'd_hz'
+00305 [L708] TGETS    A=4 B=4 C=33 D=1057 'gethz'
+00306 [L708] KSTR     A=5 B=0 C=54 D=54 'txt_get_order_fail'
+00307 [L708] CALL     A=4 B=0 C=2 D=2 
+00308 [L708] CALLM    A=3 B=1 C=0 D=256 
+00309 [L711] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto15 offset=0x52f4 source_lines=714-717 params=0
+UPVALUES ['main_server']
+00001 [L715] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L715] TGETS    A=0 B=0 C=1 D=1 'd_alert'
+00003 [L715] TGETS    A=0 B=0 C=2 D=2 'start_wait'
+00004 [L715] KPRI     A=1 B=0 C=0 D=0 
+00005 [L715] KSHORT   A=2 B=0 C=15 D=15 15
+00006 [L715] GGET     A=3 B=0 C=3 D=3 'recharge_getBalance_fail'
+00007 [L715] CALL     A=0 B=2 C=4 D=516 
+00008 [L715] GSET     A=0 B=0 C=4 D=4 'g_last_alter_id'
+00009 [L716] UGET     A=0 B=0 C=0 D=0 main_server
+00010 [L716] TGETS    A=0 B=0 C=5 D=5 'thirdPartyPlatformRefreshBalance'
+00011 [L716] CALL     A=0 B=1 C=1 D=257 
+00012 [L717] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto16 offset=0x53ad source_lines=720-722 params=0
+UPVALUES []
+00001 [L721] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L721] TGETS    A=0 B=0 C=1 D=1 'd_info'
+00003 [L721] TGETS    A=0 B=0 C=2 D=2 'show'
+00004 [L721] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00005 [L721] TGETS    A=1 B=1 C=3 D=259 'd_hz'
+00006 [L721] TGETS    A=1 B=1 C=4 D=260 'gethz'
+00007 [L721] KSTR     A=2 B=0 C=5 D=5 'recharge_getBalance_fail'
+00008 [L721] CALL     A=1 B=0 C=2 D=2 
+00009 [L721] CALLM    A=0 B=1 C=0 D=256 
+00010 [L722] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto17 offset=0x5422 source_lines=0-723 params=0
+UPVALUES []
+00001 [L7] GGET     A=0 B=0 C=0 D=0 'require'
+00002 [L8] GGET     A=1 B=0 C=1 D=1 'bits'
+00003 [L9] GGET     A=2 B=0 C=2 D=2 'type'
+00004 [L10] GGET     A=3 B=0 C=3 D=3 'table'
+00005 [L11] GGET     A=4 B=0 C=4 D=4 'os'
+00006 [L12] GGET     A=5 B=0 C=5 D=5 'io'
+00007 [L13] GGET     A=6 B=0 C=6 D=6 '_G'
+00008 [L14] GGET     A=7 B=0 C=7 D=7 'pairs'
+00009 [L15] GGET     A=8 B=0 C=8 D=8 'string'
+00010 [L16] GGET     A=9 B=0 C=9 D=9 'math'
+00011 [L17] GGET     A=10 B=0 C=10 D=10 'print'
+00012 [L18] GGET     A=11 B=0 C=11 D=11 'CCLuaLog'
+00013 [L19] GGET     A=12 B=0 C=12 D=12 'tostring'
+00014 [L20] GGET     A=13 B=0 C=13 D=13 'sqlite'
+00015 [L21] GGET     A=14 B=0 C=14 D=14 'main_server'
+00016 [L22] GGET     A=15 B=0 C=15 D=15 'package'
+00017 [L23] GGET     A=16 B=0 C=16 D=16 'tonumber'
+00018 [L24] GGET     A=17 B=0 C=17 D=17 'CCDirector'
+00019 [L27] GGET     A=18 B=0 C=18 D=18 'module'
+00020 [L27] KSTR     A=19 B=0 C=19 D=19 'common.recharge'
+00021 [L27] CALL     A=18 B=1 C=2 D=258 
+00022 [L29] MOV      A=18 B=0 C=0 D=0 
+00023 [L29] KSTR     A=19 B=0 C=20 D=20 'ms'
+00024 [L29] CALL     A=18 B=2 C=2 D=514 
+00025 [L29] GSET     A=18 B=0 C=21 D=21 'd_ms'
+00026 [L30] GGET     A=18 B=0 C=21 D=21 'd_ms'
+00027 [L30] IST      A=0 B=0 C=18 D=18 
+00028 [L30] JMP      A=18 B=128 C=3 D=32771 target=32
+00029 [L31] MOV      A=18 B=0 C=11 D=11 
+00030 [L31] KSTR     A=19 B=0 C=22 D=22 'mg_client load d_ms fail.'
+00031 [L31] CALL     A=18 B=1 C=2 D=258 
+00032 [L35] FNEW     A=18 B=0 C=23 D=23 {'kind': 'proto', 'id': 0}
+00033 [L37] KSHORT   A=19 B=0 C=0 D=0 0
+00034 [L37] GSET     A=19 B=0 C=24 D=24 'g_last_alter_id'
+00035 [L38] GGET     A=19 B=0 C=21 D=21 'd_ms'
+00036 [L38] TGETS    A=19 B=19 C=25 D=4889 'd_tp_config'
+00037 [L38] TGETS    A=19 B=19 C=26 D=4890 'ThirdPlatformDef'
+00038 [L48] FNEW     A=20 B=0 C=27 D=27 {'kind': 'proto', 'id': 1}
+00039 [L40] GSET     A=20 B=0 C=28 D=28 'recharge_For_IOS'
+00040 [L52] KPRI     A=20 B=0 C=1 D=1 
+00041 [L52] GSET     A=20 B=0 C=29 D=29 'g_lipr_4_has_return'
+00042 [L72] FNEW     A=20 B=0 C=30 D=30 {'kind': 'proto', 'id': 3}
+00043 [L53] GSET     A=20 B=0 C=31 D=31 'checkUnfinished_ios4'
+00044 [L106] FNEW     A=20 B=0 C=32 D=32 {'kind': 'proto', 'id': 4}
+00045 [L76] GSET     A=20 B=0 C=33 D=33 'pressBuyYYB'
+00046 [L135] FNEW     A=20 B=0 C=34 D=34 {'kind': 'proto', 'id': 5}
+00047 [L108] GSET     A=20 B=0 C=35 D=35 'buy_item_yyb'
+00048 [L147] FNEW     A=20 B=0 C=36 D=36 {'kind': 'proto', 'id': 6}
+00049 [L138] GSET     A=20 B=0 C=37 D=37 'recharge_order_request'
+00050 [L193] FNEW     A=20 B=0 C=38 D=38 {'kind': 'proto', 'id': 8}
+00051 [L151] GSET     A=20 B=0 C=39 D=39 'recharge_order_query'
+00052 [L644] FNEW     A=20 B=0 C=40 D=40 {'kind': 'proto', 'id': 13}
+00053 [L199] GSET     A=20 B=0 C=41 D=41 'callback_send_order_id'
+00054 [L711] FNEW     A=20 B=0 C=42 D=42 {'kind': 'proto', 'id': 14}
+00055 [L648] GSET     A=20 B=0 C=43 D=43 'callback_send_order_result'
+00056 [L717] FNEW     A=20 B=0 C=44 D=44 {'kind': 'proto', 'id': 15}
+00057 [L714] GSET     A=20 B=0 C=45 D=45 'recharge_getBalance'
+00058 [L722] FNEW     A=20 B=0 C=46 D=46 {'kind': 'proto', 'id': 16}
+00059 [L720] GSET     A=20 B=0 C=47 D=47 'recharge_getBalance_fail'
+00060 [L722] UCLO     A=0 B=128 C=0 D=32768 target=61
+00061 [L722] RET0     A=0 B=0 C=1 D=1 

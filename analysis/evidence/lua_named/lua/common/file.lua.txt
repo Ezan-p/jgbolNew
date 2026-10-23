@@ -1,0 +1,647 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\8e0f2c3f7ad5499baab3ba76a60cc4aa.data'; root=proto22
+
+FUNCTION proto0 offset=0x4a source_lines=19-21 params=0
+UPVALUES ['CCLuaLog', 'string']
+00001 [L20] UGET     A=0 B=0 C=0 D=0 CCLuaLog
+00002 [L20] UGET     A=1 B=0 C=1 D=1 string
+00003 [L20] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L20] VARG     A=2 B=0 C=0 D=0 
+00005 [L20] CALLM    A=1 B=0 C=0 D=0 
+00006 [L20] CALLM    A=0 B=1 C=0 D=256 
+00007 [L21] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x94 source_lines=29-31 params=1
+UPVALUES []
+00001 [L30] GGET     A=1 B=0 C=0 D=0 'readCCstringFromFile'
+00002 [L30] MOV      A=2 B=0 C=0 D=0 
+00003 [L30] CALLT    A=1 B=0 C=2 D=2 
+
+FUNCTION proto2 offset=0xcf source_lines=33-35 params=2
+UPVALUES []
+00001 [L34] GGET     A=2 B=0 C=0 D=0 'writeCCStringToFile'
+00002 [L34] MOV      A=3 B=0 C=0 D=0 
+00003 [L34] MOV      A=4 B=0 C=1 D=1 
+00004 [L34] CALLT    A=2 B=0 C=3 D=3 
+
+FUNCTION proto3 offset=0x11a source_lines=41-47 params=1
+UPVALUES ['CCString']
+00001 [L42] UGET     A=1 B=0 C=0 D=0 CCString
+00002 [L42] MOV      A=2 B=0 C=1 D=1 
+00003 [L42] TGETS    A=1 B=1 C=0 D=256 'createWithContentsOfFile'
+00004 [L42] MOV      A=3 B=0 C=0 D=0 
+00005 [L42] CALL     A=1 B=2 C=3 D=515 
+00006 [L43] IST      A=0 B=0 C=1 D=1 
+00007 [L43] JMP      A=2 B=128 C=6 D=32774 target=14
+00008 [L44] UGET     A=2 B=0 C=0 D=0 CCString
+00009 [L44] MOV      A=3 B=0 C=2 D=2 
+00010 [L44] TGETS    A=2 B=2 C=1 D=513 'create'
+00011 [L44] KSTR     A=4 B=0 C=2 D=2 ''
+00012 [L44] CALL     A=2 B=2 C=3 D=515 
+00013 [L44] MOV      A=1 B=0 C=2 D=2 
+00014 [L46] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto4 offset=0x1af source_lines=54-61 params=2
+UPVALUES ['main_server', 'cclog']
+00001 [L55] KSHORT   A=2 B=0 C=0 D=0 0
+00002 [L56] LEN      A=3 B=0 C=0 D=0 
+00003 [L56] KSHORT   A=4 B=0 C=0 D=0 0
+00004 [L56] ISGE     A=4 B=0 C=3 D=3 
+00005 [L56] JMP      A=3 B=128 C=17 D=32785 target=23
+00006 [L56] MOV      A=4 B=0 C=1 D=1 
+00007 [L56] TGETS    A=3 B=1 C=0 D=256 'length'
+00008 [L56] CALL     A=3 B=2 C=2 D=514 
+00009 [L56] KSHORT   A=4 B=0 C=0 D=0 0
+00010 [L56] ISGE     A=4 B=0 C=3 D=3 
+00011 [L56] JMP      A=3 B=128 C=11 D=32779 target=23
+00012 [L57] UGET     A=3 B=0 C=0 D=0 main_server
+00013 [L57] TGETS    A=3 B=3 C=1 D=769 'write_file'
+00014 [L57] MOV      A=4 B=0 C=0 D=0 
+00015 [L57] MOV      A=6 B=0 C=1 D=1 
+00016 [L57] TGETS    A=5 B=1 C=2 D=258 'getCString'
+00017 [L57] CALL     A=5 B=2 C=2 D=514 
+00018 [L57] MOV      A=7 B=0 C=1 D=1 
+00019 [L57] TGETS    A=6 B=1 C=0 D=256 'length'
+00020 [L57] CALL     A=6 B=0 C=2 D=2 
+00021 [L57] CALLM    A=3 B=2 C=2 D=514 
+00022 [L57] MOV      A=2 B=0 C=3 D=3 
+00023 [L59] UGET     A=3 B=0 C=1 D=1 cclog
+00024 [L59] KSTR     A=4 B=0 C=3 D=3 'call writeCCStringToFile, write_size=%d'
+00025 [L59] MOV      A=5 B=0 C=2 D=2 
+00026 [L59] CALL     A=3 B=1 C=3 D=259 
+00027 [L60] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto5 offset=0x2c6 source_lines=64-74 params=2
+UPVALUES ['io', 'cclog']
+00001 [L65] UGET     A=2 B=0 C=0 D=0 io
+00002 [L65] TGETS    A=2 B=2 C=0 D=512 'open'
+00003 [L65] MOV      A=3 B=0 C=0 D=0 
+00004 [L65] KSTR     A=4 B=0 C=1 D=1 'a+'
+00005 [L65] CALL     A=2 B=2 C=3 D=515 
+00006 [L66] IST      A=0 B=0 C=2 D=2 
+00007 [L66] JMP      A=3 B=128 C=5 D=32773 target=13
+00008 [L67] UGET     A=3 B=0 C=1 D=1 cclog
+00009 [L67] KSTR     A=4 B=0 C=2 D=2 'ERROR: open file [%s]'
+00010 [L67] MOV      A=5 B=0 C=0 D=0 
+00011 [L67] CALL     A=3 B=1 C=3 D=259 
+00012 [L67] JMP      A=3 B=128 C=10 D=32778 target=23
+00013 [L69] MOV      A=4 B=0 C=2 D=2 
+00014 [L69] TGETS    A=3 B=2 C=3 D=515 'write'
+00015 [L69] MOV      A=5 B=0 C=1 D=1 
+00016 [L69] CALL     A=3 B=1 C=3 D=259 
+00017 [L70] MOV      A=4 B=0 C=2 D=2 
+00018 [L70] TGETS    A=3 B=2 C=4 D=516 'flush'
+00019 [L70] CALL     A=3 B=1 C=2 D=258 
+00020 [L71] MOV      A=4 B=0 C=2 D=2 
+00021 [L71] TGETS    A=3 B=2 C=5 D=517 'close'
+00022 [L71] CALL     A=3 B=1 C=2 D=258 
+00023 [L73] UGET     A=3 B=0 C=1 D=1 cclog
+00024 [L73] KSTR     A=4 B=0 C=6 D=6 'call appendFile ok.'
+00025 [L73] CALL     A=3 B=1 C=2 D=258 
+00026 [L74] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x3c6 source_lines=77-87 params=1
+UPVALUES ['io', 'cclog']
+00001 [L78] KSHORT   A=1 B=0 C=0 D=0 0
+00002 [L79] UGET     A=2 B=0 C=0 D=0 io
+00003 [L79] TGETS    A=2 B=2 C=0 D=512 'open'
+00004 [L79] MOV      A=3 B=0 C=0 D=0 
+00005 [L79] KSTR     A=4 B=0 C=1 D=1 'rb'
+00006 [L79] CALL     A=2 B=2 C=3 D=515 
+00007 [L80] ISF      A=0 B=0 C=2 D=2 
+00008 [L80] JMP      A=3 B=128 C=8 D=32776 target=17
+00009 [L81] MOV      A=4 B=0 C=2 D=2 
+00010 [L81] TGETS    A=3 B=2 C=2 D=514 'seek'
+00011 [L81] KSTR     A=5 B=0 C=3 D=3 'end'
+00012 [L81] CALL     A=3 B=2 C=3 D=515 
+00013 [L81] MOV      A=1 B=0 C=3 D=3 
+00014 [L82] MOV      A=4 B=0 C=2 D=2 
+00015 [L82] TGETS    A=3 B=2 C=4 D=516 'close'
+00016 [L82] CALL     A=3 B=1 C=2 D=258 
+00017 [L85] UGET     A=3 B=0 C=1 D=1 cclog
+00018 [L85] KSTR     A=4 B=0 C=5 D=5 'call getFileSize, name='
+00019 [L85] MOV      A=5 B=0 C=0 D=0 
+00020 [L85] KSTR     A=6 B=0 C=6 D=6 ', size='
+00021 [L85] MOV      A=7 B=0 C=1 D=1 
+00022 [L85] CAT      A=4 B=4 C=7 D=1031 
+00023 [L85] CALL     A=3 B=1 C=2 D=258 
+00024 [L86] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto7 offset=0x4ab source_lines=91-102 params=1
+UPVALUES ['io', 'cclog']
+00001 [L92] KSTR     A=1 B=0 C=0 D=0 ''
+00002 [L93] UGET     A=2 B=0 C=0 D=0 io
+00003 [L93] TGETS    A=2 B=2 C=1 D=513 'open'
+00004 [L93] MOV      A=3 B=0 C=0 D=0 
+00005 [L93] KSTR     A=4 B=0 C=2 D=2 'rb'
+00006 [L93] CALL     A=2 B=2 C=3 D=515 
+00007 [L94] IST      A=0 B=0 C=2 D=2 
+00008 [L94] JMP      A=3 B=128 C=5 D=32773 target=14
+00009 [L95] UGET     A=3 B=0 C=1 D=1 cclog
+00010 [L95] KSTR     A=4 B=0 C=3 D=3 'ERROR: open file [%s]'
+00011 [L95] MOV      A=5 B=0 C=0 D=0 
+00012 [L95] CALL     A=3 B=1 C=3 D=259 
+00013 [L95] JMP      A=3 B=128 C=8 D=32776 target=22
+00014 [L97] MOV      A=4 B=0 C=2 D=2 
+00015 [L97] TGETS    A=3 B=2 C=4 D=516 'read'
+00016 [L97] KSTR     A=5 B=0 C=5 D=5 '*a'
+00017 [L97] CALL     A=3 B=2 C=3 D=515 
+00018 [L97] MOV      A=1 B=0 C=3 D=3 
+00019 [L98] MOV      A=4 B=0 C=2 D=2 
+00020 [L98] TGETS    A=3 B=2 C=6 D=518 'close'
+00021 [L98] CALL     A=3 B=1 C=2 D=258 
+00022 [L100] UGET     A=3 B=0 C=1 D=1 cclog
+00023 [L100] KSTR     A=4 B=0 C=7 D=7 'call readFile ok.'
+00024 [L100] CALL     A=3 B=1 C=2 D=258 
+00025 [L101] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto8 offset=0x59d source_lines=107-118 params=1
+UPVALUES ['io', 'cclog']
+00001 [L108] KSTR     A=1 B=0 C=0 D=0 ''
+00002 [L109] UGET     A=2 B=0 C=0 D=0 io
+00003 [L109] TGETS    A=2 B=2 C=1 D=513 'open'
+00004 [L109] MOV      A=3 B=0 C=0 D=0 
+00005 [L109] KSTR     A=4 B=0 C=2 D=2 'rb'
+00006 [L109] CALL     A=2 B=2 C=3 D=515 
+00007 [L110] IST      A=0 B=0 C=2 D=2 
+00008 [L110] JMP      A=3 B=128 C=5 D=32773 target=14
+00009 [L111] UGET     A=3 B=0 C=1 D=1 cclog
+00010 [L111] KSTR     A=4 B=0 C=3 D=3 'WARNING: open file [%s]'
+00011 [L111] MOV      A=5 B=0 C=0 D=0 
+00012 [L111] CALL     A=3 B=1 C=3 D=259 
+00013 [L111] JMP      A=3 B=128 C=8 D=32776 target=22
+00014 [L113] MOV      A=4 B=0 C=2 D=2 
+00015 [L113] TGETS    A=3 B=2 C=4 D=516 'read'
+00016 [L113] KSTR     A=5 B=0 C=5 D=5 '*l'
+00017 [L113] CALL     A=3 B=2 C=3 D=515 
+00018 [L113] MOV      A=1 B=0 C=3 D=3 
+00019 [L114] MOV      A=4 B=0 C=2 D=2 
+00020 [L114] TGETS    A=3 B=2 C=6 D=518 'close'
+00021 [L114] CALL     A=3 B=1 C=2 D=258 
+00022 [L116] UGET     A=3 B=0 C=1 D=1 cclog
+00023 [L116] KSTR     A=4 B=0 C=7 D=7 'call readFileFirstLine ok.'
+00024 [L116] CALL     A=3 B=1 C=2 D=258 
+00025 [L117] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto9 offset=0x69a source_lines=123-135 params=2
+UPVALUES ['io', 'cclog']
+00001 [L124] KPRI     A=2 B=0 C=1 D=1 
+00002 [L125] UGET     A=3 B=0 C=0 D=0 io
+00003 [L125] TGETS    A=3 B=3 C=0 D=768 'open'
+00004 [L125] MOV      A=4 B=0 C=0 D=0 
+00005 [L125] KSTR     A=5 B=0 C=1 D=1 'w'
+00006 [L125] CALL     A=3 B=2 C=3 D=515 
+00007 [L126] IST      A=0 B=0 C=3 D=3 
+00008 [L126] JMP      A=4 B=128 C=5 D=32773 target=14
+00009 [L127] UGET     A=4 B=0 C=1 D=1 cclog
+00010 [L127] KSTR     A=5 B=0 C=2 D=2 'ERROR: open file [%s]'
+00011 [L127] MOV      A=6 B=0 C=0 D=0 
+00012 [L127] CALL     A=4 B=1 C=3 D=259 
+00013 [L127] JMP      A=4 B=128 C=14 D=32782 target=28
+00014 [L129] MOV      A=5 B=0 C=3 D=3 
+00015 [L129] TGETS    A=4 B=3 C=3 D=771 'write'
+00016 [L129] MOV      A=6 B=0 C=1 D=1 
+00017 [L129] CALL     A=4 B=2 C=3 D=515 
+00018 [L129] MOV      A=2 B=0 C=4 D=4 
+00019 [L130] MOV      A=5 B=0 C=3 D=3 
+00020 [L130] TGETS    A=4 B=3 C=4 D=772 'flush'
+00021 [L130] CALL     A=4 B=1 C=2 D=258 
+00022 [L131] MOV      A=5 B=0 C=3 D=3 
+00023 [L131] TGETS    A=4 B=3 C=5 D=773 'close'
+00024 [L131] CALL     A=4 B=1 C=2 D=258 
+00025 [L132] UGET     A=4 B=0 C=1 D=1 cclog
+00026 [L132] KSTR     A=5 B=0 C=6 D=6 'call writeFile ok.'
+00027 [L132] CALL     A=4 B=1 C=2 D=258 
+00028 [L134] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto10 offset=0x7a7 source_lines=139-146 params=2
+UPVALUES ['table']
+00001 [L140] ISF      A=0 B=0 C=0 D=0 
+00002 [L140] JMP      A=2 B=128 C=2 D=32770 target=5
+00003 [L140] IST      A=0 B=0 C=1 D=1 
+00004 [L140] JMP      A=2 B=128 C=2 D=32770 target=7
+00005 [L141] KPRI     A=2 B=0 C=1 D=1 
+00006 [L141] RET1     A=2 B=0 C=2 D=2 
+00007 [L144] UGET     A=2 B=0 C=0 D=0 table
+00008 [L144] TGETS    A=2 B=2 C=0 D=512 'tostring'
+00009 [L144] MOV      A=3 B=0 C=0 D=0 
+00010 [L144] CALL     A=2 B=2 C=2 D=514 
+00011 [L145] GGET     A=3 B=0 C=1 D=1 'writeFile'
+00012 [L145] MOV      A=4 B=0 C=1 D=1 
+00013 [L145] MOV      A=5 B=0 C=2 D=2 
+00014 [L145] CALLT    A=3 B=0 C=3 D=3 
+
+FUNCTION proto11 offset=0x826 source_lines=149-158 params=1
+UPVALUES ['table']
+00001 [L150] TNEW     A=1 B=0 C=0 D=0 
+00002 [L151] GGET     A=2 B=0 C=0 D=0 'readFile'
+00003 [L151] MOV      A=3 B=0 C=0 D=0 
+00004 [L151] CALL     A=2 B=2 C=2 D=514 
+00005 [L152] ISF      A=0 B=0 C=2 D=2 
+00006 [L152] JMP      A=3 B=128 C=4 D=32772 target=11
+00007 [L152] LEN      A=3 B=0 C=2 D=2 
+00008 [L152] KSHORT   A=4 B=0 C=0 D=0 0
+00009 [L152] ISGT     A=3 B=0 C=4 D=4 
+00010 [L152] JMP      A=3 B=128 C=1 D=32769 target=12
+00011 [L153] RET1     A=1 B=0 C=2 D=2 
+00012 [L155] UGET     A=3 B=0 C=0 D=0 table
+00013 [L155] TGETS    A=3 B=3 C=1 D=769 'loadstring'
+00014 [L155] MOV      A=4 B=0 C=2 D=2 
+00015 [L155] CALL     A=3 B=2 C=2 D=514 
+00016 [L155] MOV      A=1 B=0 C=3 D=3 
+00017 [L157] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto12 offset=0x8b6 source_lines=162-164 params=1
+UPVALUES []
+00001 [L163] KPRI     A=1 B=0 C=2 D=2 
+00002 [L163] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto13 offset=0x8d2 source_lines=171-191 params=3
+UPVALUES ['d_u', 'io', 'cclog']
+00001 [L172] UGET     A=3 B=0 C=0 D=0 d_u
+00002 [L172] TGETS    A=3 B=3 C=0 D=768 'isLuaC'
+00003 [L172] CALL     A=3 B=2 C=1 D=513 
+00004 [L172] ISF      A=0 B=0 C=3 D=3 
+00005 [L172] JMP      A=4 B=128 C=2 D=32770 target=8
+00006 [L173] TNEW     A=3 B=0 C=0 D=0 
+00007 [L173] RET1     A=3 B=0 C=2 D=2 
+00008 [L175] KSHORT   A=3 B=0 C=0 D=0 0
+00009 [L175] TNEW     A=4 B=0 C=0 D=0 
+00010 [L175] UGET     A=5 B=0 C=1 D=1 io
+00011 [L175] TGETS    A=5 B=5 C=1 D=1281 'popen'
+00012 [L176] KSTR     A=6 B=0 C=2 D=2 'ls "'
+00013 [L176] MOV      A=7 B=0 C=0 D=0 
+00014 [L176] KSTR     A=8 B=0 C=3 D=3 '"'
+00015 [L176] CAT      A=6 B=6 C=8 D=1544 
+00016 [L177] ISF      A=0 B=0 C=1 D=1 
+00017 [L177] JMP      A=7 B=128 C=5 D=32773 target=23
+00018 [L178] MOV      A=7 B=0 C=6 D=6 
+00019 [L178] KSTR     A=8 B=0 C=4 D=4 ' | grep "'
+00020 [L178] MOV      A=9 B=0 C=1 D=1 
+00021 [L178] KSTR     A=10 B=0 C=3 D=3 '"'
+00022 [L178] CAT      A=6 B=7 C=10 D=1802 
+00023 [L180] UGET     A=7 B=0 C=2 D=2 cclog
+00024 [L180] KSTR     A=8 B=0 C=5 D=5 'cmd=[%s]'
+00025 [L180] MOV      A=9 B=0 C=6 D=6 
+00026 [L180] CALL     A=7 B=1 C=3 D=259 
+00027 [L182] IST      A=0 B=0 C=2 D=2 
+00028 [L182] JMP      A=7 B=128 C=1 D=32769 target=30
+00029 [L182] GGET     A=2 B=0 C=6 D=6 'return_true'
+00030 [L184] MOV      A=7 B=0 C=5 D=5 
+00031 [L184] MOV      A=8 B=0 C=6 D=6 
+00032 [L184] CALL     A=7 B=2 C=2 D=514 
+00033 [L184] MOV      A=8 B=0 C=7 D=7 
+00034 [L184] TGETS    A=7 B=7 C=7 D=1799 'lines'
+00035 [L184] CALL     A=7 B=4 C=2 D=1026 
+00036 [L184] JMP      A=10 B=128 C=7 D=32775 target=44
+00037 [L185] MOV      A=11 B=0 C=2 D=2 
+00038 [L185] MOV      A=12 B=0 C=10 D=10 
+00039 [L185] CALL     A=11 B=2 C=2 D=514 
+00040 [L185] ISNEP    A=11 B=0 C=2 D=2 
+00041 [L185] JMP      A=11 B=128 C=2 D=32770 target=44
+00042 [L186] ADDVN    A=3 B=3 C=0 D=768 
+00043 [L187] TSETV    A=10 B=4 C=3 D=1027 
+00044 [L184] ITERC    A=10 B=2 C=3 D=515 
+00045 [L184] ITERL    A=10 B=127 C=247 D=32759 target=37
+00046 [L190] RET1     A=4 B=0 C=2 D=2 
+
+FUNCTION proto14 offset=0xa67 source_lines=196-211 params=2
+UPVALUES ['io', 'string', 'cclog']
+00001 [L197] KSHORT   A=2 B=0 C=0 D=0 0
+00002 [L197] TNEW     A=3 B=0 C=0 D=0 
+00003 [L197] UGET     A=4 B=0 C=0 D=0 io
+00004 [L197] TGETS    A=4 B=4 C=0 D=1024 'popen'
+00005 [L198] UGET     A=5 B=0 C=1 D=1 string
+00006 [L198] TGETS    A=5 B=5 C=1 D=1281 'gsub'
+00007 [L198] MOV      A=6 B=0 C=0 D=0 
+00008 [L198] KSTR     A=7 B=0 C=2 D=2 '\\'
+00009 [L198] KSTR     A=8 B=0 C=3 D=3 '/'
+00010 [L198] CALL     A=5 B=2 C=4 D=516 
+00011 [L198] MOV      A=0 B=0 C=5 D=5 
+00012 [L199] KSTR     A=5 B=0 C=4 D=4 'dir "'
+00013 [L199] MOV      A=6 B=0 C=0 D=0 
+00014 [L199] KSTR     A=7 B=0 C=5 D=5 '" /b'
+00015 [L199] CAT      A=5 B=5 C=7 D=1287 
+00016 [L200] UGET     A=6 B=0 C=2 D=2 cclog
+00017 [L200] KSTR     A=7 B=0 C=6 D=6 'cmd=[%s]'
+00018 [L200] MOV      A=8 B=0 C=5 D=5 
+00019 [L200] CALL     A=6 B=1 C=3 D=259 
+00020 [L202] IST      A=0 B=0 C=1 D=1 
+00021 [L202] JMP      A=6 B=128 C=1 D=32769 target=23
+00022 [L202] GGET     A=1 B=0 C=7 D=7 'return_true'
+00023 [L204] MOV      A=6 B=0 C=4 D=4 
+00024 [L204] MOV      A=7 B=0 C=5 D=5 
+00025 [L204] CALL     A=6 B=2 C=2 D=514 
+00026 [L204] MOV      A=7 B=0 C=6 D=6 
+00027 [L204] TGETS    A=6 B=6 C=8 D=1544 'lines'
+00028 [L204] CALL     A=6 B=4 C=2 D=1026 
+00029 [L204] JMP      A=9 B=128 C=7 D=32775 target=37
+00030 [L205] MOV      A=10 B=0 C=1 D=1 
+00031 [L205] MOV      A=11 B=0 C=9 D=9 
+00032 [L205] CALL     A=10 B=2 C=2 D=514 
+00033 [L205] ISNEP    A=10 B=0 C=2 D=2 
+00034 [L205] JMP      A=10 B=128 C=2 D=32770 target=37
+00035 [L206] ADDVN    A=2 B=2 C=0 D=512 
+00036 [L207] TSETV    A=9 B=3 C=2 D=770 
+00037 [L204] ITERC    A=9 B=2 C=3 D=515 
+00038 [L204] ITERL    A=9 B=127 C=247 D=32759 target=30
+00039 [L210] RET1     A=3 B=0 C=2 D=2 
+
+FUNCTION proto15 offset=0xbc8 source_lines=218-230 params=3
+UPVALUES ['main_server']
+00001 [L220] KSTR     A=3 B=0 C=0 D=0 ''
+00002 [L221] UGET     A=4 B=0 C=0 D=0 main_server
+00003 [L221] TGETS    A=4 B=4 C=1 D=1025 'scan_dir'
+00004 [L221] IST      A=0 B=0 C=4 D=4 
+00005 [L221] JMP      A=4 B=128 C=1 D=32769 target=7
+00006 [L222] RET1     A=3 B=0 C=2 D=2 
+00007 [L225] IST      A=0 B=0 C=1 D=1 
+00008 [L225] JMP      A=4 B=128 C=1 D=32769 target=10
+00009 [L225] KSTR     A=1 B=0 C=2 D=2 '*.*'
+00010 [L226] IST      A=0 B=0 C=2 D=2 
+00011 [L226] JMP      A=4 B=128 C=1 D=32769 target=13
+00012 [L226] GGET     A=2 B=0 C=3 D=3 'return_true'
+00013 [L228] UGET     A=4 B=0 C=0 D=0 main_server
+00014 [L228] TGETS    A=4 B=4 C=1 D=1025 'scan_dir'
+00015 [L228] MOV      A=5 B=0 C=0 D=0 
+00016 [L228] MOV      A=6 B=0 C=1 D=1 
+00017 [L228] CALL     A=4 B=2 C=3 D=515 
+00018 [L228] MOV      A=3 B=0 C=4 D=4 
+00019 [L229] RET1     A=3 B=0 C=2 D=2 
+
+FUNCTION proto16 offset=0xc8c source_lines=240-246 params=3
+UPVALUES ['cclog']
+00001 [L241] GGET     A=3 B=0 C=0 D=0 'getKVFileName'
+00002 [L241] MOV      A=4 B=0 C=2 D=2 
+00003 [L241] CALL     A=3 B=2 C=2 D=514 
+00004 [L242] GGET     A=4 B=0 C=1 D=1 'readTable'
+00005 [L242] MOV      A=5 B=0 C=3 D=3 
+00006 [L242] CALL     A=4 B=2 C=2 D=514 
+00007 [L243] KSTR     A=5 B=0 C=2 D=2 ''
+00008 [L243] MOV      A=6 B=0 C=0 D=0 
+00009 [L243] CAT      A=5 B=5 C=6 D=1286 
+00010 [L243] TSETV    A=1 B=4 C=5 D=1029 
+00011 [L244] GGET     A=5 B=0 C=3 D=3 'saveTable'
+00012 [L244] MOV      A=6 B=0 C=4 D=4 
+00013 [L244] MOV      A=7 B=0 C=3 D=3 
+00014 [L244] CALL     A=5 B=1 C=3 D=259 
+00015 [L245] UGET     A=5 B=0 C=0 D=0 cclog
+00016 [L245] KSTR     A=6 B=0 C=4 D=4 'save KV ok: ['
+00017 [L245] MOV      A=7 B=0 C=0 D=0 
+00018 [L245] KSTR     A=8 B=0 C=5 D=5 ']=['
+00019 [L245] MOV      A=9 B=0 C=1 D=1 
+00020 [L245] KSTR     A=10 B=0 C=6 D=6 ']'
+00021 [L245] CAT      A=6 B=6 C=10 D=1546 
+00022 [L245] CALL     A=5 B=1 C=2 D=258 
+00023 [L246] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto17 offset=0xd6c source_lines=249-255 params=2
+UPVALUES ['cclog']
+00001 [L250] GGET     A=2 B=0 C=0 D=0 'getKVFileName'
+00002 [L250] MOV      A=3 B=0 C=1 D=1 
+00003 [L250] CALL     A=2 B=2 C=2 D=514 
+00004 [L251] GGET     A=3 B=0 C=1 D=1 'readTable'
+00005 [L251] MOV      A=4 B=0 C=2 D=2 
+00006 [L251] CALL     A=3 B=2 C=2 D=514 
+00007 [L252] KSTR     A=4 B=0 C=2 D=2 ''
+00008 [L252] MOV      A=5 B=0 C=0 D=0 
+00009 [L252] CAT      A=4 B=4 C=5 D=1029 
+00010 [L252] TGETV    A=4 B=3 C=4 D=772 
+00011 [L253] UGET     A=5 B=0 C=0 D=0 cclog
+00012 [L253] KSTR     A=6 B=0 C=3 D=3 'get KV ok: ['
+00013 [L253] MOV      A=7 B=0 C=0 D=0 
+00014 [L253] KSTR     A=8 B=0 C=4 D=4 ']=['
+00015 [L253] ISTC     A=9 B=0 C=4 D=4 
+00016 [L253] JMP      A=9 B=128 C=1 D=32769 target=18
+00017 [L253] KSTR     A=9 B=0 C=5 D=5 'nil'
+00018 [L253] KSTR     A=10 B=0 C=6 D=6 ']'
+00019 [L253] CAT      A=6 B=6 C=10 D=1546 
+00020 [L253] CALL     A=5 B=1 C=2 D=258 
+00021 [L254] RET1     A=4 B=0 C=2 D=2 
+
+FUNCTION proto18 offset=0xe3d source_lines=259-268 params=1
+UPVALUES ['CCFileUtils', 'string']
+00001 [L260] UGET     A=1 B=0 C=0 D=0 CCFileUtils
+00002 [L260] MOV      A=2 B=0 C=1 D=1 
+00003 [L260] TGETS    A=1 B=1 C=0 D=256 'sharedFileUtils'
+00004 [L260] CALL     A=1 B=2 C=2 D=514 
+00005 [L260] MOV      A=2 B=0 C=1 D=1 
+00006 [L260] TGETS    A=1 B=1 C=1 D=257 'getWriteablePath'
+00007 [L260] CALL     A=1 B=2 C=2 D=514 
+00008 [L260] KSTR     A=2 B=0 C=2 D=2 'setting_w/'
+00009 [L260] CAT      A=1 B=1 C=2 D=258 
+00010 [L261] ISF      A=0 B=0 C=0 D=0 
+00011 [L261] JMP      A=2 B=128 C=9 D=32777 target=21
+00012 [L262] MOV      A=2 B=0 C=1 D=1 
+00013 [L262] UGET     A=3 B=0 C=1 D=1 string
+00014 [L262] TGETS    A=3 B=3 C=3 D=771 'format'
+00015 [L262] KSTR     A=4 B=0 C=4 D=4 '%0.0f'
+00016 [L262] MOV      A=5 B=0 C=0 D=0 
+00017 [L262] CALL     A=3 B=2 C=3 D=515 
+00018 [L262] KSTR     A=4 B=0 C=5 D=5 '_kv.log'
+00019 [L262] CAT      A=1 B=2 C=4 D=516 
+00020 [L262] JMP      A=2 B=128 C=3 D=32771 target=24
+00021 [L264] MOV      A=2 B=0 C=1 D=1 
+00022 [L264] KSTR     A=3 B=0 C=6 D=6 'all_kv.log'
+00023 [L264] CAT      A=1 B=2 C=3 D=515 
+00024 [L267] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto19 offset=0xf3c source_lines=273-295 params=2
+UPVALUES ['CCFileUtils', 'CCString', 'cclog']
+00001 [L275] KSTR     A=2 B=0 C=0 D=0 'release_/'
+00002 [L275] MOV      A=3 B=0 C=0 D=0 
+00003 [L275] CAT      A=2 B=2 C=3 D=515 
+00004 [L278] KSTR     A=3 B=0 C=1 D=1 ''
+00005 [L279] KPRI     A=4 B=0 C=0 D=0 
+00006 [L280] KSHORT   A=5 B=0 C=0 D=0 0
+00007 [L281] UGET     A=6 B=0 C=0 D=0 CCFileUtils
+00008 [L281] MOV      A=7 B=0 C=6 D=6 
+00009 [L281] TGETS    A=6 B=6 C=2 D=1538 'sharedFileUtils'
+00010 [L281] CALL     A=6 B=2 C=2 D=514 
+00011 [L281] MOV      A=7 B=0 C=6 D=6 
+00012 [L281] TGETS    A=6 B=6 C=3 D=1539 'getFileData'
+00013 [L281] MOV      A=8 B=0 C=2 D=2 
+00014 [L281] KSTR     A=9 B=0 C=4 D=4 'rb'
+00015 [L281] MOV      A=10 B=0 C=5 D=5 
+00016 [L281] CALL     A=6 B=3 C=5 D=773 
+00017 [L281] MOV      A=5 B=0 C=7 D=7 
+00018 [L281] MOV      A=4 B=0 C=6 D=6 
+00019 [L282] ISF      A=0 B=0 C=4 D=4 
+00020 [L282] JMP      A=6 B=128 C=10 D=32778 target=31
+00021 [L283] UGET     A=6 B=0 C=1 D=1 CCString
+00022 [L283] MOV      A=7 B=0 C=6 D=6 
+00023 [L283] TGETS    A=6 B=6 C=5 D=1541 'createWithData'
+00024 [L283] MOV      A=8 B=0 C=4 D=4 
+00025 [L283] MOV      A=9 B=0 C=5 D=5 
+00026 [L283] CALL     A=6 B=2 C=4 D=516 
+00027 [L283] MOV      A=7 B=0 C=6 D=6 
+00028 [L283] TGETS    A=6 B=6 C=6 D=1542 'getCString'
+00029 [L283] CALL     A=6 B=2 C=2 D=514 
+00030 [L283] MOV      A=3 B=0 C=6 D=6 
+00031 [L286] ISF      A=0 B=0 C=3 D=3 
+00032 [L286] JMP      A=6 B=128 C=21 D=32789 target=54
+00033 [L286] LEN      A=6 B=0 C=3 D=3 
+00034 [L286] KSHORT   A=7 B=0 C=0 D=0 0
+00035 [L286] ISGE     A=7 B=0 C=6 D=6 
+00036 [L286] JMP      A=6 B=128 C=17 D=32785 target=54
+00037 [L287] UGET     A=6 B=0 C=0 D=0 CCFileUtils
+00038 [L287] MOV      A=7 B=0 C=6 D=6 
+00039 [L287] TGETS    A=6 B=6 C=2 D=1538 'sharedFileUtils'
+00040 [L287] CALL     A=6 B=2 C=2 D=514 
+00041 [L287] MOV      A=7 B=0 C=6 D=6 
+00042 [L287] TGETS    A=6 B=6 C=7 D=1543 'getWriteablePath'
+00043 [L287] CALL     A=6 B=2 C=2 D=514 
+00044 [L287] KSTR     A=7 B=0 C=8 D=8 'release_w/'
+00045 [L287] MOV      A=8 B=0 C=1 D=1 
+00046 [L287] CAT      A=6 B=6 C=8 D=1544 
+00047 [L288] GGET     A=7 B=0 C=9 D=9 'writeFile'
+00048 [L288] MOV      A=8 B=0 C=6 D=6 
+00049 [L288] MOV      A=9 B=0 C=3 D=3 
+00050 [L288] CALL     A=7 B=1 C=3 D=259 
+00051 [L289] KPRI     A=7 B=0 C=2 D=2 
+00052 [L289] RET1     A=7 B=0 C=2 D=2 
+00053 [L289] JMP      A=6 B=128 C=5 D=32773 target=59
+00054 [L291] UGET     A=6 B=0 C=2 D=2 cclog
+00055 [L291] KSTR     A=7 B=0 C=10 D=10 'WARNING: apk_file read length<=0, name='
+00056 [L291] MOV      A=8 B=0 C=2 D=2 
+00057 [L291] CAT      A=7 B=7 C=8 D=1800 
+00058 [L291] CALL     A=6 B=1 C=2 D=258 
+00059 [L294] KPRI     A=6 B=0 C=1 D=1 
+00060 [L294] RET1     A=6 B=0 C=2 D=2 
+
+FUNCTION proto20 offset=0x1194 source_lines=299-316 params=1
+UPVALUES ['CCApplication', 'CCFileUtils', 'CCString']
+00001 [L300] KPRI     A=1 B=0 C=0 D=0 
+00002 [L301] KSHORT   A=2 B=0 C=0 D=0 0
+00003 [L302] KSTR     A=3 B=0 C=0 D=0 'release_/'
+00004 [L302] MOV      A=4 B=0 C=0 D=0 
+00005 [L302] CAT      A=3 B=3 C=4 D=772 
+00006 [L304] UGET     A=4 B=0 C=0 D=0 CCApplication
+00007 [L304] MOV      A=5 B=0 C=4 D=4 
+00008 [L304] TGETS    A=4 B=4 C=1 D=1025 'sharedApplication'
+00009 [L304] CALL     A=4 B=2 C=2 D=514 
+00010 [L304] MOV      A=5 B=0 C=4 D=4 
+00011 [L304] TGETS    A=4 B=4 C=2 D=1026 'getTargetPlatform'
+00012 [L304] CALL     A=4 B=2 C=2 D=514 
+00013 [L304] ISNEN    A=4 B=0 C=0 D=0 0
+00014 [L304] JMP      A=4 B=128 C=3 D=32771 target=18
+00015 [L305] KSTR     A=4 B=0 C=3 D=3 '../../../release_/'
+00016 [L305] MOV      A=5 B=0 C=0 D=0 
+00017 [L305] CAT      A=3 B=4 C=5 D=1029 
+00018 [L308] UGET     A=4 B=0 C=1 D=1 CCFileUtils
+00019 [L308] MOV      A=5 B=0 C=4 D=4 
+00020 [L308] TGETS    A=4 B=4 C=4 D=1028 'sharedFileUtils'
+00021 [L308] CALL     A=4 B=2 C=2 D=514 
+00022 [L308] MOV      A=5 B=0 C=4 D=4 
+00023 [L308] TGETS    A=4 B=4 C=5 D=1029 'getFileData'
+00024 [L308] MOV      A=6 B=0 C=3 D=3 
+00025 [L308] KSTR     A=7 B=0 C=6 D=6 'rb'
+00026 [L308] MOV      A=8 B=0 C=2 D=2 
+00027 [L308] CALL     A=4 B=3 C=5 D=773 
+00028 [L308] MOV      A=2 B=0 C=5 D=5 
+00029 [L308] MOV      A=1 B=0 C=4 D=4 
+00030 [L309] ISF      A=0 B=0 C=1 D=1 
+00031 [L309] JMP      A=4 B=128 C=11 D=32779 target=43
+00032 [L310] UGET     A=4 B=0 C=2 D=2 CCString
+00033 [L310] MOV      A=5 B=0 C=4 D=4 
+00034 [L310] TGETS    A=4 B=4 C=7 D=1031 'createWithData'
+00035 [L310] MOV      A=6 B=0 C=1 D=1 
+00036 [L310] MOV      A=7 B=0 C=2 D=2 
+00037 [L310] CALL     A=4 B=2 C=4 D=516 
+00038 [L310] MOV      A=5 B=0 C=4 D=4 
+00039 [L310] TGETS    A=4 B=4 C=8 D=1032 'getCString'
+00040 [L310] CALL     A=4 B=2 C=2 D=514 
+00041 [L310] GSET     A=4 B=0 C=9 D=9 'content'
+00042 [L310] JMP      A=4 B=128 C=2 D=32770 target=45
+00043 [L312] KSTR     A=4 B=0 C=10 D=10 ''
+00044 [L312] GSET     A=4 B=0 C=9 D=9 'content'
+00045 [L315] GGET     A=4 B=0 C=9 D=9 'content'
+00046 [L315] RET1     A=4 B=0 C=2 D=2 
+
+FUNCTION proto21 offset=0x1365 source_lines=320-328 params=2
+UPVALUES ['cclog']
+00001 [L321] UGET     A=2 B=0 C=0 D=0 cclog
+00002 [L321] KSTR     A=3 B=0 C=0 D=0 'CALL copy_file ['
+00003 [L321] MOV      A=4 B=0 C=0 D=0 
+00004 [L321] KSTR     A=5 B=0 C=1 D=1 ']  ['
+00005 [L321] MOV      A=6 B=0 C=1 D=1 
+00006 [L321] KSTR     A=7 B=0 C=2 D=2 ']'
+00007 [L321] CAT      A=3 B=3 C=7 D=775 
+00008 [L321] CALL     A=2 B=1 C=2 D=258 
+00009 [L322] GGET     A=2 B=0 C=3 D=3 'readFile'
+00010 [L322] MOV      A=3 B=0 C=0 D=0 
+00011 [L322] CALL     A=2 B=2 C=2 D=514 
+00012 [L323] ISF      A=0 B=0 C=2 D=2 
+00013 [L323] JMP      A=3 B=128 C=5 D=32773 target=19
+00014 [L324] GGET     A=3 B=0 C=4 D=4 'writeFile'
+00015 [L324] MOV      A=4 B=0 C=1 D=1 
+00016 [L324] MOV      A=5 B=0 C=2 D=2 
+00017 [L324] CALL     A=3 B=1 C=3 D=259 
+00018 [L324] JMP      A=3 B=128 C=3 D=32771 target=22
+00019 [L326] UGET     A=3 B=0 C=0 D=0 cclog
+00020 [L326] KSTR     A=4 B=0 C=5 D=5 'ERROR: src file read error.'
+00021 [L326] CALL     A=3 B=1 C=2 D=258 
+00022 [L328] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto22 offset=0x1450 source_lines=0-330 params=0
+UPVALUES []
+00001 [L7] GGET     A=0 B=0 C=0 D=0 'CCLuaLog'
+00002 [L8] GGET     A=1 B=0 C=1 D=1 'CCString'
+00003 [L9] GGET     A=2 B=0 C=2 D=2 'string'
+00004 [L10] GGET     A=3 B=0 C=3 D=3 'main_server'
+00005 [L11] GGET     A=4 B=0 C=4 D=4 'CCFileUtils'
+00006 [L12] GGET     A=5 B=0 C=5 D=5 'table'
+00007 [L13] GGET     A=6 B=0 C=6 D=6 'pairs'
+00008 [L14] GGET     A=7 B=0 C=7 D=7 'io'
+00009 [L15] GGET     A=8 B=0 C=8 D=8 'CCApplication'
+00010 [L16] GGET     A=9 B=0 C=9 D=9 'require'
+00011 [L21] FNEW     A=10 B=0 C=10 D=10 {'kind': 'proto', 'id': 0}
+00012 [L24] GGET     A=11 B=0 C=11 D=11 'module'
+00013 [L24] KSTR     A=12 B=0 C=12 D=12 'common.file'
+00014 [L24] CALL     A=11 B=1 C=2 D=258 
+00015 [L26] MOV      A=11 B=0 C=9 D=9 
+00016 [L26] KSTR     A=12 B=0 C=13 D=13 'common.utils'
+00017 [L26] CALL     A=11 B=2 C=2 D=514 
+00018 [L31] FNEW     A=12 B=0 C=14 D=14 {'kind': 'proto', 'id': 1}
+00019 [L29] GSET     A=12 B=0 C=15 D=15 'read'
+00020 [L35] FNEW     A=12 B=0 C=16 D=16 {'kind': 'proto', 'id': 2}
+00021 [L33] GSET     A=12 B=0 C=17 D=17 'write'
+00022 [L47] FNEW     A=12 B=0 C=18 D=18 {'kind': 'proto', 'id': 3}
+00023 [L41] GSET     A=12 B=0 C=19 D=19 'readCCstringFromFile'
+00024 [L61] FNEW     A=12 B=0 C=20 D=20 {'kind': 'proto', 'id': 4}
+00025 [L54] GSET     A=12 B=0 C=21 D=21 'writeCCStringToFile'
+00026 [L74] FNEW     A=12 B=0 C=22 D=22 {'kind': 'proto', 'id': 5}
+00027 [L64] GSET     A=12 B=0 C=23 D=23 'appendFile'
+00028 [L87] FNEW     A=12 B=0 C=24 D=24 {'kind': 'proto', 'id': 6}
+00029 [L77] GSET     A=12 B=0 C=25 D=25 'getFileSize'
+00030 [L102] FNEW     A=12 B=0 C=26 D=26 {'kind': 'proto', 'id': 7}
+00031 [L91] GSET     A=12 B=0 C=27 D=27 'readFile'
+00032 [L118] FNEW     A=12 B=0 C=28 D=28 {'kind': 'proto', 'id': 8}
+00033 [L107] GSET     A=12 B=0 C=29 D=29 'readFileFirstLine'
+00034 [L135] FNEW     A=12 B=0 C=30 D=30 {'kind': 'proto', 'id': 9}
+00035 [L123] GSET     A=12 B=0 C=31 D=31 'writeFile'
+00036 [L146] FNEW     A=12 B=0 C=32 D=32 {'kind': 'proto', 'id': 10}
+00037 [L139] GSET     A=12 B=0 C=33 D=33 'saveTable'
+00038 [L158] FNEW     A=12 B=0 C=34 D=34 {'kind': 'proto', 'id': 11}
+00039 [L149] GSET     A=12 B=0 C=35 D=35 'readTable'
+00040 [L164] FNEW     A=12 B=0 C=36 D=36 {'kind': 'proto', 'id': 12}
+00041 [L162] GSET     A=12 B=0 C=37 D=37 'return_true'
+00042 [L191] FNEW     A=12 B=0 C=38 D=38 {'kind': 'proto', 'id': 13}
+00043 [L171] GSET     A=12 B=0 C=39 D=39 'scandir_ios'
+00044 [L211] FNEW     A=12 B=0 C=40 D=40 {'kind': 'proto', 'id': 14}
+00045 [L196] GSET     A=12 B=0 C=41 D=41 'scandir_win'
+00046 [L230] FNEW     A=12 B=0 C=42 D=42 {'kind': 'proto', 'id': 15}
+00047 [L218] GSET     A=12 B=0 C=43 D=43 'scandir_adr'
+00048 [L246] FNEW     A=12 B=0 C=44 D=44 {'kind': 'proto', 'id': 16}
+00049 [L240] GSET     A=12 B=0 C=45 D=45 'set'
+00050 [L255] FNEW     A=12 B=0 C=46 D=46 {'kind': 'proto', 'id': 17}
+00051 [L249] GSET     A=12 B=0 C=47 D=47 'get'
+00052 [L268] FNEW     A=12 B=0 C=48 D=48 {'kind': 'proto', 'id': 18}
+00053 [L259] GSET     A=12 B=0 C=49 D=49 'getKVFileName'
+00054 [L295] FNEW     A=12 B=0 C=50 D=50 {'kind': 'proto', 'id': 19}
+00055 [L273] GSET     A=12 B=0 C=51 D=51 'copyOrginIndexFile'
+00056 [L316] FNEW     A=12 B=0 C=52 D=52 {'kind': 'proto', 'id': 20}
+00057 [L299] GSET     A=12 B=0 C=53 D=53 'readAPKFile'
+00058 [L328] FNEW     A=12 B=0 C=54 D=54 {'kind': 'proto', 'id': 21}
+00059 [L320] GSET     A=12 B=0 C=55 D=55 'copy_file'
+00060 [L328] UCLO     A=0 B=128 C=0 D=32768 target=61
+00061 [L328] RET0     A=0 B=0 C=1 D=1 

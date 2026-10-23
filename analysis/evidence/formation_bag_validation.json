@@ -1,0 +1,156 @@
+{
+  "date": "2026-10-24",
+  "timezone": "Asia/Shanghai",
+  "device": "emulator-5562",
+  "session": ".runtime/redirect/sessions/20261023T171721Z-099e82e1",
+  "root_causes": [
+    "config_end=false skipped cheerSquadUI.initCost, leaving Lv nil in canJoin",
+    "Missing 1035 inventory snapshot and lowercase b array-count support",
+    "1033 did not send update-UI event or 1106 completion; response serial numbers were incorrectly reused"
+  ],
+  "checks": {
+    "original_client_query_sequence": [
+      1034,
+      1035,
+      2998,
+      1106
+    ],
+    "client_after_reconnect_and_query": {
+      "characters": 1,
+      "used_characters": 1,
+      "items": 0,
+      "formation_slots": 2,
+      "waiting_1106": false,
+      "client_request_serial": 100003,
+      "server_response_serial": 200005
+    },
+    "formation_portrait_and_stats_visible": true,
+    "bag_weapon_and_item_tabs_visible": true,
+    "original_client_reconnect_and_empty_replay_completed": true,
+    "module_lua_errors_after_final_reconnect": []
+  },
+  "wire_events_after_final_reconnect": [
+    {
+      "time": "2026-10-23T17:21:00.654+00:00",
+      "kind": "game_request",
+      "message_id": 1018
+    },
+    {
+      "time": "2026-10-23T17:21:00.654+00:00",
+      "kind": "game_response",
+      "message_id": 1020
+    },
+    {
+      "time": "2026-10-23T17:21:00.654+00:00",
+      "kind": "game_response",
+      "message_id": 1023
+    },
+    {
+      "time": "2026-10-23T17:21:18.403+00:00",
+      "kind": "game_request",
+      "message_id": 1016
+    },
+    {
+      "time": "2026-10-23T17:21:18.404+00:00",
+      "kind": "game_response",
+      "message_id": 2996
+    },
+    {
+      "time": "2026-10-23T17:21:18.404+00:00",
+      "kind": "game_response",
+      "message_id": 2998
+    },
+    {
+      "time": "2026-10-23T17:21:18.404+00:00",
+      "kind": "game_response",
+      "message_id": 1017
+    },
+    {
+      "time": "2026-10-23T17:21:18.404+00:00",
+      "kind": "game_response",
+      "message_id": 1034
+    },
+    {
+      "time": "2026-10-23T17:21:18.404+00:00",
+      "kind": "game_response",
+      "message_id": 1035
+    },
+    {
+      "time": "2026-10-23T17:21:18.668+00:00",
+      "kind": "game_request",
+      "message_id": 1105
+    },
+    {
+      "time": "2026-10-23T17:21:18.669+00:00",
+      "kind": "game_response",
+      "message_id": 1106
+    },
+    {
+      "time": "2026-10-23T17:21:18.804+00:00",
+      "kind": "game_request",
+      "message_id": 1105
+    },
+    {
+      "time": "2026-10-23T17:21:18.804+00:00",
+      "kind": "game_response",
+      "message_id": 1106
+    },
+    {
+      "time": "2026-10-23T17:21:56.032+00:00",
+      "kind": "game_request",
+      "message_id": 1033
+    },
+    {
+      "time": "2026-10-23T17:21:56.033+00:00",
+      "kind": "game_response",
+      "message_id": 1034
+    },
+    {
+      "time": "2026-10-23T17:21:56.033+00:00",
+      "kind": "game_response",
+      "message_id": 1035
+    },
+    {
+      "time": "2026-10-23T17:21:56.033+00:00",
+      "kind": "game_response",
+      "message_id": 2998
+    },
+    {
+      "time": "2026-10-23T17:21:56.033+00:00",
+      "kind": "game_response",
+      "message_id": 1106
+    },
+    {
+      "time": "2026-10-23T17:22:10.271+00:00",
+      "kind": "game_request",
+      "message_id": 2999
+    },
+    {
+      "time": "2026-10-23T17:22:10.273+00:00",
+      "kind": "game_response",
+      "message_id": 2999
+    }
+  ],
+  "tests": {
+    "command": ".runtime/venv/bin/python -m unittest tests.test_offline_backend tests.test_network_redirect tests.test_server_list tests.test_game_server -v",
+    "passed": 36
+  },
+  "save_backup": ".runtime/offline/backups/before-formation-bag-fix.sqlite3",
+  "screenshots": {
+    "formation": "analysis/evidence/offline_formation_fixed.png",
+    "bag": "analysis/evidence/offline_bag_fixed.png"
+  },
+  "limits": [
+    "Current saved inventory is empty; equipment and item mutations remain unimplemented.",
+    "One local account; response replay cache keeps the latest 256 numbered packets.",
+    "An initial diagnostic invoked reconnect inside a Frida callback and bypassed the existing native socket hook; final reconnect validation used the original game scheduler and passed.",
+    "Unrelated existing support endpoint returns HTTP 501 and the legacy JSON parser logs an empty-array parse error."
+  ],
+  "sha256": {
+    "network_redirect/backend.py": "6d6ca15b0e64c07757412f855b4028f6c35105dce8f5d3be8df7d3cb6561d83c",
+    "network_redirect/protocol.py": "4a6a624274a6d9bda8749dde549bfccba44d997f04776db4addeadf2a245bc80",
+    "tests/test_offline_backend.py": "fcd480520a7191b12bfaf7c2e02eecb744556a34c963ea4d26feb9b478494a73",
+    "analysis/evidence/offline_formation_fixed.png": "6604bb9ac4dd1547a83ec5cde83cac2b831ee1115fce556d1897e23971f62f2b",
+    "analysis/evidence/offline_bag_fixed.png": "faabb86e4da4258e88a2ac6d92b5532f9b1e1a3dda80678e9ce5988a90448df7"
+  }
+}

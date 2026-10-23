@@ -1,0 +1,1120 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\cce5c7821aefc5630cf38ef4809136e7.data'; root=proto21
+
+FUNCTION proto0 offset=0x4a source_lines=40-42 params=0
+UPVALUES ['print', 'string']
+00001 [L41] UGET     A=0 B=0 C=0 D=0 print
+00002 [L41] UGET     A=1 B=0 C=1 D=1 string
+00003 [L41] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L41] VARG     A=2 B=0 C=0 D=0 
+00005 [L41] CALLM    A=1 B=0 C=0 D=0 
+00006 [L41] CALLM    A=0 B=1 C=0 D=256 
+00007 [L42] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x92 source_lines=54-60 params=0
+UPVALUES ['g_self']
+00001 [L55] UGET     A=0 B=0 C=0 D=0 g_self
+00002 [L55] TGETS    A=0 B=0 C=0 D=0 'Filter'
+00003 [L55] IST      A=0 B=0 C=0 D=0 
+00004 [L55] JMP      A=0 B=128 C=13 D=32781 target=18
+00005 [L56] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00006 [L56] TGETS    A=0 B=0 C=2 D=2 'd_csv'
+00007 [L56] TGETS    A=0 B=0 C=3 D=3 'open2'
+00008 [L56] KSTR     A=1 B=0 C=4 D=4 'csv_config/item_exchange_config.csv'
+00009 [L56] CALL     A=0 B=2 C=2 D=514 
+00010 [L57] UGET     A=1 B=0 C=0 D=0 g_self
+00011 [L57] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00012 [L57] TGETS    A=2 B=2 C=5 D=517 'd_data'
+00013 [L57] TGETS    A=2 B=2 C=6 D=518 'getItemListFromStr'
+00014 [L57] TGETB    A=3 B=0 C=1 D=1 
+00015 [L57] TGETS    A=3 B=3 C=7 D=775 'input'
+00016 [L57] CALL     A=2 B=2 C=2 D=514 
+00017 [L57] TSETS    A=2 B=1 C=0 D=256 'Filter'
+00018 [L59] UGET     A=0 B=0 C=0 D=0 g_self
+00019 [L59] TGETS    A=0 B=0 C=0 D=0 'Filter'
+00020 [L59] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto2 offset=0x178 source_lines=62-112 params=1
+UPVALUES ['CCLayer', 'g_transUI', 'CCLayerColor', 'ccc4', 'CCSprite', 'g_self', 'i_t_t']
+00001 [L63] ISTC     A=1 B=0 C=0 D=0 
+00002 [L63] JMP      A=1 B=128 C=4 D=32772 target=7
+00003 [L63] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00004 [L63] TGETS    A=1 B=1 C=1 D=257 'd_mainUI'
+00005 [L63] TGETS    A=1 B=1 C=2 D=258 'g_mainUI'
+00006 [L63] TGETS    A=1 B=1 C=3 D=259 'main_layer'
+00007 [L65] UGET     A=2 B=0 C=0 D=0 CCLayer
+00008 [L65] MOV      A=3 B=0 C=2 D=2 
+00009 [L65] TGETS    A=2 B=2 C=4 D=516 'create'
+00010 [L65] CALL     A=2 B=2 C=2 D=514 
+00011 [L66] MOV      A=4 B=0 C=1 D=1 
+00012 [L66] TGETS    A=3 B=1 C=5 D=261 'addChild'
+00013 [L66] MOV      A=5 B=0 C=2 D=2 
+00014 [L66] KSHORT   A=6 B=0 C=50 D=50 50
+00015 [L66] CALL     A=3 B=1 C=4 D=260 
+00016 [L67] UGET     A=3 B=0 C=1 D=1 g_transUI
+00017 [L67] TSETS    A=2 B=3 C=3 D=771 'main_layer'
+00018 [L69] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00019 [L69] TGETS    A=3 B=3 C=6 D=774 'd_u'
+00020 [L69] TGETS    A=3 B=3 C=7 D=775 'createSwallowTouchLayer'
+00021 [L69] MOV      A=4 B=0 C=2 D=2 
+00022 [L69] CALL     A=3 B=1 C=2 D=258 
+00023 [L70] UGET     A=3 B=0 C=2 D=2 CCLayerColor
+00024 [L70] MOV      A=4 B=0 C=3 D=3 
+00025 [L70] TGETS    A=3 B=3 C=4 D=772 'create'
+00026 [L70] UGET     A=5 B=0 C=3 D=3 ccc4
+00027 [L70] KSHORT   A=6 B=0 C=0 D=0 0
+00028 [L70] KSHORT   A=7 B=0 C=0 D=0 0
+00029 [L70] KSHORT   A=8 B=0 C=0 D=0 0
+00030 [L70] KSHORT   A=9 B=0 C=100 D=100 100
+00031 [L70] CALL     A=5 B=0 C=5 D=5 
+00032 [L70] CALLM    A=3 B=2 C=1 D=513 
+00033 [L71] MOV      A=5 B=0 C=2 D=2 
+00034 [L71] TGETS    A=4 B=2 C=5 D=517 'addChild'
+00035 [L71] MOV      A=6 B=0 C=3 D=3 
+00036 [L71] KSHORT   A=7 B=255 C=255 D=65535 -1
+00037 [L71] CALL     A=4 B=1 C=4 D=260 
+00038 [L73] KNUM     A=4 B=0 C=0 D=0 0.5
+00039 [L73] KNUM     A=5 B=0 C=0 D=0 0.5
+00040 [L75] UGET     A=6 B=0 C=4 D=4 CCSprite
+00041 [L75] MOV      A=7 B=0 C=6 D=6 
+00042 [L75] TGETS    A=6 B=6 C=4 D=1540 'create'
+00043 [L75] KSTR     A=8 B=0 C=8 D=8 'v2/qiankunnizhuan/change_bkg.png'
+00044 [L75] CALL     A=6 B=2 C=3 D=515 
+00045 [L76] MOV      A=8 B=0 C=2 D=2 
+00046 [L76] TGETS    A=7 B=2 C=5 D=517 'addChild'
+00047 [L76] MOV      A=9 B=0 C=6 D=6 
+00048 [L76] CALL     A=7 B=1 C=3 D=259 
+00049 [L77] GGET     A=7 B=0 C=0 D=0 'd_ms'
+00050 [L77] TGETS    A=7 B=7 C=6 D=1798 'd_u'
+00051 [L77] TGETS    A=7 B=7 C=9 D=1801 'setStyles'
+00052 [L77] MOV      A=8 B=0 C=6 D=6 
+00053 [L77] TDUP     A=9 B=0 C=10 D=10 {'kind': 'table', 'value': {}}
+00054 [L77] TSETS    A=4 B=9 C=11 D=2315 'x'
+00055 [L77] TSETS    A=5 B=9 C=12 D=2316 'y'
+00056 [L77] CALL     A=7 B=1 C=3 D=259 
+00057 [L79] GGET     A=7 B=0 C=0 D=0 'd_ms'
+00058 [L79] TGETS    A=7 B=7 C=6 D=1798 'd_u'
+00059 [L79] TGETS    A=7 B=7 C=13 D=1805 'getRealScale'
+00060 [L79] MOV      A=8 B=0 C=6 D=6 
+00061 [L79] CALL     A=7 B=3 C=2 D=770 
+00062 [L80] UGET     A=9 B=0 C=5 D=5 g_self
+00063 [L80] TDUP     A=10 B=0 C=15 D=15 {'kind': 'table', 'value': {}}
+00064 [L80] TSETS    A=4 B=10 C=16 D=2576 'mx'
+00065 [L80] TSETS    A=5 B=10 C=17 D=2577 'my'
+00066 [L80] TSETS    A=10 B=9 C=14 D=2318 'params'
+00067 [L83] MOV      A=10 B=0 C=2 D=2 
+00068 [L83] TGETS    A=9 B=2 C=5 D=517 'addChild'
+00069 [L83] GGET     A=11 B=0 C=0 D=0 'd_ms'
+00070 [L83] TGETS    A=11 B=11 C=6 D=2822 'd_u'
+00071 [L83] TGETS    A=11 B=11 C=18 D=2834 'createByStyle'
+00072 [L83] TDUP     A=12 B=0 C=19 D=19 {'kind': 'table', 'value': {'pic': 'v2/qiankunnizhuan/mask.png'}}
+00073 [L83] TSETS    A=4 B=12 C=11 D=3083 'x'
+00074 [L83] MULNV    A=13 B=8 C=1 D=2049 
+00075 [L83] SUBVV    A=13 B=5 C=13 D=1293 
+00076 [L83] TSETS    A=13 B=12 C=12 D=3084 'y'
+00077 [L83] CALL     A=11 B=0 C=2 D=2 
+00078 [L83] CALLM    A=9 B=1 C=1 D=257 
+00079 [L85] GGET     A=9 B=0 C=0 D=0 'd_ms'
+00080 [L85] TGETS    A=9 B=9 C=6 D=2310 'd_u'
+00081 [L85] TGETS    A=9 B=9 C=18 D=2322 'createByStyle'
+00082 [L85] TDUP     A=10 B=0 C=20 D=20 {'kind': 'table', 'value': {'font': 'arial', 'type': 'label', 'fontsize': 30}}
+00083 [L85] TSETS    A=4 B=10 C=11 D=2571 'x'
+00084 [L85] MULNV    A=11 B=8 C=2 D=2050 
+00085 [L85] ADDVV    A=11 B=5 C=11 D=1291 
+00086 [L85] TSETS    A=11 B=10 C=12 D=2572 'y'
+00087 [L85] GGET     A=11 B=0 C=0 D=0 'd_ms'
+00088 [L85] TGETS    A=11 B=11 C=21 D=2837 'd_hz'
+00089 [L85] TGETS    A=11 B=11 C=22 D=2838 'gethz'
+00090 [L85] KSTR     A=12 B=0 C=23 D=23 'eTrans1'
+00091 [L85] CALL     A=11 B=2 C=2 D=514 
+00092 [L85] TSETS    A=11 B=10 C=24 D=2584 'string'
+00093 [L85] TDUP     A=11 B=0 C=25 D=25 {'kind': 'table', 'value': {1: 255, 2: 215, 3: 131}}
+00094 [L85] TSETS    A=11 B=10 C=26 D=2586 'color'
+00095 [L85] CALL     A=9 B=2 C=2 D=514 
+00096 [L86] MOV      A=11 B=0 C=2 D=2 
+00097 [L86] TGETS    A=10 B=2 C=5 D=517 'addChild'
+00098 [L86] MOV      A=12 B=0 C=9 D=9 
+00099 [L86] KSHORT   A=13 B=0 C=1 D=1 1
+00100 [L86] CALL     A=10 B=1 C=4 D=260 
+00101 [L88] GGET     A=10 B=0 C=0 D=0 'd_ms'
+00102 [L88] TGETS    A=10 B=10 C=6 D=2566 'd_u'
+00103 [L88] TGETS    A=10 B=10 C=18 D=2578 'createByStyle'
+00104 [L88] TDUP     A=11 B=0 C=27 D=27 {'kind': 'table', 'value': {'font': 'arial', 'type': 'label', 'fontsize': 22}}
+00105 [L88] TSETS    A=4 B=11 C=11 D=2827 'x'
+00106 [L88] MULNV    A=12 B=8 C=3 D=2051 
+00107 [L88] SUBVV    A=12 B=5 C=12 D=1292 
+00108 [L88] TSETS    A=12 B=11 C=12 D=2828 'y'
+00109 [L88] GGET     A=12 B=0 C=0 D=0 'd_ms'
+00110 [L88] TGETS    A=12 B=12 C=21 D=3093 'd_hz'
+00111 [L88] TGETS    A=12 B=12 C=22 D=3094 'gethz'
+00112 [L88] KSTR     A=13 B=0 C=28 D=28 'eTrans2'
+00113 [L88] CALL     A=12 B=2 C=2 D=514 
+00114 [L88] TSETS    A=12 B=11 C=24 D=2840 'string'
+00115 [L88] TDUP     A=12 B=0 C=29 D=29 {'kind': 'table', 'value': {1: 227, 2: 154, 3: 49}}
+00116 [L88] TSETS    A=12 B=11 C=26 D=2842 'color'
+00117 [L88] CALL     A=10 B=2 C=2 D=514 
+00118 [L89] MOV      A=12 B=0 C=2 D=2 
+00119 [L89] TGETS    A=11 B=2 C=5 D=517 'addChild'
+00120 [L89] MOV      A=13 B=0 C=10 D=10 
+00121 [L89] KSHORT   A=14 B=0 C=1 D=1 1
+00122 [L89] CALL     A=11 B=1 C=4 D=260 
+00123 [L91] GGET     A=11 B=0 C=0 D=0 'd_ms'
+00124 [L91] TGETS    A=11 B=11 C=6 D=2822 'd_u'
+00125 [L91] TGETS    A=11 B=11 C=18 D=2834 'createByStyle'
+00126 [L91] TDUP     A=12 B=0 C=30 D=30 {'kind': 'table', 'value': {'font': 'arial', 'type': 'label', 'fontsize': 22}}
+00127 [L91] TSETS    A=4 B=12 C=11 D=3083 'x'
+00128 [L91] MULNV    A=13 B=8 C=4 D=2052 
+00129 [L91] SUBVV    A=13 B=5 C=13 D=1293 
+00130 [L91] TSETS    A=13 B=12 C=12 D=3084 'y'
+00131 [L91] GGET     A=13 B=0 C=0 D=0 'd_ms'
+00132 [L91] TGETS    A=13 B=13 C=21 D=3349 'd_hz'
+00133 [L91] TGETS    A=13 B=13 C=22 D=3350 'gethz'
+00134 [L91] KSTR     A=14 B=0 C=31 D=31 'eTrans3'
+00135 [L91] CALL     A=13 B=2 C=2 D=514 
+00136 [L91] TSETS    A=13 B=12 C=24 D=3096 'string'
+00137 [L91] TDUP     A=13 B=0 C=32 D=32 {'kind': 'table', 'value': {1: 255, 2: 215, 3: 131}}
+00138 [L91] TSETS    A=13 B=12 C=26 D=3098 'color'
+00139 [L91] CALL     A=11 B=2 C=2 D=514 
+00140 [L92] MOV      A=13 B=0 C=2 D=2 
+00141 [L92] TGETS    A=12 B=2 C=5 D=517 'addChild'
+00142 [L92] MOV      A=14 B=0 C=11 D=11 
+00143 [L92] KSHORT   A=15 B=0 C=1 D=1 1
+00144 [L92] CALL     A=12 B=1 C=4 D=260 
+00145 [L94] TDUP     A=12 B=0 C=33 D=33 {'kind': 'table', 'value': {}}
+00146 [L96] TSETS    A=4 B=12 C=11 D=3083 'x'
+00147 [L96] TSETS    A=5 B=12 C=12 D=3084 'y'
+00148 [L96] TDUP     A=13 B=0 C=34 D=34 {'kind': 'table', 'value': {'npic': 'v2/introUI/close1.png', 'spic': 'v2/introUI/close2.png'}}
+00149 [L97] MULNV    A=14 B=7 C=5 D=1797 
+00150 [L97] TSETS    A=14 B=13 C=11 D=3339 'x'
+00151 [L97] MULNV    A=14 B=8 C=5 D=2053 
+00152 [L97] TSETS    A=14 B=13 C=12 D=3340 'y'
+00153 [L97] GGET     A=14 B=0 C=35 D=35 'pressClose'
+00154 [L97] TSETS    A=14 B=13 C=36 D=3364 'call_back'
+00155 [L97] TSETB    A=13 B=12 C=1 D=3073 
+00156 [L97] TDUP     A=13 B=0 C=37 D=37 {'kind': 'table', 'value': {'npic': 'v2/forgeUI/item_bkg.png', 'spic': 'v2/forgeUI/item_bkg.png', 'x': 0}}
+00157 [L98] MULNV    A=14 B=8 C=6 D=2054 
+00158 [L98] TSETS    A=14 B=13 C=12 D=3340 'y'
+00159 [L98] GGET     A=14 B=0 C=38 D=38 'pressChooseEquip'
+00160 [L98] TSETS    A=14 B=13 C=36 D=3364 'call_back'
+00161 [L98] TSETB    A=13 B=12 C=2 D=3074 
+00162 [L98] TDUP     A=13 B=0 C=39 D=39 {'kind': 'table', 'value': {'npic': 'v2/multi-selectUI/check_frame.png', 'spic': 'v2/multi-selectUI/check_frame.png'}}
+00163 [L99] MULNV    A=14 B=7 C=7 D=1799 
+00164 [L99] TSETS    A=14 B=13 C=11 D=3339 'x'
+00165 [L99] MULNV    A=14 B=8 C=7 D=2055 
+00166 [L99] TSETS    A=14 B=13 C=12 D=3340 'y'
+00167 [L99] UGET     A=14 B=0 C=6 D=6 i_t_t
+00168 [L99] TGETS    A=14 B=14 C=40 D=3624 'to_weapon'
+00169 [L99] TSETS    A=14 B=13 C=41 D=3369 'tag'
+00170 [L99] GGET     A=14 B=0 C=42 D=42 'changeType'
+00171 [L99] TSETS    A=14 B=13 C=36 D=3364 'call_back'
+00172 [L99] TSETB    A=13 B=12 C=3 D=3075 
+00173 [L99] TDUP     A=13 B=0 C=43 D=43 {'kind': 'table', 'value': {'npic': 'v2/multi-selectUI/check_frame.png', 'spic': 'v2/multi-selectUI/check_frame.png'}}
+00174 [L100] MULNV    A=14 B=7 C=8 D=1800 
+00175 [L100] TSETS    A=14 B=13 C=11 D=3339 'x'
+00176 [L100] MULNV    A=14 B=8 C=7 D=2055 
+00177 [L100] TSETS    A=14 B=13 C=12 D=3340 'y'
+00178 [L100] UGET     A=14 B=0 C=6 D=6 i_t_t
+00179 [L100] TGETS    A=14 B=14 C=44 D=3628 'to_guard'
+00180 [L100] TSETS    A=14 B=13 C=41 D=3369 'tag'
+00181 [L100] GGET     A=14 B=0 C=42 D=42 'changeType'
+00182 [L100] TSETS    A=14 B=13 C=36 D=3364 'call_back'
+00183 [L100] TSETB    A=13 B=12 C=4 D=3076 
+00184 [L100] TDUP     A=13 B=0 C=45 D=45 {'kind': 'table', 'value': {'npic': 'v2/qiankunnizhuan/change1.png', 'spic': 'v2/qiankunnizhuan/change2.png', 'x': 0}}
+00185 [L101] MULNV    A=14 B=8 C=9 D=2057 
+00186 [L101] TSETS    A=14 B=13 C=12 D=3340 'y'
+00187 [L101] GGET     A=14 B=0 C=46 D=46 'changeExpressed'
+00188 [L101] TSETS    A=14 B=13 C=36 D=3364 'call_back'
+00189 [L101] TSETB    A=13 B=12 C=5 D=3077 
+00190 [L103] MOV      A=14 B=0 C=2 D=2 
+00191 [L103] TGETS    A=13 B=2 C=5 D=517 'addChild'
+00192 [L103] GGET     A=15 B=0 C=0 D=0 'd_ms'
+00193 [L103] TGETS    A=15 B=15 C=6 D=3846 'd_u'
+00194 [L103] TGETS    A=15 B=15 C=47 D=3887 'createMenu'
+00195 [L103] MOV      A=16 B=0 C=12 D=12 
+00196 [L103] CALL     A=15 B=2 C=2 D=514 
+00197 [L103] KSHORT   A=16 B=0 C=1 D=1 1
+00198 [L103] CALL     A=13 B=1 C=4 D=260 
+00199 [L104] UGET     A=13 B=0 C=5 D=5 g_self
+00200 [L104] TDUP     A=14 B=0 C=49 D=49 {'kind': 'table', 'value': {}}
+00201 [L104] TSETS    A=4 B=14 C=11 D=3595 'x'
+00202 [L104] MULNV    A=15 B=8 C=6 D=2054 
+00203 [L104] ADDVV    A=15 B=5 C=15 D=1295 
+00204 [L104] TSETS    A=15 B=14 C=12 D=3596 'y'
+00205 [L104] TSETS    A=14 B=13 C=48 D=3376 'IconPos'
+00206 [L105] UGET     A=13 B=0 C=5 D=5 g_self
+00207 [L105] TNEW     A=14 B=8 C=0 D=2048 
+00208 [L105] UGET     A=15 B=0 C=6 D=6 i_t_t
+00209 [L105] TGETS    A=15 B=15 C=40 D=3880 'to_weapon'
+00210 [L105] TDUP     A=16 B=0 C=51 D=51 {'kind': 'table', 'value': {}}
+00211 [L105] MULNV    A=17 B=7 C=8 D=1800 
+00212 [L105] SUBVV    A=17 B=4 C=17 D=1041 
+00213 [L105] TSETS    A=17 B=16 C=11 D=4107 'x'
+00214 [L105] MULNV    A=17 B=8 C=8 D=2056 
+00215 [L105] SUBVV    A=17 B=5 C=17 D=1297 
+00216 [L105] TSETS    A=17 B=16 C=12 D=4108 'y'
+00217 [L105] TSETV    A=16 B=14 C=15 D=3599 
+00218 [L105] UGET     A=15 B=0 C=6 D=6 i_t_t
+00219 [L105] TGETS    A=15 B=15 C=44 D=3884 'to_guard'
+00220 [L105] TDUP     A=16 B=0 C=52 D=52 {'kind': 'table', 'value': {}}
+00221 [L105] MULNV    A=17 B=7 C=8 D=1800 
+00222 [L105] ADDVV    A=17 B=4 C=17 D=1041 
+00223 [L105] TSETS    A=17 B=16 C=11 D=4107 'x'
+00224 [L105] MULNV    A=17 B=8 C=8 D=2056 
+00225 [L105] SUBVV    A=17 B=5 C=17 D=1297 
+00226 [L105] TSETS    A=17 B=16 C=12 D=4108 'y'
+00227 [L105] TSETV    A=16 B=14 C=15 D=3599 
+00228 [L105] TSETS    A=14 B=13 C=50 D=3378 'CheckPos'
+00229 [L106] TDUP     A=13 B=0 C=53 D=53 {'kind': 'table', 'value': {1: 'gong', 2: 'fang'}}
+00230 [L107] KSHORT   A=14 B=0 C=1 D=1 1
+00231 [L107] KSHORT   A=15 B=0 C=2 D=2 2
+00232 [L107] KSHORT   A=16 B=0 C=1 D=1 1
+00233 [L107] FORI     A=14 B=128 C=22 D=32790 target=256
+00234 [L108] UGET     A=18 B=0 C=4 D=4 CCSprite
+00235 [L108] MOV      A=19 B=0 C=18 D=18 
+00236 [L108] TGETS    A=18 B=18 C=4 D=4612 'create'
+00237 [L108] KSTR     A=20 B=0 C=54 D=54 'v2/qiankunnizhuan/'
+00238 [L108] TGETV    A=21 B=13 C=17 D=3345 
+00239 [L108] KSTR     A=22 B=0 C=55 D=55 '.png'
+00240 [L108] CAT      A=20 B=20 C=22 D=5142 
+00241 [L108] CALL     A=18 B=2 C=3 D=515 
+00242 [L109] GGET     A=19 B=0 C=0 D=0 'd_ms'
+00243 [L109] TGETS    A=19 B=19 C=6 D=4870 'd_u'
+00244 [L109] TGETS    A=19 B=19 C=9 D=4873 'setStyles'
+00245 [L109] MOV      A=20 B=0 C=18 D=18 
+00246 [L109] UGET     A=21 B=0 C=5 D=5 g_self
+00247 [L109] TGETS    A=21 B=21 C=50 D=5426 'CheckPos'
+00248 [L109] TGETV    A=21 B=21 C=17 D=5393 
+00249 [L109] CALL     A=19 B=1 C=3 D=259 
+00250 [L110] MOV      A=20 B=0 C=2 D=2 
+00251 [L110] TGETS    A=19 B=2 C=5 D=517 'addChild'
+00252 [L110] MOV      A=21 B=0 C=18 D=18 
+00253 [L110] KSHORT   A=22 B=0 C=2 D=2 2
+00254 [L110] CALL     A=19 B=1 C=4 D=260 
+00255 [L107] FORL     A=14 B=127 C=234 D=32746 target=234
+00256 [L112] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto3 offset=0xb66 source_lines=114-127 params=0
+UPVALUES ['g_transUI', 'g_self']
+00001 [L115] UGET     A=0 B=0 C=0 D=0 g_transUI
+00002 [L115] TGETS    A=0 B=0 C=0 D=0 'main_layer'
+00003 [L115] IST      A=0 B=0 C=0 D=0 
+00004 [L115] JMP      A=0 B=128 C=1 D=32769 target=6
+00005 [L116] RET0     A=0 B=0 C=1 D=1 
+00006 [L118] UGET     A=0 B=0 C=0 D=0 g_transUI
+00007 [L118] TGETS    A=0 B=0 C=0 D=0 'main_layer'
+00008 [L119] MOV      A=2 B=0 C=0 D=0 
+00009 [L119] TGETS    A=1 B=0 C=1 D=1 'removeChildByTag'
+00010 [L119] UGET     A=3 B=0 C=1 D=1 g_self
+00011 [L119] TGETS    A=3 B=3 C=2 D=770 'Tags'
+00012 [L119] TGETS    A=3 B=3 C=3 D=771 'Icon'
+00013 [L119] KPRI     A=4 B=0 C=2 D=2 
+00014 [L119] CALL     A=1 B=1 C=4 D=260 
+00015 [L120] MOV      A=2 B=0 C=0 D=0 
+00016 [L120] TGETS    A=1 B=0 C=1 D=1 'removeChildByTag'
+00017 [L120] UGET     A=3 B=0 C=1 D=1 g_self
+00018 [L120] TGETS    A=3 B=3 C=2 D=770 'Tags'
+00019 [L120] TGETS    A=3 B=3 C=4 D=772 'Choose'
+00020 [L120] KPRI     A=4 B=0 C=2 D=2 
+00021 [L120] CALL     A=1 B=1 C=4 D=260 
+00022 [L121] UGET     A=1 B=0 C=0 D=0 g_transUI
+00023 [L121] TGETS    A=1 B=1 C=5 D=261 'equipInfo'
+00024 [L121] ISF      A=0 B=0 C=1 D=1 
+00025 [L121] JMP      A=2 B=128 C=32 D=32800 target=58
+00026 [L122] GGET     A=1 B=0 C=6 D=6 'd_ms'
+00027 [L122] TGETS    A=1 B=1 C=7 D=263 'd_data'
+00028 [L122] TGETS    A=1 B=1 C=8 D=264 'getCertainSmallSprite'
+00029 [L122] UGET     A=2 B=0 C=0 D=0 g_transUI
+00030 [L122] TGETS    A=2 B=2 C=5 D=517 'equipInfo'
+00031 [L122] TGETS    A=2 B=2 C=9 D=521 'attach_type'
+00032 [L122] UGET     A=3 B=0 C=0 D=0 g_transUI
+00033 [L122] TGETS    A=3 B=3 C=5 D=773 'equipInfo'
+00034 [L122] TGETS    A=3 B=3 C=10 D=778 'type_id'
+00035 [L122] CALL     A=1 B=2 C=3 D=515 
+00036 [L123] GGET     A=2 B=0 C=6 D=6 'd_ms'
+00037 [L123] TGETS    A=2 B=2 C=11 D=523 'd_u'
+00038 [L123] TGETS    A=2 B=2 C=12 D=524 'setStyles'
+00039 [L123] MOV      A=3 B=0 C=1 D=1 
+00040 [L123] TDUP     A=4 B=0 C=15 D=15 {'kind': 'table', 'value': {'scale': 0.1}}
+00041 [L123] UGET     A=5 B=0 C=1 D=1 g_self
+00042 [L123] TGETS    A=5 B=5 C=13 D=1293 'IconPos'
+00043 [L123] TGETS    A=5 B=5 C=14 D=1294 'x'
+00044 [L123] TSETS    A=5 B=4 C=14 D=1038 'x'
+00045 [L123] UGET     A=5 B=0 C=1 D=1 g_self
+00046 [L123] TGETS    A=5 B=5 C=13 D=1293 'IconPos'
+00047 [L123] TGETS    A=5 B=5 C=16 D=1296 'y'
+00048 [L123] TSETS    A=5 B=4 C=16 D=1040 'y'
+00049 [L123] CALL     A=2 B=1 C=3 D=259 
+00050 [L124] MOV      A=3 B=0 C=0 D=0 
+00051 [L124] TGETS    A=2 B=0 C=17 D=17 'addChild'
+00052 [L124] MOV      A=4 B=0 C=1 D=1 
+00053 [L124] KSHORT   A=5 B=0 C=3 D=3 3
+00054 [L124] UGET     A=6 B=0 C=1 D=1 g_self
+00055 [L124] TGETS    A=6 B=6 C=2 D=1538 'Tags'
+00056 [L124] TGETS    A=6 B=6 C=3 D=1539 'Icon'
+00057 [L124] CALL     A=2 B=1 C=5 D=261 
+00058 [L126] GGET     A=1 B=0 C=18 D=18 'changeType'
+00059 [L126] CALL     A=1 B=1 C=1 D=257 
+00060 [L127] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto4 offset=0xd78 source_lines=129-148 params=1
+UPVALUES ['g_transUI', 'g_self', 'CCSprite']
+00001 [L130] UGET     A=1 B=0 C=0 D=0 g_transUI
+00002 [L130] TGETS    A=1 B=1 C=0 D=256 'main_layer'
+00003 [L130] IST      A=0 B=0 C=1 D=1 
+00004 [L130] JMP      A=1 B=128 C=1 D=32769 target=6
+00005 [L131] RET0     A=0 B=0 C=1 D=1 
+00006 [L134] UGET     A=1 B=0 C=0 D=0 g_transUI
+00007 [L134] TGETS    A=1 B=1 C=0 D=256 'main_layer'
+00008 [L135] MOV      A=3 B=0 C=1 D=1 
+00009 [L135] TGETS    A=2 B=1 C=1 D=257 'removeChildByTag'
+00010 [L135] UGET     A=4 B=0 C=1 D=1 g_self
+00011 [L135] TGETS    A=4 B=4 C=2 D=1026 'Tags'
+00012 [L135] TGETS    A=4 B=4 C=3 D=1027 'Check'
+00013 [L135] KPRI     A=5 B=0 C=2 D=2 
+00014 [L135] CALL     A=2 B=1 C=4 D=260 
+00015 [L137] UGET     A=2 B=0 C=0 D=0 g_transUI
+00016 [L137] TGETS    A=2 B=2 C=4 D=516 'equipInfo'
+00017 [L137] IST      A=0 B=0 C=2 D=2 
+00018 [L137] JMP      A=2 B=128 C=12 D=32780 target=31
+00019 [L137] ISF      A=0 B=0 C=0 D=0 
+00020 [L137] JMP      A=2 B=128 C=10 D=32778 target=31
+00021 [L138] GGET     A=2 B=0 C=5 D=5 'd_ms'
+00022 [L138] TGETS    A=2 B=2 C=6 D=518 'd_info'
+00023 [L138] TGETS    A=2 B=2 C=7 D=519 'show'
+00024 [L138] GGET     A=3 B=0 C=5 D=5 'd_ms'
+00025 [L138] TGETS    A=3 B=3 C=8 D=776 'd_hz'
+00026 [L138] TGETS    A=3 B=3 C=9 D=777 'gethz'
+00027 [L138] KSTR     A=4 B=0 C=10 D=10 'eTrans1'
+00028 [L138] CALL     A=3 B=0 C=2 D=2 
+00029 [L138] CALLM    A=2 B=1 C=0 D=256 
+00030 [L139] RET0     A=0 B=0 C=1 D=1 
+00031 [L142] ISF      A=0 B=0 C=0 D=0 
+00032 [L142] JMP      A=2 B=128 C=21 D=32789 target=54
+00033 [L143] UGET     A=2 B=0 C=2 D=2 CCSprite
+00034 [L143] MOV      A=3 B=0 C=2 D=2 
+00035 [L143] TGETS    A=2 B=2 C=11 D=523 'create'
+00036 [L143] KSTR     A=4 B=0 C=12 D=12 'v2/multi-selectUI/check.png'
+00037 [L143] CALL     A=2 B=2 C=3 D=515 
+00038 [L144] GGET     A=3 B=0 C=5 D=5 'd_ms'
+00039 [L144] TGETS    A=3 B=3 C=13 D=781 'd_u'
+00040 [L144] TGETS    A=3 B=3 C=14 D=782 'setStyles'
+00041 [L144] MOV      A=4 B=0 C=2 D=2 
+00042 [L144] UGET     A=5 B=0 C=1 D=1 g_self
+00043 [L144] TGETS    A=5 B=5 C=15 D=1295 'CheckPos'
+00044 [L144] TGETV    A=5 B=5 C=0 D=1280 
+00045 [L144] CALL     A=3 B=1 C=3 D=259 
+00046 [L145] MOV      A=4 B=0 C=1 D=1 
+00047 [L145] TGETS    A=3 B=1 C=16 D=272 'addChild'
+00048 [L145] MOV      A=5 B=0 C=2 D=2 
+00049 [L145] KSHORT   A=6 B=0 C=3 D=3 3
+00050 [L145] UGET     A=7 B=0 C=1 D=1 g_self
+00051 [L145] TGETS    A=7 B=7 C=2 D=1794 'Tags'
+00052 [L145] TGETS    A=7 B=7 C=3 D=1795 'Check'
+00053 [L145] CALL     A=3 B=1 C=5 D=261 
+00054 [L147] UGET     A=2 B=0 C=0 D=0 g_transUI
+00055 [L147] TSETS    A=0 B=2 C=17 D=529 'targetType'
+00056 [L148] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto5 offset=0xf7d source_lines=150-166 params=0
+UPVALUES ['g_transUI']
+00001 [L151] UGET     A=0 B=0 C=0 D=0 g_transUI
+00002 [L151] TGETS    A=0 B=0 C=0 D=0 'equipInfo'
+00003 [L151] IST      A=0 B=0 C=0 D=0 
+00004 [L151] JMP      A=0 B=128 C=11 D=32779 target=16
+00005 [L152] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00006 [L152] TGETS    A=0 B=0 C=2 D=2 'd_info'
+00007 [L152] TGETS    A=0 B=0 C=3 D=3 'show'
+00008 [L152] GGET     A=1 B=0 C=1 D=1 'd_ms'
+00009 [L152] TGETS    A=1 B=1 C=4 D=260 'd_hz'
+00010 [L152] TGETS    A=1 B=1 C=5 D=261 'gethz'
+00011 [L152] KSTR     A=2 B=0 C=6 D=6 'eTrans1'
+00012 [L152] CALL     A=1 B=0 C=2 D=2 
+00013 [L152] CALLM    A=0 B=1 C=0 D=256 
+00014 [L153] RET0     A=0 B=0 C=1 D=1 
+00015 [L153] JMP      A=0 B=128 C=14 D=32782 target=30
+00016 [L154] UGET     A=0 B=0 C=0 D=0 g_transUI
+00017 [L154] TGETS    A=0 B=0 C=7 D=7 'targetType'
+00018 [L154] IST      A=0 B=0 C=0 D=0 
+00019 [L154] JMP      A=0 B=128 C=10 D=32778 target=30
+00020 [L155] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00021 [L155] TGETS    A=0 B=0 C=2 D=2 'd_info'
+00022 [L155] TGETS    A=0 B=0 C=3 D=3 'show'
+00023 [L155] GGET     A=1 B=0 C=1 D=1 'd_ms'
+00024 [L155] TGETS    A=1 B=1 C=4 D=260 'd_hz'
+00025 [L155] TGETS    A=1 B=1 C=5 D=261 'gethz'
+00026 [L155] KSTR     A=2 B=0 C=8 D=8 'eTrans2'
+00027 [L155] CALL     A=1 B=0 C=2 D=2 
+00028 [L155] CALLM    A=0 B=1 C=0 D=256 
+00029 [L156] RET0     A=0 B=0 C=1 D=1 
+00030 [L161] TNEW     A=0 B=0 C=0 D=0 
+00031 [L162] UGET     A=1 B=0 C=0 D=0 g_transUI
+00032 [L162] TGETS    A=1 B=1 C=0 D=256 'equipInfo'
+00033 [L162] TGETS    A=1 B=1 C=10 D=266 'id'
+00034 [L162] TSETS    A=1 B=0 C=9 D=9 'item_id'
+00035 [L163] UGET     A=1 B=0 C=0 D=0 g_transUI
+00036 [L163] TGETS    A=1 B=1 C=7 D=263 'targetType'
+00037 [L163] TSETS    A=1 B=0 C=11 D=11 'state'
+00038 [L165] GGET     A=1 B=0 C=1 D=1 'd_ms'
+00039 [L165] TGETS    A=1 B=1 C=12 D=268 'd_u'
+00040 [L165] TGETS    A=1 B=1 C=13 D=269 'main_server_send_msg'
+00041 [L165] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00042 [L165] TGETS    A=2 B=2 C=14 D=526 'd_msg_def'
+00043 [L165] TGETS    A=2 B=2 C=15 D=527 'gscl_msg_id'
+00044 [L165] TGETS    A=2 B=2 C=16 D=528 'msg_item_transform'
+00045 [L165] MOV      A=3 B=0 C=0 D=0 
+00046 [L165] CALL     A=1 B=1 C=3 D=259 
+00047 [L166] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x111f source_lines=186-188 params=0
+UPVALUES ['layer']
+00001 [L187] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L187] TGETS    A=0 B=0 C=1 D=1 'd_u'
+00003 [L187] TGETS    A=0 B=0 C=2 D=2 'remove'
+00004 [L187] UGET     A=1 B=0 C=0 D=0 layer
+00005 [L187] CALL     A=0 B=1 C=2 D=258 
+00006 [L188] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto7 offset=0x1163 source_lines=169-206 params=0
+UPVALUES ['g_transUI', 'CCLayer', 'g_self', 'CCSprite', 'scrSize', 'CCSizeMake']
+00001 [L170] GGET     A=0 B=0 C=0 D=0 'getTransformEquipsExcept'
+00002 [L170] UGET     A=1 B=0 C=0 D=0 g_transUI
+00003 [L170] TGETS    A=1 B=1 C=1 D=257 'equipInfo'
+00004 [L170] ISF      A=0 B=0 C=1 D=1 
+00005 [L170] JMP      A=2 B=128 C=3 D=32771 target=9
+00006 [L170] UGET     A=1 B=0 C=0 D=0 g_transUI
+00007 [L170] TGETS    A=1 B=1 C=1 D=257 'equipInfo'
+00008 [L170] TGETS    A=1 B=1 C=2 D=258 'id'
+00009 [L170] CALL     A=0 B=2 C=2 D=514 
+00010 [L172] LEN      A=1 B=0 C=0 D=0 
+00011 [L172] ISNEN    A=1 B=0 C=0 D=0 0
+00012 [L172] JMP      A=1 B=128 C=10 D=32778 target=23
+00013 [L173] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00014 [L173] TGETS    A=1 B=1 C=4 D=260 'd_info'
+00015 [L173] TGETS    A=1 B=1 C=5 D=261 'show'
+00016 [L173] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00017 [L173] TGETS    A=2 B=2 C=6 D=518 'd_hz'
+00018 [L173] TGETS    A=2 B=2 C=7 D=519 'gethz'
+00019 [L173] KSTR     A=3 B=0 C=8 D=8 'eTrans4'
+00020 [L173] CALL     A=2 B=0 C=2 D=2 
+00021 [L173] CALLM    A=1 B=1 C=0 D=256 
+00022 [L174] UCLO     A=0 B=128 C=92 D=32860 target=115
+00023 [L178] UGET     A=1 B=0 C=1 D=1 CCLayer
+00024 [L178] MOV      A=2 B=0 C=1 D=1 
+00025 [L178] TGETS    A=1 B=1 C=9 D=265 'create'
+00026 [L178] CALL     A=1 B=2 C=2 D=514 
+00027 [L179] UGET     A=2 B=0 C=0 D=0 g_transUI
+00028 [L179] TGETS    A=2 B=2 C=10 D=522 'main_layer'
+00029 [L179] MOV      A=3 B=0 C=2 D=2 
+00030 [L179] TGETS    A=2 B=2 C=11 D=523 'addChild'
+00031 [L179] MOV      A=4 B=0 C=1 D=1 
+00032 [L179] KSHORT   A=5 B=0 C=200 D=200 200
+00033 [L179] UGET     A=6 B=0 C=2 D=2 g_self
+00034 [L179] TGETS    A=6 B=6 C=12 D=1548 'Tags'
+00035 [L179] TGETS    A=6 B=6 C=13 D=1549 'Choose'
+00036 [L179] CALL     A=2 B=1 C=5 D=261 
+00037 [L180] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00038 [L180] TGETS    A=2 B=2 C=14 D=526 'd_u'
+00039 [L180] TGETS    A=2 B=2 C=15 D=527 'createSwallowTouchLayer'
+00040 [L180] MOV      A=3 B=0 C=1 D=1 
+00041 [L180] CALL     A=2 B=1 C=2 D=258 
+00042 [L182] UGET     A=2 B=0 C=3 D=3 CCSprite
+00043 [L182] MOV      A=3 B=0 C=2 D=2 
+00044 [L182] TGETS    A=2 B=2 C=9 D=521 'create'
+00045 [L182] KSTR     A=4 B=0 C=16 D=16 'v2/common/frame3.png'
+00046 [L182] CALL     A=2 B=2 C=3 D=515 
+00047 [L183] GGET     A=3 B=0 C=3 D=3 'd_ms'
+00048 [L183] TGETS    A=3 B=3 C=14 D=782 'd_u'
+00049 [L183] TGETS    A=3 B=3 C=17 D=785 'setStyles'
+00050 [L183] MOV      A=4 B=0 C=2 D=2 
+00051 [L183] TDUP     A=5 B=0 C=18 D=18 {'kind': 'table', 'value': {'scaleY': 0.95, 'scaleX': 0.62, 'x': 0.5, 'y': 0.5}}
+00052 [L183] CALL     A=3 B=1 C=3 D=259 
+00053 [L184] MOV      A=4 B=0 C=1 D=1 
+00054 [L184] TGETS    A=3 B=1 C=11 D=267 'addChild'
+00055 [L184] MOV      A=5 B=0 C=2 D=2 
+00056 [L184] CALL     A=3 B=1 C=3 D=259 
+00057 [L188] FNEW     A=3 B=0 C=19 D=19 {'kind': 'proto', 'id': 6}
+00058 [L190] TDUP     A=4 B=0 C=20 D=20 {'kind': 'table', 'value': {'x': 0, 'y': 0}}
+00059 [L193] TDUP     A=5 B=0 C=21 D=21 {'kind': 'table', 'value': {'npic': 'v2/introUI/close1.png', 'spic': 'v2/introUI/close2.png', 'y': 0.95, 'x': 0.82}}
+00060 [L194] TSETS    A=3 B=5 C=22 D=1302 'call_back'
+00061 [L194] TSETB    A=5 B=4 C=1 D=1025 
+00062 [L196] MOV      A=6 B=0 C=1 D=1 
+00063 [L196] TGETS    A=5 B=1 C=11 D=267 'addChild'
+00064 [L196] GGET     A=7 B=0 C=3 D=3 'd_ms'
+00065 [L196] TGETS    A=7 B=7 C=14 D=1806 'd_u'
+00066 [L196] TGETS    A=7 B=7 C=23 D=1815 'createMenu'
+00067 [L196] MOV      A=8 B=0 C=4 D=4 
+00068 [L196] CALL     A=7 B=2 C=2 D=514 
+00069 [L196] KSHORT   A=8 B=0 C=10 D=10 10
+00070 [L196] CALL     A=5 B=1 C=4 D=260 
+00071 [L199] TDUP     A=5 B=0 C=25 D=25 {'kind': 'table', 'value': {}}
+00072 [L199] UGET     A=6 B=0 C=4 D=4 scrSize
+00073 [L199] TGETS    A=6 B=6 C=24 D=1560 'width'
+00074 [L199] MULNV    A=6 B=6 C=1 D=1537 
+00075 [L199] TSETS    A=6 B=5 C=26 D=1306 'x'
+00076 [L199] UGET     A=6 B=0 C=4 D=4 scrSize
+00077 [L199] TGETS    A=6 B=6 C=27 D=1563 'height'
+00078 [L199] MULNV    A=6 B=6 C=2 D=1538 
+00079 [L199] TSETS    A=6 B=5 C=28 D=1308 'y'
+00080 [L199] UGET     A=6 B=0 C=4 D=4 scrSize
+00081 [L199] TGETS    A=6 B=6 C=24 D=1560 'width'
+00082 [L199] MULNV    A=6 B=6 C=3 D=1539 
+00083 [L199] TSETS    A=6 B=5 C=24 D=1304 'width'
+00084 [L199] UGET     A=6 B=0 C=4 D=4 scrSize
+00085 [L199] TGETS    A=6 B=6 C=27 D=1563 'height'
+00086 [L199] MULNV    A=6 B=6 C=4 D=1540 
+00087 [L199] TSETS    A=6 B=5 C=27 D=1307 'height'
+00088 [L200] UGET     A=6 B=0 C=5 D=5 CCSizeMake
+00089 [L200] UGET     A=7 B=0 C=4 D=4 scrSize
+00090 [L200] TGETS    A=7 B=7 C=24 D=1816 'width'
+00091 [L200] MULNV    A=7 B=7 C=3 D=1795 
+00092 [L200] UGET     A=8 B=0 C=4 D=4 scrSize
+00093 [L200] TGETS    A=8 B=8 C=27 D=2075 'height'
+00094 [L200] MULNV    A=8 B=8 C=1 D=2049 
+00095 [L200] CALL     A=6 B=2 C=3 D=515 
+00096 [L202] GGET     A=7 B=0 C=3 D=3 'd_ms'
+00097 [L202] TGETS    A=7 B=7 C=29 D=1821 'd_tableView'
+00098 [L202] TGETS    A=7 B=7 C=30 D=1822 'tableView'
+00099 [L202] MOV      A=8 B=0 C=1 D=1 
+00100 [L202] MOV      A=9 B=0 C=5 D=5 
+00101 [L202] CALL     A=7 B=2 C=3 D=515 
+00102 [L203] GGET     A=8 B=0 C=31 D=31 'getTransformEquipCellsDataSource'
+00103 [L203] MOV      A=9 B=0 C=0 D=0 
+00104 [L203] MOV      A=10 B=0 C=6 D=6 
+00105 [L203] CALL     A=8 B=2 C=3 D=515 
+00106 [L204] MOV      A=10 B=0 C=7 D=7 
+00107 [L204] TGETS    A=9 B=7 C=32 D=1824 'startScroll'
+00108 [L204] CALL     A=9 B=1 C=2 D=258 
+00109 [L205] MOV      A=10 B=0 C=7 D=7 
+00110 [L205] TGETS    A=9 B=7 C=33 D=1825 'setDataSource'
+00111 [L205] MOV      A=11 B=0 C=8 D=8 
+00112 [L205] CALL     A=9 B=1 C=3 D=259 
+00113 [L206] UCLO     A=0 B=128 C=0 D=32768 target=114
+00114 [L206] RET0     A=0 B=0 C=1 D=1 
+00115 [L206] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto8 offset=0x1656 source_lines=208-215 params=1
+UPVALUES ['pairs']
+00001 [L209] GGET     A=1 B=0 C=0 D=0 'getFilter'
+00002 [L209] CALL     A=1 B=2 C=1 D=513 
+00003 [L210] UGET     A=2 B=0 C=0 D=0 pairs
+00004 [L210] MOV      A=3 B=0 C=1 D=1 
+00005 [L210] CALL     A=2 B=4 C=2 D=1026 
+00006 [L210] ISNEXT   A=5 B=128 C=5 D=32773 target=12
+00007 [L211] TGETS    A=7 B=6 C=1 D=1537 'attach_type'
+00008 [L211] ISNEV    A=0 B=0 C=7 D=7 
+00009 [L211] JMP      A=7 B=128 C=2 D=32770 target=12
+00010 [L212] KPRI     A=7 B=0 C=2 D=2 
+00011 [L212] RET1     A=7 B=0 C=2 D=2 
+00012 [L210] ITERN    A=5 B=3 C=3 D=771 
+00013 [L210] ITERL    A=5 B=127 C=249 D=32761 target=7
+00014 [L215] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto9 offset=0x16ec source_lines=218-238 params=1
+UPVALUES ['o_t', 'pairs', 'm_t', 'table']
+00001 [L219] TNEW     A=1 B=0 C=0 D=0 
+00002 [L220] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00003 [L220] TGETS    A=2 B=2 C=1 D=513 'd_packageUI'
+00004 [L220] TGETS    A=2 B=2 C=2 D=514 'g_reorgItemsInfo'
+00005 [L220] UGET     A=3 B=0 C=0 D=0 o_t
+00006 [L220] TGETS    A=3 B=3 C=3 D=771 'item'
+00007 [L220] TGETV    A=2 B=2 C=3 D=515 
+00008 [L221] UGET     A=3 B=0 C=1 D=1 pairs
+00009 [L221] MOV      A=4 B=0 C=2 D=2 
+00010 [L221] CALL     A=3 B=4 C=2 D=1026 
+00011 [L221] ISNEXT   A=6 B=128 C=36 D=32804 target=48
+00012 [L222] UGET     A=8 B=0 C=2 D=2 m_t
+00013 [L222] TGETS    A=8 B=8 C=4 D=2052 'talismans'
+00014 [L222] ISGT     A=6 B=0 C=8 D=8 
+00015 [L222] JMP      A=8 B=128 C=32 D=32800 target=48
+00016 [L223] UGET     A=8 B=0 C=1 D=1 pairs
+00017 [L223] MOV      A=9 B=0 C=7 D=7 
+00018 [L223] CALL     A=8 B=4 C=2 D=1026 
+00019 [L223] ISNEXT   A=11 B=128 C=26 D=32794 target=46
+00020 [L224] ISF      A=0 B=0 C=0 D=0 
+00021 [L224] JMP      A=13 B=128 C=3 D=32771 target=25
+00022 [L224] TGETS    A=13 B=12 C=5 D=3077 'id'
+00023 [L224] ISEQV    A=13 B=0 C=0 D=0 
+00024 [L224] JMP      A=13 B=128 C=21 D=32789 target=46
+00025 [L225] TGETS    A=13 B=12 C=6 D=3078 'csvInfo'
+00026 [L225] TGETS    A=13 B=13 C=7 D=3335 'quality'
+00027 [L225] KSHORT   A=14 B=0 C=5 D=5 5
+00028 [L225] ISGT     A=14 B=0 C=13 D=13 
+00029 [L225] JMP      A=13 B=128 C=16 D=32784 target=46
+00030 [L226] TGETS    A=13 B=12 C=8 D=3080 'equip_order'
+00031 [L226] ISNEN    A=13 B=0 C=0 D=0 0
+00032 [L226] JMP      A=13 B=128 C=13 D=32781 target=46
+00033 [L227] GGET     A=13 B=0 C=9 D=9 'isChangable'
+00034 [L228] TGETS    A=14 B=12 C=10 D=3082 'type_id'
+00035 [L227] CALL     A=13 B=2 C=2 D=514 
+00036 [L228] ISF      A=0 B=0 C=13 D=13 
+00037 [L228] JMP      A=14 B=128 C=8 D=32776 target=46
+00038 [L229] TGETS    A=13 B=12 C=11 D=3083 'star_level'
+00039 [L229] ISEQN    A=13 B=0 C=1 D=1 1
+00040 [L229] JMP      A=13 B=128 C=5 D=32773 target=46
+00041 [L230] UGET     A=13 B=0 C=3 D=3 table
+00042 [L230] TGETS    A=13 B=13 C=12 D=3340 'insert'
+00043 [L230] MOV      A=14 B=0 C=1 D=1 
+00044 [L230] MOV      A=15 B=0 C=12 D=12 
+00045 [L230] CALL     A=13 B=1 C=3 D=259 
+00046 [L223] ITERN    A=11 B=3 C=3 D=771 
+00047 [L223] ITERL    A=11 B=127 C=228 D=32740 target=20
+00048 [L221] ITERN    A=6 B=3 C=3 D=771 
+00049 [L221] ITERL    A=6 B=127 C=218 D=32730 target=12
+00050 [L236] UGET     A=3 B=0 C=3 D=3 table
+00051 [L236] TGETS    A=3 B=3 C=13 D=781 'sort'
+00052 [L236] MOV      A=4 B=0 C=1 D=1 
+00053 [L236] GGET     A=5 B=0 C=0 D=0 'd_ms'
+00054 [L236] TGETS    A=5 B=5 C=1 D=1281 'd_packageUI'
+00055 [L236] TGETS    A=5 B=5 C=14 D=1294 'packageSortFunc'
+00056 [L236] CALL     A=3 B=1 C=3 D=259 
+00057 [L237] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto10 offset=0x18fe source_lines=245-247 params=0
+UPVALUES ['num']
+00001 [L246] UGET     A=0 B=0 C=0 D=0 num
+00002 [L246] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto11 offset=0x191c source_lines=249-255 params=1
+UPVALUES ['CCNode', 'equips', 'bkgPic', 'cellSize']
+00001 [L250] UGET     A=1 B=0 C=0 D=0 CCNode
+00002 [L250] MOV      A=2 B=0 C=1 D=1 
+00003 [L250] TGETS    A=1 B=1 C=0 D=256 'create'
+00004 [L250] CALL     A=1 B=2 C=2 D=514 
+00005 [L251] UGET     A=2 B=0 C=1 D=1 equips
+00006 [L251] TGETV    A=2 B=2 C=0 D=512 
+00007 [L251] ISF      A=0 B=0 C=2 D=2 
+00008 [L251] JMP      A=3 B=128 C=7 D=32775 target=16
+00009 [L252] GGET     A=2 B=0 C=1 D=1 'createEquipCellOnTransform'
+00010 [L252] MOV      A=3 B=0 C=1 D=1 
+00011 [L252] UGET     A=4 B=0 C=1 D=1 equips
+00012 [L252] TGETV    A=4 B=4 C=0 D=1024 
+00013 [L252] UGET     A=5 B=0 C=2 D=2 bkgPic
+00014 [L252] UGET     A=6 B=0 C=3 D=3 cellSize
+00015 [L252] CALL     A=2 B=1 C=5 D=261 
+00016 [L254] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto12 offset=0x19d0 source_lines=257-259 params=1
+UPVALUES ['cellSize']
+00001 [L258] UGET     A=1 B=0 C=0 D=0 cellSize
+00002 [L258] TGETS    A=1 B=1 C=0 D=256 'height'
+00003 [L258] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto13 offset=0x1a07 source_lines=240-262 params=2
+UPVALUES ['CCNode']
+00001 [L241] KSTR     A=2 B=0 C=0 D=0 'v2/charPositionUI/item_bkg.png'
+00002 [L243] TNEW     A=3 B=0 C=0 D=0 
+00003 [L244] LEN      A=4 B=0 C=0 D=0 
+00004 [L247] FNEW     A=5 B=0 C=2 D=2 {'kind': 'proto', 'id': 10}
+00005 [L247] TSETS    A=5 B=3 C=1 D=769 'tableViewNumberOfRows'
+00006 [L255] FNEW     A=5 B=0 C=4 D=4 {'kind': 'proto', 'id': 11}
+00007 [L255] TSETS    A=5 B=3 C=3 D=771 'drawCellAtIndex'
+00008 [L259] FNEW     A=5 B=0 C=6 D=6 {'kind': 'proto', 'id': 12}
+00009 [L259] TSETS    A=5 B=3 C=5 D=773 'heightForRowAtIndex'
+00010 [L261] UCLO     A=0 B=128 C=0 D=32768 target=11
+00011 [L261] RET1     A=3 B=0 C=2 D=2 
+
+FUNCTION proto14 offset=0x1ae0 source_lines=267-270 params=0
+UPVALUES ['g_transUI', 'itemInfo']
+00001 [L268] UGET     A=0 B=0 C=0 D=0 g_transUI
+00002 [L268] UGET     A=1 B=0 C=1 D=1 itemInfo
+00003 [L268] TSETS    A=1 B=0 C=0 D=0 'equipInfo'
+00004 [L269] GGET     A=0 B=0 C=1 D=1 'changeEquip'
+00005 [L269] CALL     A=0 B=1 C=1 D=257 
+00006 [L270] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto15 offset=0x1b39 source_lines=264-281 params=4
+UPVALUES ['g_transUI', 'BtnPics', 'CCMenuItemImage', 'CCMenu']
+00001 [L265] GGET     A=4 B=0 C=0 D=0 'd_ms'
+00002 [L265] TGETS    A=4 B=4 C=1 D=1025 'd_createCell'
+00003 [L265] TGETS    A=4 B=4 C=2 D=1026 'createCellWithOwnerNoBtn'
+00004 [L265] MOV      A=5 B=0 C=0 D=0 
+00005 [L265] MOV      A=6 B=0 C=1 D=1 
+00006 [L265] MOV      A=7 B=0 C=2 D=2 
+00007 [L265] MOV      A=8 B=0 C=3 D=3 
+00008 [L265] CALL     A=4 B=1 C=5 D=261 
+00009 [L270] FNEW     A=4 B=0 C=3 D=3 {'kind': 'proto', 'id': 14}
+00010 [L272] UGET     A=5 B=0 C=0 D=0 g_transUI
+00011 [L272] TGETS    A=5 B=5 C=4 D=1284 'equipInfo'
+00012 [L272] ISF      A=0 B=0 C=5 D=5 
+00013 [L272] JMP      A=6 B=128 C=4 D=32772 target=18
+00014 [L272] UGET     A=5 B=0 C=1 D=1 BtnPics
+00015 [L272] TGETS    A=5 B=5 C=5 D=1285 'change'
+00016 [L272] IST      A=0 B=0 C=5 D=5 
+00017 [L272] JMP      A=6 B=128 C=2 D=32770 target=20
+00018 [L272] UGET     A=5 B=0 C=1 D=1 BtnPics
+00019 [L272] TGETS    A=5 B=5 C=6 D=1286 'choose'
+00020 [L274] UGET     A=6 B=0 C=2 D=2 CCMenuItemImage
+00021 [L274] MOV      A=7 B=0 C=6 D=6 
+00022 [L274] TGETS    A=6 B=6 C=7 D=1543 'create'
+00023 [L274] TGETB    A=8 B=5 C=1 D=1281 
+00024 [L274] TGETB    A=9 B=5 C=2 D=1282 
+00025 [L274] CALL     A=6 B=2 C=4 D=516 
+00026 [L275] MOV      A=8 B=0 C=6 D=6 
+00027 [L275] TGETS    A=7 B=6 C=8 D=1544 'setPosition'
+00028 [L275] TGETS    A=9 B=3 C=9 D=777 'width'
+00029 [L275] MULVN    A=9 B=9 C=0 D=2304 
+00030 [L275] TGETS    A=10 B=3 C=10 D=778 'height'
+00031 [L275] MULVN    A=10 B=10 C=1 D=2561 
+00032 [L275] CALL     A=7 B=1 C=4 D=260 
+00033 [L276] MOV      A=8 B=0 C=6 D=6 
+00034 [L276] TGETS    A=7 B=6 C=11 D=1547 'registerScriptTapHandler'
+00035 [L276] MOV      A=9 B=0 C=4 D=4 
+00036 [L276] CALL     A=7 B=1 C=3 D=259 
+00037 [L278] UGET     A=7 B=0 C=3 D=3 CCMenu
+00038 [L278] MOV      A=8 B=0 C=7 D=7 
+00039 [L278] TGETS    A=7 B=7 C=12 D=1804 'createWithItem'
+00040 [L278] MOV      A=9 B=0 C=6 D=6 
+00041 [L278] CALL     A=7 B=2 C=3 D=515 
+00042 [L279] MOV      A=9 B=0 C=7 D=7 
+00043 [L279] TGETS    A=8 B=7 C=8 D=1800 'setPosition'
+00044 [L279] KSHORT   A=10 B=0 C=0 D=0 0
+00045 [L279] KSHORT   A=11 B=0 C=0 D=0 0
+00046 [L279] CALL     A=8 B=1 C=4 D=260 
+00047 [L280] MOV      A=9 B=0 C=0 D=0 
+00048 [L280] TGETS    A=8 B=0 C=13 D=13 'addChild'
+00049 [L280] MOV      A=10 B=0 C=7 D=7 
+00050 [L280] KSHORT   A=11 B=0 C=5 D=5 5
+00051 [L280] CALL     A=8 B=1 C=4 D=260 
+00052 [L281] UCLO     A=0 B=128 C=0 D=32768 target=53
+00053 [L281] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto16 offset=0x1d85 source_lines=316-318 params=0
+UPVALUES ['main_layer', 'item']
+00001 [L317] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L317] TGETS    A=0 B=0 C=1 D=1 'd_data'
+00003 [L317] TGETS    A=0 B=0 C=2 D=2 'showCertainIntro'
+00004 [L317] UGET     A=1 B=0 C=0 D=0 main_layer
+00005 [L317] UGET     A=2 B=0 C=1 D=1 item
+00006 [L317] KPRI     A=3 B=0 C=2 D=2 
+00007 [L317] CALL     A=0 B=1 C=4 D=260 
+00008 [L318] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto17 offset=0x1dec source_lines=283-329 params=1
+UPVALUES ['g_transUI', 'i_t_r', 'CCLayerColor', 'ccc4', 'g_self', 'CCSprite']
+00001 [L284] UGET     A=1 B=0 C=0 D=0 g_transUI
+00002 [L284] TGETS    A=1 B=1 C=0 D=256 'main_layer'
+00003 [L285] IST      A=0 B=0 C=1 D=1 
+00004 [L285] JMP      A=2 B=128 C=1 D=32769 target=6
+00005 [L286] UCLO     A=0 B=128 C=167 D=32935 target=173
+00006 [L288] TGETS    A=2 B=0 C=1 D=1 'result'
+00007 [L288] UGET     A=3 B=0 C=1 D=1 i_t_r
+00008 [L288] TGETS    A=3 B=3 C=2 D=770 'success'
+00009 [L288] ISEQV    A=2 B=0 C=3 D=3 
+00010 [L288] JMP      A=2 B=128 C=12 D=32780 target=23
+00011 [L289] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00012 [L289] TGETS    A=2 B=2 C=4 D=516 'd_info'
+00013 [L289] TGETS    A=2 B=2 C=5 D=517 'show'
+00014 [L289] GGET     A=3 B=0 C=3 D=3 'd_ms'
+00015 [L289] TGETS    A=3 B=3 C=6 D=774 'd_hz'
+00016 [L289] TGETS    A=3 B=3 C=7 D=775 'gethz'
+00017 [L289] KSTR     A=4 B=0 C=8 D=8 'eTransTip'
+00018 [L289] TGETS    A=5 B=0 C=1 D=1 'result'
+00019 [L289] CAT      A=4 B=4 C=5 D=1029 
+00020 [L289] CALL     A=3 B=0 C=2 D=2 
+00021 [L289] CALLM    A=2 B=1 C=0 D=256 
+00022 [L290] UCLO     A=0 B=128 C=151 D=32919 target=174
+00023 [L292] MOV      A=3 B=0 C=1 D=1 
+00024 [L292] TGETS    A=2 B=1 C=9 D=265 'removeAllChildrenWithCleanup'
+00025 [L292] KPRI     A=4 B=0 C=2 D=2 
+00026 [L292] CALL     A=2 B=1 C=3 D=259 
+00027 [L294] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00028 [L294] TGETS    A=2 B=2 C=10 D=522 'd_u'
+00029 [L294] TGETS    A=2 B=2 C=11 D=523 'createSwallowTouchLayer'
+00030 [L294] MOV      A=3 B=0 C=1 D=1 
+00031 [L294] CALL     A=2 B=1 C=2 D=258 
+00032 [L295] UGET     A=2 B=0 C=2 D=2 CCLayerColor
+00033 [L295] MOV      A=3 B=0 C=2 D=2 
+00034 [L295] TGETS    A=2 B=2 C=12 D=524 'create'
+00035 [L295] UGET     A=4 B=0 C=3 D=3 ccc4
+00036 [L295] KSHORT   A=5 B=0 C=0 D=0 0
+00037 [L295] KSHORT   A=6 B=0 C=0 D=0 0
+00038 [L295] KSHORT   A=7 B=0 C=0 D=0 0
+00039 [L295] KSHORT   A=8 B=0 C=100 D=100 100
+00040 [L295] CALL     A=4 B=0 C=5 D=5 
+00041 [L295] CALLM    A=2 B=2 C=1 D=513 
+00042 [L296] MOV      A=4 B=0 C=1 D=1 
+00043 [L296] TGETS    A=3 B=1 C=13 D=269 'addChild'
+00044 [L296] MOV      A=5 B=0 C=2 D=2 
+00045 [L296] KSHORT   A=6 B=255 C=255 D=65535 -1
+00046 [L296] CALL     A=3 B=1 C=4 D=260 
+00047 [L298] UGET     A=3 B=0 C=4 D=4 g_self
+00048 [L298] TGETS    A=3 B=3 C=14 D=782 'params'
+00049 [L298] TGETS    A=3 B=3 C=15 D=783 'mx'
+00050 [L298] UGET     A=4 B=0 C=4 D=4 g_self
+00051 [L298] TGETS    A=4 B=4 C=14 D=1038 'params'
+00052 [L298] TGETS    A=4 B=4 C=16 D=1040 'my'
+00053 [L299] UGET     A=5 B=0 C=5 D=5 CCSprite
+00054 [L299] MOV      A=6 B=0 C=5 D=5 
+00055 [L299] TGETS    A=5 B=5 C=12 D=1292 'create'
+00056 [L299] KSTR     A=7 B=0 C=17 D=17 'v2/qiankunnizhuan/success.png'
+00057 [L299] CALL     A=5 B=2 C=3 D=515 
+00058 [L300] GGET     A=6 B=0 C=3 D=3 'd_ms'
+00059 [L300] TGETS    A=6 B=6 C=10 D=1546 'd_u'
+00060 [L300] TGETS    A=6 B=6 C=18 D=1554 'setStyles'
+00061 [L300] MOV      A=7 B=0 C=5 D=5 
+00062 [L300] TDUP     A=8 B=0 C=19 D=19 {'kind': 'table', 'value': {}}
+00063 [L300] TSETS    A=3 B=8 C=20 D=2068 'x'
+00064 [L300] TSETS    A=4 B=8 C=21 D=2069 'y'
+00065 [L300] CALL     A=6 B=1 C=3 D=259 
+00066 [L301] MOV      A=7 B=0 C=1 D=1 
+00067 [L301] TGETS    A=6 B=1 C=13 D=269 'addChild'
+00068 [L301] MOV      A=8 B=0 C=5 D=5 
+00069 [L301] CALL     A=6 B=1 C=3 D=259 
+00070 [L303] GGET     A=6 B=0 C=3 D=3 'd_ms'
+00071 [L303] TGETS    A=6 B=6 C=10 D=1546 'd_u'
+00072 [L303] TGETS    A=6 B=6 C=22 D=1558 'getRealScale'
+00073 [L303] MOV      A=7 B=0 C=5 D=5 
+00074 [L303] CALL     A=6 B=3 C=2 D=770 
+00075 [L305] GGET     A=8 B=0 C=3 D=3 'd_ms'
+00076 [L305] TGETS    A=8 B=8 C=10 D=2058 'd_u'
+00077 [L305] TGETS    A=8 B=8 C=23 D=2071 'createByStyle'
+00078 [L305] TDUP     A=9 B=0 C=24 D=24 {'kind': 'table', 'value': {'font': 'arial', 'type': 'label', 'fontsize': 30}}
+00079 [L305] TSETS    A=3 B=9 C=20 D=2324 'x'
+00080 [L305] MULNV    A=10 B=7 C=0 D=1792 
+00081 [L305] ADDVV    A=10 B=4 C=10 D=1034 
+00082 [L305] TSETS    A=10 B=9 C=21 D=2325 'y'
+00083 [L305] TDUP     A=10 B=0 C=25 D=25 {'kind': 'table', 'value': {1: 255, 2: 215, 3: 131}}
+00084 [L305] TSETS    A=10 B=9 C=26 D=2330 'color'
+00085 [L305] GGET     A=10 B=0 C=3 D=3 'd_ms'
+00086 [L305] TGETS    A=10 B=10 C=6 D=2566 'd_hz'
+00087 [L305] TGETS    A=10 B=10 C=7 D=2567 'gethz'
+00088 [L305] KSTR     A=11 B=0 C=27 D=27 'transformSuccess'
+00089 [L305] CALL     A=10 B=2 C=2 D=514 
+00090 [L305] TSETS    A=10 B=9 C=28 D=2332 'string'
+00091 [L305] CALL     A=8 B=2 C=2 D=514 
+00092 [L306] MOV      A=10 B=0 C=1 D=1 
+00093 [L306] TGETS    A=9 B=1 C=13 D=269 'addChild'
+00094 [L306] MOV      A=11 B=0 C=8 D=8 
+00095 [L306] CALL     A=9 B=1 C=3 D=259 
+00096 [L308] GGET     A=9 B=0 C=29 D=29 'getEquipById'
+00097 [L308] TGETS    A=10 B=0 C=30 D=30 'item_id'
+00098 [L308] CALL     A=9 B=2 C=2 D=514 
+00099 [L309] GGET     A=10 B=0 C=3 D=3 'd_ms'
+00100 [L309] TGETS    A=10 B=10 C=10 D=2570 'd_u'
+00101 [L309] TGETS    A=10 B=10 C=23 D=2583 'createByStyle'
+00102 [L309] TDUP     A=11 B=0 C=31 D=31 {'kind': 'table', 'value': {'font': 'arial', 'type': 'label', 'fontsize': 26}}
+00103 [L309] TGETS    A=12 B=9 C=32 D=2336 'csvInfo'
+00104 [L309] TGETS    A=12 B=12 C=33 D=3105 'name'
+00105 [L309] TSETS    A=12 B=11 C=28 D=2844 'string'
+00106 [L309] TSETS    A=3 B=11 C=20 D=2836 'x'
+00107 [L309] MULNV    A=12 B=7 C=1 D=1793 
+00108 [L309] SUBVV    A=12 B=4 C=12 D=1036 
+00109 [L309] TSETS    A=12 B=11 C=21 D=2837 'y'
+00110 [L309] TDUP     A=12 B=0 C=34 D=34 {'kind': 'table', 'value': {1: 172, 2: 152, 3: 128}}
+00111 [L309] TSETS    A=12 B=11 C=26 D=2842 'color'
+00112 [L309] CALL     A=10 B=2 C=2 D=514 
+00113 [L310] MOV      A=12 B=0 C=1 D=1 
+00114 [L310] TGETS    A=11 B=1 C=13 D=269 'addChild'
+00115 [L310] MOV      A=13 B=0 C=10 D=10 
+00116 [L310] KSHORT   A=14 B=0 C=1 D=1 1
+00117 [L310] CALL     A=11 B=1 C=4 D=260 
+00118 [L312] GGET     A=11 B=0 C=3 D=3 'd_ms'
+00119 [L312] TGETS    A=11 B=11 C=35 D=2851 'd_data'
+00120 [L312] TGETS    A=11 B=11 C=36 D=2852 'getCertainSmallSprite'
+00121 [L312] TGETS    A=12 B=9 C=37 D=2341 'attach_type'
+00122 [L312] TGETS    A=13 B=9 C=38 D=2342 'type_id'
+00123 [L312] CALL     A=11 B=2 C=3 D=515 
+00124 [L313] GGET     A=12 B=0 C=3 D=3 'd_ms'
+00125 [L313] TGETS    A=12 B=12 C=10 D=3082 'd_u'
+00126 [L313] TGETS    A=12 B=12 C=18 D=3090 'setStyles'
+00127 [L313] MOV      A=13 B=0 C=11 D=11 
+00128 [L313] TDUP     A=14 B=0 C=39 D=39 {'kind': 'table', 'value': {'scale': 0.1}}
+00129 [L313] TSETS    A=3 B=14 C=20 D=3604 'x'
+00130 [L313] MULNV    A=15 B=7 C=1 D=1793 
+00131 [L313] ADDVV    A=15 B=4 C=15 D=1039 
+00132 [L313] TSETS    A=15 B=14 C=21 D=3605 'y'
+00133 [L313] CALL     A=12 B=1 C=3 D=259 
+00134 [L314] MOV      A=13 B=0 C=1 D=1 
+00135 [L314] TGETS    A=12 B=1 C=13 D=269 'addChild'
+00136 [L314] MOV      A=14 B=0 C=11 D=11 
+00137 [L314] KSHORT   A=15 B=0 C=3 D=3 3
+00138 [L314] CALL     A=12 B=1 C=4 D=260 
+00139 [L318] FNEW     A=12 B=0 C=40 D=40 {'kind': 'proto', 'id': 16}
+00140 [L320] TDUP     A=13 B=0 C=41 D=41 {'kind': 'table', 'value': {}}
+00141 [L322] TSETS    A=3 B=13 C=20 D=3348 'x'
+00142 [L323] TSETS    A=4 B=13 C=21 D=3349 'y'
+00143 [L323] TDUP     A=14 B=0 C=42 D=42 {'kind': 'table', 'value': {'npic': 'v2/introUI/close1.png', 'spic': 'v2/introUI/close2.png'}}
+00144 [L324] MULNV    A=15 B=6 C=2 D=1538 
+00145 [L324] TSETS    A=15 B=14 C=20 D=3604 'x'
+00146 [L324] MULNV    A=15 B=7 C=2 D=1794 
+00147 [L324] TSETS    A=15 B=14 C=21 D=3605 'y'
+00148 [L324] GGET     A=15 B=0 C=43 D=43 'closeCallBack'
+00149 [L324] TSETS    A=15 B=14 C=44 D=3628 'call_back'
+00150 [L324] TSETB    A=14 B=13 C=1 D=3329 
+00151 [L324] TDUP     A=14 B=0 C=45 D=45 {'kind': 'table', 'value': {'npic': 'v2/qiankunnizhuan/ensure1.png', 'spic': 'v2/equipTransUI/ensure2.png', 'x': 0}}
+00152 [L325] MULNV    A=15 B=7 C=3 D=1795 
+00153 [L325] TSETS    A=15 B=14 C=21 D=3605 'y'
+00154 [L325] GGET     A=15 B=0 C=43 D=43 'closeCallBack'
+00155 [L325] TSETS    A=15 B=14 C=44 D=3628 'call_back'
+00156 [L325] TSETB    A=14 B=13 C=2 D=3330 
+00157 [L325] TDUP     A=14 B=0 C=46 D=46 {'kind': 'table', 'value': {'npic': 'v2/forgeUI/item_bkg.png', 'spic': 'v2/forgeUI/item_bkg.png', 'x': 0}}
+00158 [L326] MULNV    A=15 B=7 C=1 D=1793 
+00159 [L326] TSETS    A=15 B=14 C=21 D=3605 'y'
+00160 [L326] TSETS    A=12 B=14 C=44 D=3628 'call_back'
+00161 [L326] TSETB    A=14 B=13 C=3 D=3331 
+00162 [L328] MOV      A=15 B=0 C=1 D=1 
+00163 [L328] TGETS    A=14 B=1 C=13 D=269 'addChild'
+00164 [L328] GGET     A=16 B=0 C=3 D=3 'd_ms'
+00165 [L328] TGETS    A=16 B=16 C=10 D=4106 'd_u'
+00166 [L328] TGETS    A=16 B=16 C=47 D=4143 'createMenu'
+00167 [L328] MOV      A=17 B=0 C=13 D=13 
+00168 [L328] CALL     A=16 B=2 C=2 D=514 
+00169 [L328] KSHORT   A=17 B=0 C=1 D=1 1
+00170 [L328] CALL     A=14 B=1 C=4 D=260 
+00171 [L329] UCLO     A=0 B=128 C=0 D=32768 target=172
+00172 [L329] RET0     A=0 B=0 C=1 D=1 
+00173 [L329] RET0     A=0 B=0 C=1 D=1 
+00174 [L329] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto18 offset=0x24fd source_lines=331-345 params=1
+UPVALUES ['o_t', 'pairs', 'm_t']
+00001 [L332] IST      A=0 B=0 C=0 D=0 
+00002 [L332] JMP      A=1 B=128 C=1 D=32769 target=4
+00003 [L333] RET0     A=0 B=0 C=1 D=1 
+00004 [L335] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00005 [L335] TGETS    A=1 B=1 C=1 D=257 'd_packageUI'
+00006 [L335] TGETS    A=1 B=1 C=2 D=258 'g_reorgItemsInfo'
+00007 [L335] UGET     A=2 B=0 C=0 D=0 o_t
+00008 [L335] TGETS    A=2 B=2 C=3 D=515 'item'
+00009 [L335] TGETV    A=1 B=1 C=2 D=258 
+00010 [L336] UGET     A=2 B=0 C=1 D=1 pairs
+00011 [L336] MOV      A=3 B=0 C=1 D=1 
+00012 [L336] CALL     A=2 B=4 C=2 D=1026 
+00013 [L336] ISNEXT   A=5 B=128 C=14 D=32782 target=28
+00014 [L337] UGET     A=7 B=0 C=2 D=2 m_t
+00015 [L337] TGETS    A=7 B=7 C=4 D=1796 'talismans'
+00016 [L337] ISGT     A=5 B=0 C=7 D=7 
+00017 [L337] JMP      A=7 B=128 C=10 D=32778 target=28
+00018 [L338] UGET     A=7 B=0 C=1 D=1 pairs
+00019 [L338] MOV      A=8 B=0 C=6 D=6 
+00020 [L338] CALL     A=7 B=4 C=2 D=1026 
+00021 [L338] ISNEXT   A=10 B=128 C=4 D=32772 target=26
+00022 [L339] TGETS    A=12 B=11 C=5 D=2821 'id'
+00023 [L339] ISNEV    A=12 B=0 C=0 D=0 
+00024 [L339] JMP      A=12 B=128 C=1 D=32769 target=26
+00025 [L340] RET1     A=11 B=0 C=2 D=2 
+00026 [L338] ITERN    A=10 B=3 C=3 D=771 
+00027 [L338] ITERL    A=10 B=127 C=250 D=32762 target=22
+00028 [L336] ITERN    A=5 B=3 C=3 D=771 
+00029 [L336] ITERL    A=5 B=127 C=240 D=32752 target=14
+00030 [L345] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto19 offset=0x261a source_lines=347-350 params=0
+UPVALUES ['g_transUI']
+00001 [L348] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L348] TGETS    A=0 B=0 C=1 D=1 'd_u'
+00003 [L348] TGETS    A=0 B=0 C=2 D=2 'remove'
+00004 [L348] UGET     A=1 B=0 C=0 D=0 g_transUI
+00005 [L348] TGETS    A=1 B=1 C=3 D=259 'main_layer'
+00006 [L348] CALL     A=0 B=1 C=2 D=258 
+00007 [L349] TNEW     A=0 B=0 C=0 D=0 
+00008 [L349] USETV    A=0 B=0 C=0 D=0 g_transUI
+00009 [L350] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto20 offset=0x267c source_lines=352-356 params=0
+UPVALUES ['g_transUI']
+00001 [L353] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L353] TGETS    A=0 B=0 C=1 D=1 'd_u'
+00003 [L353] TGETS    A=0 B=0 C=2 D=2 'remove'
+00004 [L353] UGET     A=1 B=0 C=0 D=0 g_transUI
+00005 [L353] TGETS    A=1 B=1 C=3 D=259 'main_layer'
+00006 [L353] CALL     A=0 B=1 C=2 D=258 
+00007 [L354] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00008 [L354] TGETS    A=0 B=0 C=4 D=4 'd_packageUI'
+00009 [L354] TGETS    A=0 B=0 C=5 D=5 'updateItemCellInfo'
+00010 [L354] KSHORT   A=1 B=4 C=76 D=1100 1100
+00011 [L354] CALL     A=0 B=1 C=2 D=258 
+00012 [L355] TNEW     A=0 B=0 C=0 D=0 
+00013 [L355] USETV    A=0 B=0 C=0 D=0 g_transUI
+00014 [L356] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto21 offset=0x2716 source_lines=0-356 params=0
+UPVALUES []
+00001 [L8] GGET     A=0 B=0 C=0 D=0 'ccp'
+00002 [L9] GGET     A=1 B=0 C=1 D=1 'print'
+00003 [L10] GGET     A=2 B=0 C=2 D=2 'string'
+00004 [L11] GGET     A=3 B=0 C=3 D=3 'table'
+00005 [L12] GGET     A=4 B=0 C=4 D=4 'pairs'
+00006 [L13] GGET     A=5 B=0 C=5 D=5 'require'
+00007 [L14] GGET     A=6 B=0 C=6 D=6 'main_server'
+00008 [L16] GGET     A=7 B=0 C=7 D=7 'ccc3'
+00009 [L17] GGET     A=8 B=0 C=8 D=8 'ccc4'
+00010 [L19] GGET     A=9 B=0 C=9 D=9 'CCLayer'
+00011 [L20] GGET     A=10 B=0 C=10 D=10 'CCNode'
+00012 [L21] GGET     A=11 B=0 C=11 D=11 'CCSprite'
+00013 [L22] GGET     A=12 B=0 C=12 D=12 'CCLayerColor'
+00014 [L23] GGET     A=13 B=0 C=13 D=13 'CCSizeMake'
+00015 [L25] GGET     A=14 B=0 C=14 D=14 'CCMenu'
+00016 [L26] GGET     A=15 B=0 C=15 D=15 'CCArray'
+00017 [L27] GGET     A=16 B=0 C=16 D=16 'CCMenuItemImage'
+00018 [L28] GGET     A=17 B=0 C=17 D=17 'CCMenuItemSprite'
+00019 [L30] GGET     A=18 B=0 C=18 D=18 'CCDirector'
+00020 [L32] GGET     A=19 B=0 C=19 D=19 'module'
+00021 [L32] KSTR     A=20 B=0 C=20 D=20 'ui.equipTransUI'
+00022 [L32] CALL     A=19 B=1 C=2 D=258 
+00023 [L35] MOV      A=19 B=0 C=5 D=5 
+00024 [L35] KSTR     A=20 B=0 C=21 D=21 'ms'
+00025 [L35] CALL     A=19 B=2 C=2 D=514 
+00026 [L35] GSET     A=19 B=0 C=22 D=22 'd_ms'
+00027 [L36] GGET     A=19 B=0 C=22 D=22 'd_ms'
+00028 [L36] IST      A=0 B=0 C=19 D=19 
+00029 [L36] JMP      A=19 B=128 C=3 D=32771 target=33
+00030 [L37] MOV      A=19 B=0 C=1 D=1 
+00031 [L37] KSTR     A=20 B=0 C=23 D=23 'equipTransUI load d_ms fail.\n'
+00032 [L37] CALL     A=19 B=1 C=2 D=258 
+00033 [L42] FNEW     A=19 B=0 C=24 D=24 {'kind': 'proto', 'id': 0}
+00034 [L44] GGET     A=20 B=0 C=22 D=22 'd_ms'
+00035 [L44] TGETS    A=20 B=20 C=25 D=5145 'd_common_def'
+00036 [L44] TGETS    A=20 B=20 C=26 D=5146 'object_type'
+00037 [L45] GGET     A=21 B=0 C=22 D=22 'd_ms'
+00038 [L45] TGETS    A=21 B=21 C=25 D=5401 'd_common_def'
+00039 [L45] TGETS    A=21 B=21 C=27 D=5403 'item_main_type'
+00040 [L46] GGET     A=22 B=0 C=22 D=22 'd_ms'
+00041 [L46] TGETS    A=22 B=22 C=25 D=5657 'd_common_def'
+00042 [L46] TGETS    A=22 B=22 C=28 D=5660 'item_transform_type'
+00043 [L47] GGET     A=23 B=0 C=22 D=22 'd_ms'
+00044 [L47] TGETS    A=23 B=23 C=25 D=5913 'd_common_def'
+00045 [L47] TGETS    A=23 B=23 C=29 D=5917 'item_transform_result'
+00046 [L48] MOV      A=25 B=0 C=18 D=18 
+00047 [L48] TGETS    A=24 B=18 C=30 D=4638 'sharedDirector'
+00048 [L48] CALL     A=24 B=2 C=2 D=514 
+00049 [L48] MOV      A=25 B=0 C=24 D=24 
+00050 [L48] TGETS    A=24 B=24 C=31 D=6175 'getVisibleSize'
+00051 [L48] CALL     A=24 B=2 C=2 D=514 
+00052 [L49] TNEW     A=25 B=0 C=0 D=0 
+00053 [L50] TNEW     A=26 B=0 C=0 D=0 
+00054 [L51] TDUP     A=27 B=0 C=33 D=33 {'kind': 'table', 'value': {'Choose': 2, 'Icon': 3, 'Check': 1}}
+00055 [L51] TSETS    A=27 B=25 C=32 D=6432 'Tags'
+00056 [L52] GGET     A=27 B=0 C=22 D=22 'd_ms'
+00057 [L52] TGETS    A=27 B=27 C=34 D=6946 'd_stoneUI'
+00058 [L52] TGETS    A=27 B=27 C=35 D=6947 'g_self'
+00059 [L52] TGETS    A=27 B=27 C=36 D=6948 'btnPicsList'
+00060 [L60] FNEW     A=28 B=0 C=37 D=37 {'kind': 'proto', 'id': 1}
+00061 [L54] GSET     A=28 B=0 C=38 D=38 'getFilter'
+00062 [L112] FNEW     A=28 B=0 C=39 D=39 {'kind': 'proto', 'id': 2}
+00063 [L62] GSET     A=28 B=0 C=40 D=40 'show'
+00064 [L127] FNEW     A=28 B=0 C=41 D=41 {'kind': 'proto', 'id': 3}
+00065 [L114] GSET     A=28 B=0 C=42 D=42 'changeEquip'
+00066 [L148] FNEW     A=28 B=0 C=43 D=43 {'kind': 'proto', 'id': 4}
+00067 [L129] GSET     A=28 B=0 C=44 D=44 'changeType'
+00068 [L166] FNEW     A=28 B=0 C=45 D=45 {'kind': 'proto', 'id': 5}
+00069 [L150] GSET     A=28 B=0 C=46 D=46 'changeExpressed'
+00070 [L206] FNEW     A=28 B=0 C=47 D=47 {'kind': 'proto', 'id': 7}
+00071 [L169] GSET     A=28 B=0 C=48 D=48 'pressChooseEquip'
+00072 [L215] FNEW     A=28 B=0 C=49 D=49 {'kind': 'proto', 'id': 8}
+00073 [L208] GSET     A=28 B=0 C=50 D=50 'isChangable'
+00074 [L238] FNEW     A=28 B=0 C=51 D=51 {'kind': 'proto', 'id': 9}
+00075 [L218] GSET     A=28 B=0 C=52 D=52 'getTransformEquipsExcept'
+00076 [L262] FNEW     A=28 B=0 C=53 D=53 {'kind': 'proto', 'id': 13}
+00077 [L240] GSET     A=28 B=0 C=54 D=54 'getTransformEquipCellsDataSource'
+00078 [L281] FNEW     A=28 B=0 C=55 D=55 {'kind': 'proto', 'id': 15}
+00079 [L264] GSET     A=28 B=0 C=56 D=56 'createEquipCellOnTransform'
+00080 [L329] FNEW     A=28 B=0 C=57 D=57 {'kind': 'proto', 'id': 17}
+00081 [L283] GSET     A=28 B=0 C=58 D=58 'transformSuccess'
+00082 [L345] FNEW     A=28 B=0 C=59 D=59 {'kind': 'proto', 'id': 18}
+00083 [L331] GSET     A=28 B=0 C=60 D=60 'getEquipById'
+00084 [L350] FNEW     A=28 B=0 C=61 D=61 {'kind': 'proto', 'id': 19}
+00085 [L347] GSET     A=28 B=0 C=62 D=62 'pressClose'
+00086 [L356] FNEW     A=28 B=0 C=63 D=63 {'kind': 'proto', 'id': 20}
+00087 [L352] GSET     A=28 B=0 C=64 D=64 'closeCallBack'
+00088 [L356] UCLO     A=0 B=128 C=0 D=32768 target=89
+00089 [L356] RET0     A=0 B=0 C=1 D=1 

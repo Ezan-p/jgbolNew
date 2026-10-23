@@ -1,0 +1,156 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\485e72cd1d350f15fde3aa9d633ee8fe.data'; root=proto2
+
+FUNCTION proto0 offset=0x4b source_lines=64-73 params=1
+UPVALUES ['os', 'require']
+00001 [L65] UGET     A=1 B=0 C=0 D=0 os
+00002 [L65] TGETS    A=1 B=1 C=0 D=256 'time'
+00003 [L65] CALL     A=1 B=2 C=1 D=513 
+00004 [L66] GGET     A=2 B=0 C=1 D=1 'g_last_report_error_time'
+00005 [L66] SUBVV    A=2 B=1 C=2 D=258 
+00006 [L66] KSHORT   A=3 B=0 C=60 D=60 60
+00007 [L66] ISGE     A=3 B=0 C=2 D=2 
+00008 [L66] JMP      A=2 B=128 C=13 D=32781 target=22
+00009 [L67] GSET     A=1 B=0 C=1 D=1 'g_last_report_error_time'
+00010 [L68] UGET     A=2 B=0 C=1 D=1 require
+00011 [L68] KSTR     A=3 B=0 C=2 D=2 'common.statistics'
+00012 [L68] CALL     A=2 B=2 C=2 D=514 
+00013 [L69] UGET     A=3 B=0 C=1 D=1 require
+00014 [L69] KSTR     A=4 B=0 C=3 D=3 'update.update_mgr'
+00015 [L69] CALL     A=3 B=2 C=2 D=514 
+00016 [L70] TGETS    A=4 B=2 C=4 D=516 'getReportErrorParams'
+00017 [L70] MOV      A=5 B=0 C=0 D=0 
+00018 [L70] CALL     A=4 B=2 C=2 D=514 
+00019 [L71] TGETS    A=5 B=3 C=5 D=773 'reportError'
+00020 [L71] MOV      A=6 B=0 C=4 D=4 
+00021 [L71] CALL     A=5 B=1 C=2 D=258 
+00022 [L73] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x16b source_lines=76-82 params=1
+UPVALUES ['CCLuaLog', 'tostring', 'debug']
+00001 [L77] UGET     A=1 B=0 C=0 D=0 CCLuaLog
+00002 [L77] KSTR     A=2 B=0 C=0 D=0 'MS__G__TRACKBACK__:----------------------------------------'
+00003 [L77] CALL     A=1 B=1 C=2 D=258 
+00004 [L78] UGET     A=1 B=0 C=0 D=0 CCLuaLog
+00005 [L78] KSTR     A=2 B=0 C=1 D=1 'LUA ERROR: '
+00006 [L78] UGET     A=3 B=0 C=1 D=1 tostring
+00007 [L78] MOV      A=4 B=0 C=0 D=0 
+00008 [L78] CALL     A=3 B=2 C=2 D=514 
+00009 [L78] KSTR     A=4 B=0 C=2 D=2 '\n'
+00010 [L78] CAT      A=2 B=2 C=4 D=516 
+00011 [L78] CALL     A=1 B=1 C=2 D=258 
+00012 [L79] UGET     A=1 B=0 C=0 D=0 CCLuaLog
+00013 [L79] UGET     A=2 B=0 C=2 D=2 debug
+00014 [L79] TGETS    A=2 B=2 C=3 D=515 'traceback'
+00015 [L79] CALL     A=2 B=0 C=1 D=1 
+00016 [L79] CALLM    A=1 B=1 C=0 D=256 
+00017 [L80] UGET     A=1 B=0 C=0 D=0 CCLuaLog
+00018 [L80] KSTR     A=2 B=0 C=4 D=4 '----------------------------------------'
+00019 [L80] CALL     A=1 B=1 C=2 D=258 
+00020 [L81] GGET     A=1 B=0 C=5 D=5 'MS_report_error'
+00021 [L81] UGET     A=2 B=0 C=1 D=1 tostring
+00022 [L81] MOV      A=3 B=0 C=0 D=0 
+00023 [L81] CALL     A=2 B=2 C=2 D=514 
+00024 [L81] KSTR     A=3 B=0 C=2 D=2 '\n'
+00025 [L81] UGET     A=4 B=0 C=2 D=2 debug
+00026 [L81] TGETS    A=4 B=4 C=3 D=1027 'traceback'
+00027 [L81] CALL     A=4 B=2 C=1 D=513 
+00028 [L81] CAT      A=2 B=2 C=4 D=516 
+00029 [L81] CALL     A=1 B=1 C=2 D=258 
+00030 [L82] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto2 offset=0x2bf source_lines=0-85 params=0
+UPVALUES []
+00001 [L6] GGET     A=0 B=0 C=0 D=0 'require'
+00002 [L7] GGET     A=1 B=0 C=1 D=1 'bits'
+00003 [L8] GGET     A=2 B=0 C=2 D=2 'sqlite'
+00004 [L9] GGET     A=3 B=0 C=3 D=3 'type'
+00005 [L10] GGET     A=4 B=0 C=4 D=4 'print'
+00006 [L11] GGET     A=5 B=0 C=5 D=5 'tostring'
+00007 [L12] GGET     A=6 B=0 C=6 D=6 'pairs'
+00008 [L13] GGET     A=7 B=0 C=7 D=7 'debug'
+00009 [L14] GGET     A=8 B=0 C=8 D=8 'CCLuaLog'
+00010 [L15] GGET     A=9 B=0 C=9 D=9 '_G'
+00011 [L16] GGET     A=10 B=0 C=10 D=10 'package'
+00012 [L17] GGET     A=11 B=0 C=11 D=11 'os'
+00013 [L18] GGET     A=12 B=0 C=12 D=12 'main_server'
+00014 [L21] GGET     A=13 B=0 C=13 D=13 'module'
+00015 [L21] KSTR     A=14 B=0 C=14 D=14 'ms'
+00016 [L21] CALL     A=13 B=1 C=2 D=258 
+00017 [L25] KPRI     A=13 B=0 C=0 D=0 
+00018 [L25] TSETS    A=13 B=9 C=15 D=2319 'ms_name'
+00019 [L26] TGETS    A=13 B=10 C=16 D=2576 'loaded'
+00020 [L26] KPRI     A=14 B=0 C=0 D=0 
+00021 [L26] TSETS    A=14 B=13 C=15 D=3343 'ms_name'
+00022 [L27] MOV      A=13 B=0 C=0 D=0 
+00023 [L27] KSTR     A=14 B=0 C=15 D=15 'ms_name'
+00024 [L27] CALL     A=13 B=2 C=2 D=514 
+00025 [L30] KSHORT   A=14 B=0 C=0 D=0 0
+00026 [L30] KSHORT   A=15 B=0 C=0 D=0 0
+00027 [L31] TGETS    A=16 B=12 C=17 D=3089 'time_us'
+00028 [L31] ISF      A=0 B=0 C=16 D=16 
+00029 [L31] JMP      A=17 B=128 C=4 D=32772 target=34
+00030 [L31] TGETS    A=16 B=12 C=17 D=3089 'time_us'
+00031 [L31] CALL     A=16 B=3 C=1 D=769 
+00032 [L31] MOV      A=15 B=0 C=17 D=17 
+00033 [L31] MOV      A=14 B=0 C=16 D=16 
+00034 [L33] KSHORT   A=16 B=0 C=1 D=1 1
+00035 [L33] TGETS    A=17 B=13 C=18 D=3346 'g_all_ms_name'
+00036 [L33] LEN      A=17 B=0 C=17 D=17 
+00037 [L33] KSHORT   A=18 B=0 C=1 D=1 1
+00038 [L33] FORI     A=16 B=128 C=46 D=32814 target=85
+00039 [L34] KPRI     A=20 B=0 C=1 D=1 
+00040 [L35] TGETS    A=21 B=13 C=18 D=3346 'g_all_ms_name'
+00041 [L35] TGETV    A=21 B=21 C=19 D=5395 
+00042 [L36] KSHORT   A=22 B=0 C=1 D=1 1
+00043 [L36] TGETS    A=23 B=21 C=19 D=5395 'module_list'
+00044 [L36] LEN      A=23 B=0 C=23 D=23 
+00045 [L36] KSHORT   A=24 B=0 C=1 D=1 1
+00046 [L36] FORI     A=22 B=128 C=11 D=32779 target=58
+00047 [L37] TGETS    A=26 B=21 C=19 D=5395 'module_list'
+00048 [L37] TGETV    A=26 B=26 C=25 D=6681 
+00049 [L38] IST      A=0 B=0 C=20 D=20 
+00050 [L38] JMP      A=27 B=128 C=2 D=32770 target=53
+00051 [L39] MOV      A=20 B=0 C=26 D=26 
+00052 [L39] JMP      A=27 B=128 C=4 D=32772 target=57
+00053 [L41] MOV      A=27 B=0 C=20 D=20 
+00054 [L41] KSTR     A=28 B=0 C=20 D=20 '.'
+00055 [L41] MOV      A=29 B=0 C=26 D=26 
+00056 [L41] CAT      A=20 B=27 C=29 D=6941 
+00057 [L36] FORL     A=22 B=127 C=245 D=32757 target=47
+00058 [L45] TGETS    A=22 B=9 C=14 D=2318 'ms'
+00059 [L45] TGETS    A=23 B=21 C=21 D=5397 'name'
+00060 [L45] MOV      A=24 B=0 C=0 D=0 
+00061 [L45] MOV      A=25 B=0 C=20 D=20 
+00062 [L45] CALL     A=24 B=2 C=2 D=514 
+00063 [L45] TSETV    A=24 B=22 C=23 D=5655 
+00064 [L46] MOV      A=22 B=0 C=14 D=14 
+00065 [L46] MOV      A=23 B=0 C=15 D=15 
+00066 [L47] TGETS    A=24 B=12 C=17 D=3089 'time_us'
+00067 [L47] ISF      A=0 B=0 C=24 D=24 
+00068 [L47] JMP      A=25 B=128 C=4 D=32772 target=73
+00069 [L47] TGETS    A=24 B=12 C=17 D=3089 'time_us'
+00070 [L47] CALL     A=24 B=3 C=1 D=769 
+00071 [L47] MOV      A=15 B=0 C=25 D=25 
+00072 [L47] MOV      A=14 B=0 C=24 D=24 
+00073 [L49] SUBVV    A=24 B=14 C=22 D=3606 
+00074 [L49] MULVN    A=24 B=24 C=0 D=6144 
+00075 [L49] SUBVV    A=25 B=15 C=23 D=3863 
+00076 [L49] ADDVV    A=24 B=24 C=25 D=6169 
+00077 [L50] MOV      A=25 B=0 C=4 D=4 
+00078 [L50] KSTR     A=26 B=0 C=22 D=22 'time='
+00079 [L50] MOV      A=27 B=0 C=24 D=24 
+00080 [L50] KSTR     A=28 B=0 C=23 D=23 ', require = '
+00081 [L50] MOV      A=29 B=0 C=20 D=20 
+00082 [L50] CAT      A=26 B=26 C=29 D=6685 
+00083 [L50] CALL     A=25 B=1 C=2 D=258 
+00084 [L33] FORL     A=16 B=127 C=210 D=32722 target=39
+00085 [L55] TDUP     A=16 B=0 C=24 D=24 {'kind': 'table', 'value': {'pass': 2, 'ok': 0, 'fail': 1}}
+00086 [L59] GSET     A=16 B=0 C=25 D=25 'func_ret'
+00087 [L63] KSHORT   A=16 B=0 C=0 D=0 0
+00088 [L63] GSET     A=16 B=0 C=26 D=26 'g_last_report_error_time'
+00089 [L73] FNEW     A=16 B=0 C=27 D=27 {'kind': 'proto', 'id': 0}
+00090 [L64] GSET     A=16 B=0 C=28 D=28 'MS_report_error'
+00091 [L82] FNEW     A=16 B=0 C=29 D=29 {'kind': 'proto', 'id': 1}
+00092 [L76] GSET     A=16 B=0 C=30 D=30 'MS__G__TRACKBACK__'
+00093 [L82] UCLO     A=0 B=128 C=0 D=32768 target=94
+00094 [L82] RET0     A=0 B=0 C=1 D=1 

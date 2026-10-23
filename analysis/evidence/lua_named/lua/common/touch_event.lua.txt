@@ -1,0 +1,1496 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\acf8398c3950fcf82711e741f54a99ad.data'; root=proto35
+
+FUNCTION proto0 offset=0x4a source_lines=38-40 params=0
+UPVALUES ['CCLuaLog', 'string']
+00001 [L39] UGET     A=0 B=0 C=0 D=0 CCLuaLog
+00002 [L39] UGET     A=1 B=0 C=1 D=1 string
+00003 [L39] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L39] VARG     A=2 B=0 C=0 D=0 
+00005 [L39] CALLM    A=1 B=0 C=0 D=0 
+00006 [L39] CALLM    A=0 B=1 C=0 D=256 
+00007 [L40] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x95 source_lines=59-70 params=2
+UPVALUES ['cclog', 'beginFunc']
+00001 [L60] UGET     A=2 B=0 C=0 D=0 cclog
+00002 [L60] KSTR     A=3 B=0 C=0 D=0 'onTouchBegan'
+00003 [L60] CALL     A=2 B=1 C=2 D=258 
+00004 [L61] GSET     A=0 B=0 C=1 D=1 'g_pos_x'
+00005 [L62] GSET     A=0 B=0 C=2 D=2 'g_move_begin_x'
+00006 [L64] GSET     A=1 B=0 C=3 D=3 'g_pos_y'
+00007 [L65] GSET     A=1 B=0 C=4 D=4 'g_move_begin_y'
+00008 [L66] UGET     A=2 B=0 C=1 D=1 beginFunc
+00009 [L66] ISF      A=0 B=0 C=2 D=2 
+00010 [L66] JMP      A=3 B=128 C=4 D=32772 target=15
+00011 [L67] UGET     A=2 B=0 C=1 D=1 beginFunc
+00012 [L67] MOV      A=3 B=0 C=0 D=0 
+00013 [L67] MOV      A=4 B=0 C=1 D=1 
+00014 [L67] CALL     A=2 B=1 C=3 D=259 
+00015 [L69] KPRI     A=2 B=0 C=2 D=2 
+00016 [L69] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto2 offset=0x148 source_lines=72-78 params=2
+UPVALUES ['cclog', 'moveFunc']
+00001 [L73] UGET     A=2 B=0 C=0 D=0 cclog
+00002 [L73] KSTR     A=3 B=0 C=0 D=0 'onTouchMoved'
+00003 [L73] CALL     A=2 B=1 C=2 D=258 
+00004 [L74] UGET     A=2 B=0 C=1 D=1 moveFunc
+00005 [L74] ISF      A=0 B=0 C=2 D=2 
+00006 [L74] JMP      A=3 B=128 C=4 D=32772 target=11
+00007 [L75] UGET     A=2 B=0 C=1 D=1 moveFunc
+00008 [L75] MOV      A=3 B=0 C=0 D=0 
+00009 [L75] MOV      A=4 B=0 C=1 D=1 
+00010 [L75] CALL     A=2 B=1 C=3 D=259 
+00011 [L77] KPRI     A=2 B=0 C=2 D=2 
+00012 [L77] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto3 offset=0x1b8 source_lines=80-86 params=2
+UPVALUES ['cclog', 'endFunc']
+00001 [L81] UGET     A=2 B=0 C=0 D=0 cclog
+00002 [L81] KSTR     A=3 B=0 C=0 D=0 'onTouchEnded'
+00003 [L81] CALL     A=2 B=1 C=2 D=258 
+00004 [L82] UGET     A=2 B=0 C=1 D=1 endFunc
+00005 [L82] ISF      A=0 B=0 C=2 D=2 
+00006 [L82] JMP      A=3 B=128 C=4 D=32772 target=11
+00007 [L83] UGET     A=2 B=0 C=1 D=1 endFunc
+00008 [L83] MOV      A=3 B=0 C=0 D=0 
+00009 [L83] MOV      A=4 B=0 C=1 D=1 
+00010 [L83] CALL     A=2 B=1 C=3 D=259 
+00011 [L85] KPRI     A=2 B=0 C=2 D=2 
+00012 [L85] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto4 offset=0x228 source_lines=88-97 params=3
+UPVALUES ['cclog', 'CCTOUCHBEGAN', 'onTouchBegan', 'CCTOUCHMOVED', 'onTouchMoved', 'onTouchEnded']
+00001 [L89] UGET     A=3 B=0 C=0 D=0 cclog
+00002 [L89] KSTR     A=4 B=0 C=0 D=0 'onTouch, %d, %d, %d'
+00003 [L89] MOV      A=5 B=0 C=0 D=0 
+00004 [L89] MOV      A=6 B=0 C=1 D=1 
+00005 [L89] MOV      A=7 B=0 C=2 D=2 
+00006 [L89] CALL     A=3 B=1 C=5 D=261 
+00007 [L90] UGET     A=3 B=0 C=1 D=1 CCTOUCHBEGAN
+00008 [L90] ISNEV    A=0 B=0 C=3 D=3 
+00009 [L90] JMP      A=3 B=128 C=5 D=32773 target=15
+00010 [L91] UGET     A=3 B=0 C=2 D=2 onTouchBegan
+00011 [L91] MOV      A=4 B=0 C=1 D=1 
+00012 [L91] MOV      A=5 B=0 C=2 D=2 
+00013 [L91] CALLT    A=3 B=0 C=3 D=3 
+00014 [L91] JMP      A=3 B=128 C=12 D=32780 target=27
+00015 [L92] UGET     A=3 B=0 C=3 D=3 CCTOUCHMOVED
+00016 [L92] ISNEV    A=0 B=0 C=3 D=3 
+00017 [L92] JMP      A=3 B=128 C=5 D=32773 target=23
+00018 [L93] UGET     A=3 B=0 C=4 D=4 onTouchMoved
+00019 [L93] MOV      A=4 B=0 C=1 D=1 
+00020 [L93] MOV      A=5 B=0 C=2 D=2 
+00021 [L93] CALLT    A=3 B=0 C=3 D=3 
+00022 [L93] JMP      A=3 B=128 C=4 D=32772 target=27
+00023 [L95] UGET     A=3 B=0 C=5 D=5 onTouchEnded
+00024 [L95] MOV      A=4 B=0 C=1 D=1 
+00025 [L95] MOV      A=5 B=0 C=2 D=2 
+00026 [L95] CALLT    A=3 B=0 C=3 D=3 
+00027 [L97] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto5 offset=0x337 source_lines=51-102 params=4
+UPVALUES ['cclog', 'CCTOUCHBEGAN', 'CCTOUCHMOVED']
+00001 [L52] KPRI     A=4 B=0 C=0 D=0 
+00002 [L52] GSET     A=4 B=0 C=0 D=0 'g_pos_x'
+00003 [L53] KPRI     A=4 B=0 C=0 D=0 
+00004 [L53] GSET     A=4 B=0 C=1 D=1 'g_move_begin_x'
+00005 [L55] KPRI     A=4 B=0 C=0 D=0 
+00006 [L55] GSET     A=4 B=0 C=2 D=2 'g_pos_y'
+00007 [L56] KPRI     A=4 B=0 C=0 D=0 
+00008 [L56] GSET     A=4 B=0 C=3 D=3 'g_move_begin_y'
+00009 [L70] FNEW     A=4 B=0 C=4 D=4 {'kind': 'proto', 'id': 1}
+00010 [L78] FNEW     A=5 B=0 C=5 D=5 {'kind': 'proto', 'id': 2}
+00011 [L86] FNEW     A=6 B=0 C=6 D=6 {'kind': 'proto', 'id': 3}
+00012 [L97] FNEW     A=7 B=0 C=7 D=7 {'kind': 'proto', 'id': 4}
+00013 [L100] MOV      A=9 B=0 C=0 D=0 
+00014 [L100] TGETS    A=8 B=0 C=8 D=8 'registerScriptTouchHandler'
+00015 [L100] MOV      A=10 B=0 C=7 D=7 
+00016 [L100] KPRI     A=11 B=0 C=1 D=1 
+00017 [L100] KSHORT   A=12 B=255 C=128 D=65408 -128
+00018 [L100] KPRI     A=13 B=0 C=1 D=1 
+00019 [L100] CALL     A=8 B=1 C=6 D=262 
+00020 [L101] MOV      A=9 B=0 C=0 D=0 
+00021 [L101] TGETS    A=8 B=0 C=9 D=9 'setTouchEnabled'
+00022 [L101] KPRI     A=10 B=0 C=2 D=2 
+00023 [L101] CALL     A=8 B=1 C=3 D=259 
+00024 [L102] UCLO     A=0 B=128 C=0 D=32768 target=25
+00025 [L102] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x4ab source_lines=124-142 params=3
+UPVALUES ['cclog', 'frame', 'CCPointMake', 'is_eat_in', 'is_eat_out']
+00001 [L125] UGET     A=3 B=0 C=0 D=0 cclog
+00002 [L125] KSTR     A=4 B=0 C=0 D=0 'Swallow onTouch, %d, %d, %d'
+00003 [L125] MOV      A=5 B=0 C=0 D=0 
+00004 [L125] MOV      A=6 B=0 C=1 D=1 
+00005 [L125] MOV      A=7 B=0 C=2 D=2 
+00006 [L125] CALL     A=3 B=1 C=5 D=261 
+00007 [L126] UGET     A=3 B=0 C=1 D=1 frame
+00008 [L126] MOV      A=4 B=0 C=3 D=3 
+00009 [L126] TGETS    A=3 B=3 C=1 D=769 'containsPoint'
+00010 [L126] UGET     A=5 B=0 C=2 D=2 CCPointMake
+00011 [L126] MOV      A=6 B=0 C=1 D=1 
+00012 [L126] MOV      A=7 B=0 C=2 D=2 
+00013 [L126] CALL     A=5 B=0 C=3 D=3 
+00014 [L126] CALLM    A=3 B=2 C=1 D=513 
+00015 [L128] ISF      A=0 B=0 C=3 D=3 
+00016 [L128] JMP      A=4 B=128 C=3 D=32771 target=20
+00017 [L129] UGET     A=4 B=0 C=3 D=3 is_eat_in
+00018 [L129] RET1     A=4 B=0 C=2 D=2 
+00019 [L129] JMP      A=4 B=128 C=2 D=32770 target=22
+00020 [L131] UGET     A=4 B=0 C=4 D=4 is_eat_out
+00021 [L131] RET1     A=4 B=0 C=2 D=2 
+00022 [L142] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto7 offset=0x5a6 source_lines=119-149 params=4
+UPVALUES ['CCRectMake', 'cclog', 'CCPointMake', 'CCLayer']
+00001 [L121] TDUP     A=4 B=0 C=2 D=2 {'kind': 'table', 'value': {}}
+00002 [L121] TGETS    A=5 B=1 C=0 D=256 'origin'
+00003 [L121] TGETS    A=5 B=5 C=1 D=1281 'x'
+00004 [L121] TSETS    A=5 B=4 C=1 D=1025 'x'
+00005 [L121] TGETS    A=5 B=1 C=0 D=256 'origin'
+00006 [L121] TGETS    A=5 B=5 C=3 D=1283 'y'
+00007 [L121] TSETS    A=5 B=4 C=3 D=1027 'y'
+00008 [L121] TGETS    A=5 B=1 C=4 D=260 'size'
+00009 [L121] TGETS    A=5 B=5 C=5 D=1285 'width'
+00010 [L121] TSETS    A=5 B=4 C=5 D=1029 'width'
+00011 [L121] TGETS    A=5 B=1 C=4 D=260 'size'
+00012 [L121] TGETS    A=5 B=5 C=6 D=1286 'height'
+00013 [L121] TSETS    A=5 B=4 C=6 D=1030 'height'
+00014 [L122] UGET     A=5 B=0 C=0 D=0 CCRectMake
+00015 [L122] TGETS    A=6 B=4 C=1 D=1025 'x'
+00016 [L122] TGETS    A=7 B=4 C=3 D=1027 'y'
+00017 [L122] TGETS    A=8 B=4 C=5 D=1029 'width'
+00018 [L122] TGETS    A=9 B=4 C=6 D=1030 'height'
+00019 [L122] CALL     A=5 B=2 C=5 D=517 
+00020 [L142] FNEW     A=6 B=0 C=7 D=7 {'kind': 'proto', 'id': 6}
+00021 [L145] UGET     A=7 B=0 C=3 D=3 CCLayer
+00022 [L145] MOV      A=8 B=0 C=7 D=7 
+00023 [L145] TGETS    A=7 B=7 C=8 D=1800 'create'
+00024 [L145] CALL     A=7 B=2 C=2 D=514 
+00025 [L146] MOV      A=9 B=0 C=7 D=7 
+00026 [L146] TGETS    A=8 B=7 C=9 D=1801 'registerScriptTouchHandler'
+00027 [L146] MOV      A=10 B=0 C=6 D=6 
+00028 [L146] KPRI     A=11 B=0 C=1 D=1 
+00029 [L146] KSHORT   A=12 B=255 C=128 D=65408 -128
+00030 [L146] KPRI     A=13 B=0 C=2 D=2 
+00031 [L146] CALL     A=8 B=1 C=6 D=262 
+00032 [L147] MOV      A=9 B=0 C=7 D=7 
+00033 [L147] TGETS    A=8 B=7 C=10 D=1802 'setTouchEnabled'
+00034 [L147] KPRI     A=10 B=0 C=2 D=2 
+00035 [L147] CALL     A=8 B=1 C=3 D=259 
+00036 [L148] MOV      A=9 B=0 C=0 D=0 
+00037 [L148] TGETS    A=8 B=0 C=11 D=11 'addChild'
+00038 [L148] MOV      A=10 B=0 C=7 D=7 
+00039 [L148] CALL     A=8 B=1 C=3 D=259 
+00040 [L149] UCLO     A=0 B=128 C=0 D=32768 target=41
+00041 [L149] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto8 offset=0x760 source_lines=176-190 params=1
+UPVALUES ['slide_layer', 'CCDirector', 'params', 'CCMoveTo', 'd_u', 'inertia_speed']
+00001 [L177] UGET     A=1 B=0 C=0 D=0 slide_layer
+00002 [L177] MOV      A=2 B=0 C=1 D=1 
+00003 [L177] TGETS    A=1 B=1 C=0 D=256 'getPositionY'
+00004 [L177] CALL     A=1 B=2 C=2 D=514 
+00005 [L178] KSHORT   A=2 B=0 C=0 D=0 0
+00006 [L178] ISGE     A=0 B=0 C=2 D=2 
+00007 [L178] JMP      A=2 B=128 C=35 D=32803 target=43
+00008 [L178] UGET     A=2 B=0 C=1 D=1 CCDirector
+00009 [L178] MOV      A=3 B=0 C=2 D=2 
+00010 [L178] TGETS    A=2 B=2 C=1 D=513 'sharedDirector'
+00011 [L178] CALL     A=2 B=2 C=2 D=514 
+00012 [L178] MOV      A=3 B=0 C=2 D=2 
+00013 [L178] TGETS    A=2 B=2 C=2 D=514 'getVisibleSize'
+00014 [L178] CALL     A=2 B=2 C=2 D=514 
+00015 [L178] TGETS    A=2 B=2 C=3 D=515 'height'
+00016 [L178] UGET     A=3 B=0 C=2 D=2 params
+00017 [L178] TGETS    A=3 B=3 C=4 D=772 'y_limit_down'
+00018 [L178] UGET     A=4 B=0 C=2 D=2 params
+00019 [L178] TGETS    A=4 B=4 C=5 D=1029 'limit_springback'
+00020 [L178] SUBVV    A=3 B=3 C=4 D=772 
+00021 [L178] MULVV    A=2 B=2 C=3 D=515 
+00022 [L178] ISGE     A=1 B=0 C=2 D=2 
+00023 [L178] JMP      A=2 B=128 C=19 D=32787 target=43
+00024 [L180] UGET     A=2 B=0 C=0 D=0 slide_layer
+00025 [L180] MOV      A=3 B=0 C=2 D=2 
+00026 [L180] TGETS    A=2 B=2 C=6 D=518 'runAction'
+00027 [L180] UGET     A=4 B=0 C=3 D=3 CCMoveTo
+00028 [L180] MOV      A=5 B=0 C=4 D=4 
+00029 [L180] TGETS    A=4 B=4 C=7 D=1031 'create'
+00030 [L180] KNUM     A=6 B=0 C=0 D=0 0.3
+00031 [L180] UGET     A=7 B=0 C=4 D=4 d_u
+00032 [L180] TGETS    A=7 B=7 C=8 D=1800 'makePoint'
+00033 [L180] KSHORT   A=8 B=0 C=0 D=0 0
+00034 [L180] UGET     A=9 B=0 C=2 D=2 params
+00035 [L180] TGETS    A=9 B=9 C=4 D=2308 'y_limit_down'
+00036 [L180] CALL     A=7 B=0 C=3 D=3 
+00037 [L180] CALLM    A=4 B=0 C=2 D=2 
+00038 [L180] CALLM    A=2 B=1 C=1 D=257 
+00039 [L181] USETN    A=5 B=0 C=1 D=1 0
+00040 [L182] KPRI     A=2 B=0 C=1 D=1 
+00041 [L182] RET1     A=2 B=0 C=2 D=2 
+00042 [L182] JMP      A=2 B=128 C=37 D=32805 target=80
+00043 [L183] KSHORT   A=2 B=0 C=0 D=0 0
+00044 [L183] ISGE     A=2 B=0 C=0 D=0 
+00045 [L183] JMP      A=2 B=128 C=34 D=32802 target=80
+00046 [L183] UGET     A=2 B=0 C=1 D=1 CCDirector
+00047 [L183] MOV      A=3 B=0 C=2 D=2 
+00048 [L183] TGETS    A=2 B=2 C=1 D=513 'sharedDirector'
+00049 [L183] CALL     A=2 B=2 C=2 D=514 
+00050 [L183] MOV      A=3 B=0 C=2 D=2 
+00051 [L183] TGETS    A=2 B=2 C=2 D=514 'getVisibleSize'
+00052 [L183] CALL     A=2 B=2 C=2 D=514 
+00053 [L183] TGETS    A=2 B=2 C=3 D=515 'height'
+00054 [L183] UGET     A=3 B=0 C=2 D=2 params
+00055 [L183] TGETS    A=3 B=3 C=9 D=777 'y_limit_top'
+00056 [L183] UGET     A=4 B=0 C=2 D=2 params
+00057 [L183] TGETS    A=4 B=4 C=5 D=1029 'limit_springback'
+00058 [L183] ADDVV    A=3 B=3 C=4 D=772 
+00059 [L183] MULVV    A=2 B=2 C=3 D=515 
+00060 [L183] ISGE     A=2 B=0 C=1 D=1 
+00061 [L183] JMP      A=2 B=128 C=18 D=32786 target=80
+00062 [L185] UGET     A=2 B=0 C=0 D=0 slide_layer
+00063 [L185] MOV      A=3 B=0 C=2 D=2 
+00064 [L185] TGETS    A=2 B=2 C=6 D=518 'runAction'
+00065 [L185] UGET     A=4 B=0 C=3 D=3 CCMoveTo
+00066 [L185] MOV      A=5 B=0 C=4 D=4 
+00067 [L185] TGETS    A=4 B=4 C=7 D=1031 'create'
+00068 [L185] KNUM     A=6 B=0 C=0 D=0 0.3
+00069 [L185] UGET     A=7 B=0 C=4 D=4 d_u
+00070 [L185] TGETS    A=7 B=7 C=8 D=1800 'makePoint'
+00071 [L185] KSHORT   A=8 B=0 C=0 D=0 0
+00072 [L185] UGET     A=9 B=0 C=2 D=2 params
+00073 [L185] TGETS    A=9 B=9 C=9 D=2313 'y_limit_top'
+00074 [L185] CALL     A=7 B=0 C=3 D=3 
+00075 [L185] CALLM    A=4 B=0 C=2 D=2 
+00076 [L185] CALLM    A=2 B=1 C=1 D=257 
+00077 [L186] USETN    A=5 B=0 C=1 D=1 0
+00078 [L187] KPRI     A=2 B=0 C=1 D=1 
+00079 [L187] RET1     A=2 B=0 C=2 D=2 
+00080 [L189] KPRI     A=2 B=0 C=2 D=2 
+00081 [L189] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto9 offset=0x9d4 source_lines=194-204 params=2
+UPVALUES ['CCArray', 'CCMoveBy', 'CCPointMake', 'CCCallFuncN', 'slide_layer', 'CCSequence', 'checkCanMove']
+00001 [L197] UGET     A=2 B=0 C=0 D=0 CCArray
+00002 [L197] MOV      A=3 B=0 C=2 D=2 
+00003 [L197] TGETS    A=2 B=2 C=0 D=512 'create'
+00004 [L197] CALL     A=2 B=2 C=2 D=514 
+00005 [L198] MOV      A=4 B=0 C=2 D=2 
+00006 [L198] TGETS    A=3 B=2 C=1 D=513 'addObject'
+00007 [L198] UGET     A=5 B=0 C=1 D=1 CCMoveBy
+00008 [L198] MOV      A=6 B=0 C=5 D=5 
+00009 [L198] TGETS    A=5 B=5 C=0 D=1280 'create'
+00010 [L198] KNUM     A=7 B=0 C=0 D=0 0.01
+00011 [L198] UGET     A=8 B=0 C=2 D=2 CCPointMake
+00012 [L198] KSHORT   A=9 B=0 C=0 D=0 0
+00013 [L198] MOV      A=10 B=0 C=0 D=0 
+00014 [L198] CALL     A=8 B=0 C=3 D=3 
+00015 [L198] CALLM    A=5 B=0 C=2 D=2 
+00016 [L198] CALLM    A=3 B=1 C=1 D=257 
+00017 [L199] MOV      A=4 B=0 C=2 D=2 
+00018 [L199] TGETS    A=3 B=2 C=1 D=513 'addObject'
+00019 [L199] UGET     A=5 B=0 C=3 D=3 CCCallFuncN
+00020 [L199] MOV      A=6 B=0 C=5 D=5 
+00021 [L199] TGETS    A=5 B=5 C=0 D=1280 'create'
+00022 [L199] MOV      A=7 B=0 C=1 D=1 
+00023 [L199] CALL     A=5 B=0 C=3 D=3 
+00024 [L199] CALLM    A=3 B=1 C=1 D=257 
+00025 [L200] UGET     A=3 B=0 C=4 D=4 slide_layer
+00026 [L200] MOV      A=4 B=0 C=3 D=3 
+00027 [L200] TGETS    A=3 B=3 C=2 D=770 'runAction'
+00028 [L200] UGET     A=5 B=0 C=5 D=5 CCSequence
+00029 [L200] MOV      A=6 B=0 C=5 D=5 
+00030 [L200] TGETS    A=5 B=5 C=0 D=1280 'create'
+00031 [L200] MOV      A=7 B=0 C=2 D=2 
+00032 [L200] CALL     A=5 B=0 C=3 D=3 
+00033 [L200] CALLM    A=3 B=1 C=1 D=257 
+00034 [L203] UGET     A=3 B=0 C=6 D=6 checkCanMove
+00035 [L203] MOV      A=4 B=0 C=0 D=0 
+00036 [L203] CALL     A=3 B=1 C=2 D=258 
+00037 [L204] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto10 offset=0xb37 source_lines=208-215 params=0
+UPVALUES ['math', 'inertia_speed', 'moveLayerInertia', 'inertiaRun']
+00001 [L209] UGET     A=0 B=0 C=0 D=0 math
+00002 [L209] TGETS    A=0 B=0 C=0 D=0 'abs'
+00003 [L209] UGET     A=1 B=0 C=1 D=1 inertia_speed
+00004 [L209] CALL     A=0 B=2 C=2 D=514 
+00005 [L209] KSHORT   A=1 B=0 C=1 D=1 1
+00006 [L209] ISGE     A=0 B=0 C=1 D=1 
+00007 [L209] JMP      A=0 B=128 C=2 D=32770 target=10
+00008 [L210] USETN    A=1 B=0 C=0 D=0 0
+00009 [L210] JMP      A=0 B=128 C=7 D=32775 target=17
+00010 [L212] UGET     A=0 B=0 C=2 D=2 moveLayerInertia
+00011 [L212] UGET     A=1 B=0 C=1 D=1 inertia_speed
+00012 [L212] UGET     A=2 B=0 C=3 D=3 inertiaRun
+00013 [L212] CALL     A=0 B=1 C=3 D=259 
+00014 [L213] UGET     A=0 B=0 C=1 D=1 inertia_speed
+00015 [L213] MULVN    A=0 B=0 C=1 D=1 
+00016 [L213] USETV    A=1 B=0 C=0 D=0 inertia_speed
+00017 [L215] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto11 offset=0xbe0 source_lines=220-226 params=1
+UPVALUES ['checkCanMove', 'slide_layer']
+00001 [L221] UGET     A=1 B=0 C=0 D=0 checkCanMove
+00002 [L221] MOV      A=2 B=0 C=0 D=0 
+00003 [L221] CALL     A=1 B=2 C=2 D=514 
+00004 [L221] ISNEP    A=1 B=0 C=2 D=2 
+00005 [L221] JMP      A=1 B=128 C=9 D=32777 target=15
+00006 [L222] UGET     A=1 B=0 C=1 D=1 slide_layer
+00007 [L222] MOV      A=2 B=0 C=1 D=1 
+00008 [L222] TGETS    A=1 B=1 C=0 D=256 'getPositionY'
+00009 [L222] CALL     A=1 B=2 C=2 D=514 
+00010 [L224] UGET     A=2 B=0 C=1 D=1 slide_layer
+00011 [L224] MOV      A=3 B=0 C=2 D=2 
+00012 [L224] TGETS    A=2 B=2 C=1 D=513 'setPositionY'
+00013 [L224] ADDVV    A=4 B=1 C=0 D=256 
+00014 [L224] CALL     A=2 B=1 C=3 D=259 
+00015 [L226] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto12 offset=0xc79 source_lines=229-246 params=2
+UPVALUES ['frame', 'CCPointMake', 'last_time', 'os', 'last_event', 'CCTOUCHBEGAN', 'x_begin', 'y_begin', 'y_move']
+00001 [L230] UGET     A=2 B=0 C=0 D=0 frame
+00002 [L230] MOV      A=3 B=0 C=2 D=2 
+00003 [L230] TGETS    A=2 B=2 C=0 D=512 'containsPoint'
+00004 [L230] UGET     A=4 B=0 C=1 D=1 CCPointMake
+00005 [L230] MOV      A=5 B=0 C=0 D=0 
+00006 [L230] MOV      A=6 B=0 C=1 D=1 
+00007 [L230] CALL     A=4 B=0 C=3 D=3 
+00008 [L230] CALLM    A=2 B=2 C=1 D=513 
+00009 [L230] ISF      A=0 B=0 C=2 D=2 
+00010 [L230] JMP      A=3 B=128 C=17 D=32785 target=28
+00011 [L232] UGET     A=2 B=0 C=2 D=2 last_time
+00012 [L232] UGET     A=3 B=0 C=3 D=3 os
+00013 [L232] TGETS    A=3 B=3 C=1 D=769 'time'
+00014 [L232] CALL     A=3 B=2 C=1 D=513 
+00015 [L232] ISEQV    A=2 B=0 C=3 D=3 
+00016 [L232] JMP      A=2 B=128 C=1 D=32769 target=18
+00017 [L233] USETN    A=4 B=0 C=0 D=0 -1
+00018 [L236] UGET     A=2 B=0 C=4 D=4 last_event
+00019 [L236] UGET     A=3 B=0 C=5 D=5 CCTOUCHBEGAN
+00020 [L236] ISEQV    A=2 B=0 C=3 D=3 
+00021 [L236] JMP      A=2 B=128 C=3 D=32771 target=25
+00022 [L237] USETV    A=6 B=0 C=0 D=0 x_begin
+00023 [L238] USETV    A=7 B=0 C=1 D=1 y_begin
+00024 [L239] USETV    A=8 B=0 C=1 D=1 y_move
+00025 [L241] KPRI     A=2 B=0 C=2 D=2 
+00026 [L241] RET1     A=2 B=0 C=2 D=2 
+00027 [L241] JMP      A=2 B=128 C=2 D=32770 target=30
+00028 [L244] KPRI     A=2 B=0 C=1 D=1 
+00029 [L244] RET1     A=2 B=0 C=2 D=2 
+00030 [L246] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto13 offset=0xd9d source_lines=249-281 params=2
+UPVALUES ['frame', 'CCPointMake', 'y_begin', 'y_move', 'inertia_speed', 'math', 'slide_layer', 'moveLayer', 'inertiaRun']
+00001 [L250] UGET     A=2 B=0 C=0 D=0 frame
+00002 [L250] MOV      A=3 B=0 C=2 D=2 
+00003 [L250] TGETS    A=2 B=2 C=0 D=512 'containsPoint'
+00004 [L250] UGET     A=4 B=0 C=1 D=1 CCPointMake
+00005 [L250] MOV      A=5 B=0 C=0 D=0 
+00006 [L250] MOV      A=6 B=0 C=1 D=1 
+00007 [L250] CALL     A=4 B=0 C=3 D=3 
+00008 [L250] CALLM    A=2 B=2 C=1 D=513 
+00009 [L250] ISF      A=0 B=0 C=2 D=2 
+00010 [L250] JMP      A=3 B=128 C=47 D=32815 target=58
+00011 [L252] UGET     A=2 B=0 C=2 D=2 y_begin
+00012 [L252] IST      A=0 B=0 C=2 D=2 
+00013 [L252] JMP      A=2 B=128 C=1 D=32769 target=15
+00014 [L252] USETV    A=2 B=0 C=1 D=1 y_begin
+00015 [L253] UGET     A=2 B=0 C=3 D=3 y_move
+00016 [L253] IST      A=0 B=0 C=2 D=2 
+00017 [L253] JMP      A=2 B=128 C=1 D=32769 target=19
+00018 [L253] USETV    A=3 B=0 C=1 D=1 y_move
+00019 [L256] UGET     A=2 B=0 C=3 D=3 y_move
+00020 [L256] SUBVV    A=2 B=1 C=2 D=258 
+00021 [L257] UGET     A=3 B=0 C=4 D=4 inertia_speed
+00022 [L257] MULVV    A=3 B=3 C=2 D=770 
+00023 [L257] KSHORT   A=4 B=0 C=0 D=0 0
+00024 [L257] ISGE     A=3 B=0 C=4 D=4 
+00025 [L257] JMP      A=3 B=128 C=4 D=32772 target=30
+00026 [L259] UGET     A=3 B=0 C=4 D=4 inertia_speed
+00027 [L259] ADDVV    A=3 B=3 C=2 D=770 
+00028 [L259] USETV    A=4 B=0 C=3 D=3 inertia_speed
+00029 [L259] JMP      A=3 B=128 C=15 D=32783 target=45
+00030 [L262] UGET     A=3 B=0 C=5 D=5 math
+00031 [L262] TGETS    A=3 B=3 C=1 D=769 'abs'
+00032 [L262] MOV      A=4 B=0 C=2 D=2 
+00033 [L262] CALL     A=3 B=2 C=2 D=514 
+00034 [L262] UGET     A=4 B=0 C=5 D=5 math
+00035 [L262] TGETS    A=4 B=4 C=1 D=1025 'abs'
+00036 [L262] UGET     A=5 B=0 C=4 D=4 inertia_speed
+00037 [L262] CALL     A=4 B=2 C=2 D=514 
+00038 [L262] ISGE     A=4 B=0 C=3 D=3 
+00039 [L262] JMP      A=3 B=128 C=2 D=32770 target=42
+00040 [L263] USETV    A=4 B=0 C=2 D=2 inertia_speed
+00041 [L263] JMP      A=3 B=128 C=3 D=32771 target=45
+00042 [L266] UGET     A=3 B=0 C=4 D=4 inertia_speed
+00043 [L266] MULVN    A=3 B=3 C=0 D=768 
+00044 [L266] USETV    A=4 B=0 C=3 D=3 inertia_speed
+00045 [L272] UGET     A=3 B=0 C=6 D=6 slide_layer
+00046 [L272] MOV      A=4 B=0 C=3 D=3 
+00047 [L272] TGETS    A=3 B=3 C=2 D=770 'stopAllActions'
+00048 [L272] CALL     A=3 B=1 C=2 D=258 
+00049 [L273] USETV    A=3 B=0 C=1 D=1 y_move
+00050 [L274] UGET     A=3 B=0 C=7 D=7 moveLayer
+00051 [L274] UGET     A=4 B=0 C=4 D=4 inertia_speed
+00052 [L274] CALL     A=3 B=1 C=2 D=258 
+00053 [L275] UGET     A=3 B=0 C=8 D=8 inertiaRun
+00054 [L275] CALL     A=3 B=1 C=1 D=257 
+00055 [L276] KPRI     A=3 B=0 C=2 D=2 
+00056 [L276] RET1     A=3 B=0 C=2 D=2 
+00057 [L276] JMP      A=2 B=128 C=2 D=32770 target=60
+00058 [L279] KPRI     A=2 B=0 C=1 D=1 
+00059 [L279] RET1     A=2 B=0 C=2 D=2 
+00060 [L281] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto14 offset=0xf7e source_lines=284-303 params=2
+UPVALUES ['frame', 'CCPointMake', 'params', 'y_begin', 'x_begin', 'math', 'CCDirector', 'cclog']
+00001 [L285] UGET     A=2 B=0 C=0 D=0 frame
+00002 [L285] MOV      A=3 B=0 C=2 D=2 
+00003 [L285] TGETS    A=2 B=2 C=0 D=512 'containsPoint'
+00004 [L285] UGET     A=4 B=0 C=1 D=1 CCPointMake
+00005 [L285] MOV      A=5 B=0 C=0 D=0 
+00006 [L285] MOV      A=6 B=0 C=1 D=1 
+00007 [L285] CALL     A=4 B=0 C=3 D=3 
+00008 [L285] CALLM    A=2 B=2 C=1 D=513 
+00009 [L285] ISF      A=0 B=0 C=2 D=2 
+00010 [L285] JMP      A=3 B=128 C=55 D=32823 target=66
+00011 [L290] UGET     A=2 B=0 C=2 D=2 params
+00012 [L290] TGETS    A=2 B=2 C=1 D=513 'click_fun'
+00013 [L290] ISF      A=0 B=0 C=2 D=2 
+00014 [L290] JMP      A=3 B=128 C=48 D=32816 target=63
+00015 [L290] UGET     A=2 B=0 C=3 D=3 y_begin
+00016 [L290] ISF      A=0 B=0 C=2 D=2 
+00017 [L290] JMP      A=3 B=128 C=45 D=32813 target=63
+00018 [L290] UGET     A=2 B=0 C=4 D=4 x_begin
+00019 [L290] ISF      A=0 B=0 C=2 D=2 
+00020 [L290] JMP      A=3 B=128 C=42 D=32810 target=63
+00021 [L291] UGET     A=2 B=0 C=5 D=5 math
+00022 [L291] TGETS    A=2 B=2 C=2 D=514 'abs'
+00023 [L291] UGET     A=3 B=0 C=3 D=3 y_begin
+00024 [L291] SUBVV    A=3 B=3 C=1 D=769 
+00025 [L291] CALL     A=2 B=2 C=2 D=514 
+00026 [L291] UGET     A=3 B=0 C=6 D=6 CCDirector
+00027 [L291] MOV      A=4 B=0 C=3 D=3 
+00028 [L291] TGETS    A=3 B=3 C=3 D=771 'sharedDirector'
+00029 [L291] CALL     A=3 B=2 C=2 D=514 
+00030 [L291] MOV      A=4 B=0 C=3 D=3 
+00031 [L291] TGETS    A=3 B=3 C=4 D=772 'getVisibleSize'
+00032 [L291] CALL     A=3 B=2 C=2 D=514 
+00033 [L291] TGETS    A=3 B=3 C=5 D=773 'height'
+00034 [L291] MULVN    A=3 B=3 C=0 D=768 
+00035 [L291] ISGE     A=2 B=0 C=3 D=3 
+00036 [L291] JMP      A=2 B=128 C=26 D=32794 target=63
+00037 [L292] UGET     A=2 B=0 C=5 D=5 math
+00038 [L292] TGETS    A=2 B=2 C=2 D=514 'abs'
+00039 [L292] UGET     A=3 B=0 C=4 D=4 x_begin
+00040 [L292] SUBVV    A=3 B=3 C=0 D=768 
+00041 [L292] CALL     A=2 B=2 C=2 D=514 
+00042 [L292] UGET     A=3 B=0 C=6 D=6 CCDirector
+00043 [L292] MOV      A=4 B=0 C=3 D=3 
+00044 [L292] TGETS    A=3 B=3 C=3 D=771 'sharedDirector'
+00045 [L292] CALL     A=3 B=2 C=2 D=514 
+00046 [L292] MOV      A=4 B=0 C=3 D=3 
+00047 [L292] TGETS    A=3 B=3 C=4 D=772 'getVisibleSize'
+00048 [L292] CALL     A=3 B=2 C=2 D=514 
+00049 [L292] TGETS    A=3 B=3 C=6 D=774 'width'
+00050 [L292] MULVN    A=3 B=3 C=1 D=769 
+00051 [L292] ISGE     A=2 B=0 C=3 D=3 
+00052 [L292] JMP      A=2 B=128 C=10 D=32778 target=63
+00053 [L294] UGET     A=2 B=0 C=7 D=7 cclog
+00054 [L294] KSTR     A=3 B=0 C=7 D=7 ' click == [%d]'
+00055 [L294] UGET     A=4 B=0 C=3 D=3 y_begin
+00056 [L294] SUBVV    A=4 B=4 C=1 D=1025 
+00057 [L294] CALL     A=2 B=1 C=3 D=259 
+00058 [L295] UGET     A=2 B=0 C=2 D=2 params
+00059 [L295] TGETS    A=2 B=2 C=1 D=513 'click_fun'
+00060 [L295] MOV      A=3 B=0 C=0 D=0 
+00061 [L295] MOV      A=4 B=0 C=1 D=1 
+00062 [L295] CALL     A=2 B=1 C=3 D=259 
+00063 [L298] KPRI     A=2 B=0 C=2 D=2 
+00064 [L298] RET1     A=2 B=0 C=2 D=2 
+00065 [L298] JMP      A=2 B=128 C=2 D=32770 target=68
+00066 [L301] KPRI     A=2 B=0 C=1 D=1 
+00067 [L301] RET1     A=2 B=0 C=2 D=2 
+00068 [L303] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto15 offset=0x11a2 source_lines=306-320 params=3
+UPVALUES ['CCTOUCHBEGAN', 'slide_onTouchBegan', 'CCTOUCHMOVED', 'slide_onTouchMoved', 'slide_onTouchEnded', 'last_event', 'last_time', 'os']
+00001 [L308] KPRI     A=3 B=0 C=1 D=1 
+00002 [L309] UGET     A=4 B=0 C=0 D=0 CCTOUCHBEGAN
+00003 [L309] ISNEV    A=0 B=0 C=4 D=4 
+00004 [L309] JMP      A=4 B=128 C=6 D=32774 target=11
+00005 [L310] UGET     A=4 B=0 C=1 D=1 slide_onTouchBegan
+00006 [L310] MOV      A=5 B=0 C=1 D=1 
+00007 [L310] MOV      A=6 B=0 C=2 D=2 
+00008 [L310] CALL     A=4 B=2 C=3 D=515 
+00009 [L310] MOV      A=3 B=0 C=4 D=4 
+00010 [L310] JMP      A=4 B=128 C=14 D=32782 target=25
+00011 [L311] UGET     A=4 B=0 C=2 D=2 CCTOUCHMOVED
+00012 [L311] ISNEV    A=0 B=0 C=4 D=4 
+00013 [L311] JMP      A=4 B=128 C=6 D=32774 target=20
+00014 [L312] UGET     A=4 B=0 C=3 D=3 slide_onTouchMoved
+00015 [L312] MOV      A=5 B=0 C=1 D=1 
+00016 [L312] MOV      A=6 B=0 C=2 D=2 
+00017 [L312] CALL     A=4 B=2 C=3 D=515 
+00018 [L312] MOV      A=3 B=0 C=4 D=4 
+00019 [L312] JMP      A=4 B=128 C=5 D=32773 target=25
+00020 [L314] UGET     A=4 B=0 C=4 D=4 slide_onTouchEnded
+00021 [L314] MOV      A=5 B=0 C=1 D=1 
+00022 [L314] MOV      A=6 B=0 C=2 D=2 
+00023 [L314] CALL     A=4 B=2 C=3 D=515 
+00024 [L314] MOV      A=3 B=0 C=4 D=4 
+00025 [L317] USETV    A=5 B=0 C=0 D=0 last_event
+00026 [L318] UGET     A=4 B=0 C=7 D=7 os
+00027 [L318] TGETS    A=4 B=4 C=0 D=1024 'time'
+00028 [L318] CALL     A=4 B=2 C=1 D=513 
+00029 [L318] USETV    A=6 B=0 C=4 D=4 last_time
+00030 [L319] RET1     A=3 B=0 C=2 D=2 
+
+FUNCTION proto16 offset=0x12e1 source_lines=159-330 params=3
+UPVALUES ['CCRectMake', 'CCDirector', 'CCMoveTo', 'd_u', 'CCArray', 'CCMoveBy', 'CCPointMake', 'CCCallFuncN', 'CCSequence', 'math', 'os', 'CCTOUCHBEGAN', 'cclog', 'CCTOUCHMOVED']
+00001 [L160] TDUP     A=3 B=0 C=2 D=2 {'kind': 'table', 'value': {}}
+00002 [L160] TGETS    A=4 B=1 C=0 D=256 'origin'
+00003 [L160] TGETS    A=4 B=4 C=1 D=1025 'x'
+00004 [L160] TSETS    A=4 B=3 C=1 D=769 'x'
+00005 [L160] TGETS    A=4 B=1 C=0 D=256 'origin'
+00006 [L160] TGETS    A=4 B=4 C=3 D=1027 'y'
+00007 [L160] TSETS    A=4 B=3 C=3 D=771 'y'
+00008 [L160] TGETS    A=4 B=1 C=4 D=260 'size'
+00009 [L160] TGETS    A=4 B=4 C=5 D=1029 'width'
+00010 [L160] TSETS    A=4 B=3 C=5 D=773 'width'
+00011 [L160] TGETS    A=4 B=1 C=4 D=260 'size'
+00012 [L160] TGETS    A=4 B=4 C=6 D=1030 'height'
+00013 [L160] TSETS    A=4 B=3 C=6 D=774 'height'
+00014 [L161] UGET     A=4 B=0 C=0 D=0 CCRectMake
+00015 [L161] TGETS    A=5 B=3 C=1 D=769 'x'
+00016 [L161] TGETS    A=6 B=3 C=3 D=771 'y'
+00017 [L161] TGETS    A=7 B=3 C=5 D=773 'width'
+00018 [L161] TGETS    A=8 B=3 C=6 D=774 'height'
+00019 [L161] CALL     A=4 B=2 C=5 D=517 
+00020 [L162] TGETS    A=5 B=2 C=7 D=519 'limit_springback'
+00021 [L162] IST      A=0 B=0 C=5 D=5 
+00022 [L162] JMP      A=5 B=128 C=2 D=32770 target=25
+00023 [L163] KNUM     A=5 B=0 C=0 D=0 0.1
+00024 [L163] TSETS    A=5 B=2 C=7 D=519 'limit_springback'
+00025 [L166] KSHORT   A=5 B=255 C=255 D=65535 -1
+00026 [L167] KSHORT   A=6 B=0 C=0 D=0 0
+00027 [L168] KNIL     A=7 B=0 C=9 D=9 
+00028 [L171] KSHORT   A=10 B=0 C=0 D=0 0
+00029 [L190] FNEW     A=11 B=0 C=8 D=8 {'kind': 'proto', 'id': 8}
+00030 [L204] FNEW     A=12 B=0 C=9 D=9 {'kind': 'proto', 'id': 9}
+00031 [L215] FNEW     A=13 B=0 C=10 D=10 {'kind': 'proto', 'id': 10}
+00032 [L226] FNEW     A=14 B=0 C=11 D=11 {'kind': 'proto', 'id': 11}
+00033 [L246] FNEW     A=15 B=0 C=12 D=12 {'kind': 'proto', 'id': 12}
+00034 [L281] FNEW     A=16 B=0 C=13 D=13 {'kind': 'proto', 'id': 13}
+00035 [L303] FNEW     A=17 B=0 C=14 D=14 {'kind': 'proto', 'id': 14}
+00036 [L320] FNEW     A=18 B=0 C=15 D=15 {'kind': 'proto', 'id': 15}
+00037 [L322] KPRI     A=19 B=0 C=2 D=2 
+00038 [L323] TGETS    A=20 B=2 C=16 D=528 'isSwallow'
+00039 [L323] ISEQP    A=20 B=0 C=0 D=0 
+00040 [L323] JMP      A=20 B=128 C=1 D=32769 target=42
+00041 [L324] TGETS    A=19 B=2 C=16 D=528 'isSwallow'
+00042 [L327] TGETS    A=20 B=2 C=17 D=529 'btn_pri'
+00043 [L327] IST      A=0 B=0 C=20 D=20 
+00044 [L327] JMP      A=21 B=128 C=1 D=32769 target=46
+00045 [L327] KSHORT   A=20 B=255 C=128 D=65408 -128
+00046 [L327] TSETS    A=20 B=2 C=17 D=529 'btn_pri'
+00047 [L328] MOV      A=21 B=0 C=0 D=0 
+00048 [L328] TGETS    A=20 B=0 C=18 D=18 'registerScriptTouchHandler'
+00049 [L328] MOV      A=22 B=0 C=18 D=18 
+00050 [L328] KPRI     A=23 B=0 C=1 D=1 
+00051 [L328] TGETS    A=24 B=2 C=17 D=529 'btn_pri'
+00052 [L328] MOV      A=25 B=0 C=19 D=19 
+00053 [L328] CALL     A=20 B=1 C=6 D=262 
+00054 [L329] MOV      A=21 B=0 C=0 D=0 
+00055 [L329] TGETS    A=20 B=0 C=19 D=19 'setTouchEnabled'
+00056 [L329] KPRI     A=22 B=0 C=2 D=2 
+00057 [L329] CALL     A=20 B=1 C=3 D=259 
+00058 [L330] UCLO     A=0 B=128 C=0 D=32768 target=59
+00059 [L330] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto17 offset=0x1642 source_lines=351-374 params=0
+UPVALUES ['inertia_speed', 'math', 'cclog', 'CCArray', 'CCEaseOut', 'CCMoveBy', 'CCPointMake', 'slide_layer', 'CCSequence']
+00001 [L353] UGET     A=0 B=0 C=0 D=0 inertia_speed
+00002 [L356] UGET     A=1 B=0 C=1 D=1 math
+00003 [L356] TGETS    A=1 B=1 C=0 D=256 'abs'
+00004 [L356] MOV      A=2 B=0 C=0 D=0 
+00005 [L356] CALL     A=1 B=2 C=2 D=514 
+00006 [L356] KSHORT   A=2 B=0 C=1 D=1 1
+00007 [L356] ISGE     A=2 B=0 C=1 D=1 
+00008 [L356] JMP      A=1 B=128 C=49 D=32817 target=58
+00009 [L358] UGET     A=1 B=0 C=1 D=1 math
+00010 [L358] TGETS    A=1 B=1 C=0 D=256 'abs'
+00011 [L358] MOV      A=2 B=0 C=0 D=0 
+00012 [L358] CALL     A=1 B=2 C=2 D=514 
+00013 [L358] MULVV    A=1 B=0 C=1 D=1 
+00014 [L358] MULVN    A=1 B=1 C=0 D=256 
+00015 [L359] KSHORT   A=2 B=5 C=160 D=1440 1440
+00016 [L359] ISGE     A=2 B=0 C=1 D=1 
+00017 [L359] JMP      A=2 B=128 C=2 D=32770 target=20
+00018 [L360] KSHORT   A=1 B=5 C=160 D=1440 1440
+00019 [L360] JMP      A=2 B=128 C=4 D=32772 target=24
+00020 [L361] KSHORT   A=2 B=250 C=96 D=64096 -1440
+00021 [L361] ISGE     A=1 B=0 C=2 D=2 
+00022 [L361] JMP      A=2 B=128 C=1 D=32769 target=24
+00023 [L362] KSHORT   A=1 B=250 C=96 D=64096 -1440
+00024 [L365] UGET     A=2 B=0 C=2 D=2 cclog
+00025 [L365] KSTR     A=3 B=0 C=1 D=1 'len=====%f'
+00026 [L365] MOV      A=4 B=0 C=1 D=1 
+00027 [L365] CALL     A=2 B=1 C=3 D=259 
+00028 [L367] UGET     A=2 B=0 C=3 D=3 CCArray
+00029 [L367] MOV      A=3 B=0 C=2 D=2 
+00030 [L367] TGETS    A=2 B=2 C=2 D=514 'create'
+00031 [L367] CALL     A=2 B=2 C=2 D=514 
+00032 [L369] MOV      A=4 B=0 C=2 D=2 
+00033 [L369] TGETS    A=3 B=2 C=3 D=515 'addObject'
+00034 [L369] UGET     A=5 B=0 C=4 D=4 CCEaseOut
+00035 [L369] MOV      A=6 B=0 C=5 D=5 
+00036 [L369] TGETS    A=5 B=5 C=2 D=1282 'create'
+00037 [L369] UGET     A=7 B=0 C=5 D=5 CCMoveBy
+00038 [L369] MOV      A=8 B=0 C=7 D=7 
+00039 [L369] TGETS    A=7 B=7 C=2 D=1794 'create'
+00040 [L369] KSHORT   A=9 B=0 C=2 D=2 2
+00041 [L369] UGET     A=10 B=0 C=6 D=6 CCPointMake
+00042 [L369] KSHORT   A=11 B=0 C=0 D=0 0
+00043 [L369] MOV      A=12 B=0 C=1 D=1 
+00044 [L369] CALL     A=10 B=0 C=3 D=3 
+00045 [L369] CALLM    A=7 B=2 C=2 D=514 
+00046 [L369] KSHORT   A=8 B=0 C=3 D=3 3
+00047 [L369] CALL     A=5 B=0 C=4 D=4 
+00048 [L369] CALLM    A=3 B=1 C=1 D=257 
+00049 [L371] UGET     A=3 B=0 C=7 D=7 slide_layer
+00050 [L371] MOV      A=4 B=0 C=3 D=3 
+00051 [L371] TGETS    A=3 B=3 C=4 D=772 'runAction'
+00052 [L371] UGET     A=5 B=0 C=8 D=8 CCSequence
+00053 [L371] MOV      A=6 B=0 C=5 D=5 
+00054 [L371] TGETS    A=5 B=5 C=2 D=1282 'create'
+00055 [L371] MOV      A=7 B=0 C=2 D=2 
+00056 [L371] CALL     A=5 B=0 C=3 D=3 
+00057 [L371] CALLM    A=3 B=1 C=1 D=257 
+00058 [L374] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto18 offset=0x181c source_lines=378-391 params=0
+UPVALUES ['slide_layer', 'CCDirector', 'params', 'CCMoveTo', 'd_u', 'checkCanMove']
+00001 [L379] UGET     A=0 B=0 C=0 D=0 slide_layer
+00002 [L379] MOV      A=1 B=0 C=0 D=0 
+00003 [L379] TGETS    A=0 B=0 C=0 D=0 'getPositionY'
+00004 [L379] CALL     A=0 B=2 C=2 D=514 
+00005 [L380] UGET     A=1 B=0 C=1 D=1 CCDirector
+00006 [L380] MOV      A=2 B=0 C=1 D=1 
+00007 [L380] TGETS    A=1 B=1 C=1 D=257 'sharedDirector'
+00008 [L380] CALL     A=1 B=2 C=2 D=514 
+00009 [L380] MOV      A=2 B=0 C=1 D=1 
+00010 [L380] TGETS    A=1 B=1 C=2 D=258 'getVisibleSize'
+00011 [L380] CALL     A=1 B=2 C=2 D=514 
+00012 [L380] TGETS    A=1 B=1 C=3 D=259 'height'
+00013 [L380] UGET     A=2 B=0 C=2 D=2 params
+00014 [L380] TGETS    A=2 B=2 C=4 D=516 'y_limit_down'
+00015 [L380] UGET     A=3 B=0 C=2 D=2 params
+00016 [L380] TGETS    A=3 B=3 C=5 D=773 'limit_springback'
+00017 [L380] SUBVV    A=2 B=2 C=3 D=515 
+00018 [L380] MULVV    A=1 B=1 C=2 D=258 
+00019 [L380] ISGE     A=0 B=0 C=1 D=1 
+00020 [L380] JMP      A=1 B=128 C=20 D=32788 target=41
+00021 [L382] UGET     A=1 B=0 C=0 D=0 slide_layer
+00022 [L382] MOV      A=2 B=0 C=1 D=1 
+00023 [L382] TGETS    A=1 B=1 C=6 D=262 'stopAllActions'
+00024 [L382] CALL     A=1 B=1 C=2 D=258 
+00025 [L383] UGET     A=1 B=0 C=0 D=0 slide_layer
+00026 [L383] MOV      A=2 B=0 C=1 D=1 
+00027 [L383] TGETS    A=1 B=1 C=7 D=263 'runAction'
+00028 [L383] UGET     A=3 B=0 C=3 D=3 CCMoveTo
+00029 [L383] MOV      A=4 B=0 C=3 D=3 
+00030 [L383] TGETS    A=3 B=3 C=8 D=776 'create'
+00031 [L383] KNUM     A=5 B=0 C=0 D=0 0.3
+00032 [L383] UGET     A=6 B=0 C=4 D=4 d_u
+00033 [L383] TGETS    A=6 B=6 C=9 D=1545 'makePoint'
+00034 [L383] KSHORT   A=7 B=0 C=0 D=0 0
+00035 [L383] UGET     A=8 B=0 C=2 D=2 params
+00036 [L383] TGETS    A=8 B=8 C=4 D=2052 'y_limit_down'
+00037 [L383] CALL     A=6 B=0 C=3 D=3 
+00038 [L383] CALLM    A=3 B=0 C=2 D=2 
+00039 [L383] CALLM    A=1 B=1 C=1 D=257 
+00040 [L383] JMP      A=1 B=128 C=35 D=32803 target=76
+00041 [L384] UGET     A=1 B=0 C=1 D=1 CCDirector
+00042 [L384] MOV      A=2 B=0 C=1 D=1 
+00043 [L384] TGETS    A=1 B=1 C=1 D=257 'sharedDirector'
+00044 [L384] CALL     A=1 B=2 C=2 D=514 
+00045 [L384] MOV      A=2 B=0 C=1 D=1 
+00046 [L384] TGETS    A=1 B=1 C=2 D=258 'getVisibleSize'
+00047 [L384] CALL     A=1 B=2 C=2 D=514 
+00048 [L384] TGETS    A=1 B=1 C=3 D=259 'height'
+00049 [L384] UGET     A=2 B=0 C=2 D=2 params
+00050 [L384] TGETS    A=2 B=2 C=10 D=522 'y_limit_top'
+00051 [L384] UGET     A=3 B=0 C=2 D=2 params
+00052 [L384] TGETS    A=3 B=3 C=5 D=773 'limit_springback'
+00053 [L384] ADDVV    A=2 B=2 C=3 D=515 
+00054 [L384] MULVV    A=1 B=1 C=2 D=258 
+00055 [L384] ISGE     A=1 B=0 C=0 D=0 
+00056 [L384] JMP      A=1 B=128 C=19 D=32787 target=76
+00057 [L386] UGET     A=1 B=0 C=0 D=0 slide_layer
+00058 [L386] MOV      A=2 B=0 C=1 D=1 
+00059 [L386] TGETS    A=1 B=1 C=6 D=262 'stopAllActions'
+00060 [L386] CALL     A=1 B=1 C=2 D=258 
+00061 [L387] UGET     A=1 B=0 C=0 D=0 slide_layer
+00062 [L387] MOV      A=2 B=0 C=1 D=1 
+00063 [L387] TGETS    A=1 B=1 C=7 D=263 'runAction'
+00064 [L387] UGET     A=3 B=0 C=3 D=3 CCMoveTo
+00065 [L387] MOV      A=4 B=0 C=3 D=3 
+00066 [L387] TGETS    A=3 B=3 C=8 D=776 'create'
+00067 [L387] KNUM     A=5 B=0 C=0 D=0 0.3
+00068 [L387] UGET     A=6 B=0 C=4 D=4 d_u
+00069 [L387] TGETS    A=6 B=6 C=9 D=1545 'makePoint'
+00070 [L387] KSHORT   A=7 B=0 C=0 D=0 0
+00071 [L387] UGET     A=8 B=0 C=2 D=2 params
+00072 [L387] TGETS    A=8 B=8 C=10 D=2058 'y_limit_top'
+00073 [L387] CALL     A=6 B=0 C=3 D=3 
+00074 [L387] CALLM    A=3 B=0 C=2 D=2 
+00075 [L387] CALLM    A=1 B=1 C=1 D=257 
+00076 [L390] UGET     A=1 B=0 C=4 D=4 d_u
+00077 [L390] TGETS    A=1 B=1 C=11 D=267 'delay'
+00078 [L390] UGET     A=2 B=0 C=0 D=0 slide_layer
+00079 [L390] KNUM     A=3 B=0 C=1 D=1 0.31
+00080 [L390] UGET     A=4 B=0 C=5 D=5 checkCanMove
+00081 [L390] CALL     A=1 B=1 C=4 D=260 
+00082 [L391] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto19 offset=0x1aac source_lines=395-401 params=1
+UPVALUES ['slide_layer']
+00001 [L397] UGET     A=1 B=0 C=0 D=0 slide_layer
+00002 [L397] MOV      A=2 B=0 C=1 D=1 
+00003 [L397] TGETS    A=1 B=1 C=0 D=256 'getPositionY'
+00004 [L397] CALL     A=1 B=2 C=2 D=514 
+00005 [L399] UGET     A=2 B=0 C=0 D=0 slide_layer
+00006 [L399] MOV      A=3 B=0 C=2 D=2 
+00007 [L399] TGETS    A=2 B=2 C=1 D=513 'setPositionY'
+00008 [L399] ADDVV    A=4 B=1 C=0 D=256 
+00009 [L399] CALL     A=2 B=1 C=3 D=259 
+00010 [L401] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto20 offset=0x1b1d source_lines=405-419 params=2
+UPVALUES ['frame', 'CCPointMake', 'last_event', 'CCTOUCHBEGAN', 'x_begin', 'y_begin', 'y_move']
+00001 [L406] UGET     A=2 B=0 C=0 D=0 frame
+00002 [L406] MOV      A=3 B=0 C=2 D=2 
+00003 [L406] TGETS    A=2 B=2 C=0 D=512 'containsPoint'
+00004 [L406] UGET     A=4 B=0 C=1 D=1 CCPointMake
+00005 [L406] MOV      A=5 B=0 C=0 D=0 
+00006 [L406] MOV      A=6 B=0 C=1 D=1 
+00007 [L406] CALL     A=4 B=0 C=3 D=3 
+00008 [L406] CALLM    A=2 B=2 C=1 D=513 
+00009 [L406] ISF      A=0 B=0 C=2 D=2 
+00010 [L406] JMP      A=3 B=128 C=10 D=32778 target=21
+00011 [L408] UGET     A=2 B=0 C=2 D=2 last_event
+00012 [L408] UGET     A=3 B=0 C=3 D=3 CCTOUCHBEGAN
+00013 [L408] ISEQV    A=2 B=0 C=3 D=3 
+00014 [L408] JMP      A=2 B=128 C=3 D=32771 target=18
+00015 [L409] USETV    A=4 B=0 C=0 D=0 x_begin
+00016 [L410] USETV    A=5 B=0 C=1 D=1 y_begin
+00017 [L411] USETV    A=6 B=0 C=1 D=1 y_move
+00018 [L414] KPRI     A=2 B=0 C=2 D=2 
+00019 [L414] RET1     A=2 B=0 C=2 D=2 
+00020 [L414] JMP      A=2 B=128 C=2 D=32770 target=23
+00021 [L417] KPRI     A=2 B=0 C=1 D=1 
+00022 [L417] RET1     A=2 B=0 C=2 D=2 
+00023 [L419] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto21 offset=0x1c03 source_lines=422-454 params=2
+UPVALUES ['frame', 'CCPointMake', 'y_begin', 'y_move', 'inertia_speed', 'math', 'moveLayer', 'inertiaRun']
+00001 [L423] UGET     A=2 B=0 C=0 D=0 frame
+00002 [L423] MOV      A=3 B=0 C=2 D=2 
+00003 [L423] TGETS    A=2 B=2 C=0 D=512 'containsPoint'
+00004 [L423] UGET     A=4 B=0 C=1 D=1 CCPointMake
+00005 [L423] MOV      A=5 B=0 C=0 D=0 
+00006 [L423] MOV      A=6 B=0 C=1 D=1 
+00007 [L423] CALL     A=4 B=0 C=3 D=3 
+00008 [L423] CALLM    A=2 B=2 C=1 D=513 
+00009 [L423] ISF      A=0 B=0 C=2 D=2 
+00010 [L423] JMP      A=3 B=128 C=43 D=32811 target=54
+00011 [L425] UGET     A=2 B=0 C=2 D=2 y_begin
+00012 [L425] IST      A=0 B=0 C=2 D=2 
+00013 [L425] JMP      A=2 B=128 C=1 D=32769 target=15
+00014 [L425] USETV    A=2 B=0 C=1 D=1 y_begin
+00015 [L426] UGET     A=2 B=0 C=3 D=3 y_move
+00016 [L426] IST      A=0 B=0 C=2 D=2 
+00017 [L426] JMP      A=2 B=128 C=1 D=32769 target=19
+00018 [L426] USETV    A=3 B=0 C=1 D=1 y_move
+00019 [L429] UGET     A=2 B=0 C=3 D=3 y_move
+00020 [L429] SUBVV    A=2 B=1 C=2 D=258 
+00021 [L430] UGET     A=3 B=0 C=4 D=4 inertia_speed
+00022 [L430] MULVV    A=3 B=3 C=2 D=770 
+00023 [L430] KSHORT   A=4 B=0 C=0 D=0 0
+00024 [L430] ISGE     A=3 B=0 C=4 D=4 
+00025 [L430] JMP      A=3 B=128 C=4 D=32772 target=30
+00026 [L432] UGET     A=3 B=0 C=4 D=4 inertia_speed
+00027 [L432] ADDVV    A=3 B=3 C=2 D=770 
+00028 [L432] USETV    A=4 B=0 C=3 D=3 inertia_speed
+00029 [L432] JMP      A=3 B=128 C=15 D=32783 target=45
+00030 [L435] UGET     A=3 B=0 C=5 D=5 math
+00031 [L435] TGETS    A=3 B=3 C=1 D=769 'abs'
+00032 [L435] MOV      A=4 B=0 C=2 D=2 
+00033 [L435] CALL     A=3 B=2 C=2 D=514 
+00034 [L435] UGET     A=4 B=0 C=5 D=5 math
+00035 [L435] TGETS    A=4 B=4 C=1 D=1025 'abs'
+00036 [L435] UGET     A=5 B=0 C=4 D=4 inertia_speed
+00037 [L435] CALL     A=4 B=2 C=2 D=514 
+00038 [L435] ISGE     A=4 B=0 C=3 D=3 
+00039 [L435] JMP      A=3 B=128 C=2 D=32770 target=42
+00040 [L436] USETV    A=4 B=0 C=2 D=2 inertia_speed
+00041 [L436] JMP      A=3 B=128 C=3 D=32771 target=45
+00042 [L439] UGET     A=3 B=0 C=4 D=4 inertia_speed
+00043 [L439] MULVN    A=3 B=3 C=0 D=768 
+00044 [L439] USETV    A=4 B=0 C=3 D=3 inertia_speed
+00045 [L446] USETV    A=3 B=0 C=1 D=1 y_move
+00046 [L447] UGET     A=3 B=0 C=6 D=6 moveLayer
+00047 [L447] UGET     A=4 B=0 C=4 D=4 inertia_speed
+00048 [L447] CALL     A=3 B=1 C=2 D=258 
+00049 [L448] UGET     A=3 B=0 C=7 D=7 inertiaRun
+00050 [L448] CALL     A=3 B=1 C=1 D=257 
+00051 [L449] KPRI     A=3 B=0 C=2 D=2 
+00052 [L449] RET1     A=3 B=0 C=2 D=2 
+00053 [L449] JMP      A=2 B=128 C=2 D=32770 target=56
+00054 [L452] KPRI     A=2 B=0 C=1 D=1 
+00055 [L452] RET1     A=2 B=0 C=2 D=2 
+00056 [L454] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto22 offset=0x1db3 source_lines=457-476 params=2
+UPVALUES ['frame', 'CCPointMake', 'params', 'y_begin', 'x_begin', 'math', 'CCDirector', 'cclog']
+00001 [L458] UGET     A=2 B=0 C=0 D=0 frame
+00002 [L458] MOV      A=3 B=0 C=2 D=2 
+00003 [L458] TGETS    A=2 B=2 C=0 D=512 'containsPoint'
+00004 [L458] UGET     A=4 B=0 C=1 D=1 CCPointMake
+00005 [L458] MOV      A=5 B=0 C=0 D=0 
+00006 [L458] MOV      A=6 B=0 C=1 D=1 
+00007 [L458] CALL     A=4 B=0 C=3 D=3 
+00008 [L458] CALLM    A=2 B=2 C=1 D=513 
+00009 [L458] ISF      A=0 B=0 C=2 D=2 
+00010 [L458] JMP      A=3 B=128 C=55 D=32823 target=66
+00011 [L463] UGET     A=2 B=0 C=2 D=2 params
+00012 [L463] TGETS    A=2 B=2 C=1 D=513 'click_fun'
+00013 [L463] ISF      A=0 B=0 C=2 D=2 
+00014 [L463] JMP      A=3 B=128 C=48 D=32816 target=63
+00015 [L463] UGET     A=2 B=0 C=3 D=3 y_begin
+00016 [L463] ISF      A=0 B=0 C=2 D=2 
+00017 [L463] JMP      A=3 B=128 C=45 D=32813 target=63
+00018 [L463] UGET     A=2 B=0 C=4 D=4 x_begin
+00019 [L463] ISF      A=0 B=0 C=2 D=2 
+00020 [L463] JMP      A=3 B=128 C=42 D=32810 target=63
+00021 [L464] UGET     A=2 B=0 C=5 D=5 math
+00022 [L464] TGETS    A=2 B=2 C=2 D=514 'abs'
+00023 [L464] UGET     A=3 B=0 C=3 D=3 y_begin
+00024 [L464] SUBVV    A=3 B=3 C=1 D=769 
+00025 [L464] CALL     A=2 B=2 C=2 D=514 
+00026 [L464] UGET     A=3 B=0 C=6 D=6 CCDirector
+00027 [L464] MOV      A=4 B=0 C=3 D=3 
+00028 [L464] TGETS    A=3 B=3 C=3 D=771 'sharedDirector'
+00029 [L464] CALL     A=3 B=2 C=2 D=514 
+00030 [L464] MOV      A=4 B=0 C=3 D=3 
+00031 [L464] TGETS    A=3 B=3 C=4 D=772 'getVisibleSize'
+00032 [L464] CALL     A=3 B=2 C=2 D=514 
+00033 [L464] TGETS    A=3 B=3 C=5 D=773 'height'
+00034 [L464] MULVN    A=3 B=3 C=0 D=768 
+00035 [L464] ISGE     A=2 B=0 C=3 D=3 
+00036 [L464] JMP      A=2 B=128 C=26 D=32794 target=63
+00037 [L465] UGET     A=2 B=0 C=5 D=5 math
+00038 [L465] TGETS    A=2 B=2 C=2 D=514 'abs'
+00039 [L465] UGET     A=3 B=0 C=4 D=4 x_begin
+00040 [L465] SUBVV    A=3 B=3 C=0 D=768 
+00041 [L465] CALL     A=2 B=2 C=2 D=514 
+00042 [L465] UGET     A=3 B=0 C=6 D=6 CCDirector
+00043 [L465] MOV      A=4 B=0 C=3 D=3 
+00044 [L465] TGETS    A=3 B=3 C=3 D=771 'sharedDirector'
+00045 [L465] CALL     A=3 B=2 C=2 D=514 
+00046 [L465] MOV      A=4 B=0 C=3 D=3 
+00047 [L465] TGETS    A=3 B=3 C=4 D=772 'getVisibleSize'
+00048 [L465] CALL     A=3 B=2 C=2 D=514 
+00049 [L465] TGETS    A=3 B=3 C=6 D=774 'width'
+00050 [L465] MULVN    A=3 B=3 C=1 D=769 
+00051 [L465] ISGE     A=2 B=0 C=3 D=3 
+00052 [L465] JMP      A=2 B=128 C=10 D=32778 target=63
+00053 [L467] UGET     A=2 B=0 C=7 D=7 cclog
+00054 [L467] KSTR     A=3 B=0 C=7 D=7 ' click == [%d]'
+00055 [L467] UGET     A=4 B=0 C=3 D=3 y_begin
+00056 [L467] SUBVV    A=4 B=4 C=1 D=1025 
+00057 [L467] CALL     A=2 B=1 C=3 D=259 
+00058 [L468] UGET     A=2 B=0 C=2 D=2 params
+00059 [L468] TGETS    A=2 B=2 C=1 D=513 'click_fun'
+00060 [L468] MOV      A=3 B=0 C=0 D=0 
+00061 [L468] MOV      A=4 B=0 C=1 D=1 
+00062 [L468] CALL     A=2 B=1 C=3 D=259 
+00063 [L471] KPRI     A=2 B=0 C=2 D=2 
+00064 [L471] RET1     A=2 B=0 C=2 D=2 
+00065 [L471] JMP      A=2 B=128 C=2 D=32770 target=68
+00066 [L474] KPRI     A=2 B=0 C=1 D=1 
+00067 [L474] RET1     A=2 B=0 C=2 D=2 
+00068 [L476] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto23 offset=0x1fd7 source_lines=479-491 params=3
+UPVALUES ['CCTOUCHBEGAN', 'slide_onTouchBegan', 'CCTOUCHMOVED', 'slide_onTouchMoved', 'slide_onTouchEnded', 'last_event']
+00001 [L482] UGET     A=3 B=0 C=0 D=0 CCTOUCHBEGAN
+00002 [L482] ISNEV    A=0 B=0 C=3 D=3 
+00003 [L482] JMP      A=3 B=128 C=5 D=32773 target=9
+00004 [L483] UGET     A=3 B=0 C=1 D=1 slide_onTouchBegan
+00005 [L483] MOV      A=4 B=0 C=1 D=1 
+00006 [L483] MOV      A=5 B=0 C=2 D=2 
+00007 [L483] CALLT    A=3 B=0 C=3 D=3 
+00008 [L483] JMP      A=3 B=128 C=12 D=32780 target=21
+00009 [L484] UGET     A=3 B=0 C=2 D=2 CCTOUCHMOVED
+00010 [L484] ISNEV    A=0 B=0 C=3 D=3 
+00011 [L484] JMP      A=3 B=128 C=5 D=32773 target=17
+00012 [L485] UGET     A=3 B=0 C=3 D=3 slide_onTouchMoved
+00013 [L485] MOV      A=4 B=0 C=1 D=1 
+00014 [L485] MOV      A=5 B=0 C=2 D=2 
+00015 [L485] CALLT    A=3 B=0 C=3 D=3 
+00016 [L485] JMP      A=3 B=128 C=4 D=32772 target=21
+00017 [L487] UGET     A=3 B=0 C=4 D=4 slide_onTouchEnded
+00018 [L487] MOV      A=4 B=0 C=1 D=1 
+00019 [L487] MOV      A=5 B=0 C=2 D=2 
+00020 [L487] CALLT    A=3 B=0 C=3 D=3 
+00021 [L490] USETV    A=5 B=0 C=0 D=0 last_event
+00022 [L491] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto24 offset=0x20d2 source_lines=336-498 params=3
+UPVALUES ['CCRectMake', 'math', 'cclog', 'CCArray', 'CCEaseOut', 'CCMoveBy', 'CCPointMake', 'CCSequence', 'CCDirector', 'CCMoveTo', 'd_u', 'CCTOUCHBEGAN', 'CCTOUCHMOVED']
+00001 [L337] TDUP     A=3 B=0 C=2 D=2 {'kind': 'table', 'value': {}}
+00002 [L337] TGETS    A=4 B=1 C=0 D=256 'origin'
+00003 [L337] TGETS    A=4 B=4 C=1 D=1025 'x'
+00004 [L337] TSETS    A=4 B=3 C=1 D=769 'x'
+00005 [L337] TGETS    A=4 B=1 C=0 D=256 'origin'
+00006 [L337] TGETS    A=4 B=4 C=3 D=1027 'y'
+00007 [L337] TSETS    A=4 B=3 C=3 D=771 'y'
+00008 [L337] TGETS    A=4 B=1 C=4 D=260 'size'
+00009 [L337] TGETS    A=4 B=4 C=5 D=1029 'width'
+00010 [L337] TSETS    A=4 B=3 C=5 D=773 'width'
+00011 [L337] TGETS    A=4 B=1 C=4 D=260 'size'
+00012 [L337] TGETS    A=4 B=4 C=6 D=1030 'height'
+00013 [L337] TSETS    A=4 B=3 C=6 D=774 'height'
+00014 [L338] UGET     A=4 B=0 C=0 D=0 CCRectMake
+00015 [L338] TGETS    A=5 B=3 C=1 D=769 'x'
+00016 [L338] TGETS    A=6 B=3 C=3 D=771 'y'
+00017 [L338] TGETS    A=7 B=3 C=5 D=773 'width'
+00018 [L338] TGETS    A=8 B=3 C=6 D=774 'height'
+00019 [L338] CALL     A=4 B=2 C=5 D=517 
+00020 [L339] TGETS    A=5 B=2 C=7 D=519 'limit_springback'
+00021 [L339] IST      A=0 B=0 C=5 D=5 
+00022 [L339] JMP      A=5 B=128 C=2 D=32770 target=25
+00023 [L340] KNUM     A=5 B=0 C=0 D=0 0.1
+00024 [L340] TSETS    A=5 B=2 C=7 D=519 'limit_springback'
+00025 [L343] KSHORT   A=5 B=255 C=255 D=65535 -1
+00026 [L344] KNIL     A=6 B=0 C=8 D=8 
+00027 [L347] KSHORT   A=9 B=0 C=0 D=0 0
+00028 [L374] FNEW     A=10 B=0 C=8 D=8 {'kind': 'proto', 'id': 17}
+00029 [L391] FNEW     A=11 B=0 C=9 D=9 {'kind': 'proto', 'id': 18}
+00030 [L401] FNEW     A=12 B=0 C=10 D=10 {'kind': 'proto', 'id': 19}
+00031 [L419] FNEW     A=13 B=0 C=11 D=11 {'kind': 'proto', 'id': 20}
+00032 [L454] FNEW     A=14 B=0 C=12 D=12 {'kind': 'proto', 'id': 21}
+00033 [L476] FNEW     A=15 B=0 C=13 D=13 {'kind': 'proto', 'id': 22}
+00034 [L491] FNEW     A=16 B=0 C=14 D=14 {'kind': 'proto', 'id': 23}
+00035 [L494] MOV      A=18 B=0 C=0 D=0 
+00036 [L494] TGETS    A=17 B=0 C=15 D=15 'registerScriptTouchHandler'
+00037 [L494] MOV      A=19 B=0 C=16 D=16 
+00038 [L494] KPRI     A=20 B=0 C=1 D=1 
+00039 [L494] KSHORT   A=21 B=255 C=128 D=65408 -128
+00040 [L494] KPRI     A=22 B=0 C=2 D=2 
+00041 [L494] CALL     A=17 B=1 C=6 D=262 
+00042 [L495] MOV      A=18 B=0 C=0 D=0 
+00043 [L495] TGETS    A=17 B=0 C=16 D=16 'setTouchEnabled'
+00044 [L495] KPRI     A=19 B=0 C=2 D=2 
+00045 [L495] CALL     A=17 B=1 C=3 D=259 
+00046 [L497] MOV      A=17 B=0 C=11 D=11 
+00047 [L497] CALL     A=17 B=1 C=1 D=257 
+00048 [L498] UCLO     A=0 B=128 C=0 D=32768 target=49
+00049 [L498] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto25 offset=0x23bc source_lines=523-537 params=1
+UPVALUES ['slide_layer', 'CCDirector', 'params', 'CCMoveTo', 'd_u', 'inertia_speed']
+00001 [L524] UGET     A=1 B=0 C=0 D=0 slide_layer
+00002 [L524] MOV      A=2 B=0 C=1 D=1 
+00003 [L524] TGETS    A=1 B=1 C=0 D=256 'getPositionX'
+00004 [L524] CALL     A=1 B=2 C=2 D=514 
+00005 [L525] KSHORT   A=2 B=0 C=0 D=0 0
+00006 [L525] ISGE     A=0 B=0 C=2 D=2 
+00007 [L525] JMP      A=2 B=128 C=35 D=32803 target=43
+00008 [L525] UGET     A=2 B=0 C=1 D=1 CCDirector
+00009 [L525] MOV      A=3 B=0 C=2 D=2 
+00010 [L525] TGETS    A=2 B=2 C=1 D=513 'sharedDirector'
+00011 [L525] CALL     A=2 B=2 C=2 D=514 
+00012 [L525] MOV      A=3 B=0 C=2 D=2 
+00013 [L525] TGETS    A=2 B=2 C=2 D=514 'getVisibleSize'
+00014 [L525] CALL     A=2 B=2 C=2 D=514 
+00015 [L525] TGETS    A=2 B=2 C=3 D=515 'width'
+00016 [L525] UGET     A=3 B=0 C=2 D=2 params
+00017 [L525] TGETS    A=3 B=3 C=4 D=772 'x_limit_left'
+00018 [L525] UGET     A=4 B=0 C=2 D=2 params
+00019 [L525] TGETS    A=4 B=4 C=5 D=1029 'limit_springback'
+00020 [L525] SUBVV    A=3 B=3 C=4 D=772 
+00021 [L525] MULVV    A=2 B=2 C=3 D=515 
+00022 [L525] ISGE     A=1 B=0 C=2 D=2 
+00023 [L525] JMP      A=2 B=128 C=19 D=32787 target=43
+00024 [L527] UGET     A=2 B=0 C=0 D=0 slide_layer
+00025 [L527] MOV      A=3 B=0 C=2 D=2 
+00026 [L527] TGETS    A=2 B=2 C=6 D=518 'runAction'
+00027 [L527] UGET     A=4 B=0 C=3 D=3 CCMoveTo
+00028 [L527] MOV      A=5 B=0 C=4 D=4 
+00029 [L527] TGETS    A=4 B=4 C=7 D=1031 'create'
+00030 [L527] KNUM     A=6 B=0 C=0 D=0 0.3
+00031 [L527] UGET     A=7 B=0 C=4 D=4 d_u
+00032 [L527] TGETS    A=7 B=7 C=8 D=1800 'makePoint'
+00033 [L527] UGET     A=8 B=0 C=2 D=2 params
+00034 [L527] TGETS    A=8 B=8 C=4 D=2052 'x_limit_left'
+00035 [L527] KSHORT   A=9 B=0 C=0 D=0 0
+00036 [L527] CALL     A=7 B=0 C=3 D=3 
+00037 [L527] CALLM    A=4 B=0 C=2 D=2 
+00038 [L527] CALLM    A=2 B=1 C=1 D=257 
+00039 [L528] USETN    A=5 B=0 C=1 D=1 0
+00040 [L529] KPRI     A=2 B=0 C=1 D=1 
+00041 [L529] RET1     A=2 B=0 C=2 D=2 
+00042 [L529] JMP      A=2 B=128 C=37 D=32805 target=80
+00043 [L530] KSHORT   A=2 B=0 C=0 D=0 0
+00044 [L530] ISGE     A=2 B=0 C=0 D=0 
+00045 [L530] JMP      A=2 B=128 C=34 D=32802 target=80
+00046 [L530] UGET     A=2 B=0 C=1 D=1 CCDirector
+00047 [L530] MOV      A=3 B=0 C=2 D=2 
+00048 [L530] TGETS    A=2 B=2 C=1 D=513 'sharedDirector'
+00049 [L530] CALL     A=2 B=2 C=2 D=514 
+00050 [L530] MOV      A=3 B=0 C=2 D=2 
+00051 [L530] TGETS    A=2 B=2 C=2 D=514 'getVisibleSize'
+00052 [L530] CALL     A=2 B=2 C=2 D=514 
+00053 [L530] TGETS    A=2 B=2 C=3 D=515 'width'
+00054 [L530] UGET     A=3 B=0 C=2 D=2 params
+00055 [L530] TGETS    A=3 B=3 C=9 D=777 'x_limit_right'
+00056 [L530] UGET     A=4 B=0 C=2 D=2 params
+00057 [L530] TGETS    A=4 B=4 C=5 D=1029 'limit_springback'
+00058 [L530] ADDVV    A=3 B=3 C=4 D=772 
+00059 [L530] MULVV    A=2 B=2 C=3 D=515 
+00060 [L530] ISGE     A=2 B=0 C=1 D=1 
+00061 [L530] JMP      A=2 B=128 C=18 D=32786 target=80
+00062 [L532] UGET     A=2 B=0 C=0 D=0 slide_layer
+00063 [L532] MOV      A=3 B=0 C=2 D=2 
+00064 [L532] TGETS    A=2 B=2 C=6 D=518 'runAction'
+00065 [L532] UGET     A=4 B=0 C=3 D=3 CCMoveTo
+00066 [L532] MOV      A=5 B=0 C=4 D=4 
+00067 [L532] TGETS    A=4 B=4 C=7 D=1031 'create'
+00068 [L532] KNUM     A=6 B=0 C=0 D=0 0.3
+00069 [L532] UGET     A=7 B=0 C=4 D=4 d_u
+00070 [L532] TGETS    A=7 B=7 C=8 D=1800 'makePoint'
+00071 [L532] UGET     A=8 B=0 C=2 D=2 params
+00072 [L532] TGETS    A=8 B=8 C=9 D=2057 'x_limit_right'
+00073 [L532] KSHORT   A=9 B=0 C=0 D=0 0
+00074 [L532] CALL     A=7 B=0 C=3 D=3 
+00075 [L532] CALLM    A=4 B=0 C=2 D=2 
+00076 [L532] CALLM    A=2 B=1 C=1 D=257 
+00077 [L533] USETN    A=5 B=0 C=1 D=1 0
+00078 [L534] KPRI     A=2 B=0 C=1 D=1 
+00079 [L534] RET1     A=2 B=0 C=2 D=2 
+00080 [L536] KPRI     A=2 B=0 C=2 D=2 
+00081 [L536] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto26 offset=0x2631 source_lines=540-554 params=2
+UPVALUES ['CCArray', 'CCMoveBy', 'CCPointMake', 'CCCallFuncN', 'slide_layer', 'CCSequence', 'checkCanMove', 'params']
+00001 [L543] UGET     A=2 B=0 C=0 D=0 CCArray
+00002 [L543] MOV      A=3 B=0 C=2 D=2 
+00003 [L543] TGETS    A=2 B=2 C=0 D=512 'create'
+00004 [L543] CALL     A=2 B=2 C=2 D=514 
+00005 [L544] MOV      A=4 B=0 C=2 D=2 
+00006 [L544] TGETS    A=3 B=2 C=1 D=513 'addObject'
+00007 [L544] UGET     A=5 B=0 C=1 D=1 CCMoveBy
+00008 [L544] MOV      A=6 B=0 C=5 D=5 
+00009 [L544] TGETS    A=5 B=5 C=0 D=1280 'create'
+00010 [L544] KNUM     A=7 B=0 C=0 D=0 0.01
+00011 [L544] UGET     A=8 B=0 C=2 D=2 CCPointMake
+00012 [L544] MOV      A=9 B=0 C=0 D=0 
+00013 [L544] KSHORT   A=10 B=0 C=0 D=0 0
+00014 [L544] CALL     A=8 B=0 C=3 D=3 
+00015 [L544] CALLM    A=5 B=0 C=2 D=2 
+00016 [L544] CALLM    A=3 B=1 C=1 D=257 
+00017 [L545] MOV      A=4 B=0 C=2 D=2 
+00018 [L545] TGETS    A=3 B=2 C=1 D=513 'addObject'
+00019 [L545] UGET     A=5 B=0 C=3 D=3 CCCallFuncN
+00020 [L545] MOV      A=6 B=0 C=5 D=5 
+00021 [L545] TGETS    A=5 B=5 C=0 D=1280 'create'
+00022 [L545] MOV      A=7 B=0 C=1 D=1 
+00023 [L545] CALL     A=5 B=0 C=3 D=3 
+00024 [L545] CALLM    A=3 B=1 C=1 D=257 
+00025 [L546] UGET     A=3 B=0 C=4 D=4 slide_layer
+00026 [L546] MOV      A=4 B=0 C=3 D=3 
+00027 [L546] TGETS    A=3 B=3 C=2 D=770 'runAction'
+00028 [L546] UGET     A=5 B=0 C=5 D=5 CCSequence
+00029 [L546] MOV      A=6 B=0 C=5 D=5 
+00030 [L546] TGETS    A=5 B=5 C=0 D=1280 'create'
+00031 [L546] MOV      A=7 B=0 C=2 D=2 
+00032 [L546] CALL     A=5 B=0 C=3 D=3 
+00033 [L546] CALLM    A=3 B=1 C=1 D=257 
+00034 [L549] UGET     A=3 B=0 C=6 D=6 checkCanMove
+00035 [L549] MOV      A=4 B=0 C=0 D=0 
+00036 [L549] CALL     A=3 B=1 C=2 D=258 
+00037 [L551] UGET     A=3 B=0 C=7 D=7 params
+00038 [L551] TGETS    A=3 B=3 C=3 D=771 'move_callback'
+00039 [L551] ISF      A=0 B=0 C=3 D=3 
+00040 [L551] JMP      A=4 B=128 C=3 D=32771 target=44
+00041 [L552] UGET     A=3 B=0 C=7 D=7 params
+00042 [L552] TGETS    A=3 B=3 C=3 D=771 'move_callback'
+00043 [L552] CALL     A=3 B=1 C=1 D=257 
+00044 [L554] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto27 offset=0x27ce source_lines=558-565 params=0
+UPVALUES ['math', 'inertia_speed', 'moveLayerInertia', 'inertiaRun']
+00001 [L559] UGET     A=0 B=0 C=0 D=0 math
+00002 [L559] TGETS    A=0 B=0 C=0 D=0 'abs'
+00003 [L559] UGET     A=1 B=0 C=1 D=1 inertia_speed
+00004 [L559] CALL     A=0 B=2 C=2 D=514 
+00005 [L559] KSHORT   A=1 B=0 C=1 D=1 1
+00006 [L559] ISGE     A=0 B=0 C=1 D=1 
+00007 [L559] JMP      A=0 B=128 C=2 D=32770 target=10
+00008 [L560] USETN    A=1 B=0 C=0 D=0 0
+00009 [L560] JMP      A=0 B=128 C=7 D=32775 target=17
+00010 [L562] UGET     A=0 B=0 C=2 D=2 moveLayerInertia
+00011 [L562] UGET     A=1 B=0 C=1 D=1 inertia_speed
+00012 [L562] UGET     A=2 B=0 C=3 D=3 inertiaRun
+00013 [L562] CALL     A=0 B=1 C=3 D=259 
+00014 [L563] UGET     A=0 B=0 C=1 D=1 inertia_speed
+00015 [L563] MULVN    A=0 B=0 C=1 D=1 
+00016 [L563] USETV    A=1 B=0 C=0 D=0 inertia_speed
+00017 [L565] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto28 offset=0x2877 source_lines=569-575 params=1
+UPVALUES ['checkCanMove', 'slide_layer']
+00001 [L570] UGET     A=1 B=0 C=0 D=0 checkCanMove
+00002 [L570] MOV      A=2 B=0 C=0 D=0 
+00003 [L570] CALL     A=1 B=2 C=2 D=514 
+00004 [L570] ISNEP    A=1 B=0 C=2 D=2 
+00005 [L570] JMP      A=1 B=128 C=9 D=32777 target=15
+00006 [L571] UGET     A=1 B=0 C=1 D=1 slide_layer
+00007 [L571] MOV      A=2 B=0 C=1 D=1 
+00008 [L571] TGETS    A=1 B=1 C=0 D=256 'getPositionX'
+00009 [L571] CALL     A=1 B=2 C=2 D=514 
+00010 [L573] UGET     A=2 B=0 C=1 D=1 slide_layer
+00011 [L573] MOV      A=3 B=0 C=2 D=2 
+00012 [L573] TGETS    A=2 B=2 C=1 D=513 'setPositionX'
+00013 [L573] ADDVV    A=4 B=1 C=0 D=256 
+00014 [L573] CALL     A=2 B=1 C=3 D=259 
+00015 [L575] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto29 offset=0x2910 source_lines=579-598 params=2
+UPVALUES ['frame', 'CCPointMake', 'last_time', 'os', 'last_event', 'CCTOUCHBEGAN', 'x_begin', 'y_begin', 'x_move']
+00001 [L580] UGET     A=2 B=0 C=0 D=0 frame
+00002 [L580] MOV      A=3 B=0 C=2 D=2 
+00003 [L580] TGETS    A=2 B=2 C=0 D=512 'containsPoint'
+00004 [L580] UGET     A=4 B=0 C=1 D=1 CCPointMake
+00005 [L580] MOV      A=5 B=0 C=0 D=0 
+00006 [L580] MOV      A=6 B=0 C=1 D=1 
+00007 [L580] CALL     A=4 B=0 C=3 D=3 
+00008 [L580] CALLM    A=2 B=2 C=1 D=513 
+00009 [L580] ISF      A=0 B=0 C=2 D=2 
+00010 [L580] JMP      A=3 B=128 C=20 D=32788 target=31
+00011 [L582] UGET     A=2 B=0 C=2 D=2 last_time
+00012 [L582] UGET     A=3 B=0 C=3 D=3 os
+00013 [L582] TGETS    A=3 B=3 C=1 D=769 'time'
+00014 [L582] CALL     A=3 B=2 C=1 D=513 
+00015 [L582] ISEQV    A=2 B=0 C=3 D=3 
+00016 [L582] JMP      A=2 B=128 C=1 D=32769 target=18
+00017 [L583] USETN    A=4 B=0 C=0 D=0 -1
+00018 [L586] UGET     A=2 B=0 C=4 D=4 last_event
+00019 [L586] UGET     A=3 B=0 C=5 D=5 CCTOUCHBEGAN
+00020 [L586] ISEQV    A=2 B=0 C=3 D=3 
+00021 [L586] JMP      A=2 B=128 C=6 D=32774 target=28
+00022 [L587] USETV    A=6 B=0 C=0 D=0 x_begin
+00023 [L588] USETV    A=7 B=0 C=1 D=1 y_begin
+00024 [L589] USETV    A=8 B=0 C=0 D=0 x_move
+00025 [L590] KPRI     A=2 B=0 C=2 D=2 
+00026 [L590] RET1     A=2 B=0 C=2 D=2 
+00027 [L590] JMP      A=2 B=128 C=5 D=32773 target=33
+00028 [L592] KPRI     A=2 B=0 C=1 D=1 
+00029 [L592] RET1     A=2 B=0 C=2 D=2 
+00030 [L593] JMP      A=2 B=128 C=2 D=32770 target=33
+00031 [L596] KPRI     A=2 B=0 C=1 D=1 
+00032 [L596] RET1     A=2 B=0 C=2 D=2 
+00033 [L598] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto30 offset=0x2a43 source_lines=601-633 params=2
+UPVALUES ['frame', 'CCPointMake', 'x_begin', 'x_move', 'inertia_speed', 'math', 'slide_layer', 'moveLayer', 'inertiaRun']
+00001 [L602] UGET     A=2 B=0 C=0 D=0 frame
+00002 [L602] MOV      A=3 B=0 C=2 D=2 
+00003 [L602] TGETS    A=2 B=2 C=0 D=512 'containsPoint'
+00004 [L602] UGET     A=4 B=0 C=1 D=1 CCPointMake
+00005 [L602] MOV      A=5 B=0 C=0 D=0 
+00006 [L602] MOV      A=6 B=0 C=1 D=1 
+00007 [L602] CALL     A=4 B=0 C=3 D=3 
+00008 [L602] CALLM    A=2 B=2 C=1 D=513 
+00009 [L602] ISF      A=0 B=0 C=2 D=2 
+00010 [L602] JMP      A=3 B=128 C=47 D=32815 target=58
+00011 [L604] UGET     A=2 B=0 C=2 D=2 x_begin
+00012 [L604] IST      A=0 B=0 C=2 D=2 
+00013 [L604] JMP      A=2 B=128 C=1 D=32769 target=15
+00014 [L604] USETV    A=2 B=0 C=0 D=0 x_begin
+00015 [L605] UGET     A=2 B=0 C=3 D=3 x_move
+00016 [L605] IST      A=0 B=0 C=2 D=2 
+00017 [L605] JMP      A=2 B=128 C=1 D=32769 target=19
+00018 [L605] USETV    A=3 B=0 C=0 D=0 x_move
+00019 [L608] UGET     A=2 B=0 C=3 D=3 x_move
+00020 [L608] SUBVV    A=2 B=0 C=2 D=2 
+00021 [L609] UGET     A=3 B=0 C=4 D=4 inertia_speed
+00022 [L609] MULVV    A=3 B=3 C=2 D=770 
+00023 [L609] KSHORT   A=4 B=0 C=0 D=0 0
+00024 [L609] ISGE     A=3 B=0 C=4 D=4 
+00025 [L609] JMP      A=3 B=128 C=4 D=32772 target=30
+00026 [L611] UGET     A=3 B=0 C=4 D=4 inertia_speed
+00027 [L611] ADDVV    A=3 B=3 C=2 D=770 
+00028 [L611] USETV    A=4 B=0 C=3 D=3 inertia_speed
+00029 [L611] JMP      A=3 B=128 C=15 D=32783 target=45
+00030 [L614] UGET     A=3 B=0 C=5 D=5 math
+00031 [L614] TGETS    A=3 B=3 C=1 D=769 'abs'
+00032 [L614] MOV      A=4 B=0 C=2 D=2 
+00033 [L614] CALL     A=3 B=2 C=2 D=514 
+00034 [L614] UGET     A=4 B=0 C=5 D=5 math
+00035 [L614] TGETS    A=4 B=4 C=1 D=1025 'abs'
+00036 [L614] UGET     A=5 B=0 C=4 D=4 inertia_speed
+00037 [L614] CALL     A=4 B=2 C=2 D=514 
+00038 [L614] ISGE     A=4 B=0 C=3 D=3 
+00039 [L614] JMP      A=3 B=128 C=2 D=32770 target=42
+00040 [L615] USETV    A=4 B=0 C=2 D=2 inertia_speed
+00041 [L615] JMP      A=3 B=128 C=3 D=32771 target=45
+00042 [L618] UGET     A=3 B=0 C=4 D=4 inertia_speed
+00043 [L618] MULVN    A=3 B=3 C=0 D=768 
+00044 [L618] USETV    A=4 B=0 C=3 D=3 inertia_speed
+00045 [L624] UGET     A=3 B=0 C=6 D=6 slide_layer
+00046 [L624] MOV      A=4 B=0 C=3 D=3 
+00047 [L624] TGETS    A=3 B=3 C=2 D=770 'stopAllActions'
+00048 [L624] CALL     A=3 B=1 C=2 D=258 
+00049 [L625] USETV    A=3 B=0 C=0 D=0 x_move
+00050 [L626] UGET     A=3 B=0 C=7 D=7 moveLayer
+00051 [L626] UGET     A=4 B=0 C=4 D=4 inertia_speed
+00052 [L626] CALL     A=3 B=1 C=2 D=258 
+00053 [L627] UGET     A=3 B=0 C=8 D=8 inertiaRun
+00054 [L627] CALL     A=3 B=1 C=1 D=257 
+00055 [L628] KPRI     A=3 B=0 C=2 D=2 
+00056 [L628] RET1     A=3 B=0 C=2 D=2 
+00057 [L628] JMP      A=2 B=128 C=2 D=32770 target=60
+00058 [L631] KPRI     A=2 B=0 C=1 D=1 
+00059 [L631] RET1     A=2 B=0 C=2 D=2 
+00060 [L633] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto31 offset=0x2c24 source_lines=636-655 params=2
+UPVALUES ['frame', 'CCPointMake', 'params', 'y_begin', 'x_begin', 'math', 'CCDirector', 'cclog']
+00001 [L637] UGET     A=2 B=0 C=0 D=0 frame
+00002 [L637] MOV      A=3 B=0 C=2 D=2 
+00003 [L637] TGETS    A=2 B=2 C=0 D=512 'containsPoint'
+00004 [L637] UGET     A=4 B=0 C=1 D=1 CCPointMake
+00005 [L637] MOV      A=5 B=0 C=0 D=0 
+00006 [L637] MOV      A=6 B=0 C=1 D=1 
+00007 [L637] CALL     A=4 B=0 C=3 D=3 
+00008 [L637] CALLM    A=2 B=2 C=1 D=513 
+00009 [L637] ISF      A=0 B=0 C=2 D=2 
+00010 [L637] JMP      A=3 B=128 C=55 D=32823 target=66
+00011 [L642] UGET     A=2 B=0 C=2 D=2 params
+00012 [L642] TGETS    A=2 B=2 C=1 D=513 'click_fun'
+00013 [L642] ISF      A=0 B=0 C=2 D=2 
+00014 [L642] JMP      A=3 B=128 C=48 D=32816 target=63
+00015 [L642] UGET     A=2 B=0 C=3 D=3 y_begin
+00016 [L642] ISF      A=0 B=0 C=2 D=2 
+00017 [L642] JMP      A=3 B=128 C=45 D=32813 target=63
+00018 [L642] UGET     A=2 B=0 C=4 D=4 x_begin
+00019 [L642] ISF      A=0 B=0 C=2 D=2 
+00020 [L642] JMP      A=3 B=128 C=42 D=32810 target=63
+00021 [L643] UGET     A=2 B=0 C=5 D=5 math
+00022 [L643] TGETS    A=2 B=2 C=2 D=514 'abs'
+00023 [L643] UGET     A=3 B=0 C=3 D=3 y_begin
+00024 [L643] SUBVV    A=3 B=3 C=1 D=769 
+00025 [L643] CALL     A=2 B=2 C=2 D=514 
+00026 [L643] UGET     A=3 B=0 C=6 D=6 CCDirector
+00027 [L643] MOV      A=4 B=0 C=3 D=3 
+00028 [L643] TGETS    A=3 B=3 C=3 D=771 'sharedDirector'
+00029 [L643] CALL     A=3 B=2 C=2 D=514 
+00030 [L643] MOV      A=4 B=0 C=3 D=3 
+00031 [L643] TGETS    A=3 B=3 C=4 D=772 'getVisibleSize'
+00032 [L643] CALL     A=3 B=2 C=2 D=514 
+00033 [L643] TGETS    A=3 B=3 C=5 D=773 'height'
+00034 [L643] MULVN    A=3 B=3 C=0 D=768 
+00035 [L643] ISGE     A=2 B=0 C=3 D=3 
+00036 [L643] JMP      A=2 B=128 C=26 D=32794 target=63
+00037 [L644] UGET     A=2 B=0 C=5 D=5 math
+00038 [L644] TGETS    A=2 B=2 C=2 D=514 'abs'
+00039 [L644] UGET     A=3 B=0 C=4 D=4 x_begin
+00040 [L644] SUBVV    A=3 B=3 C=0 D=768 
+00041 [L644] CALL     A=2 B=2 C=2 D=514 
+00042 [L644] UGET     A=3 B=0 C=6 D=6 CCDirector
+00043 [L644] MOV      A=4 B=0 C=3 D=3 
+00044 [L644] TGETS    A=3 B=3 C=3 D=771 'sharedDirector'
+00045 [L644] CALL     A=3 B=2 C=2 D=514 
+00046 [L644] MOV      A=4 B=0 C=3 D=3 
+00047 [L644] TGETS    A=3 B=3 C=4 D=772 'getVisibleSize'
+00048 [L644] CALL     A=3 B=2 C=2 D=514 
+00049 [L644] TGETS    A=3 B=3 C=6 D=774 'width'
+00050 [L644] MULVN    A=3 B=3 C=1 D=769 
+00051 [L644] ISGE     A=2 B=0 C=3 D=3 
+00052 [L644] JMP      A=2 B=128 C=10 D=32778 target=63
+00053 [L646] UGET     A=2 B=0 C=7 D=7 cclog
+00054 [L646] KSTR     A=3 B=0 C=7 D=7 ' click == [%d]'
+00055 [L646] UGET     A=4 B=0 C=4 D=4 x_begin
+00056 [L646] SUBVV    A=4 B=4 C=0 D=1024 
+00057 [L646] CALL     A=2 B=1 C=3 D=259 
+00058 [L647] UGET     A=2 B=0 C=2 D=2 params
+00059 [L647] TGETS    A=2 B=2 C=1 D=513 'click_fun'
+00060 [L647] MOV      A=3 B=0 C=0 D=0 
+00061 [L647] MOV      A=4 B=0 C=1 D=1 
+00062 [L647] CALL     A=2 B=1 C=3 D=259 
+00063 [L650] KPRI     A=2 B=0 C=2 D=2 
+00064 [L650] RET1     A=2 B=0 C=2 D=2 
+00065 [L650] JMP      A=2 B=128 C=2 D=32770 target=68
+00066 [L653] KPRI     A=2 B=0 C=1 D=1 
+00067 [L653] RET1     A=2 B=0 C=2 D=2 
+00068 [L655] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto32 offset=0x2e48 source_lines=658-673 params=3
+UPVALUES ['CCTOUCHBEGAN', 'slide_onTouchBegan', 'CCTOUCHMOVED', 'slide_onTouchMoved', 'slide_onTouchEnded', 'last_event', 'last_time', 'os']
+00001 [L661] KPRI     A=3 B=0 C=1 D=1 
+00002 [L662] UGET     A=4 B=0 C=0 D=0 CCTOUCHBEGAN
+00003 [L662] ISNEV    A=0 B=0 C=4 D=4 
+00004 [L662] JMP      A=4 B=128 C=6 D=32774 target=11
+00005 [L663] UGET     A=4 B=0 C=1 D=1 slide_onTouchBegan
+00006 [L663] MOV      A=5 B=0 C=1 D=1 
+00007 [L663] MOV      A=6 B=0 C=2 D=2 
+00008 [L663] CALL     A=4 B=2 C=3 D=515 
+00009 [L663] MOV      A=3 B=0 C=4 D=4 
+00010 [L663] JMP      A=4 B=128 C=14 D=32782 target=25
+00011 [L664] UGET     A=4 B=0 C=2 D=2 CCTOUCHMOVED
+00012 [L664] ISNEV    A=0 B=0 C=4 D=4 
+00013 [L664] JMP      A=4 B=128 C=6 D=32774 target=20
+00014 [L665] UGET     A=4 B=0 C=3 D=3 slide_onTouchMoved
+00015 [L665] MOV      A=5 B=0 C=1 D=1 
+00016 [L665] MOV      A=6 B=0 C=2 D=2 
+00017 [L665] CALL     A=4 B=2 C=3 D=515 
+00018 [L665] MOV      A=3 B=0 C=4 D=4 
+00019 [L665] JMP      A=4 B=128 C=5 D=32773 target=25
+00020 [L667] UGET     A=4 B=0 C=4 D=4 slide_onTouchEnded
+00021 [L667] MOV      A=5 B=0 C=1 D=1 
+00022 [L667] MOV      A=6 B=0 C=2 D=2 
+00023 [L667] CALL     A=4 B=2 C=3 D=515 
+00024 [L667] MOV      A=3 B=0 C=4 D=4 
+00025 [L670] USETV    A=5 B=0 C=0 D=0 last_event
+00026 [L671] UGET     A=4 B=0 C=7 D=7 os
+00027 [L671] TGETS    A=4 B=4 C=0 D=1024 'time'
+00028 [L671] CALL     A=4 B=2 C=1 D=513 
+00029 [L671] USETV    A=6 B=0 C=4 D=4 last_time
+00030 [L672] RET1     A=3 B=0 C=2 D=2 
+
+FUNCTION proto33 offset=0x2f87 source_lines=507-684 params=3
+UPVALUES ['CCRectMake', 'CCDirector', 'CCMoveTo', 'd_u', 'CCArray', 'CCMoveBy', 'CCPointMake', 'CCCallFuncN', 'CCSequence', 'math', 'os', 'CCTOUCHBEGAN', 'cclog', 'CCTOUCHMOVED']
+00001 [L508] TDUP     A=3 B=0 C=2 D=2 {'kind': 'table', 'value': {}}
+00002 [L508] TGETS    A=4 B=1 C=0 D=256 'origin'
+00003 [L508] TGETS    A=4 B=4 C=1 D=1025 'x'
+00004 [L508] TSETS    A=4 B=3 C=1 D=769 'x'
+00005 [L508] TGETS    A=4 B=1 C=0 D=256 'origin'
+00006 [L508] TGETS    A=4 B=4 C=3 D=1027 'y'
+00007 [L508] TSETS    A=4 B=3 C=3 D=771 'y'
+00008 [L508] TGETS    A=4 B=1 C=4 D=260 'size'
+00009 [L508] TGETS    A=4 B=4 C=5 D=1029 'width'
+00010 [L508] TSETS    A=4 B=3 C=5 D=773 'width'
+00011 [L508] TGETS    A=4 B=1 C=4 D=260 'size'
+00012 [L508] TGETS    A=4 B=4 C=6 D=1030 'height'
+00013 [L508] TSETS    A=4 B=3 C=6 D=774 'height'
+00014 [L509] UGET     A=4 B=0 C=0 D=0 CCRectMake
+00015 [L509] TGETS    A=5 B=3 C=1 D=769 'x'
+00016 [L509] TGETS    A=6 B=3 C=3 D=771 'y'
+00017 [L509] TGETS    A=7 B=3 C=5 D=773 'width'
+00018 [L509] TGETS    A=8 B=3 C=6 D=774 'height'
+00019 [L509] CALL     A=4 B=2 C=5 D=517 
+00020 [L511] TGETS    A=5 B=2 C=7 D=519 'limit_springback'
+00021 [L511] IST      A=0 B=0 C=5 D=5 
+00022 [L511] JMP      A=5 B=128 C=2 D=32770 target=25
+00023 [L512] KNUM     A=5 B=0 C=0 D=0 0.1
+00024 [L512] TSETS    A=5 B=2 C=7 D=519 'limit_springback'
+00025 [L515] KSHORT   A=5 B=255 C=255 D=65535 -1
+00026 [L516] KSHORT   A=6 B=0 C=0 D=0 0
+00027 [L517] KNIL     A=7 B=0 C=9 D=9 
+00028 [L520] KSHORT   A=10 B=0 C=0 D=0 0
+00029 [L537] FNEW     A=11 B=0 C=8 D=8 {'kind': 'proto', 'id': 25}
+00030 [L554] FNEW     A=12 B=0 C=9 D=9 {'kind': 'proto', 'id': 26}
+00031 [L565] FNEW     A=13 B=0 C=10 D=10 {'kind': 'proto', 'id': 27}
+00032 [L575] FNEW     A=14 B=0 C=11 D=11 {'kind': 'proto', 'id': 28}
+00033 [L598] FNEW     A=15 B=0 C=12 D=12 {'kind': 'proto', 'id': 29}
+00034 [L633] FNEW     A=16 B=0 C=13 D=13 {'kind': 'proto', 'id': 30}
+00035 [L655] FNEW     A=17 B=0 C=14 D=14 {'kind': 'proto', 'id': 31}
+00036 [L673] FNEW     A=18 B=0 C=15 D=15 {'kind': 'proto', 'id': 32}
+00037 [L675] KPRI     A=19 B=0 C=2 D=2 
+00038 [L676] TGETS    A=20 B=2 C=16 D=528 'isSwallow'
+00039 [L676] ISEQP    A=20 B=0 C=0 D=0 
+00040 [L676] JMP      A=20 B=128 C=1 D=32769 target=42
+00041 [L677] TGETS    A=19 B=2 C=16 D=528 'isSwallow'
+00042 [L680] TGETS    A=20 B=2 C=17 D=529 'btn_pri'
+00043 [L680] IST      A=0 B=0 C=20 D=20 
+00044 [L680] JMP      A=21 B=128 C=1 D=32769 target=46
+00045 [L680] KSHORT   A=20 B=255 C=128 D=65408 -128
+00046 [L680] TSETS    A=20 B=2 C=17 D=529 'btn_pri'
+00047 [L682] MOV      A=21 B=0 C=0 D=0 
+00048 [L682] TGETS    A=20 B=0 C=18 D=18 'registerScriptTouchHandler'
+00049 [L682] MOV      A=22 B=0 C=18 D=18 
+00050 [L682] KPRI     A=23 B=0 C=1 D=1 
+00051 [L682] TGETS    A=24 B=2 C=17 D=529 'btn_pri'
+00052 [L682] MOV      A=25 B=0 C=19 D=19 
+00053 [L682] CALL     A=20 B=1 C=6 D=262 
+00054 [L683] MOV      A=21 B=0 C=0 D=0 
+00055 [L683] TGETS    A=20 B=0 C=19 D=19 'setTouchEnabled'
+00056 [L683] KPRI     A=22 B=0 C=2 D=2 
+00057 [L683] CALL     A=20 B=1 C=3 D=259 
+00058 [L684] UCLO     A=0 B=128 C=0 D=32768 target=59
+00059 [L684] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto34 offset=0x32e8 source_lines=688-695 params=2
+UPVALUES ['cclog']
+00001 [L689] UGET     A=2 B=0 C=0 D=0 cclog
+00002 [L689] KSTR     A=3 B=0 C=0 D=0 'setAndroidReturnBtn'
+00003 [L689] CALL     A=2 B=1 C=2 D=258 
+00004 [L690] ISF      A=0 B=0 C=0 D=0 
+00005 [L690] JMP      A=2 B=128 C=2 D=32770 target=8
+00006 [L690] IST      A=0 B=0 C=1 D=1 
+00007 [L690] JMP      A=2 B=128 C=1 D=32769 target=9
+00008 [L691] RET0     A=0 B=0 C=1 D=1 
+00009 [L694] MOV      A=3 B=0 C=0 D=0 
+00010 [L694] TGETS    A=2 B=0 C=1 D=1 'setKeypadEnabled'
+00011 [L694] KPRI     A=4 B=0 C=2 D=2 
+00012 [L694] CALL     A=2 B=1 C=3 D=259 
+00013 [L695] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto35 offset=0x337a source_lines=0-704 params=0
+UPVALUES []
+00001 [L8] GGET     A=0 B=0 C=0 D=0 'require'
+00002 [L9] GGET     A=1 B=0 C=1 D=1 'math'
+00003 [L10] GGET     A=2 B=0 C=2 D=2 'string'
+00004 [L11] GGET     A=3 B=0 C=3 D=3 'os'
+00005 [L12] GGET     A=4 B=0 C=4 D=4 'CCLuaLog'
+00006 [L13] GGET     A=5 B=0 C=5 D=5 'CCDirector'
+00007 [L15] GGET     A=6 B=0 C=6 D=6 'CCLayer'
+00008 [L16] GGET     A=7 B=0 C=7 D=7 'CCRectMake'
+00009 [L17] GGET     A=8 B=0 C=8 D=8 'CCTOUCHBEGAN'
+00010 [L18] GGET     A=9 B=0 C=9 D=9 'CCTOUCHMOVED'
+00011 [L19] GGET     A=10 B=0 C=10 D=10 'CCPointMake'
+00012 [L20] GGET     A=11 B=0 C=11 D=11 'CCArray'
+00013 [L21] GGET     A=12 B=0 C=12 D=12 'CCCallFuncN'
+00014 [L22] GGET     A=13 B=0 C=13 D=13 'CCSequence'
+00015 [L23] GGET     A=14 B=0 C=14 D=14 'CCMoveBy'
+00016 [L24] GGET     A=15 B=0 C=15 D=15 'CCMoveTo'
+00017 [L25] GGET     A=16 B=0 C=16 D=16 'CCEaseOut'
+00018 [L28] GGET     A=17 B=0 C=17 D=17 'module'
+00019 [L28] KSTR     A=18 B=0 C=18 D=18 'common.touch_event'
+00020 [L28] CALL     A=17 B=1 C=2 D=258 
+00021 [L36] MOV      A=17 B=0 C=0 D=0 
+00022 [L36] KSTR     A=18 B=0 C=19 D=19 'common.utils'
+00023 [L36] CALL     A=17 B=2 C=2 D=514 
+00024 [L40] FNEW     A=18 B=0 C=20 D=20 {'kind': 'proto', 'id': 0}
+00025 [L43] TNEW     A=19 B=0 C=0 D=0 
+00026 [L43] GSET     A=19 B=0 C=21 D=21 'g_self'
+00027 [L102] FNEW     A=19 B=0 C=22 D=22 {'kind': 'proto', 'id': 5}
+00028 [L51] GSET     A=19 B=0 C=23 D=23 'setTouchFunction'
+00029 [L149] FNEW     A=19 B=0 C=24 D=24 {'kind': 'proto', 'id': 7}
+00030 [L119] GSET     A=19 B=0 C=25 D=25 'createSwallowTouchLayer'
+00031 [L330] FNEW     A=19 B=0 C=26 D=26 {'kind': 'proto', 'id': 16}
+00032 [L159] GSET     A=19 B=0 C=27 D=27 'enableSlideY'
+00033 [L498] FNEW     A=19 B=0 C=28 D=28 {'kind': 'proto', 'id': 24}
+00034 [L336] GSET     A=19 B=0 C=29 D=29 'enableSlideY_Ease'
+00035 [L684] FNEW     A=19 B=0 C=30 D=30 {'kind': 'proto', 'id': 33}
+00036 [L507] GSET     A=19 B=0 C=31 D=31 'enableSlideX'
+00037 [L695] FNEW     A=19 B=0 C=32 D=32 {'kind': 'proto', 'id': 34}
+00038 [L688] GSET     A=19 B=0 C=33 D=33 'setAndroidReturnBtn'
+00039 [L695] UCLO     A=0 B=128 C=0 D=32768 target=40
+00040 [L695] RET0     A=0 B=0 C=1 D=1 

@@ -1,0 +1,1461 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\9b7111183d2ac5c7c5e999734f6edfc5.data'; root=proto26
+
+FUNCTION proto0 offset=0x4a source_lines=79-81 params=0
+UPVALUES ['print', 'string']
+00001 [L80] UGET     A=0 B=0 C=0 D=0 print
+00002 [L80] UGET     A=1 B=0 C=1 D=1 string
+00003 [L80] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L80] VARG     A=2 B=0 C=0 D=0 
+00005 [L80] CALLM    A=1 B=0 C=0 D=0 
+00006 [L80] CALLM    A=0 B=1 C=0 D=256 
+00007 [L81] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x92 source_lines=90-115 params=5
+UPVALUES ['CCLayer', 'CCScrollView', 'CCSizeMake', 'tolua', 'kCCScrollViewDirectionVertical', 'CCPointMake']
+00001 [L91] UGET     A=5 B=0 C=0 D=0 CCLayer
+00002 [L91] MOV      A=6 B=0 C=5 D=5 
+00003 [L91] TGETS    A=5 B=5 C=1 D=1281 'create'
+00004 [L91] CALL     A=5 B=2 C=2 D=514 
+00005 [L91] TSETS    A=5 B=0 C=0 D=0 'container'
+00006 [L92] TGETS    A=5 B=0 C=0 D=0 'container'
+00007 [L92] MOV      A=6 B=0 C=5 D=5 
+00008 [L92] TGETS    A=5 B=5 C=2 D=1282 'setTag'
+00009 [L92] KSHORT   A=7 B=0 C=1 D=1 1
+00010 [L92] CALL     A=5 B=1 C=3 D=259 
+00011 [L93] UGET     A=5 B=0 C=1 D=1 CCScrollView
+00012 [L93] MOV      A=6 B=0 C=5 D=5 
+00013 [L93] TGETS    A=5 B=5 C=1 D=1281 'create'
+00014 [L93] UGET     A=7 B=0 C=2 D=2 CCSizeMake
+00015 [L93] TGETS    A=8 B=1 C=4 D=260 'width'
+00016 [L93] TGETS    A=9 B=1 C=5 D=261 'height'
+00017 [L93] CALL     A=7 B=2 C=3 D=515 
+00018 [L93] UGET     A=8 B=0 C=3 D=3 tolua
+00019 [L93] TGETS    A=8 B=8 C=6 D=2054 'cast'
+00020 [L93] TGETS    A=9 B=0 C=0 D=0 'container'
+00021 [L93] KSTR     A=10 B=0 C=7 D=7 'CCNode'
+00022 [L93] CALL     A=8 B=0 C=3 D=3 
+00023 [L93] CALLM    A=5 B=2 C=2 D=514 
+00024 [L93] TSETS    A=5 B=0 C=3 D=3 'scrollView'
+00025 [L94] TGETS    A=5 B=0 C=3 D=3 'scrollView'
+00026 [L94] MOV      A=6 B=0 C=5 D=5 
+00027 [L94] TGETS    A=5 B=5 C=8 D=1288 'setDirection'
+00028 [L94] UGET     A=7 B=0 C=4 D=4 kCCScrollViewDirectionVertical
+00029 [L94] CALL     A=5 B=1 C=3 D=259 
+00030 [L95] TGETS    A=5 B=0 C=3 D=3 'scrollView'
+00031 [L95] MOV      A=6 B=0 C=5 D=5 
+00032 [L95] TGETS    A=5 B=5 C=9 D=1289 'setPosition'
+00033 [L95] UGET     A=7 B=0 C=5 D=5 CCPointMake
+00034 [L95] TGETS    A=8 B=2 C=10 D=522 'x'
+00035 [L95] TGETS    A=9 B=2 C=11 D=523 'y'
+00036 [L95] CALL     A=7 B=0 C=3 D=3 
+00037 [L95] CALLM    A=5 B=1 C=1 D=257 
+00038 [L96] TGETS    A=5 B=0 C=3 D=3 'scrollView'
+00039 [L96] MOV      A=6 B=0 C=5 D=5 
+00040 [L96] TGETS    A=5 B=5 C=12 D=1292 'setContentSize'
+00041 [L96] UGET     A=7 B=0 C=2 D=2 CCSizeMake
+00042 [L96] TGETS    A=8 B=1 C=4 D=260 'width'
+00043 [L96] TGETS    A=9 B=1 C=5 D=261 'height'
+00044 [L96] CALL     A=7 B=0 C=3 D=3 
+00045 [L96] CALLM    A=5 B=1 C=1 D=257 
+00046 [L97] TGETS    A=5 B=0 C=3 D=3 'scrollView'
+00047 [L97] MOV      A=6 B=0 C=5 D=5 
+00048 [L97] TGETS    A=5 B=5 C=13 D=1293 'setTouchEnabled'
+00049 [L97] KPRI     A=7 B=0 C=1 D=1 
+00050 [L97] CALL     A=5 B=1 C=3 D=259 
+00051 [L98] TSETS    A=2 B=0 C=14 D=14 'viewPosition'
+00052 [L99] TSETS    A=3 B=0 C=15 D=15 'touchArea'
+00053 [L100] TSETS    A=1 B=0 C=16 D=16 'viewSize'
+00054 [L101] KSHORT   A=5 B=0 C=0 D=0 0
+00055 [L101] TSETS    A=5 B=0 C=17 D=17 'deaccelHandler'
+00056 [L102] KSHORT   A=5 B=0 C=0 D=0 0
+00057 [L102] TSETS    A=5 B=0 C=18 D=18 'upward_max'
+00058 [L103] KSHORT   A=5 B=0 C=0 D=0 0
+00059 [L103] TSETS    A=5 B=0 C=19 D=19 'downward_max'
+00060 [L104] KSHORT   A=5 B=0 C=0 D=0 0
+00061 [L104] TSETS    A=5 B=0 C=20 D=20 'cells_height'
+00062 [L105] KNUM     A=5 B=0 C=0 D=0 0.9
+00063 [L105] TSETS    A=5 B=0 C=21 D=21 'deaccel_rate'
+00064 [L106] KSHORT   A=5 B=0 C=0 D=0 0
+00065 [L106] TSETS    A=5 B=0 C=22 D=22 'm_tScrollDistance'
+00066 [L107] KPRI     A=5 B=0 C=1 D=1 
+00067 [L107] TSETS    A=5 B=0 C=23 D=23 'm_bDragging'
+00068 [L108] TSETS    A=4 B=0 C=24 D=24 'touchCellCallBack'
+00069 [L109] KSHORT   A=5 B=0 C=0 D=0 0
+00070 [L109] TSETS    A=5 B=0 C=25 D=25 'moveToEndCallBack'
+00071 [L110] KSHORT   A=5 B=0 C=0 D=0 0
+00072 [L110] TSETS    A=5 B=0 C=26 D=26 'nearToEndCallBack'
+00073 [L111] KSHORT   A=5 B=0 C=0 D=0 0
+00074 [L111] TSETS    A=5 B=0 C=27 D=27 'near_len'
+00075 [L112] TNEW     A=5 B=0 C=0 D=0 
+00076 [L112] TSETS    A=5 B=0 C=28 D=28 'cells'
+00077 [L113] TNEW     A=5 B=0 C=0 D=0 
+00078 [L113] TSETS    A=5 B=0 C=29 D=29 'cells_size'
+00079 [L114] KPRI     A=5 B=0 C=2 D=2 
+00080 [L114] TSETS    A=5 B=0 C=30 D=30 'containAllCells'
+00081 [L115] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto2 offset=0x434 source_lines=117-134 params=4
+UPVALUES ['CCDirector']
+00001 [L118] ISTC     A=4 B=0 C=3 D=3 
+00002 [L118] JMP      A=4 B=128 C=1 D=32769 target=4
+00003 [L118] KSHORT   A=4 B=0 C=0 D=0 0
+00004 [L119] TGETS    A=5 B=0 C=0 D=0 'container'
+00005 [L119] MOV      A=6 B=0 C=5 D=5 
+00006 [L119] TGETS    A=5 B=5 C=1 D=1281 'addChild'
+00007 [L119] MOV      A=7 B=0 C=1 D=1 
+00008 [L119] MOV      A=8 B=0 C=4 D=4 
+00009 [L119] CALL     A=5 B=1 C=4 D=260 
+00010 [L120] TGETS    A=5 B=0 C=2 D=2 'cells_height'
+00011 [L120] TGETS    A=6 B=2 C=3 D=515 'height'
+00012 [L120] ADDVV    A=5 B=5 C=6 D=1286 
+00013 [L120] TSETS    A=5 B=0 C=2 D=2 'cells_height'
+00014 [L122] TGETS    A=5 B=0 C=4 D=4 'cells_size'
+00015 [L122] TGETS    A=6 B=0 C=4 D=4 'cells_size'
+00016 [L122] LEN      A=6 B=0 C=6 D=6 
+00017 [L122] ADDVN    A=6 B=6 C=0 D=1536 
+00018 [L122] TSETV    A=2 B=5 C=6 D=1286 
+00019 [L123] TGETS    A=5 B=0 C=5 D=5 'cells'
+00020 [L123] TGETS    A=6 B=0 C=5 D=5 'cells'
+00021 [L123] LEN      A=6 B=0 C=6 D=6 
+00022 [L123] ADDVN    A=6 B=6 C=0 D=1536 
+00023 [L123] TSETV    A=1 B=5 C=6 D=1286 
+00024 [L124] UGET     A=5 B=0 C=0 D=0 CCDirector
+00025 [L124] MOV      A=6 B=0 C=5 D=5 
+00026 [L124] TGETS    A=5 B=5 C=6 D=1286 'sharedDirector'
+00027 [L124] CALL     A=5 B=2 C=2 D=514 
+00028 [L124] MOV      A=6 B=0 C=5 D=5 
+00029 [L124] TGETS    A=5 B=5 C=7 D=1287 'getVisibleSize'
+00030 [L124] CALL     A=5 B=2 C=2 D=514 
+00031 [L125] TGETS    A=6 B=0 C=2 D=2 'cells_height'
+00032 [L125] TGETS    A=7 B=0 C=8 D=8 'viewSize'
+00033 [L125] TGETS    A=7 B=7 C=3 D=1795 'height'
+00034 [L125] ISGE     A=7 B=0 C=6 D=6 
+00035 [L125] JMP      A=6 B=128 C=6 D=32774 target=42
+00036 [L126] TGETS    A=6 B=0 C=2 D=2 'cells_height'
+00037 [L126] TGETS    A=7 B=0 C=8 D=8 'viewSize'
+00038 [L126] TGETS    A=7 B=7 C=3 D=1795 'height'
+00039 [L126] SUBVV    A=6 B=6 C=7 D=1543 
+00040 [L126] TSETS    A=6 B=0 C=9 D=9 'upward_max'
+00041 [L126] JMP      A=6 B=128 C=4 D=32772 target=46
+00042 [L128] TGETS    A=6 B=0 C=8 D=8 'viewSize'
+00043 [L128] TGETS    A=6 B=6 C=3 D=1539 'height'
+00044 [L128] MULNV    A=6 B=6 C=1 D=1537 
+00045 [L128] TSETS    A=6 B=0 C=9 D=9 'upward_max'
+00046 [L130] TGETS    A=6 B=0 C=8 D=8 'viewSize'
+00047 [L130] TGETS    A=6 B=6 C=3 D=1539 'height'
+00048 [L130] MULNV    A=6 B=6 C=2 D=1538 
+00049 [L130] TSETS    A=6 B=0 C=10 D=10 'downward_max'
+00050 [L132] TGETS    A=6 B=0 C=2 D=2 'cells_height'
+00051 [L132] TGETS    A=7 B=0 C=8 D=8 'viewSize'
+00052 [L132] TGETS    A=7 B=7 C=3 D=1795 'height'
+00053 [L132] ISLT     A=6 B=0 C=7 D=7 
+00054 [L132] JMP      A=6 B=128 C=2 D=32770 target=57
+00055 [L132] KPRI     A=6 B=0 C=1 D=1 
+00056 [L132] JMP      A=7 B=128 C=1 D=32769 target=58
+00057 [L132] KPRI     A=6 B=0 C=2 D=2 
+00058 [L132] TSETS    A=6 B=0 C=11 D=11 'containAllCells'
+00059 [L133] TGETS    A=6 B=0 C=5 D=5 'cells'
+00060 [L133] LEN      A=6 B=0 C=6 D=6 
+00061 [L133] RET1     A=6 B=0 C=2 D=2 
+
+FUNCTION proto3 offset=0x650 source_lines=136-138 params=2
+UPVALUES []
+00001 [L137] TSETS    A=1 B=0 C=0 D=0 'moveToEndCallBack'
+00002 [L138] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto4 offset=0x68b source_lines=141-143 params=1
+UPVALUES []
+00001 [L142] KSHORT   A=1 B=0 C=0 D=0 0
+00002 [L142] TSETS    A=1 B=0 C=0 D=0 'moveToEndCallBack'
+00003 [L143] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto5 offset=0x6c0 source_lines=146-149 params=3
+UPVALUES []
+00001 [L147] TSETS    A=1 B=0 C=0 D=0 'nearToEndCallBack'
+00002 [L148] TSETS    A=2 B=0 C=1 D=1 'near_len'
+00003 [L149] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x714 source_lines=151-154 params=1
+UPVALUES []
+00001 [L152] KSHORT   A=1 B=0 C=0 D=0 0
+00002 [L152] TSETS    A=1 B=0 C=0 D=0 'nearToEndCallBack'
+00003 [L153] KSHORT   A=1 B=0 C=0 D=0 0
+00004 [L153] TSETS    A=1 B=0 C=1 D=1 'near_len'
+00005 [L154] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto7 offset=0x75d source_lines=159-169 params=1
+UPVALUES ['CCDirector']
+00001 [L160] TGETS    A=1 B=0 C=0 D=0 'deaccelHandler'
+00002 [L160] ISEQP    A=1 B=0 C=0 D=0 
+00003 [L160] JMP      A=1 B=128 C=16 D=32784 target=20
+00004 [L160] TGETS    A=1 B=0 C=0 D=0 'deaccelHandler'
+00005 [L160] ISEQN    A=1 B=0 C=0 D=0 0
+00006 [L160] JMP      A=1 B=128 C=13 D=32781 target=20
+00007 [L161] UGET     A=1 B=0 C=0 D=0 CCDirector
+00008 [L161] MOV      A=2 B=0 C=1 D=1 
+00009 [L161] TGETS    A=1 B=1 C=1 D=257 'sharedDirector'
+00010 [L161] CALL     A=1 B=2 C=2 D=514 
+00011 [L161] MOV      A=2 B=0 C=1 D=1 
+00012 [L161] TGETS    A=1 B=1 C=2 D=258 'getScheduler'
+00013 [L161] CALL     A=1 B=2 C=2 D=514 
+00014 [L161] MOV      A=2 B=0 C=1 D=1 
+00015 [L161] TGETS    A=1 B=1 C=3 D=259 'unscheduleScriptEntry'
+00016 [L161] TGETS    A=3 B=0 C=0 D=0 'deaccelHandler'
+00017 [L161] CALL     A=1 B=1 C=3 D=259 
+00018 [L162] KSHORT   A=1 B=0 C=0 D=0 0
+00019 [L162] TSETS    A=1 B=0 C=0 D=0 'deaccelHandler'
+00020 [L165] TGETS    A=1 B=0 C=4 D=4 'container'
+00021 [L165] ISEQP    A=1 B=0 C=0 D=0 
+00022 [L165] JMP      A=1 B=128 C=7 D=32775 target=30
+00023 [L166] TGETS    A=1 B=0 C=4 D=4 'container'
+00024 [L166] MOV      A=2 B=0 C=1 D=1 
+00025 [L166] TGETS    A=1 B=1 C=5 D=261 'removeAllChildrenWithCleanup'
+00026 [L166] KPRI     A=3 B=0 C=2 D=2 
+00027 [L166] CALL     A=1 B=1 C=3 D=259 
+00028 [L167] KPRI     A=1 B=0 C=0 D=0 
+00029 [L167] TSETS    A=1 B=0 C=4 D=4 'container'
+00030 [L169] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto8 offset=0x87e source_lines=171-195 params=2
+UPVALUES ['table']
+00001 [L172] ISTC     A=2 B=0 C=1 D=1 
+00002 [L172] JMP      A=2 B=128 C=1 D=32769 target=4
+00003 [L172] KSHORT   A=2 B=0 C=1 D=1 1
+00004 [L173] GGET     A=3 B=0 C=0 D=0 'endIndex'
+00005 [L173] IST      A=0 B=0 C=3 D=3 
+00006 [L173] JMP      A=4 B=128 C=2 D=32770 target=9
+00007 [L173] TGETS    A=3 B=0 C=1 D=1 'cells'
+00008 [L173] LEN      A=3 B=0 C=3 D=3 
+00009 [L175] TGETS    A=4 B=0 C=1 D=1 'cells'
+00010 [L175] LEN      A=4 B=0 C=4 D=4 
+00011 [L175] ISGE     A=2 B=0 C=4 D=4 
+00012 [L175] JMP      A=4 B=128 C=63 D=32831 target=76
+00013 [L176] MOV      A=4 B=0 C=2 D=2 
+00014 [L176] MOV      A=5 B=0 C=3 D=3 
+00015 [L176] KSHORT   A=6 B=0 C=1 D=1 1
+00016 [L176] FORI     A=4 B=128 C=14 D=32782 target=31
+00017 [L177] TGETS    A=8 B=0 C=2 D=2 'container'
+00018 [L177] MOV      A=9 B=0 C=8 D=8 
+00019 [L177] TGETS    A=8 B=8 C=3 D=2051 'removeChild'
+00020 [L177] TGETS    A=10 B=0 C=1 D=1 'cells'
+00021 [L177] TGETV    A=10 B=10 C=7 D=2567 
+00022 [L177] KPRI     A=11 B=0 C=2 D=2 
+00023 [L177] CALL     A=8 B=1 C=4 D=260 
+00024 [L178] TGETS    A=8 B=0 C=4 D=4 'cells_height'
+00025 [L178] TGETS    A=9 B=0 C=5 D=5 'cells_size'
+00026 [L178] TGETV    A=9 B=9 C=7 D=2311 
+00027 [L178] TGETS    A=9 B=9 C=6 D=2310 'height'
+00028 [L178] SUBVV    A=8 B=8 C=9 D=2057 
+00029 [L178] TSETS    A=8 B=0 C=4 D=4 'cells_height'
+00030 [L176] FORL     A=4 B=127 C=242 D=32754 target=17
+00031 [L181] TGETS    A=4 B=0 C=5 D=5 'cells_size'
+00032 [L181] LEN      A=4 B=0 C=4 D=4 
+00033 [L181] ISGT     A=2 B=0 C=4 D=4 
+00034 [L181] JMP      A=4 B=128 C=12 D=32780 target=47
+00035 [L181] LOOP     A=4 B=128 C=11 D=32779 target=47
+00036 [L182] UGET     A=4 B=0 C=0 D=0 table
+00037 [L182] TGETS    A=4 B=4 C=7 D=1031 'remove'
+00038 [L182] TGETS    A=5 B=0 C=5 D=5 'cells_size'
+00039 [L182] MOV      A=6 B=0 C=2 D=2 
+00040 [L182] CALL     A=4 B=1 C=3 D=259 
+00041 [L183] UGET     A=4 B=0 C=0 D=0 table
+00042 [L183] TGETS    A=4 B=4 C=7 D=1031 'remove'
+00043 [L183] TGETS    A=5 B=0 C=1 D=1 'cells'
+00044 [L183] MOV      A=6 B=0 C=2 D=2 
+00045 [L183] CALL     A=4 B=1 C=3 D=259 
+00046 [L183] JMP      A=4 B=127 C=240 D=32752 target=31
+00047 [L187] TGETS    A=4 B=0 C=4 D=4 'cells_height'
+00048 [L187] TGETS    A=5 B=0 C=8 D=8 'viewSize'
+00049 [L187] TGETS    A=5 B=5 C=6 D=1286 'height'
+00050 [L187] ISGE     A=5 B=0 C=4 D=4 
+00051 [L187] JMP      A=4 B=128 C=7 D=32775 target=59
+00052 [L188] TGETS    A=4 B=0 C=4 D=4 'cells_height'
+00053 [L188] TGETS    A=5 B=0 C=8 D=8 'viewSize'
+00054 [L188] TGETS    A=5 B=5 C=6 D=1286 'height'
+00055 [L188] MULVN    A=5 B=5 C=0 D=1280 
+00056 [L188] SUBVV    A=4 B=4 C=5 D=1029 
+00057 [L188] TSETS    A=4 B=0 C=9 D=9 'upward_max'
+00058 [L188] JMP      A=4 B=128 C=4 D=32772 target=63
+00059 [L190] TGETS    A=4 B=0 C=8 D=8 'viewSize'
+00060 [L190] TGETS    A=4 B=4 C=6 D=1030 'height'
+00061 [L190] MULNV    A=4 B=4 C=1 D=1025 
+00062 [L190] TSETS    A=4 B=0 C=9 D=9 'upward_max'
+00063 [L192] TGETS    A=4 B=0 C=8 D=8 'viewSize'
+00064 [L192] TGETS    A=4 B=4 C=6 D=1030 'height'
+00065 [L192] MULNV    A=4 B=4 C=2 D=1026 
+00066 [L192] TSETS    A=4 B=0 C=10 D=10 'downward_max'
+00067 [L193] TGETS    A=4 B=0 C=4 D=4 'cells_height'
+00068 [L193] TGETS    A=5 B=0 C=8 D=8 'viewSize'
+00069 [L193] TGETS    A=5 B=5 C=6 D=1286 'height'
+00070 [L193] ISLT     A=4 B=0 C=5 D=5 
+00071 [L193] JMP      A=4 B=128 C=2 D=32770 target=74
+00072 [L193] KPRI     A=4 B=0 C=1 D=1 
+00073 [L193] JMP      A=5 B=128 C=1 D=32769 target=75
+00074 [L193] KPRI     A=4 B=0 C=2 D=2 
+00075 [L193] TSETS    A=4 B=0 C=11 D=11 'containAllCells'
+00076 [L195] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto9 offset=0xae4 source_lines=197-212 params=3
+UPVALUES []
+00001 [L198] TGETS    A=3 B=0 C=0 D=0 'container'
+00002 [L198] MOV      A=4 B=0 C=3 D=3 
+00003 [L198] TGETS    A=3 B=3 C=1 D=769 'removeChild'
+00004 [L198] MOV      A=5 B=0 C=1 D=1 
+00005 [L198] KPRI     A=6 B=0 C=2 D=2 
+00006 [L198] CALL     A=3 B=1 C=4 D=260 
+00007 [L199] TGETS    A=3 B=0 C=2 D=2 'cells_height'
+00008 [L199] TGETS    A=4 B=2 C=3 D=515 'height'
+00009 [L199] SUBVV    A=3 B=3 C=4 D=772 
+00010 [L199] TSETS    A=3 B=0 C=2 D=2 'cells_height'
+00011 [L201] TGETS    A=3 B=0 C=4 D=4 'cells_size'
+00012 [L201] TGETS    A=4 B=0 C=4 D=4 'cells_size'
+00013 [L201] LEN      A=4 B=0 C=4 D=4 
+00014 [L201] ADDVN    A=4 B=4 C=0 D=1024 
+00015 [L201] TSETV    A=2 B=3 C=4 D=772 
+00016 [L202] TGETS    A=3 B=0 C=5 D=5 'cells'
+00017 [L202] TGETS    A=4 B=0 C=5 D=5 'cells'
+00018 [L202] LEN      A=4 B=0 C=4 D=4 
+00019 [L202] ADDVN    A=4 B=4 C=0 D=1024 
+00020 [L202] TSETV    A=1 B=3 C=4 D=772 
+00021 [L204] TGETS    A=3 B=0 C=2 D=2 'cells_height'
+00022 [L204] TGETS    A=4 B=0 C=6 D=6 'viewSize'
+00023 [L204] TGETS    A=4 B=4 C=3 D=1027 'height'
+00024 [L204] ISGE     A=4 B=0 C=3 D=3 
+00025 [L204] JMP      A=3 B=128 C=6 D=32774 target=32
+00026 [L205] TGETS    A=3 B=0 C=2 D=2 'cells_height'
+00027 [L205] TGETS    A=4 B=0 C=6 D=6 'viewSize'
+00028 [L205] TGETS    A=4 B=4 C=3 D=1027 'height'
+00029 [L205] SUBVV    A=3 B=3 C=4 D=772 
+00030 [L205] TSETS    A=3 B=0 C=7 D=7 'upward_max'
+00031 [L205] JMP      A=3 B=128 C=4 D=32772 target=36
+00032 [L207] TGETS    A=3 B=0 C=6 D=6 'viewSize'
+00033 [L207] TGETS    A=3 B=3 C=3 D=771 'height'
+00034 [L207] MULNV    A=3 B=3 C=1 D=769 
+00035 [L207] TSETS    A=3 B=0 C=7 D=7 'upward_max'
+00036 [L209] TGETS    A=3 B=0 C=6 D=6 'viewSize'
+00037 [L209] TGETS    A=3 B=3 C=3 D=771 'height'
+00038 [L209] MULNV    A=3 B=3 C=2 D=770 
+00039 [L209] TSETS    A=3 B=0 C=8 D=8 'downward_max'
+00040 [L211] TGETS    A=3 B=0 C=2 D=2 'cells_height'
+00041 [L211] TGETS    A=4 B=0 C=6 D=6 'viewSize'
+00042 [L211] TGETS    A=4 B=4 C=3 D=1027 'height'
+00043 [L211] ISLT     A=3 B=0 C=4 D=4 
+00044 [L211] JMP      A=3 B=128 C=2 D=32770 target=47
+00045 [L211] KPRI     A=3 B=0 C=1 D=1 
+00046 [L211] JMP      A=4 B=128 C=1 D=32769 target=48
+00047 [L211] KPRI     A=3 B=0 C=2 D=2 
+00048 [L211] TSETS    A=3 B=0 C=9 D=9 'containAllCells'
+00049 [L212] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto10 offset=0xc82 source_lines=214-271 params=2
+UPVALUES ['pairs', 'CCMoveBy', 'CCPointMake']
+00001 [L216] KPRI     A=2 B=0 C=0 D=0 
+00002 [L217] KPRI     A=3 B=0 C=1 D=1 
+00003 [L218] UGET     A=4 B=0 C=0 D=0 pairs
+00004 [L218] TGETS    A=5 B=0 C=0 D=0 'cells'
+00005 [L218] CALL     A=4 B=4 C=2 D=1026 
+00006 [L218] ISNEXT   A=7 B=128 C=39 D=32807 target=46
+00007 [L219] IST      A=0 B=0 C=3 D=3 
+00008 [L219] JMP      A=9 B=128 C=19 D=32787 target=28
+00009 [L219] ISNEV    A=7 B=0 C=1 D=1 
+00010 [L219] JMP      A=9 B=128 C=17 D=32785 target=28
+00011 [L220] TGETS    A=9 B=0 C=1 D=1 'cells_size'
+00012 [L220] TGETV    A=2 B=9 C=7 D=2311 
+00013 [L221] TGETS    A=9 B=0 C=2 D=2 'container'
+00014 [L221] MOV      A=10 B=0 C=9 D=9 
+00015 [L221] TGETS    A=9 B=9 C=3 D=2307 'removeChild'
+00016 [L221] TGETS    A=11 B=0 C=0 D=0 'cells'
+00017 [L221] TGETV    A=11 B=11 C=7 D=2823 
+00018 [L221] KPRI     A=12 B=0 C=2 D=2 
+00019 [L221] CALL     A=9 B=1 C=4 D=260 
+00020 [L222] TGETS    A=9 B=0 C=1 D=1 'cells_size'
+00021 [L222] KPRI     A=10 B=0 C=0 D=0 
+00022 [L222] TSETV    A=10 B=9 C=7 D=2311 
+00023 [L223] TGETS    A=9 B=0 C=0 D=0 'cells'
+00024 [L223] KPRI     A=10 B=0 C=0 D=0 
+00025 [L223] TSETV    A=10 B=9 C=7 D=2311 
+00026 [L224] KPRI     A=3 B=0 C=2 D=2 
+00027 [L224] JMP      A=9 B=128 C=18 D=32786 target=46
+00028 [L225] ISF      A=0 B=0 C=3 D=3 
+00029 [L225] JMP      A=9 B=128 C=16 D=32784 target=46
+00030 [L225] ISF      A=0 B=0 C=8 D=8 
+00031 [L225] JMP      A=9 B=128 C=14 D=32782 target=46
+00032 [L225] ISF      A=0 B=0 C=2 D=2 
+00033 [L225] JMP      A=9 B=128 C=12 D=32780 target=46
+00034 [L226] MOV      A=10 B=0 C=8 D=8 
+00035 [L226] TGETS    A=9 B=8 C=4 D=2052 'runAction'
+00036 [L226] UGET     A=11 B=0 C=1 D=1 CCMoveBy
+00037 [L226] MOV      A=12 B=0 C=11 D=11 
+00038 [L226] TGETS    A=11 B=11 C=5 D=2821 'create'
+00039 [L226] KNUM     A=13 B=0 C=0 D=0 0.3
+00040 [L226] UGET     A=14 B=0 C=2 D=2 CCPointMake
+00041 [L226] KSHORT   A=15 B=0 C=0 D=0 0
+00042 [L226] TGETS    A=16 B=2 C=6 D=518 'height'
+00043 [L226] CALL     A=14 B=0 C=3 D=3 
+00044 [L226] CALLM    A=11 B=0 C=2 D=2 
+00045 [L226] CALLM    A=9 B=1 C=1 D=257 
+00046 [L218] ITERN    A=7 B=3 C=3 D=771 
+00047 [L218] ITERL    A=7 B=127 C=215 D=32727 target=7
+00048 [L231] ISF      A=0 B=0 C=2 D=2 
+00049 [L231] JMP      A=4 B=128 C=32 D=32800 target=82
+00050 [L232] TGETS    A=4 B=0 C=7 D=7 'cells_height'
+00051 [L232] TGETS    A=5 B=2 C=6 D=518 'height'
+00052 [L232] SUBVV    A=4 B=4 C=5 D=1029 
+00053 [L232] TSETS    A=4 B=0 C=7 D=7 'cells_height'
+00054 [L234] TGETS    A=4 B=0 C=7 D=7 'cells_height'
+00055 [L234] TGETS    A=5 B=0 C=8 D=8 'viewSize'
+00056 [L234] TGETS    A=5 B=5 C=6 D=1286 'height'
+00057 [L234] ISGE     A=5 B=0 C=4 D=4 
+00058 [L234] JMP      A=4 B=128 C=6 D=32774 target=65
+00059 [L235] TGETS    A=4 B=0 C=7 D=7 'cells_height'
+00060 [L235] TGETS    A=5 B=0 C=8 D=8 'viewSize'
+00061 [L235] TGETS    A=5 B=5 C=6 D=1286 'height'
+00062 [L235] SUBVV    A=4 B=4 C=5 D=1029 
+00063 [L235] TSETS    A=4 B=0 C=9 D=9 'upward_max'
+00064 [L235] JMP      A=4 B=128 C=4 D=32772 target=69
+00065 [L237] TGETS    A=4 B=0 C=8 D=8 'viewSize'
+00066 [L237] TGETS    A=4 B=4 C=6 D=1030 'height'
+00067 [L237] MULNV    A=4 B=4 C=1 D=1025 
+00068 [L237] TSETS    A=4 B=0 C=9 D=9 'upward_max'
+00069 [L239] TGETS    A=4 B=0 C=8 D=8 'viewSize'
+00070 [L239] TGETS    A=4 B=4 C=6 D=1030 'height'
+00071 [L239] MULNV    A=4 B=4 C=2 D=1026 
+00072 [L239] TSETS    A=4 B=0 C=10 D=10 'downward_max'
+00073 [L241] TGETS    A=4 B=0 C=7 D=7 'cells_height'
+00074 [L241] TGETS    A=5 B=0 C=8 D=8 'viewSize'
+00075 [L241] TGETS    A=5 B=5 C=6 D=1286 'height'
+00076 [L241] ISLT     A=4 B=0 C=5 D=5 
+00077 [L241] JMP      A=4 B=128 C=2 D=32770 target=80
+00078 [L241] KPRI     A=4 B=0 C=1 D=1 
+00079 [L241] JMP      A=5 B=128 C=1 D=32769 target=81
+00080 [L241] KPRI     A=4 B=0 C=2 D=2 
+00081 [L241] TSETS    A=4 B=0 C=11 D=11 'containAllCells'
+00082 [L271] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto11 offset=0xf1c source_lines=273-275 params=2
+UPVALUES []
+00001 [L274] TGETS    A=2 B=0 C=0 D=0 'cells'
+00002 [L274] TGETV    A=2 B=2 C=1 D=513 
+00003 [L274] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto12 offset=0xf4e source_lines=277-299 params=2
+UPVALUES ['CCMoveTo', 'CCPointMake']
+00001 [L279] TGETS    A=2 B=0 C=0 D=0 'containAllCells'
+00002 [L279] ISF      A=0 B=0 C=2 D=2 
+00003 [L279] JMP      A=3 B=128 C=1 D=32769 target=5
+00004 [L280] RET0     A=0 B=0 C=1 D=1 
+00005 [L283] KSHORT   A=2 B=0 C=0 D=0 0
+00006 [L284] KSHORT   A=3 B=0 C=1 D=1 1
+00007 [L284] SUBVN    A=4 B=1 C=0 D=256 
+00008 [L284] KSHORT   A=5 B=0 C=1 D=1 1
+00009 [L284] FORI     A=3 B=128 C=5 D=32773 target=15
+00010 [L285] TGETS    A=7 B=0 C=1 D=1 'cells_size'
+00011 [L285] TGETV    A=7 B=7 C=6 D=1798 
+00012 [L285] TGETS    A=7 B=7 C=2 D=1794 'height'
+00013 [L285] ADDVV    A=2 B=2 C=7 D=519 
+00014 [L284] FORL     A=3 B=127 C=251 D=32763 target=10
+00015 [L287] TGETS    A=3 B=0 C=1 D=1 'cells_size'
+00016 [L287] TGETV    A=3 B=3 C=1 D=769 
+00017 [L287] TGETS    A=3 B=3 C=2 D=770 'height'
+00018 [L287] MULVN    A=3 B=3 C=1 D=769 
+00019 [L287] ADDVV    A=2 B=2 C=3 D=515 
+00020 [L289] TGETS    A=3 B=0 C=3 D=3 'viewSize'
+00021 [L289] TGETS    A=3 B=3 C=2 D=770 'height'
+00022 [L289] MULVN    A=3 B=3 C=1 D=769 
+00023 [L289] SUBVV    A=3 B=2 C=3 D=515 
+00024 [L291] KSHORT   A=4 B=0 C=0 D=0 0
+00025 [L291] ISGE     A=3 B=0 C=4 D=4 
+00026 [L291] JMP      A=4 B=128 C=2 D=32770 target=29
+00027 [L292] KSHORT   A=3 B=0 C=0 D=0 0
+00028 [L292] JMP      A=4 B=128 C=10 D=32778 target=39
+00029 [L293] TGETS    A=4 B=0 C=4 D=4 'cells_height'
+00030 [L293] TGETS    A=5 B=0 C=3 D=3 'viewSize'
+00031 [L293] TGETS    A=5 B=5 C=2 D=1282 'height'
+00032 [L293] SUBVV    A=4 B=4 C=5 D=1029 
+00033 [L293] ISGE     A=4 B=0 C=3 D=3 
+00034 [L293] JMP      A=4 B=128 C=4 D=32772 target=39
+00035 [L294] TGETS    A=4 B=0 C=4 D=4 'cells_height'
+00036 [L294] TGETS    A=5 B=0 C=3 D=3 'viewSize'
+00037 [L294] TGETS    A=5 B=5 C=2 D=1282 'height'
+00038 [L294] SUBVV    A=3 B=4 C=5 D=1029 
+00039 [L297] TGETS    A=4 B=0 C=5 D=5 'container'
+00040 [L297] MOV      A=5 B=0 C=4 D=4 
+00041 [L297] TGETS    A=4 B=4 C=6 D=1030 'runAction'
+00042 [L297] UGET     A=6 B=0 C=0 D=0 CCMoveTo
+00043 [L297] MOV      A=7 B=0 C=6 D=6 
+00044 [L297] TGETS    A=6 B=6 C=7 D=1543 'create'
+00045 [L297] KNUM     A=8 B=0 C=2 D=2 0.3
+00046 [L297] UGET     A=9 B=0 C=1 D=1 CCPointMake
+00047 [L297] KSHORT   A=10 B=0 C=0 D=0 0
+00048 [L297] MOV      A=11 B=0 C=3 D=3 
+00049 [L297] CALL     A=9 B=0 C=3 D=3 
+00050 [L297] CALLM    A=6 B=0 C=2 D=2 
+00051 [L297] CALLM    A=4 B=1 C=1 D=257 
+00052 [L299] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto13 offset=0x110e source_lines=301-309 params=2
+UPVALUES ['CCMoveTo', 'CCPointMake']
+00001 [L302] TGETS    A=2 B=0 C=0 D=0 'cells_height'
+00002 [L302] TGETS    A=3 B=0 C=1 D=1 'viewSize'
+00003 [L302] TGETS    A=3 B=3 C=2 D=770 'height'
+00004 [L302] SUBVV    A=2 B=2 C=3 D=515 
+00005 [L303] ISF      A=0 B=0 C=1 D=1 
+00006 [L303] JMP      A=3 B=128 C=17 D=32785 target=24
+00007 [L304] ISTC     A=3 B=0 C=1 D=1 
+00008 [L304] JMP      A=3 B=128 C=1 D=32769 target=10
+00009 [L304] KNUM     A=3 B=0 C=0 D=0 0.1
+00010 [L305] TGETS    A=4 B=0 C=3 D=3 'container'
+00011 [L305] MOV      A=5 B=0 C=4 D=4 
+00012 [L305] TGETS    A=4 B=4 C=4 D=1028 'runAction'
+00013 [L305] UGET     A=6 B=0 C=0 D=0 CCMoveTo
+00014 [L305] MOV      A=7 B=0 C=6 D=6 
+00015 [L305] TGETS    A=6 B=6 C=5 D=1541 'create'
+00016 [L305] MOV      A=8 B=0 C=3 D=3 
+00017 [L305] UGET     A=9 B=0 C=1 D=1 CCPointMake
+00018 [L305] KSHORT   A=10 B=0 C=0 D=0 0
+00019 [L305] MOV      A=11 B=0 C=2 D=2 
+00020 [L305] CALL     A=9 B=0 C=3 D=3 
+00021 [L305] CALLM    A=6 B=0 C=2 D=2 
+00022 [L305] CALLM    A=4 B=1 C=1 D=257 
+00023 [L305] JMP      A=3 B=128 C=8 D=32776 target=32
+00024 [L307] TGETS    A=3 B=0 C=3 D=3 'container'
+00025 [L307] MOV      A=4 B=0 C=3 D=3 
+00026 [L307] TGETS    A=3 B=3 C=6 D=774 'setPosition'
+00027 [L307] UGET     A=5 B=0 C=1 D=1 CCPointMake
+00028 [L307] KSHORT   A=6 B=0 C=0 D=0 0
+00029 [L307] MOV      A=7 B=0 C=2 D=2 
+00030 [L307] CALL     A=5 B=0 C=3 D=3 
+00031 [L307] CALLM    A=3 B=1 C=1 D=257 
+00032 [L309] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto14 offset=0x1244 source_lines=311-315 params=1
+UPVALUES ['math']
+00001 [L312] UGET     A=1 B=0 C=0 D=0 math
+00002 [L312] TGETS    A=1 B=1 C=0 D=256 'ceil'
+00003 [L312] TGETS    A=2 B=0 C=1 D=1 'container'
+00004 [L312] MOV      A=3 B=0 C=2 D=2 
+00005 [L312] TGETS    A=2 B=2 C=2 D=514 'getPositionLua'
+00006 [L312] CALL     A=2 B=2 C=2 D=514 
+00007 [L312] TGETS    A=2 B=2 C=3 D=515 'y'
+00008 [L312] CALL     A=1 B=2 C=2 D=514 
+00009 [L313] UGET     A=2 B=0 C=0 D=0 math
+00010 [L313] TGETS    A=2 B=2 C=0 D=512 'ceil'
+00011 [L313] TGETS    A=3 B=0 C=4 D=4 'cells_height'
+00012 [L313] TGETS    A=4 B=0 C=5 D=5 'viewSize'
+00013 [L313] TGETS    A=4 B=4 C=6 D=1030 'height'
+00014 [L313] SUBVV    A=3 B=3 C=4 D=772 
+00015 [L313] CALL     A=2 B=2 C=2 D=514 
+00016 [L314] ISLE     A=2 B=0 C=1 D=1 
+00017 [L314] JMP      A=3 B=128 C=2 D=32770 target=20
+00018 [L314] KPRI     A=3 B=0 C=1 D=1 
+00019 [L314] JMP      A=4 B=128 C=1 D=32769 target=21
+00020 [L314] KPRI     A=3 B=0 C=2 D=2 
+00021 [L314] RET1     A=3 B=0 C=2 D=2 
+
+FUNCTION proto15 offset=0x131e source_lines=317-319 params=1
+UPVALUES []
+00001 [L318] TGETS    A=1 B=0 C=0 D=0 'cells_height'
+00002 [L318] TGETS    A=2 B=0 C=1 D=1 'viewSize'
+00003 [L318] TGETS    A=2 B=2 C=2 D=514 'height'
+00004 [L318] ISLT     A=1 B=0 C=2 D=2 
+00005 [L318] JMP      A=1 B=128 C=2 D=32770 target=8
+00006 [L318] KPRI     A=1 B=0 C=1 D=1 
+00007 [L318] JMP      A=2 B=128 C=1 D=32769 target=9
+00008 [L318] KPRI     A=1 B=0 C=2 D=2 
+00009 [L318] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto16 offset=0x137c source_lines=321-323 params=0
+UPVALUES []
+00001 [L322] TNEW     A=0 B=0 C=0 D=0 
+00002 [L322] GSET     A=0 B=0 C=0 D=0 'scrollViewHelper'
+00003 [L323] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto17 offset=0x13aa source_lines=333-346 params=1
+UPVALUES ['self', 'CCDirector']
+00001 [L334] TGETS    A=1 B=0 C=0 D=0 'name'
+00002 [L334] ISNES    A=1 B=0 C=1 D=1 'exit'
+00003 [L334] JMP      A=1 B=128 C=38 D=32806 target=42
+00004 [L335] UGET     A=1 B=0 C=0 D=0 self
+00005 [L335] TGETS    A=1 B=1 C=2 D=258 'deaccelHandler'
+00006 [L335] ISEQP    A=1 B=0 C=0 D=0 
+00007 [L335] JMP      A=1 B=128 C=19 D=32787 target=27
+00008 [L335] UGET     A=1 B=0 C=0 D=0 self
+00009 [L335] TGETS    A=1 B=1 C=2 D=258 'deaccelHandler'
+00010 [L335] ISEQN    A=1 B=0 C=0 D=0 0
+00011 [L335] JMP      A=1 B=128 C=15 D=32783 target=27
+00012 [L336] UGET     A=1 B=0 C=1 D=1 CCDirector
+00013 [L336] MOV      A=2 B=0 C=1 D=1 
+00014 [L336] TGETS    A=1 B=1 C=3 D=259 'sharedDirector'
+00015 [L336] CALL     A=1 B=2 C=2 D=514 
+00016 [L336] MOV      A=2 B=0 C=1 D=1 
+00017 [L336] TGETS    A=1 B=1 C=4 D=260 'getScheduler'
+00018 [L336] CALL     A=1 B=2 C=2 D=514 
+00019 [L336] MOV      A=2 B=0 C=1 D=1 
+00020 [L336] TGETS    A=1 B=1 C=5 D=261 'unscheduleScriptEntry'
+00021 [L336] UGET     A=3 B=0 C=0 D=0 self
+00022 [L336] TGETS    A=3 B=3 C=2 D=770 'deaccelHandler'
+00023 [L336] CALL     A=1 B=1 C=3 D=259 
+00024 [L337] UGET     A=1 B=0 C=0 D=0 self
+00025 [L337] KSHORT   A=2 B=0 C=0 D=0 0
+00026 [L337] TSETS    A=2 B=1 C=2 D=258 'deaccelHandler'
+00027 [L339] TNEW     A=1 B=0 C=0 D=0 
+00028 [L339] GSET     A=1 B=0 C=6 D=6 'scrollViewHelper'
+00029 [L340] UGET     A=1 B=0 C=0 D=0 self
+00030 [L340] TGETS    A=1 B=1 C=7 D=263 'container'
+00031 [L340] ISEQP    A=1 B=0 C=0 D=0 
+00032 [L340] JMP      A=1 B=128 C=9 D=32777 target=42
+00033 [L341] UGET     A=1 B=0 C=0 D=0 self
+00034 [L341] TGETS    A=1 B=1 C=7 D=263 'container'
+00035 [L341] MOV      A=2 B=0 C=1 D=1 
+00036 [L341] TGETS    A=1 B=1 C=8 D=264 'removeAllChildrenWithCleanup'
+00037 [L341] KPRI     A=3 B=0 C=2 D=2 
+00038 [L341] CALL     A=1 B=1 C=3 D=259 
+00039 [L342] UGET     A=1 B=0 C=0 D=0 self
+00040 [L342] KPRI     A=2 B=0 C=0 D=0 
+00041 [L342] TSETS    A=2 B=1 C=7 D=263 'container'
+00042 [L346] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto18 offset=0x152e source_lines=355-376 params=0
+UPVALUES ['self']
+00001 [L356] UGET     A=0 B=0 C=0 D=0 self
+00002 [L356] TGETS    A=0 B=0 C=0 D=0 'container'
+00003 [L356] MOV      A=1 B=0 C=0 D=0 
+00004 [L356] TGETS    A=0 B=0 C=1 D=1 'getPositionLua'
+00005 [L356] CALL     A=0 B=2 C=2 D=514 
+00006 [L357] KPRI     A=1 B=0 C=1 D=1 
+00007 [L358] KSHORT   A=2 B=0 C=0 D=0 0
+00008 [L360] TGETS    A=3 B=0 C=2 D=2 'y'
+00009 [L360] KSHORT   A=4 B=0 C=0 D=0 0
+00010 [L360] ISGE     A=3 B=0 C=4 D=4 
+00011 [L360] JMP      A=3 B=128 C=3 D=32771 target=15
+00012 [L361] KPRI     A=1 B=0 C=2 D=2 
+00013 [L362] KSHORT   A=2 B=0 C=0 D=0 0
+00014 [L362] JMP      A=3 B=128 C=30 D=32798 target=45
+00015 [L364] UGET     A=3 B=0 C=0 D=0 self
+00016 [L364] TGETS    A=3 B=3 C=3 D=771 'cells_height'
+00017 [L364] UGET     A=4 B=0 C=0 D=0 self
+00018 [L364] TGETS    A=4 B=4 C=4 D=1028 'viewSize'
+00019 [L364] TGETS    A=4 B=4 C=5 D=1029 'height'
+00020 [L364] ISGE     A=4 B=0 C=3 D=3 
+00021 [L364] JMP      A=3 B=128 C=17 D=32785 target=39
+00022 [L365] TGETS    A=3 B=0 C=2 D=2 'y'
+00023 [L365] UGET     A=4 B=0 C=0 D=0 self
+00024 [L365] TGETS    A=4 B=4 C=3 D=1027 'cells_height'
+00025 [L365] UGET     A=5 B=0 C=0 D=0 self
+00026 [L365] TGETS    A=5 B=5 C=4 D=1284 'viewSize'
+00027 [L365] TGETS    A=5 B=5 C=5 D=1285 'height'
+00028 [L365] SUBVV    A=4 B=4 C=5 D=1029 
+00029 [L365] ISGE     A=4 B=0 C=3 D=3 
+00030 [L365] JMP      A=3 B=128 C=14 D=32782 target=45
+00031 [L366] KPRI     A=1 B=0 C=2 D=2 
+00032 [L367] UGET     A=3 B=0 C=0 D=0 self
+00033 [L367] TGETS    A=3 B=3 C=3 D=771 'cells_height'
+00034 [L367] UGET     A=4 B=0 C=0 D=0 self
+00035 [L367] TGETS    A=4 B=4 C=4 D=1028 'viewSize'
+00036 [L367] TGETS    A=4 B=4 C=5 D=1029 'height'
+00037 [L367] SUBVV    A=2 B=3 C=4 D=772 
+00038 [L368] JMP      A=3 B=128 C=6 D=32774 target=45
+00039 [L369] TGETS    A=3 B=0 C=2 D=2 'y'
+00040 [L369] KSHORT   A=4 B=0 C=0 D=0 0
+00041 [L369] ISGE     A=4 B=0 C=3 D=3 
+00042 [L369] JMP      A=3 B=128 C=2 D=32770 target=45
+00043 [L370] KPRI     A=1 B=0 C=2 D=2 
+00044 [L371] KSHORT   A=2 B=0 C=0 D=0 0
+00045 [L375] MOV      A=3 B=0 C=1 D=1 
+00046 [L375] MOV      A=4 B=0 C=2 D=2 
+00047 [L375] RET      A=3 B=0 C=3 D=3 
+
+FUNCTION proto19 offset=0x1684 source_lines=378-383 params=1
+UPVALUES ['self', 'CCMoveTo', 'CCPointMake']
+00001 [L379] UGET     A=1 B=0 C=0 D=0 self
+00002 [L379] TGETS    A=1 B=1 C=0 D=256 'container'
+00003 [L379] MOV      A=2 B=0 C=1 D=1 
+00004 [L379] TGETS    A=1 B=1 C=1 D=257 'runAction'
+00005 [L379] UGET     A=3 B=0 C=1 D=1 CCMoveTo
+00006 [L379] MOV      A=4 B=0 C=3 D=3 
+00007 [L379] TGETS    A=3 B=3 C=2 D=770 'create'
+00008 [L379] KNUM     A=5 B=0 C=0 D=0 0.3
+00009 [L379] UGET     A=6 B=0 C=2 D=2 CCPointMake
+00010 [L379] KSHORT   A=7 B=0 C=0 D=0 0
+00011 [L379] MOV      A=8 B=0 C=0 D=0 
+00012 [L379] CALL     A=6 B=0 C=3 D=3 
+00013 [L379] CALLM    A=3 B=0 C=2 D=2 
+00014 [L379] CALLM    A=1 B=1 C=1 D=257 
+00015 [L380] UGET     A=1 B=0 C=0 D=0 self
+00016 [L380] TGETS    A=1 B=1 C=3 D=259 'nearToEndCallBack'
+00017 [L380] ISEQN    A=1 B=0 C=1 D=1 0
+00018 [L380] JMP      A=1 B=128 C=3 D=32771 target=22
+00019 [L381] UGET     A=1 B=0 C=0 D=0 self
+00020 [L381] TGETS    A=1 B=1 C=3 D=259 'nearToEndCallBack'
+00021 [L381] CALL     A=1 B=1 C=1 D=257 
+00022 [L383] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto20 offset=0x1764 source_lines=385-461 params=1
+UPVALUES ['self', 'CCDirector', 'scroll_deaccel_dist', 'math', 'isContainerNeedBack', 'rollBack']
+00001 [L386] UGET     A=1 B=0 C=0 D=0 self
+00002 [L386] TGETS    A=1 B=1 C=0 D=256 'container'
+00003 [L386] ISNEP    A=1 B=0 C=0 D=0 
+00004 [L386] JMP      A=1 B=128 C=16 D=32784 target=21
+00005 [L387] UGET     A=1 B=0 C=1 D=1 CCDirector
+00006 [L387] MOV      A=2 B=0 C=1 D=1 
+00007 [L387] TGETS    A=1 B=1 C=1 D=257 'sharedDirector'
+00008 [L387] CALL     A=1 B=2 C=2 D=514 
+00009 [L387] MOV      A=2 B=0 C=1 D=1 
+00010 [L387] TGETS    A=1 B=1 C=2 D=258 'getScheduler'
+00011 [L387] CALL     A=1 B=2 C=2 D=514 
+00012 [L387] MOV      A=2 B=0 C=1 D=1 
+00013 [L387] TGETS    A=1 B=1 C=3 D=259 'unscheduleScriptEntry'
+00014 [L387] UGET     A=3 B=0 C=0 D=0 self
+00015 [L387] TGETS    A=3 B=3 C=4 D=772 'deaccelHandler'
+00016 [L387] CALL     A=1 B=1 C=3 D=259 
+00017 [L388] UGET     A=1 B=0 C=0 D=0 self
+00018 [L388] KSHORT   A=2 B=0 C=0 D=0 0
+00019 [L388] TSETS    A=2 B=1 C=4 D=260 'deaccelHandler'
+00020 [L389] RET0     A=0 B=0 C=1 D=1 
+00021 [L392] UGET     A=1 B=0 C=0 D=0 self
+00022 [L392] TGETS    A=1 B=1 C=5 D=261 'm_bDragging'
+00023 [L392] ISF      A=0 B=0 C=1 D=1 
+00024 [L392] JMP      A=2 B=128 C=20 D=32788 target=45
+00025 [L392] UGET     A=1 B=0 C=0 D=0 self
+00026 [L392] TGETS    A=1 B=1 C=4 D=260 'deaccelHandler'
+00027 [L392] ISEQN    A=1 B=0 C=0 D=0 0
+00028 [L392] JMP      A=1 B=128 C=16 D=32784 target=45
+00029 [L393] UGET     A=1 B=0 C=1 D=1 CCDirector
+00030 [L393] MOV      A=2 B=0 C=1 D=1 
+00031 [L393] TGETS    A=1 B=1 C=1 D=257 'sharedDirector'
+00032 [L393] CALL     A=1 B=2 C=2 D=514 
+00033 [L393] MOV      A=2 B=0 C=1 D=1 
+00034 [L393] TGETS    A=1 B=1 C=2 D=258 'getScheduler'
+00035 [L393] CALL     A=1 B=2 C=2 D=514 
+00036 [L393] MOV      A=2 B=0 C=1 D=1 
+00037 [L393] TGETS    A=1 B=1 C=3 D=259 'unscheduleScriptEntry'
+00038 [L393] UGET     A=3 B=0 C=0 D=0 self
+00039 [L393] TGETS    A=3 B=3 C=4 D=772 'deaccelHandler'
+00040 [L393] CALL     A=1 B=1 C=3 D=259 
+00041 [L394] UGET     A=1 B=0 C=0 D=0 self
+00042 [L394] KSHORT   A=2 B=0 C=0 D=0 0
+00043 [L394] TSETS    A=2 B=1 C=4 D=260 'deaccelHandler'
+00044 [L395] RET0     A=0 B=0 C=1 D=1 
+00045 [L397] GGET     A=1 B=0 C=6 D=6 'scrollViewHelper'
+00046 [L397] TGETS    A=1 B=1 C=7 D=263 'scrollViewDidScroll'
+00047 [L397] ISF      A=0 B=0 C=1 D=1 
+00048 [L397] JMP      A=2 B=128 C=3 D=32771 target=52
+00049 [L398] GGET     A=1 B=0 C=6 D=6 'scrollViewHelper'
+00050 [L398] TGETS    A=1 B=1 C=7 D=263 'scrollViewDidScroll'
+00051 [L398] CALL     A=1 B=1 C=1 D=257 
+00052 [L401] UGET     A=1 B=0 C=2 D=2 scroll_deaccel_dist
+00053 [L401] UGET     A=2 B=0 C=3 D=3 math
+00054 [L401] TGETS    A=2 B=2 C=8 D=520 'abs'
+00055 [L401] UGET     A=3 B=0 C=0 D=0 self
+00056 [L401] TGETS    A=3 B=3 C=9 D=777 'm_tScrollDistance'
+00057 [L401] CALL     A=2 B=2 C=2 D=514 
+00058 [L401] ISGE     A=2 B=0 C=1 D=1 
+00059 [L401] JMP      A=1 B=128 C=27 D=32795 target=87
+00060 [L401] UGET     A=1 B=0 C=0 D=0 self
+00061 [L401] TGETS    A=1 B=1 C=4 D=260 'deaccelHandler'
+00062 [L401] ISEQN    A=1 B=0 C=0 D=0 0
+00063 [L401] JMP      A=1 B=128 C=23 D=32791 target=87
+00064 [L402] UGET     A=1 B=0 C=4 D=4 isContainerNeedBack
+00065 [L402] CALL     A=1 B=3 C=1 D=769 
+00066 [L403] ISF      A=0 B=0 C=1 D=1 
+00067 [L403] JMP      A=3 B=128 C=3 D=32771 target=71
+00068 [L404] UGET     A=3 B=0 C=5 D=5 rollBack
+00069 [L404] MOV      A=4 B=0 C=2 D=2 
+00070 [L404] CALL     A=3 B=1 C=2 D=258 
+00071 [L407] UGET     A=3 B=0 C=1 D=1 CCDirector
+00072 [L407] MOV      A=4 B=0 C=3 D=3 
+00073 [L407] TGETS    A=3 B=3 C=1 D=769 'sharedDirector'
+00074 [L407] CALL     A=3 B=2 C=2 D=514 
+00075 [L407] MOV      A=4 B=0 C=3 D=3 
+00076 [L407] TGETS    A=3 B=3 C=2 D=770 'getScheduler'
+00077 [L407] CALL     A=3 B=2 C=2 D=514 
+00078 [L407] MOV      A=4 B=0 C=3 D=3 
+00079 [L407] TGETS    A=3 B=3 C=3 D=771 'unscheduleScriptEntry'
+00080 [L407] UGET     A=5 B=0 C=0 D=0 self
+00081 [L407] TGETS    A=5 B=5 C=4 D=1284 'deaccelHandler'
+00082 [L407] CALL     A=3 B=1 C=3 D=259 
+00083 [L408] UGET     A=3 B=0 C=0 D=0 self
+00084 [L408] KSHORT   A=4 B=0 C=0 D=0 0
+00085 [L408] TSETS    A=4 B=3 C=4 D=772 'deaccelHandler'
+00086 [L409] RET0     A=0 B=0 C=1 D=1 
+00087 [L412] UGET     A=1 B=0 C=0 D=0 self
+00088 [L412] TGETS    A=1 B=1 C=0 D=256 'container'
+00089 [L412] MOV      A=2 B=0 C=1 D=1 
+00090 [L412] TGETS    A=1 B=1 C=10 D=266 'getPositionLua'
+00091 [L412] CALL     A=1 B=2 C=2 D=514 
+00092 [L414] UGET     A=2 B=0 C=0 D=0 self
+00093 [L414] TGETS    A=2 B=2 C=11 D=523 'moveToEndCallBack'
+00094 [L414] ISEQN    A=2 B=0 C=0 D=0 0
+00095 [L414] JMP      A=2 B=128 C=16 D=32784 target=112
+00096 [L414] UGET     A=2 B=0 C=0 D=0 self
+00097 [L414] TGETS    A=2 B=2 C=12 D=524 'containAllCells'
+00098 [L414] IST      A=0 B=0 C=2 D=2 
+00099 [L414] JMP      A=2 B=128 C=12 D=32780 target=112
+00100 [L414] TGETS    A=2 B=1 C=13 D=269 'y'
+00101 [L414] UGET     A=3 B=0 C=0 D=0 self
+00102 [L414] TGETS    A=3 B=3 C=14 D=782 'cells_height'
+00103 [L414] UGET     A=4 B=0 C=0 D=0 self
+00104 [L414] TGETS    A=4 B=4 C=15 D=1039 'viewSize'
+00105 [L414] TGETS    A=4 B=4 C=16 D=1040 'height'
+00106 [L414] SUBVV    A=3 B=3 C=4 D=772 
+00107 [L414] ISGE     A=3 B=0 C=2 D=2 
+00108 [L414] JMP      A=2 B=128 C=3 D=32771 target=112
+00109 [L415] UGET     A=2 B=0 C=0 D=0 self
+00110 [L415] TGETS    A=2 B=2 C=11 D=523 'moveToEndCallBack'
+00111 [L415] CALL     A=2 B=1 C=1 D=257 
+00112 [L419] UGET     A=2 B=0 C=0 D=0 self
+00113 [L419] TGETS    A=2 B=2 C=17 D=529 'nearToEndCallBack'
+00114 [L419] ISEQN    A=2 B=0 C=0 D=0 0
+00115 [L419] JMP      A=2 B=128 C=23 D=32791 target=139
+00116 [L419] UGET     A=2 B=0 C=0 D=0 self
+00117 [L419] TGETS    A=2 B=2 C=12 D=524 'containAllCells'
+00118 [L419] IST      A=0 B=0 C=2 D=2 
+00119 [L419] JMP      A=2 B=128 C=19 D=32787 target=139
+00120 [L419] TGETS    A=2 B=1 C=13 D=269 'y'
+00121 [L419] UGET     A=3 B=0 C=0 D=0 self
+00122 [L419] TGETS    A=3 B=3 C=14 D=782 'cells_height'
+00123 [L419] UGET     A=4 B=0 C=0 D=0 self
+00124 [L419] TGETS    A=4 B=4 C=15 D=1039 'viewSize'
+00125 [L419] TGETS    A=4 B=4 C=16 D=1040 'height'
+00126 [L419] SUBVV    A=3 B=3 C=4 D=772 
+00127 [L419] UGET     A=4 B=0 C=0 D=0 self
+00128 [L419] TGETS    A=4 B=4 C=15 D=1039 'viewSize'
+00129 [L419] TGETS    A=4 B=4 C=16 D=1040 'height'
+00130 [L419] UGET     A=5 B=0 C=0 D=0 self
+00131 [L419] TGETS    A=5 B=5 C=18 D=1298 'near_len'
+00132 [L419] MULVV    A=4 B=4 C=5 D=1029 
+00133 [L419] SUBVV    A=3 B=3 C=4 D=772 
+00134 [L419] ISGE     A=3 B=0 C=2 D=2 
+00135 [L419] JMP      A=2 B=128 C=3 D=32771 target=139
+00136 [L420] UGET     A=2 B=0 C=0 D=0 self
+00137 [L420] TGETS    A=2 B=2 C=17 D=529 'nearToEndCallBack'
+00138 [L420] CALL     A=2 B=1 C=1 D=257 
+00139 [L423] UGET     A=2 B=0 C=0 D=0 self
+00140 [L423] TGETS    A=2 B=2 C=12 D=524 'containAllCells'
+00141 [L423] IST      A=0 B=0 C=2 D=2 
+00142 [L423] JMP      A=2 B=128 C=23 D=32791 target=166
+00143 [L423] TGETS    A=2 B=1 C=13 D=269 'y'
+00144 [L423] UGET     A=3 B=0 C=0 D=0 self
+00145 [L423] TGETS    A=3 B=3 C=14 D=782 'cells_height'
+00146 [L423] UGET     A=4 B=0 C=0 D=0 self
+00147 [L423] TGETS    A=4 B=4 C=15 D=1039 'viewSize'
+00148 [L423] TGETS    A=4 B=4 C=16 D=1040 'height'
+00149 [L423] SUBVV    A=3 B=3 C=4 D=772 
+00150 [L423] UGET     A=4 B=0 C=0 D=0 self
+00151 [L423] TGETS    A=4 B=4 C=15 D=1039 'viewSize'
+00152 [L423] TGETS    A=4 B=4 C=16 D=1040 'height'
+00153 [L423] UGET     A=5 B=0 C=0 D=0 self
+00154 [L423] TGETS    A=5 B=5 C=18 D=1298 'near_len'
+00155 [L423] MULVV    A=4 B=4 C=5 D=1029 
+00156 [L423] SUBVV    A=3 B=3 C=4 D=772 
+00157 [L423] ISGE     A=3 B=0 C=2 D=2 
+00158 [L423] JMP      A=2 B=128 C=7 D=32775 target=166
+00159 [L424] GGET     A=2 B=0 C=6 D=6 'scrollViewHelper'
+00160 [L424] TGETS    A=2 B=2 C=19 D=531 'addMoreCells'
+00161 [L424] ISF      A=0 B=0 C=2 D=2 
+00162 [L424] JMP      A=3 B=128 C=3 D=32771 target=166
+00163 [L425] GGET     A=2 B=0 C=6 D=6 'scrollViewHelper'
+00164 [L425] TGETS    A=2 B=2 C=19 D=531 'addMoreCells'
+00165 [L425] CALL     A=2 B=1 C=1 D=257 
+00166 [L429] TGETS    A=2 B=1 C=13 D=269 'y'
+00167 [L429] UGET     A=3 B=0 C=0 D=0 self
+00168 [L429] TGETS    A=3 B=3 C=20 D=788 'upward_max'
+00169 [L429] ISLT     A=3 B=0 C=2 D=2 
+00170 [L429] JMP      A=2 B=128 C=5 D=32773 target=176
+00171 [L429] TGETS    A=2 B=1 C=13 D=269 'y'
+00172 [L429] UGET     A=3 B=0 C=0 D=0 self
+00173 [L429] TGETS    A=3 B=3 C=21 D=789 'downward_max'
+00174 [L429] ISGE     A=2 B=0 C=3 D=3 
+00175 [L429] JMP      A=2 B=128 C=49 D=32817 target=225
+00176 [L430] UGET     A=2 B=0 C=0 D=0 self
+00177 [L430] TGETS    A=2 B=2 C=4 D=516 'deaccelHandler'
+00178 [L430] ISEQN    A=2 B=0 C=0 D=0 0
+00179 [L430] JMP      A=2 B=128 C=15 D=32783 target=195
+00180 [L431] UGET     A=2 B=0 C=1 D=1 CCDirector
+00181 [L431] MOV      A=3 B=0 C=2 D=2 
+00182 [L431] TGETS    A=2 B=2 C=1 D=513 'sharedDirector'
+00183 [L431] CALL     A=2 B=2 C=2 D=514 
+00184 [L431] MOV      A=3 B=0 C=2 D=2 
+00185 [L431] TGETS    A=2 B=2 C=2 D=514 'getScheduler'
+00186 [L431] CALL     A=2 B=2 C=2 D=514 
+00187 [L431] MOV      A=3 B=0 C=2 D=2 
+00188 [L431] TGETS    A=2 B=2 C=3 D=515 'unscheduleScriptEntry'
+00189 [L431] UGET     A=4 B=0 C=0 D=0 self
+00190 [L431] TGETS    A=4 B=4 C=4 D=1028 'deaccelHandler'
+00191 [L431] CALL     A=2 B=1 C=3 D=259 
+00192 [L432] UGET     A=2 B=0 C=0 D=0 self
+00193 [L432] KSHORT   A=3 B=0 C=0 D=0 0
+00194 [L432] TSETS    A=3 B=2 C=4 D=516 'deaccelHandler'
+00195 [L435] KSHORT   A=2 B=0 C=0 D=0 0
+00196 [L436] TGETS    A=3 B=1 C=13 D=269 'y'
+00197 [L436] KSHORT   A=4 B=0 C=0 D=0 0
+00198 [L436] ISGE     A=4 B=0 C=3 D=3 
+00199 [L436] JMP      A=3 B=128 C=16 D=32784 target=216
+00200 [L437] UGET     A=3 B=0 C=0 D=0 self
+00201 [L437] TGETS    A=3 B=3 C=14 D=782 'cells_height'
+00202 [L437] UGET     A=4 B=0 C=0 D=0 self
+00203 [L437] TGETS    A=4 B=4 C=15 D=1039 'viewSize'
+00204 [L437] TGETS    A=4 B=4 C=16 D=1040 'height'
+00205 [L437] ISGE     A=4 B=0 C=3 D=3 
+00206 [L437] JMP      A=3 B=128 C=7 D=32775 target=214
+00207 [L438] UGET     A=3 B=0 C=0 D=0 self
+00208 [L438] TGETS    A=3 B=3 C=14 D=782 'cells_height'
+00209 [L438] UGET     A=4 B=0 C=0 D=0 self
+00210 [L438] TGETS    A=4 B=4 C=15 D=1039 'viewSize'
+00211 [L438] TGETS    A=4 B=4 C=16 D=1040 'height'
+00212 [L438] SUBVV    A=2 B=3 C=4 D=772 
+00213 [L438] JMP      A=3 B=128 C=7 D=32775 target=221
+00214 [L440] KSHORT   A=2 B=0 C=0 D=0 0
+00215 [L441] JMP      A=3 B=128 C=5 D=32773 target=221
+00216 [L442] TGETS    A=3 B=1 C=13 D=269 'y'
+00217 [L442] KSHORT   A=4 B=0 C=0 D=0 0
+00218 [L442] ISGE     A=3 B=0 C=4 D=4 
+00219 [L442] JMP      A=3 B=128 C=1 D=32769 target=221
+00220 [L443] KSHORT   A=2 B=0 C=0 D=0 0
+00221 [L445] UGET     A=3 B=0 C=5 D=5 rollBack
+00222 [L445] MOV      A=4 B=0 C=2 D=2 
+00223 [L445] CALL     A=3 B=1 C=2 D=258 
+00224 [L446] RET0     A=0 B=0 C=1 D=1 
+00225 [L449] UGET     A=2 B=0 C=0 D=0 self
+00226 [L449] UGET     A=3 B=0 C=0 D=0 self
+00227 [L449] TGETS    A=3 B=3 C=9 D=777 'm_tScrollDistance'
+00228 [L449] UGET     A=4 B=0 C=0 D=0 self
+00229 [L449] TGETS    A=4 B=4 C=22 D=1046 'deaccel_rate'
+00230 [L449] MULVV    A=3 B=3 C=4 D=772 
+00231 [L449] TSETS    A=3 B=2 C=9 D=521 'm_tScrollDistance'
+00232 [L450] UGET     A=2 B=0 C=0 D=0 self
+00233 [L450] TGETS    A=2 B=2 C=0 D=512 'container'
+00234 [L450] MOV      A=3 B=0 C=2 D=2 
+00235 [L450] TGETS    A=2 B=2 C=23 D=535 'setPosition'
+00236 [L450] TGETS    A=4 B=1 C=24 D=280 'x'
+00237 [L450] TGETS    A=5 B=1 C=13 D=269 'y'
+00238 [L450] UGET     A=6 B=0 C=0 D=0 self
+00239 [L450] TGETS    A=6 B=6 C=9 D=1545 'm_tScrollDistance'
+00240 [L450] ADDVV    A=5 B=5 C=6 D=1286 
+00241 [L450] CALL     A=2 B=1 C=4 D=260 
+00242 [L451] UGET     A=2 B=0 C=3 D=3 math
+00243 [L451] TGETS    A=2 B=2 C=8 D=520 'abs'
+00244 [L451] UGET     A=3 B=0 C=0 D=0 self
+00245 [L451] TGETS    A=3 B=3 C=9 D=777 'm_tScrollDistance'
+00246 [L451] CALL     A=2 B=2 C=2 D=514 
+00247 [L451] UGET     A=3 B=0 C=2 D=2 scroll_deaccel_dist
+00248 [L451] ISGE     A=2 B=0 C=3 D=3 
+00249 [L451] JMP      A=2 B=128 C=26 D=32794 target=276
+00250 [L452] UGET     A=2 B=0 C=4 D=4 isContainerNeedBack
+00251 [L452] CALL     A=2 B=3 C=1 D=769 
+00252 [L453] ISF      A=0 B=0 C=2 D=2 
+00253 [L453] JMP      A=4 B=128 C=3 D=32771 target=257
+00254 [L454] UGET     A=4 B=0 C=5 D=5 rollBack
+00255 [L454] MOV      A=5 B=0 C=3 D=3 
+00256 [L454] CALL     A=4 B=1 C=2 D=258 
+00257 [L456] UGET     A=4 B=0 C=0 D=0 self
+00258 [L456] TGETS    A=4 B=4 C=4 D=1028 'deaccelHandler'
+00259 [L456] ISEQN    A=4 B=0 C=0 D=0 0
+00260 [L456] JMP      A=4 B=128 C=15 D=32783 target=276
+00261 [L457] UGET     A=4 B=0 C=1 D=1 CCDirector
+00262 [L457] MOV      A=5 B=0 C=4 D=4 
+00263 [L457] TGETS    A=4 B=4 C=1 D=1025 'sharedDirector'
+00264 [L457] CALL     A=4 B=2 C=2 D=514 
+00265 [L457] MOV      A=5 B=0 C=4 D=4 
+00266 [L457] TGETS    A=4 B=4 C=2 D=1026 'getScheduler'
+00267 [L457] CALL     A=4 B=2 C=2 D=514 
+00268 [L457] MOV      A=5 B=0 C=4 D=4 
+00269 [L457] TGETS    A=4 B=4 C=3 D=1027 'unscheduleScriptEntry'
+00270 [L457] UGET     A=6 B=0 C=0 D=0 self
+00271 [L457] TGETS    A=6 B=6 C=4 D=1540 'deaccelHandler'
+00272 [L457] CALL     A=4 B=1 C=3 D=259 
+00273 [L458] UGET     A=4 B=0 C=0 D=0 self
+00274 [L458] KSHORT   A=5 B=0 C=0 D=0 0
+00275 [L458] TSETS    A=5 B=4 C=4 D=1028 'deaccelHandler'
+00276 [L461] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto21 offset=0x1eac source_lines=466-488 params=2
+UPVALUES ['frame', 'CCPointMake', 'isTouchEnd', 'self', 'savedY', 'startY', 'isTouchMoved', 'isTouchMoveOut']
+00001 [L467] UGET     A=2 B=0 C=0 D=0 frame
+00002 [L467] MOV      A=3 B=0 C=2 D=2 
+00003 [L467] TGETS    A=2 B=2 C=0 D=512 'containsPoint'
+00004 [L467] UGET     A=4 B=0 C=1 D=1 CCPointMake
+00005 [L467] MOV      A=5 B=0 C=0 D=0 
+00006 [L467] MOV      A=6 B=0 C=1 D=1 
+00007 [L467] CALL     A=4 B=0 C=3 D=3 
+00008 [L467] CALLM    A=2 B=2 C=1 D=513 
+00009 [L467] IST      A=0 B=0 C=2 D=2 
+00010 [L467] JMP      A=2 B=128 C=2 D=32770 target=13
+00011 [L469] KPRI     A=2 B=0 C=1 D=1 
+00012 [L469] RET1     A=2 B=0 C=2 D=2 
+00013 [L472] UGET     A=2 B=0 C=2 D=2 isTouchEnd
+00014 [L472] IST      A=0 B=0 C=2 D=2 
+00015 [L472] JMP      A=2 B=128 C=2 D=32770 target=18
+00016 [L474] KPRI     A=2 B=0 C=1 D=1 
+00017 [L474] RET1     A=2 B=0 C=2 D=2 
+00018 [L477] UGET     A=2 B=0 C=3 D=3 self
+00019 [L477] TGETS    A=2 B=2 C=1 D=513 'container'
+00020 [L477] IST      A=0 B=0 C=2 D=2 
+00021 [L477] JMP      A=2 B=128 C=1 D=32769 target=23
+00022 [L478] RET0     A=0 B=0 C=1 D=1 
+00023 [L481] USETP    A=2 B=0 C=1 D=1 isTouchEnd
+00024 [L482] UGET     A=2 B=0 C=3 D=3 self
+00025 [L482] KPRI     A=3 B=0 C=2 D=2 
+00026 [L482] TSETS    A=3 B=2 C=2 D=514 'm_bDragging'
+00027 [L483] USETV    A=4 B=0 C=1 D=1 savedY
+00028 [L484] USETV    A=5 B=0 C=1 D=1 startY
+00029 [L485] USETP    A=6 B=0 C=1 D=1 isTouchMoved
+00030 [L486] USETP    A=7 B=0 C=1 D=1 isTouchMoveOut
+00031 [L487] KPRI     A=2 B=0 C=2 D=2 
+00032 [L487] RET1     A=2 B=0 C=2 D=2 
+
+FUNCTION proto22 offset=0x1fe2 source_lines=490-531 params=2
+UPVALUES ['math', 'startY', 'scrSize', 'isTouchMoved', 'frame', 'CCPointMake', 'isContainerNeedBack', 'rollBack', 'self', 'isTouchMoveOut', 'savedY']
+00001 [L492] UGET     A=2 B=0 C=0 D=0 math
+00002 [L492] TGETS    A=2 B=2 C=0 D=512 'abs'
+00003 [L492] UGET     A=3 B=0 C=1 D=1 startY
+00004 [L492] SUBVV    A=3 B=1 C=3 D=259 
+00005 [L492] CALL     A=2 B=2 C=2 D=514 
+00006 [L492] UGET     A=3 B=0 C=2 D=2 scrSize
+00007 [L492] TGETS    A=3 B=3 C=1 D=769 'height'
+00008 [L492] MULVN    A=3 B=3 C=0 D=768 
+00009 [L492] ISGE     A=3 B=0 C=2 D=2 
+00010 [L492] JMP      A=2 B=128 C=1 D=32769 target=12
+00011 [L493] USETP    A=3 B=0 C=2 D=2 isTouchMoved
+00012 [L496] UGET     A=2 B=0 C=4 D=4 frame
+00013 [L496] MOV      A=3 B=0 C=2 D=2 
+00014 [L496] TGETS    A=2 B=2 C=2 D=514 'containsPoint'
+00015 [L496] UGET     A=4 B=0 C=5 D=5 CCPointMake
+00016 [L496] MOV      A=5 B=0 C=0 D=0 
+00017 [L496] MOV      A=6 B=0 C=1 D=1 
+00018 [L496] CALL     A=4 B=0 C=3 D=3 
+00019 [L496] CALLM    A=2 B=2 C=1 D=513 
+00020 [L496] IST      A=0 B=0 C=2 D=2 
+00021 [L496] JMP      A=2 B=128 C=12 D=32780 target=34
+00022 [L497] UGET     A=2 B=0 C=6 D=6 isContainerNeedBack
+00023 [L497] CALL     A=2 B=3 C=1 D=769 
+00024 [L498] ISF      A=0 B=0 C=2 D=2 
+00025 [L498] JMP      A=4 B=128 C=7 D=32775 target=33
+00026 [L499] UGET     A=4 B=0 C=7 D=7 rollBack
+00027 [L499] MOV      A=5 B=0 C=3 D=3 
+00028 [L499] CALL     A=4 B=1 C=2 D=258 
+00029 [L501] UGET     A=4 B=0 C=8 D=8 self
+00030 [L501] KPRI     A=5 B=0 C=1 D=1 
+00031 [L501] TSETS    A=5 B=4 C=3 D=1027 'm_bDragging'
+00032 [L502] USETP    A=9 B=0 C=2 D=2 isTouchMoveOut
+00033 [L504] RET0     A=0 B=0 C=1 D=1 
+00034 [L507] UGET     A=2 B=0 C=3 D=3 isTouchMoved
+00035 [L507] ISF      A=0 B=0 C=2 D=2 
+00036 [L507] JMP      A=3 B=128 C=67 D=32835 target=104
+00037 [L509] UGET     A=2 B=0 C=8 D=8 self
+00038 [L509] TGETS    A=2 B=2 C=4 D=516 'container'
+00039 [L509] MOV      A=3 B=0 C=2 D=2 
+00040 [L509] TGETS    A=2 B=2 C=5 D=517 'getPositionLua'
+00041 [L509] CALL     A=2 B=2 C=2 D=514 
+00042 [L511] UGET     A=3 B=0 C=4 D=4 frame
+00043 [L511] MOV      A=4 B=0 C=3 D=3 
+00044 [L511] TGETS    A=3 B=3 C=2 D=770 'containsPoint'
+00045 [L511] UGET     A=5 B=0 C=5 D=5 CCPointMake
+00046 [L511] MOV      A=6 B=0 C=0 D=0 
+00047 [L511] MOV      A=7 B=0 C=1 D=1 
+00048 [L511] CALL     A=5 B=0 C=3 D=3 
+00049 [L511] CALLM    A=3 B=2 C=1 D=513 
+00050 [L511] IST      A=0 B=0 C=3 D=3 
+00051 [L511] JMP      A=3 B=128 C=1 D=32769 target=53
+00052 [L512] RET0     A=0 B=0 C=1 D=1 
+00053 [L515] GGET     A=3 B=0 C=6 D=6 'scrollViewHelper'
+00054 [L515] TGETS    A=3 B=3 C=7 D=775 'scrollViewDidScroll'
+00055 [L515] ISF      A=0 B=0 C=3 D=3 
+00056 [L515] JMP      A=4 B=128 C=3 D=32771 target=60
+00057 [L516] GGET     A=3 B=0 C=6 D=6 'scrollViewHelper'
+00058 [L516] TGETS    A=3 B=3 C=7 D=775 'scrollViewDidScroll'
+00059 [L516] CALL     A=3 B=1 C=1 D=257 
+00060 [L519] UGET     A=3 B=0 C=8 D=8 self
+00061 [L519] UGET     A=4 B=0 C=10 D=10 savedY
+00062 [L519] SUBVV    A=4 B=1 C=4 D=260 
+00063 [L519] TSETS    A=4 B=3 C=8 D=776 'm_tScrollDistance'
+00064 [L521] UGET     A=3 B=0 C=8 D=8 self
+00065 [L521] TGETS    A=3 B=3 C=4 D=772 'container'
+00066 [L521] MOV      A=4 B=0 C=3 D=3 
+00067 [L521] TGETS    A=3 B=3 C=9 D=777 'setPosition'
+00068 [L521] UGET     A=5 B=0 C=5 D=5 CCPointMake
+00069 [L521] TGETS    A=6 B=2 C=10 D=522 'x'
+00070 [L521] TGETS    A=7 B=2 C=11 D=523 'y'
+00071 [L521] UGET     A=8 B=0 C=8 D=8 self
+00072 [L521] TGETS    A=8 B=8 C=8 D=2056 'm_tScrollDistance'
+00073 [L521] ADDVV    A=7 B=7 C=8 D=1800 
+00074 [L521] CALL     A=5 B=0 C=3 D=3 
+00075 [L521] CALLM    A=3 B=1 C=1 D=257 
+00076 [L522] USETV    A=10 B=0 C=1 D=1 savedY
+00077 [L524] UGET     A=3 B=0 C=8 D=8 self
+00078 [L524] TGETS    A=3 B=3 C=12 D=780 'containAllCells'
+00079 [L524] IST      A=0 B=0 C=3 D=3 
+00080 [L524] JMP      A=3 B=128 C=23 D=32791 target=104
+00081 [L524] TGETS    A=3 B=2 C=11 D=523 'y'
+00082 [L524] UGET     A=4 B=0 C=8 D=8 self
+00083 [L524] TGETS    A=4 B=4 C=13 D=1037 'cells_height'
+00084 [L524] UGET     A=5 B=0 C=8 D=8 self
+00085 [L524] TGETS    A=5 B=5 C=14 D=1294 'viewSize'
+00086 [L524] TGETS    A=5 B=5 C=1 D=1281 'height'
+00087 [L524] SUBVV    A=4 B=4 C=5 D=1029 
+00088 [L524] UGET     A=5 B=0 C=8 D=8 self
+00089 [L524] TGETS    A=5 B=5 C=14 D=1294 'viewSize'
+00090 [L524] TGETS    A=5 B=5 C=1 D=1281 'height'
+00091 [L524] UGET     A=6 B=0 C=8 D=8 self
+00092 [L524] TGETS    A=6 B=6 C=15 D=1551 'near_len'
+00093 [L524] MULVV    A=5 B=5 C=6 D=1286 
+00094 [L524] SUBVV    A=4 B=4 C=5 D=1029 
+00095 [L524] ISGE     A=4 B=0 C=3 D=3 
+00096 [L524] JMP      A=3 B=128 C=7 D=32775 target=104
+00097 [L525] GGET     A=3 B=0 C=6 D=6 'scrollViewHelper'
+00098 [L525] TGETS    A=3 B=3 C=16 D=784 'addMoreCells'
+00099 [L525] ISF      A=0 B=0 C=3 D=3 
+00100 [L525] JMP      A=4 B=128 C=3 D=32771 target=104
+00101 [L526] GGET     A=3 B=0 C=6 D=6 'scrollViewHelper'
+00102 [L526] TGETS    A=3 B=3 C=16 D=784 'addMoreCells'
+00103 [L526] CALL     A=3 B=1 C=1 D=257 
+00104 [L531] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto23 offset=0x236b source_lines=533-571 params=2
+UPVALUES ['isTouchEnd', 'self', 'isTouchMoveOut', 'isTouchMoved', 'CCDirector', 'deaccelerateScrolling', 'frame', 'CCPointMake', 'pairs']
+00001 [L535] USETP    A=0 B=0 C=2 D=2 isTouchEnd
+00002 [L536] UGET     A=2 B=0 C=1 D=1 self
+00003 [L536] KPRI     A=3 B=0 C=1 D=1 
+00004 [L536] TSETS    A=3 B=2 C=0 D=512 'm_bDragging'
+00005 [L537] UGET     A=2 B=0 C=2 D=2 isTouchMoveOut
+00006 [L537] IST      A=0 B=0 C=2 D=2 
+00007 [L537] JMP      A=2 B=128 C=95 D=32863 target=103
+00008 [L538] UGET     A=2 B=0 C=3 D=3 isTouchMoved
+00009 [L538] ISF      A=0 B=0 C=2 D=2 
+00010 [L538] JMP      A=3 B=128 C=36 D=32804 target=47
+00011 [L539] UGET     A=2 B=0 C=4 D=4 CCDirector
+00012 [L539] MOV      A=3 B=0 C=2 D=2 
+00013 [L539] TGETS    A=2 B=2 C=1 D=513 'sharedDirector'
+00014 [L539] CALL     A=2 B=2 C=2 D=514 
+00015 [L539] MOV      A=3 B=0 C=2 D=2 
+00016 [L539] TGETS    A=2 B=2 C=2 D=514 'getScheduler'
+00017 [L539] CALL     A=2 B=2 C=2 D=514 
+00018 [L541] UGET     A=3 B=0 C=1 D=1 self
+00019 [L541] TGETS    A=3 B=3 C=3 D=771 'deaccelHandler'
+00020 [L541] ISEQN    A=3 B=0 C=0 D=0 0
+00021 [L541] JMP      A=3 B=128 C=16 D=32784 target=38
+00022 [L542] UGET     A=3 B=0 C=4 D=4 CCDirector
+00023 [L542] MOV      A=4 B=0 C=3 D=3 
+00024 [L542] TGETS    A=3 B=3 C=1 D=769 'sharedDirector'
+00025 [L542] CALL     A=3 B=2 C=2 D=514 
+00026 [L542] MOV      A=4 B=0 C=3 D=3 
+00027 [L542] TGETS    A=3 B=3 C=2 D=770 'getScheduler'
+00028 [L542] CALL     A=3 B=2 C=2 D=514 
+00029 [L542] MOV      A=4 B=0 C=3 D=3 
+00030 [L542] TGETS    A=3 B=3 C=4 D=772 'unscheduleScriptEntry'
+00031 [L542] UGET     A=5 B=0 C=1 D=1 self
+00032 [L542] TGETS    A=5 B=5 C=3 D=1283 'deaccelHandler'
+00033 [L542] CALL     A=3 B=1 C=3 D=259 
+00034 [L543] UGET     A=3 B=0 C=1 D=1 self
+00035 [L543] KSHORT   A=4 B=0 C=0 D=0 0
+00036 [L543] TSETS    A=4 B=3 C=3 D=771 'deaccelHandler'
+00037 [L543] JMP      A=3 B=128 C=65 D=32833 target=103
+00038 [L545] UGET     A=3 B=0 C=1 D=1 self
+00039 [L545] MOV      A=5 B=0 C=2 D=2 
+00040 [L545] TGETS    A=4 B=2 C=5 D=517 'scheduleScriptFunc'
+00041 [L545] UGET     A=6 B=0 C=5 D=5 deaccelerateScrolling
+00042 [L545] KSHORT   A=7 B=0 C=0 D=0 0
+00043 [L545] KPRI     A=8 B=0 C=1 D=1 
+00044 [L545] CALL     A=4 B=2 C=5 D=517 
+00045 [L545] TSETS    A=4 B=3 C=3 D=771 'deaccelHandler'
+00046 [L546] JMP      A=2 B=128 C=56 D=32824 target=103
+00047 [L548] UGET     A=2 B=0 C=6 D=6 frame
+00048 [L548] MOV      A=3 B=0 C=2 D=2 
+00049 [L548] TGETS    A=2 B=2 C=6 D=518 'containsPoint'
+00050 [L548] UGET     A=4 B=0 C=7 D=7 CCPointMake
+00051 [L548] MOV      A=5 B=0 C=0 D=0 
+00052 [L548] MOV      A=6 B=0 C=1 D=1 
+00053 [L548] CALL     A=4 B=0 C=3 D=3 
+00054 [L548] CALLM    A=2 B=2 C=1 D=513 
+00055 [L548] IST      A=0 B=0 C=2 D=2 
+00056 [L548] JMP      A=2 B=128 C=1 D=32769 target=58
+00057 [L549] RET0     A=0 B=0 C=1 D=1 
+00058 [L552] UGET     A=2 B=0 C=1 D=1 self
+00059 [L552] TGETS    A=2 B=2 C=7 D=519 'touchCellCallBack'
+00060 [L552] ISEQP    A=2 B=0 C=0 D=0 
+00061 [L552] JMP      A=2 B=128 C=41 D=32809 target=103
+00062 [L553] UGET     A=2 B=0 C=1 D=1 self
+00063 [L553] TGETS    A=2 B=2 C=8 D=520 'container'
+00064 [L553] MOV      A=3 B=0 C=2 D=2 
+00065 [L553] TGETS    A=2 B=2 C=9 D=521 'convertToNodeSpace'
+00066 [L553] UGET     A=4 B=0 C=7 D=7 CCPointMake
+00067 [L553] MOV      A=5 B=0 C=0 D=0 
+00068 [L553] MOV      A=6 B=0 C=1 D=1 
+00069 [L553] CALL     A=4 B=0 C=3 D=3 
+00070 [L553] CALLM    A=2 B=2 C=1 D=513 
+00071 [L554] UGET     A=3 B=0 C=1 D=1 self
+00072 [L554] TGETS    A=3 B=3 C=10 D=778 'viewSize'
+00073 [L554] TGETS    A=3 B=3 C=11 D=779 'height'
+00074 [L555] MOV      A=4 B=0 C=3 D=3 
+00075 [L556] UGET     A=5 B=0 C=8 D=8 pairs
+00076 [L556] UGET     A=6 B=0 C=1 D=1 self
+00077 [L556] TGETS    A=6 B=6 C=12 D=1548 'cells'
+00078 [L556] CALL     A=5 B=4 C=2 D=1026 
+00079 [L556] ISNEXT   A=8 B=128 C=21 D=32789 target=101
+00080 [L557] ISF      A=0 B=0 C=9 D=9 
+00081 [L557] JMP      A=10 B=128 C=19 D=32787 target=101
+00082 [L558] MOV      A=10 B=0 C=9 D=9 
+00083 [L559] UGET     A=11 B=0 C=1 D=1 self
+00084 [L559] TGETS    A=11 B=11 C=13 D=2829 'cells_size'
+00085 [L559] TGETV    A=11 B=11 C=8 D=2824 
+00086 [L560] TGETS    A=12 B=11 C=11 D=2827 'height'
+00087 [L560] SUBVV    A=12 B=3 C=12 D=780 
+00088 [L561] TGETS    A=13 B=2 C=14 D=526 'y'
+00089 [L561] ISGE     A=12 B=0 C=13 D=13 
+00090 [L561] JMP      A=13 B=128 C=9 D=32777 target=100
+00091 [L561] TGETS    A=13 B=2 C=14 D=526 'y'
+00092 [L561] ISGE     A=13 B=0 C=3 D=3 
+00093 [L561] JMP      A=13 B=128 C=6 D=32774 target=100
+00094 [L562] UGET     A=13 B=0 C=1 D=1 self
+00095 [L562] TGETS    A=13 B=13 C=7 D=3335 'touchCellCallBack'
+00096 [L562] MOV      A=14 B=0 C=10 D=10 
+00097 [L562] MOV      A=15 B=0 C=2 D=2 
+00098 [L562] CALL     A=13 B=1 C=3 D=259 
+00099 [L563] JMP      A=5 B=128 C=3 D=32771 target=103
+00100 [L565] MOV      A=3 B=0 C=12 D=12 
+00101 [L556] ITERN    A=8 B=3 C=3 D=771 
+00102 [L556] ITERL    A=8 B=127 C=233 D=32745 target=80
+00103 [L571] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto24 offset=0x2719 source_lines=573-582 params=3
+UPVALUES ['CCTOUCHBEGAN', 'onTouchBegan', 'CCTOUCHMOVED', 'onTouchMoved', 'onTouchEnded']
+00001 [L575] UGET     A=3 B=0 C=0 D=0 CCTOUCHBEGAN
+00002 [L575] ISNEV    A=0 B=0 C=3 D=3 
+00003 [L575] JMP      A=3 B=128 C=5 D=32773 target=9
+00004 [L576] UGET     A=3 B=0 C=1 D=1 onTouchBegan
+00005 [L576] MOV      A=4 B=0 C=1 D=1 
+00006 [L576] MOV      A=5 B=0 C=2 D=2 
+00007 [L576] CALLT    A=3 B=0 C=3 D=3 
+00008 [L576] JMP      A=3 B=128 C=12 D=32780 target=21
+00009 [L577] UGET     A=3 B=0 C=2 D=2 CCTOUCHMOVED
+00010 [L577] ISNEV    A=0 B=0 C=3 D=3 
+00011 [L577] JMP      A=3 B=128 C=5 D=32773 target=17
+00012 [L578] UGET     A=3 B=0 C=3 D=3 onTouchMoved
+00013 [L578] MOV      A=4 B=0 C=1 D=1 
+00014 [L578] MOV      A=5 B=0 C=2 D=2 
+00015 [L578] CALLT    A=3 B=0 C=3 D=3 
+00016 [L578] JMP      A=3 B=128 C=4 D=32772 target=21
+00017 [L580] UGET     A=3 B=0 C=4 D=4 onTouchEnded
+00018 [L580] MOV      A=4 B=0 C=1 D=1 
+00019 [L580] MOV      A=5 B=0 C=2 D=2 
+00020 [L580] CALLT    A=3 B=0 C=3 D=3 
+00021 [L582] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto25 offset=0x27ef source_lines=325-586 params=2
+UPVALUES ['CCDirector', 'CCMoveTo', 'CCPointMake', 'scroll_deaccel_dist', 'math', 'CCRectMake', 'pairs', 'CCTOUCHBEGAN', 'CCTOUCHMOVED']
+00001 [L327] UGET     A=2 B=0 C=0 D=0 CCDirector
+00002 [L327] MOV      A=3 B=0 C=2 D=2 
+00003 [L327] TGETS    A=2 B=2 C=0 D=512 'sharedDirector'
+00004 [L327] CALL     A=2 B=2 C=2 D=514 
+00005 [L327] MOV      A=3 B=0 C=2 D=2 
+00006 [L327] TGETS    A=2 B=2 C=1 D=513 'getVisibleSize'
+00007 [L327] CALL     A=2 B=2 C=2 D=514 
+00008 [L328] ISTC     A=3 B=0 C=1 D=1 
+00009 [L328] JMP      A=3 B=128 C=1 D=32769 target=11
+00010 [L328] KSHORT   A=3 B=255 C=128 D=65408 -128
+00011 [L329] KNIL     A=4 B=0 C=5 D=5 
+00012 [L331] KPRI     A=6 B=0 C=1 D=1 
+00013 [L346] FNEW     A=7 B=0 C=2 D=2 {'kind': 'proto', 'id': 17}
+00014 [L348] GGET     A=8 B=0 C=3 D=3 'd_ms'
+00015 [L348] TGETS    A=8 B=8 C=4 D=2052 'd_u'
+00016 [L348] TGETS    A=8 B=8 C=5 D=2053 'isLuaC'
+00017 [L348] CALL     A=8 B=2 C=1 D=513 
+00018 [L348] ISF      A=0 B=0 C=8 D=8 
+00019 [L348] JMP      A=9 B=128 C=6 D=32774 target=26
+00020 [L348] GGET     A=8 B=0 C=3 D=3 'd_ms'
+00021 [L348] TGETS    A=8 B=8 C=4 D=2052 'd_u'
+00022 [L348] TGETS    A=8 B=8 C=6 D=2054 'isIOS'
+00023 [L348] CALL     A=8 B=2 C=1 D=513 
+00024 [L348] IST      A=0 B=0 C=8 D=8 
+00025 [L348] JMP      A=9 B=128 C=6 D=32774 target=32
+00026 [L348] GGET     A=8 B=0 C=3 D=3 'd_ms'
+00027 [L348] TGETS    A=8 B=8 C=4 D=2052 'd_u'
+00028 [L348] TGETS    A=8 B=8 C=7 D=2055 'isWP8'
+00029 [L348] CALL     A=8 B=2 C=1 D=513 
+00030 [L348] ISF      A=0 B=0 C=8 D=8 
+00031 [L348] JMP      A=9 B=128 C=7 D=32775 target=39
+00032 [L349] TGETS    A=8 B=0 C=8 D=8 'scrollView'
+00033 [L349] MOV      A=9 B=0 C=8 D=8 
+00034 [L349] TGETS    A=8 B=8 C=9 D=2057 'registerScriptHandler'
+00035 [L349] MOV      A=10 B=0 C=7 D=7 
+00036 [L349] KSHORT   A=11 B=0 C=0 D=0 0
+00037 [L349] CALL     A=8 B=1 C=4 D=260 
+00038 [L349] JMP      A=8 B=128 C=5 D=32773 target=44
+00039 [L351] TGETS    A=8 B=0 C=8 D=8 'scrollView'
+00040 [L351] MOV      A=9 B=0 C=8 D=8 
+00041 [L351] TGETS    A=8 B=8 C=9 D=2057 'registerScriptHandler'
+00042 [L351] MOV      A=10 B=0 C=7 D=7 
+00043 [L351] CALL     A=8 B=1 C=3 D=259 
+00044 [L376] FNEW     A=8 B=0 C=10 D=10 {'kind': 'proto', 'id': 18}
+00045 [L383] FNEW     A=9 B=0 C=11 D=11 {'kind': 'proto', 'id': 19}
+00046 [L461] FNEW     A=10 B=0 C=12 D=12 {'kind': 'proto', 'id': 20}
+00047 [L463] UGET     A=11 B=0 C=5 D=5 CCRectMake
+00048 [L463] TGETS    A=12 B=0 C=13 D=13 'touchArea'
+00049 [L463] TGETS    A=12 B=12 C=14 D=3086 'x'
+00050 [L463] TGETS    A=13 B=0 C=13 D=13 'touchArea'
+00051 [L463] TGETS    A=13 B=13 C=15 D=3343 'y'
+00052 [L463] TGETS    A=14 B=0 C=13 D=13 'touchArea'
+00053 [L463] TGETS    A=14 B=14 C=16 D=3600 'width'
+00054 [L463] TGETS    A=15 B=0 C=13 D=13 'touchArea'
+00055 [L463] TGETS    A=15 B=15 C=17 D=3857 'height'
+00056 [L463] CALL     A=11 B=2 C=5 D=517 
+00057 [L464] KPRI     A=12 B=0 C=1 D=1 
+00058 [L465] KPRI     A=13 B=0 C=2 D=2 
+00059 [L488] FNEW     A=14 B=0 C=18 D=18 {'kind': 'proto', 'id': 21}
+00060 [L531] FNEW     A=15 B=0 C=19 D=19 {'kind': 'proto', 'id': 22}
+00061 [L571] FNEW     A=16 B=0 C=20 D=20 {'kind': 'proto', 'id': 23}
+00062 [L582] FNEW     A=17 B=0 C=21 D=21 {'kind': 'proto', 'id': 24}
+00063 [L584] TGETS    A=18 B=0 C=22 D=22 'container'
+00064 [L584] MOV      A=19 B=0 C=18 D=18 
+00065 [L584] TGETS    A=18 B=18 C=23 D=4631 'registerScriptTouchHandler'
+00066 [L584] MOV      A=20 B=0 C=17 D=17 
+00067 [L584] KPRI     A=21 B=0 C=1 D=1 
+00068 [L584] MOV      A=22 B=0 C=3 D=3 
+00069 [L584] KPRI     A=23 B=0 C=1 D=1 
+00070 [L584] CALL     A=18 B=1 C=6 D=262 
+00071 [L585] TGETS    A=18 B=0 C=22 D=22 'container'
+00072 [L585] MOV      A=19 B=0 C=18 D=18 
+00073 [L585] TGETS    A=18 B=18 C=24 D=4632 'setTouchEnabled'
+00074 [L585] KPRI     A=20 B=0 C=2 D=2 
+00075 [L585] CALL     A=18 B=1 C=3 D=259 
+00076 [L586] UCLO     A=0 B=128 C=0 D=32768 target=77
+00077 [L586] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto26 offset=0x2bee source_lines=0-592 params=0
+UPVALUES []
+00001 [L1] GGET     A=0 B=0 C=0 D=0 'require'
+00002 [L2] GGET     A=1 B=0 C=1 D=1 'bits'
+00003 [L3] GGET     A=2 B=0 C=2 D=2 'sqlite'
+00004 [L4] GGET     A=3 B=0 C=3 D=3 'type'
+00005 [L5] GGET     A=4 B=0 C=4 D=4 'print'
+00006 [L6] GGET     A=5 B=0 C=5 D=5 'tostring'
+00007 [L7] GGET     A=6 B=0 C=6 D=6 'pairs'
+00008 [L8] GGET     A=7 B=0 C=7 D=7 'string'
+00009 [L9] GGET     A=8 B=0 C=8 D=8 'table'
+00010 [L10] GGET     A=9 B=0 C=9 D=9 'math'
+00011 [L12] GGET     A=10 B=0 C=10 D=10 'main_server'
+00012 [L13] GGET     A=11 B=0 C=11 D=11 '_G'
+00013 [L14] MOV      A=12 B=0 C=1 D=1 
+00014 [L15] GGET     A=13 B=0 C=12 D=12 'tonumber'
+00015 [L16] GGET     A=14 B=0 C=13 D=13 'os'
+00016 [L17] GGET     A=15 B=0 C=14 D=14 'io'
+00017 [L18] GGET     A=16 B=0 C=15 D=15 'tolua'
+00018 [L23] GGET     A=17 B=0 C=16 D=16 'class'
+00019 [L24] GGET     A=18 B=0 C=17 D=17 'CCArray'
+00020 [L25] GGET     A=19 B=0 C=18 D=18 'CCDirector'
+00021 [L26] GGET     A=20 B=0 C=19 D=19 'CCLayer'
+00022 [L27] GGET     A=21 B=0 C=20 D=20 'CCMenu'
+00023 [L28] GGET     A=22 B=0 C=21 D=21 'CCMenuItemImage'
+00024 [L29] GGET     A=23 B=0 C=22 D=22 'CCSprite'
+00025 [L30] GGET     A=24 B=0 C=23 D=23 'CCScene'
+00026 [L31] GGET     A=25 B=0 C=24 D=24 'CCTextFieldTTF'
+00027 [L32] GGET     A=26 B=0 C=25 D=25 'CCTOUCHBEGAN'
+00028 [L33] GGET     A=27 B=0 C=26 D=26 'CCTOUCHMOVED'
+00029 [L34] GGET     A=28 B=0 C=27 D=27 'CCLayerColor'
+00030 [L35] GGET     A=29 B=0 C=28 D=28 'ccc4'
+00031 [L36] GGET     A=30 B=0 C=29 D=29 'ccc3'
+00032 [L37] GGET     A=31 B=0 C=30 D=30 'CCMenuItemSprite'
+00033 [L38] MOV      A=32 B=0 C=22 D=22 
+00034 [L39] GGET     A=33 B=0 C=31 D=31 'CCRectMake'
+00035 [L40] GGET     A=34 B=0 C=32 D=32 'CCPointMake'
+00036 [L41] GGET     A=35 B=0 C=33 D=33 'ccpAdd'
+00037 [L42] GGET     A=36 B=0 C=34 D=34 'CCMoveBy'
+00038 [L43] GGET     A=37 B=0 C=35 D=35 'CCMenuItemFont'
+00039 [L44] GGET     A=38 B=0 C=36 D=36 'kCCMenuHandlerPriority'
+00040 [L45] GGET     A=39 B=0 C=37 D=37 'CCSequence'
+00041 [L46] GGET     A=40 B=0 C=38 D=38 'CCCallFuncN'
+00042 [L47] GGET     A=41 B=0 C=39 D=39 'CCDelayTime'
+00043 [L48] GGET     A=42 B=0 C=40 D=40 'CCEaseOut'
+00044 [L49] GGET     A=43 B=0 C=41 D=41 'CCSpawn'
+00045 [L50] GGET     A=44 B=0 C=42 D=42 'CCEaseInOut'
+00046 [L51] GGET     A=45 B=0 C=43 D=43 'CCEaseElasticInOut'
+00047 [L52] GGET     A=46 B=0 C=44 D=44 'CCLuaLog'
+00048 [L53] GGET     A=47 B=0 C=45 D=45 'CCFileUtils'
+00049 [L54] GGET     A=48 B=0 C=46 D=46 'CCVerticalTextAlignment'
+00050 [L55] GGET     A=49 B=0 C=47 D=47 'CCMoveTo'
+00051 [L56] GGET     A=50 B=0 C=48 D=48 'CCEaseElasticOut'
+00052 [L57] GGET     A=51 B=0 C=49 D=49 'CCEaseElastic'
+00053 [L58] GGET     A=52 B=0 C=50 D=50 'CCEaseBounce'
+00054 [L59] GGET     A=53 B=0 C=51 D=51 'CCEaseBounceInOut'
+00055 [L60] GGET     A=54 B=0 C=52 D=52 'CCEaseBounceOut'
+00056 [L61] GGET     A=55 B=0 C=53 D=53 'CCEaseBackInOut'
+00057 [L62] GGET     A=56 B=0 C=54 D=54 'CCSizeMake'
+00058 [L63] GGET     A=57 B=0 C=55 D=55 'CCScrollView'
+00059 [L64] GGET     A=58 B=0 C=56 D=56 'CCTargetedAction'
+00060 [L65] GGET     A=59 B=0 C=57 D=57 'CCScheduler'
+00061 [L66] GGET     A=60 B=0 C=58 D=58 'kCCScrollViewDirectionVertical'
+00062 [L67] GGET     A=61 B=0 C=59 D=59 'kCCNodeOnExit'
+00063 [L70] GGET     A=62 B=0 C=60 D=60 'module'
+00064 [L70] KSTR     A=63 B=0 C=61 D=61 'common.inertiaLayer'
+00065 [L70] CALL     A=62 B=1 C=2 D=258 
+00066 [L73] MOV      A=62 B=0 C=0 D=0 
+00067 [L73] KSTR     A=63 B=0 C=62 D=62 'ms'
+00068 [L73] CALL     A=62 B=2 C=2 D=514 
+00069 [L73] GSET     A=62 B=0 C=63 D=63 'd_ms'
+00070 [L74] GGET     A=62 B=0 C=63 D=63 'd_ms'
+00071 [L74] IST      A=0 B=0 C=62 D=62 
+00072 [L74] JMP      A=62 B=128 C=3 D=32771 target=76
+00073 [L75] MOV      A=62 B=0 C=4 D=4 
+00074 [L75] KSTR     A=63 B=0 C=64 D=64 'inertiaLayer load fail.'
+00075 [L75] CALL     A=62 B=1 C=2 D=258 
+00076 [L81] FNEW     A=62 B=0 C=65 D=65 {'kind': 'proto', 'id': 0}
+00077 [L85] GGET     A=63 B=0 C=63 D=63 'd_ms'
+00078 [L85] TGETS    A=63 B=63 C=66 D=16194 'oo'
+00079 [L85] TGETS    A=63 B=63 C=16 D=16144 'class'
+00080 [L85] KSTR     A=64 B=0 C=67 D=67 'inertiaLayer'
+00081 [L85] CALL     A=63 B=1 C=2 D=258 
+00082 [L87] KSHORT   A=63 B=0 C=1 D=1 1
+00083 [L89] TNEW     A=64 B=0 C=0 D=0 
+00084 [L89] GSET     A=64 B=0 C=68 D=68 'scrollViewHelper'
+00085 [L90] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00086 [L115] FNEW     A=65 B=0 C=70 D=70 {'kind': 'proto', 'id': 1}
+00087 [L90] TSETS    A=65 B=64 C=69 D=16453 '__init'
+00088 [L117] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00089 [L134] FNEW     A=65 B=0 C=72 D=72 {'kind': 'proto', 'id': 2}
+00090 [L117] TSETS    A=65 B=64 C=71 D=16455 'addCell'
+00091 [L136] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00092 [L138] FNEW     A=65 B=0 C=74 D=74 {'kind': 'proto', 'id': 3}
+00093 [L136] TSETS    A=65 B=64 C=73 D=16457 'setMoveToEndCallBack'
+00094 [L141] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00095 [L143] FNEW     A=65 B=0 C=76 D=76 {'kind': 'proto', 'id': 4}
+00096 [L141] TSETS    A=65 B=64 C=75 D=16459 'removeMoveToEndCallBack'
+00097 [L146] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00098 [L149] FNEW     A=65 B=0 C=78 D=78 {'kind': 'proto', 'id': 5}
+00099 [L146] TSETS    A=65 B=64 C=77 D=16461 'setNearToEndCallBack'
+00100 [L151] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00101 [L154] FNEW     A=65 B=0 C=80 D=80 {'kind': 'proto', 'id': 6}
+00102 [L151] TSETS    A=65 B=64 C=79 D=16463 'removeNearToEndCallBack'
+00103 [L159] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00104 [L169] FNEW     A=65 B=0 C=82 D=82 {'kind': 'proto', 'id': 7}
+00105 [L159] TSETS    A=65 B=64 C=81 D=16465 'cleanLayer'
+00106 [L171] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00107 [L195] FNEW     A=65 B=0 C=84 D=84 {'kind': 'proto', 'id': 8}
+00108 [L171] TSETS    A=65 B=64 C=83 D=16467 'removeCellsByRange'
+00109 [L197] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00110 [L212] FNEW     A=65 B=0 C=86 D=86 {'kind': 'proto', 'id': 9}
+00111 [L197] TSETS    A=65 B=64 C=85 D=16469 'removeCell'
+00112 [L214] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00113 [L271] FNEW     A=65 B=0 C=88 D=88 {'kind': 'proto', 'id': 10}
+00114 [L214] TSETS    A=65 B=64 C=87 D=16471 'removeCellByIndex'
+00115 [L273] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00116 [L275] FNEW     A=65 B=0 C=90 D=90 {'kind': 'proto', 'id': 11}
+00117 [L273] TSETS    A=65 B=64 C=89 D=16473 'getCell'
+00118 [L277] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00119 [L299] FNEW     A=65 B=0 C=92 D=92 {'kind': 'proto', 'id': 12}
+00120 [L277] TSETS    A=65 B=64 C=91 D=16475 'scrollToIndex'
+00121 [L301] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00122 [L309] FNEW     A=65 B=0 C=94 D=94 {'kind': 'proto', 'id': 13}
+00123 [L301] TSETS    A=65 B=64 C=93 D=16477 'moveToEnd'
+00124 [L311] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00125 [L315] FNEW     A=65 B=0 C=96 D=96 {'kind': 'proto', 'id': 14}
+00126 [L311] TSETS    A=65 B=64 C=95 D=16479 'isBottom'
+00127 [L317] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00128 [L319] FNEW     A=65 B=0 C=98 D=98 {'kind': 'proto', 'id': 15}
+00129 [L317] TSETS    A=65 B=64 C=97 D=16481 'isContainAllCells'
+00130 [L323] FNEW     A=64 B=0 C=99 D=99 {'kind': 'proto', 'id': 16}
+00131 [L321] GSET     A=64 B=0 C=100 D=100 'closeMain'
+00132 [L325] GGET     A=64 B=0 C=67 D=67 'inertiaLayer'
+00133 [L586] FNEW     A=65 B=0 C=102 D=102 {'kind': 'proto', 'id': 25}
+00134 [L325] TSETS    A=65 B=64 C=101 D=16485 'createInertiaMove'
+00135 [L586] UCLO     A=0 B=128 C=0 D=32768 target=136
+00136 [L586] RET0     A=0 B=0 C=1 D=1 

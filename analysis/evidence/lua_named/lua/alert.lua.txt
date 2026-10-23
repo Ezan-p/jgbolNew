@@ -1,0 +1,349 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\b22aa66b6ca8979d6fc5099e15e4e758.data'; root=proto11
+
+FUNCTION proto0 offset=0x4a source_lines=53-55 params=0
+UPVALUES ['CCLuaLog', 'string']
+00001 [L54] UGET     A=0 B=0 C=0 D=0 CCLuaLog
+00002 [L54] UGET     A=1 B=0 C=1 D=1 string
+00003 [L54] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L54] VARG     A=2 B=0 C=0 D=0 
+00005 [L54] CALLM    A=1 B=0 C=0 D=0 
+00006 [L54] CALLM    A=0 B=1 C=0 D=256 
+00007 [L55] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0x95 source_lines=73-85 params=0
+UPVALUES ['CCLayer']
+00001 [L75] GGET     A=0 B=0 C=0 D=0 'CCAlter_cleanLayer'
+00002 [L75] CALL     A=0 B=1 C=1 D=257 
+00003 [L77] GGET     A=0 B=0 C=1 D=1 'self'
+00004 [L77] KPRI     A=1 B=0 C=1 D=1 
+00005 [L77] TSETS    A=1 B=0 C=2 D=2 'runingScene'
+00006 [L78] GGET     A=0 B=0 C=1 D=1 'self'
+00007 [L78] UGET     A=1 B=0 C=0 D=0 CCLayer
+00008 [L78] MOV      A=2 B=0 C=1 D=1 
+00009 [L78] TGETS    A=1 B=1 C=4 D=260 'create'
+00010 [L78] CALL     A=1 B=2 C=2 D=514 
+00011 [L78] TSETS    A=1 B=0 C=3 D=3 'layer'
+00012 [L79] GGET     A=0 B=0 C=1 D=1 'self'
+00013 [L79] TNEW     A=1 B=0 C=0 D=0 
+00014 [L79] TSETS    A=1 B=0 C=5 D=5 'lastInfoLable'
+00015 [L80] GGET     A=0 B=0 C=1 D=1 'self'
+00016 [L80] GGET     A=1 B=0 C=7 D=7 'g_alter_count'
+00017 [L80] TSETS    A=1 B=0 C=6 D=6 'id'
+00018 [L81] GGET     A=0 B=0 C=7 D=7 'g_alter_count'
+00019 [L81] ADDVN    A=0 B=0 C=0 D=0 
+00020 [L81] GSET     A=0 B=0 C=7 D=7 'g_alter_count'
+00021 [L82] GGET     A=0 B=0 C=1 D=1 'self'
+00022 [L82] TGETS    A=0 B=0 C=3 D=3 'layer'
+00023 [L82] MOV      A=1 B=0 C=0 D=0 
+00024 [L82] TGETS    A=0 B=0 C=8 D=8 'setTag'
+00025 [L82] KNUM     A=2 B=0 C=1 D=1 990013
+00026 [L82] CALL     A=0 B=1 C=3 D=259 
+00027 [L84] GGET     A=0 B=0 C=1 D=1 'self'
+00028 [L84] TGETS    A=0 B=0 C=3 D=3 'layer'
+00029 [L84] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto2 offset=0x198 source_lines=113-124 params=0
+UPVALUES ['cclog']
+00001 [L114] GGET     A=0 B=0 C=0 D=0 'CCAlter_cleanLayer'
+00002 [L114] CALL     A=0 B=1 C=1 D=257 
+00003 [L115] UGET     A=0 B=0 C=0 D=0 cclog
+00004 [L115] KSTR     A=1 B=0 C=1 D=1 'alter call timeout'
+00005 [L115] CALL     A=0 B=1 C=2 D=258 
+00006 [L116] GGET     A=0 B=0 C=2 D=2 'd_u'
+00007 [L116] TGETS    A=0 B=0 C=3 D=3 'g_sys_busy'
+00008 [L116] ISF      A=0 B=0 C=0 D=0 
+00009 [L116] JMP      A=1 B=128 C=3 D=32771 target=13
+00010 [L120] GGET     A=0 B=0 C=2 D=2 'd_u'
+00011 [L120] TGETS    A=0 B=0 C=4 D=4 'packageTimeOut'
+00012 [L120] CALL     A=0 B=1 C=1 D=257 
+00013 [L122] GGET     A=0 B=0 C=2 D=2 'd_u'
+00014 [L122] KPRI     A=1 B=0 C=1 D=1 
+00015 [L122] TSETS    A=1 B=0 C=3 D=3 'g_sys_busy'
+00016 [L123] KPRI     A=0 B=0 C=0 D=0 
+00017 [L123] GSET     A=0 B=0 C=5 D=5 'g_last_alter'
+00018 [L124] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto3 offset=0x257 source_lines=134-136 params=0
+UPVALUES []
+00001 [L135] KPRI     A=0 B=0 C=2 D=2 
+00002 [L135] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto4 offset=0x26f source_lines=89-140 params=3
+UPVALUES ['CCDirector', 'cclog', 'CCSprite', 'CCRepeatForever', 'CCRotateBy', 'CCArray', 'CCDelayTime', 'CCCallFuncN', 'CCSequence']
+00001 [L90] ISF      A=0 B=0 C=0 D=0 
+00002 [L90] JMP      A=3 B=128 C=3 D=32771 target=6
+00003 [L91] GGET     A=3 B=0 C=0 D=0 'self'
+00004 [L91] TSETS    A=0 B=3 C=1 D=769 'runingScene'
+00005 [L91] JMP      A=3 B=128 C=9 D=32777 target=15
+00006 [L93] GGET     A=3 B=0 C=0 D=0 'self'
+00007 [L93] UGET     A=4 B=0 C=0 D=0 CCDirector
+00008 [L93] MOV      A=5 B=0 C=4 D=4 
+00009 [L93] TGETS    A=4 B=4 C=2 D=1026 'sharedDirector'
+00010 [L93] CALL     A=4 B=2 C=2 D=514 
+00011 [L93] MOV      A=5 B=0 C=4 D=4 
+00012 [L93] TGETS    A=4 B=4 C=3 D=1027 'getRunningScene'
+00013 [L93] CALL     A=4 B=2 C=2 D=514 
+00014 [L93] TSETS    A=4 B=3 C=1 D=769 'runingScene'
+00015 [L96] GGET     A=3 B=0 C=0 D=0 'self'
+00016 [L96] TGETS    A=3 B=3 C=1 D=769 'runingScene'
+00017 [L96] IST      A=0 B=0 C=3 D=3 
+00018 [L96] JMP      A=3 B=128 C=4 D=32772 target=23
+00019 [L97] UGET     A=3 B=0 C=1 D=1 cclog
+00020 [L97] KSTR     A=4 B=0 C=4 D=4 'call alter show(), but not Running Scene found.'
+00021 [L97] CALL     A=3 B=1 C=2 D=258 
+00022 [L98] UCLO     A=0 B=128 C=97 D=32865 target=120
+00023 [L101] GGET     A=3 B=0 C=5 D=5 'd_u'
+00024 [L101] KPRI     A=4 B=0 C=2 D=2 
+00025 [L101] TSETS    A=4 B=3 C=6 D=774 'g_sys_busy'
+00026 [L103] GGET     A=3 B=0 C=0 D=0 'self'
+00027 [L103] TGETS    A=3 B=3 C=1 D=769 'runingScene'
+00028 [L103] MOV      A=4 B=0 C=3 D=3 
+00029 [L103] TGETS    A=3 B=3 C=7 D=775 'addChild'
+00030 [L103] GGET     A=5 B=0 C=0 D=0 'self'
+00031 [L103] TGETS    A=5 B=5 C=8 D=1288 'layer'
+00032 [L103] KSHORT   A=6 B=39 C=14 D=9998 9998
+00033 [L103] CALL     A=3 B=1 C=4 D=260 
+00034 [L106] UGET     A=3 B=0 C=2 D=2 CCSprite
+00035 [L106] MOV      A=4 B=0 C=3 D=3 
+00036 [L106] TGETS    A=3 B=3 C=9 D=777 'create'
+00037 [L106] KSTR     A=5 B=0 C=10 D=10 'v2/indicator_alert.png'
+00038 [L106] CALL     A=3 B=2 C=3 D=515 
+00039 [L107] GGET     A=4 B=0 C=5 D=5 'd_u'
+00040 [L107] TGETS    A=4 B=4 C=11 D=1035 'setStyles'
+00041 [L107] MOV      A=5 B=0 C=3 D=3 
+00042 [L107] TDUP     A=6 B=0 C=12 D=12 {'kind': 'table', 'value': {'scale': 0.2, 'x': 0.5, 'y': 0.5}}
+00043 [L107] CALL     A=4 B=1 C=3 D=259 
+00044 [L108] MOV      A=5 B=0 C=3 D=3 
+00045 [L108] TGETS    A=4 B=3 C=13 D=781 'runAction'
+00046 [L108] UGET     A=6 B=0 C=3 D=3 CCRepeatForever
+00047 [L108] MOV      A=7 B=0 C=6 D=6 
+00048 [L108] TGETS    A=6 B=6 C=9 D=1545 'create'
+00049 [L108] UGET     A=8 B=0 C=4 D=4 CCRotateBy
+00050 [L108] MOV      A=9 B=0 C=8 D=8 
+00051 [L108] TGETS    A=8 B=8 C=9 D=2057 'create'
+00052 [L108] KNUM     A=10 B=0 C=0 D=0 0.2
+00053 [L108] KSHORT   A=11 B=255 C=196 D=65476 -60
+00054 [L108] CALL     A=8 B=0 C=4 D=4 
+00055 [L108] CALLM    A=6 B=0 C=1 D=1 
+00056 [L108] CALLM    A=4 B=1 C=1 D=257 
+00057 [L109] GGET     A=4 B=0 C=0 D=0 'self'
+00058 [L109] TGETS    A=4 B=4 C=8 D=1032 'layer'
+00059 [L109] MOV      A=5 B=0 C=4 D=4 
+00060 [L109] TGETS    A=4 B=4 C=7 D=1031 'addChild'
+00061 [L109] MOV      A=6 B=0 C=3 D=3 
+00062 [L109] KSHORT   A=7 B=0 C=0 D=0 0
+00063 [L109] CALL     A=4 B=1 C=4 D=260 
+00064 [L111] ISTC     A=4 B=0 C=1 D=1 
+00065 [L111] JMP      A=4 B=128 C=1 D=32769 target=67
+00066 [L111] KSHORT   A=4 B=0 C=10 D=10 10
+00067 [L124] FNEW     A=5 B=0 C=14 D=14 {'kind': 'proto', 'id': 2}
+00068 [L113] GSET     A=5 B=0 C=15 D=15 'timeOut'
+00069 [L126] ISTC     A=5 B=0 C=2 D=2 
+00070 [L126] JMP      A=5 B=128 C=1 D=32769 target=72
+00071 [L126] GGET     A=5 B=0 C=15 D=15 'timeOut'
+00072 [L129] UGET     A=6 B=0 C=5 D=5 CCArray
+00073 [L129] MOV      A=7 B=0 C=6 D=6 
+00074 [L129] TGETS    A=6 B=6 C=9 D=1545 'create'
+00075 [L129] CALL     A=6 B=2 C=2 D=514 
+00076 [L130] MOV      A=8 B=0 C=6 D=6 
+00077 [L130] TGETS    A=7 B=6 C=16 D=1552 'addObject'
+00078 [L130] UGET     A=9 B=0 C=6 D=6 CCDelayTime
+00079 [L130] MOV      A=10 B=0 C=9 D=9 
+00080 [L130] TGETS    A=9 B=9 C=9 D=2313 'create'
+00081 [L130] MOV      A=11 B=0 C=4 D=4 
+00082 [L130] CALL     A=9 B=0 C=3 D=3 
+00083 [L130] CALLM    A=7 B=1 C=1 D=257 
+00084 [L131] MOV      A=8 B=0 C=6 D=6 
+00085 [L131] TGETS    A=7 B=6 C=16 D=1552 'addObject'
+00086 [L131] UGET     A=9 B=0 C=7 D=7 CCCallFuncN
+00087 [L131] MOV      A=10 B=0 C=9 D=9 
+00088 [L131] TGETS    A=9 B=9 C=9 D=2313 'create'
+00089 [L131] MOV      A=11 B=0 C=5 D=5 
+00090 [L131] CALL     A=9 B=0 C=3 D=3 
+00091 [L131] CALLM    A=7 B=1 C=1 D=257 
+00092 [L132] GGET     A=7 B=0 C=0 D=0 'self'
+00093 [L132] TGETS    A=7 B=7 C=8 D=1800 'layer'
+00094 [L132] MOV      A=8 B=0 C=7 D=7 
+00095 [L132] TGETS    A=7 B=7 C=13 D=1805 'runAction'
+00096 [L132] UGET     A=9 B=0 C=8 D=8 CCSequence
+00097 [L132] MOV      A=10 B=0 C=9 D=9 
+00098 [L132] TGETS    A=9 B=9 C=9 D=2313 'create'
+00099 [L132] MOV      A=11 B=0 C=6 D=6 
+00100 [L132] CALL     A=9 B=0 C=3 D=3 
+00101 [L132] CALLM    A=7 B=1 C=1 D=257 
+00102 [L136] FNEW     A=7 B=0 C=17 D=17 {'kind': 'proto', 'id': 3}
+00103 [L134] GSET     A=7 B=0 C=18 D=18 'onTouch'
+00104 [L138] GGET     A=7 B=0 C=0 D=0 'self'
+00105 [L138] TGETS    A=7 B=7 C=8 D=1800 'layer'
+00106 [L138] MOV      A=8 B=0 C=7 D=7 
+00107 [L138] TGETS    A=7 B=7 C=19 D=1811 'registerScriptTouchHandler'
+00108 [L138] GGET     A=9 B=0 C=18 D=18 'onTouch'
+00109 [L138] KPRI     A=10 B=0 C=1 D=1 
+00110 [L138] KSHORT   A=11 B=255 C=128 D=65408 -128
+00111 [L138] KPRI     A=12 B=0 C=2 D=2 
+00112 [L138] CALL     A=7 B=1 C=6 D=262 
+00113 [L139] GGET     A=7 B=0 C=0 D=0 'self'
+00114 [L139] TGETS    A=7 B=7 C=8 D=1800 'layer'
+00115 [L139] MOV      A=8 B=0 C=7 D=7 
+00116 [L139] TGETS    A=7 B=7 C=20 D=1812 'setTouchEnabled'
+00117 [L139] KPRI     A=9 B=0 C=2 D=2 
+00118 [L139] CALL     A=7 B=1 C=3 D=259 
+00119 [L140] RET0     A=0 B=0 C=1 D=1 
+00120 [L140] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto5 offset=0x6ce source_lines=144-148 params=0
+UPVALUES ['CCDirector']
+00001 [L146] UGET     A=0 B=0 C=0 D=0 CCDirector
+00002 [L146] MOV      A=1 B=0 C=0 D=0 
+00003 [L146] TGETS    A=0 B=0 C=0 D=0 'sharedDirector'
+00004 [L146] CALL     A=0 B=2 C=2 D=514 
+00005 [L146] MOV      A=1 B=0 C=0 D=0 
+00006 [L146] TGETS    A=0 B=0 C=1 D=1 'getRunningScene'
+00007 [L146] CALL     A=0 B=2 C=2 D=514 
+00008 [L147] MOV      A=2 B=0 C=0 D=0 
+00009 [L147] TGETS    A=1 B=0 C=2 D=2 'removeChildByTag'
+00010 [L147] KNUM     A=3 B=0 C=0 D=0 990013
+00011 [L147] KPRI     A=4 B=0 C=2 D=2 
+00012 [L147] CALL     A=1 B=1 C=4 D=260 
+00013 [L148] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x768 source_lines=151-154 params=0
+UPVALUES []
+00001 [L152] GGET     A=0 B=0 C=0 D=0 'CCAlter_cleanLayer'
+00002 [L152] CALL     A=0 B=1 C=1 D=257 
+00003 [L153] KPRI     A=0 B=0 C=0 D=0 
+00004 [L153] GSET     A=0 B=0 C=1 D=1 'g_last_alter'
+00005 [L154] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto7 offset=0x7ae source_lines=160-166 params=2
+UPVALUES []
+00001 [L161] GGET     A=2 B=0 C=0 D=0 'g_last_alter'
+00002 [L161] ISF      A=0 B=0 C=2 D=2 
+00003 [L161] JMP      A=3 B=128 C=2 D=32770 target=6
+00004 [L162] RET0     A=0 B=0 C=1 D=1 
+00005 [L162] JMP      A=2 B=128 C=4 D=32772 target=10
+00006 [L164] GGET     A=2 B=0 C=1 D=1 'start_wait'
+00007 [L164] MOV      A=3 B=0 C=0 D=0 
+00008 [L164] MOV      A=4 B=0 C=1 D=1 
+00009 [L164] CALL     A=2 B=1 C=3 D=259 
+00010 [L166] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto8 offset=0x819 source_lines=169-182 params=3
+UPVALUES []
+00001 [L170] KSHORT   A=3 B=0 C=0 D=0 0
+00002 [L170] ISGT     A=1 B=0 C=3 D=3 
+00003 [L170] JMP      A=3 B=128 C=1 D=32769 target=5
+00004 [L171] RET0     A=0 B=0 C=1 D=1 
+00005 [L174] GGET     A=3 B=0 C=0 D=0 'g_last_alter'
+00006 [L174] ISF      A=0 B=0 C=3 D=3 
+00007 [L174] JMP      A=4 B=128 C=2 D=32770 target=10
+00008 [L175] GGET     A=3 B=0 C=1 D=1 'CCAlter_stop'
+00009 [L175] CALL     A=3 B=1 C=1 D=257 
+00010 [L178] GGET     A=3 B=0 C=2 D=2 'CCAlter_new'
+00011 [L178] CALL     A=3 B=2 C=1 D=513 
+00012 [L178] GSET     A=3 B=0 C=0 D=0 'g_last_alter'
+00013 [L179] GGET     A=3 B=0 C=3 D=3 'CCAlter_show'
+00014 [L179] MOV      A=4 B=0 C=0 D=0 
+00015 [L179] MOV      A=5 B=0 C=1 D=1 
+00016 [L179] MOV      A=6 B=0 C=2 D=2 
+00017 [L179] CALL     A=3 B=1 C=4 D=260 
+00018 [L181] GGET     A=3 B=0 C=4 D=4 'self'
+00019 [L181] TGETS    A=3 B=3 C=5 D=773 'id'
+00020 [L181] RET1     A=3 B=0 C=2 D=2 
+
+FUNCTION proto9 offset=0x8e8 source_lines=185-200 params=2
+UPVALUES ['cclog']
+00001 [L186] ISNEP    A=0 B=0 C=0 D=0 
+00002 [L186] JMP      A=2 B=128 C=1 D=32769 target=4
+00003 [L187] RET0     A=0 B=0 C=1 D=1 
+00004 [L190] GGET     A=2 B=0 C=0 D=0 'g_last_alter'
+00005 [L190] ISF      A=0 B=0 C=2 D=2 
+00006 [L190] JMP      A=3 B=128 C=12 D=32780 target=19
+00007 [L191] ISF      A=0 B=0 C=1 D=1 
+00008 [L191] JMP      A=2 B=128 C=8 D=32776 target=17
+00009 [L192] GGET     A=2 B=0 C=1 D=1 'self'
+00010 [L192] TGETS    A=2 B=2 C=2 D=514 'id'
+00011 [L192] ISEQV    A=2 B=0 C=1 D=1 
+00012 [L192] JMP      A=2 B=128 C=4 D=32772 target=17
+00013 [L193] UGET     A=2 B=0 C=0 D=0 cclog
+00014 [L193] KSTR     A=3 B=0 C=3 D=3 'alter id not find, ignore stop.'
+00015 [L193] CALL     A=2 B=1 C=2 D=258 
+00016 [L194] RET0     A=0 B=0 C=1 D=1 
+00017 [L197] GGET     A=2 B=0 C=4 D=4 'CCAlter_stop'
+00018 [L197] CALL     A=2 B=1 C=1 D=257 
+00019 [L199] GGET     A=2 B=0 C=5 D=5 'd_u'
+00020 [L199] KPRI     A=3 B=0 C=1 D=1 
+00021 [L199] TSETS    A=3 B=2 C=6 D=518 'g_sys_busy'
+00022 [L200] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto10 offset=0x9cb source_lines=203-205 params=0
+UPVALUES []
+00001 [L204] GGET     A=0 B=0 C=0 D=0 'd_u'
+00002 [L204] TGETS    A=0 B=0 C=1 D=1 'g_sys_busy'
+00003 [L204] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto11 offset=0x9f7 source_lines=0-213 params=0
+UPVALUES []
+00001 [L6] GGET     A=0 B=0 C=0 D=0 'require'
+00002 [L7] GGET     A=1 B=0 C=1 D=1 'bits'
+00003 [L8] GGET     A=2 B=0 C=2 D=2 'sqlite'
+00004 [L9] GGET     A=3 B=0 C=3 D=3 'type'
+00005 [L10] GGET     A=4 B=0 C=4 D=4 'print'
+00006 [L11] GGET     A=5 B=0 C=5 D=5 'tostring'
+00007 [L12] GGET     A=6 B=0 C=6 D=6 'pairs'
+00008 [L13] GGET     A=7 B=0 C=7 D=7 'string'
+00009 [L15] GGET     A=8 B=0 C=8 D=8 'main_server'
+00010 [L16] GGET     A=9 B=0 C=9 D=9 '_G'
+00011 [L17] MOV      A=10 B=0 C=1 D=1 
+00012 [L19] GGET     A=11 B=0 C=10 D=10 'CCRepeatForever'
+00013 [L20] GGET     A=12 B=0 C=11 D=11 'CCRotateBy'
+00014 [L26] GGET     A=13 B=0 C=12 D=12 'class'
+00015 [L27] GGET     A=14 B=0 C=13 D=13 'CCArray'
+00016 [L28] GGET     A=15 B=0 C=14 D=14 'CCDirector'
+00017 [L29] GGET     A=16 B=0 C=15 D=15 'CCLayer'
+00018 [L30] GGET     A=17 B=0 C=16 D=16 'CCMenu'
+00019 [L31] GGET     A=18 B=0 C=17 D=17 'CCMenuItemImage'
+00020 [L32] GGET     A=19 B=0 C=18 D=18 'CCSprite'
+00021 [L33] GGET     A=20 B=0 C=19 D=19 'CCTextFieldTTF'
+00022 [L34] GGET     A=21 B=0 C=20 D=20 'CCTOUCHBEGAN'
+00023 [L35] GGET     A=22 B=0 C=21 D=21 'CCTOUCHMOVED'
+00024 [L38] GGET     A=23 B=0 C=22 D=22 'CCDelayTime'
+00025 [L39] GGET     A=24 B=0 C=23 D=23 'CCCallFuncN'
+00026 [L40] GGET     A=25 B=0 C=24 D=24 'CCSequence'
+00027 [L41] GGET     A=26 B=0 C=25 D=25 'CCLuaLog'
+00028 [L44] GGET     A=27 B=0 C=26 D=26 'module'
+00029 [L44] KSTR     A=28 B=0 C=27 D=27 'alert'
+00030 [L44] CALL     A=27 B=1 C=2 D=258 
+00031 [L55] FNEW     A=27 B=0 C=28 D=28 {'kind': 'proto', 'id': 0}
+00032 [L60] KPRI     A=28 B=0 C=0 D=0 
+00033 [L60] GSET     A=28 B=0 C=29 D=29 'g_last_alter'
+00034 [L61] KSHORT   A=28 B=39 C=16 D=10000 10000
+00035 [L61] GSET     A=28 B=0 C=30 D=30 'g_alter_count'
+00036 [L65] MOV      A=28 B=0 C=0 D=0 
+00037 [L65] KSTR     A=29 B=0 C=31 D=31 'base.loop'
+00038 [L65] CALL     A=28 B=2 C=2 D=514 
+00039 [L65] GSET     A=28 B=0 C=32 D=32 'oo'
+00040 [L66] MOV      A=28 B=0 C=0 D=0 
+00041 [L66] KSTR     A=29 B=0 C=33 D=33 'common.utils'
+00042 [L66] CALL     A=28 B=2 C=2 D=514 
+00043 [L66] GSET     A=28 B=0 C=34 D=34 'd_u'
+00044 [L70] TNEW     A=28 B=0 C=0 D=0 
+00045 [L70] GSET     A=28 B=0 C=35 D=35 'self'
+00046 [L85] FNEW     A=28 B=0 C=36 D=36 {'kind': 'proto', 'id': 1}
+00047 [L73] GSET     A=28 B=0 C=37 D=37 'CCAlter_new'
+00048 [L140] FNEW     A=28 B=0 C=38 D=38 {'kind': 'proto', 'id': 4}
+00049 [L89] GSET     A=28 B=0 C=39 D=39 'CCAlter_show'
+00050 [L148] FNEW     A=28 B=0 C=40 D=40 {'kind': 'proto', 'id': 5}
+00051 [L144] GSET     A=28 B=0 C=41 D=41 'CCAlter_cleanLayer'
+00052 [L154] FNEW     A=28 B=0 C=42 D=42 {'kind': 'proto', 'id': 6}
+00053 [L151] GSET     A=28 B=0 C=43 D=43 'CCAlter_stop'
+00054 [L166] FNEW     A=28 B=0 C=44 D=44 {'kind': 'proto', 'id': 7}
+00055 [L160] GSET     A=28 B=0 C=45 D=45 'continue_wait'
+00056 [L182] FNEW     A=28 B=0 C=46 D=46 {'kind': 'proto', 'id': 8}
+00057 [L169] GSET     A=28 B=0 C=47 D=47 'start_wait'
+00058 [L200] FNEW     A=28 B=0 C=48 D=48 {'kind': 'proto', 'id': 9}
+00059 [L185] GSET     A=28 B=0 C=49 D=49 'stop_wait'
+00060 [L205] FNEW     A=28 B=0 C=50 D=50 {'kind': 'proto', 'id': 10}
+00061 [L203] GSET     A=28 B=0 C=51 D=51 'is_sys_busy'
+00062 [L205] UCLO     A=0 B=128 C=0 D=32768 target=63
+00063 [L205] RET0     A=0 B=0 C=1 D=1 
