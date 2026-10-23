@@ -9,6 +9,7 @@ import sqlite3
 import time
 
 from .protocol import encode, decode
+from . import summon
 
 
 # The client initializes these sections together in data.set_g_new_config.
@@ -45,6 +46,8 @@ def login_fields(text):
 
 class Backend:
     def __init__(self, directory, port, emit):
+        self.summon_rules = summon.load_rules()
+        self.summon_status = summon.rule_status()
         directory.mkdir(parents=True, exist_ok=True)
         self.port, self.emit = port, emit
         self.db = sqlite3.connect(directory / 'game.sqlite3')
@@ -61,6 +64,8 @@ class Backend:
         # One local account. Keep response numbering/replay across TCP reconnects.
         self.server_serial = 200000
         self.reply_history = deque(maxlen=256)
+        self.summon_replies = {}
+        self.last_summon_serial = 0
 
     def close(self):
         self.db.close()
@@ -95,18 +100,31 @@ class Backend:
         self.db.commit()
 
     def snapshot(self):
-        return dict(self.profile(), server_time=int(time.time()), random_key=self.random_key)
+        role = self.profile()
+        now = int(time.time())
+        summon.prepare(role, now, self.summon_rules)
+        role.update(summon.remaining(role, now))
+        self.save(role)
+        return dict(role, server_time=now, random_key=self.random_key)
 
     def bootstrap(self, reconnect=False):
         # 2998/event 80 feeds data.callback_update_config before mainUI is created.
         # This is a minimal local configuration, not an official configuration dump.
         config = CLIENT_CONFIG.replace('server_time=0', 'server_time=%d' % int(time.time()))
-        return [encode(2998, dict(id=80, data=config)),
+        replies = [encode(2998, dict(id=80, data=config)),
                 encode(1017, dict(self.snapshot(), reconnect=reconnect)),
                 self.roster(), self.attachments()]
-
-    def roster(self, serial=0):
         role = self.profile()
+        if 'souls' in role:
+            replies.append(summon.soul_snapshot(role))
+        if 'news' in role.get('summon', {}):
+            replies.append(summon.news_snapshot(role, self.summon_rules))
+        if role.get('summon', {}).get('last_result'):
+            replies.append(summon.event(79, role['summon']['last_result']))
+        return replies
+
+    def roster(self, serial=0, role=None):
+        role = self.profile() if role is None else role
         if 'corteges' not in role:
             # A local starter companion; attributes come from cortege_base_0.csv.
             role['corteges'] = [dict(id=1.0, order=1, type=5004, level=1, next_exp=100,
@@ -116,8 +134,8 @@ class Backend:
         return encode(1034, dict(serial_num=serial, first_send=True,
                                 cortege_count=len(role['corteges']), cortege_list=role['corteges']))
 
-    def attachments(self, serial=0):
-        items = self.profile().get('attachments', [])
+    def attachments(self, serial=0, role=None):
+        items = (self.profile() if role is None else role).get('attachments', [])
         return encode(1035, dict(serial_num=serial, first_send=True,
                                 attach_count=len(items), attach_list=items))
 
@@ -139,6 +157,35 @@ class Backend:
             numbered.append(packet)
             self.reply_history.append((self.server_serial, packet))
         return numbered
+
+    def summon(self, packet, data):
+        serial = data['serial_num']
+        cached = self.summon_replies.get(serial)
+        if cached and cached[0] == packet:
+            return cached[1]
+        if not serial or serial <= self.last_summon_serial:
+            return self.complete(serial, [summon.event(55, {'op_string': '召唤请求已过期，请重新操作'})])
+        try:
+            role = self.profile()
+            result = summon.settle(role, data, int(time.time()), self.summon_rules)
+            # Encode every business response before committing any resources.
+            replies = [self.roster(role=role), self.attachments(role=role), summon.soul_snapshot(role),
+                       encode(1032, dict(id=role['role_id'], unit_type=1, attr_count=1,
+                                        attr_list=[dict(type=8, value=role['gold_coin'])])),
+                       summon.news_snapshot(role, self.summon_rules), summon.event(23, result)]
+            self.save(role)
+            self.emit('game_summon_ok', grade=data['pick_grade'], payment=data['pick_type'],
+                      count=data['ten_pick'] or 1, rules_revision=self.summon_rules['revision'],
+                      rule_mode='inferred', roster_count=len(role['corteges']))
+        except summon.SummonRejected as error:
+            replies = [summon.event(55, {'op_string': str(error)})]
+            self.emit('game_summon_rejected', message=str(error))
+        replies = self.complete(serial, replies)
+        self.last_summon_serial = serial
+        self.summon_replies[serial] = (packet, replies)
+        if len(self.summon_replies) > 256:
+            del self.summon_replies[next(iter(self.summon_replies))]
+        return replies
 
     def respond(self, packet, state):
         mid, connection, data = decode(packet)
@@ -164,6 +211,8 @@ class Backend:
             state['authenticated'] = True
             self.server_serial = 200000
             self.reply_history.clear()
+            self.summon_replies.clear()
+            self.last_summon_serial = 0
             self.emit('game_login_ok', message='本地账号通过 LS→BS 认证')
             return [encode(1002, {'result': 0})] + self.bootstrap()
         if mid == 1016:
@@ -199,5 +248,7 @@ class Backend:
             # Event 1 opens/refreshes the requested UI after both lists arrive.
             return self.complete(data['serial_num'], [self.roster(), self.attachments(),
                 encode(2998, dict(id=1, data='{flag=%d}' % data['flag']))])
+        if mid == 1042:
+            return self.summon(packet, data)
         self.emit('game_unimplemented', message_id=mid, message='尚未实现的业务消息；不返回伪成功')
         return []

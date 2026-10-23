@@ -1,0 +1,144 @@
+getSoulInfo
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\167306a3e04c030beaecb178b917575b.data'; root=proto0
+
+FUNCTION proto0 offset=0x4b source_lines=2371-2393 params=2
+UPVALUES []
+00001 [L2372] TNEW     A=2 B=0 C=0 D=0 
+00002 [L2373] TSETS    A=1 B=2 C=0 D=512 'count'
+00003 [L2374] GGET     A=3 B=0 C=1 D=1 'getCharBySoul'
+00004 [L2374] MOV      A=4 B=0 C=0 D=0 
+00005 [L2374] CALL     A=3 B=2 C=2 D=514 
+00006 [L2375] TSETS    A=0 B=2 C=2 D=514 'type'
+00007 [L2376] TSETS    A=0 B=2 C=3 D=515 'type_id'
+00008 [L2377] KPRI     A=4 B=0 C=2 D=2 
+00009 [L2377] TSETS    A=4 B=2 C=4 D=516 'isSoul'
+00010 [L2378] ISF      A=0 B=0 C=3 D=3 
+00011 [L2378] JMP      A=4 B=128 C=21 D=32789 target=33
+00012 [L2379] GGET     A=4 B=0 C=5 D=5 'd_ms'
+00013 [L2379] TGETS    A=4 B=4 C=6 D=1030 'd_feishengUI'
+00014 [L2379] TGETS    A=4 B=4 C=7 D=1031 'getFeiShengCount'
+00015 [L2379] CALL     A=4 B=1 C=1 D=257 
+00016 [L2380] GGET     A=4 B=0 C=5 D=5 'd_ms'
+00017 [L2380] TGETS    A=4 B=4 C=6 D=1030 'd_feishengUI'
+00018 [L2380] TGETS    A=4 B=4 C=8 D=1032 'g_feiShengCount'
+00019 [L2381] TGETS    A=5 B=3 C=9 D=777 'evolve_level'
+00020 [L2381] IST      A=0 B=0 C=5 D=5 
+00021 [L2381] JMP      A=6 B=128 C=1 D=32769 target=23
+00022 [L2381] KSHORT   A=5 B=0 C=0 D=0 0
+00023 [L2382] ADDVN    A=6 B=5 C=0 D=1280 
+00024 [L2382] TGETV    A=6 B=4 C=6 D=1030 
+00025 [L2382] IST      A=0 B=0 C=6 D=6 
+00026 [L2382] JMP      A=7 B=128 C=1 D=32769 target=28
+00027 [L2382] TGETV    A=6 B=4 C=5 D=1029 
+00028 [L2382] SUBVV    A=6 B=6 C=1 D=1537 
+00029 [L2382] TSETS    A=6 B=2 C=10 D=522 'feiShengCount'
+00030 [L2383] TGETS    A=6 B=3 C=11 D=779 'csvInfo'
+00031 [L2383] TSETS    A=6 B=2 C=11 D=523 'csvInfo'
+00032 [L2383] JMP      A=4 B=128 C=17 D=32785 target=50
+00033 [L2385] GGET     A=4 B=0 C=5 D=5 'd_ms'
+00034 [L2385] TGETS    A=4 B=4 C=12 D=1036 'd_lineupUI'
+00035 [L2385] TGETS    A=4 B=4 C=13 D=1037 'g_characterAttrTable'
+00036 [L2385] TGETV    A=4 B=4 C=0 D=1024 
+00037 [L2385] TSETS    A=4 B=2 C=11 D=523 'csvInfo'
+00038 [L2386] TGETS    A=4 B=2 C=11 D=523 'csvInfo'
+00039 [L2386] TGETS    A=4 B=4 C=14 D=1038 'quality'
+00040 [L2387] GGET     A=5 B=0 C=15 D=15 'g_characterQualityTable'
+00041 [L2387] IST      A=0 B=0 C=5 D=5 
+00042 [L2387] JMP      A=5 B=128 C=2 D=32770 target=45
+00043 [L2388] GGET     A=5 B=0 C=16 D=16 'getCharacterQualityCSVConfig'
+00044 [L2388] CALL     A=5 B=1 C=1 D=257 
+00045 [L2390] GGET     A=5 B=0 C=15 D=15 'g_characterQualityTable'
+00046 [L2390] TGETV    A=5 B=5 C=4 D=1284 
+00047 [L2390] TGETS    A=5 B=5 C=18 D=1298 'compose'
+00048 [L2390] SUBVV    A=5 B=5 C=1 D=1281 
+00049 [L2390] TSETS    A=5 B=2 C=17 D=529 'huanHunCount'
+00050 [L2392] RET1     A=2 B=0 C=2 D=2 
+
+updateSoulsData
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\167306a3e04c030beaecb178b917575b.data'; root=proto0
+
+FUNCTION proto0 offset=0x4b source_lines=2446-2482 params=1
+UPVALUES ['table']
+00001 [L2448] GGET     A=1 B=0 C=0 D=0 'g_soulsInfoTable'
+00002 [L2449] GGET     A=2 B=0 C=1 D=1 'g_soulsTypeTable'
+00003 [L2450] GGET     A=3 B=0 C=2 D=2 'soulsTable'
+00004 [L2450] IST      A=0 B=0 C=3 D=3 
+00005 [L2450] JMP      A=3 B=128 C=2 D=32770 target=8
+00006 [L2451] GGET     A=3 B=0 C=3 D=3 'initSoulsData'
+00007 [L2451] CALL     A=3 B=1 C=1 D=257 
+00008 [L2454] KPRI     A=3 B=0 C=1 D=1 
+00009 [L2454] TSETS    A=3 B=1 C=4 D=260 'isSorted'
+00010 [L2457] KPRI     A=3 B=0 C=1 D=1 
+00011 [L2458] KSHORT   A=4 B=0 C=1 D=1 1
+00012 [L2458] LEN      A=5 B=0 C=1 D=1 
+00013 [L2458] KSHORT   A=6 B=0 C=1 D=1 1
+00014 [L2458] FORI     A=4 B=128 C=22 D=32790 target=37
+00015 [L2459] TGETV    A=8 B=1 C=7 D=263 
+00016 [L2459] TGETS    A=8 B=8 C=5 D=2053 'type'
+00017 [L2459] TGETS    A=9 B=0 C=6 D=6 'type_id'
+00018 [L2459] ISNEV    A=8 B=0 C=9 D=9 
+00019 [L2459] JMP      A=8 B=128 C=16 D=32784 target=36
+00020 [L2460] TGETS    A=8 B=0 C=7 D=7 'total_count'
+00021 [L2460] ISNEN    A=8 B=0 C=0 D=0 0
+00022 [L2460] JMP      A=8 B=128 C=6 D=32774 target=29
+00023 [L2461] UGET     A=8 B=0 C=0 D=0 table
+00024 [L2461] TGETS    A=8 B=8 C=8 D=2056 'remove'
+00025 [L2461] MOV      A=9 B=0 C=1 D=1 
+00026 [L2461] MOV      A=10 B=0 C=7 D=7 
+00027 [L2461] CALL     A=8 B=1 C=3 D=259 
+00028 [L2461] JMP      A=8 B=128 C=5 D=32773 target=34
+00029 [L2463] GGET     A=8 B=0 C=9 D=9 'getSoulInfo'
+00030 [L2463] TGETS    A=9 B=0 C=6 D=6 'type_id'
+00031 [L2463] TGETS    A=10 B=0 C=7 D=7 'total_count'
+00032 [L2463] CALL     A=8 B=2 C=3 D=515 
+00033 [L2463] TSETV    A=8 B=1 C=7 D=263 
+00034 [L2466] KPRI     A=3 B=0 C=2 D=2 
+00035 [L2467] JMP      A=4 B=128 C=1 D=32769 target=37
+00036 [L2458] FORL     A=4 B=127 C=234 D=32746 target=15
+00037 [L2471] IST      A=0 B=0 C=3 D=3 
+00038 [L2471] JMP      A=4 B=128 C=7 D=32775 target=46
+00039 [L2472] LEN      A=4 B=0 C=1 D=1 
+00040 [L2472] ADDVN    A=4 B=4 C=1 D=1025 
+00041 [L2472] GGET     A=5 B=0 C=9 D=9 'getSoulInfo'
+00042 [L2472] TGETS    A=6 B=0 C=6 D=6 'type_id'
+00043 [L2472] TGETS    A=7 B=0 C=7 D=7 'total_count'
+00044 [L2472] CALL     A=5 B=2 C=3 D=515 
+00045 [L2472] TSETV    A=5 B=1 C=4 D=260 
+00046 [L2475] TGETS    A=4 B=0 C=7 D=7 'total_count'
+00047 [L2475] ISNEN    A=4 B=0 C=0 D=0 0
+00048 [L2475] JMP      A=4 B=128 C=4 D=32772 target=53
+00049 [L2476] TGETS    A=4 B=0 C=6 D=6 'type_id'
+00050 [L2476] KPRI     A=5 B=0 C=0 D=0 
+00051 [L2476] TSETV    A=5 B=2 C=4 D=516 
+00052 [L2476] JMP      A=4 B=128 C=3 D=32771 target=56
+00053 [L2478] TGETS    A=4 B=0 C=6 D=6 'type_id'
+00054 [L2478] TGETS    A=5 B=0 C=7 D=7 'total_count'
+00055 [L2478] TSETV    A=5 B=2 C=4 D=516 
+00056 [L2481] GGET     A=4 B=0 C=10 D=10 'd_ms'
+00057 [L2481] TGETS    A=4 B=4 C=11 D=1035 'd_allLineupUI'
+00058 [L2481] TGETS    A=4 B=4 C=12 D=1036 'updateSoulCellByType'
+00059 [L2481] TGETS    A=5 B=0 C=6 D=6 'type_id'
+00060 [L2481] CALL     A=4 B=1 C=2 D=258 
+00061 [L2482] RET0     A=0 B=0 C=1 D=1 
+
+getCharBySoul
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\167306a3e04c030beaecb178b917575b.data'; root=proto0
+
+FUNCTION proto0 offset=0x4b source_lines=2395-2406 params=1
+UPVALUES []
+00001 [L2396] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00002 [L2396] TGETS    A=1 B=1 C=1 D=257 'd_lineupUI'
+00003 [L2396] TGETS    A=1 B=1 C=2 D=258 'g_characterInfo'
+00004 [L2397] KPRI     A=2 B=0 C=0 D=0 
+00005 [L2398] KSHORT   A=3 B=0 C=1 D=1 1
+00006 [L2398] LEN      A=4 B=0 C=1 D=1 
+00007 [L2398] KSHORT   A=5 B=0 C=1 D=1 1
+00008 [L2398] FORI     A=3 B=128 C=7 D=32775 target=16
+00009 [L2399] TGETV    A=7 B=1 C=6 D=262 
+00010 [L2399] TGETS    A=7 B=7 C=3 D=1795 'type'
+00011 [L2399] ISNEV    A=7 B=0 C=0 D=0 
+00012 [L2399] JMP      A=7 B=128 C=2 D=32770 target=15
+00013 [L2400] TGETV    A=2 B=1 C=6 D=262 
+00014 [L2401] JMP      A=3 B=128 C=1 D=32769 target=16
+00015 [L2398] FORL     A=3 B=127 C=249 D=32761 target=9
+00016 [L2405] RET1     A=2 B=0 C=2 D=2 

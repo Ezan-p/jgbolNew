@@ -125,8 +125,12 @@ async def run(config, args):
         reverse_added = True
         hook_config = dict(port=args.port, offline=args.offline, caPath=ca_path,
                            sdkToken=backend.token if backend else '')
+        if backend:
+            from .summon import client_source
+            hook_config['summonClientSource'] = client_source(backend.summon_rules)
         source = 'const REDIRECT_CONFIG = ' + json.dumps(hook_config) + ';\n' + (HERE / 'hooks.js').read_text()
         if args.offline:
+            source += '\n' + (HERE / 'summon_client.js').read_text()
             source += '\n' + (HERE / 'offline.js').read_text()
         if args.probe:
             source += '\n' + (HERE / 'probe.js').read_text()

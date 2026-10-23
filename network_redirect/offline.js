@@ -11,10 +11,14 @@ if (REDIRECT_CONFIG.offline) {
             const SSLContext = Java.use('javax.net.ssl.SSLContext');
             const HTTPS = Java.use('javax.net.ssl.HttpsURLConnection');
             const originalFactory = HTTPS.getDefaultSSLSocketFactory();
-            rpc.exports.offlinecleanup = () => new Promise(resolve => Java.perform(function () {
-                HTTPS.setDefaultSSLSocketFactory(originalFactory);
-                resolve(true);
-            }));
+            rpc.exports.offlinecleanup = async () => {
+                const restored = await cleanupSummonClient();
+                await new Promise(resolve => Java.perform(function () {
+                    HTTPS.setDefaultSSLSocketFactory(originalFactory);
+                    resolve(true);
+                }));
+                return restored;
+            };
             const input = FileInputStream.$new(REDIRECT_CONFIG.caPath);
             const ca = CertificateFactory.getInstance('X.509').generateCertificate(input);
             input.close();

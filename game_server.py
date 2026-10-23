@@ -4,6 +4,7 @@ import asyncio
 import contextlib
 import errno
 import hashlib
+import json
 import math
 from pathlib import Path
 import signal
@@ -174,8 +175,14 @@ def main(argv=None):
                         help='自动停止前运行的秒数，0 表示持续运行（默认）')
     parser.add_argument('--quiet', action='store_true', help='不在终端逐条显示事件，仍保存完整日志')
     parser.add_argument('--probe', action='store_true', help='启动后通过真实连接自检健康端点和服务器列表')
+    parser.add_argument('--summon-status', action='store_true',
+                        help='校验共享的召唤推测配置并显示启用状态后退出，不启动监听')
     args = parser.parse_args(argv)
     try:
+        if args.summon_status:
+            from network_redirect.summon import rule_status
+            print(json.dumps(rule_status(), ensure_ascii=False, indent=2))
+            return 0
         return asyncio.run(run(args))
     except KeyboardInterrupt:
         return 130

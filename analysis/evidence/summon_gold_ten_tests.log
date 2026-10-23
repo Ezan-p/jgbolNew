@@ -1,0 +1,63 @@
+test_invalid_arguments_fail_before_creating_session (test_game_server.GameServerCLITests) ... ok
+test_port_conflict_does_not_disturb_existing_listener (test_game_server.GameServerCLITests) ... ok
+test_probe_duration_and_quiet_write_complete_session (test_game_server.GameServerCLITests) ... ok
+test_sigterm_closes_active_connection_and_releases_port (test_game_server.GameServerCLITests) ... ok
+test_cached_list_bytes_and_query_redaction (test_network_redirect.LandingTests) ... ok
+test_concurrent_connections_have_separate_complete_logs (test_network_redirect.LandingTests) ... ok
+test_fragmented_health (test_network_redirect.LandingTests) ... ok
+test_head_and_traversal (test_network_redirect.LandingTests) ... ok
+test_short_binary_and_shutdown (test_network_redirect.LandingTests) ... ok
+test_shutdown_closes_waiting_clients_and_records_reason (test_network_redirect.LandingTests) ... ok
+test_tls_reaches_local_without_downgrade (test_network_redirect.LandingTests) ... ok
+test_truncated_request_does_not_poison_listener (test_network_redirect.LandingTests) ... ok
+test_unknown_endpoint_not_fake_success (test_network_redirect.LandingTests) ... ok
+test_auth_reconnect_queries_and_expired_ticket (test_offline_backend.ProtocolTests) ... ok
+test_bootstrap_initializes_formation_and_empty_inventory (test_offline_backend.ProtocolTests) ... ok
+test_double_role_id_and_all_fields (test_offline_backend.ProtocolTests) ... ok
+test_empty_replay_completes_reconnect_wait_without_a_client_request (test_offline_backend.ProtocolTests) ... ok
+test_existing_save_gains_formation_slots_without_replacing_progress (test_offline_backend.ProtocolTests) ... ok
+test_invalid_packets_rejected (test_offline_backend.ProtocolTests) ... ok
+test_inventory_array_accepts_lowercase_byte_count_and_rejects_truncation (test_offline_backend.ProtocolTests) ... ok
+test_known_wire_bytes (test_offline_backend.ProtocolTests) ... ok
+test_literal_credentials_only (test_offline_backend.ProtocolTests) ... ok
+test_missing_response_replay_preserves_bytes_and_sequence_after_reconnect (test_offline_backend.ProtocolTests) ... ok
+test_serial_zero_queries_do_not_consume_server_sequence_or_send_done (test_offline_backend.ProtocolTests) ... ok
+test_struct_array_wire_and_bounds (test_offline_backend.ProtocolTests) ... ok
+test_ticket_replay_and_persistence (test_offline_backend.ProtocolTests) ... ok
+test_fragmented_binary_ls_response (test_offline_backend.TLSAndWireTests) ... Executing <Task pending name='Task-86' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:102> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x108be6370>()] created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/tasks.py:704> created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:118> took 0.138 seconds
+ok
+test_large_tls_response (test_offline_backend.TLSAndWireTests) ... ok
+test_unsupported_support_endpoint_is_json_error (test_offline_backend.TLSAndWireTests) ... Executing <Task pending name='Task-105' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:102> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x108be6850>()] created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/tasks.py:704> created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:118> took 0.118 seconds
+ok
+test_untrusted_certificate_rejected (test_offline_backend.TLSAndWireTests) ... Executing <Task pending name='Task-112' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:102> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x108c9e400>()] created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/tasks.py:704> created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:118> took 0.106 seconds
+ok
+test_verified_tls_with_dynamic_sni (test_offline_backend.TLSAndWireTests) ... ok
+test_bytecode_changes_only_list_directory_and_branch (test_server_list.ServerListTests) ... ok
+test_parse_nested_data_and_ignore_comment_ids (test_server_list.ServerListTests) ... ok
+test_reject_404_html (test_server_list.ServerListTests) ... ok
+test_reject_executable_expression (test_server_list.ServerListTests) ... ok
+test_reject_invalid_endpoint_and_duplicate_fields (test_server_list.ServerListTests) ... ok
+test_configured_gold_exact_balance_and_replay (test_summon.SummonTests) ... ok
+test_daily_limit_and_midnight_reset_preserve_cooldowns (test_summon.SummonTests) ... ok
+test_duplicate_souls_and_activity_are_separate_inventories (test_summon.SummonTests) ... ok
+test_encoding_failure_and_capacity_do_not_commit (test_summon.SummonTests) ... ok
+test_first_super_ten_and_pity_reset_on_natural_high_quality (test_summon.SummonTests) ... ok
+test_free_grades_cooldown_and_super_first_five (test_summon.SummonTests) ... ok
+test_gold_ten_exact_cost_rewards_pity_and_replay (test_summon.SummonTests) ... ok
+test_gold_ten_insufficient_daily_limit_and_encoding_failure_are_atomic (test_summon.SummonTests) ... ok
+test_insufficient_invalid_and_limits_do_not_mutate (test_summon.SummonTests) ... ok
+test_legacy_migration_preserves_progress_and_infers_only_known_first (test_summon.SummonTests) ... ok
+test_pity_across_payment_and_ten_draws (test_summon.SummonTests) ... ok
+test_probability_boundaries_and_real_csv_quality (test_summon.SummonTests) ... ok
+test_replay_conflict_reconnect_do_not_settle_twice (test_summon.SummonTests) ... ok
+test_restart_persists_pity_souls_first_pick_and_remaining_time (test_summon.SummonTests) ... ok
+test_rules_fail_closed_and_status_identifies_inference (test_summon.SummonTests) ... ok
+test_single_token_and_gold_leave_free_cooldown_unchanged (test_summon.SummonTests) ... ok
+test_token_reward_and_activity_window_boundaries (test_summon.SummonTests) ... ok
+test_tokens_split_stacks_ten_rewards_and_ids_not_reused (test_summon.SummonTests) ... ok
+test_unauthenticated_and_zero_serial_do_not_mutate (test_summon.SummonTests) ... ok
+
+----------------------------------------------------------------------
+Ran 55 tests in 2.418s
+
+OK

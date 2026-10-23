@@ -1,0 +1,145 @@
+{
+  "date": "2026-10-24",
+  "timezone": "Asia/Shanghai",
+  "scope": "3.87 original client / local offline backend",
+  "tests": {
+    "command": ".runtime/venv/bin/python -m unittest discover -s tests -v",
+    "total": 46,
+    "passed": 46,
+    "summon_tests": 10
+  },
+  "client_session": "20261023T175055Z-c0a0b894",
+  "successful_summons": [
+    {
+      "time": "2026-10-23T17:52:12.812+00:00",
+      "grade": 1,
+      "payment": 1,
+      "count": 1,
+      "roster_count": 2
+    },
+    {
+      "time": "2026-10-23T17:52:42.883+00:00",
+      "grade": 2,
+      "payment": 1,
+      "count": 1,
+      "roster_count": 3
+    },
+    {
+      "time": "2026-10-23T17:53:17.174+00:00",
+      "grade": 3,
+      "payment": 1,
+      "count": 1,
+      "roster_count": 4
+    },
+    {
+      "time": "2026-10-23T17:54:36.194+00:00",
+      "grade": 2,
+      "payment": 2,
+      "count": 1,
+      "roster_count": 5
+    },
+    {
+      "time": "2026-10-23T17:55:02.242+00:00",
+      "grade": 2,
+      "payment": 2,
+      "count": 10,
+      "roster_count": 15
+    }
+  ],
+  "client_checks": [
+    {
+      "case": "normal free",
+      "characters": 2,
+      "waiting": false
+    },
+    {
+      "case": "advanced free",
+      "characters": 3,
+      "waiting": false
+    },
+    {
+      "case": "super free",
+      "characters": 4,
+      "waiting": false
+    },
+    {
+      "case": "advanced token single",
+      "characters": 5,
+      "tokens_remaining": 10,
+      "waiting": false
+    },
+    {
+      "case": "advanced token ten",
+      "characters": 15,
+      "tokens_remaining": 0,
+      "waiting": false
+    }
+  ],
+  "fixture": {
+    "injected_advanced_tokens": 11,
+    "restored": true,
+    "temporary_rewards_removed": 11,
+    "backup": ".runtime/summon-fixture-original.json"
+  },
+  "retained_roster": [
+    {
+      "id": 1.0,
+      "type": 5004,
+      "order": 1
+    },
+    {
+      "id": 2.0,
+      "type": 4023,
+      "order": 0
+    },
+    {
+      "id": 3.0,
+      "type": 4015,
+      "order": 0
+    },
+    {
+      "id": 4.0,
+      "type": 4035,
+      "order": 0
+    }
+  ],
+  "retained_attachments": [],
+  "restart": {
+    "state": {
+      "status": 0,
+      "text": "characters=4, used=1, items=0, slots=2, waiting=false, request=100001, response=0, cheer_open=false"
+    },
+    "timers": {
+      "status": 0,
+      "text": "normal_time=243, advanced_time=86073, super_time=258908, normal_count=1, gold_coin=0, g_banshu=true, g_isInSummonPage=nil, g_noNormalSummonCount=false"
+    }
+  },
+  "client_errors": {
+    "summon_attempt_to_or_stack_traceback": false,
+    "other_existing_startup_resource_warnings": true
+  },
+  "limitations": [
+    "Local equal-probability pools and cooldowns, not recovered official odds",
+    "Duplicate types are separate companions; soul conversion and activity rewards not implemented",
+    "Gold payment verified by protocol tests; original UI g_banshu=true keeps paid entry disabled",
+    "Advanced token single/ten verified in UI; super token deduction also verified by backend regression tests"
+  ],
+  "screenshots": [
+    "summon_normal_fixed.png",
+    "summon_advanced_fixed.png",
+    "summon_super_fixed.png",
+    "summon_token_fixed.png",
+    "summon_ten_fixed.png",
+    "summon_restart_fixed.png"
+  ],
+  "reconnect": {
+    "state": {
+      "status": 0,
+      "text": "characters=4, used=1, items=0, slots=2, waiting=false, request=100002, response=200001, cheer_open=false"
+    },
+    "timers": {
+      "status": 0,
+      "text": "normal_time=195, advanced_time=86025, super_time=258860, normal_count=1, gold_coin=0, g_banshu=true, g_isInSummonPage=true, g_noNormalSummonCount=false"
+    }
+  }
+}

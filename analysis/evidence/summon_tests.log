@@ -1,0 +1,52 @@
+test_invalid_arguments_fail_before_creating_session (test_game_server.GameServerCLITests) ... ok
+test_port_conflict_does_not_disturb_existing_listener (test_game_server.GameServerCLITests) ... ok
+test_probe_duration_and_quiet_write_complete_session (test_game_server.GameServerCLITests) ... ok
+test_sigterm_closes_active_connection_and_releases_port (test_game_server.GameServerCLITests) ... ok
+test_cached_list_bytes_and_query_redaction (test_network_redirect.LandingTests) ... ok
+test_concurrent_connections_have_separate_complete_logs (test_network_redirect.LandingTests) ... ok
+test_fragmented_health (test_network_redirect.LandingTests) ... ok
+test_head_and_traversal (test_network_redirect.LandingTests) ... ok
+test_short_binary_and_shutdown (test_network_redirect.LandingTests) ... ok
+test_shutdown_closes_waiting_clients_and_records_reason (test_network_redirect.LandingTests) ... ok
+test_tls_reaches_local_without_downgrade (test_network_redirect.LandingTests) ... ok
+test_truncated_request_does_not_poison_listener (test_network_redirect.LandingTests) ... ok
+test_unknown_endpoint_not_fake_success (test_network_redirect.LandingTests) ... ok
+test_auth_reconnect_queries_and_expired_ticket (test_offline_backend.ProtocolTests) ... ok
+test_bootstrap_initializes_formation_and_empty_inventory (test_offline_backend.ProtocolTests) ... ok
+test_double_role_id_and_all_fields (test_offline_backend.ProtocolTests) ... ok
+test_empty_replay_completes_reconnect_wait_without_a_client_request (test_offline_backend.ProtocolTests) ... ok
+test_existing_save_gains_formation_slots_without_replacing_progress (test_offline_backend.ProtocolTests) ... ok
+test_invalid_packets_rejected (test_offline_backend.ProtocolTests) ... ok
+test_inventory_array_accepts_lowercase_byte_count_and_rejects_truncation (test_offline_backend.ProtocolTests) ... ok
+test_known_wire_bytes (test_offline_backend.ProtocolTests) ... ok
+test_literal_credentials_only (test_offline_backend.ProtocolTests) ... ok
+test_missing_response_replay_preserves_bytes_and_sequence_after_reconnect (test_offline_backend.ProtocolTests) ... ok
+test_serial_zero_queries_do_not_consume_server_sequence_or_send_done (test_offline_backend.ProtocolTests) ... ok
+test_struct_array_wire_and_bounds (test_offline_backend.ProtocolTests) ... ok
+test_ticket_replay_and_persistence (test_offline_backend.ProtocolTests) ... ok
+test_fragmented_binary_ls_response (test_offline_backend.TLSAndWireTests) ... ok
+test_large_tls_response (test_offline_backend.TLSAndWireTests) ... Executing <Task pending name='Task-96' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:102> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x106945c40>()] created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/tasks.py:704> created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:118> took 0.114 seconds
+ok
+test_unsupported_support_endpoint_is_json_error (test_offline_backend.TLSAndWireTests) ... ok
+test_untrusted_certificate_rejected (test_offline_backend.TLSAndWireTests) ... ok
+test_verified_tls_with_dynamic_sni (test_offline_backend.TLSAndWireTests) ... ok
+test_bytecode_changes_only_list_directory_and_branch (test_server_list.ServerListTests) ... ok
+test_parse_nested_data_and_ignore_comment_ids (test_server_list.ServerListTests) ... ok
+test_reject_404_html (test_server_list.ServerListTests) ... ok
+test_reject_executable_expression (test_server_list.ServerListTests) ... ok
+test_reject_invalid_endpoint_and_duplicate_fields (test_server_list.ServerListTests) ... ok
+test_capacity_and_encoding_failure_are_atomic (test_summon.SummonTests) ... ok
+test_cooldown_rejection_and_elapsed_restart (test_summon.SummonTests) ... ok
+test_duplicate_and_reconnect_replay_do_not_charge_twice (test_summon.SummonTests) ... ok
+test_free_all_grades_result_inventory_and_done (test_summon.SummonTests) ... ok
+test_legacy_timers_migrate_once (test_summon.SummonTests) ... ok
+test_normal_daily_limit_and_china_midnight_reset (test_summon.SummonTests) ... ok
+test_pay_price_and_insufficient_funds (test_summon.SummonTests) ... ok
+test_rejected_inputs_leave_save_unchanged (test_summon.SummonTests) ... ok
+test_token_single_default_zero_and_ten_split_stacks (test_summon.SummonTests) ... ok
+test_unauthenticated_and_zero_serial_cannot_draw (test_summon.SummonTests) ... ok
+
+----------------------------------------------------------------------
+Ran 46 tests in 1.524s
+
+OK
