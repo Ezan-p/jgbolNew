@@ -1,0 +1,1604 @@
+ui/charPositionUI.changeCharOrderSucceed NUMERIC CONSTANTS: []
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\a118ed90ed7f4ce24f12b78dce80b64a.data'; root=proto78
+
+FUNCTION proto78 offset=0x16c62 source_lines=3504-3510 params=0
+UPVALUES []
+00001 [L3505] GGET     A=0 B=0 C=0 D=0 'updateCombatList'
+00002 [L3505] CALL     A=0 B=1 C=1 D=257 
+00003 [L3506] GGET     A=0 B=0 C=1 D=1 'g_isQuitBoard'
+00004 [L3506] IST      A=0 B=0 C=0 D=0 
+00005 [L3506] JMP      A=0 B=128 C=6 D=32774 target=12
+00006 [L3507] GGET     A=0 B=0 C=2 D=2 'reloadData'
+00007 [L3507] CALL     A=0 B=1 C=1 D=257 
+00008 [L3508] GGET     A=0 B=0 C=3 D=3 'createHeader'
+00009 [L3508] GGET     A=1 B=0 C=4 D=4 'g_lastShowOrder'
+00010 [L3508] KPRI     A=2 B=0 C=2 D=2 
+00011 [L3508] CALL     A=0 B=1 C=3 D=259 
+00012 [L3510] RET0     A=0 B=0 C=1 D=1 
+
+ui/charPositionUI.changeCharSucceed NUMERIC CONSTANTS: []
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\a118ed90ed7f4ce24f12b78dce80b64a.data'; root=proto102
+
+FUNCTION proto102 offset=0x1afaf source_lines=4121-4125 params=0
+UPVALUES []
+00001 [L4122] GGET     A=0 B=0 C=0 D=0 'reloadData'
+00002 [L4122] CALL     A=0 B=1 C=1 D=257 
+00003 [L4123] GGET     A=0 B=0 C=1 D=1 'g_charPosUI'
+00004 [L4123] TGETS    A=0 B=0 C=2 D=2 'chgCharCloseMenuItem'
+00005 [L4123] MOV      A=1 B=0 C=0 D=0 
+00006 [L4123] TGETS    A=0 B=0 C=3 D=3 'activate'
+00007 [L4123] CALL     A=0 B=1 C=2 D=258 
+00008 [L4124] GGET     A=0 B=0 C=4 D=4 'createHeader'
+00009 [L4124] GGET     A=1 B=0 C=5 D=5 'g_lastShowOrder'
+00010 [L4124] KPRI     A=2 B=0 C=2 D=2 
+00011 [L4124] CALL     A=0 B=1 C=3 D=259 
+00012 [L4125] RET0     A=0 B=0 C=1 D=1 
+
+ui/lineupUI.getDateFormServer NUMERIC CONSTANTS: [1]
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\f8e562f5e1c1de4716d573dd13289bcd.data'; root=proto4
+
+FUNCTION proto4 offset=0x2aa source_lines=158-191 params=1
+UPVALUES ['cclog', 'pairs']
+00001 [L159] UGET     A=1 B=0 C=0 D=0 cclog
+00002 [L159] KSTR     A=2 B=0 C=0 D=0 'getDateFormServer:1034'
+00003 [L159] CALL     A=1 B=1 C=2 D=258 
+00004 [L160] TGETS    A=1 B=0 C=1 D=1 'first_send'
+00005 [L160] ISNEP    A=1 B=0 C=2 D=2 
+00006 [L160] JMP      A=1 B=128 C=10 D=32778 target=17
+00007 [L161] UGET     A=1 B=0 C=0 D=0 cclog
+00008 [L161] KSTR     A=2 B=0 C=2 D=2 'getDateFormServer:1034  first_send is true'
+00009 [L161] CALL     A=1 B=1 C=2 D=258 
+00010 [L162] TNEW     A=1 B=0 C=0 D=0 
+00011 [L162] GSET     A=1 B=0 C=3 D=3 'g_characterInfo'
+00012 [L163] TGETS    A=1 B=0 C=4 D=4 'cortege_list'
+00013 [L163] GSET     A=1 B=0 C=3 D=3 'g_characterInfo'
+00014 [L164] TNEW     A=1 B=0 C=0 D=0 
+00015 [L164] GSET     A=1 B=0 C=5 D=5 'g_AscTable'
+00016 [L164] JMP      A=1 B=128 C=21 D=32789 target=38
+00017 [L166] UGET     A=1 B=0 C=0 D=0 cclog
+00018 [L166] KSTR     A=2 B=0 C=6 D=6 'getDateFormServer:1034  first_send is false'
+00019 [L166] CALL     A=1 B=1 C=2 D=258 
+00020 [L167] GGET     A=1 B=0 C=3 D=3 'g_characterInfo'
+00021 [L167] IST      A=0 B=0 C=1 D=1 
+00022 [L167] JMP      A=1 B=128 C=2 D=32770 target=25
+00023 [L168] TNEW     A=1 B=0 C=0 D=0 
+00024 [L168] GSET     A=1 B=0 C=3 D=3 'g_characterInfo'
+00025 [L171] KSHORT   A=1 B=0 C=1 D=1 1
+00026 [L171] TGETS    A=2 B=0 C=4 D=4 'cortege_list'
+00027 [L171] LEN      A=2 B=0 C=2 D=2 
+00028 [L171] KSHORT   A=3 B=0 C=1 D=1 1
+00029 [L171] FORI     A=1 B=128 C=8 D=32776 target=38
+00030 [L172] GGET     A=5 B=0 C=3 D=3 'g_characterInfo'
+00031 [L172] GGET     A=6 B=0 C=3 D=3 'g_characterInfo'
+00032 [L172] LEN      A=6 B=0 C=6 D=6 
+00033 [L172] ADDVN    A=6 B=6 C=0 D=1536 
+00034 [L172] TGETS    A=7 B=0 C=4 D=4 'cortege_list'
+00035 [L172] TGETV    A=7 B=7 C=4 D=1796 
+00036 [L172] TSETV    A=7 B=5 C=6 D=1286 
+00037 [L171] FORL     A=1 B=127 C=248 D=32760 target=30
+00038 [L176] UGET     A=1 B=0 C=1 D=1 pairs
+00039 [L176] TGETS    A=2 B=0 C=4 D=4 'cortege_list'
+00040 [L176] CALL     A=1 B=4 C=2 D=1026 
+00041 [L176] ISNEXT   A=4 B=128 C=8 D=32776 target=50
+00042 [L177] TGETS    A=6 B=5 C=7 D=1287 'reborn_layer'
+00043 [L177] KSHORT   A=7 B=0 C=0 D=0 0
+00044 [L177] ISGE     A=7 B=0 C=6 D=6 
+00045 [L177] JMP      A=6 B=128 C=4 D=32772 target=50
+00046 [L178] GGET     A=6 B=0 C=5 D=5 'g_AscTable'
+00047 [L178] TGETS    A=7 B=5 C=8 D=1288 'type'
+00048 [L178] KPRI     A=8 B=0 C=2 D=2 
+00049 [L178] TSETV    A=8 B=6 C=7 D=1543 
+00050 [L176] ITERN    A=4 B=3 C=3 D=771 
+00051 [L176] ITERL    A=4 B=127 C=246 D=32758 target=42
+00052 [L182] UGET     A=1 B=0 C=0 D=0 cclog
+00053 [L182] KSTR     A=2 B=0 C=9 D=9 'start sort character'
+00054 [L182] CALL     A=1 B=1 C=2 D=258 
+00055 [L183] GGET     A=1 B=0 C=10 D=10 'sortcharacterInfo'
+00056 [L183] CALL     A=1 B=1 C=1 D=257 
+00057 [L185] UGET     A=1 B=0 C=0 D=0 cclog
+00058 [L185] KSTR     A=2 B=0 C=11 D=11 'end sort character'
+00059 [L185] CALL     A=1 B=1 C=2 D=258 
+00060 [L187] GGET     A=1 B=0 C=12 D=12 'd_ms'
+00061 [L187] TGETS    A=1 B=1 C=13 D=269 'd_packageUI'
+00062 [L187] TGETS    A=1 B=1 C=14 D=270 'g_isPackageSorted'
+00063 [L187] IST      A=0 B=0 C=1 D=1 
+00064 [L187] JMP      A=1 B=128 C=4 D=32772 target=69
+00065 [L188] GGET     A=1 B=0 C=12 D=12 'd_ms'
+00066 [L188] TGETS    A=1 B=1 C=13 D=269 'd_packageUI'
+00067 [L188] TGETS    A=1 B=1 C=15 D=271 'sortItems'
+00068 [L188] CALL     A=1 B=1 C=1 D=257 
+00069 [L190] UGET     A=1 B=0 C=0 D=0 cclog
+00070 [L190] KSTR     A=2 B=0 C=16 D=16 'getDateFormServer:1034 end'
+00071 [L190] CALL     A=1 B=1 C=2 D=258 
+00072 [L191] RET0     A=0 B=0 C=1 D=1 
+
+ui/lineupUI.updateCharacterInfo NUMERIC CONSTANTS: []
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\f8e562f5e1c1de4716d573dd13289bcd.data'; root=proto5
+
+FUNCTION proto5 offset=0x590 source_lines=193-291 params=1
+UPVALUES ['pairs', 'cclog']
+00001 [L194] GGET     A=1 B=0 C=0 D=0 'g_characterInfo'
+00002 [L194] ISNEP    A=1 B=0 C=0 D=0 
+00003 [L194] JMP      A=1 B=128 C=2 D=32770 target=6
+00004 [L195] TNEW     A=1 B=0 C=0 D=0 
+00005 [L195] GSET     A=1 B=0 C=0 D=0 'g_characterInfo'
+00006 [L198] GGET     A=1 B=0 C=0 D=0 'g_characterInfo'
+00007 [L199] KPRI     A=2 B=0 C=0 D=0 
+00008 [L200] KSHORT   A=3 B=0 C=1 D=1 1
+00009 [L200] LEN      A=4 B=0 C=1 D=1 
+00010 [L200] KSHORT   A=5 B=0 C=1 D=1 1
+00011 [L200] FORI     A=3 B=128 C=8 D=32776 target=20
+00012 [L201] TGETS    A=7 B=0 C=1 D=1 'id'
+00013 [L201] TGETV    A=8 B=1 C=6 D=262 
+00014 [L201] TGETS    A=8 B=8 C=1 D=2049 'id'
+00015 [L201] ISNEV    A=7 B=0 C=8 D=8 
+00016 [L201] JMP      A=7 B=128 C=2 D=32770 target=19
+00017 [L202] TGETV    A=2 B=1 C=6 D=262 
+00018 [L203] JMP      A=3 B=128 C=1 D=32769 target=20
+00019 [L200] FORL     A=3 B=127 C=248 D=32760 target=12
+00020 [L207] KPRI     A=3 B=0 C=1 D=1 
+00021 [L208] ISEQP    A=2 B=0 C=0 D=0 
+00022 [L208] JMP      A=4 B=129 C=10 D=33034 target=289
+00023 [L209] KSHORT   A=4 B=0 C=1 D=1 1
+00024 [L209] TGETS    A=5 B=0 C=2 D=2 'attr_count'
+00025 [L209] KSHORT   A=6 B=0 C=1 D=1 1
+00026 [L209] FORI     A=4 B=129 C=6 D=33030 target=289
+00027 [L210] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00028 [L210] TGETV    A=8 B=8 C=7 D=2055 
+00029 [L210] TGETS    A=8 B=8 C=4 D=2052 'type'
+00030 [L210] GGET     A=9 B=0 C=5 D=5 'c_p'
+00031 [L210] TGETS    A=9 B=9 C=6 D=2310 'level'
+00032 [L210] ISNEV    A=8 B=0 C=9 D=9 
+00033 [L210] JMP      A=8 B=128 C=6 D=32774 target=40
+00034 [L211] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00035 [L211] TGETV    A=8 B=8 C=7 D=2055 
+00036 [L211] TGETS    A=8 B=8 C=7 D=2055 'value'
+00037 [L211] TSETS    A=8 B=2 C=6 D=518 'level'
+00038 [L212] KPRI     A=3 B=0 C=2 D=2 
+00039 [L212] JMP      A=8 B=128 C=248 D=33016 target=288
+00040 [L214] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00041 [L214] TGETV    A=8 B=8 C=7 D=2055 
+00042 [L214] TGETS    A=8 B=8 C=4 D=2052 'type'
+00043 [L214] GGET     A=9 B=0 C=5 D=5 'c_p'
+00044 [L214] TGETS    A=9 B=9 C=8 D=2312 'order'
+00045 [L214] ISNEV    A=8 B=0 C=9 D=9 
+00046 [L214] JMP      A=8 B=128 C=6 D=32774 target=53
+00047 [L215] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00048 [L215] TGETV    A=8 B=8 C=7 D=2055 
+00049 [L215] TGETS    A=8 B=8 C=7 D=2055 'value'
+00050 [L215] TSETS    A=8 B=2 C=8 D=520 'order'
+00051 [L216] KPRI     A=3 B=0 C=2 D=2 
+00052 [L216] JMP      A=8 B=128 C=235 D=33003 target=288
+00053 [L218] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00054 [L218] TGETV    A=8 B=8 C=7 D=2055 
+00055 [L218] TGETS    A=8 B=8 C=4 D=2052 'type'
+00056 [L218] GGET     A=9 B=0 C=5 D=5 'c_p'
+00057 [L218] TGETS    A=9 B=9 C=9 D=2313 'cheer_order'
+00058 [L218] ISNEV    A=8 B=0 C=9 D=9 
+00059 [L218] JMP      A=8 B=128 C=6 D=32774 target=66
+00060 [L219] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00061 [L219] TGETV    A=8 B=8 C=7 D=2055 
+00062 [L219] TGETS    A=8 B=8 C=7 D=2055 'value'
+00063 [L219] TSETS    A=8 B=2 C=9 D=521 'cheer_order'
+00064 [L220] KPRI     A=3 B=0 C=2 D=2 
+00065 [L220] JMP      A=8 B=128 C=222 D=32990 target=288
+00066 [L222] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00067 [L222] TGETV    A=8 B=8 C=7 D=2055 
+00068 [L222] TGETS    A=8 B=8 C=4 D=2052 'type'
+00069 [L222] GGET     A=9 B=0 C=5 D=5 'c_p'
+00070 [L222] TGETS    A=9 B=9 C=10 D=2314 'max_hp_show'
+00071 [L222] ISNEV    A=8 B=0 C=9 D=9 
+00072 [L222] JMP      A=8 B=128 C=5 D=32773 target=78
+00073 [L223] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00074 [L223] TGETV    A=8 B=8 C=7 D=2055 
+00075 [L223] TGETS    A=8 B=8 C=7 D=2055 'value'
+00076 [L223] TSETS    A=8 B=2 C=11 D=523 'hp'
+00077 [L223] JMP      A=8 B=128 C=210 D=32978 target=288
+00078 [L225] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00079 [L225] TGETV    A=8 B=8 C=7 D=2055 
+00080 [L225] TGETS    A=8 B=8 C=4 D=2052 'type'
+00081 [L225] GGET     A=9 B=0 C=5 D=5 'c_p'
+00082 [L225] TGETS    A=9 B=9 C=12 D=2316 'max_magic_show'
+00083 [L225] ISNEV    A=8 B=0 C=9 D=9 
+00084 [L225] JMP      A=8 B=128 C=5 D=32773 target=90
+00085 [L226] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00086 [L226] TGETV    A=8 B=8 C=7 D=2055 
+00087 [L226] TGETS    A=8 B=8 C=7 D=2055 'value'
+00088 [L226] TSETS    A=8 B=2 C=13 D=525 'magic'
+00089 [L226] JMP      A=8 B=128 C=198 D=32966 target=288
+00090 [L228] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00091 [L228] TGETV    A=8 B=8 C=7 D=2055 
+00092 [L228] TGETS    A=8 B=8 C=4 D=2052 'type'
+00093 [L228] GGET     A=9 B=0 C=5 D=5 'c_p'
+00094 [L228] TGETS    A=9 B=9 C=14 D=2318 'wuligongji_show'
+00095 [L228] ISNEV    A=8 B=0 C=9 D=9 
+00096 [L228] JMP      A=8 B=128 C=5 D=32773 target=102
+00097 [L229] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00098 [L229] TGETV    A=8 B=8 C=7 D=2055 
+00099 [L229] TGETS    A=8 B=8 C=7 D=2055 'value'
+00100 [L229] TSETS    A=8 B=2 C=15 D=527 'gongji'
+00101 [L229] JMP      A=8 B=128 C=186 D=32954 target=288
+00102 [L231] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00103 [L231] TGETV    A=8 B=8 C=7 D=2055 
+00104 [L231] TGETS    A=8 B=8 C=4 D=2052 'type'
+00105 [L231] GGET     A=9 B=0 C=5 D=5 'c_p'
+00106 [L231] TGETS    A=9 B=9 C=16 D=2320 'wulifangyu_show'
+00107 [L231] ISNEV    A=8 B=0 C=9 D=9 
+00108 [L231] JMP      A=8 B=128 C=5 D=32773 target=114
+00109 [L232] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00110 [L232] TGETV    A=8 B=8 C=7 D=2055 
+00111 [L232] TGETS    A=8 B=8 C=7 D=2055 'value'
+00112 [L232] TSETS    A=8 B=2 C=17 D=529 'fangyu'
+00113 [L232] JMP      A=8 B=128 C=174 D=32942 target=288
+00114 [L234] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00115 [L234] TGETV    A=8 B=8 C=7 D=2055 
+00116 [L234] TGETS    A=8 B=8 C=4 D=2052 'type'
+00117 [L234] GGET     A=9 B=0 C=5 D=5 'c_p'
+00118 [L234] TGETS    A=9 B=9 C=18 D=2322 'cur_exp'
+00119 [L234] ISNEV    A=8 B=0 C=9 D=9 
+00120 [L234] JMP      A=8 B=128 C=5 D=32773 target=126
+00121 [L235] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00122 [L235] TGETV    A=8 B=8 C=7 D=2055 
+00123 [L235] TGETS    A=8 B=8 C=7 D=2055 'value'
+00124 [L235] TSETS    A=8 B=2 C=18 D=530 'cur_exp'
+00125 [L235] JMP      A=8 B=128 C=162 D=32930 target=288
+00126 [L237] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00127 [L237] TGETV    A=8 B=8 C=7 D=2055 
+00128 [L237] TGETS    A=8 B=8 C=4 D=2052 'type'
+00129 [L237] GGET     A=9 B=0 C=5 D=5 'c_p'
+00130 [L237] TGETS    A=9 B=9 C=19 D=2323 'next_exp'
+00131 [L237] ISNEV    A=8 B=0 C=9 D=9 
+00132 [L237] JMP      A=8 B=128 C=5 D=32773 target=138
+00133 [L238] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00134 [L238] TGETV    A=8 B=8 C=7 D=2055 
+00135 [L238] TGETS    A=8 B=8 C=7 D=2055 'value'
+00136 [L238] TSETS    A=8 B=2 C=19 D=531 'next_exp'
+00137 [L238] JMP      A=8 B=128 C=150 D=32918 target=288
+00138 [L240] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00139 [L240] TGETV    A=8 B=8 C=7 D=2055 
+00140 [L240] TGETS    A=8 B=8 C=4 D=2052 'type'
+00141 [L240] GGET     A=9 B=0 C=5 D=5 'c_p'
+00142 [L240] TGETS    A=9 B=9 C=20 D=2324 'culture_point'
+00143 [L240] ISNEV    A=8 B=0 C=9 D=9 
+00144 [L240] JMP      A=8 B=128 C=5 D=32773 target=150
+00145 [L241] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00146 [L241] TGETV    A=8 B=8 C=7 D=2055 
+00147 [L241] TGETS    A=8 B=8 C=7 D=2055 'value'
+00148 [L241] TSETS    A=8 B=2 C=20 D=532 'culture_point'
+00149 [L241] JMP      A=8 B=128 C=138 D=32906 target=288
+00150 [L243] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00151 [L243] TGETV    A=8 B=8 C=7 D=2055 
+00152 [L243] TGETS    A=8 B=8 C=4 D=2052 'type'
+00153 [L243] GGET     A=9 B=0 C=5 D=5 'c_p'
+00154 [L243] TGETS    A=9 B=9 C=21 D=2325 'culture_max_hp_plus'
+00155 [L243] ISNEV    A=8 B=0 C=9 D=9 
+00156 [L243] JMP      A=8 B=128 C=5 D=32773 target=162
+00157 [L244] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00158 [L244] TGETV    A=8 B=8 C=7 D=2055 
+00159 [L244] TGETS    A=8 B=8 C=7 D=2055 'value'
+00160 [L244] TSETS    A=8 B=2 C=22 D=534 'hp_plus'
+00161 [L244] JMP      A=8 B=128 C=126 D=32894 target=288
+00162 [L246] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00163 [L246] TGETV    A=8 B=8 C=7 D=2055 
+00164 [L246] TGETS    A=8 B=8 C=4 D=2052 'type'
+00165 [L246] GGET     A=9 B=0 C=5 D=5 'c_p'
+00166 [L246] TGETS    A=9 B=9 C=23 D=2327 'culture_wuligongji_plus'
+00167 [L246] ISNEV    A=8 B=0 C=9 D=9 
+00168 [L246] JMP      A=8 B=128 C=5 D=32773 target=174
+00169 [L247] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00170 [L247] TGETV    A=8 B=8 C=7 D=2055 
+00171 [L247] TGETS    A=8 B=8 C=7 D=2055 'value'
+00172 [L247] TSETS    A=8 B=2 C=24 D=536 'gongji_plus'
+00173 [L247] JMP      A=8 B=128 C=114 D=32882 target=288
+00174 [L249] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00175 [L249] TGETV    A=8 B=8 C=7 D=2055 
+00176 [L249] TGETS    A=8 B=8 C=4 D=2052 'type'
+00177 [L249] GGET     A=9 B=0 C=5 D=5 'c_p'
+00178 [L249] TGETS    A=9 B=9 C=25 D=2329 'culture_wulifangyu_plus'
+00179 [L249] ISNEV    A=8 B=0 C=9 D=9 
+00180 [L249] JMP      A=8 B=128 C=5 D=32773 target=186
+00181 [L250] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00182 [L250] TGETV    A=8 B=8 C=7 D=2055 
+00183 [L250] TGETS    A=8 B=8 C=7 D=2055 'value'
+00184 [L250] TSETS    A=8 B=2 C=26 D=538 'fangyu_plus'
+00185 [L250] JMP      A=8 B=128 C=102 D=32870 target=288
+00186 [L252] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00187 [L252] TGETV    A=8 B=8 C=7 D=2055 
+00188 [L252] TGETS    A=8 B=8 C=4 D=2052 'type'
+00189 [L252] GGET     A=9 B=0 C=5 D=5 'c_p'
+00190 [L252] TGETS    A=9 B=9 C=27 D=2331 'culture_max_magic_plus'
+00191 [L252] ISNEV    A=8 B=0 C=9 D=9 
+00192 [L252] JMP      A=8 B=128 C=5 D=32773 target=198
+00193 [L253] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00194 [L253] TGETV    A=8 B=8 C=7 D=2055 
+00195 [L253] TGETS    A=8 B=8 C=7 D=2055 'value'
+00196 [L253] TSETS    A=8 B=2 C=28 D=540 'magic_plus'
+00197 [L253] JMP      A=8 B=128 C=90 D=32858 target=288
+00198 [L255] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00199 [L255] TGETV    A=8 B=8 C=7 D=2055 
+00200 [L255] TGETS    A=8 B=8 C=4 D=2052 'type'
+00201 [L255] GGET     A=9 B=0 C=5 D=5 'c_p'
+00202 [L255] TGETS    A=9 B=9 C=29 D=2333 'train_change_value'
+00203 [L255] ISNEV    A=8 B=0 C=9 D=9 
+00204 [L255] JMP      A=8 B=128 C=5 D=32773 target=210
+00205 [L256] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00206 [L256] TGETV    A=8 B=8 C=7 D=2055 
+00207 [L256] TGETS    A=8 B=8 C=7 D=2055 'value'
+00208 [L256] TSETS    A=8 B=2 C=29 D=541 'train_change_value'
+00209 [L256] JMP      A=8 B=128 C=78 D=32846 target=288
+00210 [L258] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00211 [L258] TGETV    A=8 B=8 C=7 D=2055 
+00212 [L258] TGETS    A=8 B=8 C=4 D=2052 'type'
+00213 [L258] GGET     A=9 B=0 C=5 D=5 'c_p'
+00214 [L258] TGETS    A=9 B=9 C=30 D=2334 'train_increase_field'
+00215 [L258] ISNEV    A=8 B=0 C=9 D=9 
+00216 [L258] JMP      A=8 B=128 C=5 D=32773 target=222
+00217 [L259] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00218 [L259] TGETV    A=8 B=8 C=7 D=2055 
+00219 [L259] TGETS    A=8 B=8 C=7 D=2055 'value'
+00220 [L259] TSETS    A=8 B=2 C=30 D=542 'train_increase_field'
+00221 [L259] JMP      A=8 B=128 C=66 D=32834 target=288
+00222 [L261] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00223 [L261] TGETV    A=8 B=8 C=7 D=2055 
+00224 [L261] TGETS    A=8 B=8 C=4 D=2052 'type'
+00225 [L261] GGET     A=9 B=0 C=5 D=5 'c_p'
+00226 [L261] TGETS    A=9 B=9 C=31 D=2335 'train_decrease_field'
+00227 [L261] ISNEV    A=8 B=0 C=9 D=9 
+00228 [L261] JMP      A=8 B=128 C=5 D=32773 target=234
+00229 [L262] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00230 [L262] TGETV    A=8 B=8 C=7 D=2055 
+00231 [L262] TGETS    A=8 B=8 C=7 D=2055 'value'
+00232 [L262] TSETS    A=8 B=2 C=31 D=543 'train_decrease_field'
+00233 [L262] JMP      A=8 B=128 C=54 D=32822 target=288
+00234 [L264] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00235 [L264] TGETV    A=8 B=8 C=7 D=2055 
+00236 [L264] TGETS    A=8 B=8 C=4 D=2052 'type'
+00237 [L264] GGET     A=9 B=0 C=5 D=5 'c_p'
+00238 [L264] TGETS    A=9 B=9 C=32 D=2336 'evolve_level'
+00239 [L264] ISNEV    A=8 B=0 C=9 D=9 
+00240 [L264] JMP      A=8 B=128 C=5 D=32773 target=246
+00241 [L265] TGETS    A=8 B=0 C=3 D=3 'attr_list'
+00242 [L265] TGETV    A=8 B=8 C=7 D=2055 
+00243 [L265] TGETS    A=8 B=8 C=7 D=2055 'value'
+00244 [L265] TSETS    A=8 B=2 C=32 D=544 'evolve_level'
+00245 [L265] JMP      A=8 B=128 C=42 D=32810 target=288
+00246 [L267] KPRI     A=8 B=0 C=1 D=1 
+00247 [L268] UGET     A=9 B=0 C=0 D=0 pairs
+00248 [L268] GGET     A=10 B=0 C=5 D=5 'c_p'
+00249 [L268] CALL     A=9 B=4 C=2 D=1026 
+00250 [L268] ISNEXT   A=12 B=128 C=26 D=32794 target=277
+00251 [L269] TGETS    A=14 B=0 C=3 D=3 'attr_list'
+00252 [L269] TGETV    A=14 B=14 C=7 D=3591 
+00253 [L269] TGETS    A=14 B=14 C=4 D=3588 'type'
+00254 [L269] ISNEV    A=13 B=0 C=14 D=14 
+00255 [L269] JMP      A=14 B=128 C=21 D=32789 target=277
+00256 [L270] KPRI     A=8 B=0 C=2 D=2 
+00257 [L271] UGET     A=14 B=0 C=1 D=1 cclog
+00258 [L271] KSTR     A=15 B=0 C=33 D=33 'update item property, property_name='
+00259 [L271] MOV      A=16 B=0 C=12 D=12 
+00260 [L271] CAT      A=15 B=15 C=16 D=3856 
+00261 [L271] CALL     A=14 B=1 C=2 D=258 
+00262 [L272] TGETV    A=14 B=2 C=12 D=524 
+00263 [L272] ISF      A=0 B=0 C=14 D=14 
+00264 [L272] JMP      A=15 B=128 C=5 D=32773 target=270
+00265 [L273] TGETS    A=14 B=0 C=3 D=3 'attr_list'
+00266 [L273] TGETV    A=14 B=14 C=7 D=3591 
+00267 [L273] TGETS    A=14 B=14 C=7 D=3591 'value'
+00268 [L273] TSETV    A=14 B=2 C=12 D=524 
+00269 [L273] JMP      A=14 B=128 C=9 D=32777 target=279
+00270 [L275] UGET     A=14 B=0 C=1 D=1 cclog
+00271 [L275] KSTR     A=15 B=0 C=34 D=34 'ERROR: 1032 can not find cortege_property=['
+00272 [L275] MOV      A=16 B=0 C=12 D=12 
+00273 [L275] KSTR     A=17 B=0 C=35 D=35 '] in cortege.'
+00274 [L275] CAT      A=15 B=15 C=17 D=3857 
+00275 [L275] CALL     A=14 B=1 C=2 D=258 
+00276 [L277] JMP      A=9 B=128 C=2 D=32770 target=279
+00277 [L268] ITERN    A=12 B=3 C=3 D=771 
+00278 [L268] ITERL    A=12 B=127 C=228 D=32740 target=251
+00279 [L281] IST      A=0 B=0 C=8 D=8 
+00280 [L281] JMP      A=9 B=128 C=7 D=32775 target=288
+00281 [L282] UGET     A=9 B=0 C=1 D=1 cclog
+00282 [L282] KSTR     A=10 B=0 C=36 D=36 'ERROR: 1032 unhandle cortege_property='
+00283 [L282] TGETS    A=11 B=0 C=3 D=3 'attr_list'
+00284 [L282] TGETV    A=11 B=11 C=7 D=2823 
+00285 [L282] TGETS    A=11 B=11 C=4 D=2820 'type'
+00286 [L282] CAT      A=10 B=10 C=11 D=2571 
+00287 [L282] CALL     A=9 B=1 C=2 D=258 
+00288 [L209] FORL     A=4 B=126 C=250 D=32506 target=27
+00289 [L288] ISF      A=0 B=0 C=3 D=3 
+00290 [L288] JMP      A=4 B=128 C=2 D=32770 target=293
+00291 [L289] GGET     A=4 B=0 C=37 D=37 'sortcharacterInfo'
+00292 [L289] CALL     A=4 B=1 C=1 D=257 
+00293 [L291] RET0     A=0 B=0 C=1 D=1 
+
+ui/lineupUI.updateSkillInfo NUMERIC CONSTANTS: []
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\f8e562f5e1c1de4716d573dd13289bcd.data'; root=proto16
+
+FUNCTION proto16 offset=0x2bb9 source_lines=725-773 params=1
+UPVALUES []
+00001 [L726] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00002 [L726] TGETS    A=1 B=1 C=1 D=257 'd_packageUI'
+00003 [L726] TGETS    A=1 B=1 C=2 D=258 'g_packageItemsInfo'
+00004 [L726] ISNEP    A=1 B=0 C=0 D=0 
+00005 [L726] JMP      A=1 B=128 C=1 D=32769 target=7
+00006 [L727] RET0     A=0 B=0 C=1 D=1 
+00007 [L730] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00008 [L730] TGETS    A=1 B=1 C=1 D=257 'd_packageUI'
+00009 [L730] TGETS    A=1 B=1 C=2 D=258 'g_packageItemsInfo'
+00010 [L731] KPRI     A=2 B=0 C=0 D=0 
+00011 [L732] KSHORT   A=3 B=0 C=1 D=1 1
+00012 [L732] LEN      A=4 B=0 C=1 D=1 
+00013 [L732] KSHORT   A=5 B=0 C=1 D=1 1
+00014 [L732] FORI     A=3 B=128 C=14 D=32782 target=29
+00015 [L733] TGETS    A=7 B=0 C=3 D=3 'id'
+00016 [L733] TGETV    A=8 B=1 C=6 D=262 
+00017 [L733] TGETS    A=8 B=8 C=3 D=2051 'id'
+00018 [L733] ISNEV    A=7 B=0 C=8 D=8 
+00019 [L733] JMP      A=7 B=128 C=8 D=32776 target=28
+00020 [L733] TGETV    A=7 B=1 C=6 D=262 
+00021 [L733] TGETS    A=7 B=7 C=4 D=1796 'attach_type'
+00022 [L733] GGET     A=8 B=0 C=5 D=5 'o_t'
+00023 [L733] TGETS    A=8 B=8 C=6 D=2054 'skill'
+00024 [L733] ISNEV    A=7 B=0 C=8 D=8 
+00025 [L733] JMP      A=7 B=128 C=2 D=32770 target=28
+00026 [L734] TGETV    A=2 B=1 C=6 D=262 
+00027 [L735] JMP      A=3 B=128 C=1 D=32769 target=29
+00028 [L732] FORL     A=3 B=127 C=242 D=32754 target=15
+00029 [L739] ISEQP    A=2 B=0 C=0 D=0 
+00030 [L739] JMP      A=3 B=128 C=141 D=32909 target=172
+00031 [L740] KSHORT   A=3 B=0 C=1 D=1 1
+00032 [L740] TGETS    A=4 B=0 C=7 D=7 'attr_count'
+00033 [L740] KSHORT   A=5 B=0 C=1 D=1 1
+00034 [L740] FORI     A=3 B=128 C=120 D=32888 target=155
+00035 [L741] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00036 [L741] TGETV    A=7 B=7 C=6 D=1798 
+00037 [L741] TGETS    A=7 B=7 C=9 D=1801 'type'
+00038 [L741] GGET     A=8 B=0 C=10 D=10 's_p'
+00039 [L741] TGETS    A=8 B=8 C=11 D=2059 'level'
+00040 [L741] ISNEV    A=7 B=0 C=8 D=8 
+00041 [L741] JMP      A=7 B=128 C=5 D=32773 target=47
+00042 [L742] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00043 [L742] TGETV    A=7 B=7 C=6 D=1798 
+00044 [L742] TGETS    A=7 B=7 C=12 D=1804 'value'
+00045 [L742] TSETS    A=7 B=2 C=11 D=523 'level'
+00046 [L742] JMP      A=7 B=128 C=107 D=32875 target=154
+00047 [L743] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00048 [L743] TGETV    A=7 B=7 C=6 D=1798 
+00049 [L743] TGETS    A=7 B=7 C=9 D=1801 'type'
+00050 [L743] GGET     A=8 B=0 C=10 D=10 's_p'
+00051 [L743] TGETS    A=8 B=8 C=13 D=2061 'equip_pos'
+00052 [L743] ISNEV    A=7 B=0 C=8 D=8 
+00053 [L743] JMP      A=7 B=128 C=5 D=32773 target=59
+00054 [L744] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00055 [L744] TGETV    A=7 B=7 C=6 D=1798 
+00056 [L744] TGETS    A=7 B=7 C=12 D=1804 'value'
+00057 [L744] TSETS    A=7 B=2 C=13 D=525 'equip_pos'
+00058 [L744] JMP      A=7 B=128 C=95 D=32863 target=154
+00059 [L745] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00060 [L745] TGETV    A=7 B=7 C=6 D=1798 
+00061 [L745] TGETS    A=7 B=7 C=9 D=1801 'type'
+00062 [L745] GGET     A=8 B=0 C=10 D=10 's_p'
+00063 [L745] TGETS    A=8 B=8 C=14 D=2062 'order'
+00064 [L745] ISNEV    A=7 B=0 C=8 D=8 
+00065 [L745] JMP      A=7 B=128 C=5 D=32773 target=71
+00066 [L746] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00067 [L746] TGETV    A=7 B=7 C=6 D=1798 
+00068 [L746] TGETS    A=7 B=7 C=12 D=1804 'value'
+00069 [L746] TSETS    A=7 B=2 C=15 D=527 'equip_order'
+00070 [L746] JMP      A=7 B=128 C=83 D=32851 target=154
+00071 [L747] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00072 [L747] TGETV    A=7 B=7 C=6 D=1798 
+00073 [L747] TGETS    A=7 B=7 C=9 D=1801 'type'
+00074 [L747] GGET     A=8 B=0 C=10 D=10 's_p'
+00075 [L747] TGETS    A=8 B=8 C=16 D=2064 'gongji_plus'
+00076 [L747] ISNEV    A=7 B=0 C=8 D=8 
+00077 [L747] JMP      A=7 B=128 C=5 D=32773 target=83
+00078 [L748] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00079 [L748] TGETV    A=7 B=7 C=6 D=1798 
+00080 [L748] TGETS    A=7 B=7 C=12 D=1804 'value'
+00081 [L748] TSETS    A=7 B=2 C=17 D=529 'effect_value'
+00082 [L748] JMP      A=7 B=128 C=71 D=32839 target=154
+00083 [L749] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00084 [L749] TGETV    A=7 B=7 C=6 D=1798 
+00085 [L749] TGETS    A=7 B=7 C=9 D=1801 'type'
+00086 [L749] GGET     A=8 B=0 C=10 D=10 's_p'
+00087 [L749] TGETS    A=8 B=8 C=18 D=2066 'fangyu_plus'
+00088 [L749] ISNEV    A=7 B=0 C=8 D=8 
+00089 [L749] JMP      A=7 B=128 C=5 D=32773 target=95
+00090 [L750] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00091 [L750] TGETV    A=7 B=7 C=6 D=1798 
+00092 [L750] TGETS    A=7 B=7 C=12 D=1804 'value'
+00093 [L750] TSETS    A=7 B=2 C=17 D=529 'effect_value'
+00094 [L750] JMP      A=7 B=128 C=59 D=32827 target=154
+00095 [L751] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00096 [L751] TGETV    A=7 B=7 C=6 D=1798 
+00097 [L751] TGETS    A=7 B=7 C=9 D=1801 'type'
+00098 [L751] GGET     A=8 B=0 C=10 D=10 's_p'
+00099 [L751] TGETS    A=8 B=8 C=19 D=2067 'magic_plus'
+00100 [L751] ISNEV    A=7 B=0 C=8 D=8 
+00101 [L751] JMP      A=7 B=128 C=5 D=32773 target=107
+00102 [L752] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00103 [L752] TGETV    A=7 B=7 C=6 D=1798 
+00104 [L752] TGETS    A=7 B=7 C=12 D=1804 'value'
+00105 [L752] TSETS    A=7 B=2 C=17 D=529 'effect_value'
+00106 [L752] JMP      A=7 B=128 C=47 D=32815 target=154
+00107 [L753] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00108 [L753] TGETV    A=7 B=7 C=6 D=1798 
+00109 [L753] TGETS    A=7 B=7 C=9 D=1801 'type'
+00110 [L753] GGET     A=8 B=0 C=10 D=10 's_p'
+00111 [L753] TGETS    A=8 B=8 C=20 D=2068 'prob_compen'
+00112 [L753] ISNEV    A=7 B=0 C=8 D=8 
+00113 [L753] JMP      A=7 B=128 C=5 D=32773 target=119
+00114 [L754] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00115 [L754] TGETV    A=7 B=7 C=6 D=1798 
+00116 [L754] TGETS    A=7 B=7 C=12 D=1804 'value'
+00117 [L754] TSETS    A=7 B=2 C=21 D=533 'count'
+00118 [L754] JMP      A=7 B=128 C=35 D=32803 target=154
+00119 [L755] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00120 [L755] TGETV    A=7 B=7 C=6 D=1798 
+00121 [L755] TGETS    A=7 B=7 C=9 D=1801 'type'
+00122 [L755] GGET     A=8 B=0 C=10 D=10 's_p'
+00123 [L755] TGETS    A=8 B=8 C=22 D=2070 'upgrade_level'
+00124 [L755] ISNEV    A=7 B=0 C=8 D=8 
+00125 [L755] JMP      A=7 B=128 C=5 D=32773 target=131
+00126 [L756] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00127 [L756] TGETV    A=7 B=7 C=6 D=1798 
+00128 [L756] TGETS    A=7 B=7 C=12 D=1804 'value'
+00129 [L756] TSETS    A=7 B=2 C=22 D=534 'upgrade_level'
+00130 [L756] JMP      A=7 B=128 C=23 D=32791 target=154
+00131 [L757] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00132 [L757] TGETV    A=7 B=7 C=6 D=1798 
+00133 [L757] TGETS    A=7 B=7 C=9 D=1801 'type'
+00134 [L757] GGET     A=8 B=0 C=10 D=10 's_p'
+00135 [L757] TGETS    A=8 B=8 C=23 D=2071 'awaken'
+00136 [L757] ISNEV    A=7 B=0 C=8 D=8 
+00137 [L757] JMP      A=7 B=128 C=5 D=32773 target=143
+00138 [L758] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00139 [L758] TGETV    A=7 B=7 C=6 D=1798 
+00140 [L758] TGETS    A=7 B=7 C=12 D=1804 'value'
+00141 [L758] TSETS    A=7 B=2 C=23 D=535 'awaken'
+00142 [L758] JMP      A=7 B=128 C=11 D=32779 target=154
+00143 [L759] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00144 [L759] TGETV    A=7 B=7 C=6 D=1798 
+00145 [L759] TGETS    A=7 B=7 C=9 D=1801 'type'
+00146 [L759] GGET     A=8 B=0 C=10 D=10 's_p'
+00147 [L759] TGETS    A=8 B=8 C=24 D=2072 'intensity'
+00148 [L759] ISNEV    A=7 B=0 C=8 D=8 
+00149 [L759] JMP      A=7 B=128 C=4 D=32772 target=154
+00150 [L760] TGETS    A=7 B=0 C=8 D=8 'attr_list'
+00151 [L760] TGETV    A=7 B=7 C=6 D=1798 
+00152 [L760] TGETS    A=7 B=7 C=12 D=1804 'value'
+00153 [L760] TSETS    A=7 B=2 C=17 D=529 'effect_value'
+00154 [L740] FORL     A=3 B=127 C=136 D=32648 target=35
+00155 [L764] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00156 [L764] TGETS    A=3 B=3 C=1 D=769 'd_packageUI'
+00157 [L764] TGETS    A=3 B=3 C=25 D=793 'g_reorgItemsInfo'
+00158 [L764] GGET     A=4 B=0 C=5 D=5 'o_t'
+00159 [L764] TGETS    A=4 B=4 C=6 D=1030 'skill'
+00160 [L764] TGETV    A=3 B=3 C=4 D=772 
+00161 [L765] KSHORT   A=4 B=0 C=1 D=1 1
+00162 [L765] LEN      A=5 B=0 C=3 D=3 
+00163 [L765] KSHORT   A=6 B=0 C=1 D=1 1
+00164 [L765] FORI     A=4 B=128 C=7 D=32775 target=172
+00165 [L766] TGETV    A=8 B=3 C=7 D=775 
+00166 [L766] TGETS    A=8 B=8 C=3 D=2051 'id'
+00167 [L766] TGETS    A=9 B=2 C=3 D=515 'id'
+00168 [L766] ISNEV    A=8 B=0 C=9 D=9 
+00169 [L766] JMP      A=8 B=128 C=1 D=32769 target=171
+00170 [L767] TSETV    A=2 B=3 C=7 D=775 
+00171 [L765] FORL     A=4 B=127 C=249 D=32761 target=165
+00172 [L772] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00173 [L772] TGETS    A=3 B=3 C=1 D=769 'd_packageUI'
+00174 [L772] KPRI     A=4 B=0 C=1 D=1 
+00175 [L772] TSETS    A=4 B=3 C=26 D=794 'g_isPackageSorted'
+00176 [L773] RET0     A=0 B=0 C=1 D=1 
+
+ui/trainingUI.onGetDirectResult NUMERIC CONSTANTS: []
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\b72bed60e946772677eba6fb36abf5e5.data'; root=proto15
+
+FUNCTION proto15 offset=0x59fc source_lines=756-769 params=0
+UPVALUES ['math', 'tostring']
+00001 [L758] UGET     A=0 B=0 C=0 D=0 math
+00002 [L758] TGETS    A=0 B=0 C=0 D=0 'floor'
+00003 [L758] GGET     A=1 B=0 C=1 D=1 'g_characterInfo'
+00004 [L758] TGETS    A=1 B=1 C=2 D=258 'culture_point'
+00005 [L758] CALL     A=0 B=2 C=2 D=514 
+00006 [L759] GGET     A=1 B=0 C=3 D=3 'g_leftPotentialNumLabel'
+00007 [L759] MOV      A=2 B=0 C=1 D=1 
+00008 [L759] TGETS    A=1 B=1 C=4 D=260 'setString'
+00009 [L759] UGET     A=3 B=0 C=1 D=1 tostring
+00010 [L759] MOV      A=4 B=0 C=0 D=0 
+00011 [L759] CALL     A=3 B=0 C=2 D=2 
+00012 [L759] CALLM    A=1 B=1 C=1 D=257 
+00013 [L760] GGET     A=1 B=0 C=5 D=5 'updateCharacterInfo'
+00014 [L760] CALL     A=1 B=1 C=1 D=257 
+00015 [L761] TDUP     A=1 B=0 C=7 D=7 {'kind': 'table', 'value': {}}
+00016 [L761] GGET     A=2 B=0 C=1 D=1 'g_characterInfo'
+00017 [L761] TGETS    A=2 B=2 C=6 D=518 'hp'
+00018 [L761] TSETS    A=2 B=1 C=8 D=264 'health'
+00019 [L761] GGET     A=2 B=0 C=1 D=1 'g_characterInfo'
+00020 [L761] TGETS    A=2 B=2 C=9 D=521 'gongji'
+00021 [L761] TSETS    A=2 B=1 C=10 D=266 'damage'
+00022 [L762] GGET     A=2 B=0 C=1 D=1 'g_characterInfo'
+00023 [L762] TGETS    A=2 B=2 C=11 D=523 'fangyu'
+00024 [L762] TSETS    A=2 B=1 C=12 D=268 'defence'
+00025 [L762] GGET     A=2 B=0 C=1 D=1 'g_characterInfo'
+00026 [L762] TGETS    A=2 B=2 C=13 D=525 'magic'
+00027 [L762] TSETS    A=2 B=1 C=14 D=270 'mana'
+00028 [L763] GGET     A=2 B=0 C=15 D=15 'g_statsLabel'
+00029 [L763] TGETB    A=2 B=2 C=1 D=513 
+00030 [L763] MOV      A=3 B=0 C=2 D=2 
+00031 [L763] TGETS    A=2 B=2 C=4 D=516 'setString'
+00032 [L763] UGET     A=4 B=0 C=1 D=1 tostring
+00033 [L763] GGET     A=5 B=0 C=1 D=1 'g_characterInfo'
+00034 [L763] TGETS    A=5 B=5 C=6 D=1286 'hp'
+00035 [L763] CALL     A=4 B=0 C=2 D=2 
+00036 [L763] CALLM    A=2 B=1 C=1 D=257 
+00037 [L764] GGET     A=2 B=0 C=15 D=15 'g_statsLabel'
+00038 [L764] TGETB    A=2 B=2 C=2 D=514 
+00039 [L764] MOV      A=3 B=0 C=2 D=2 
+00040 [L764] TGETS    A=2 B=2 C=4 D=516 'setString'
+00041 [L764] UGET     A=4 B=0 C=1 D=1 tostring
+00042 [L764] GGET     A=5 B=0 C=1 D=1 'g_characterInfo'
+00043 [L764] TGETS    A=5 B=5 C=9 D=1289 'gongji'
+00044 [L764] CALL     A=4 B=0 C=2 D=2 
+00045 [L764] CALLM    A=2 B=1 C=1 D=257 
+00046 [L765] GGET     A=2 B=0 C=15 D=15 'g_statsLabel'
+00047 [L765] TGETB    A=2 B=2 C=3 D=515 
+00048 [L765] MOV      A=3 B=0 C=2 D=2 
+00049 [L765] TGETS    A=2 B=2 C=4 D=516 'setString'
+00050 [L765] UGET     A=4 B=0 C=1 D=1 tostring
+00051 [L765] GGET     A=5 B=0 C=1 D=1 'g_characterInfo'
+00052 [L765] TGETS    A=5 B=5 C=11 D=1291 'fangyu'
+00053 [L765] CALL     A=4 B=0 C=2 D=2 
+00054 [L765] CALLM    A=2 B=1 C=1 D=257 
+00055 [L766] GGET     A=2 B=0 C=15 D=15 'g_statsLabel'
+00056 [L766] TGETB    A=2 B=2 C=4 D=516 
+00057 [L766] MOV      A=3 B=0 C=2 D=2 
+00058 [L766] TGETS    A=2 B=2 C=4 D=516 'setString'
+00059 [L766] UGET     A=4 B=0 C=1 D=1 tostring
+00060 [L766] GGET     A=5 B=0 C=1 D=1 'g_characterInfo'
+00061 [L766] TGETS    A=5 B=5 C=13 D=1293 'magic'
+00062 [L766] CALL     A=4 B=0 C=2 D=2 
+00063 [L766] CALLM    A=2 B=1 C=1 D=257 
+00064 [L767] GGET     A=2 B=0 C=16 D=16 'd_ms'
+00065 [L767] TGETS    A=2 B=2 C=17 D=529 'd_info'
+00066 [L767] TGETS    A=2 B=2 C=18 D=530 'show'
+00067 [L767] GGET     A=3 B=0 C=16 D=16 'd_ms'
+00068 [L767] TGETS    A=3 B=3 C=19 D=787 'd_hz'
+00069 [L767] TGETS    A=3 B=3 C=20 D=788 'gethz'
+00070 [L767] KSTR     A=4 B=0 C=21 D=21 'confirmTraining'
+00071 [L767] CALL     A=3 B=0 C=2 D=2 
+00072 [L767] CALLM    A=2 B=1 C=0 D=256 
+00073 [L768] GGET     A=2 B=0 C=22 D=22 'createStartTrainingInfo'
+00074 [L768] GGET     A=3 B=0 C=23 D=23 'g_trainingLayer'
+00075 [L768] GGET     A=4 B=0 C=24 D=24 'g_boardSize'
+00076 [L768] CALL     A=2 B=1 C=3 D=259 
+00077 [L769] RET0     A=0 B=0 C=1 D=1 
+
+ui/trainingUI.confirmResult NUMERIC CONSTANTS: []
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\b72bed60e946772677eba6fb36abf5e5.data'; root=proto24
+
+FUNCTION proto24 offset=0x8032 source_lines=1076-1088 params=1
+UPVALUES ['tostring']
+00001 [L1077] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00002 [L1077] TGETS    A=1 B=1 C=1 D=257 'd_info'
+00003 [L1077] TGETS    A=1 B=1 C=2 D=258 'show'
+00004 [L1077] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00005 [L1077] TGETS    A=2 B=2 C=3 D=515 'd_hz'
+00006 [L1077] TGETS    A=2 B=2 C=4 D=516 'gethz'
+00007 [L1077] KSTR     A=3 B=0 C=5 D=5 'confirmTraining'
+00008 [L1077] CALL     A=2 B=0 C=2 D=2 
+00009 [L1077] CALLM    A=1 B=1 C=0 D=256 
+00010 [L1078] GGET     A=1 B=0 C=6 D=6 'createStartTrainingInfo'
+00011 [L1078] GGET     A=2 B=0 C=7 D=7 'g_trainingLayer'
+00012 [L1078] GGET     A=3 B=0 C=8 D=8 'g_boardSize'
+00013 [L1078] CALL     A=1 B=1 C=3 D=259 
+00014 [L1080] GGET     A=1 B=0 C=9 D=9 'updateCharacterInfo'
+00015 [L1080] CALL     A=1 B=1 C=1 D=257 
+00016 [L1081] TDUP     A=1 B=0 C=12 D=12 {'kind': 'table', 'value': {}}
+00017 [L1081] GGET     A=2 B=0 C=10 D=10 'g_characterInfo'
+00018 [L1081] TGETS    A=2 B=2 C=11 D=523 'hp'
+00019 [L1081] TSETS    A=2 B=1 C=13 D=269 'health'
+00020 [L1081] GGET     A=2 B=0 C=10 D=10 'g_characterInfo'
+00021 [L1081] TGETS    A=2 B=2 C=14 D=526 'gongji'
+00022 [L1081] TSETS    A=2 B=1 C=15 D=271 'damage'
+00023 [L1082] GGET     A=2 B=0 C=10 D=10 'g_characterInfo'
+00024 [L1082] TGETS    A=2 B=2 C=16 D=528 'fangyu'
+00025 [L1082] TSETS    A=2 B=1 C=17 D=273 'defence'
+00026 [L1082] GGET     A=2 B=0 C=10 D=10 'g_characterInfo'
+00027 [L1082] TGETS    A=2 B=2 C=18 D=530 'magic'
+00028 [L1082] TSETS    A=2 B=1 C=19 D=275 'mana'
+00029 [L1083] GGET     A=2 B=0 C=20 D=20 'g_statsLabel'
+00030 [L1083] TGETB    A=2 B=2 C=1 D=513 
+00031 [L1083] MOV      A=3 B=0 C=2 D=2 
+00032 [L1083] TGETS    A=2 B=2 C=21 D=533 'setString'
+00033 [L1083] UGET     A=4 B=0 C=0 D=0 tostring
+00034 [L1083] GGET     A=5 B=0 C=10 D=10 'g_characterInfo'
+00035 [L1083] TGETS    A=5 B=5 C=11 D=1291 'hp'
+00036 [L1083] CALL     A=4 B=0 C=2 D=2 
+00037 [L1083] CALLM    A=2 B=1 C=1 D=257 
+00038 [L1084] GGET     A=2 B=0 C=20 D=20 'g_statsLabel'
+00039 [L1084] TGETB    A=2 B=2 C=2 D=514 
+00040 [L1084] MOV      A=3 B=0 C=2 D=2 
+00041 [L1084] TGETS    A=2 B=2 C=21 D=533 'setString'
+00042 [L1084] UGET     A=4 B=0 C=0 D=0 tostring
+00043 [L1084] GGET     A=5 B=0 C=10 D=10 'g_characterInfo'
+00044 [L1084] TGETS    A=5 B=5 C=14 D=1294 'gongji'
+00045 [L1084] CALL     A=4 B=0 C=2 D=2 
+00046 [L1084] CALLM    A=2 B=1 C=1 D=257 
+00047 [L1085] GGET     A=2 B=0 C=20 D=20 'g_statsLabel'
+00048 [L1085] TGETB    A=2 B=2 C=3 D=515 
+00049 [L1085] MOV      A=3 B=0 C=2 D=2 
+00050 [L1085] TGETS    A=2 B=2 C=21 D=533 'setString'
+00051 [L1085] UGET     A=4 B=0 C=0 D=0 tostring
+00052 [L1085] GGET     A=5 B=0 C=10 D=10 'g_characterInfo'
+00053 [L1085] TGETS    A=5 B=5 C=16 D=1296 'fangyu'
+00054 [L1085] CALL     A=4 B=0 C=2 D=2 
+00055 [L1085] CALLM    A=2 B=1 C=1 D=257 
+00056 [L1086] GGET     A=2 B=0 C=20 D=20 'g_statsLabel'
+00057 [L1086] TGETB    A=2 B=2 C=4 D=516 
+00058 [L1086] MOV      A=3 B=0 C=2 D=2 
+00059 [L1086] TGETS    A=2 B=2 C=21 D=533 'setString'
+00060 [L1086] UGET     A=4 B=0 C=0 D=0 tostring
+00061 [L1086] GGET     A=5 B=0 C=10 D=10 'g_characterInfo'
+00062 [L1086] TGETS    A=5 B=5 C=18 D=1298 'magic'
+00063 [L1086] CALL     A=4 B=0 C=2 D=2 
+00064 [L1086] CALLM    A=2 B=1 C=1 D=257 
+00065 [L1088] RET0     A=0 B=0 C=1 D=1 
+
+ui/trainingUI.updateCharacterInfo NUMERIC CONSTANTS: []
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\b72bed60e946772677eba6fb36abf5e5.data'; root=proto26
+
+FUNCTION proto26 offset=0x84b4 source_lines=1105-1113 params=0
+UPVALUES []
+00001 [L1106] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L1106] TGETS    A=0 B=0 C=1 D=1 'd_lineupUI'
+00003 [L1106] TGETS    A=0 B=0 C=2 D=2 'g_characterInfo'
+00004 [L1107] KSHORT   A=1 B=0 C=1 D=1 1
+00005 [L1107] LEN      A=2 B=0 C=0 D=0 
+00006 [L1107] KSHORT   A=3 B=0 C=1 D=1 1
+00007 [L1107] FORI     A=1 B=128 C=10 D=32778 target=18
+00008 [L1108] TGETV    A=5 B=0 C=4 D=4 
+00009 [L1108] TGETS    A=5 B=5 C=3 D=1283 'id'
+00010 [L1108] GGET     A=6 B=0 C=2 D=2 'g_characterInfo'
+00011 [L1108] TGETS    A=6 B=6 C=3 D=1539 'id'
+00012 [L1108] ISNEV    A=5 B=0 C=6 D=6 
+00013 [L1108] JMP      A=5 B=128 C=3 D=32771 target=17
+00014 [L1109] TGETV    A=5 B=0 C=4 D=4 
+00015 [L1109] GSET     A=5 B=0 C=2 D=2 'g_characterInfo'
+00016 [L1110] RET0     A=0 B=0 C=1 D=1 
+00017 [L1107] FORL     A=1 B=127 C=246 D=32758 target=8
+00018 [L1113] RET0     A=0 B=0 C=1 D=1 
+
+ui/inheritUI.makeCharacterTableWithTag NUMERIC CONSTANTS: [2, 1, 0]
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\db9445b29a10be74a68c5a02feaa0f70.data'; root=proto21
+
+FUNCTION proto21 offset=0x1cac source_lines=401-431 params=2
+UPVALUES []
+00001 [L402] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00002 [L402] TGETS    A=2 B=2 C=1 D=513 'd_lineupUI'
+00003 [L402] TGETS    A=2 B=2 C=2 D=514 'g_characterInfo'
+00004 [L403] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00005 [L403] TGETS    A=3 B=3 C=3 D=771 'd_mainUI'
+00006 [L403] TGETS    A=3 B=3 C=4 D=772 'g_playerInfo'
+00007 [L403] TGETS    A=3 B=3 C=5 D=773 'level'
+00008 [L403] MULVN    A=3 B=3 C=0 D=768 
+00009 [L405] TGETV    A=4 B=2 C=0 D=512 
+00010 [L405] TGETS    A=4 B=4 C=6 D=1030 'id'
+00011 [L405] GGET     A=5 B=0 C=7 D=7 'g_inheritUI'
+00012 [L405] TGETS    A=5 B=5 C=8 D=1288 'right_id'
+00013 [L405] ISEQV    A=4 B=0 C=5 D=5 
+00014 [L405] JMP      A=4 B=128 C=6 D=32774 target=21
+00015 [L405] TGETV    A=4 B=2 C=0 D=512 
+00016 [L405] TGETS    A=4 B=4 C=6 D=1030 'id'
+00017 [L405] GGET     A=5 B=0 C=7 D=7 'g_inheritUI'
+00018 [L405] TGETS    A=5 B=5 C=9 D=1289 'left_id'
+00019 [L405] ISNEV    A=4 B=0 C=5 D=5 
+00020 [L405] JMP      A=4 B=128 C=2 D=32770 target=23
+00021 [L406] KPRI     A=4 B=0 C=0 D=0 
+00022 [L406] RET1     A=4 B=0 C=2 D=2 
+00023 [L409] ISNEN    A=1 B=0 C=1 D=1 1
+00024 [L409] JMP      A=4 B=128 C=10 D=32778 target=35
+00025 [L410] TGETV    A=4 B=2 C=0 D=512 
+00026 [L410] TGETS    A=4 B=4 C=5 D=1029 'level'
+00027 [L410] ISNEN    A=4 B=0 C=1 D=1 1
+00028 [L410] JMP      A=4 B=128 C=6 D=32774 target=35
+00029 [L410] TGETV    A=4 B=2 C=0 D=512 
+00030 [L410] TGETS    A=4 B=4 C=10 D=1034 'cur_exp'
+00031 [L410] ISNEN    A=4 B=0 C=2 D=2 0
+00032 [L410] JMP      A=4 B=128 C=2 D=32770 target=35
+00033 [L411] KPRI     A=4 B=0 C=0 D=0 
+00034 [L411] RET1     A=4 B=0 C=2 D=2 
+00035 [L415] ISNEN    A=1 B=0 C=0 D=0 2
+00036 [L415] JMP      A=4 B=128 C=12 D=32780 target=49
+00037 [L416] TGETV    A=4 B=2 C=0 D=512 
+00038 [L416] TGETS    A=4 B=4 C=6 D=1030 'id'
+00039 [L416] GGET     A=5 B=0 C=7 D=7 'g_inheritUI'
+00040 [L416] TGETS    A=5 B=5 C=9 D=1289 'left_id'
+00041 [L416] ISEQV    A=4 B=0 C=5 D=5 
+00042 [L416] JMP      A=4 B=128 C=4 D=32772 target=47
+00043 [L416] TGETV    A=4 B=2 C=0 D=512 
+00044 [L416] TGETS    A=4 B=4 C=5 D=1029 'level'
+00045 [L416] ISGT     A=3 B=0 C=4 D=4 
+00046 [L416] JMP      A=4 B=128 C=2 D=32770 target=49
+00047 [L417] KPRI     A=4 B=0 C=0 D=0 
+00048 [L417] RET1     A=4 B=0 C=2 D=2 
+00049 [L421] TNEW     A=4 B=0 C=0 D=0 
+00050 [L422] TGETV    A=5 B=2 C=0 D=512 
+00051 [L422] TGETS    A=5 B=5 C=11 D=1291 'type'
+00052 [L422] TSETS    A=5 B=4 C=11 D=1035 'type'
+00053 [L423] TGETV    A=5 B=2 C=0 D=512 
+00054 [L423] TGETS    A=5 B=5 C=6 D=1286 'id'
+00055 [L423] TSETS    A=5 B=4 C=6 D=1030 'id'
+00056 [L424] TGETV    A=5 B=2 C=0 D=512 
+00057 [L424] TGETS    A=5 B=5 C=13 D=1293 'reborn_layer'
+00058 [L424] KSHORT   A=6 B=0 C=0 D=0 0
+00059 [L424] ISLT     A=6 B=0 C=5 D=5 
+00060 [L424] JMP      A=5 B=128 C=2 D=32770 target=63
+00061 [L424] KPRI     A=5 B=0 C=1 D=1 
+00062 [L424] JMP      A=6 B=128 C=1 D=32769 target=64
+00063 [L424] KPRI     A=5 B=0 C=2 D=2 
+00064 [L424] TSETS    A=5 B=4 C=12 D=1036 'is_asc'
+00065 [L425] TGETV    A=5 B=2 C=0 D=512 
+00066 [L425] TGETS    A=5 B=5 C=5 D=1285 'level'
+00067 [L425] TSETS    A=5 B=4 C=14 D=1038 'lv'
+00068 [L426] TGETV    A=5 B=2 C=0 D=512 
+00069 [L426] TGETS    A=5 B=5 C=16 D=1296 'csvInfo'
+00070 [L426] TGETS    A=5 B=5 C=15 D=1295 'name'
+00071 [L426] TSETS    A=5 B=4 C=15 D=1039 'name'
+00072 [L427] TGETV    A=5 B=2 C=0 D=512 
+00073 [L427] TGETS    A=5 B=5 C=16 D=1296 'csvInfo'
+00074 [L427] TGETS    A=5 B=5 C=17 D=1297 'file'
+00075 [L427] TSETS    A=5 B=4 C=17 D=1041 'file'
+00076 [L428] TGETV    A=5 B=2 C=0 D=512 
+00077 [L428] TGETS    A=5 B=5 C=16 D=1296 'csvInfo'
+00078 [L428] TGETS    A=5 B=5 C=18 D=1298 'quality'
+00079 [L428] TSETS    A=5 B=4 C=18 D=1042 'quality'
+00080 [L429] TGETV    A=5 B=2 C=0 D=512 
+00081 [L429] TGETS    A=5 B=5 C=19 D=1299 'order'
+00082 [L429] TSETS    A=5 B=4 C=19 D=1043 'order'
+00083 [L430] RET1     A=4 B=0 C=2 D=2 
+
+ui/inheritUI.recvInheritMsg NUMERIC CONSTANTS: []
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\db9445b29a10be74a68c5a02feaa0f70.data'; root=proto51
+
+FUNCTION proto51 offset=0x7083 source_lines=1249-1255 params=1
+UPVALUES []
+00001 [L1251] GGET     A=1 B=0 C=0 D=0 'inheritSuccess'
+00002 [L1251] CALL     A=1 B=1 C=1 D=257 
+00003 [L1251] JMP      A=1 B=128 C=2 D=32770 target=6
+00004 [L1253] GGET     A=1 B=0 C=1 D=1 'inheritFaild'
+00005 [L1253] CALL     A=1 B=1 C=1 D=257 
+00006 [L1255] RET0     A=0 B=0 C=1 D=1 
+
+ui/expbookUI.getExpResult NUMERIC CONSTANTS: [1, 0]
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\31f661f25e3f80110bebb2bd95fbe4f2.data'; root=proto27
+
+FUNCTION proto27 offset=0x408d source_lines=851-904 params=1
+UPVALUES ['math']
+00001 [L855] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00002 [L855] TGETS    A=1 B=1 C=1 D=257 'd_data'
+00003 [L855] TGETS    A=1 B=1 C=2 D=258 'g_characterExpTable'
+00004 [L857] GGET     A=2 B=0 C=3 D=3 'getCortegeInfo'
+00005 [L857] GGET     A=3 B=0 C=4 D=4 'g_self'
+00006 [L857] TGETS    A=3 B=3 C=5 D=773 'selectedCortId'
+00007 [L857] CALL     A=2 B=2 C=2 D=514 
+00008 [L858] TGETS    A=3 B=2 C=6 D=518 'csvInfo'
+00009 [L858] TGETS    A=3 B=3 C=7 D=775 'quality'
+00010 [L859] TGETS    A=4 B=2 C=8 D=520 'level'
+00011 [L860] TGETS    A=5 B=2 C=9 D=521 'cur_exp'
+00012 [L861] KSHORT   A=6 B=0 C=1 D=1 1
+00013 [L862] GGET     A=7 B=0 C=4 D=4 'g_self'
+00014 [L862] TGETS    A=7 B=7 C=10 D=1802 'lvLimit'
+00015 [L864] KSHORT   A=8 B=0 C=1 D=1 1
+00016 [L864] LEN      A=9 B=0 C=7 D=7 
+00017 [L864] KSHORT   A=10 B=0 C=1 D=1 1
+00018 [L864] FORI     A=8 B=128 C=16 D=32784 target=35
+00019 [L865] TGETV    A=12 B=7 C=11 D=1803 
+00020 [L866] UGET     A=13 B=0 C=0 D=0 math
+00021 [L866] TGETS    A=13 B=13 C=11 D=3339 'floor'
+00022 [L866] GGET     A=14 B=0 C=0 D=0 'd_ms'
+00023 [L866] TGETS    A=14 B=14 C=12 D=3596 'd_mainUI'
+00024 [L866] TGETS    A=14 B=14 C=13 D=3597 'g_playerInfo'
+00025 [L866] TGETS    A=14 B=14 C=8 D=3592 'level'
+00026 [L866] TGETS    A=15 B=12 C=14 D=3086 'lv'
+00027 [L866] MULVV    A=14 B=14 C=15 D=3599 
+00028 [L866] CALL     A=13 B=2 C=2 D=514 
+00029 [L866] TSETS    A=13 B=12 C=8 D=3080 'level'
+00030 [L867] TGETS    A=13 B=12 C=8 D=3080 'level'
+00031 [L867] ISGT     A=13 B=0 C=4 D=4 
+00032 [L867] JMP      A=13 B=128 C=1 D=32769 target=34
+00033 [L868] MOV      A=6 B=0 C=11 D=11 
+00034 [L864] FORL     A=8 B=127 C=240 D=32752 target=19
+00035 [L872] MOV      A=8 B=0 C=0 D=0 
+00036 [L873] KSHORT   A=9 B=0 C=0 D=0 0
+00037 [L876] MOV      A=10 B=0 C=4 D=4 
+00038 [L876] GGET     A=11 B=0 C=4 D=4 'g_self'
+00039 [L876] TGETS    A=11 B=11 C=15 D=2831 'MAXLV'
+00040 [L876] KSHORT   A=12 B=0 C=1 D=1 1
+00041 [L876] FORI     A=10 B=128 C=58 D=32826 target=100
+00042 [L878] ADDVN    A=14 B=6 C=0 D=1536 
+00043 [L878] TGETV    A=14 B=7 C=14 D=1806 
+00044 [L878] ISF      A=0 B=0 C=14 D=14 
+00045 [L878] JMP      A=15 B=128 C=6 D=32774 target=52
+00046 [L878] ADDVN    A=14 B=6 C=0 D=1536 
+00047 [L878] TGETV    A=14 B=7 C=14 D=1806 
+00048 [L878] TGETS    A=14 B=14 C=8 D=3592 'level'
+00049 [L878] ISGT     A=14 B=0 C=13 D=13 
+00050 [L878] JMP      A=14 B=128 C=1 D=32769 target=52
+00051 [L879] ADDVN    A=6 B=6 C=0 D=1536 
+00052 [L881] GGET     A=14 B=0 C=16 D=16 'isMorethan80'
+00053 [L881] CALL     A=14 B=2 C=1 D=513 
+00054 [L881] ISF      A=0 B=0 C=14 D=14 
+00055 [L881] JMP      A=15 B=128 C=1 D=32769 target=57
+00056 [L882] KSHORT   A=6 B=0 C=1 D=1 1
+00057 [L886] TGETV    A=14 B=7 C=6 D=1798 
+00058 [L886] TGETS    A=14 B=14 C=17 D=3601 'rate'
+00059 [L886] ISNEN    A=14 B=0 C=1 D=1 0
+00060 [L886] JMP      A=14 B=128 C=5 D=32773 target=66
+00061 [L887] MOV      A=14 B=0 C=4 D=4 
+00062 [L887] MOV      A=15 B=0 C=13 D=13 
+00063 [L887] MOV      A=16 B=0 C=9 D=9 
+00064 [L887] MOV      A=17 B=0 C=5 D=5 
+00065 [L887] RET      A=14 B=0 C=5 D=5 
+00066 [L890] TGETV    A=14 B=1 C=3 D=259 
+00067 [L890] TGETV    A=14 B=14 C=13 D=3597 
+00068 [L890] SUBVV    A=14 B=14 C=5 D=3589 
+00069 [L890] TGETV    A=15 B=7 C=6 D=1798 
+00070 [L890] TGETS    A=15 B=15 C=17 D=3857 'rate'
+00071 [L890] DIVVV    A=14 B=14 C=15 D=3599 
+00072 [L891] ISGT     A=14 B=0 C=8 D=8 
+00073 [L891] JMP      A=15 B=128 C=11 D=32779 target=85
+00074 [L891] GGET     A=15 B=0 C=4 D=4 'g_self'
+00075 [L891] TGETS    A=15 B=15 C=15 D=3855 'MAXLV'
+00076 [L891] ISGE     A=13 B=0 C=15 D=15 
+00077 [L891] JMP      A=15 B=128 C=7 D=32775 target=85
+00078 [L892] TGETV    A=15 B=7 C=6 D=1798 
+00079 [L892] TGETS    A=15 B=15 C=17 D=3857 'rate'
+00080 [L892] MULVV    A=15 B=14 C=15 D=3599 
+00081 [L892] ADDVV    A=9 B=9 C=15 D=2319 
+00082 [L893] KSHORT   A=5 B=0 C=0 D=0 0
+00083 [L894] SUBVV    A=8 B=8 C=14 D=2062 
+00084 [L894] JMP      A=15 B=128 C=14 D=32782 target=99
+00085 [L896] TGETV    A=15 B=7 C=6 D=1798 
+00086 [L896] TGETS    A=15 B=15 C=17 D=3857 'rate'
+00087 [L896] MULVV    A=15 B=8 C=15 D=2063 
+00088 [L896] ADDVV    A=9 B=9 C=15 D=2319 
+00089 [L897] TGETV    A=15 B=7 C=6 D=1798 
+00090 [L897] TGETS    A=15 B=15 C=17 D=3857 'rate'
+00091 [L897] MULVV    A=15 B=8 C=15 D=2063 
+00092 [L897] ADDVV    A=5 B=5 C=15 D=1295 
+00093 [L898] SUBVV    A=8 B=8 C=8 D=2056 
+00094 [L899] MOV      A=15 B=0 C=4 D=4 
+00095 [L899] MOV      A=16 B=0 C=13 D=13 
+00096 [L899] MOV      A=17 B=0 C=9 D=9 
+00097 [L899] MOV      A=18 B=0 C=5 D=5 
+00098 [L899] RET      A=15 B=0 C=5 D=5 
+00099 [L876] FORL     A=10 B=127 C=198 D=32710 target=42
+00100 [L903] MOV      A=10 B=0 C=4 D=4 
+00101 [L903] MOV      A=11 B=0 C=4 D=4 
+00102 [L903] MOV      A=12 B=0 C=9 D=9 
+00103 [L903] MOV      A=13 B=0 C=5 D=5 
+00104 [L903] RET      A=10 B=0 C=5 D=5 
+
+ui/expbookUI.getMaxLimitLevel NUMERIC CONSTANTS: [200]
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\31f661f25e3f80110bebb2bd95fbe4f2.data'; root=proto24
+
+FUNCTION proto24 offset=0x3c33 source_lines=801-808 params=0
+UPVALUES []
+00001 [L802] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L802] TGETS    A=0 B=0 C=1 D=1 'd_homeUI'
+00003 [L802] TGETS    A=0 B=0 C=2 D=2 'g_csv'
+00004 [L802] TGETS    A=0 B=0 C=3 D=3 'build'
+00005 [L802] IST      A=0 B=0 C=0 D=0 
+00006 [L802] JMP      A=0 B=128 C=4 D=32772 target=11
+00007 [L803] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00008 [L803] TGETS    A=0 B=0 C=1 D=1 'd_homeUI'
+00009 [L803] TGETS    A=0 B=0 C=4 D=4 'initCsv'
+00010 [L803] CALL     A=0 B=1 C=1 D=257 
+00011 [L805] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00012 [L805] TGETS    A=0 B=0 C=1 D=1 'd_homeUI'
+00013 [L805] TGETS    A=0 B=0 C=5 D=5 'g_p_level'
+00014 [L805] IST      A=0 B=0 C=0 D=0 
+00015 [L805] JMP      A=1 B=128 C=1 D=32769 target=17
+00016 [L805] KSHORT   A=0 B=0 C=0 D=0 0
+00017 [L806] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00018 [L806] TGETS    A=1 B=1 C=1 D=257 'd_homeUI'
+00019 [L806] TGETS    A=1 B=1 C=2 D=258 'g_csv'
+00020 [L806] TGETS    A=1 B=1 C=3 D=259 'build'
+00021 [L806] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00022 [L806] TGETS    A=2 B=2 C=6 D=518 'd_common_def'
+00023 [L806] TGETS    A=2 B=2 C=7 D=519 'building_type'
+00024 [L806] TGETS    A=2 B=2 C=8 D=520 'main_building'
+00025 [L806] TGETV    A=1 B=1 C=2 D=258 
+00026 [L806] TGETV    A=1 B=1 C=0 D=256 
+00027 [L807] TGETS    A=2 B=1 C=9 D=265 'coretege_limit_plus'
+00028 [L807] ADDNV    A=2 B=2 C=0 D=512 
+00029 [L807] RET1     A=2 B=0 C=2 D=2 
+
+ui/expbookUI.createExpbookMutilSelectLayer NUMERIC CONSTANTS: [2, 1, 0, 0.43499999999999994, 0.185, 0.53, 0.57, 0.3]
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\31f661f25e3f80110bebb2bd95fbe4f2.data'; root=proto11
+
+FUNCTION proto11 offset=0x1462 source_lines=304-419 params=0
+UPVALUES ['pairs', 'table', 'scrSize', 'CCSizeMake']
+00001 [L305] GGET     A=0 B=0 C=0 D=0 'g_expbookUI'
+00002 [L305] KPRI     A=1 B=0 C=0 D=0 
+00003 [L305] TSETS    A=1 B=0 C=1 D=1 'expTableView'
+00004 [L306] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00005 [L306] TGETS    A=0 B=0 C=3 D=3 'd_u'
+00006 [L306] TGETS    A=0 B=0 C=4 D=4 'clearLayer'
+00007 [L306] GGET     A=1 B=0 C=0 D=0 'g_expbookUI'
+00008 [L306] TGETS    A=1 B=1 C=5 D=261 'page_layer'
+00009 [L306] KSHORT   A=2 B=0 C=5 D=5 5
+00010 [L306] GGET     A=3 B=0 C=6 D=6 'g_self'
+00011 [L306] TGETS    A=3 B=3 C=7 D=775 'tags'
+00012 [L306] TGETS    A=3 B=3 C=8 D=776 'exp'
+00013 [L306] CALL     A=0 B=2 C=4 D=516 
+00014 [L307] IST      A=0 B=0 C=0 D=0 
+00015 [L307] JMP      A=1 B=128 C=1 D=32769 target=17
+00016 [L308] UCLO     A=0 B=128 C=181 D=32949 target=198
+00017 [L311] GGET     A=1 B=0 C=6 D=6 'g_self'
+00018 [L311] TNEW     A=2 B=0 C=0 D=0 
+00019 [L311] TSETS    A=2 B=1 C=9 D=265 'expbook'
+00020 [L312] GGET     A=1 B=0 C=2 D=2 'd_ms'
+00021 [L312] TGETS    A=1 B=1 C=10 D=266 'd_packageUI'
+00022 [L312] TGETS    A=1 B=1 C=11 D=267 'getAllProps'
+00023 [L312] CALL     A=1 B=1 C=1 D=257 
+00024 [L313] GGET     A=1 B=0 C=2 D=2 'd_ms'
+00025 [L313] TGETS    A=1 B=1 C=10 D=266 'd_packageUI'
+00026 [L313] TGETS    A=1 B=1 C=12 D=268 'g_propsTable'
+00027 [L315] UGET     A=2 B=0 C=0 D=0 pairs
+00028 [L315] MOV      A=3 B=0 C=1 D=1 
+00029 [L315] CALL     A=2 B=4 C=2 D=1026 
+00030 [L315] ISNEXT   A=5 B=128 C=80 D=32848 target=111
+00031 [L316] TGETS    A=7 B=6 C=13 D=1549 'csvInfo'
+00032 [L316] TGETS    A=7 B=7 C=14 D=1806 'base_experience_plus'
+00033 [L316] KSHORT   A=8 B=0 C=0 D=0 0
+00034 [L316] ISGE     A=8 B=0 C=7 D=7 
+00035 [L316] JMP      A=7 B=128 C=75 D=32843 target=111
+00036 [L317] GGET     A=7 B=0 C=6 D=6 'g_self'
+00037 [L317] TGETS    A=7 B=7 C=15 D=1807 'last_select_page'
+00038 [L317] ISNEN    A=7 B=0 C=0 D=0 2
+00039 [L317] JMP      A=7 B=128 C=34 D=32802 target=74
+00040 [L317] TGETS    A=7 B=6 C=13 D=1549 'csvInfo'
+00041 [L317] TGETS    A=7 B=7 C=16 D=1808 'sub_type'
+00042 [L317] GGET     A=8 B=0 C=2 D=2 'd_ms'
+00043 [L317] TGETS    A=8 B=8 C=17 D=2065 'd_common_def'
+00044 [L317] TGETS    A=8 B=8 C=18 D=2066 'item_sub_type'
+00045 [L317] TGETS    A=8 B=8 C=19 D=2067 'exp_pill'
+00046 [L317] ISNEV    A=7 B=0 C=8 D=8 
+00047 [L317] JMP      A=7 B=128 C=26 D=32794 target=74
+00048 [L318] KSHORT   A=7 B=0 C=1 D=1 1
+00049 [L318] TGETS    A=8 B=6 C=20 D=1556 'count'
+00050 [L318] KSHORT   A=9 B=0 C=1 D=1 1
+00051 [L318] FORI     A=7 B=128 C=21 D=32789 target=73
+00052 [L319] TNEW     A=11 B=0 C=0 D=0 
+00053 [L320] TGETS    A=12 B=6 C=21 D=1557 'id'
+00054 [L320] TSETS    A=12 B=11 C=21 D=2837 'id'
+00055 [L321] TGETS    A=12 B=6 C=23 D=1559 'type_id'
+00056 [L321] TSETS    A=12 B=11 C=22 D=2838 'type'
+00057 [L322] TGETS    A=12 B=6 C=13 D=1549 'csvInfo'
+00058 [L322] TGETS    A=12 B=12 C=25 D=3097 'show_level'
+00059 [L322] TSETS    A=12 B=11 C=24 D=2840 'level'
+00060 [L323] TGETS    A=12 B=6 C=13 D=1549 'csvInfo'
+00061 [L323] TGETS    A=12 B=12 C=26 D=3098 'name'
+00062 [L323] TSETS    A=12 B=11 C=26 D=2842 'name'
+00063 [L324] TGETS    A=12 B=6 C=13 D=1549 'csvInfo'
+00064 [L324] TGETS    A=12 B=12 C=14 D=3086 'base_experience_plus'
+00065 [L324] TSETS    A=12 B=11 C=8 D=2824 'exp'
+00066 [L325] UGET     A=12 B=0 C=1 D=1 table
+00067 [L325] TGETS    A=12 B=12 C=27 D=3099 'insert'
+00068 [L325] GGET     A=13 B=0 C=6 D=6 'g_self'
+00069 [L325] TGETS    A=13 B=13 C=9 D=3337 'expbook'
+00070 [L325] MOV      A=14 B=0 C=11 D=11 
+00071 [L325] CALL     A=12 B=1 C=3 D=259 
+00072 [L318] FORL     A=7 B=127 C=235 D=32747 target=52
+00073 [L326] JMP      A=7 B=128 C=37 D=32805 target=111
+00074 [L327] GGET     A=7 B=0 C=6 D=6 'g_self'
+00075 [L327] TGETS    A=7 B=7 C=15 D=1807 'last_select_page'
+00076 [L327] ISNEN    A=7 B=0 C=1 D=1 1
+00077 [L327] JMP      A=7 B=128 C=33 D=32801 target=111
+00078 [L327] TGETS    A=7 B=6 C=13 D=1549 'csvInfo'
+00079 [L327] TGETS    A=7 B=7 C=16 D=1808 'sub_type'
+00080 [L327] GGET     A=8 B=0 C=2 D=2 'd_ms'
+00081 [L327] TGETS    A=8 B=8 C=17 D=2065 'd_common_def'
+00082 [L327] TGETS    A=8 B=8 C=18 D=2066 'item_sub_type'
+00083 [L327] TGETS    A=8 B=8 C=28 D=2076 'roll'
+00084 [L327] ISNEV    A=7 B=0 C=8 D=8 
+00085 [L327] JMP      A=7 B=128 C=25 D=32793 target=111
+00086 [L328] KSHORT   A=7 B=0 C=1 D=1 1
+00087 [L328] TGETS    A=8 B=6 C=20 D=1556 'count'
+00088 [L328] KSHORT   A=9 B=0 C=1 D=1 1
+00089 [L328] FORI     A=7 B=128 C=21 D=32789 target=111
+00090 [L329] TNEW     A=11 B=0 C=0 D=0 
+00091 [L330] TGETS    A=12 B=6 C=21 D=1557 'id'
+00092 [L330] TSETS    A=12 B=11 C=21 D=2837 'id'
+00093 [L331] TGETS    A=12 B=6 C=23 D=1559 'type_id'
+00094 [L331] TSETS    A=12 B=11 C=22 D=2838 'type'
+00095 [L332] TGETS    A=12 B=6 C=13 D=1549 'csvInfo'
+00096 [L332] TGETS    A=12 B=12 C=25 D=3097 'show_level'
+00097 [L332] TSETS    A=12 B=11 C=24 D=2840 'level'
+00098 [L333] TGETS    A=12 B=6 C=13 D=1549 'csvInfo'
+00099 [L333] TGETS    A=12 B=12 C=26 D=3098 'name'
+00100 [L333] TSETS    A=12 B=11 C=26 D=2842 'name'
+00101 [L334] TGETS    A=12 B=6 C=13 D=1549 'csvInfo'
+00102 [L334] TGETS    A=12 B=12 C=14 D=3086 'base_experience_plus'
+00103 [L334] TSETS    A=12 B=11 C=8 D=2824 'exp'
+00104 [L335] UGET     A=12 B=0 C=1 D=1 table
+00105 [L335] TGETS    A=12 B=12 C=27 D=3099 'insert'
+00106 [L335] GGET     A=13 B=0 C=6 D=6 'g_self'
+00107 [L335] TGETS    A=13 B=13 C=9 D=3337 'expbook'
+00108 [L335] MOV      A=14 B=0 C=11 D=11 
+00109 [L335] CALL     A=12 B=1 C=3 D=259 
+00110 [L328] FORL     A=7 B=127 C=235 D=32747 target=90
+00111 [L315] ITERN    A=5 B=3 C=3 D=771 
+00112 [L315] ITERL    A=5 B=127 C=174 D=32686 target=31
+00113 [L352] FNEW     A=2 B=0 C=29 D=29 {'kind': 'proto', 'id': 9}
+00114 [L342] GSET     A=2 B=0 C=30 D=30 'sort_expbook'
+00115 [L354] UGET     A=2 B=0 C=1 D=1 table
+00116 [L354] TGETS    A=2 B=2 C=31 D=543 'sort'
+00117 [L354] GGET     A=3 B=0 C=6 D=6 'g_self'
+00118 [L354] TGETS    A=3 B=3 C=9 D=777 'expbook'
+00119 [L354] GGET     A=4 B=0 C=30 D=30 'sort_expbook'
+00120 [L354] CALL     A=2 B=1 C=3 D=259 
+00121 [L358] GGET     A=2 B=0 C=6 D=6 'g_self'
+00122 [L358] TGETS    A=2 B=2 C=9 D=521 'expbook'
+00123 [L358] LEN      A=2 B=0 C=2 D=2 
+00124 [L358] ISNEN    A=2 B=0 C=2 D=2 0
+00125 [L358] JMP      A=2 B=128 C=23 D=32791 target=149
+00126 [L359] GGET     A=2 B=0 C=2 D=2 'd_ms'
+00127 [L359] TGETS    A=2 B=2 C=3 D=515 'd_u'
+00128 [L359] TGETS    A=2 B=2 C=32 D=544 'createByStyle'
+00129 [L359] TDUP     A=3 B=0 C=33 D=33 {'kind': 'table', 'value': {'font': 'arial', 'y': 0.51, 'type': 'label', 'x': 0.7, 'fontsize': 30}}
+00130 [L359] GGET     A=4 B=0 C=2 D=2 'd_ms'
+00131 [L359] TGETS    A=4 B=4 C=34 D=1058 'd_hz'
+00132 [L359] TGETS    A=4 B=4 C=35 D=1059 'gethz'
+00133 [L359] KSTR     A=5 B=0 C=36 D=36 'no_scroll'
+00134 [L359] GGET     A=6 B=0 C=6 D=6 'g_self'
+00135 [L359] TGETS    A=6 B=6 C=15 D=1551 'last_select_page'
+00136 [L359] CAT      A=5 B=5 C=6 D=1286 
+00137 [L359] CALL     A=4 B=2 C=2 D=514 
+00138 [L359] TSETS    A=4 B=3 C=37 D=805 'string'
+00139 [L359] TDUP     A=4 B=0 C=38 D=38 {'kind': 'table', 'value': {1: 254, 2: 188, 3: 39}}
+00140 [L359] TSETS    A=4 B=3 C=39 D=807 'color'
+00141 [L359] CALL     A=2 B=2 C=2 D=514 
+00142 [L361] MOV      A=4 B=0 C=0 D=0 
+00143 [L361] TGETS    A=3 B=0 C=40 D=40 'addChild'
+00144 [L361] MOV      A=5 B=0 C=2 D=2 
+00145 [L361] KSHORT   A=6 B=0 C=10 D=10 10
+00146 [L361] CALL     A=3 B=1 C=4 D=260 
+00147 [L362] UCLO     A=0 B=128 C=0 D=32768 target=148
+00148 [L362] RET0     A=0 B=0 C=1 D=1 
+00149 [L364] TDUP     A=2 B=0 C=42 D=42 {'kind': 'table', 'value': {}}
+00150 [L364] UGET     A=3 B=0 C=2 D=2 scrSize
+00151 [L364] TGETS    A=3 B=3 C=41 D=809 'width'
+00152 [L364] MULNV    A=3 B=3 C=3 D=771 
+00153 [L364] TSETS    A=3 B=2 C=43 D=555 'x'
+00154 [L364] UGET     A=3 B=0 C=2 D=2 scrSize
+00155 [L364] TGETS    A=3 B=3 C=44 D=812 'height'
+00156 [L364] MULNV    A=3 B=3 C=4 D=772 
+00157 [L364] TSETS    A=3 B=2 C=45 D=557 'y'
+00158 [L365] UGET     A=3 B=0 C=2 D=2 scrSize
+00159 [L365] TGETS    A=3 B=3 C=41 D=809 'width'
+00160 [L365] MULNV    A=3 B=3 C=5 D=773 
+00161 [L365] TSETS    A=3 B=2 C=41 D=553 'width'
+00162 [L365] UGET     A=3 B=0 C=2 D=2 scrSize
+00163 [L365] TGETS    A=3 B=3 C=44 D=812 'height'
+00164 [L365] MULNV    A=3 B=3 C=6 D=774 
+00165 [L365] TSETS    A=3 B=2 C=44 D=556 'height'
+00166 [L367] UGET     A=3 B=0 C=3 D=3 CCSizeMake
+00167 [L367] TGETS    A=4 B=2 C=41 D=553 'width'
+00168 [L367] TGETS    A=5 B=2 C=44 D=556 'height'
+00169 [L367] MULNV    A=5 B=5 C=7 D=1287 
+00170 [L367] CALL     A=3 B=2 C=3 D=515 
+00171 [L369] GGET     A=4 B=0 C=2 D=2 'd_ms'
+00172 [L369] TGETS    A=4 B=4 C=46 D=1070 'd_tableView'
+00173 [L369] TGETS    A=4 B=4 C=47 D=1071 'tableView'
+00174 [L369] MOV      A=5 B=0 C=0 D=0 
+00175 [L369] MOV      A=6 B=0 C=2 D=2 
+00176 [L369] CALL     A=4 B=2 C=3 D=515 
+00177 [L370] GGET     A=5 B=0 C=48 D=48 'createExpBookDataSource'
+00178 [L370] MOV      A=6 B=0 C=3 D=3 
+00179 [L370] CALL     A=5 B=2 C=2 D=514 
+00180 [L372] MOV      A=7 B=0 C=4 D=4 
+00181 [L372] TGETS    A=6 B=4 C=49 D=1073 'startScroll'
+00182 [L372] CALL     A=6 B=1 C=2 D=258 
+00183 [L373] MOV      A=7 B=0 C=4 D=4 
+00184 [L373] TGETS    A=6 B=4 C=50 D=1074 'setDataSource'
+00185 [L373] MOV      A=8 B=0 C=5 D=5 
+00186 [L373] CALL     A=6 B=1 C=3 D=259 
+00187 [L392] FNEW     A=6 B=0 C=51 D=51 {'kind': 'proto', 'id': 10}
+00188 [L394] TDUP     A=7 B=0 C=52 D=52 {'kind': 'table', 'value': {}}
+00189 [L394] TSETS    A=6 B=7 C=53 D=1845 'touchCellAtIndex'
+00190 [L395] MOV      A=9 B=0 C=4 D=4 
+00191 [L395] TGETS    A=8 B=4 C=54 D=1078 'setDelegate'
+00192 [L395] MOV      A=10 B=0 C=7 D=7 
+00193 [L395] CALL     A=8 B=1 C=3 D=259 
+00194 [L396] GGET     A=8 B=0 C=0 D=0 'g_expbookUI'
+00195 [L396] TSETS    A=4 B=8 C=1 D=2049 'expTableView'
+00196 [L419] UCLO     A=0 B=128 C=0 D=32768 target=197
+00197 [L419] RET0     A=0 B=0 C=1 D=1 
+00198 [L419] RET0     A=0 B=0 C=1 D=1 
+
+ui/skillUpgradeUI.showServerRet NUMERIC CONSTANTS: []
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\d312ee575ca61eea0f713679037fad06.data'; root=proto7
+
+FUNCTION proto7 offset=0x265d source_lines=474-505 params=1
+UPVALUES ['cclog']
+00001 [L475] UGET     A=1 B=0 C=0 D=0 cclog
+00002 [L475] KSTR     A=2 B=0 C=0 D=0 'skill update ret=[%d, --> %d]'
+00003 [L475] TGETS    A=3 B=0 C=1 D=1 'old_level'
+00004 [L475] TGETS    A=4 B=0 C=2 D=2 'new_level'
+00005 [L475] CALL     A=1 B=1 C=4 D=260 
+00006 [L478] GGET     A=1 B=0 C=3 D=3 'g_self'
+00007 [L478] TGETS    A=2 B=0 C=1 D=1 'old_level'
+00008 [L478] TSETS    A=2 B=1 C=1 D=257 'old_level'
+00009 [L479] GGET     A=1 B=0 C=3 D=3 'g_self'
+00010 [L479] TGETS    A=2 B=0 C=2 D=2 'new_level'
+00011 [L479] TSETS    A=2 B=1 C=2 D=258 'new_level'
+00012 [L481] GGET     A=1 B=0 C=3 D=3 'g_self'
+00013 [L481] TGETS    A=2 B=0 C=2 D=2 'new_level'
+00014 [L481] TSETS    A=2 B=1 C=4 D=260 'target_skill_level'
+00015 [L484] GGET     A=1 B=0 C=5 D=5 'd_ms'
+00016 [L484] TGETS    A=1 B=1 C=6 D=262 'd_u'
+00017 [L484] TGETS    A=1 B=1 C=7 D=263 'remove'
+00018 [L484] GGET     A=2 B=0 C=3 D=3 'g_self'
+00019 [L484] TGETS    A=2 B=2 C=8 D=520 'main_layer'
+00020 [L484] CALL     A=1 B=1 C=2 D=258 
+00021 [L485] GGET     A=1 B=0 C=9 D=9 'show'
+00022 [L485] CALL     A=1 B=1 C=1 D=257 
+00023 [L488] TGETS    A=1 B=0 C=2 D=2 'new_level'
+00024 [L488] TGETS    A=2 B=0 C=1 D=1 'old_level'
+00025 [L488] ISGE     A=2 B=0 C=1 D=1 
+00026 [L488] JMP      A=1 B=128 C=28 D=32796 target=55
+00027 [L490] GGET     A=1 B=0 C=3 D=3 'g_self'
+00028 [L490] TGETS    A=1 B=1 C=10 D=266 'label_skill_up_alert'
+00029 [L490] MOV      A=2 B=0 C=1 D=1 
+00030 [L490] TGETS    A=1 B=1 C=11 D=267 'setString'
+00031 [L490] GGET     A=3 B=0 C=5 D=5 'd_ms'
+00032 [L490] TGETS    A=3 B=3 C=12 D=780 'd_hz'
+00033 [L490] TGETS    A=3 B=3 C=13 D=781 'gethz'
+00034 [L490] KSTR     A=4 B=0 C=14 D=14 'skill_up_succ'
+00035 [L490] CALL     A=3 B=0 C=2 D=2 
+00036 [L490] CALLM    A=1 B=1 C=1 D=257 
+00037 [L492] GGET     A=1 B=0 C=5 D=5 'd_ms'
+00038 [L492] TGETS    A=1 B=1 C=6 D=262 'd_u'
+00039 [L492] TGETS    A=1 B=1 C=15 D=271 'setColor'
+00040 [L492] GGET     A=2 B=0 C=3 D=3 'g_self'
+00041 [L492] TGETS    A=2 B=2 C=10 D=522 'label_skill_up_alert'
+00042 [L492] TDUP     A=3 B=0 C=16 D=16 {'kind': 'table', 'value': {1: 0, 2: 255, 3: 0}}
+00043 [L492] CALL     A=1 B=1 C=3 D=259 
+00044 [L496] GGET     A=1 B=0 C=5 D=5 'd_ms'
+00045 [L496] TGETS    A=1 B=1 C=6 D=262 'd_u'
+00046 [L496] TGETS    A=1 B=1 C=17 D=273 'createAnimation'
+00047 [L496] KSTR     A=2 B=0 C=18 D=18 '119_1.ccbi'
+00048 [L496] TDUP     A=3 B=0 C=19 D=19 {'kind': 'table', 'value': {'scale': 1, 'z': 100, 'x': 0.37, 'y': 0.64}}
+00049 [L496] KSHORT   A=4 B=0 C=2 D=2 2
+00050 [L496] KPRI     A=5 B=0 C=0 D=0 
+00051 [L496] GGET     A=6 B=0 C=3 D=3 'g_self'
+00052 [L496] TGETS    A=6 B=6 C=8 D=1544 'main_layer'
+00053 [L496] CALL     A=1 B=1 C=6 D=262 
+00054 [L496] JMP      A=1 B=128 C=17 D=32785 target=72
+00055 [L499] GGET     A=1 B=0 C=3 D=3 'g_self'
+00056 [L499] TGETS    A=1 B=1 C=10 D=266 'label_skill_up_alert'
+00057 [L499] MOV      A=2 B=0 C=1 D=1 
+00058 [L499] TGETS    A=1 B=1 C=11 D=267 'setString'
+00059 [L499] GGET     A=3 B=0 C=5 D=5 'd_ms'
+00060 [L499] TGETS    A=3 B=3 C=12 D=780 'd_hz'
+00061 [L499] TGETS    A=3 B=3 C=13 D=781 'gethz'
+00062 [L499] KSTR     A=4 B=0 C=20 D=20 'skill_up_fail'
+00063 [L499] CALL     A=3 B=0 C=2 D=2 
+00064 [L499] CALLM    A=1 B=1 C=1 D=257 
+00065 [L501] GGET     A=1 B=0 C=5 D=5 'd_ms'
+00066 [L501] TGETS    A=1 B=1 C=6 D=262 'd_u'
+00067 [L501] TGETS    A=1 B=1 C=15 D=271 'setColor'
+00068 [L501] GGET     A=2 B=0 C=3 D=3 'g_self'
+00069 [L501] TGETS    A=2 B=2 C=10 D=522 'label_skill_up_alert'
+00070 [L501] TDUP     A=3 B=0 C=21 D=21 {'kind': 'table', 'value': {1: 255, 2: 0, 3: 0}}
+00071 [L501] CALL     A=1 B=1 C=3 D=259 
+00072 [L505] RET0     A=0 B=0 C=1 D=1 
+
+ui/equipAdvanceUI.showAdvanceInfoLayer NUMERIC CONSTANTS: [0.12, 0.5]
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\27bdc6e45eb88aff49b068219cfdc779.data'; root=proto13
+
+FUNCTION proto13 offset=0x1c8a source_lines=357-380 params=0
+UPVALUES []
+00001 [L358] GGET     A=0 B=0 C=0 D=0 'g_AdvanceUI'
+00002 [L358] TGETS    A=0 B=0 C=1 D=1 'main_layer'
+00003 [L359] GGET     A=1 B=0 C=0 D=0 'g_AdvanceUI'
+00004 [L359] TGETS    A=1 B=1 C=2 D=258 'equipInfo'
+00005 [L360] ISF      A=0 B=0 C=0 D=0 
+00006 [L360] JMP      A=2 B=128 C=2 D=32770 target=9
+00007 [L360] IST      A=0 B=0 C=1 D=1 
+00008 [L360] JMP      A=2 B=128 C=1 D=32769 target=10
+00009 [L361] RET0     A=0 B=0 C=1 D=1 
+00010 [L363] GGET     A=2 B=0 C=3 D=3 'd_ms'
+00011 [L363] TGETS    A=2 B=2 C=4 D=516 'd_u'
+00012 [L363] TGETS    A=2 B=2 C=5 D=517 'clearLayer'
+00013 [L363] MOV      A=3 B=0 C=0 D=0 
+00014 [L363] KSHORT   A=4 B=0 C=20 D=20 20
+00015 [L363] GGET     A=5 B=0 C=6 D=6 'g_self'
+00016 [L363] TGETS    A=5 B=5 C=7 D=1287 'tags'
+00017 [L363] TGETS    A=5 B=5 C=8 D=1288 'Status'
+00018 [L363] CALL     A=2 B=2 C=4 D=516 
+00019 [L364] GGET     A=3 B=0 C=6 D=6 'g_self'
+00020 [L364] TGETS    A=3 B=3 C=9 D=777 'w'
+00021 [L364] GGET     A=4 B=0 C=6 D=6 'g_self'
+00022 [L364] TGETS    A=4 B=4 C=10 D=1034 'h'
+00023 [L366] GGET     A=5 B=0 C=11 D=11 'getNumHZ'
+00024 [L366] TGETS    A=6 B=1 C=12 D=268 'advance_level'
+00025 [L366] CALL     A=5 B=2 C=2 D=514 
+00026 [L366] GGET     A=6 B=0 C=3 D=3 'd_ms'
+00027 [L366] TGETS    A=6 B=6 C=13 D=1549 'd_hz'
+00028 [L366] TGETS    A=6 B=6 C=14 D=1550 'gethz'
+00029 [L366] KSTR     A=7 B=0 C=15 D=15 'jie_hz'
+00030 [L366] CALL     A=6 B=2 C=2 D=514 
+00031 [L366] CAT      A=5 B=5 C=6 D=1286 
+00032 [L367] TGETS    A=6 B=1 C=12 D=268 'advance_level'
+00033 [L367] GGET     A=7 B=0 C=6 D=6 'g_self'
+00034 [L367] TGETS    A=7 B=7 C=16 D=1808 'MAX_ADVANCE_LEVEL'
+00035 [L367] ISGE     A=6 B=0 C=7 D=7 
+00036 [L367] JMP      A=6 B=128 C=8 D=32776 target=45
+00037 [L368] MOV      A=6 B=0 C=5 D=5 
+00038 [L368] TGETS    A=7 B=1 C=17 D=273 'star_count'
+00039 [L368] GGET     A=8 B=0 C=3 D=3 'd_ms'
+00040 [L368] TGETS    A=8 B=8 C=13 D=2061 'd_hz'
+00041 [L368] TGETS    A=8 B=8 C=14 D=2062 'gethz'
+00042 [L368] KSTR     A=9 B=0 C=18 D=18 'star'
+00043 [L368] CALL     A=8 B=2 C=2 D=514 
+00044 [L368] CAT      A=5 B=6 C=8 D=1544 
+00045 [L370] MOV      A=7 B=0 C=2 D=2 
+00046 [L370] TGETS    A=6 B=2 C=19 D=531 'addChild'
+00047 [L370] GGET     A=8 B=0 C=3 D=3 'd_ms'
+00048 [L370] TGETS    A=8 B=8 C=4 D=2052 'd_u'
+00049 [L370] TGETS    A=8 B=8 C=20 D=2068 'createByStyle'
+00050 [L370] TDUP     A=9 B=0 C=21 D=21 {'kind': 'table', 'value': {'font': 'arial', 'type': 'label', 'fontsize': 26}}
+00051 [L370] TSETS    A=5 B=9 C=22 D=2326 'string'
+00052 [L370] TDUP     A=10 B=0 C=23 D=23 {'kind': 'table', 'value': {1: 177, 2: 177, 3: 177}}
+00053 [L370] TSETS    A=10 B=9 C=24 D=2328 'color'
+00054 [L370] MULNV    A=10 B=3 C=0 D=768 
+00055 [L370] ADDNV    A=10 B=10 C=1 D=2561 
+00056 [L370] TSETS    A=10 B=9 C=25 D=2329 'x'
+00057 [L370] GGET     A=10 B=0 C=6 D=6 'g_self'
+00058 [L370] TGETS    A=10 B=10 C=26 D=2586 'namey'
+00059 [L370] TSETS    A=10 B=9 C=27 D=2331 'y'
+00060 [L370] CALL     A=8 B=2 C=2 D=514 
+00061 [L370] KSHORT   A=9 B=0 C=5 D=5 5
+00062 [L370] CALL     A=6 B=1 C=4 D=260 
+00063 [L372] GGET     A=6 B=0 C=6 D=6 'g_self'
+00064 [L372] TGETS    A=6 B=6 C=28 D=1564 'MAX_STAR_COUNT'
+00065 [L372] TGETS    A=7 B=1 C=17 D=273 'star_count'
+00066 [L372] ISNEV    A=6 B=0 C=7 D=7 
+00067 [L372] JMP      A=6 B=128 C=15 D=32783 target=83
+00068 [L373] TGETS    A=6 B=1 C=12 D=268 'advance_level'
+00069 [L373] GGET     A=7 B=0 C=6 D=6 'g_self'
+00070 [L373] TGETS    A=7 B=7 C=16 D=1808 'MAX_ADVANCE_LEVEL'
+00071 [L373] ISGE     A=6 B=0 C=7 D=7 
+00072 [L373] JMP      A=6 B=128 C=10 D=32778 target=83
+00073 [L374] MOV      A=7 B=0 C=0 D=0 
+00074 [L374] TGETS    A=6 B=0 C=29 D=29 'removeChildByTag'
+00075 [L374] GGET     A=8 B=0 C=6 D=6 'g_self'
+00076 [L374] TGETS    A=8 B=8 C=7 D=2055 'tags'
+00077 [L374] TGETS    A=8 B=8 C=30 D=2078 'ExpAdd'
+00078 [L374] KPRI     A=9 B=0 C=2 D=2 
+00079 [L374] CALL     A=6 B=1 C=4 D=260 
+00080 [L375] GGET     A=6 B=0 C=31 D=31 'showExpFullInfo'
+00081 [L375] CALL     A=6 B=1 C=1 D=257 
+00082 [L375] JMP      A=6 B=128 C=9 D=32777 target=92
+00083 [L377] MOV      A=7 B=0 C=0 D=0 
+00084 [L377] TGETS    A=6 B=0 C=29 D=29 'removeChildByTag'
+00085 [L377] GGET     A=8 B=0 C=6 D=6 'g_self'
+00086 [L377] TGETS    A=8 B=8 C=7 D=2055 'tags'
+00087 [L377] TGETS    A=8 B=8 C=32 D=2080 'Advance'
+00088 [L377] KPRI     A=9 B=0 C=2 D=2 
+00089 [L377] CALL     A=6 B=1 C=4 D=260 
+00090 [L378] GGET     A=6 B=0 C=33 D=33 'showExpAddInfo'
+00091 [L378] CALL     A=6 B=1 C=1 D=257 
+00092 [L380] RET0     A=0 B=0 C=1 D=1 
+
+ui/equipAdvanceUI.afterFakeShow NUMERIC CONSTANTS: []
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\27bdc6e45eb88aff49b068219cfdc779.data'; root=proto9
+
+FUNCTION proto9 offset=0x13cf source_lines=281-286 params=0
+UPVALUES []
+00001 [L282] GGET     A=0 B=0 C=0 D=0 'g_AdvanceUI'
+00002 [L282] TGETS    A=0 B=0 C=1 D=1 'main_layer'
+00003 [L282] IST      A=0 B=0 C=0 D=0 
+00004 [L282] JMP      A=0 B=128 C=1 D=32769 target=6
+00005 [L283] RET0     A=0 B=0 C=1 D=1 
+00006 [L285] GGET     A=0 B=0 C=2 D=2 'showAdvanceInfoLayer'
+00007 [L285] CALL     A=0 B=1 C=1 D=257 
+00008 [L286] RET0     A=0 B=0 C=1 D=1 
+
+ui/inheritUI proto21 NUMERIC CONSTANTS: [2, 1, 0]
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\db9445b29a10be74a68c5a02feaa0f70.data'; root=proto21
+
+FUNCTION proto21 offset=0x1cac source_lines=401-431 params=2
+UPVALUES []
+00001 [L402] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00002 [L402] TGETS    A=2 B=2 C=1 D=513 'd_lineupUI'
+00003 [L402] TGETS    A=2 B=2 C=2 D=514 'g_characterInfo'
+00004 [L403] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00005 [L403] TGETS    A=3 B=3 C=3 D=771 'd_mainUI'
+00006 [L403] TGETS    A=3 B=3 C=4 D=772 'g_playerInfo'
+00007 [L403] TGETS    A=3 B=3 C=5 D=773 'level'
+00008 [L403] MULVN    A=3 B=3 C=0 D=768 
+00009 [L405] TGETV    A=4 B=2 C=0 D=512 
+00010 [L405] TGETS    A=4 B=4 C=6 D=1030 'id'
+00011 [L405] GGET     A=5 B=0 C=7 D=7 'g_inheritUI'
+00012 [L405] TGETS    A=5 B=5 C=8 D=1288 'right_id'
+00013 [L405] ISEQV    A=4 B=0 C=5 D=5 
+00014 [L405] JMP      A=4 B=128 C=6 D=32774 target=21
+00015 [L405] TGETV    A=4 B=2 C=0 D=512 
+00016 [L405] TGETS    A=4 B=4 C=6 D=1030 'id'
+00017 [L405] GGET     A=5 B=0 C=7 D=7 'g_inheritUI'
+00018 [L405] TGETS    A=5 B=5 C=9 D=1289 'left_id'
+00019 [L405] ISNEV    A=4 B=0 C=5 D=5 
+00020 [L405] JMP      A=4 B=128 C=2 D=32770 target=23
+00021 [L406] KPRI     A=4 B=0 C=0 D=0 
+00022 [L406] RET1     A=4 B=0 C=2 D=2 
+00023 [L409] ISNEN    A=1 B=0 C=1 D=1 1
+00024 [L409] JMP      A=4 B=128 C=10 D=32778 target=35
+00025 [L410] TGETV    A=4 B=2 C=0 D=512 
+00026 [L410] TGETS    A=4 B=4 C=5 D=1029 'level'
+00027 [L410] ISNEN    A=4 B=0 C=1 D=1 1
+00028 [L410] JMP      A=4 B=128 C=6 D=32774 target=35
+00029 [L410] TGETV    A=4 B=2 C=0 D=512 
+00030 [L410] TGETS    A=4 B=4 C=10 D=1034 'cur_exp'
+00031 [L410] ISNEN    A=4 B=0 C=2 D=2 0
+00032 [L410] JMP      A=4 B=128 C=2 D=32770 target=35
+00033 [L411] KPRI     A=4 B=0 C=0 D=0 
+00034 [L411] RET1     A=4 B=0 C=2 D=2 
+00035 [L415] ISNEN    A=1 B=0 C=0 D=0 2
+00036 [L415] JMP      A=4 B=128 C=12 D=32780 target=49
+00037 [L416] TGETV    A=4 B=2 C=0 D=512 
+00038 [L416] TGETS    A=4 B=4 C=6 D=1030 'id'
+00039 [L416] GGET     A=5 B=0 C=7 D=7 'g_inheritUI'
+00040 [L416] TGETS    A=5 B=5 C=9 D=1289 'left_id'
+00041 [L416] ISEQV    A=4 B=0 C=5 D=5 
+00042 [L416] JMP      A=4 B=128 C=4 D=32772 target=47
+00043 [L416] TGETV    A=4 B=2 C=0 D=512 
+00044 [L416] TGETS    A=4 B=4 C=5 D=1029 'level'
+00045 [L416] ISGT     A=3 B=0 C=4 D=4 
+00046 [L416] JMP      A=4 B=128 C=2 D=32770 target=49
+00047 [L417] KPRI     A=4 B=0 C=0 D=0 
+00048 [L417] RET1     A=4 B=0 C=2 D=2 
+00049 [L421] TNEW     A=4 B=0 C=0 D=0 
+00050 [L422] TGETV    A=5 B=2 C=0 D=512 
+00051 [L422] TGETS    A=5 B=5 C=11 D=1291 'type'
+00052 [L422] TSETS    A=5 B=4 C=11 D=1035 'type'
+00053 [L423] TGETV    A=5 B=2 C=0 D=512 
+00054 [L423] TGETS    A=5 B=5 C=6 D=1286 'id'
+00055 [L423] TSETS    A=5 B=4 C=6 D=1030 'id'
+00056 [L424] TGETV    A=5 B=2 C=0 D=512 
+00057 [L424] TGETS    A=5 B=5 C=13 D=1293 'reborn_layer'
+00058 [L424] KSHORT   A=6 B=0 C=0 D=0 0
+00059 [L424] ISLT     A=6 B=0 C=5 D=5 
+00060 [L424] JMP      A=5 B=128 C=2 D=32770 target=63
+00061 [L424] KPRI     A=5 B=0 C=1 D=1 
+00062 [L424] JMP      A=6 B=128 C=1 D=32769 target=64
+00063 [L424] KPRI     A=5 B=0 C=2 D=2 
+00064 [L424] TSETS    A=5 B=4 C=12 D=1036 'is_asc'
+00065 [L425] TGETV    A=5 B=2 C=0 D=512 
+00066 [L425] TGETS    A=5 B=5 C=5 D=1285 'level'
+00067 [L425] TSETS    A=5 B=4 C=14 D=1038 'lv'
+00068 [L426] TGETV    A=5 B=2 C=0 D=512 
+00069 [L426] TGETS    A=5 B=5 C=16 D=1296 'csvInfo'
+00070 [L426] TGETS    A=5 B=5 C=15 D=1295 'name'
+00071 [L426] TSETS    A=5 B=4 C=15 D=1039 'name'
+00072 [L427] TGETV    A=5 B=2 C=0 D=512 
+00073 [L427] TGETS    A=5 B=5 C=16 D=1296 'csvInfo'
+00074 [L427] TGETS    A=5 B=5 C=17 D=1297 'file'
+00075 [L427] TSETS    A=5 B=4 C=17 D=1041 'file'
+00076 [L428] TGETV    A=5 B=2 C=0 D=512 
+00077 [L428] TGETS    A=5 B=5 C=16 D=1296 'csvInfo'
+00078 [L428] TGETS    A=5 B=5 C=18 D=1298 'quality'
+00079 [L428] TSETS    A=5 B=4 C=18 D=1042 'quality'
+00080 [L429] TGETV    A=5 B=2 C=0 D=512 
+00081 [L429] TGETS    A=5 B=5 C=19 D=1299 'order'
+00082 [L429] TSETS    A=5 B=4 C=19 D=1043 'order'
+00083 [L430] RET1     A=4 B=0 C=2 D=2 
+
+ui/expbookUI proto24 NUMERIC CONSTANTS: [200]
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\31f661f25e3f80110bebb2bd95fbe4f2.data'; root=proto24
+
+FUNCTION proto24 offset=0x3c33 source_lines=801-808 params=0
+UPVALUES []
+00001 [L802] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L802] TGETS    A=0 B=0 C=1 D=1 'd_homeUI'
+00003 [L802] TGETS    A=0 B=0 C=2 D=2 'g_csv'
+00004 [L802] TGETS    A=0 B=0 C=3 D=3 'build'
+00005 [L802] IST      A=0 B=0 C=0 D=0 
+00006 [L802] JMP      A=0 B=128 C=4 D=32772 target=11
+00007 [L803] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00008 [L803] TGETS    A=0 B=0 C=1 D=1 'd_homeUI'
+00009 [L803] TGETS    A=0 B=0 C=4 D=4 'initCsv'
+00010 [L803] CALL     A=0 B=1 C=1 D=257 
+00011 [L805] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00012 [L805] TGETS    A=0 B=0 C=1 D=1 'd_homeUI'
+00013 [L805] TGETS    A=0 B=0 C=5 D=5 'g_p_level'
+00014 [L805] IST      A=0 B=0 C=0 D=0 
+00015 [L805] JMP      A=1 B=128 C=1 D=32769 target=17
+00016 [L805] KSHORT   A=0 B=0 C=0 D=0 0
+00017 [L806] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00018 [L806] TGETS    A=1 B=1 C=1 D=257 'd_homeUI'
+00019 [L806] TGETS    A=1 B=1 C=2 D=258 'g_csv'
+00020 [L806] TGETS    A=1 B=1 C=3 D=259 'build'
+00021 [L806] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00022 [L806] TGETS    A=2 B=2 C=6 D=518 'd_common_def'
+00023 [L806] TGETS    A=2 B=2 C=7 D=519 'building_type'
+00024 [L806] TGETS    A=2 B=2 C=8 D=520 'main_building'
+00025 [L806] TGETV    A=1 B=1 C=2 D=258 
+00026 [L806] TGETV    A=1 B=1 C=0 D=256 
+00027 [L807] TGETS    A=2 B=1 C=9 D=265 'coretege_limit_plus'
+00028 [L807] ADDNV    A=2 B=2 C=0 D=512 
+00029 [L807] RET1     A=2 B=0 C=2 D=2 
+
+ui/equipmentUpgradeUI proto26 NUMERIC CONSTANTS: [2, 0.5]
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\c33019ac15fb4cf32a93687690efc94d.data'; root=proto26
+
+FUNCTION proto26 offset=0x52b7 source_lines=869-892 params=3
+UPVALUES []
+00001 [L870] IST      A=0 B=0 C=1 D=1 
+00002 [L870] JMP      A=3 B=128 C=3 D=32771 target=6
+00003 [L870] GGET     A=3 B=0 C=0 D=0 'g_equipment_upgrade'
+00004 [L870] TGETS    A=3 B=3 C=1 D=769 'item_table'
+00005 [L870] TGETS    A=1 B=3 C=2 D=770 'level'
+00006 [L871] IST      A=0 B=0 C=2 D=2 
+00007 [L871] JMP      A=3 B=128 C=4 D=32772 target=12
+00008 [L871] GGET     A=3 B=0 C=0 D=0 'g_equipment_upgrade'
+00009 [L871] TGETS    A=3 B=3 C=1 D=769 'item_table'
+00010 [L871] TGETS    A=3 B=3 C=3 D=771 'csvInfo'
+00011 [L871] TGETS    A=2 B=3 C=4 D=772 'quality'
+00012 [L873] GGET     A=3 B=0 C=5 D=5 'd_ms'
+00013 [L873] TGETS    A=3 B=3 C=6 D=774 'd_mainUI'
+00014 [L873] TGETS    A=3 B=3 C=7 D=775 'g_playerInfo'
+00015 [L873] TGETS    A=3 B=3 C=2 D=770 'level'
+00016 [L873] MULVN    A=3 B=3 C=0 D=768 
+00017 [L875] GGET     A=4 B=0 C=5 D=5 'd_ms'
+00018 [L875] TGETS    A=4 B=4 C=8 D=1032 'd_packageUI'
+00019 [L875] TGETS    A=4 B=4 C=9 D=1033 'g_itemLevelPriceTable'
+00020 [L875] TGETV    A=4 B=4 C=1 D=1025 
+00021 [L875] TGETV    A=4 B=4 C=2 D=1026 
+00022 [L876] GGET     A=5 B=0 C=5 D=5 'd_ms'
+00023 [L876] TGETS    A=5 B=5 C=6 D=1286 'd_mainUI'
+00024 [L876] TGETS    A=5 B=5 C=7 D=1287 'g_playerInfo'
+00025 [L876] TGETS    A=5 B=5 C=10 D=1290 'silver_coin'
+00026 [L879] ISGT     A=3 B=0 C=1 D=1 
+00027 [L879] JMP      A=6 B=128 C=16 D=32784 target=44
+00028 [L880] ISF      A=0 B=0 C=0 D=0 
+00029 [L880] JMP      A=6 B=128 C=11 D=32779 target=41
+00030 [L881] GGET     A=6 B=0 C=5 D=5 'd_ms'
+00031 [L881] TGETS    A=6 B=6 C=11 D=1547 'd_info'
+00032 [L881] TGETS    A=6 B=6 C=12 D=1548 'show'
+00033 [L881] GGET     A=7 B=0 C=5 D=5 'd_ms'
+00034 [L881] TGETS    A=7 B=7 C=13 D=1805 'd_hz'
+00035 [L881] TGETS    A=7 B=7 C=14 D=1806 'gethz'
+00036 [L881] KSTR     A=8 B=0 C=15 D=15 'enhance_cannot2'
+00037 [L881] CALL     A=7 B=2 C=2 D=514 
+00038 [L881] KSHORT   A=8 B=0 C=4 D=4 4
+00039 [L881] KNUM     A=9 B=0 C=1 D=1 0.5
+00040 [L881] CALL     A=6 B=1 C=4 D=260 
+00041 [L883] KSHORT   A=6 B=0 C=2 D=2 2
+00042 [L883] RET1     A=6 B=0 C=2 D=2 
+00043 [L883] JMP      A=6 B=128 C=17 D=32785 target=61
+00044 [L884] ISGE     A=5 B=0 C=4 D=4 
+00045 [L884] JMP      A=6 B=128 C=15 D=32783 target=61
+00046 [L885] ISF      A=0 B=0 C=0 D=0 
+00047 [L885] JMP      A=6 B=128 C=11 D=32779 target=59
+00048 [L886] GGET     A=6 B=0 C=5 D=5 'd_ms'
+00049 [L886] TGETS    A=6 B=6 C=11 D=1547 'd_info'
+00050 [L886] TGETS    A=6 B=6 C=12 D=1548 'show'
+00051 [L886] GGET     A=7 B=0 C=5 D=5 'd_ms'
+00052 [L886] TGETS    A=7 B=7 C=13 D=1805 'd_hz'
+00053 [L886] TGETS    A=7 B=7 C=14 D=1806 'gethz'
+00054 [L886] KSTR     A=8 B=0 C=16 D=16 'enhance_cannot1'
+00055 [L886] CALL     A=7 B=2 C=2 D=514 
+00056 [L886] KSHORT   A=8 B=0 C=4 D=4 4
+00057 [L886] KNUM     A=9 B=0 C=1 D=1 0.5
+00058 [L886] CALL     A=6 B=1 C=4 D=260 
+00059 [L888] KSHORT   A=6 B=0 C=1 D=1 1
+00060 [L888] RET1     A=6 B=0 C=2 D=2 
+00061 [L891] KSHORT   A=6 B=0 C=0 D=0 0
+00062 [L891] RET1     A=6 B=0 C=2 D=2 

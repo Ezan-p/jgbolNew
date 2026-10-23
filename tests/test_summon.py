@@ -268,8 +268,8 @@ class SummonTests(unittest.TestCase):
         role=self.backend.profile()
         self.assertEqual(role['corteges'][0]['order'],1)
         self.assertEqual(role['souls'],{'5004':15})
-        self.assertEqual(role['attachments'][0]['type_id'],5005)
-        self.assertEqual(role['attachments'][0]['count'],5)
+        self.assertIn(5005, [i['type_id'] for i in role['attachments'] if i['attach_type'] == 5])
+        self.assertEqual(next(i['count'] for i in role['attachments'] if i['type_id']==5005 and i['attach_type']==5),5)
         self.assertEqual(self.result(self.backend.bootstrap(),1046),souls)
 
     def test_token_reward_and_activity_window_boundaries(self):
@@ -280,7 +280,7 @@ class SummonTests(unittest.TestCase):
         self.assertNotIn('cortege_type',result)
         self.assertNotIn('prize_info',result)
         self.assertEqual(len(self.backend.profile()['corteges']),1)
-        self.assertEqual(self.backend.profile()['attachments'][0]['type_id'],1006)
+        self.assertIn(1006, [i['type_id'] for i in self.backend.profile()['attachments'] if i['attach_type'] == 5])
 
     def test_probability_boundaries_and_real_csv_quality(self):
         weights={2:65,3:30,4:5}
@@ -331,17 +331,20 @@ class SummonTests(unittest.TestCase):
         self.assertGreater(snapshot['super_first_pick_time'],0)
         self.assertEqual(snapshot['corteges'],role['corteges'])
 
-    def test_encoding_failure_and_capacity_do_not_commit(self):
+    def test_encoding_failure_does_not_commit_and_large_roster_is_chunked(self):
         before=self.backend.profile()
         with patch('network_redirect.backend.encode',side_effect=ValueError('encoding failed')):
             with self.assertRaises(ValueError):
                 self.draw(3)
         self.assertEqual(self.backend.profile(),before)
         role=self.backend.profile()
-        role['corteges']=[dict(role['corteges'][0],id=float(i+1)) for i in range(255)]
+        role['corteges']=[dict(role['corteges'][0],id=float(i+100),order=1 if i==0 else 0) for i in range(255)]
         self.backend.save(role)
         with patch('network_redirect.summon.choose_reward',return_value=(4015,None)):
-            self.reject_unchanged(3)
+            packets=self.draw(3)
+        self.assertEqual(len(self.backend.profile()['corteges']),256)
+        chunks=[decode(p)[2] for p in packets if decode(p)[0]==1034]
+        self.assertEqual([c['cortege_count'] for c in chunks],[128,128])
 
     def test_unauthenticated_and_zero_serial_do_not_mutate(self):
         before=self.backend.profile()

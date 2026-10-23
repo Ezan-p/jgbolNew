@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-24",
+  "client": "3.87",
+  "automated": {
+    "total_passed": 88,
+    "formation_passed": 29,
+    "command": ".runtime/venv/bin/python -m unittest discover -s tests -q"
+  },
+  "original_client_observations": [
+    {
+      "operation": "empty slot deployment",
+      "hero_type": 5001,
+      "innate_skill_type": 207,
+      "slot": 2,
+      "waiting": false
+    },
+    {
+      "operation": "occupied slot replacement",
+      "hero_type": 5010,
+      "innate_skill_type": 208,
+      "slot": 2,
+      "waiting": false
+    },
+    {
+      "operation": "swap",
+      "active_heroes": {
+        "9": 1,
+        "1": 2
+      },
+      "innate_skills": {
+        "46": 1,
+        "40": 2
+      },
+      "waiting": false
+    },
+    {
+      "operation": "restore and cold restart",
+      "active_heroes": {
+        "1": 1
+      },
+      "innate_skill_type": 209,
+      "waiting": false
+    },
+    {
+      "operation": "pour once",
+      "advance": 0,
+      "stars": 0,
+      "spirit": 5,
+      "waiting": false
+    },
+    {
+      "operation": "one-key pour",
+      "advance": 0,
+      "stars": 1,
+      "spirit": 0,
+      "waiting": false
+    },
+    {
+      "operation": "repeat one-key pour",
+      "advance": 0,
+      "stars": 7,
+      "spirit": 0,
+      "waiting": false
+    },
+    {
+      "operation": "advance equipment",
+      "advance": 1,
+      "stars": 0,
+      "spirit": 0,
+      "waiting": false
+    }
+  ],
+  "save_checks": {
+    "temporary_fixture_removed": true,
+    "original_currency_unchanged": true,
+    "original_item_fields_unchanged": true,
+    "original_hero_identity_levels_orders_unchanged": true,
+    "innate_skill_instances": 34,
+    "hero_count": 34
+  },
+  "caveat": "Other settlement workflows are covered by automated wire/database tests and static callback review, not all manually clicked in the original client. See documentation for unimplemented linked subsystems."
+}

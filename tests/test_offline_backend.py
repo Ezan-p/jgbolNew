@@ -42,7 +42,8 @@ class ProtocolTests(unittest.TestCase):
             login = encode(1001, {k: ticket[k] for k in ('auth_key', 'seed', 'account')})
             state = {}
             replies = backend.respond(login, state)
-            self.assertEqual([decode(r)[0] for r in replies], [1002, 2998, 1017, 1034, 1035])
+            self.assertEqual([decode(r)[0] for r in replies[:5]], [1002, 2998, 1017, 1034, 1035])
+            self.assertIn(1046, [decode(r)[0] for r in replies])
             self.assertTrue(state['authenticated'])
             self.assertEqual(decode(backend.respond(login, {})[0])[2]['result'], 1)
             token = backend.token
@@ -79,14 +80,14 @@ class ProtocolTests(unittest.TestCase):
                 reconnect = encode(1016, dict(account='local-player', random_key=backend.random_key))
                 replies = backend.respond(reconnect, state)
                 self.assertTrue(state['authenticated'])
-                self.assertEqual([decode(r)[0] for r in replies], [2996, 2998, 1017, 1034, 1035])
+                self.assertEqual([decode(r)[0] for r in replies[:5]], [2996, 2998, 1017, 1034, 1035])
                 self.assertTrue(decode(replies[2])[2]['reconnect'])
                 self.assertEqual(decode(replies[2])[2]['cortege_count'], 2)
                 self.assertEqual(decode(replies[3])[2]['cortege_count'], 1)
                 next_server_serial = 200001
                 for mid, values, ids in [(1018, {'serial_num': 123}, [1020, 1023, 1106]),
                                          (1094, {'serial_num': 124, 'flag': 1}, [1095, 1106]),
-                                         (1033, {'serial_num': 125, 'flag': 3}, [1034, 1035, 2998, 1106])]:
+                                         (1033, {'serial_num': 125, 'flag': 3}, [1034, 1035, 1046, 2998, 1106])]:
                     replies = [decode(r) for r in backend.respond(encode(mid, values), state)]
                     self.assertEqual([r[0] for r in replies], ids)
                     self.assertEqual([r[2]['serial_num'] for r in replies],
@@ -95,20 +96,20 @@ class ProtocolTests(unittest.TestCase):
                     next_server_serial += len(ids)
                     if mid == 1033:
                         self.assertTrue(replies[1][2]['first_send'])
-                        self.assertEqual(replies[1][2]['attach_list'], [])
-                        self.assertEqual(replies[2][2]['id'], 1)
-                        self.assertEqual(login_fields(replies[2][2]['data']), {'flag': 3})
+                        self.assertEqual(replies[1][2]['attach_list'][0]['type_id'], 209)
+                        self.assertEqual(replies[-2][2]['id'], 1)
+                        self.assertEqual(login_fields(replies[-2][2]['data']), {'flag': 3})
                 heartbeat = backend.respond(encode(2999, {}), state)
                 self.assertEqual(decode(heartbeat[0])[2]['random_key'], backend.random_key)
             finally:
                 backend.close()
 
-    def test_bootstrap_initializes_formation_and_empty_inventory(self):
+    def test_bootstrap_initializes_formation_and_innate_skill(self):
         with tempfile.TemporaryDirectory() as directory:
             backend = Backend(Path(directory), 18770, lambda *a, **k: None)
             try:
                 replies = [decode(r) for r in backend.bootstrap()]
-                self.assertEqual([r[0] for r in replies], [2998, 1017, 1034, 1035])
+                self.assertEqual([r[0] for r in replies[:4]], [2998, 1017, 1034, 1035])
                 self.assertEqual(replies[0][2]['id'], 80)
                 config = login_fields(replies[0][2]['data'])
                 self.assertIs(config['config_end'], True)
@@ -116,13 +117,17 @@ class ProtocolTests(unittest.TestCase):
                 # an absent config leaves both fields nil and crashes the UI.
                 self.assertIs(config[14]['is_open'], False)
                 self.assertIsInstance(config[14]['cheer_level_limit'], dict)
-                for key in ('cheap_item_list', 'rich_item_list', 'limit_item_list'):
-                    self.assertEqual(config[10][key], {})
+                self.assertEqual(len(config[10]['cheap_item_list']), 7)
+                self.assertEqual(len(config[10]['rich_item_list']), 8)
+                self.assertEqual(config[10]['limit_item_list'], {})
+                self.assertEqual(len(config[10]['panic_buy_list']['activity_data']['sale_item']), 2)
                 self.assertEqual(replies[1][2]['cortege_count'], 2)
                 self.assertEqual(replies[2][2]['cortege_count'], 1)
                 self.assertEqual(replies[2][2]['cortege_list'][0]['order'], 1)
-                self.assertEqual(replies[3][2], dict(serial_num=0, first_send=True,
-                                                     attach_count=0, attach_list=[]))
+                self.assertTrue(replies[3][2]['first_send'])
+                self.assertEqual(replies[3][2]['attach_count'], 1)
+                self.assertEqual(replies[3][2]['attach_list'][0]['type_id'], 209)
+                self.assertEqual(replies[3][2]['attach_list'][0]['protogenic'], 1)
             finally:
                 backend.close()
 
@@ -138,7 +143,13 @@ class ProtocolTests(unittest.TestCase):
             backend = Backend(Path(directory), 18770, lambda *a, **k: None)
             try:
                 migrated = backend.profile()
-                self.assertEqual(migrated, dict(legacy, cortege_count=2))
+                for key in ('role_name', 'level', 'gold_coin', 'silver_coin', 'local_note'):
+                    self.assertEqual(migrated[key], legacy[key])
+                self.assertEqual(migrated['attachments'][0], legacy['attachments'][0])
+                self.assertEqual(migrated['corteges'][0]['id'], 42.0)
+                self.assertEqual(migrated['corteges'][0]['level'], 3)
+                self.assertEqual(migrated['cortege_count'], 2)
+                self.assertEqual(migrated['attachments'][1]['type_id'], 209)
                 stored = json.loads(backend.db.execute(
                     'SELECT data FROM roles WHERE account=?', ('local-player',)).fetchone()[0])
                 self.assertEqual(stored, migrated)
@@ -153,7 +164,7 @@ class ProtocolTests(unittest.TestCase):
                 state = {'authenticated': True}
                 for mid, values, ids in [(1018, {}, [1020, 1023]),
                                          (1094, {'flag': 1}, [1095]),
-                                         (1033, {'flag': 3}, [1034, 1035, 2998])]:
+                                         (1033, {'flag': 3}, [1034, 1035, 1046, 2998])]:
                     replies = [decode(r) for r in backend.respond(encode(mid, values), state)]
                     self.assertEqual([r[0] for r in replies], ids)
                     self.assertTrue(all(r[2]['serial_num'] == 0 for r in replies))
@@ -180,7 +191,7 @@ class ProtocolTests(unittest.TestCase):
                 self.assertEqual(backend.respond(encode(1105, {'req_serial_num': 200000}), state),
                                  original)
                 following = backend.respond(encode(1094, {'serial_num': 32}), state)
-                self.assertEqual([decode(r)[2]['serial_num'] for r in following], [200005, 200006])
+                self.assertEqual([decode(r)[2]['serial_num'] for r in following], [200006, 200007])
                 self.assertEqual(decode(following[-1])[2]['req_serial_num'], 32)
             finally:
                 backend.close()

@@ -168,10 +168,12 @@ def next_id(role):
 
 def add_item(role, type_id, count):
     for item in role['attachments']:
-        if item['attach_type'] == 5 and item['type_id'] == type_id:
+        if (item['attach_type'] == 5 and item['type_id'] == type_id
+                and not item.get('owner_id') and not item.get('is_lock')
+                and item.get('level', 1) <= 1 and not item.get('prob_compen')):
             item['count'] += count
             return
-    role['attachments'].append(dict(id=next_id(role), attach_type=5, type_id=type_id, count=count))
+    role['attachments'].append(dict(id=next_id(role), attach_type=5, type_id=type_id, count=count, level=1))
 
 
 def companion(role, type_id):
@@ -238,7 +240,7 @@ def settle(role, request, now, rules):
                 used = min(needed, item['count'])
                 item['count'] -= used
                 needed -= used
-            role['attachments'] = [r for r in role['attachments'] if r['count'] > 0]
+            role['attachments'] = [r for r in role['attachments'] if r['attach_type'] == 6 or r['count'] > 0]
         state['last_payment'] = dict(token_id=config['token_id'], tokens_used=tokens, gold_spent=cost, count=count)
     results = []
     for _ in range(count):
@@ -279,22 +281,26 @@ def settle(role, request, now, rules):
             role[field] = role.get(field) or now
             result['first_pick_time'] = role[field]
         results.append(result)
-    # Current full-snapshot transport uses a byte count. This is a technical cap,
-    # not an assertion about the official game's inventory limits.
-    if (len(role['corteges']) > 255 or len(role['attachments']) > 255 or
-            sum(n > 0 for n in role.get('souls', {}).values()) > 255):
-        raise SummonRejected('当前本地快照容量不足，请先整理伙伴或背包')
     outcome = results[0] if count == 1 else dict(ten_pick=True, pick_grade=grade, event_data=results)
     state['last_result'] = results[-1]
     role.update(remaining(role, now))
     return outcome
 
 
-def soul_snapshot(role):
-    # 1046 is a full list; event 3 expects a single {type_id,total_count}.
+def soul_snapshots(role):
+    # [A] data.lua:2300-2345 clears on first_send and appends later chunks.
     spirits = [dict(type_id=int(t), count=n)
-               for t, n in sorted(role.get('souls', {}).items()) if n > 0]
-    return encode(1046, dict(first_send=True, spirit_count=len(spirits), spirit_list=spirits))
+               for t, n in sorted(role.get('souls', {}).items(), key=lambda x: int(x[0])) if n > 0]
+    return [encode(1046, dict(first_send=start == 0, spirit_count=len(spirits[start:start + 128]),
+                             spirit_list=spirits[start:start + 128]))
+            for start in range(0, max(1, len(spirits)), 128)]
+
+
+def soul_snapshot(role):
+    packets = soul_snapshots(role)
+    if len(packets) != 1:
+        raise ValueError('Use soul_snapshots for a large soul inventory')
+    return packets[0]
 
 
 def news_snapshot(role, rules):
