@@ -34,7 +34,7 @@ python3 android_emulator/run.py --config my-game/game.json install
 
 | 配置 | 引擎/镜像 | 用途 |
 |---|---|---|
-| `arm32-native` | 原生宿主 ARM32 引擎 + Android 6.0/API 23 | 原项目使用的旧 ARM 游戏环境，软件仿真，无浏览器音频 |
+| `arm32-native` | 原生宿主 ARM32 引擎 + Android 6.0/API 23 | 原项目使用的旧 ARM 游戏环境，软件仿真，通过 gRPC 转发游戏音频至浏览器（已验证引擎 37.2.12） |
 | `arm64` | SDK emulator + Android 11/API 30 ARM64 | ARM64 游戏；不代表支持旧 `armeabi` 原生库 |
 | `arm32-software` | 旧 Intel launcher + API 23 ARM32 | 保留的实验配置；新部署不自动安装此旧 launcher |
 
@@ -119,6 +119,14 @@ app = make_app(config)  # aiohttp application，按应用隔离配置和控制�
 
 `local_game/`、`scripts/prepare_apk.py`、`scripts/build_local_game.py`、逆向与资源导出脚本仍属于原游戏。共享网页资源和 gRPC 协议已移到本目录，保留一份实现。
 
+## 本机画面延迟优化
+
+内置模拟器的新网页通过 `?format=rgba` 协商 RGBA 原始像素传输，省去逐帧 PNG 压缩与浏览器图片解码，传输上限为 30 FPS。保持原始分辨率，逐帧等待浏览器绘制确认，避免慢客户端积压旧画面；未协商的旧客户端仍使用 PNG / 20 FPS，ADB 仍使用 PNG / 5 FPS。拖动事件按浏览器动画帧合并为每根手指的最新位置，按下和抬起立即发送。
+
+2026-10-24 在本项目 960×540 ARM32 环境中的一次测量：30 次截图的中位耗时 PNG 41.4 ms、RGBA 3.13 ms；网关连续 61 帧、立即确认的传输测试分别约 19.6 / 28.6 FPS。这不是游戏内部帧率或点击到显示的端到端延迟；ARM32 软件仿真的 CPU 限制仍存在。RGBA 每帧约 2.07 MB，适用于当前本机回环连接。
+
+修改生效只需 `restart-web` 后刷新浏览器并重新连接画面，无需重启安卓或重新安装游戏。
+
 ## 验证
 
 在模块父目录、安装了依赖的 Python 环境中执行：
@@ -126,6 +134,7 @@ app = make_app(config)  # aiohttp application，按应用隔离配置和控制�
 ```sh
 python -m unittest discover -s android_emulator/tests -v
 node --check android_emulator/web/app.js
+node android_emulator/tests/test_web_input.cjs
 ```
 
 测试覆盖复制后的独立运行、多游戏配置与浏览器会话隔离、实际 APK ABI 检查、启动目标、端口冲突、外部设备保护及 AVD 数据保留。原游戏测试仍在原 `cloud_android` 目录运行。

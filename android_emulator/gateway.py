@@ -65,9 +65,9 @@ async def status(request):
     try:
         s=await app['stub'].getStatus(Empty(),timeout=3)
         device=await device_info(app)
-        return web.json_response({'emulator':True,'version':s.version,'control_busy':app['controller'] is not None,'frames':app['frames'],'audio_packets':app['audio_packets'],'package':app['config']['package'],'mode':app['config']['mode'],'runtime_profile':app['config']['runtime_profile'],'ui':public_ui(app['config']),'audio':app['config']['mode']=='emulator' and app['config']['runtime_profile']!='arm32-native','device':device})
+        return web.json_response({'emulator':True,'version':s.version,'control_busy':app['controller'] is not None,'frames':app['frames'],'audio_packets':app['audio_packets'],'package':app['config']['package'],'mode':app['config']['mode'],'runtime_profile':app['config']['runtime_profile'],'ui':public_ui(app['config']),'audio':app['config']['mode']=='emulator','device':device})
     except (grpc.RpcError,RuntimeError,OSError,KeyError) as exc:
-        return web.json_response({'emulator':False,'ui':public_ui(app['config']),'message':connection_error(exc),'mode':app['config']['mode'],'audio':app['config']['mode']=='emulator' and app['config']['runtime_profile']!='arm32-native'})
+        return web.json_response({'emulator':False,'ui':public_ui(app['config']),'message':connection_error(exc),'mode':app['config']['mode'],'audio':app['config']['mode']=='emulator'})
 
 async def action(request):
     data=await request.json();name=data.get('action')
@@ -95,17 +95,23 @@ async def screen(request):
     try:await ws.prepare(request)
     except BaseException:app['controller']=None;raise
     touches={};ready=asyncio.Event();ready.set();dimensions=[1280,720]
+    # Raw pixels avoid PNG encoding on the local emulator and browser decoding.
+    # Negotiate per connection so older clients and ADB retain PNG support.
+    raw=app['config']['mode']=='emulator' and request.query.get('format')=='rgba'
+    image_format=pb.ImageFormat.RGBA8888 if raw else pb.ImageFormat.PNG
+    frame_rate=5 if app['config']['mode']=='adb' else (30 if raw else 20)
     async def frames():
         while not ws.closed:
             await ready.wait();ready.clear();start=time.monotonic()
-            img=await app['stub'].getScreenshot(pb.ImageFormat(format=pb.ImageFormat.PNG),timeout=10)
+            img=await app['stub'].getScreenshot(pb.ImageFormat(format=image_format),timeout=10)
             if not img.image:await asyncio.sleep(.2);ready.set();continue
             w=img.format.width or img.width;h=img.format.height or img.height
             if not w or not h:raise RuntimeError('Invalid frame dimensions')
+            if raw and len(img.image)!=w*h*4:raise RuntimeError('Invalid RGBA frame size')
             dimensions[:]=[w,h]
-            await ws.send_json({'type':'frame','width':w,'height':h})
+            await ws.send_json({'type':'frame','width':w,'height':h,'encoding':'rgba' if raw else 'png'})
             await ws.send_bytes(img.image);app['frames']+=1
-            await asyncio.sleep(max(0,1/(5 if app['config']['mode']=='adb' else 20)-(time.monotonic()-start)))
+            await asyncio.sleep(max(0,1/frame_rate-(time.monotonic()-start)))
     task=asyncio.create_task(frames())
     async def watch():
         try:await task
@@ -151,24 +157,40 @@ async def screen(request):
 
 async def audio(request):
     app=request.app
-    if app['config']['runtime_profile']=='arm32-native':raise web.HTTPBadRequest(text='当前 ARM32 环境已禁用音频，避免系统音频锁导致模拟器无响应。')
     if app['config']['mode']=='adb':raise web.HTTPBadRequest(text='ADB 模式声音由安卓设备播放，不支持浏览器音频。')
     if app['audio_client'] is not None:raise web.HTTPConflict(text='Audio stream already active')
     ws=web.WebSocketResponse(heartbeat=20,max_msg_size=1024);app['audio_client']=ws
     try:await ws.prepare(request)
     except BaseException:app['audio_client']=None;raise
-    stream=app['stub'].streamAudio(pb.AudioFormat(samplingRate=44100,channels=pb.AudioFormat.Stereo,format=pb.AudioFormat.AUD_FMT_S16))
-    async def forward():
-        try:
-            async for packet in stream:
-                await ws.send_bytes(packet.audio);app['audio_packets']+=1
-        except (grpc.RpcError,ConnectionError):
-            if not ws.closed:await ws.close(code=1011)
-    task=asyncio.create_task(forward())
+    stream=None;task=None
     try:
+        stream=app['stub'].streamAudio(pb.AudioFormat(samplingRate=44100,channels=pb.AudioFormat.Stereo,format=pb.AudioFormat.AUD_FMT_S16))
+        async def forward():
+            try:
+                async for packet in stream:
+                    if packet.audio:
+                        await asyncio.wait_for(ws.send_bytes(packet.audio),timeout=2)
+                        app['audio_packets']+=1
+            except (grpc.RpcError,ConnectionError,asyncio.TimeoutError) as exc:
+                if not ws.closed:
+                    await ws.send_json({'type':'error','message':connection_error(exc)})
+            # On cancellation the request handler owns cleanup; awaiting close
+            # there would deadlock with the handler awaiting this task.
+            if not ws.closed:await ws.close()
+        task=asyncio.create_task(forward())
         async for _ in ws:pass
+    except (grpc.RpcError,RuntimeError,OSError,KeyError) as exc:
+        if not ws.closed:
+            await ws.send_json({'type':'error','message':connection_error(exc)})
+            await ws.close(code=1011)
     finally:
-        stream.cancel();task.cancel();await asyncio.gather(task,return_exceptions=True);app['audio_client']=None
+        try:
+            if stream is not None:stream.cancel()
+            if task is not None:
+                task.cancel();await asyncio.gather(task,return_exceptions=True)
+        finally:
+            if app['audio_client'] is ws:app['audio_client']=None
+
     return ws
 
 class AuthorizedStub:

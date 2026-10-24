@@ -25,7 +25,8 @@ def profiles_for(config):
             "api": 23, "abi": "armeabi-v7a", "arch": "arm", "tag": "default",
             "memory": 1536, "cores": 1, "gpu": "host",
             "width": 960, "height": 540, "density": 160,
-            # CoreAudio input can deadlock the ARM32 engine's main loop on macOS.
+            # Avoid CoreAudio deadlocks; the null host backend still supplies
+            # guest PCM to streamAudio for browser playback (verified on 37.2.12).
             "extra": ["-accel", "off", "-no-metrics", "-audio", "none"],
         },
     }
