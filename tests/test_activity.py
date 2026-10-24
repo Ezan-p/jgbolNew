@@ -32,8 +32,8 @@ class ActivityTests(ActivityCase):
     def test_boards_and_bootstrap_limits(self):
         for flag,e in ((0,47),(1,48)):
             out=self.req(1205,flag=flag);self.ok(out);self.assertEqual(out[-1][0],e)
-        snapshot=self.b.snapshot();self.assertEqual(snapshot['top_fight_limit'],10)
-        self.assertEqual(snapshot['convert_fight_limit'],3)
+        snapshot=self.b.snapshot();self.assertEqual(snapshot['top_fight_limit'],self.b.activity_rules['rank_daily_limit'])
+        self.assertEqual(snapshot['convert_fight_limit'],self.b.activity_rules['convert_daily_limit'])
     def test_feed_time_limits_duplicate_and_rollover(self):
         self.ok(self.req(1040,feed_count=0))
         self.assertEqual(self.req(1040,feed_count=30)[-1][1]['feed_result'],2)
@@ -91,7 +91,7 @@ class ActivityTests(ActivityCase):
     def test_rape_refresh_and_sweep(self):
         self.ok(self.req(1029,flag=1));self.ok(self.req(1041,form_index=1,object_type=2,object_id=11))
         self.ok(self.req(1072));self.assertEqual(self.decoded[-2][2]['id'],114)
-        for _ in range(5):self.ok(self.req(1029,flag=2))
+        for _ in range(self.b.activity_rules['rape_free_refreshes']):self.ok(self.req(1029,flag=2))
         self.assertEqual(self.req(1029,flag=2)[0][0],55)
     def test_duty_query_start_fight_claim(self):
         self.ok(self.req(1043,flag=1));self.assertIsNone(self.b.profile()['activity']['duty'])
@@ -106,7 +106,7 @@ class ActivityTests(ActivityCase):
         self.ok(self.req(1201,flag=1));self.assertEqual(self.req(1201,flag=1)[0][0],55)
         with patch('network_redirect.backend.time.time',return_value=NOW+7200):self.assertEqual(self.req(1026,fight_type=6)[0][0],55)
     def test_convert_first_free_and_monthcard_extra(self):
-        r=self.b.profile();tid=next(iter(activity.CONVERT))
+        r=self.b.profile();r['vip_level']=3;tid=next(iter(activity.CONVERT))
         if not any(c['type']==tid for c in r['corteges']):r['corteges'].append(summon.companion(r,tid))
         r['attachments']=[i for i in r['attachments'] if i['type_id']!=1024];self.b.save(r)
         self.ok(self.req(1026,fight_type=10,des_value=tid))

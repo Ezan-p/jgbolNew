@@ -90,7 +90,11 @@ def client_source(rules):
     """Use the same validated prices for the UI, affordability check and debit."""
     prices = [rules['grades'][str(grade)]['gold_cost'] for grade in (1, 2, 3)]
     template = Path(__file__).with_name('summon_client.lua').read_text(encoding='utf-8')
-    return template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
+    from . import vip
+    vip_source = Path(__file__).with_name('vip_client.lua').read_text(encoding='utf-8')
+    vip_source = vip_source.replace('__VIP_PRODUCTS__', lua(vip.load_rules()['products']))
+    welfare_source = Path(__file__).with_name('welfare_client.lua').read_text(encoding='utf-8')
+    return vip_source + '\n' + welfare_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
 
 
 def lua(value):

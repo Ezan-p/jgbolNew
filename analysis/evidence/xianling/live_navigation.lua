@@ -1,0 +1,8 @@
+local ms=assert(package.loaded.ms)
+local scene=CCDirector:sharedDirector():getRunningScene()
+scene:removeChildByTag(709001,true)
+ms.d_xianlingShopUI.create(scene)
+ms.d_xianlingShopUI.gotoVIP()
+assert(ms.d_vipUI.g_self.main_layer)
+ms.d_vipUI.pressClose()
+return table.tostring({vip_navigation=true,shop_open=ms.d_xianlingShopUI.g_self.main_layer~=nil})

@@ -35,7 +35,7 @@ def load_rules(path=ROOT / 'server_config/journey_rules.json'):
     require(r.get('schema_version') == 1 and r.get('mode') == 'inferred', '旅途配置须标注 inferred')
     for key, lo, hi in [('timezone_offset_hours', -12, 14), ('strength_recovery_seconds', 1, 86400),
                         ('energy_recovery_seconds', 1, 86400), ('resource_item_daily_limit', 1, 255),
-                        ('normal_flush_daily_limit', 1, 10), ('defeat_companion_exp_percent', 0, 100),
+                        ('normal_flush_daily_limit', 0, 10), ('defeat_companion_exp_percent', 0, 100),
                         ('defeat_silver_percent', 0, 100)]:
         require(type(r.get(key)) is int and lo <= r[key] <= hi, '旅途配置无效：' + key)
     b = r.get('battle', {})
@@ -50,6 +50,7 @@ def load_rules(path=ROOT / 'server_config/journey_rules.json'):
 
 
 def prepare(role, now, rules):
+    from . import vip
     old = json.dumps(role, sort_keys=True)
     state = role.setdefault('journey', dict(gates={}, claimed_maps=[], fight_id=0))
     day = (now + rules['timezone_offset_hours'] * 3600) // 86400
@@ -60,9 +61,9 @@ def prepare(role, now, rules):
         for key in ('elite_fight_count', 'elite_tollgate_flush_count', 'tollgate_flush_count',
                     'sweep_flush_count', 'strength_item_count', 'energy_item_count'):
             role[key] = 0
-    role['tollgate_flush_limit'] = rules['normal_flush_daily_limit']
+    role['tollgate_flush_limit'] = vip.limit(role, vip.REFRESH, rules['normal_flush_daily_limit'])
     role['sweep_flush_limit'] = 30  # [A] common_def.const_def
-    role['strength_item_limit'] = role['energy_item_limit'] = rules['resource_item_daily_limit']
+    role['strength_item_limit'] = role['energy_item_limit'] = vip.limit(role, vip.RESOURCE, rules['resource_item_daily_limit'])
     for key in ('last_sweep_time', 'tollgate_flush_time', 'elite_tollgate_flush_time',
                 'elite_fight_time', 'strength_item_time', 'energy_item_time'):
         role.setdefault(key, 0)

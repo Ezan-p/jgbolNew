@@ -15,7 +15,11 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description='启动模拟器、本地登录服务和游戏')
     parser.add_argument('--client-only', action='store_true',
                         help='仅启动客户端，供单独调试渠道或重定向使用')
+    parser.add_argument('--repair', action='store_true',
+                        help='自动清理失效的登录注入后重启并自检，保留存档')
     args = parser.parse_args(argv)
+    if args.repair and args.client_only:
+        parser.error('--repair 不能与 --client-only 同时使用')
     config = load_config(ROOT / 'game.json')
     if not config['apk'].is_file():
         from build_apk import build
@@ -46,7 +50,11 @@ def main(argv=None):
         redirect = [str(config['python_path']), str(ROOT / 'redirect_game.py'),
                     '--config', str(config['config_path'])]
         print('启动本地登录服务并检查连接……', flush=True)
-        subprocess.run(redirect + ['stop'], check=True)
+        if args.repair:
+            from network_redirect.repair import reset_login
+            reset_login(config)
+        else:
+            subprocess.run(redirect + ['stop'], check=True)
         subprocess.run(redirect + ['start', '--offline', '--probe'], check=True)
     url = f"http://127.0.0.1:{config['web_port']}"
     subprocess.run(['open', url], check=True)

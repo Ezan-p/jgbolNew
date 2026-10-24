@@ -34,10 +34,18 @@ def divination(role, req, rules, parse, now=None):
     f.require(role['level'] >= rules['divination_min_level'], '占星尚未开放')
     now = time.time() if now is None else now
     day = int((now + 8 * 3600) // 86400)
-    state = role.setdefault('divination', dict(day=day, divi_count=rules['daily_divinations'],
-              buy_count=rules['buy_limit'], cur_pos=1, star_list=[], has_half=True))
+    from . import vip
+    free_limit = vip.limit(role, vip.DIVINATION, rules['daily_divinations'])
+    buy_limit = vip.level(role)*10 if vip.level(role) else rules['buy_limit']
+    state = role.setdefault('divination', dict(day=day, divi_count=free_limit,
+              buy_count=buy_limit, cur_pos=1, star_list=[], has_half=True))
     if state['day'] != day:
-        state.update(day=day, divi_count=rules['daily_divinations'], buy_count=rules['buy_limit'], has_half=True)
+        state.update(day=day, divi_count=free_limit, buy_count=buy_limit, has_half=True, vip_free_limit=free_limit, vip_buy_limit=buy_limit)
+    previous_free = state.get('vip_free_limit', free_limit)
+    previous_buy = state.get('vip_buy_limit', buy_limit)
+    state['divi_count'] += max(0, free_limit-previous_free)
+    state['buy_count'] += max(0, buy_limit-previous_buy)
+    state.update(vip_free_limit=free_limit, vip_buy_limit=buy_limit)
     op = req['event_type']
     f.require(op in range(1, 7), '占星操作无效')
     data = parse(req['data'])

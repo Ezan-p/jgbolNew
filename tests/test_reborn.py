@@ -129,6 +129,7 @@ class RebornTests(unittest.TestCase):
             before=self.role();self.assertEqual(self.op(3,6,equip_id=ident,equip_order=0)[-1][0],55);self.assertEqual(before,self.role())
 
     def test_divination_query_draw_quick_collect_reset_buy(self):
+        role=self.role();role['vip_level']=3;self.b.save(role)
         self.assertEqual(self.req(1337,event_type=1,data='{}')[-1][0],190)
         self.req(1337,event_type=2,data='{}');self.assertEqual(len(self.role()['divination']['star_list']),1)
         self.req(1337,event_type=3,data='{}');self.assertEqual(len(self.role()['divination']['star_list']),20)
@@ -145,7 +146,7 @@ class RebornTests(unittest.TestCase):
         stars.divination(role,dict(event_type=2,data='{}'),rules,login_fields,now=100000)
         pending=copy.deepcopy(role['divination']['star_list'])
         stars.divination(role,dict(event_type=1,data='{}'),rules,login_fields,now=200000)
-        self.assertEqual(role['divination']['divi_count'],20);self.assertEqual(role['divination']['star_list'],pending)
+        self.assertEqual(role['divination']['divi_count'],rules['daily_divinations']);self.assertEqual(role['divination']['star_list'],pending)
 
     def test_awaken_star_equip_upgrade_unload_decompose_restore(self):
         sid=self.awake(); self.assertEqual(self.get(sid)['awaken'],1)

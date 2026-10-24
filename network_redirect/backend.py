@@ -11,7 +11,7 @@ import struct
 import time
 
 from .protocol import encode, decode
-from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily
+from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily, guild, vip, xianling, welfare
 
 
 # The client initializes these sections together in data.set_g_new_config.
@@ -25,7 +25,7 @@ CLIENT_CONFIG = '''{
     [14]={cost_item_count={},cost_gold_count={},is_open=false,cheer_level_limit={},
           is_open_ni=false,open_cheer_item={}},
     [15]=__IMMORTAL_CONFIG__,
-    [24]={vip_shop={had_gift=false},buff_data={buff_type=0}},
+    [24]={vip_shop=__XIANLING_HINT__,buff_data={buff_type=0}},
     config_end=true
 }'''
 with (Path(__file__).resolve().parents[1] / 'analysis/configs/role_level_config.csv').open() as _levels:
@@ -47,6 +47,16 @@ def login_fields(text):
 
 class Backend:
     def __init__(self, directory, port, emit):
+        self.welfare_rules = welfare.load_rules()
+        self.welfare_replies = {}
+        self.last_welfare_serial = 0
+        self.xianling_rules = xianling.load_rules()
+        self.vip_rules = vip.load_rules()
+        self.vip_replies = {}
+        self.last_vip_serial = 0
+        self.guild_rules = guild.load_rules()
+        self.guild_replies = {}
+        self.last_guild_serial = 0
         self.daily_rules = daily.load_rules()
         self.daily_replies = {}
         self.last_daily_serial = 0
@@ -125,6 +135,7 @@ class Backend:
         return role
 
     def save(self, role, account='local-player'):
+        vip.prepare(role, self.vip_rules)
         reborn.prepare(role, self.reborn_rules)
         immortal.prepare(role, self.immortal_rules)
         formation.recalculate(role, self.formation_rules)
@@ -139,6 +150,9 @@ class Backend:
         summon.prepare(role, now, self.summon_rules)
         activity.prepare(role, now, self.activity_rules)
         daily.prepare(role, now, self.daily_rules)
+        guild.prepare(role, now, self.guild_rules)
+        xianling.prepare(role, now)
+        welfare.prepare(role, now, self.welfare_rules)
         role.update(summon.remaining(role, now))
         self.save(role)
         return dict(role, server_time=now, random_key=self.random_key)
@@ -147,11 +161,17 @@ class Backend:
         # 2998/event 80 feeds data.callback_update_config before mainUI is created.
         # This is a minimal local configuration, not an official configuration dump.
         role = self.profile()
+        journey.prepare(role, int(time.time()), self.journey_rules)
+        activity.prepare(role, int(time.time()), self.activity_rules)
         goods = market.catalog(role, int(time.time()), self.market_rules)
         self.save(role)
+        vip.prepare(role, self.vip_rules)
         config = CLIENT_CONFIG.replace('__MARKET_CONFIG__', summon.lua(goods))
+        config = config.replace('__XIANLING_HINT__', summon.lua(xianling.hint(role,int(time.time()),self.xianling_rules)))
+        config = config.replace('config_end=true', '[8]=' + summon.lua(guild.client_config(self.guild_rules)) + ',config_end=true')
         for key, value in daily.client_config(self.daily_rules).items():
             config = config.replace('config_end=true', '[%d]=' % key + summon.lua(value) + ',config_end=true')
+        config = config.replace('config_end=true', '[1]=' + summon.lua(vip.client_config(self.vip_rules)) + ',local_vip=' + summon.lua(vip.client_state(role)) + ',config_end=true')
         config = config.replace('__PARTY_CONFIG__', summon.lua(dict(party_top_list={},pay_consume_gold=self.activity_rules['party_fight_gold'])))
         config = config.replace('__IMMORTAL_CONFIG__', summon.lua(immortal.client_config(self.immortal_rules)))
         config = config.replace('config_end=true', '[31]=' + summon.lua(reborn.client_config(self.reborn_rules)) + ',[32]={is_open=true,flag=true},config_end=true')
@@ -172,6 +192,8 @@ class Backend:
         if role.get('summon', {}).get('last_result'):
             replies.append(summon.event(79, role['summon']['last_result']))
         replies.append(daily.hint(role, int(time.time()), self.daily_rules))
+        replies.append(welfare.hint(role, int(time.time()), self.welfare_rules))
+        self.save(role)
         return replies
 
     def roster(self, serial=0, role=None):
@@ -306,6 +328,7 @@ class Backend:
         try:
             role = self.profile()
             result = summon.settle(role, data, int(time.time()), self.summon_rules)
+            welfare.track(role,1045,data,[],int(time.time()),self.welfare_rules)
             formation.prepare(role, self.formation_rules)
             immortal.prepare(role, self.immortal_rules)
             # Encode every business response before committing any resources.
@@ -351,6 +374,12 @@ class Backend:
             state['authenticated'] = True
             self.server_serial = 200000
             self.reply_history.clear()
+            self.welfare_replies.clear()
+            self.last_welfare_serial = 0
+            self.vip_replies.clear()
+            self.last_vip_serial = 0
+            self.guild_replies.clear()
+            self.last_guild_serial = 0
             self.daily_replies.clear()
             self.last_daily_serial = 0
             self.summon_replies.clear()
@@ -379,13 +408,19 @@ class Backend:
         if mid == 2999:
             role = self.profile()
             now = int(time.time())
+            previous_month = role.get('xianling', {}).get('month')
+            xianling.prepare(role, now)
             previous_day = role.get('daily', {}).get('day')
             journey.prepare(role, now, self.journey_rules)
             daily.prepare(role, now, self.daily_rules)
             self.save(role)
             updates = self.journey_attributes(role)
+            if previous_month != role['xianling']['month']:
+                updates.append(xianling.tip(role,now,self.xianling_rules))
             if previous_day != role['daily']['day']:
                 updates.append(daily.hint(role, now, self.daily_rules))
+                updates.append(welfare.hint(role, now, self.welfare_rules))
+                self.save(role)
             return [encode(2999, dict(time=now, random_key=self.random_key, delay_time=0))] + self.number_replies(updates)
         if mid == 1105:
             last = data['req_serial_num']
@@ -398,6 +433,12 @@ class Backend:
                 return [packet for serial, packet in self.reply_history if serial > last]
             self.emit('game_replay_unavailable', message_id=mid, message='请求不在当前响应缓存范围内')
             return []
+        if welfare.handles(mid, data):
+            return self.welfares(packet, mid, data)
+        if vip.handles(mid, data) or mid == 1336 or mid == 1051 and data['item_type'] == 1249:
+            return self.vips(packet, mid, data)
+        if mid in guild.HANDLED or mid == 1026 and data['fight_type'] in guild.FIGHTS or mid == 1097 and data['channel'] == 6:
+            return self.guilds(packet, mid, data)
         if mid in daily.HANDLED:
             return self.dailies(packet, mid, data)
         if (mid in activity.HANDLED or (mid == 1026 and data['fight_type'] in activity.FIGHTS)
@@ -429,6 +470,111 @@ class Backend:
         if data and data.get('serial_num'):
             return self.complete(data['serial_num'], [summon.event(55, {'op_string': '该功能尚未接入本地服务端（%d）' % mid})])
         return []
+
+    def guilds(self, packet, mid, data):
+        serial = data['serial_num']
+        cached = self.guild_replies.get(serial)
+        if cached and cached[0] == packet:
+            return cached[1]
+        if not serial or serial <= self.last_guild_serial:
+            return self.complete(serial, [summon.event(55, {'op_string': '仙盟请求已过期，请刷新后重试'})])
+        try:
+            now = int(time.time())
+            role = self.profile()
+            before = copy.deepcopy(role)
+            if mid == 1026:
+                from . import guild_combat
+                events = guild_combat.fight(role, data, now, self.guild_rules, self.journey_rules)
+            elif mid == 1097:
+                events = guild.chat(role, data['chat_msg'], now, self.guild_rules)
+            else:
+                events = guild.settle(role, data, now, self.guild_rules, login_fields, self.daily_rules)
+            gs, current_guild = guild.prepare(role, now, self.guild_rules)
+            if mid == 1301 and current_guild and data['id'] in guild.MANAGEMENT:
+                current_guild['events'].append(role['role_name'] + '：' + guild.OP_LABELS.get(data['id'], '仙盟管理操作') + '（' + str(now) + '）')
+                current_guild['events'] = current_guild['events'][-100:]
+            attrs = [dict(type=t, value=role.get(k, 0)) for t, k in ((7, 'silver_coin'), (8, 'gold_coin'),
+                (101, 'strength'), (102, 'energy'), (144, 'union_id'), (145, 'union_rank'), (146, 'union_contrib'), (148, 'cur_union_contrib'), (147, 'union_store_flush_time'), (151, 'last_feast_grab_time'), (152, 'last_feast_grab_count'), (153, 'last_rece_award_time'), (154, 'train_tree_rate'), (155, 'contrib_plus_rate'), (156, 'last_west_book_time'), (157, 'west_book_count'), (158, 'last_stop_book_time'), (159, 'stop_book_count'))]
+            replies = self.item_deltas(before, role) + self.inventory(role) + [
+                encode(1032, dict(id=role['role_id'], unit_type=1, attr_count=len(attrs), attr_list=attrs)),
+                daily.hint(role, now, self.daily_rules)] + events
+            self.save(role)
+            self.emit('game_guild_ok', operation=data.get('id', data.get('fight_type')), rules_revision=self.guild_rules['revision'])
+        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
+            replies = [summon.event(55, {'op_string': str(error) if isinstance(error, formation.Rejected) else '仙盟数据无效，请刷新后重试'})]
+            self.emit('game_guild_rejected', operation=data.get('id', data.get('fight_type')), message=str(error))
+        replies = self.complete(serial, replies)
+        self.last_guild_serial = serial
+        self.guild_replies[serial] = (packet, replies)
+        if len(self.guild_replies) > 256:
+            del self.guild_replies[next(iter(self.guild_replies))]
+        return replies
+
+    def welfares(self, packet, mid, data):
+        serial = data['serial_num']
+        cached = self.welfare_replies.get(serial)
+        if cached and cached[0] == packet:
+            return cached[1]
+        if not serial or serial <= self.last_welfare_serial:
+            return self.complete(serial, [summon.event(55, {'op_string': '福利请求已过期，请刷新后重试'})])
+        try:
+            now = int(time.time())
+            role = self.profile()
+            before = copy.deepcopy(role)
+            events = welfare.settle(role, mid, data, now, self.welfare_rules, login_fields)
+            replies = self.item_deltas(before, role) + self.inventory(role) + summon.soul_snapshots(role) + [
+                welfare_attributes(role), vip.attrs(role), summon.event(80,dict(local_vip=vip.client_state(role)))] + events + [welfare.hint(role, now, self.welfare_rules)]
+            self.save(role)
+            self.emit('game_welfare_ok', message_id=mid, rules_revision=self.welfare_rules['revision'])
+        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
+            replies = [summon.event(55, {'op_string': str(error) if isinstance(error, formation.Rejected) else '福利数据无效，请刷新后重试'})]
+            self.emit('game_welfare_rejected', message_id=mid, message=str(error))
+        replies = self.complete(serial, replies)
+        self.last_welfare_serial = serial
+        self.welfare_replies[serial] = (packet, replies)
+        if len(self.welfare_replies) > 256:
+            del self.welfare_replies[next(iter(self.welfare_replies))]
+        return replies
+
+    def vips(self, packet, mid, data):
+        serial = data['serial_num']
+        cached = self.vip_replies.get(serial)
+        if cached and cached[0] == packet:
+            return cached[1]
+        if not serial or serial <= self.last_vip_serial:
+            return self.complete(serial, [summon.event(55, {'op_string': 'VIP请求已过期，请刷新后重试'})])
+        try:
+            now = int(time.time())
+            role = self.profile()
+            before = copy.deepcopy(role)
+            if mid == 1336 or mid == 1051 and data['item_type'] == 1249:
+                events = xianling.settle(role, mid, data, now, self.xianling_rules)
+            else:
+                events = vip.settle(role, mid, data, now, self.vip_rules, login_fields)
+            charged = role.get('charge_gold',0)-before.get('charge_gold',0)
+            if charged > 0:
+                xianling.record_charge(role, charged, now)
+                welfare.record_charge(role, charged, now, self.welfare_rules)
+            journey.prepare(role, now, self.journey_rules)
+            activity.prepare(role, now, self.activity_rules)
+            formation.prepare(role, self.formation_rules)
+            replies = self.item_deltas(before, role) + self.inventory(role) + [vip.attrs(role),
+                summon.event(80, dict(local_vip=vip.client_state(role)))] + events
+            if mid in (1336,1111):
+                replies.append(xianling.tip(role,now,self.xianling_rules))
+                if mid == 1111:
+                    replies = [welfare.hint(role,now,self.welfare_rules), welfare_attributes(role)] + replies
+            self.save(role)
+            self.emit('game_vip_ok', message_id=mid, rules_revision=self.vip_rules['revision'])
+        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
+            replies = [summon.event(55, {'op_string': str(error) if isinstance(error, formation.Rejected) else 'VIP数据无效，请刷新后重试'})]
+            self.emit('game_vip_rejected', message_id=mid, message=str(error))
+        replies = self.complete(serial, replies)
+        self.last_vip_serial = serial
+        self.vip_replies[serial] = (packet, replies)
+        if len(self.vip_replies) > 256:
+            del self.vip_replies[next(iter(self.vip_replies))]
+        return replies
 
     def dailies(self, packet, mid, data):
         serial = data['serial_num']
@@ -470,6 +616,7 @@ class Backend:
             before = copy.deepcopy(role)
             events = (reborn.settle(role, data, self.reborn_rules, login_fields) if mid == 1328 else
                       reborn_stars.settle(role, mid, data, self.reborn_rules, login_fields))
+            welfare.track(role,mid,data,events,int(time.time()),self.welfare_rules)
             events = daily.track(role, before, mid, data, events, int(time.time()), self.daily_rules, login_fields) + events
             reborn.prepare(role, self.reborn_rules)
             formation.recalculate(role, self.formation_rules)
@@ -624,6 +771,7 @@ class Backend:
             journey.prepare(role, now, self.journey_rules)
             before = copy.deepcopy(role)
             events = journey.settle(role, mid, data, now, self.journey_rules, self.formation_rules, self.activity_rules)
+            welfare.track(role,mid,data,events,now,self.welfare_rules)
             hints = daily.track(role, before, mid, data, events, now, self.daily_rules, login_fields)
             # Keep the sweep result first and the battle-start callback last.
             events = events + hints if mid == 1061 else hints + events
@@ -665,6 +813,7 @@ class Backend:
             before = copy.deepcopy(role)
             events = activity.settle(role, mid, data, now, self.activity_rules,
                                      self.journey_rules, self.formation_rules, login_fields)
+            welfare.track(role,mid,data,events,int(time.time()),self.welfare_rules)
             events = daily.track(role, before, mid, data, events, now, self.daily_rules, login_fields) + events
             formation.prepare(role, self.formation_rules)
             immortal.prepare(role, self.immortal_rules)
@@ -687,3 +836,8 @@ class Backend:
         if len(self.activity_replies) > 256:
             del self.activity_replies[next(iter(self.activity_replies))]
         return replies
+
+
+def welfare_attributes(role):
+    pairs=((7,'silver_coin'),(8,'gold_coin'),(53,'first_charge'),(23,'first_charge_gift'),(16,'take_charge_gift_time'),(34,'buy_growup'))
+    return encode(1032,dict(id=role['role_id'],unit_type=1,attr_count=len(pairs),attr_list=[dict(type=t,value=role.get(k,0)) for t,k in pairs]))

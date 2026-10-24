@@ -75,6 +75,17 @@ class LauncherTests(unittest.TestCase):
         manager.launch.assert_called_once()
         self.assertEqual(run.call_count, 1)
 
+    def test_repair_resets_stale_injection_before_probed_start(self):
+        with patch('network_redirect.repair.reset_login') as reset:
+            manager, run = self.launch(['--repair'])
+        reset.assert_called_once()
+        self.assertEqual(run.call_args_list[0].args[0][-3:], ['start', '--offline', '--probe'])
+
+    def test_repair_failure_does_not_launch_or_report_success(self):
+        with patch('network_redirect.repair.reset_login', side_effect=RuntimeError('repair failed')):
+            with self.assertRaisesRegex(RuntimeError, 'repair failed'):
+                self.launch(['--repair'])
+
     def test_missing_apk_is_installed_before_local_launch(self):
         manager, run = self.launch([], installed='')
         manager.install.assert_called_once()

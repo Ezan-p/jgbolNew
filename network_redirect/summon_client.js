@@ -50,7 +50,7 @@ if (REDIRECT_CONFIG.offline) {
                 if (executing || done) return;
                 done = true;
                 try {
-                    evaluate(args[0], "local s=package.loaded['ui.summonUI']; if s and s._localGoldRestore then s._localGoldRestore() end; return 'restored'");
+                    evaluate(args[0], "local s=package.loaded['ui.summonUI']; if s and s._localGoldRestore then s._localGoldRestore() end; local v=package.loaded['ui.vipUI']; if v and v._localVipRestore then v._localVipRestore() end; local w=package.loaded['ui.actNoticeUI']; if w and w._localWelfareRestore then w._localWelfareRestore() end; return 'restored'");
                     ready = false;
                     resolve(true);
                 } catch (e) {

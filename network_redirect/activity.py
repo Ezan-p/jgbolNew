@@ -110,8 +110,9 @@ def prepare(role,now,r):
         role.update(pray_spirit_times=0,convert_fight_count=0,party_fight_count=0,party_fight_count_plus=0,
                     gongji_plus_rate=0,party_take_prize=0)
     for key,value in dict(trial=None,trial_count=0,trial_next=0,trial_spawned=0).items():s.setdefault(key,value)
-    role.update(top_order=s['rank_order'],top_score=s['rank_score'],top_fight_limit=r['rank_daily_limit'],
-                rape_flush_limit=r['rape_free_refreshes'],convert_fight_limit=r['convert_daily_limit'])
+    from . import vip
+    role.update(top_order=s['rank_order'],top_score=s['rank_score'],top_fight_limit=vip.limit(role,vip.RANK,r['rank_daily_limit']),
+                rape_flush_limit=vip.limit(role,vip.RAPE,r['rape_free_refreshes']),convert_fight_limit=vip.limit(role,vip.CONVERT,r['convert_daily_limit']))
     return s
 
 
@@ -243,7 +244,7 @@ def rank(role,r):
     eligible=sum(1<<(i-2) for i,row in EXCHANGE.items() if int(row['promote_order']) and s.get('rank_reached_order',100000)<=int(row['promote_order']))
     claimed=sum(1<<(i-2) for i in s.get('rank_promotions',[]))
     return encode(1022,dict(need_update=True,self_order=order,self_score=s['rank_score'],promote_time=eligible,
-             promote_prize=claimed,fight_count=max(0,r['rank_daily_limit']-s['rank_count']),show_count=len(rows),show_list=rows))
+             promote_prize=claimed,fight_count=max(0,role['top_fight_limit']-s['rank_count']),show_count=len(rows),show_list=rows))
 
 
 def rank_score(order,column):
@@ -258,7 +259,7 @@ def rape_board(role,now,r,update=1):
             for j in range(1,4)}}) for i,tid in enumerate(r['rape_skills'],1)]
     boards=copy.deepcopy(s['rape_boards'])
     for b in boards:b['form_list']={int(t):{int(i):v for i,v in rows.items()} for t,rows in b['form_list'].items()}
-    return dict(time=now,update_type=update,used_count=s['rape_refreshes'],free_count=r['rape_free_refreshes'],gold_cost=r['rape_refresh_gold'],rape_list=boards)
+    return dict(time=now,update_type=update,used_count=s['rape_refreshes'],free_count=role['rape_flush_limit'],gold_cost=r['rape_refresh_gold'],rape_list=boards)
 
 
 def duty_data(role,r,result=2):
@@ -316,6 +317,10 @@ def trial_query(role,req,now,r):
 def query_lineup(role,req,r):
     s=role['activity'];ident=req['des_id']
     own=ident==role['role_id']
+    gs=role.get('guild',{});g=gs.get('unions',{}).get(str(int(role.get('union_id',0))))
+    if g and (str(int(ident)) in g['members'] or ident in range(90001,90007) or ident in range(91001,91004)):
+        from . import guild,guild_match
+        return [summon.event(11,guild_match.lineup(role,ident,guild.load_rules()))]
     valid=own or req['des_type']==2 and (10000<ident<10000+s['rank_order'] or
         any(str(int(ident)) in b['form_list'].get('2',{}) for b in (s['rape_boards'] or [])))
     require(valid,'阵容目标不存在')
@@ -339,7 +344,7 @@ def battle(role,req,now,r,jrules,frules):
     if ft==4:
         require(role['rule_index']<role['level']-4,'修炼次数已用完')
     elif ft==2:
-        require(s['rank_count']<r['rank_daily_limit'],'今日封神榜次数已用完')
+        require(s['rank_count']<role['top_fight_limit'],'今日封神榜次数已用完')
         target=req['des_value'];require(target in {max(1,s['rank_order']-v) for v in (1,2,5,10,20)} and target<s['rank_order'] and req['des_id']==10000+target and req['des_type']==2,'封神榜对手已变化')
         spend(role,'energy',1);s['rank_count']+=1
     elif ft==3:
@@ -363,7 +368,7 @@ def battle(role,req,now,r,jrules,frules):
             spend(role,'gold_coin',r['party_fight_gold']);s['party_paid']+=1
         role['party_fight_count']=s['party_count'];role['party_fight_count_plus']=s['party_paid']
     elif ft==10:
-        require(role['convert_fight_count']<r['convert_daily_limit']+int(role.get('month_card_time',0)>now),'今日唤神次数已用完')
+        require(role['convert_fight_count']<role['convert_fight_limit']+int(role.get('month_card_time',0)>now),'今日唤神次数已用完')
         require(req['des_value'] in CONVERT and any(c['type']==req['des_value'] for c in role['corteges']),'唤神来源无效')
         if role['convert_fight_count']>0:consume(role,r['convert_item'],1)
         role['convert_fight_count']+=1;role['convert_fight_time']=now
@@ -520,7 +525,7 @@ def settle(role,mid,req,now,r,jrules,frules,parse):
     if mid==1029:
         require(role['level']>=8 and req['flag'] in (1,2,3),'渡劫请求无效')
         if req['flag']!=1:
-            if req['flag']==2:require(s['rape_refreshes']<r['rape_free_refreshes'],'免费刷新次数已用完')
+            if req['flag']==2:require(s['rape_refreshes']<role['rape_flush_limit'],'免费刷新次数已用完')
             else:spend(role,'gold_coin',r['rape_refresh_gold'])
             s['rape_refreshes']+=1;s['rape_boards']=None
         return [summon.event(40,rape_board(role,now,r,req['flag']))]

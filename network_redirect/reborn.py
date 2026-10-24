@@ -33,7 +33,7 @@ def load_rules(path=ROOT / 'server_config/reborn_rules.json'):
         f.require(x['material'] in f.ITEMS and type(x['cost']) is int and x['cost'] > 0, '境界材料配置无效')
     f.require(previous == 9, '境界必须覆盖九转')
     for k in ('daily_divinations', 'buy_limit', 'buy_cost', 'pending_limit'):
-        f.require(type(r[k]) is int and 0 < r[k] <= 10000, '占星配置无效')
+        f.require(type(r[k]) is int and (0 if k == 'buy_limit' else 1) <= r[k] <= 10000, '占星配置无效')
     f.require(type(r['equip_realm']) is int and 0 <= r['equip_realm'] <= 4, '装备境界配置无效')
     f.require(r['divination_min_level'] in f.LEVELS and 0 <= r['divination_advance_percent'] <= 100, '占星门槛配置无效')
     return r

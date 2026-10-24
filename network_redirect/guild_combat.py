@@ -1,0 +1,48 @@
+"""Server-authoritative guild battles, original fixed-width replay format."""
+import copy
+from . import guild as u, journey, summon
+from .protocol import encode,decode
+
+
+def simulate(role,s,r,jrules,ft,name,hp=None):
+    u.require(any(c.get('order') for c in role['corteges']),'请先上阵神仙')
+    units=journey.fighters(role,dict(cortege_list=f"{r['battle_npc']}|{r['battle_level']}"))
+    if ft==15 and s.get('feast_fam_rate',0):
+        for unit in units[0]:
+            for key in ('hp','max_hp','gongji','fangyu','magic'):unit[key]=unit[key]*(100+s['feast_fam_rate'])//100
+    if hp is not None:units[1][0].update(hp=hp,max_hp=hp)
+    rules=copy.deepcopy(jrules);rules['battle']['max_actions']=min(60,rules['battle']['max_actions'])
+    result,lineup,actions=journey.battle(role,{},rules,units=units,slots=8)
+    s['fight_id']=s.get('fight_id',0)+1;fid=s['fight_id']
+    packets=[encode(1028,dict(fight_id=fid,first_hand=1,des_name=name,lineup_count=len(lineup),lineup=lineup)),
+             encode(1027,dict(fight_id=fid,fight_type=ft,final_result=result,fight_round=len(actions),fight_result=actions))]
+    return result,packets,dict(line_up_msg=decode(packets[0])[2],fight_result_msg=decode(packets[1])[2])
+
+
+def fight(role,req,now,r,jrules):
+    s,g=u.prepare(role,now,r);u.require(g is not None,'请先加入仙盟');ft=req['fight_type']
+    if ft==13:
+        u.authorize(role,r,15);t=g['tree'];u.require(t['state']==3,'神树尚未进入守护阶段')
+        u.require(req['des_type'] in (1,2),'守护方式无效')
+        if req['des_type']==2:u.pay(role,'gold_coin',r['tree_flush_gold'])
+        else:u.require(now>=t.get('cooltime',0),'守护冷却中')
+        old=t.get('hp',r['tree_boss_hp']);result,packets,replay=simulate(role,s,r,jrules,ft,'神树守护',old)
+        damage=sum(sum(max(0,v) for v in a['damage_list']) for a in replay['fight_result_msg']['fight_result'] if a['is_src'])
+        # Damage is read from the authoritative replay, including unsuccessful attempts.
+        damage=min(old,damage);t['hp']=old-damage;t['cooltime']=now+r['tree_fight_cooldown']
+        rank=next((x for x in t['ranks'] if x['id']==role['role_id']),None)
+        if rank is None:rank=dict(id=role['role_id'],name=role['role_name'],order=1,challenge_count=0,damage=0);t['ranks'].append(rank)
+        rank['damage']+=damage;rank['challenge_count']+=1
+        t['ranks'].sort(key=lambda x:-x['damage'])
+        for i,x in enumerate(t['ranks'],1):x['order']=i
+        if not t['hp']:
+            for p in r['tree_rewards']:journey.grant(role,p)
+            t.update(state=1,planted=0,hp=r['tree_boss_hp'])
+        return packets+[u.reply(16,u.tree_data(role,s,g,now,r)),summon.event(44,dict(fight_id=s['fight_id'],fight_type=ft))]
+    if ft==19:
+        from . import guild_escort
+        return guild_escort.rob(role,s,g,guild_escort.state(s),dict(des_id=req['des_id'],flush_cd=req['des_type']==2),now,r)
+    if ft in (14,16,17):
+        from . import guild_match
+        return guild_match.fight(role,s,g,req,now,r,jrules)
+    u.require(False,'该仙盟战斗尚未完成接入')
