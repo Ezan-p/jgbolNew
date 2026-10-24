@@ -168,6 +168,7 @@ def prepare(role, rules):
 
 def recalculate(role, rules):
     """[B] Server formula using [A] base/growth/equipment/fate coefficients."""
+    from . import reborn, reborn_stars
     active_types = {c['type'] for c in role['corteges'] if c.get('order', 0) or c.get('cheer_order', 0)}
     for c in role['corteges']:
         base = BASES.get(c['type'])
@@ -190,6 +191,8 @@ def recalculate(role, rules):
                     if field in (1, 2, 3, 5):
                         s = {1: 'gongji', 2: 'fangyu', 3: 'magic', 5: 'hp'}[field]
                         values[s] *= 1 + Decimal(item['effect_value']) / 100
+        reborn.bonuses(role, c, values, equipped)
+        reborn_stars.bonuses(role, c, values)
         rates = {s: 0 for s in STATS}
         if c.get('order', 0):
             for f in FATES:

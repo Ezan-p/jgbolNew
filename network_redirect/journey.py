@@ -188,6 +188,8 @@ def fighters(role, cfg):
 def battle(role, cfg, rules, *, units=None, slots=8):
     """[B] Server turn simulation; no client-supplied victory or damage trusted."""
     ours, enemies = copy.deepcopy(units) if units is not None else fighters(role, cfg)
+    from . import reborn_stars
+    reborn_stars.attach_combat_traits(role, ours)
     home_train = role.get('activity', {}).get('home', {}).get('train', {})
     if home_train:
         from .activity_home import TRAIN
@@ -218,7 +220,7 @@ def battle(role, cfg, rules, *, units=None, slots=8):
                 for target in targets:
                     power = actor['gongji']
                     if sk != 1:
-                        power += int(float(skill['intensity']) + float(skill['upgrade_plus']) * (sk_level - 1))
+                        power += reborn_stars.spell_power(float(skill['intensity']) + float(skill['upgrade_plus']) * (sk_level - 1), sk, actor.get('reborn_traits', {}))
                         power += actor['magic'] * b['skill_magic_percent'] // 100
                     # [B] Combine CSV training rate/flat bonuses in the local simulator.
                     buffs = actor.get('training_bonuses', [(0,0)]*4)
@@ -229,7 +231,7 @@ def battle(role, cfg, rules, *, units=None, slots=8):
                     defense = target['fangyu'] * (100+rate)//100 + flat
                     hit = max(1, power * b['minimum_damage_percent'] // 100,
                               power - defense * b['defense_percent'] // 100)
-                    hit = min(hit, target['hp'], 2147483647)
+                    hit = reborn_stars.combat_hit(hit, target['hp'], sk == 1, actor.get('reborn_traits', {}), target.get('reborn_traits', {}))
                     target['hp'] -= hit
                     damage[target['order'] - 1] = hit
                 actions.append(dict(self_use=False, skill_type=sk, is_src=is_src, result=0,

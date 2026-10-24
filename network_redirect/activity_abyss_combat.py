@@ -5,7 +5,7 @@ Events 121 carry healing/revival to the unmodified replay. Extra attacks are rea
 """
 import copy
 import secrets
-from . import formation, journey, summon
+from . import formation, journey, summon, reborn_stars
 DESC={int(x['type_id']):[int(v.rstrip('%')) for v in x['reduce_value'].split('|')] for x in summon.rows('specter_jp_desc.csv')}
 DRUGS={int(x['drug_type']):[list(map(int,t.split('|'))) for t in next(v for k,v in x.items() if k.startswith('effect1')).split('/')]
        for x in summon.rows('specter_extr_skill_drug.csv')}
@@ -25,6 +25,7 @@ def effects(row,pills):
 
 def battle(role,units,rules,effect_values,max_actions=80):
     ours,enemies=copy.deepcopy(units);b=rules['battle'];limit=min(max_actions,b['max_actions'])
+    reborn_stars.attach_combat_traits(role, ours)
     for side_index,side in enumerate((ours,enemies),1):
         for u in side:
             u['side']=side_index;u['extras']=effect_values.copy() if side_index==2 else {}
@@ -54,7 +55,7 @@ def battle(role,units,rules,effect_values,max_actions=80):
             if not target['hp']:continue
             power=actor['gongji']
             if sk!=1:
-                power+=int(float(skill['intensity'])+float(skill['upgrade_plus'])*(level-1))
+                power+=reborn_stars.spell_power(float(skill['intensity'])+float(skill['upgrade_plus'])*(level-1),sk,actor.get('reborn_traits',{}))
                 power+=actor['magic']*b['skill_magic_percent']//100
             buffs=actor.get('training_bonuses',[(0,0)]*4);guards=target.get('training_bonuses',[(0,0)]*4)
             rate,flat=buffs[0 if sk==1 else 2];power=power*(100+rate)//100+flat
@@ -65,7 +66,7 @@ def battle(role,units,rules,effect_values,max_actions=80):
             raw=max(1,power*b['minimum_damage_percent']//100,power-defense*b['defense_percent']//100)
             if sk==1:raw=raw*(100+actor['extras'].get(10111,0))//100
             raw=raw*(100-target['extras'].get(10106 if sk==1 else 10108,0))//100
-            hit=min(target['hp'],2147483647,max(1,raw*scale//100));target['hp']-=hit;total+=hit
+            hit=reborn_stars.combat_hit(max(1,raw*scale//100),target['hp'],sk==1,actor.get('reborn_traits',{}),target.get('reborn_traits',{}));target['hp']-=hit;total+=hit
             damage[target['order']-1]=hit
             revive=target['extras'].get(10119,0)
             if not target['hp'] and revive and not target['revived']:

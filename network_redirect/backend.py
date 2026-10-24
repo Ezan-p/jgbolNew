@@ -11,7 +11,7 @@ import struct
 import time
 
 from .protocol import encode, decode
-from . import summon, formation, market, immortal, journey, activity
+from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily
 
 
 # The client initializes these sections together in data.set_g_new_config.
@@ -47,6 +47,12 @@ def login_fields(text):
 
 class Backend:
     def __init__(self, directory, port, emit):
+        self.daily_rules = daily.load_rules()
+        self.daily_replies = {}
+        self.last_daily_serial = 0
+        self.reborn_rules = reborn.load_rules()
+        self.reborn_replies = {}
+        self.last_reborn_serial = 0
         self.summon_rules = summon.load_rules()
         self.formation_rules = formation.load_rules()
         self.market_rules = market.load_rules()
@@ -100,6 +106,7 @@ class Backend:
                 changed = True
             changed = formation.prepare(role, self.formation_rules) or changed
             changed = immortal.prepare(role, self.immortal_rules) or changed
+            changed = reborn.prepare(role, self.reborn_rules) or changed
             if 'journey' not in role:
                 changed = journey.prepare(role, int(time.time()), self.journey_rules) or changed
             formation.recalculate(role, self.formation_rules)
@@ -118,6 +125,7 @@ class Backend:
         return role
 
     def save(self, role, account='local-player'):
+        reborn.prepare(role, self.reborn_rules)
         immortal.prepare(role, self.immortal_rules)
         formation.recalculate(role, self.formation_rules)
         self.db.execute('INSERT OR REPLACE INTO roles VALUES (?,?)',
@@ -130,6 +138,7 @@ class Backend:
         journey.prepare(role, now, self.journey_rules)
         summon.prepare(role, now, self.summon_rules)
         activity.prepare(role, now, self.activity_rules)
+        daily.prepare(role, now, self.daily_rules)
         role.update(summon.remaining(role, now))
         self.save(role)
         return dict(role, server_time=now, random_key=self.random_key)
@@ -141,8 +150,11 @@ class Backend:
         goods = market.catalog(role, int(time.time()), self.market_rules)
         self.save(role)
         config = CLIENT_CONFIG.replace('__MARKET_CONFIG__', summon.lua(goods))
+        for key, value in daily.client_config(self.daily_rules).items():
+            config = config.replace('config_end=true', '[%d]=' % key + summon.lua(value) + ',config_end=true')
         config = config.replace('__PARTY_CONFIG__', summon.lua(dict(party_top_list={},pay_consume_gold=self.activity_rules['party_fight_gold'])))
         config = config.replace('__IMMORTAL_CONFIG__', summon.lua(immortal.client_config(self.immortal_rules)))
+        config = config.replace('config_end=true', '[31]=' + summon.lua(reborn.client_config(self.reborn_rules)) + ',[32]={is_open=true,flag=true},config_end=true')
         config = config.replace('config_end=true', '[23]=' + summon.lua(self.formation_rules['equipment_advance']) + ',config_end=true')
         replies = [encode(2998, dict(id=80, data=config)),
                 encode(1017, dict(self.snapshot(), reconnect=reconnect))] + self.inventory()
@@ -159,6 +171,7 @@ class Backend:
             replies.append(summon.news_snapshot(role, self.summon_rules))
         if role.get('summon', {}).get('last_result'):
             replies.append(summon.event(79, role['summon']['last_result']))
+        replies.append(daily.hint(role, int(time.time()), self.daily_rules))
         return replies
 
     def roster(self, serial=0, role=None):
@@ -219,7 +232,7 @@ class Backend:
                   'hp_plus': 86, 'magic_plus': 87, 'gongji_plus': 88,
                   'fangyu_plus': 89, 'culture_point': 90,
                   'train_increase_field': 55, 'train_decrease_field': 56,
-                  'train_change_value': 57}
+                  'train_change_value': 57, 'reborn_layer': 224, 'reborn_vein_level': 225, 'reborn_plus_type': 226}
         old = {c['id']: c for c in before['corteges']}
         packets = []
         for c in after['corteges']:
@@ -244,7 +257,8 @@ class Backend:
     def item_deltas(self, before, after):
         fields = {'level': 103, 'count': 102, 'equip_order': 105, 'equip_pos': 10,
                   'effect_value': 209, 'advance_level': 109, 'star_count': 110,
-                  'cur_spirit_count': 111, 'is_lock': 116}
+                  'cur_spirit_count': 111, 'is_lock': 116, 'reborn_bit': 113, 'cast_level': 115,
+                  'owner_id': 311, 'ext_awaken_pos': 313, 'prob_compen': 310}
         old = {i['id']: i for i in before['attachments']}
         packets = []
         for item in after['attachments']:
@@ -337,6 +351,8 @@ class Backend:
             state['authenticated'] = True
             self.server_serial = 200000
             self.reply_history.clear()
+            self.daily_replies.clear()
+            self.last_daily_serial = 0
             self.summon_replies.clear()
             self.last_summon_serial = 0
             self.formation_replies.clear()
@@ -362,9 +378,15 @@ class Backend:
             raise ValueError('Business message before login')
         if mid == 2999:
             role = self.profile()
-            journey.prepare(role, int(time.time()), self.journey_rules)
+            now = int(time.time())
+            previous_day = role.get('daily', {}).get('day')
+            journey.prepare(role, now, self.journey_rules)
+            daily.prepare(role, now, self.daily_rules)
             self.save(role)
-            return [encode(2999, dict(time=int(time.time()), random_key=self.random_key, delay_time=0))] + self.number_replies(self.journey_attributes(role))
+            updates = self.journey_attributes(role)
+            if previous_day != role['daily']['day']:
+                updates.append(daily.hint(role, now, self.daily_rules))
+            return [encode(2999, dict(time=now, random_key=self.random_key, delay_time=0))] + self.number_replies(updates)
         if mid == 1105:
             last = data['req_serial_num']
             if last == self.server_serial or (last == 0 and not self.reply_history):
@@ -376,6 +398,8 @@ class Backend:
                 return [packet for serial, packet in self.reply_history if serial > last]
             self.emit('game_replay_unavailable', message_id=mid, message='请求不在当前响应缓存范围内')
             return []
+        if mid in daily.HANDLED:
+            return self.dailies(packet, mid, data)
         if (mid in activity.HANDLED or (mid == 1026 and data['fight_type'] in activity.FIGHTS)
                 or (mid == 1051 and data['item_type'] in (1130,1131,1132,1133,1213,1214,1215,1216,1217))
                 or (mid == 1059 and data['flag'] == 3)
@@ -391,6 +415,8 @@ class Backend:
             # Event 1 opens/refreshes the requested UI after both lists arrive.
             return self.complete(data['serial_num'], self.inventory() + summon.soul_snapshots(self.profile()) + [
                 encode(2998, dict(id=1, data='{flag=%d}' % data['flag']))])
+        if mid in reborn.HANDLED:
+            return self.rebirth(packet, mid, data)
         if mid in immortal.HANDLED:
             return self.immortals(packet, mid, data)
         if mid in formation.HANDLED:
@@ -403,6 +429,76 @@ class Backend:
         if data and data.get('serial_num'):
             return self.complete(data['serial_num'], [summon.event(55, {'op_string': '该功能尚未接入本地服务端（%d）' % mid})])
         return []
+
+    def dailies(self, packet, mid, data):
+        serial = data['serial_num']
+        cached = self.daily_replies.get(serial)
+        if cached and cached[0] == packet:
+            return cached[1]
+        if not serial or serial <= self.last_daily_serial:
+            return self.complete(serial, [summon.event(55, {'op_string': '日常请求已过期，请刷新后重试'})])
+        try:
+            now = int(time.time())
+            role = self.profile()
+            before = copy.deepcopy(role)
+            events = daily.settle(role, mid, data, now, self.daily_rules, login_fields)
+            attrs = [dict(type=t, value=role[k]) for t, k in ((7, 'silver_coin'), (8, 'gold_coin'))]
+            replies = self.item_deltas(before, role) + self.inventory(role) + [
+                encode(1032, dict(id=role['role_id'], unit_type=1, attr_count=len(attrs), attr_list=attrs)),
+                daily.hint(role, now, self.daily_rules)] + events
+            self.save(role)
+            self.emit('game_daily_ok', message_id=mid, rules_revision=self.daily_rules['revision'])
+        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
+            replies = [summon.event(55, {'op_string': str(error) if isinstance(error, formation.Rejected) else '日常数据无效，请刷新后重试'})]
+            self.emit('game_daily_rejected', message_id=mid, message=str(error))
+        replies = self.complete(serial, replies)
+        self.last_daily_serial = serial
+        self.daily_replies[serial] = (packet, replies)
+        if len(self.daily_replies) > 256:
+            del self.daily_replies[next(iter(self.daily_replies))]
+        return replies
+
+    def rebirth(self, packet, mid, data):
+        serial = data['serial_num']
+        cached = self.reborn_replies.get(serial)
+        if cached and cached[0] == packet:
+            return cached[1]
+        if not serial or serial <= self.last_reborn_serial:
+            return self.complete(serial, [summon.event(55, {'op_string': '转生请求已过期，请刷新后重试'})])
+        try:
+            role = self.profile()
+            before = copy.deepcopy(role)
+            events = (reborn.settle(role, data, self.reborn_rules, login_fields) if mid == 1328 else
+                      reborn_stars.settle(role, mid, data, self.reborn_rules, login_fields))
+            events = daily.track(role, before, mid, data, events, int(time.time()), self.daily_rules, login_fields) + events
+            reborn.prepare(role, self.reborn_rules)
+            formation.recalculate(role, self.formation_rules)
+            attrs = [dict(type=t, value=role.get(k, 0)) for t, k in
+                     ((7, 'silver_coin'), (8, 'gold_coin'), (30, 'role_combat_power'),
+                      (580, 'reborn_layer'), (581, 'maxlayer_reborn_count'))]
+            replies = self.companion_deltas(before, role) + self.item_deltas(before, role)
+            old_skills = {x['id']: x for x in before['attachments'] if x['attach_type'] == 6}
+            for item in role['attachments']:
+                old = old_skills.get(item['id'])
+                if old and old.get('awaken', 0) != item.get('awaken', 0):
+                    replies.append(encode(1032, dict(id=item['id'], unit_type=6, attr_count=1,
+                                   attr_list=[dict(type=65, value=item.get('awaken', 0))])))
+            # Preserve selected objects during repeated rebirth/upgrade callbacks.
+            if mid in (1332, 1337, 1338, 1339, 1341, 1342):
+                replies += self.inventory(role)
+            replies += [encode(1032, dict(id=role['role_id'], unit_type=1,
+                         attr_count=len(attrs), attr_list=attrs))] + events
+            self.save(role)
+            self.emit('game_reborn_ok', message_id=mid)
+        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
+            replies = [summon.event(55, {'op_string': str(error) if isinstance(error, formation.Rejected) else '转生数据无效，请刷新后重试'})]
+            self.emit('game_reborn_rejected', message_id=mid, message=str(error))
+        replies = self.complete(serial, replies)
+        self.last_reborn_serial = serial
+        self.reborn_replies[serial] = (packet, replies)
+        if len(self.reborn_replies) > 256:
+            del self.reborn_replies[next(iter(self.reborn_replies))]
+        return replies
 
     def market(self, packet, mid, data, state):
         now = int(time.time())
@@ -512,9 +608,10 @@ class Backend:
 
     def journeys(self, packet, mid, data):
         serial = data['serial_num']
+        now = int(time.time())
         if mid == 1018:
             role = self.profile()
-            journey.prepare(role, int(time.time()), self.journey_rules)
+            journey.prepare(role, now, self.journey_rules)
             self.save(role)
             return self.complete(serial, journey.snapshots(role))
         cached = self.journey_replies.get(serial)
@@ -524,9 +621,12 @@ class Backend:
             return self.complete(serial, [summon.event(55, {'op_string': '旅途请求已过期，请刷新后重试'})])
         try:
             role = self.profile()
-            journey.prepare(role, int(time.time()), self.journey_rules)
+            journey.prepare(role, now, self.journey_rules)
             before = copy.deepcopy(role)
-            events = journey.settle(role, mid, data, int(time.time()), self.journey_rules, self.formation_rules, self.activity_rules)
+            events = journey.settle(role, mid, data, now, self.journey_rules, self.formation_rules, self.activity_rules)
+            hints = daily.track(role, before, mid, data, events, now, self.daily_rules, login_fields)
+            # Keep the sweep result first and the battle-start callback last.
+            events = events + hints if mid == 1061 else hints + events
             formation.prepare(role, self.formation_rules)
             immortal.prepare(role, self.immortal_rules)
             # Keep existing companion tables alive for the battle-end experience UI.
@@ -551,6 +651,7 @@ class Backend:
 
     def activities(self, packet, mid, data):
         serial = data['serial_num']
+        now = int(time.time())
         # [A] abyssUI sends query_tips without a request serial. This is the
         # only activity poll exempted from mutation-request replay validation.
         poll = mid == 1329 and data.get('id') == 15 and serial == 0
@@ -562,8 +663,9 @@ class Backend:
         try:
             role = self.profile()
             before = copy.deepcopy(role)
-            events = activity.settle(role, mid, data, int(time.time()), self.activity_rules,
+            events = activity.settle(role, mid, data, now, self.activity_rules,
                                      self.journey_rules, self.formation_rules, login_fields)
+            events = daily.track(role, before, mid, data, events, now, self.daily_rules, login_fields) + events
             formation.prepare(role, self.formation_rules)
             immortal.prepare(role, self.immortal_rules)
             attrs = activity.attributes(role)
