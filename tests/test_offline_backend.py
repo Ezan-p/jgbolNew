@@ -60,6 +60,8 @@ class ProtocolTests(unittest.TestCase):
             backend.close()
 
     def test_literal_credentials_only(self):
+        self.assertEqual(login_fields('{loss_plus=-10, result=1}'), {'loss_plus': -10, 'result': 1})
+        self.assertEqual(login_fields('{loss_plus=-os.execute("false")}'), {})
         self.assertEqual(login_fields('{["access_token"]="local-test"}')['access_token'], 'local-test')
         for value in ('{access_token=os.getenv("HOME")}', '{access_token="a",access_token="b"}',
                       '{note="access_token=\\"local-test\\""}; do_something()'):

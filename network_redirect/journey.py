@@ -185,15 +185,21 @@ def fighters(role, cfg):
     return ours, enemies
 
 
-def battle(role, cfg, rules):
+def battle(role, cfg, rules, *, units=None, slots=8):
     """[B] Server turn simulation; no client-supplied victory or damage trusted."""
-    ours, enemies = fighters(role, cfg)
+    ours, enemies = copy.deepcopy(units) if units is not None else fighters(role, cfg)
+    home_train = role.get('activity', {}).get('home', {}).get('train', {})
+    if home_train:
+        from .activity_home import TRAIN
+        bonuses = [tuple(map(int, TRAIN[i,home_train[str(i)]['level']]['worth'].split('|')))
+                   if home_train[str(i)]['level'] else (0,0) for i in range(1,5)]
+        for u in ours:u['training_bonuses'] = bonuses
     initial = copy.deepcopy((ours, enemies))
     actions, round_no = [], 0
     b = rules['battle']
     while any(u['hp'] for u in ours) and any(u['hp'] for u in enemies) and len(actions) < b['max_actions']:
         round_no += 1
-        for order in range(1, 9):
+        for order in range(1, slots + 1):
             for is_src, side, opposing in ((True, ours, enemies), (False, enemies, ours)):
                 actor = next((u for u in side if u['order'] == order and u['hp']), None)
                 targets = [u for u in opposing if u['hp']]
@@ -202,32 +208,39 @@ def battle(role, cfg, rules):
                 sk, sk_level = 1, 1
                 for tid, level in actor['skills']:
                     s = formation.SKILLS[tid]
-                    if int(s['use_mode(1-active，2-passive)']) == 1 and secrets.randbelow(100) < int(s['use_probability']):
+                    if int(s['use_mode(1-active，2-passive)']) == 1 and secrets.randbelow(100) < actor.get('skill_probabilities', {}).get(tid, int(s['use_probability'])):
                         sk, sk_level = tid, level
                         break
                 skill = formation.SKILLS[sk]
                 if int(skill['effect_target(1-single，2-multi)']) != 2:
                     targets = targets[:1]
-                damage = [0] * 8
+                damage = [0] * slots
                 for target in targets:
                     power = actor['gongji']
                     if sk != 1:
                         power += int(float(skill['intensity']) + float(skill['upgrade_plus']) * (sk_level - 1))
                         power += actor['magic'] * b['skill_magic_percent'] // 100
+                    # [B] Combine CSV training rate/flat bonuses in the local simulator.
+                    buffs = actor.get('training_bonuses', [(0,0)]*4)
+                    guards = target.get('training_bonuses', [(0,0)]*4)
+                    rate,flat = buffs[0 if sk == 1 else 2]
+                    power = power * (100+rate)//100 + flat
+                    rate,flat = guards[1 if sk == 1 else 3]
+                    defense = target['fangyu'] * (100+rate)//100 + flat
                     hit = max(1, power * b['minimum_damage_percent'] // 100,
-                              power - target['fangyu'] * b['defense_percent'] // 100)
+                              power - defense * b['defense_percent'] // 100)
                     hit = min(hit, target['hp'], 2147483647)
                     target['hp'] -= hit
                     damage[target['order'] - 1] = hit
                 actions.append(dict(self_use=False, skill_type=sk, is_src=is_src, result=0,
                                     src_order=order, des_order=targets[0]['order'], cur_round=round_no,
-                                    damage_count=8, damage_list=damage))
+                                    damage_count=slots, damage_list=damage))
     oh, eh = sum(u['hp'] for u in ours), sum(u['hp'] for u in enemies)
     om, em = sum(u['max_hp'] for u in ours), sum(u['max_hp'] for u in enemies)
     # [B] On bounded replay timeout compare remaining HP ratios; equal is a draw.
     result = stars(oh, om) if oh * em > eh * om else 7 - stars(eh, em) if oh * em < eh * om else 0
     lineup = []
-    for order in range(1, max(max(u['order'] for u in ours), len(enemies)) + 1):
+    for order in range(1, max(u['order'] for u in ours + enemies) + 1):
         row = {}
         for prefix, side in zip(('src', 'des'), initial):
             u = next((u for u in side if u['order'] == order), None)
@@ -312,7 +325,7 @@ def experience(role, cfg, win, rules, formation_rules, bonus_exp=0):
     return gain, exp_list, money
 
 
-def attempt(role, kind, gid, cfg, result, now, rules, formation_rules):
+def attempt(role, kind, gid, cfg, result, now, rules, formation_rules, activity_rules=None):
     state = role['journey']['gates'].setdefault(f'{kind}:{gid}', dict(day_count=0, flush_count=0, pass_star=0))
     role['strength'] -= int(cfg['strenth_consume'])
     state['day_count'] += 1
@@ -328,6 +341,9 @@ def attempt(role, kind, gid, cfg, result, now, rules, formation_rules):
             if secrets.randbelow(100) < rate:
                 bonus_exp = count
         random = drops(role, cfg['first_random_prize'] if not state['pass_star'] and cfg['first_random_prize'] else cfg['random_prize'])
+        if activity_rules:
+            from .activity_seasonal import travel_drop
+            random += travel_drop(role,now,activity_rules)
         if random:
             prize_events.append(summon.event(22, dict(prize_type=1, prize_list=random)))
             prize_list.extend(random)
@@ -365,7 +381,7 @@ def resource_item(role, req, now, rules, buy=False):
     return [summon.event(21, dict(result=1, type_id=tid, count=1))]
 
 
-def settle(role, mid, req, now, rules, formation_rules):
+def settle(role, mid, req, now, rules, formation_rules, activity_rules=None):
     if mid == 1018:
         require(req['flag'] in (0, 1, 2), '地图查询参数无效')
         return snapshots(role)
@@ -427,12 +443,12 @@ def settle(role, mid, req, now, rules, formation_rules):
         require(progress(role, kind, gid)['pass_star'] >= 1, '尚未通关，不能扫荡')
         require(now >= role['last_sweep_time'] + 1800, '扫荡冷却中')
         result = progress(role, kind, gid)['pass_star']
-        results = [attempt(role, kind, gid, cfg, result, now, rules, formation_rules)[0] for _ in range(count)]
+        results = [attempt(role, kind, gid, cfg, result, now, rules, formation_rules, activity_rules)[0] for _ in range(count)]
         role['last_sweep_time'] = now
         return [summon.event(63, results)]
     require(req['des_type'] == 1 and req['des_value'] == 0, '挑战目标参数无效')
     result, lineup, actions = battle(role, cfg, rules)
-    outcome, prizes = attempt(role, kind, gid, cfg, result, now, rules, formation_rules)
+    outcome, prizes = attempt(role, kind, gid, cfg, result, now, rules, formation_rules, activity_rules)
     role['journey']['fight_id'] = role['journey']['fight_id'] % 0x7ffffffe + 1
     fid, ft = role['journey']['fight_id'], req['fight_type']
     return [encode(1028, dict(fight_id=fid, first_hand=1, des_name='旅途', lineup_count=len(lineup), lineup=lineup)),

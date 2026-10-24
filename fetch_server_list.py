@@ -37,6 +37,8 @@ def literal(node):
         return node.s.decode('utf-8') if isinstance(node.s, bytes) else node.s
     if isinstance(node, nodes.Number):
         return node.n
+    if isinstance(node, nodes.UMinusOp) and isinstance(node.operand, nodes.Number):
+        return -node.operand.n
     if isinstance(node, nodes.TrueExpr):
         return True
     if isinstance(node, nodes.FalseExpr):

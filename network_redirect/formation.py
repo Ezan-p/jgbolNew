@@ -204,6 +204,10 @@ def recalculate(role, rules):
         for s in STATS:
             c[s] = max(0, floor(values[s] * (1 + Decimal(rates[s]) / 100 + extra_rates[s])))
             c[s] += role.get('collection_bonuses', {}).get(s, 0)
+            # Activity training is a persistent role-wide additive bonus [B].
+            c[s] += role.get({'hp':'max_hp_plus','magic':'max_magic_plus'}.get(s,s+'_plus'),0)
+        # [B] Prosperity is the role's flat cave HP bonus.
+        c['hp'] += role.get('hole_hp_plus', 0)
         c['combat_power'] = sum(c[s] * rules['combat_weights'][s] for s in STATS)
     role['role_combat_power'] = sum(c.get('combat_power', 0) for c in role['corteges'] if c.get('order', 0))
 

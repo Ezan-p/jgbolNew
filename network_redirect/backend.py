@@ -11,14 +11,14 @@ import struct
 import time
 
 from .protocol import encode, decode
-from . import summon, formation, market, immortal, journey
+from . import summon, formation, market, immortal, journey, activity
 
 
 # The client initializes these sections together in data.set_g_new_config.
 # Explicitly disable unavailable local features rather than leaving their UI
 # state uninitialized (notably cheerSquadUI.canJoin's Lv/isOpen fields).
 CLIENT_CONFIG = '''{
-    [4]={party_top_list={},pay_consume_gold=0},
+    [4]=__PARTY_CONFIG__,
     [5]={},
     [10]=__MARKET_CONFIG__,
     [11]={open_flag=false,min_role_level=60},
@@ -52,6 +52,9 @@ class Backend:
         self.market_rules = market.load_rules()
         self.immortal_rules = immortal.load_rules()
         self.journey_rules = journey.load_rules()
+        self.activity_rules = activity.load_rules()
+        self.activity_replies = {}
+        self.last_activity_serial = 0
         self.summon_status = summon.rule_status()
         directory.mkdir(parents=True, exist_ok=True)
         self.port, self.emit = port, emit
@@ -126,6 +129,7 @@ class Backend:
         now = int(time.time())
         journey.prepare(role, now, self.journey_rules)
         summon.prepare(role, now, self.summon_rules)
+        activity.prepare(role, now, self.activity_rules)
         role.update(summon.remaining(role, now))
         self.save(role)
         return dict(role, server_time=now, random_key=self.random_key)
@@ -137,6 +141,7 @@ class Backend:
         goods = market.catalog(role, int(time.time()), self.market_rules)
         self.save(role)
         config = CLIENT_CONFIG.replace('__MARKET_CONFIG__', summon.lua(goods))
+        config = config.replace('__PARTY_CONFIG__', summon.lua(dict(party_top_list={},pay_consume_gold=self.activity_rules['party_fight_gold'])))
         config = config.replace('__IMMORTAL_CONFIG__', summon.lua(immortal.client_config(self.immortal_rules)))
         config = config.replace('config_end=true', '[23]=' + summon.lua(self.formation_rules['equipment_advance']) + ',config_end=true')
         replies = [encode(2998, dict(id=80, data=config)),
@@ -340,6 +345,8 @@ class Backend:
             self.last_market_serial = 0
             self.immortal_replies.clear()
             self.last_immortal_serial = 0
+            self.activity_replies.clear()
+            self.last_activity_serial = 0
             self.journey_replies.clear()
             self.last_journey_serial = 0
             state['market_sale_time'] = market.sale_time(int(time.time()), self.market_rules)
@@ -369,6 +376,11 @@ class Backend:
                 return [packet for serial, packet in self.reply_history if serial > last]
             self.emit('game_replay_unavailable', message_id=mid, message='请求不在当前响应缓存范围内')
             return []
+        if (mid in activity.HANDLED or (mid == 1026 and data['fight_type'] in activity.FIGHTS)
+                or (mid == 1051 and data['item_type'] in (1130,1131,1132,1133,1213,1214,1215,1216,1217))
+                or (mid == 1059 and data['flag'] == 3)
+                or (mid == 1201 and data['flag'] in (1, 2))):
+            return self.activities(packet, mid, data)
         if (mid in journey.HANDLED or (mid == 1051 and data['item_type'] in (1022, 1023))
                 or (mid == 2998 and data['id'] == 3)):
             return self.journeys(packet, mid, data)
@@ -514,7 +526,7 @@ class Backend:
             role = self.profile()
             journey.prepare(role, int(time.time()), self.journey_rules)
             before = copy.deepcopy(role)
-            events = journey.settle(role, mid, data, int(time.time()), self.journey_rules, self.formation_rules)
+            events = journey.settle(role, mid, data, int(time.time()), self.journey_rules, self.formation_rules, self.activity_rules)
             formation.prepare(role, self.formation_rules)
             immortal.prepare(role, self.immortal_rules)
             # Keep existing companion tables alive for the battle-end experience UI.
@@ -535,4 +547,41 @@ class Backend:
         self.journey_replies[serial] = (packet, replies)
         if len(self.journey_replies) > 256:
             del self.journey_replies[next(iter(self.journey_replies))]
+        return replies
+
+    def activities(self, packet, mid, data):
+        serial = data['serial_num']
+        # [A] abyssUI sends query_tips without a request serial. This is the
+        # only activity poll exempted from mutation-request replay validation.
+        poll = mid == 1329 and data.get('id') == 15 and serial == 0
+        cached = self.activity_replies.get(serial) if not poll else None
+        if cached and cached[0] == packet:
+            return cached[1]
+        if not poll and (not serial or serial <= self.last_activity_serial):
+            return self.complete(serial, [summon.event(55, {'op_string': '活动请求已过期，请刷新后重试'})])
+        try:
+            role = self.profile()
+            before = copy.deepcopy(role)
+            events = activity.settle(role, mid, data, int(time.time()), self.activity_rules,
+                                     self.journey_rules, self.formation_rules, login_fields)
+            formation.prepare(role, self.formation_rules)
+            immortal.prepare(role, self.immortal_rules)
+            attrs = activity.attributes(role)
+            replies = (self.companion_deltas(before, role) + self.item_deltas(before, role)
+                       + self.inventory(role) + summon.soul_snapshots(role)
+                       + immortal.handbook(role, self.immortal_rules) + attrs + events)
+            if poll:
+                replies = events
+            self.save(role)
+            self.emit('game_activity_ok', message_id=mid, rules_revision=self.activity_rules['revision'])
+        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
+            replies = [summon.event(55, {'op_string': str(error) if isinstance(error, formation.Rejected) else '活动数据无效，请刷新后重试'})]
+            self.emit('game_activity_rejected', message_id=mid, message=str(error))
+        if poll:
+            return self.number_replies(replies)
+        replies = self.complete(serial, replies)
+        self.last_activity_serial = serial
+        self.activity_replies[serial] = (packet, replies)
+        if len(self.activity_replies) > 256:
+            del self.activity_replies[next(iter(self.activity_replies))]
         return replies

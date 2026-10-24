@@ -1,0 +1,169 @@
+{
+  "client": "3.87",
+  "date": "2026-10-24",
+  "complete": false,
+  "official_assets_modified": false,
+  "tests": {
+    "command": ".runtime/venv/bin/python -m unittest discover -s tests -q",
+    "count": 218,
+    "result": "passed",
+    "seconds": 14.768
+  },
+  "original_audit": {
+    "inputs": 132,
+    "enums": 243
+  },
+  "checks": [
+    {
+      "scope": "永久活动入口",
+      "method": "原版客户端入口巡检",
+      "result": "通过",
+      "limitation": "入口可开，不代表全部按钮通过"
+    },
+    {
+      "scope": "修炼战斗",
+      "method": "真实网络发起、原版回放、返回",
+      "result": "通过",
+      "final_result": 3
+    },
+    {
+      "scope": "逐鹿游历/普通首领",
+      "method": "真实网络挑战、回放、首张翻牌、下一层",
+      "result": "通过",
+      "limitation": "五张全翻修正后仅接口测试；占塔及冥界UI待补"
+    },
+    {
+      "scope": "九幽随机事件五类/宝图",
+      "method": "隔离后端结算数据驱动原版回调",
+      "result": "通过",
+      "limitation": "不等同完整真实网络操作"
+    },
+    {
+      "scope": "冥仙吸血和愈合",
+      "method": "后端战报驱动原版回放并读取最终生命",
+      "result": "通过",
+      "ours_hp": 700,
+      "enemy_hp": 930,
+      "lua_errors": ""
+    },
+    {
+      "scope": "冥仙复活",
+      "method": "后端战报驱动原版回放、返回",
+      "result": "通过",
+      "ours_hp": 900,
+      "enemy_hp": 0,
+      "lua_errors": ""
+    },
+    {
+      "scope": "洞府好友列表、访问、药园施肥",
+      "method": "真实网络操作链",
+      "result": "通过",
+      "session": "20261024T041740Z-c5077867",
+      "lua_errors": ""
+    },
+    {
+      "scope": "洞府灵兽幻化",
+      "method": "隔离后端数据驱动原版查询与动画",
+      "result": "通过",
+      "type_id": 202,
+      "name": "仙灵鹤",
+      "lua_errors": ""
+    },
+    {
+      "scope": "端午制作、中秋查询及制作",
+      "method": "真实网络和SQLite结算核对",
+      "result": "通过",
+      "session": "20261024T042813Z-ed49b235",
+      "messages": [
+        1205,
+        1126,
+        1333
+      ],
+      "rice_item": 1213,
+      "moon_item": 1130,
+      "lua_errors": ""
+    },
+    {
+      "scope": "粽子与月饼成品开启",
+      "method": "原版背包开启与真实1051请求",
+      "result": "通过",
+      "session": "20261024T042813Z-ed49b235",
+      "lua_errors": ""
+    },
+    {
+      "scope": "春节拜财神、钱币兑换和字牌兑换",
+      "method": "真实网络请求；字牌通过脚本摆放后调用原版兑换按钮",
+      "result": "通过",
+      "session": "20261024T043801Z-2b44fbbf",
+      "messages": [
+        1210,
+        1211,
+        1213
+      ],
+      "lua_errors": ""
+    },
+    {
+      "scope": "东海寻宝单次、十连、锦鲤兑换",
+      "method": "真实原版UI请求、奖励画面与SQLite核对",
+      "result": "通过",
+      "session": "20261024T043801Z-2b44fbbf",
+      "messages": [
+        1208
+      ],
+      "nets_remaining": 2,
+      "fish_remaining": 20,
+      "gold_spent": 200,
+      "lua_errors": ""
+    },
+    {
+      "scope": "东海批量兑换",
+      "method": "原版商品按钮、数量选择器和确认按钮，实际兑换10组",
+      "result": "通过",
+      "session": "20261024T043801Z-2b44fbbf",
+      "purchased_total": 11,
+      "lua_errors": ""
+    },
+    {
+      "scope": "东海奖池预览与重启持久化",
+      "method": "重启后1205状态、原版预览页面、SQLite核对",
+      "result": "通过",
+      "session": "20261024T044616Z-cf8e4034",
+      "visible_prizes": 5,
+      "nets_remaining": 2,
+      "first_goods_remaining": 9,
+      "fish_remaining": 0,
+      "lua_errors": ""
+    }
+  ],
+  "pending": [
+    "逐鹿占塔/冥界/五张翻牌实机",
+    "各常驻活动完整UI动作覆盖",
+    "多人邀请/协助/排名的离线替代",
+    "独立灵兽系统及技能算法"
+  ],
+  "scope": "用户要求完成东海寻宝后，其他未实现限时玩法暂缓",
+  "deferred_seasonal_activity_ids": [
+    22,
+    25,
+    26,
+    30,
+    31,
+    32,
+    33,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    46,
+    47,
+    48,
+    49
+  ],
+  "east_sea_complete": true
+}

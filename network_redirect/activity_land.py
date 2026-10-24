@@ -1,0 +1,193 @@
+"""逐鹿 1302/event149 [A]; local opponents, schedules and soul economy [B]."""
+import copy
+import secrets
+from . import activity as a, journey, summon
+from .protocol import encode, decode
+
+
+def table(name,key):return {int(x[key]):x for x in summon.rows(name+'.csv')}
+MAPS=table('prey_map_config','map_level')
+GRIDS=table('prey_open_grid','cortege_index')
+CHARMS=table('prey_open_charm','index')
+CONVERT=table('prey_charm_convert','charm')
+
+
+def status(now,r):
+    begin=a.day(now,r)*86400-r['timezone_offset_hours']*3600
+    attack=begin+r['land_tower_start_hour']*3600
+    return dict(is_open=True,cur_status=1 if now<attack else 3,next_status=3 if now<attack else 1,
+                begin_time=begin,end_time=attack if now<attack else begin+86400)
+
+
+def state(role,now,r):
+    s=role['activity'].setdefault('land',dict(map_level=1,soul_count=0,grid_count=2,boss_layer=0,
+        inv_boss_layer=0,total_score=0,tower_id=0,charms={},bag={},travel=None,day=-1,boss=None,hell=None,
+        history={},inv_history={},auto_tower=0,unlocked=[]))
+    if s['tower_id']:
+        t=s['towers'][str(s['tower_id'])]
+        end=min(now,t['expire'],(s['day']+1)*86400-r['timezone_offset_hours']*3600);n=max(0,end-t['last_tick'])//r['land_tower_tick']
+        gained=min(t['left_soul'],n*r['land_tower_soul'])
+        s['soul_count']+=gained;t['left_soul']-=gained;t['last_tick']+=n*r['land_tower_tick']
+        if now>=t['expire'] or not t['left_soul']:t['owner_type']=2;t['owner_name']='守塔者';s['tower_id']=0
+    if s['day']!=a.day(now,r):
+        s.update(day=a.day(now,r),travel_count=0,attack_count=0,hell_counts={},swept=False,tower_id=0,towers={},travel=None)
+    if s['auto_tower'] and not s['tower_id'] and status(now,r)['cur_status']==3 and s['attack_count']<r['land_daily_attack']:
+        towers(s,now,r);tid=s['map_level']*10+4;t=s['towers'][str(tid)]
+        if t['left_soul']>0:
+            s['tower_id']=tid;s['attack_count']+=1
+            t.update(owner_type=1,owner_name=role['role_name'],last_tick=now,expire=now+r['land_tower_duration'])
+    for kind,count in (('boss',5),('hell',3)):
+        pending=s[kind]
+        if pending:
+            while len(pending['rewards'])<count:pending['rewards'].append(copy.deepcopy(secrets.choice(r['land_card_rewards'])))
+    for i,row in CHARMS.items():
+        if str(i) in s['charms'] and s['boss_layer']>=int(row['need_boss']):s['charms'][str(i)]['unlock']=True
+        if int(row['auto_open']) and s['boss_layer']>=int(row['need_boss']):
+            s['charms'].setdefault(str(i),dict(unlock=True,is_open=True,key=0,value=0))
+    return s
+
+
+def charm_show(s):return {i:dict(s['charms'].get(str(i),dict(unlock=s['boss_layer']>=int(row['need_boss']),is_open=False,key=0,value=0))) for i,row in CHARMS.items()}
+
+def bag(s):return {int(k):{int(v):n for v,n in values.items() if n} for k,values in s['bag'].items()}
+
+def charm(s,kind,value,n):
+    values=s['bag'].setdefault(str(kind),{});count=values.get(str(value),0)
+    a.require(count+n>=0,'符咒不足');values[str(value)]=count+n
+
+
+def info(s,r):
+    plus={k:sum(c['value'] for c in s['charms'].values() if c['key']==k) for k in range(1,5)}
+    return dict(map_level=s['map_level'],soul_count=s['soul_count'],grid_count=s['grid_count'],boss_layer=s['boss_layer'],
+        inv_boss_layer=s['inv_boss_layer'],total_score=s['total_score'],tower_id=s['tower_id'],had_news=False,
+        left_travel_count=r['land_daily_travel']-s['travel_count'],max_travel_count=r['land_daily_travel'],
+        left_attack_count=r['land_daily_attack']-s['attack_count'],max_attack_count=r['land_daily_attack'],
+        charm_plus=plus,auto_tower=s['auto_tower'],is_clear=s['boss_layer']>=r['land_boss_layers'],is_inv_clear=s['inv_boss_layer']>=r['land_boss_layers'])
+
+
+def response(op,s,r,**data):return summon.event(149,dict(flag=op,prey_info=info(s,r),**data))
+
+def opponent(r,level=1,ident=1,count=1):
+    return dict(id=ident,object_type=2,type_id=r['battle_npc'],name='逐鹿守卫',union_name='',cortege_layer=0,
+        cortege_count=count,fight_power=level*100,expect_soul=r['land_travel_soul'],level=level)
+
+
+def travel(s,r):
+    a.require(s['travel_count']<r['land_daily_travel'],'今日游历次数已用完')
+    s['travel_count']+=1
+    n=secrets.choice(list(map(int,MAPS[s['map_level']]['count_list'].split('|'))))
+    s['travel']=[opponent(r,s['map_level']*2,i) for i in range(1,n+1)]
+
+
+def simulate(role,s,r,jrules,level,count=1,cur_num=None):
+    a.require(any(c.get('order') for c in role['corteges']),'请先上阵神仙')
+    ours,enemies=journey.fighters(role,dict(cortege_list='/'.join([f"{r['battle_npc']}|{level}"]*count)))
+    ours=ours[:cur_num or s['grid_count']]
+    for u in ours:
+        for i,key in enumerate(('gongji','fangyu','hp','magic'),1):u[key]=u[key]*(100+info(s,r)['charm_plus'][i])//100
+        u['max_hp']=u['hp']
+    replay_rules=copy.deepcopy(jrules);replay_rules['battle']['max_actions']=min(r['land_max_actions'],jrules['battle']['max_actions'])
+    result,lineup,actions=journey.battle(role,{},replay_rules,units=(ours,enemies))
+    role['activity']['fight_id']+=1;fid=role['activity']['fight_id']
+    # [A] landUI consumes nested Lua replay messages, not independent 1027 packets.
+    return result,dict(line_up_msg=decode(encode(1028,dict(fight_id=fid,first_hand=1,des_name='逐鹿守卫',lineup_count=len(lineup),lineup=lineup)))[2],
+        fight_result_msg=decode(encode(1027,dict(fight_id=fid,fight_type=21,final_result=result,fight_round=len(actions),fight_result=actions)))[2])
+
+
+def towers(s,now,r):
+    for i in range(1,5):
+        ident=s['map_level']*10+i
+        s['towers'].setdefault(str(ident),dict(id=ident,position=i,tower_type=i,create_time=now-1,
+            all_soul=r['land_tower_total'],left_soul=r['land_tower_total'],owner_type=2,owner_name='守塔者',
+            last_tick=now,expire=now+r['land_tower_duration']))
+    return [copy.deepcopy(s['towers'][str(s['map_level']*10+i)]) for i in range(1,5)]
+
+
+def tower_view(role,s,t,now,r):
+    return dict(t,player_list=[dict(opponent(r,s['map_level']*5),had_soulcount=0)],is_owner=s['tower_id']==t['id'],end_time=t['expire'],role_list=[],owner_id=role['role_id'] if s['tower_id']==t['id'] else t['id'],
+        fps_count=r['land_tower_soul'],soul_speed=r['land_tower_soul'],expect_soul=t['left_soul'],fight_power=s['map_level']*200,
+        cortege_count=s['map_level'],type_id=r['battle_npc'],cortege_layer=0)
+
+
+def settle(role,req,now,r,jrules,parse):
+    a.require(role['level']>=38,'逐鹿需38级');d=parse(req['data']) if req['data'] else {}
+    a.require(isinstance(d,dict),'逐鹿参数无效');op=req['id'];s=state(role,now,r)
+    if op==1:return [response(1,s,r,status_info=status(now,r),team_info=dict(has_team=False,is_captain=False,begin_time=0,end_time=0),
+        charm_show=charm_show(s),tower_info=towers(s,now,r))]
+    if op==2:
+        dest=d.get('des_level');a.require(type(dest)is int and dest in MAPS and dest!=s['map_level'],'地图无效')
+        a.require(not s['tower_id'] and s['boss_layer']>=int(MAPS[dest]['need_boss_layer']),'尚未解锁地图或正在占塔')
+        a.spend(s,'soul_count',int(MAPS[dest]['soul_count']));s['map_level']=dest;s['travel']=None
+        return [response(2,s,r,tower_info=towers(s,now,r))]
+    if op==3:
+        a.require(status(now,r)['cur_status']==1,'当前是占塔时段')
+        fresh=not s['travel']
+        if fresh:travel(s,r)
+        return [response(3,s,r,enemy_list=copy.deepcopy(s['travel']),is_new=fresh)]
+    if op==17:
+        a.require(s['travel'] is not None,'没有进行中的游历');s['travel']=None
+        return [response(17,s,r)]
+    if op==4 and d.get('des_type')==1:
+        ident=d.get('des_id');target=next((x for x in s['travel'] or [] if x['id']==ident),None)
+        a.require(target is not None and d.get('flag')==1,'游历目标无效')
+        result,replay=simulate(role,s,r,jrules,target['level']);win=1<=result<=3
+        reward=r['land_travel_soul'] if win else 0;drop=None
+        if win:
+            s['soul_count']+=reward;kind=secrets.randbelow(4)+1;charm(s,kind,5,1);drop=dict(key=kind,value=5)
+        s['travel']=None
+        return [response(4,s,r,fight_type=1,is_win=win,soul_count=reward,charm_data=drop,final_result_list=[replay])]
+    if op==6:return [response(6,s,r,charm_get=bag(s),exchange_consume=r['land_charm_exchange'])]
+    if op==7:
+        idx=d.get('index');a.require(type(idx)is int and idx in CHARMS,'符咒位置无效');row=CHARMS[idx]
+        c=s['charms'].setdefault(str(idx),dict(unlock=s['boss_layer']>=int(row['need_boss']),is_open=False,key=0,value=0))
+        unlock=d.get('is_unlock',False)
+        if unlock:
+            a.require(not c['unlock'] and int(row['can_force_open']),'该位置不能提前解锁')
+            a.spend(s,'soul_count',int(row['force_open_soul']));c['unlock']=True
+        else:
+            a.require(c['unlock'] and not c['is_open'],'位置未解锁或已经开启')
+            a.spend(s,'soul_count',int(row['consume_soul']));c['is_open']=True
+        return [response(7,s,r,index=idx,is_unlock=unlock)]
+    if op==8:
+        idx,kind,value=d.get('index'),d.get('key'),d.get('value');c=s['charms'].get(str(idx))
+        a.require(type(idx)is int and c is not None and c['is_open'] and type(kind)is int and type(value)is int,'符咒装备参数无效')
+        a.require((kind==0 and value==0) or (kind in (1,2,3,4) and value in CONVERT),'符咒类型无效')
+        a.require((kind,value)!=(c['key'],c['value']),'符咒没有变化')
+        if kind:charm(s,kind,value,-1)
+        if c['key']:a.spend(s,'soul_count',r['land_charm_exchange']);charm(s,c['key'],c['value'],1)
+        c.update(key=kind,value=value)
+        return [response(8,s,r,index=idx,key=kind,value=value)]
+    if op==9:
+        n=d.get('grid_count');row=GRIDS.get(n)
+        a.require(type(n)is int and n==s['grid_count']+1 and row and s['boss_layer']>=int(row['boss_layer']),'阵位解锁条件不足')
+        a.spend(s,'soul_count',int(row['consume_soul']));s['grid_count']=n
+        return [response(9,s,r)]
+    if op==10:return [response(10,s,r,news_list=[])]
+    if op==21:
+        auto=d.get('auto_tower');a.require(type(auto)is int and auto in (0,1),'占塔设置无效');s['auto_tower']=auto
+        state(role,now,r)
+        return [response(21,s,r)]
+    if op in (18,27):
+        flag=d.get('flag',1);a.require(flag in (1,2),'榜单参数无效')
+        mine=dict(name=role['role_name'],layer=s['boss_layer'],inv_layer=s['inv_boss_layer'],score=s['total_score'],soul=s['soul_count'],order=1)
+        return [response(op,s,r,top_flag=flag,top_data=[mine],my_top_data=mine)]
+    if op in (5,11,16) or op==4 and d.get('des_type')==2:
+        a.require(status(now,r)['cur_status']==3,'尚未到占塔时段');towers(s,now,r)
+        tid=d.get('des_id') if op==4 else d.get('tower_id')
+        a.require(type(tid)is int and tid in [s['map_level']*10+i for i in range(1,5)],'塔不存在');t=s['towers'][str(tid)]
+        if op==11:return [response(11,s,r,tower_info=tower_view(role,s,t,now,r))]
+        if op==5:
+            a.require(s['tower_id']==tid,'尚未占领此塔');s['tower_id']=0;t['owner_type']=2;t['owner_name']='守塔者'
+            return [response(5,s,r,tower_id=tid)]
+        a.require(not s['tower_id'] and t['left_soul']>0,'已占塔或塔内魂力耗尽')
+        a.require(s['attack_count']<r['land_daily_attack'],'今日攻塔次数已用完')
+        if op==16:
+            a.require(t['tower_type']==4,'该塔需要战斗占领');s['attack_count']+=1;s['tower_id']=tid
+            t.update(owner_type=1,owner_name=role['role_name'],last_tick=now,expire=now+r['land_tower_duration'])
+            return [response(16,s,r,tower_id=tid)]
+        a.require(d.get('flag')==1,'攻塔参数无效')
+        result,replay=simulate(role,s,r,jrules,s['map_level']*5,count=s['map_level']);s['attack_count']+=1;win=1<=result<=3
+        if win:s['tower_id']=tid;t.update(owner_type=1,owner_name=role['role_name'],last_tick=now,expire=now+r['land_tower_duration'])
+        return [response(4,s,r,fight_type=2,des_id=tid,is_win=win,final_result_list=[replay])]
+    from .activity_land_boss import settle as boss_settle
+    return boss_settle(role,s,op,d,now,r,jrules)
