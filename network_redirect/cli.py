@@ -69,6 +69,34 @@ def ensure_frida(config):
     return device
 
 
+async def poll_processes(config, stopped, emit, *, retry_delay=2, deadline=float('inf')):
+    """Keep the listener and hooks alive when ADB temporarily stops responding.
+
+    A failed query is not an empty process table: callers must not detach any
+    existing session until a complete, successful snapshot is available.
+    """
+    failures = 0
+    while not stopped.is_set() and time.monotonic() < deadline:
+        try:
+            current = await asyncio.to_thread(processes, config)
+        except (OSError, RuntimeError, subprocess.SubprocessError) as exc:
+            failures += 1
+            if failures == 1 or failures % 30 == 0:
+                emit('process_poll_retry', level='W', attempts=failures,
+                     message='ADB 进程查询暂时失败，保留本地服务并重试：' + error_text(exc))
+            try:
+                await asyncio.wait_for(stopped.wait(),
+                                       timeout=min(retry_delay, max(0, deadline - time.monotonic())))
+            except asyncio.TimeoutError:
+                pass
+        else:
+            if failures:
+                emit('process_poll_recovered', attempts=failures,
+                     message='ADB 进程查询已恢复')
+            return current
+    return None
+
+
 async def run(config, args):
     directory = state_path(config).parent
     directory.mkdir(parents=True, exist_ok=True)
@@ -228,7 +256,9 @@ async def run(config, args):
         while not stopped.is_set() and time.monotonic() < deadline:
             if errors:
                 raise RuntimeError('网络钩子异常：' + errors[0])
-            current = await asyncio.to_thread(processes, config)
+            current = await poll_processes(config, stopped, emit, deadline=deadline)
+            if current is None:
+                break
             for pid in list(sessions):
                 if pid not in current or sessions[pid][0].is_detached:
                     session, script = sessions.pop(pid)

@@ -41,6 +41,14 @@ def encode_body(message_id, values):
             if len(raw) > size or (kind[0] == 'S' and len(raw) == size):
                 raise ValueError('Fixed string too long: ' + name)
             parts.append(raw.ljust(size, b'\0'))
+        elif re.fullmatch(r'[IiWwBbldf]\[\d+\]', kind):
+            limit = int(kind[2:-1])
+            value = values.get(name, [])
+            if previous is None or previous[1] not in ('B', 'b') or values.get(previous[0], 0) != len(value):
+                raise ValueError('Array count mismatch: ' + name)
+            if len(value) > min(limit, 255):
+                raise ValueError('Array too large: ' + name)
+            parts.append(struct.pack('<' + FORMATS[kind[0]] * len(value), *value))
         elif re.fullmatch(r'\$\d+\{\d+\}', kind):
             subtype, limit = map(int, re.findall(r'\d+', kind))
             value = values.get(name, [])
@@ -98,6 +106,18 @@ def decode_body(message_id, packet, offset):
                 raise ValueError('Truncated string')
             raw = packet[offset:offset + length]
             value = raw.split(b'\0', 1)[0].decode('utf-8') if kind[0] == 'S' else raw
+        elif re.fullmatch(r'[IiWwBbldf]\[\d+\]', kind):
+            limit = int(kind[2:-1])
+            if previous is None or previous[1] not in ('B', 'b'):
+                raise ValueError('Unsupported array count: ' + name)
+            count = values[previous[0]]
+            if count > limit:
+                raise ValueError('Array too large: ' + name)
+            fmt = '<' + FORMATS[kind[0]] * count
+            length = struct.calcsize(fmt)
+            if offset + length > size:
+                raise ValueError('Truncated array: ' + name)
+            value = list(struct.unpack_from(fmt, packet, offset))
         elif re.fullmatch(r'\$\d+\{\d+\}', kind):
             subtype, limit = map(int, re.findall(r'\d+', kind))
             if previous is None or previous[1] not in ('B', 'b'):

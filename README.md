@@ -44,7 +44,7 @@ python3 observe_game.py snapshot
 
 ## 启动与停止
 
-双击 `启动游戏.command`。脚本会启动本目录的独立模拟器，等待 Android 启动，首次安装游戏，随后打开 <http://127.0.0.1:8768>。在网页中连接画面即可操作。首次冷启动和安装可能需要几分钟，请保留终端窗口等待完成。
+双击 `启动游戏.command`（与 `启动本地离线游戏.command` 使用相同流程）。脚本会启动本目录的独立模拟器，等待 Android 启动，首次安装游戏，启动本地登录服务并完成连接自检，随后打开 <http://127.0.0.1:8768>。在网页中连接画面，再点击游戏内“进入游戏”。首次冷启动和安装可能需要几分钟，请保留终端窗口等待完成。
 
 双击 `停止游戏.command` 关闭本项目的模拟器和网页服务。关闭浏览器不会停止模拟器。后续启动保留应用数据，不重复安装。
 
@@ -52,6 +52,8 @@ python3 observe_game.py snapshot
 
 ```sh
 python3 start_game.py
+# 仅调试原客户端、不启动本地登录服务
+python3 start_game.py --client-only
 python3 android_emulator/run.py --config game.json doctor
 python3 android_emulator/run.py --config game.json stop
 ```
@@ -82,7 +84,7 @@ python3 android_emulator/run.py --config game.json launch
 
 日志位于 `.runtime/logs/emulator.log` 和 `.runtime/logs/gateway.log`。若刚启动时 doctor 显示 `booted: false`，应等待 Android 冷启动完成。不要删除 `.runtime/avd/`，其中包含应用与存档。
 
-当前客户端包含 360 渠道登录和远端游戏服务；能安装、启动并显示客户端，不代表旧渠道账号服务和游戏服务器仍然可用。
+默认启动使用本地测试账号和本地存档。`--client-only` 仅打开原客户端，不提供本地登录服务；能显示客户端，不代表旧渠道账号服务和游戏服务器仍然可用。
 
 原始 3.87 为 UC 渠道版，恢复配置保存在 `game.uc.json`。当前 360 移植包与 UC 包并存。AVD 的内部标识 `jgbol379` 沿用最初创建的设备名，与当前游戏版本无关。打包脚本通过 `game.json` 的 `apk_variant` 选择移植构建；无此字段时按 `apk_source` 和 `apk` 还原原始签名包。
 

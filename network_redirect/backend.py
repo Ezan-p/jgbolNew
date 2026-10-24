@@ -11,7 +11,7 @@ import struct
 import time
 
 from .protocol import encode, decode
-from . import summon, formation, market, immortal
+from . import summon, formation, market, immortal, journey
 
 
 # The client initializes these sections together in data.set_g_new_config.
@@ -51,6 +51,7 @@ class Backend:
         self.formation_rules = formation.load_rules()
         self.market_rules = market.load_rules()
         self.immortal_rules = immortal.load_rules()
+        self.journey_rules = journey.load_rules()
         self.summon_status = summon.rule_status()
         directory.mkdir(parents=True, exist_ok=True)
         self.port, self.emit = port, emit
@@ -76,6 +77,8 @@ class Backend:
         self.last_market_serial = 0
         self.immortal_replies = {}
         self.last_immortal_serial = 0
+        self.journey_replies = {}
+        self.last_journey_serial = 0
 
     def close(self):
         self.db.close()
@@ -94,6 +97,8 @@ class Backend:
                 changed = True
             changed = formation.prepare(role, self.formation_rules) or changed
             changed = immortal.prepare(role, self.immortal_rules) or changed
+            if 'journey' not in role:
+                changed = journey.prepare(role, int(time.time()), self.journey_rules) or changed
             formation.recalculate(role, self.formation_rules)
             if changed:
                 self.save(role, account)
@@ -105,6 +110,7 @@ class Backend:
                     head_type=1, guide_progress=0x7fffffff, cortege_count=FORMATION_SLOTS[1],
                     attachments=[])
         formation.prepare(role, self.formation_rules)
+        journey.prepare(role, int(time.time()), self.journey_rules)
         self.save(role, account)
         return role
 
@@ -118,6 +124,7 @@ class Backend:
     def snapshot(self):
         role = self.profile()
         now = int(time.time())
+        journey.prepare(role, now, self.journey_rules)
         summon.prepare(role, now, self.summon_rules)
         role.update(summon.remaining(role, now))
         self.save(role)
@@ -333,6 +340,8 @@ class Backend:
             self.last_market_serial = 0
             self.immortal_replies.clear()
             self.last_immortal_serial = 0
+            self.journey_replies.clear()
+            self.last_journey_serial = 0
             state['market_sale_time'] = market.sale_time(int(time.time()), self.market_rules)
             self.emit('game_login_ok', message='本地账号通过 LS→BS 认证')
             return [encode(1002, {'result': 0})] + self.bootstrap()
@@ -345,7 +354,10 @@ class Backend:
         if not state.get('authenticated'):
             raise ValueError('Business message before login')
         if mid == 2999:
-            return [encode(2999, dict(time=int(time.time()), random_key=self.random_key, delay_time=0))]
+            role = self.profile()
+            journey.prepare(role, int(time.time()), self.journey_rules)
+            self.save(role)
+            return [encode(2999, dict(time=int(time.time()), random_key=self.random_key, delay_time=0))] + self.number_replies(self.journey_attributes(role))
         if mid == 1105:
             last = data['req_serial_num']
             if last == self.server_serial or (last == 0 and not self.reply_history):
@@ -357,12 +369,9 @@ class Backend:
                 return [packet for serial, packet in self.reply_history if serial > last]
             self.emit('game_replay_unavailable', message_id=mid, message='请求不在当前响应缓存范围内')
             return []
-        if mid == 1018:
-            serial = data['serial_num']
-            return self.complete(serial, [encode(1020, dict(first_send=True, tollgate_count=1,
-                                     tollgate_list=[dict(tollgate_type=1, map_id=1, tollgate_id=101)])),
-                    encode(1023, dict(map_count=1,
-                                     map_list=[dict(tollgate_type=1, map_id=1, pass_map=0)]))])
+        if (mid in journey.HANDLED or (mid == 1051 and data['item_type'] in (1022, 1023))
+                or (mid == 2998 and data['id'] == 3)):
+            return self.journeys(packet, mid, data)
         if mid == 1094:
             return self.complete(data['serial_num'], [encode(1095, dict(first_send=True,
                                      op_type=data['flag'], attention_count=0, attention_list=[]))])
@@ -474,4 +483,56 @@ class Backend:
         self.immortal_replies[serial] = (packet, replies)
         if len(self.immortal_replies) > 256:
             del self.immortal_replies[next(iter(self.immortal_replies))]
+        return replies
+
+    def journey_attributes(self, role):
+        fields = {3: 'level', 5: 'cur_exp', 6: 'next_exp', 7: 'silver_coin', 8: 'gold_coin',
+                  30: 'role_combat_power', 71: 'cortege_count', 101: 'strength', 102: 'energy',
+                  64: 'tollgate_flush_limit', 65: 'tollgate_flush_count', 66: 'tollgate_flush_time',
+                  91: 'sweep_flush_limit', 92: 'sweep_flush_count', 93: 'last_sweep_time',
+                  511: 'elite_tollgate_flush_count', 512: 'elite_tollgate_flush_time',
+                  513: 'elite_fight_count', 514: 'elite_fight_time',
+                  55: 'strength_item_count', 56: 'strength_item_time',
+                  57: 'energy_item_count', 58: 'energy_item_time',
+                  59: 'strength_item_limit', 60: 'energy_item_limit'}
+        attrs = [dict(type=t, value=int(role.get(k, 0))) for t, k in fields.items()]
+        return [encode(1032, dict(id=role['role_id'], unit_type=1, attr_count=len(attrs), attr_list=attrs))]
+
+    def journeys(self, packet, mid, data):
+        serial = data['serial_num']
+        if mid == 1018:
+            role = self.profile()
+            journey.prepare(role, int(time.time()), self.journey_rules)
+            self.save(role)
+            return self.complete(serial, journey.snapshots(role))
+        cached = self.journey_replies.get(serial)
+        if cached and cached[0] == packet:
+            return cached[1]
+        if not serial or serial <= self.last_journey_serial:
+            return self.complete(serial, [summon.event(55, {'op_string': '旅途请求已过期，请刷新后重试'})])
+        try:
+            role = self.profile()
+            journey.prepare(role, int(time.time()), self.journey_rules)
+            before = copy.deepcopy(role)
+            events = journey.settle(role, mid, data, int(time.time()), self.journey_rules, self.formation_rules)
+            formation.prepare(role, self.formation_rules)
+            immortal.prepare(role, self.immortal_rules)
+            # Keep existing companion tables alive for the battle-end experience UI.
+            # Refresh inventory before event 44 starts the original replay.
+            replies = []
+            if mid not in (1018, 2998):
+                replies = (self.companion_deltas(before, role) + self.item_deltas(before, role)
+                           + self.inventory(role) + summon.soul_snapshots(role)
+                           + journey.updates(role, before))
+            replies += self.journey_attributes(role) + events
+            self.save(role)
+            self.emit('game_journey_ok', message_id=mid, rules_revision=self.journey_rules['revision'])
+        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
+            replies = [summon.event(55, {'op_string': str(error) if isinstance(error, formation.Rejected) else '旅途数据无效，请刷新后重试'})]
+            self.emit('game_journey_rejected', message_id=mid, message=str(error))
+        replies = self.complete(serial, replies)
+        self.last_journey_serial = serial
+        self.journey_replies[serial] = (packet, replies)
+        if len(self.journey_replies) > 256:
+            del self.journey_replies[next(iter(self.journey_replies))]
         return replies
