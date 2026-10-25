@@ -47,8 +47,9 @@ def effect(unit, kind):
 
 def target_count(skill_id, rules):
     skill = formation.SKILLS[skill_id]
-    return rules['skill_target_limits'].get(str(skill_id),
+    configured = rules['skill_target_limits'].get(str(skill_id),
         rules['multi_target_limit'] if int(skill['effect_target(1-single，2-multi)']) == 2 else 1)
+    return min(configured, rules['multi_target_limit'])
 
 
 def select_skill(actor, rules=None):
@@ -140,7 +141,7 @@ def validate_rules(rules):
     require(set(bonuses) == {'normal', 'advanced'} and all(type(v) is int and 0 <= v <= 100
             for v in bonuses.values()), '破法概率配置无效')
     formations = rules.get('formation_target_limits', {})
-    require(set(formations) == {'8', '9'} and all(type(v) is int and 1 <= v <= int(k)
+    require(set(formations) == {'8', '9'} and all(type(v) is int and 1 <= v <= (4 if k == '8' else 9)
             for k, v in formations.items()), '阵容目标上限配置无效')
     limits = rules.get('skill_target_limits')
     require(isinstance(limits, dict) and all(str(k).isdigit() and int(k) in formation.SKILLS

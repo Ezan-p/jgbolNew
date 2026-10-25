@@ -131,7 +131,10 @@ def lineup(role,ident,r):
     for c in chars:
         c.pop('skills',None)
         c.update(type_id=c['type'],max_hp_show=c['hp'],max_magic_show=c['magic'],wuligongji_show=c['gongji'],wulifangyu_show=c['fangyu'])
-    return dict(role_id=ident,role_name=role['role_name'] if own else '离线仙盟对手',level=role['level'] if own else r['battle_level'],vip_level=0,head_type=5004,rank=0,owner_cheer_info={},title_info={},animal_info={},hole_train={},cortege_list=chars,cheer_cortege=[],skill_list=[],equip_list=[],ext_skill_list=[],ext_star_list=[])
+    from . import cheer
+    data = dict(role_id=ident,role_name=role['role_name'] if own else '离线仙盟对手',level=role['level'] if own else r['battle_level'],vip_level=0,head_type=5004,rank=0,owner_cheer_info={},title_info={},animal_info={},hole_train={},cortege_list=chars,cheer_cortege=[],skill_list=[],equip_list=[],ext_skill_list=[],ext_star_list=[])
+    data.update(cheer.inspection(role, own))
+    return data
 
 
 def tournament(role,s,g,r,cross=False):

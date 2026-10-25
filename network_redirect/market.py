@@ -118,6 +118,8 @@ def catalog(role, now, rules):
             begin_time=state['day'], end_time=state['day'] + 86400 - 1,
             buy_limit_times=max(0, rules['cheap_daily_limit'] - state['purchases'].get(str(index), 0))
                             if page == 1 else 0, is_day_limit=1)
+    from . import cheer
+    result['rich_item_list'].update(cheer.market_goods(role))
     result.update(panic_buy_list=panic_snapshot(role, now, rules),
                   item_begin_time=0, item_end_time=0, server_time=now)
     return result

@@ -61,9 +61,14 @@ def load_rules(path=ROOT / 'server_config/formation_rules.json'):
     for key in ('ordinary_points', 'intensive_points', 'peaches_per_attempt', 'gold_per_intensive'):
         if type(rules.get('training', {}).get(key)) is not int or not 1 <= rules['training'][key] <= 100:
             raise ValueError('培养配置无效：' + key)
-    for values in (rules.get('combat_weights', {}), rules.get('training', {}).get('stat_units', {})):
-        if set(values) != set(STATS) or any(type(v) is not int or not 1 <= v <= 100 for v in values.values()):
-            raise ValueError('属性配置无效')
+    values = rules.get('combat_weights', {})
+    if not isinstance(values, dict) or set(values) != set(STATS) or any(
+            type(v) not in (int, float) or not Decimal(str(v)).is_finite()
+            or not 0 < v <= 100 for v in values.values()):
+        raise ValueError('战力权重须为0到100之间的有限正数')
+    values = rules.get('training', {}).get('stat_units', {})
+    if set(values) != set(STATS) or any(type(v) is not int or not 1 <= v <= 100 for v in values.values()):
+        raise ValueError('培养属性配置无效')
     if any(v != 1 for v in rules['training']['stat_units'].values()):
         raise ValueError('原版培养预览要求每点对应一点属性')
     advancement = rules.get('equipment_advance', {})
@@ -72,6 +77,9 @@ def load_rules(path=ROOT / 'server_config/formation_rules.json'):
             and advancement.get('max_advance_level') == 10 and advancement.get('max_star_level') == 7
             and type(advancement.get('is_open')) is bool):
         raise ValueError('装备升阶配置无效')
+    policy = rules.get('combat_power', {})
+    if not isinstance(policy, dict) or set(policy) - {'title', 'pet', 'cheer', 'explicit_channels'} or any(type(v) is not bool for v in policy.values()):
+        raise ValueError('战力来源开关必须是布尔值')
     return rules
 
 
@@ -160,8 +168,10 @@ def prepare(role, rules):
                         level=int(SKILLS[innate]['begin_level']), protogenic=1)
             role['attachments'].append(item)
         claimed.add(item['id'])
-        item.update(innate_owner_id=c['id'], owner_id=c['id'], equip_order=c.get('order', 0), equip_pos=1)
+        item.update(innate_owner_id=c['id'], owner_id=c['id'], equip_order=c.get('order', 0) or (c.get('cheer_order', 0) + 8 if c.get('cheer_order') else 0), equip_pos=1)
         item['effect_value'] = skill_effect(item)
+    from . import cheer
+    cheer.prepare(role)
     recalculate(role, rules)
     return before != json.dumps(role, sort_keys=True)
 

@@ -152,7 +152,8 @@ def validate_rules(r):
     require(type(r['catch_item_bonus'])is int and 0<=r['catch_item_bonus']<=100,'捕捉道具加成无效')
     daily.validate_prize([5,r['catch_item'],1,1])
     require(r['catch_success_percent']<=100 and r['pet_limit']<=240 and r['search_daily']<=25,'概率、兽栏或棋盘配置越界')
-    require(r['train_support_limit']<=20 and r['team_size']<=3,'活动人数配置越界')
+    require(type(r.get('team_min_fighters')) is int and r['team_min_fighters']==3,'秘境至少三人出战')
+    require(r['train_support_limit']<=20 and r['team_min_fighters']<=r['team_size']<=5,'活动人数配置越界')
     for k in ('hunt_weekend_open','npc_auto_accept'):require(type(r.get(k))is bool,'开关配置无效：'+k)
     for key in ('rank_power','rank_rights','match_merit'):
         require(set(r.get(key,{}))==set(map(str,range(1,8))),'职位配置缺失：'+key)

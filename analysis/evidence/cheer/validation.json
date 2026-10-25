@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-25",
+  "client": "3.87",
+  "tests": {
+    "targeted": 79,
+    "targeted_result": "passed",
+    "full": 452,
+    "full_result": "passed"
+  },
+  "commands": [
+    "PYTHONDONTWRITEBYTECODE=1 .runtime/venv/bin/python -m unittest tests.test_cheer tests.test_market tests.test_combat_power tests.test_formation -q",
+    "PYTHONDONTWRITEBYTECODE=1 .runtime/venv/bin/python -m unittest discover -s tests -q"
+  ],
+  "original_csv_tables_verified": 3,
+  "original_lua_modules_audited": 5,
+  "original_client": {
+    "case_count": 46,
+    "passed": true,
+    "restored": true,
+    "mode": "isolated actual binary response replay",
+    "results": "client_validation.jsonl",
+    "screenshot": "client_fixture.png"
+  }
+}

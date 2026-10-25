@@ -11,19 +11,17 @@ import struct
 import time
 
 from .protocol import encode, decode
-from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily, guild, vip, xianling, welfare
+from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily, guild, vip, xianling, welfare, cheer
 
 
 # The client initializes these sections together in data.set_g_new_config.
-# Explicitly disable unavailable local features rather than leaving their UI
-# state uninitialized (notably cheerSquadUI.canJoin's Lv/isOpen fields).
+# Every enabled feature supplies the field types consumed by its original UI.
 CLIENT_CONFIG = '''{
     [4]=__PARTY_CONFIG__,
     [5]={},
     [10]=__MARKET_CONFIG__,
     [11]={open_flag=false,min_role_level=60},
-    [14]={cost_item_count={},cost_gold_count={},is_open=false,cheer_level_limit={},
-          is_open_ni=false,open_cheer_item={}},
+    [14]=__CHEER_CONFIG__,
     [15]=__IMMORTAL_CONFIG__,
     [24]={vip_shop=__XIANLING_HINT__,buff_data={buff_type=0}},
     config_end=true
@@ -66,6 +64,7 @@ class Backend:
         self.last_reborn_serial = 0
         self.summon_rules = summon.load_rules()
         self.formation_rules = formation.load_rules()
+        self.cheer_rules = cheer.load_rules()
         self.market_rules = market.load_rules()
         self.immortal_rules = immortal.load_rules()
         self.journey_rules = journey.load_rules()
@@ -108,6 +107,7 @@ class Backend:
         row = self.db.execute('SELECT data FROM roles WHERE account=?', (account,)).fetchone()
         if row:
             role = json.loads(row[0])
+            original_role = copy.deepcopy(role)
             # Migrate existing bootstrap saves without replacing the user's role.
             changed = False
             if 'cortege_count' not in role:
@@ -116,13 +116,14 @@ class Backend:
             if 'attachments' not in role:
                 role['attachments'] = []
                 changed = True
+            cheer.prepare(role, self.cheer_rules)
             changed = formation.prepare(role, self.formation_rules) or changed
             changed = immortal.prepare(role, self.immortal_rules) or changed
             changed = reborn.prepare(role, self.reborn_rules) or changed
             if 'journey' not in role:
                 changed = journey.prepare(role, int(time.time()), self.journey_rules) or changed
             formation.recalculate(role, self.formation_rules)
-            if changed:
+            if changed or role != original_role:
                 self.save(role, account)
             return role
         # Explicit local bootstrap defaults; these are not recovered official server values.
@@ -138,6 +139,7 @@ class Backend:
 
     def save(self, role, account=None):
         account = self.account if account is None else account
+        cheer.prepare(role, self.cheer_rules)
         vip.prepare(role, self.vip_rules)
         reborn.prepare(role, self.reborn_rules)
         immortal.prepare(role, self.immortal_rules)
@@ -170,6 +172,7 @@ class Backend:
         self.save(role)
         vip.prepare(role, self.vip_rules)
         config = CLIENT_CONFIG.replace('__MARKET_CONFIG__', summon.lua(goods))
+        config = config.replace('__CHEER_CONFIG__', summon.lua(cheer.client_config(self.cheer_rules)))
         config = config.replace('__XIANLING_HINT__', summon.lua(xianling.hint(role,int(time.time()),self.xianling_rules)))
         config = config.replace('config_end=true', '[8]=' + summon.lua(guild.client_config(self.guild_rules)) + ',config_end=true')
         for key, value in daily.client_config(self.daily_rules).items():
@@ -177,11 +180,20 @@ class Backend:
         config = config.replace('config_end=true', '[1]=' + summon.lua(vip.client_config(self.vip_rules)) + ',local_vip=' + summon.lua(vip.client_state(role)) + ',config_end=true')
         config = config.replace('__PARTY_CONFIG__', summon.lua(dict(party_top_list={},pay_consume_gold=self.activity_rules['party_fight_gold'])))
         config = config.replace('__IMMORTAL_CONFIG__', summon.lua(immortal.client_config(self.immortal_rules)))
-        config = config.replace('config_end=true', '[31]=' + summon.lua(reborn.client_config(self.reborn_rules)) + ',[32]={is_open=true,flag=true},config_end=true')
+        realm_config = reborn.client_config(self.reborn_rules)
+        realm_config[self.cheer_rules['skill_realm']]['rights']['open_cheer_skill'] = True
+        config = config.replace('config_end=true', '[31]=' + summon.lua(realm_config) + ',[32]={is_open=true,flag=true},config_end=true')
         config = config.replace('config_end=true', '[23]=' + summon.lua(self.formation_rules['equipment_advance']) + ',config_end=true')
+        login_snapshot = self.snapshot()
+        # Original reverse skill levels use B in 1017 but signed I in 1032.
+        # Bootstrap follows this bounded legacy snapshot with full-precision attributes.
+        for name in cheer.NAMES[8:]:
+            login_snapshot[name + '_skill_level'] = min(255, login_snapshot[name + '_skill_level'])
         replies = [encode(2998, dict(id=80, data=config)),
-                encode(1017, dict(self.snapshot(), reconnect=reconnect))] + self.inventory()
+                encode(1017, dict(login_snapshot, reconnect=reconnect))] + self.inventory()
         role = self.profile()
+        replies += self.power_attributes(role)
+        replies += cheer.attributes(role)
         replies += summon.soul_snapshots(role)
         replies += immortal.handbook(role, self.immortal_rules)
         replies.append(summon.event(158, immortal.collection_snapshot(role)))
@@ -227,15 +239,19 @@ class Backend:
         try:
             role = self.profile()
             before = copy.deepcopy(role)
-            events = formation.settle(role, mid, data, self.formation_rules, login_fields)
+            if mid == 1087:
+                events = cheer.settle(role, data, self.cheer_rules)
+                formation.prepare(role, self.formation_rules)
+            else:
+                events = formation.settle(role, mid, data, self.formation_rules, login_fields)
             immortal.prepare(role, self.immortal_rules)
             attrs = [dict(type=t, value=role.get(k, 0)) for t, k in
-                     ((7, 'silver_coin'), (8, 'gold_coin'), (30, 'role_combat_power'), (71, 'cortege_count'))]
+                     ((7, 'silver_coin'), (8, 'gold_coin'), (30, 'role_combat_power'), (39, 'max_combat_power'), (71, 'cortege_count'))]
             # Equipment panels keep the selected table throughout repeated
             # upgrades. Preserve it with deltas; full snapshots would detach it.
             snapshots = [] if mid in (1052, 1073) else self.inventory(role)
             replies = self.companion_deltas(before, role) + self.item_deltas(before, role) + snapshots + summon.soul_snapshots(role) + immortal.handbook(role, self.immortal_rules) + [
-                encode(1032, dict(id=role['role_id'], unit_type=1, attr_count=len(attrs), attr_list=attrs))] + events
+                encode(1032, dict(id=role['role_id'], unit_type=1, attr_count=len(attrs), attr_list=attrs))] + cheer.attributes(role) + events
             self.save(role)
             self.emit('game_formation_ok', message_id=mid, rules_revision=self.formation_rules['revision'])
         except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
@@ -247,6 +263,17 @@ class Backend:
         if len(self.formation_replies) > 256:
             del self.formation_replies[next(iter(self.formation_replies))]
         return replies
+
+    def panel_attributes(self, role):
+        fields = ((58, 'combat_power'), (61, 'hp'), (62, 'magic'), (63, 'gongji'), (64, 'fangyu'))
+        return [encode(1032, dict(id=c['id'], unit_type=4, attr_count=len(fields),
+                    attr_list=[dict(type=n, value=c.get(k, 0)) for n, k in fields]))
+                for c in role['corteges']]
+
+    def power_attributes(self, role):
+        return [encode(1032, dict(id=role['role_id'], unit_type=1, attr_count=2,
+                    attr_list=[dict(type=30, value=role['role_combat_power']),
+                               dict(type=39, value=role['max_combat_power'])]))]
 
     def companion_deltas(self, before, after):
         # [A] lineupUI.updateCharacterInfo mutates existing objects. Training UI
@@ -420,7 +447,8 @@ class Backend:
             journey.prepare(role, now, self.journey_rules)
             daily.prepare(role, now, self.daily_rules)
             self.save(role)
-            updates = self.journey_attributes(role)
+            # Refresh expiring permanent effects without replacing UI-held objects.
+            updates = self.panel_attributes(role) + self.journey_attributes(role)
             if previous_month != role['xianling']['month']:
                 updates.append(xianling.tip(role,now,self.xianling_rules))
             if previous_day != role['daily']['day']:
@@ -467,7 +495,7 @@ class Backend:
             return self.rebirth(packet, mid, data)
         if mid in immortal.HANDLED:
             return self.immortals(packet, mid, data)
-        if mid in formation.HANDLED:
+        if mid == 1087 or mid in formation.HANDLED:
             return self.formation(packet, mid, data)
         if mid == 1042:
             return self.summon(packet, data)
@@ -567,7 +595,7 @@ class Backend:
             journey.prepare(role, now, self.journey_rules)
             activity.prepare(role, now, self.activity_rules)
             formation.prepare(role, self.formation_rules)
-            replies = self.item_deltas(before, role) + self.inventory(role) + [vip.attrs(role),
+            replies = self.companion_deltas(before, role) + self.item_deltas(before, role) + self.inventory(role) + self.power_attributes(role) + [vip.attrs(role),
                 summon.event(80, dict(local_vip=vip.client_state(role)))] + events
             if mid in (1336,1111):
                 replies.append(xianling.tip(role,now,self.xianling_rules))
@@ -630,7 +658,7 @@ class Backend:
             reborn.prepare(role, self.reborn_rules)
             formation.recalculate(role, self.formation_rules)
             attrs = [dict(type=t, value=role.get(k, 0)) for t, k in
-                     ((7, 'silver_coin'), (8, 'gold_coin'), (30, 'role_combat_power'),
+                     ((7, 'silver_coin'), (8, 'gold_coin'), (30, 'role_combat_power'), (39, 'max_combat_power'),
                       (580, 'reborn_layer'), (581, 'maxlayer_reborn_count'))]
             replies = self.companion_deltas(before, role) + self.item_deltas(before, role)
             old_skills = {x['id']: x for x in before['attachments'] if x['attach_type'] == 6}
@@ -729,7 +757,7 @@ class Backend:
                 events = immortal.settle(role, mid, data, self.immortal_rules, login_fields)
                 formation.recalculate(role, self.formation_rules)
                 attrs = [dict(type=t, value=role.get(k, 0)) for t, k in
-                         ((7, 'silver_coin'), (8, 'gold_coin'), (30, 'role_combat_power'))]
+                         ((7, 'silver_coin'), (8, 'gold_coin'), (30, 'role_combat_power'), (39, 'max_combat_power'))]
                 attrs += [dict(type=t, value=role['collection_bonuses'][k]) for t, k in
                           ((87, 'hp'), (88, 'gongji'), (89, 'fangyu'), (90, 'magic'))]
                 replies = (self.companion_deltas(before, role) + self.item_deltas(before, role)
@@ -751,7 +779,7 @@ class Backend:
 
     def journey_attributes(self, role):
         fields = {3: 'level', 5: 'cur_exp', 6: 'next_exp', 7: 'silver_coin', 8: 'gold_coin',
-                  30: 'role_combat_power', 71: 'cortege_count', 101: 'strength', 102: 'energy',
+                  30: 'role_combat_power', 39: 'max_combat_power', 71: 'cortege_count', 101: 'strength', 102: 'energy',
                   64: 'tollgate_flush_limit', 65: 'tollgate_flush_count', 66: 'tollgate_flush_time',
                   91: 'sweep_flush_limit', 92: 'sweep_flush_count', 93: 'last_sweep_time',
                   511: 'elite_tollgate_flush_count', 512: 'elite_tollgate_flush_time',
@@ -826,7 +854,7 @@ class Backend:
             events = daily.track(role, before, mid, data, events, now, self.daily_rules, login_fields) + events
             formation.prepare(role, self.formation_rules)
             immortal.prepare(role, self.immortal_rules)
-            attrs = activity.attributes(role)
+            attrs = activity.attributes(role) + self.power_attributes(role)
             replies = (self.companion_deltas(before, role) + self.item_deltas(before, role)
                        + self.inventory(role) + summon.soul_snapshots(role)
                        + immortal.handbook(role, self.immortal_rules) + attrs + events)

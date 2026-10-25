@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "mode": "inferred",
-  "revision": "2026-10-25-combat-2",
+  "revision": "2026-10-25-combat-lanes",
   "timezone_offset_hours": 8,
   "strength_recovery_seconds": 360,
   "energy_recovery_seconds": 900,
@@ -11,7 +11,7 @@
     "max_actions": 240,
     "minimum_damage_percent": 5,
     "first_hand": "challenger",
-    "timeout": "remaining_hp_ratio",
+    "timeout": "unresolved",
     "spell_attack_ratio": 0.25,
     "spell_magic_ratio": 3,
     "intensity_curve": {
@@ -20,7 +20,7 @@
       "low_multiplier": 1.2,
       "high_multiplier": 1.8
     },
-    "multi_target_limit": 8,
+    "multi_target_limit": 4,
     "skill_target_limits": {},
     "formula_revision": "candidate-v1.1",
     "mechanics": {
@@ -36,7 +36,7 @@
       "event_budget_bytes": 12000
     },
     "formation_target_limits": {
-      "8": 8,
+      "8": 4,
       "9": 9
     }
   },

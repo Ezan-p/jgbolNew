@@ -3,7 +3,9 @@
 The breakdown is derived output only. Never use cached panel/source attributes as
 inputs. Battle triggers and temporary scenario effects stay in combat_engine.
 """
-from decimal import Decimal, ROUND_FLOOR
+from decimal import Decimal, ROUND_FLOOR, ROUND_HALF_UP
+import json
+from pathlib import Path
 import copy
 import time
 from . import summon
@@ -17,7 +19,60 @@ PETS = {int(r['type_id']): {k.split('(')[0]: v for k, v in r.items()}
         for r in summon.rows('animal_base.csv')}
 PET_TRAIN = {int(r['star_level']): r for r in summon.rows('animal_train_config.csv')}
 CHEER = {(int(r['cheer_order']), int(r['level'])): r for r in summon.rows('cortege_cheer_config.csv')}
+HOME_TRAIN = {(int(r['train_type']), int(r['level'])): r
+              for r in summon.rows('hole/hole_train_config.csv')}
 DIRECTIONS = ('heaven', 'earth', 'shake', 'sunda', 'water', 'fire', 'hill', 'pool')
+
+
+SCORE_VERSION = '1.1'
+ESSENCE_CONFIG = json.loads((Path(__file__).resolve().parents[1] /
+                            'server_config/essence_power_v1_1.json').read_text())
+ESSENCE_SCORES = {int(k): v for k, v in ESSENCE_CONFIG['scores'].items()}
+ESSENCE_PARAMS = {int(r['id']): r['parameter'] for r in summon.rows('ext_skill.csv')}
+if (ESSENCE_CONFIG.get('version') != SCORE_VERSION or ESSENCE_CONFIG.get('mode') != 'inferred'
+        or set(ESSENCE_SCORES) != set(range(10101, 10120)) | set(range(10201, 10220))
+        or any(len(v) != 5 or any(type(n) is not int or n < 0 for n in v) for v in ESSENCE_SCORES.values())):
+    raise ValueError('精魄V1.1评分表须包含38种精魄的190项非负整数评分')
+
+
+def essence_score(role, c):
+    """V1.1 fixed scores; combat effects never get applied to permanent stats here."""
+    slots = max(0, min(4, c.get('equiped_ext_skill_limit', 0)))
+    candidates = []
+    for item in role.get('attachments', []):
+        kind, level, pos = item.get('type_id'), item.get('level'), item.get('ext_skill_pos')
+        if (item.get('attach_type') != 5 or item.get('owner_id') != c['id']
+                or kind not in ESSENCE_SCORES or type(level) is not int or not 1 <= level <= 5
+                or type(pos) is not int or not 1 <= pos <= slots or item.get('count', 0) <= 0):
+            continue
+        candidates.append(dict(id=item['id'], type_id=kind, level=level, slot=pos,
+                               family=kind % 100, base=ESSENCE_SCORES[kind][level - 1]))
+    # Corrupt duplicate slots/families: deterministic strongest-first selection.
+    chosen, occupied = {}, set()
+    for item in sorted(candidates, key=lambda x: (-x['base'], x['id'])):
+        if item['family'] not in chosen and item['slot'] not in occupied:
+            chosen[item['family']] = item
+            occupied.add(item['slot'])
+    def rate(family, parameter):
+        item = chosen[family]
+        raw = ESSENCE_PARAMS[item['type_id']].split('/')[parameter].split('|')[item['level'] - 1]
+        return Decimal(raw.rstrip('%')) / 100
+    def rounded(value):
+        return int(value.to_integral_value(rounding=ROUND_HALF_UP))
+    corrections = dict(lucky_heal=0, parry_assault=0, combo_execute=0)
+    if 14 in chosen and 10 in chosen:
+        corrections['lucky_heal'] = rounded(rate(14, 0) * chosen[10]['base'])
+    if 4 in chosen and 11 in chosen:
+        corrections['parry_assault'] = rounded(Decimal('0.30') * rate(4, 1) * chosen[11]['base'])
+    if 7 in chosen and 15 in chosen:
+        corrections['combo_execute'] = -rounded(rate(7, 0) * chosen[15]['base'])
+    base = sum(x['base'] for x in chosen.values())
+    return dict(version=SCORE_VERSION, selected=sorted(chosen.values(), key=lambda x: x['family']),
+                base=base, corrections=corrections, total=base + sum(corrections.values()))
+
+
+def score_panel(panel, weights, essence=0):
+    return bounded(sum(Decimal(panel[s]) * Decimal(str(weights[s])) for s in STATS) + essence)
 
 
 def floor(value):
@@ -63,6 +118,8 @@ def add_pet(role, c, values):
         if int(stat) in attrs:
             attrs[int(stat)] += Decimal(value)
     stages = pet.get('train_levels', [0] * 4)
+    if len(stages) != 4:
+        raise ValueError('灵兽培养阶段必须有四项')
     for n in attrs:
         attrs[n] *= 1 + Decimal(train.get('each_stage_plus(percent)', '0')) * stages[n - 1] / 100
     for entry in row['plus_order'].split('/'):
@@ -76,7 +133,11 @@ def add_pet(role, c, values):
 
 
 def add_cheer(role, c, values, pending):
-    # Inferred: same-position support, cumulative level coefficients, direct fractions.
+    if 'cheer_pending' in role:
+        from .cheer import bonuses
+        bonuses(role, c, values, pending)
+        return
+    # Legacy external callers without migrated Bagua state.
     order = c['order']
     level = role.get('cheer_' + DIRECTIONS[order - 1] + '_level', 1)
     supporters = [x for x in role['corteges'] if not x.get('order')
@@ -92,8 +153,8 @@ def add_cheer(role, c, values, pending):
 
 # Source channels for missing producers. Explicit inputs live under
 # combat_sources, NOT on output fields; this prevents feeding derived caches back.
-FLAT_CHANNELS = {'role', 'cortege', 'elite', 'goss_cortege', 'goss_equip', 'goss_skill',
-                 'animal', 'title', 'free_order', 'hole', 'cheer_skill'}
+FLAT_CHANNELS = {'cortege', 'elite', 'goss_cortege', 'goss_equip', 'goss_skill',
+                 'free_order', 'cheer_skill'}
 RATE_CHANNELS = {'genius', 'fam', 'prey', 'goss', 'special_attack'}
 
 
@@ -105,6 +166,15 @@ def add_channels(role, c, values):
                 raise ValueError('未知战力来源: ' + name)
             if not isinstance(source, dict) or set(source) - set(STATS):
                 raise ValueError('战力来源只能包含四维属性')
+            for value in source.values():
+                if isinstance(value, bool) or not isinstance(value, (int, float, str)):
+                    raise ValueError('战力来源数值无效')
+                try:
+                    valid = Decimal(str(value)).is_finite()
+                except ArithmeticError:
+                    valid = False
+                if not valid:
+                    raise ValueError('战力来源数值须为有限数')
         for stat in STATS:
             flat = sum((Decimal(str(v.get(stat, 0))) for k, v in sources.items() if k in FLAT_CHANNELS), Decimal(0))
             rate = sum((Decimal(str(v.get(stat, 0))) for k, v in sources.items() if k in RATE_CHANNELS), Decimal(0))
@@ -121,12 +191,13 @@ def explain(role, rules, now=None):
 
 def recalculate(role, rules, now=None):
     """[B] Server formula using [A] base/growth/equipment/fate coefficients."""
-    from . import formation as f, reborn, reborn_stars
+    from . import formation as f, reborn, reborn_stars, immortal
+    immortal.collection_bonuses(role)
     BASES, SKILLS, ITEMS, FATES = f.BASES, f.SKILLS, f.ITEMS, f.FATES
     BASE_COLUMNS, GROWTH_COLUMNS = f.BASE_COLUMNS, f.GROWTH_COLUMNS
     equip_effect, skill_effect, advance_worth = f.equip_effect, f.skill_effect, f.advance_worth
     now = int(time.time()) if now is None else now
-    policy = rules.get('combat_power', DEFAULT_POLICY)
+    policy = dict(DEFAULT_POLICY, **rules.get('combat_power', {}))
     reports = {}
     pending = {}
 
@@ -168,15 +239,15 @@ def recalculate(role, rules, now=None):
         record(trace, 'awakening_and_stars', values)
         rates = {s: 0 for s in STATS}
         if c.get('order', 0):
-            for f in FATES:
-                if int(f['cortege_type[effected_cortege]']) != c['type']:
+            for fate in FATES:
+                if int(fate['cortege_type[effected_cortege]']) != c['type']:
                     continue
-                targets = set(map(int, f['target_object_type[1/2/3]'].split('/')))
-                kind = int(f['tartege_type[4-cortege/5-equip/6-skill]'])
+                targets = set(map(int, fate['target_object_type[1/2/3]'].split('/')))
+                kind = int(fate['tartege_type[4-cortege/5-equip/6-skill]'])
                 available = active_types if kind == 4 else {i['type_id'] for i in equipped if i['attach_type'] == kind}
                 if targets <= available:
-                    s = {1: 'hp', 2: 'magic', 3: 'gongji', 4: 'fangyu'}[int(f['effect_field[1-maxhp/2-maxmagic/3-gongji/4-fangyu]'])]
-                    rates[s] += int(f['effect_value'])
+                    s = {1: 'hp', 2: 'magic', 3: 'gongji', 4: 'fangyu'}[int(fate['effect_field[1-maxhp/2-maxmagic/3-gongji/4-fangyu]'])]
+                    rates[s] += int(fate['effect_value'])
         for s in STATS:
             values[s] *= 1 + Decimal(rates[s]) / 100 + extra_rates[s]
         record(trace, 'fates_and_advance', values)
@@ -197,6 +268,13 @@ def recalculate(role, rules, now=None):
         if policy['title']:
             add_title(role, values, now)
         record(trace, 'title', values)
+        training = role.get('activity', {}).get('home', {}).get('train', {})
+        for kind, stat in ((1, 'gongji'), (2, 'fangyu')):
+            row = HOME_TRAIN.get((kind, training.get(str(kind), {}).get('level', 0)))
+            if row:
+                rate, flat = map(Decimal, row['worth(rate|value)'].split('|'))
+                values[stat] = values[stat] * (1 + rate / 100) + flat
+        record(trace, 'home_training', values)
         if policy['pet']:
             add_pet(role, c, values)
         record(trace, 'pet', values)
@@ -206,14 +284,17 @@ def recalculate(role, rules, now=None):
         if policy['explicit_channels']:
             add_channels(role, c, values)
         record(trace, 'explicit_channels', values)
+        trace['source_inputs'] = copy.deepcopy({'role': role.get('combat_sources', {}),
+                                                 'companion': c.get('combat_sources', {})})
         for s in STATS:
             c[s] = bounded(values[s])
-        c['combat_power'] = bounded(sum(Decimal(c[s]) * rules['combat_weights'][s] for s in STATS))
+        trace['essence'] = essence_score(role, c)
+        c['combat_power'] = score_panel(c, rules['combat_weights'], trace['essence']['total'])
         trace['panel'] = {s: c[s] for s in STATS}
         trace['combat_power'] = c['combat_power']
     members = [c for c in role['corteges'] if 1 <= c.get('order', 0) <= 8]
     role['role_combat_power'] = bounded(sum(c.get('combat_power', 0) for c in members))
     role['max_combat_power'] = max(bounded(role.get('max_combat_power', 0)), role['role_combat_power'])
-    role['combat_power_breakdown'] = dict(mode='inferred', version=1, companions=reports,
+    role['combat_power_breakdown'] = dict(mode='inferred', version=2, scoring_version=SCORE_VERSION, companions=reports,
         member_ids=[c['id'] for c in members], total=role['role_combat_power'],
         maximum=role['max_combat_power'], weights=dict(rules['combat_weights']))

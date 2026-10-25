@@ -115,9 +115,8 @@ class ProtocolTests(unittest.TestCase):
                 self.assertEqual(replies[0][2]['id'], 80)
                 config = login_fields(replies[0][2]['data'])
                 self.assertIs(config['config_end'], True)
-                # The original client only skips Lv[1] when is_open is false;
-                # an absent config leaves both fields nil and crashes the UI.
-                self.assertIs(config[14]['is_open'], False)
+                # Enabled Bagua must provide complete original-client config.
+                self.assertIs(config[14]['is_open'], True)
                 self.assertIsInstance(config[14]['cheer_level_limit'], dict)
                 self.assertEqual(len(config[10]['cheap_item_list']), 7)
                 self.assertEqual(len(config[10]['rich_item_list']), 8)

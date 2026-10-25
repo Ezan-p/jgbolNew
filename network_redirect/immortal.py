@@ -66,6 +66,12 @@ def prepare(role, rules):
         if kind in acquired:
             acquired[kind].add(i['type_id'])
     role['handbook'] = {k: sorted(v) for k, v in acquired.items()}
+    collection_bonuses(role)
+    return before != role
+
+
+def collection_bonuses(role):
+    """Rebuild the derived collection cache before any panel settlement."""
     role.setdefault('immortal_collection', {})
     bonuses = dict(hp=0, gongji=0, fangyu=0, magic=0)
     for index, row in COLLECTIONS.items():
@@ -75,7 +81,6 @@ def prepare(role, rules):
             stat, value = map(int, row['prize'].split('|'))
             bonuses[{1: 'hp', 2: 'gongji', 3: 'fangyu', 4: 'magic'}[stat]] += value
     role['collection_bonuses'] = bonuses
-    return before != role
 
 
 def collection_members(row):

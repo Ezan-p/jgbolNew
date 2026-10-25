@@ -43,7 +43,7 @@ def load_rules(path=ROOT / 'server_config/journey_rules.json'):
                         ('multi_target_limit', 1, 8)]:
         require(type(b.get(key)) is int and lo <= b[key] <= hi, '战斗配置无效：' + key)
     combat.validate_rules(b)
-    require(b.get('first_hand') == 'challenger' and b.get('timeout') == 'remaining_hp_ratio'
+    require(b.get('first_hand') == 'challenger' and b.get('timeout') == 'unresolved'
             and r.get('drop_policy') == 'independent_percent'
             and r.get('sweep_result') == 'historical_best_star'
             and r.get('first_win_extra_exp') == 'all_active_companions', '不支持的旅途结算策略')
@@ -215,8 +215,22 @@ def grant(role, spec):
         else:
             for _ in range(count):
                 role['corteges'].append(summon.companion(role, tid))
-    elif typ == 7:
+    elif typ in (7, 10):
         role.setdefault('souls', {})[str(tid)] = role.get('souls', {}).get(str(tid), 0) + count
+    elif typ == 15:
+        # Original object_type.animal; attachment level denotes pet quality.
+        from . import activity, activity_home, activity_home_pets
+        import time
+        require(tid in activity_home_pets.BASE and level in (1, 2, 3, 4), '未知灵兽或品质')
+        role.setdefault('activity', {})
+        home = activity_home.state(role, int(time.time()), activity.load_rules())
+        row = activity_home_pets.BASE[tid]
+        for _ in range(count):
+            identity = max((p['id'] for p in home['pets']), default=0) + 1
+            home['pets'].append(dict(id=identity, type_id=tid, main_type=int(row['main_type']),
+                quality=level, level=1, order=0, cur_exp=0, star_level=0,
+                train_levels=[0]*4,
+                grow_values=[int(row['base_'+k]) for k in activity_home_pets.ATTR]))
     else:
         raise formation.Rejected('未知奖励类型：' + str(typ))
     return dict(object_type=typ, attach_type=tid, attach_count=count, attach_level=level)

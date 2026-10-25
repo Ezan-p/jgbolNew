@@ -79,6 +79,71 @@ class GuildTests(unittest.TestCase):
         self.ok(29,role_list=[rejected]);self.assertNotIn(rejected,self.ok(50)[-1][2])
         self.ok(30);self.assertEqual(self.ok(50)[-1][2],{})
 
+    def test_team_bulk_accept_fills_remaining_slots_and_keeps_waiting(self):
+        self.ok(4,union_id=80001)
+        r=self.role();g=r['guild']['unions']['80001']
+        for ident in (810001,810002):g['members'][str(ident)]=guild.offline.npc(ident,'候补道友',NOW)
+        self.b.save(r);self.ok(26)
+        applicants=list(self.ok(50)[-1][2])
+        self.assertEqual(len(applicants),5)
+        result=self.ok(28,role_list=applicants)[-1][2]['team']
+        team=self.role()['guild']['instances']['team']
+        self.assertEqual(team['members'],['1']+[str(v) for v in applicants[:4]])
+        self.assertEqual(set(team['applications']),{str(applicants[4])})
+        self.assertEqual(result['apply_list'],{})
+        self.assertEqual(self.ok(50)[-1][2],{})
+        self.assertEqual(len(result['teams']),self.b.guild_rules['team_size'])
+        self.ok(33,role_id=applicants[0])
+        self.assertEqual(set(self.ok(50)[-1][2]),{applicants[4]})
+        self.ok(28,role_list=[applicants[4]])
+        self.assertEqual(len(self.role()['guild']['instances']['team']['members']),5)
+        self.assertEqual(self.ok(50)[-1][2],{})
+
+    def test_team_three_applicants_all_fit_five_member_capacity(self):
+        self.ok(4,union_id=80001);self.ok(26)
+        ids=list(self.ok(50)[-1][2]);self.ok(28,role_list=ids)
+        team=self.ok(44)[-1][2]['team']
+        self.assertEqual(team['max_count'],5)
+        self.assertEqual(len(team['teams']),4)
+        self.assertEqual(set(self.role()['guild']['instances']['team']['members']),{'1'}|set(map(str,ids)))
+
+    def test_team_fight_minimum_and_maximum_boundaries(self):
+        self.ok(4,union_id=1);self.ok(26)
+        for size in (1,2,3,4,5,6):
+            with self.subTest(size=size):
+                r=self.role();g=r['guild']['unions']['1'];a=r['guild']['instances']
+                ids=[1]+list(range(820001,820000+size))
+                for ident in ids[1:]:g['members'][str(ident)]=guild.offline.npc(ident,'试战道友',NOW)
+                a['team']['members']=list(map(str,ids));a['team']['applications']={};a['team_fights']=0;self.b.save(r)
+                before=self.role()
+                with patch('network_redirect.guild_instances.simulate',return_value=(4,[],{})) as battle:
+                    if 3<=size<=5:
+                        self.ok(41,fight_list=list(reversed(ids)))
+                        battle.assert_called_once()
+                        self.assertEqual(self.role()['guild']['instances']['team_fights'],1)
+                        self.assertEqual(self.role()['guild']['instances']['team']['members'],list(map(str,reversed(ids))))
+                    else:
+                        self.assertEqual(self.req(41,fight_list=ids)[-1][1],55)
+                        battle.assert_not_called();self.assertEqual(self.role(),before)
+
+    def test_team_fight_rejects_forged_or_incomplete_roster(self):
+        self.ok(4,union_id=1);self.ok(26);self.ok(28,role_list=[10001,10002])
+        for data in ({},{'fight_list':[1,10001]},{'fight_list':[1,10001,10001]},
+                     {'fight_list':[1,10001,99999]},{'fight_list':[True,10001,10002]},
+                     {'fight_list':{2:1,3:10001,4:10002}}):
+            before=self.role()
+            with patch('network_redirect.guild_instances.simulate') as battle:
+                self.assertEqual(self.req(41,**data)[-1][1],55)
+                battle.assert_not_called();self.assertEqual(self.role(),before)
+
+    def test_team_bulk_accept_checks_every_applicant_before_mutation(self):
+        self.ok(4,union_id=80001);self.ok(26)
+        applicants=list(self.ok(50)[-1][2]);before=self.role()
+        self.assertEqual(self.req(28,role_list=applicants+[999999])[-1][1],55)
+        self.assertEqual(self.role(),before)
+        self.assertEqual(self.req(28,role_list=applicants+[applicants[0]])[-1][1],55)
+        self.assertEqual(self.role(),before)
+
     def test_match_stage_and_group_detail_contract(self):
         self.create()
         for op,q in ((18,100),(58,32)):
@@ -194,7 +259,9 @@ class GuildTests(unittest.TestCase):
         self.assertEqual(r['guild']['unions']['2']['popularity'],expected)
         r=self.role();self.assertEqual(self.req(72)[-1][1],55);self.assertEqual(r,self.role())
     def test_nested_battles(self):
-        self.create();self.ok(26);self.ok(41);self.ok(42)
+        self.create();r=self.role()
+        for ident in (830001,830002,830003,830004):r['guild']['unions']['2']['members'][str(ident)]=guild.offline.npc(ident,'试战道友',NOW)
+        self.b.save(r);self.ok(26);self.ok(28,role_list=[830001,830002,830003,830004]);self.ok(41,fight_list=[1,830001,830002,830003,830004]);self.ok(42)
         self.ok(80);self.ok(95)
         self.ok(84,task_index=1,task_type=2,pay_type=1)
     def test_tree_guard(self):
@@ -393,7 +460,7 @@ class GuildTests(unittest.TestCase):
     def test_rules_validation(self):
         import json
         p=Path(self.tmp.name)/'rules.json'
-        for key,value in (('catch_success_percent',101),('search_sweep_gold',-1),('pet_types',[106]),('rank_rights',{})):
+        for key,value in (('catch_success_percent',101),('search_sweep_gold',-1),('pet_types',[106]),('rank_rights',{}),('team_size',6),('team_size',2),('team_min_fighters',2),('team_min_fighters',True)):
             r=copy.deepcopy(self.b.guild_rules);r[key]=value;p.write_text(json.dumps(r))
             with self.subTest(key=key),self.assertRaises(guild.formation.Rejected):guild.load_rules(p)
 

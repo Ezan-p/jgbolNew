@@ -196,7 +196,7 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(actions.stop_reason, 'event_budget')
         self.assertLess(len(actions), 240)
         self.assertLess(len(e.event_packets(actions, 9)[0]), 32768)
-        self.assertEqual(result, 4)  # The defender has more HP at the bounded timeout.
+        self.assertEqual(result, 0)  # Two living armies cannot be declared defeated on HP ratio.
 
     def test_policy_invalid_values_rejected(self):
         for key, bad in [('poison_max_damage', 0), ('rulai_shield_probability', 101),

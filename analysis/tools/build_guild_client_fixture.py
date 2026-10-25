@@ -100,6 +100,9 @@ end
  lines.append("step('team_open',function() ms.d_secretAreaUI.show(ms.d_xianmengUI.getXianMengMainLayer()) end)")
  request('team_before_create',44)
  request('team_list',73)
+ r=b.profile();g=r['guild']['unions']['2']
+ for ident in (710001,710002,710003):g['members'][str(ident)]=guild.offline.npc(ident,'候补道友'+str(ident),0)
+ b.save(r)
  request('team_create',26)
  request('team_inside',44)
  request('team_applications',50)
@@ -107,12 +110,30 @@ end
  local ui=ms.d_secretAreaUI
  local accept=captureMenu(function() ui.showJoinTeamPage() end,979)
  local state=ui.g_self
- for _,check in pairs(state.join_team_btns_checks) do check:setVisible(true) end
+ for index,check in pairs(state.join_team_btns_checks) do check:setVisible(state.teams_info.team.apply_list_sort[index].id~=710003) end
  local sent
  withOverride(ui,'send_msg_union_event',function(op,data) assert(op==28);sent=data end,accept)
- assert(sent and #sent.role_list==1 and sent.role_list[1]=="""+str(applicant)+""",'wrong applicant ID')
+ assert(sent and #sent.role_list==3,'expected all three NPCs selected')
+ local expected={["""+str(applicant)+"""]=true,[710001]=true,[710002]=true}
+ for _,id in ipairs(sent.role_list) do assert(expected[id],'wrong applicant ID');expected[id]=nil end
 end)""")
- request('team_accept',28,role_list=[applicant])
+ request('team_accept',28,role_list=[applicant,710001,710002])
+ lines.append("step('team_four_after_bulk_accept',function() local t=ms.d_secretAreaUI.g_self.teams_info.team;assert(t.max_count==5);assert(#t.teams==4);assert(t.apply_list[710003]) end)")
+ request('team_accept_fifth',28,role_list=[710003])
+ lines.append("step('team_full_after_bulk_accept',function() local t=ms.d_secretAreaUI.g_self.teams_info.team;assert(t.max_count==5);assert(#t.teams==5);assert(next(t.apply_list)==nil) end)")
+ lines.append("""step('team_client_minimum_and_full_roster',function()
+ local ui=ms.d_secretAreaUI;local team=ui.g_self.teams_info.team;local all=team.teams
+ for _,count in ipairs({2,3,4,5}) do
+  local roster={};for i=1,count do roster[i]=all[i] end
+  withOverride(team,'teams',roster,function()
+   local sent
+   withOverride(ui,'send_msg_union_event',function(op,data) assert(op==41);sent=data end,function() ui.pressFight() end)
+   if count<3 then assert(sent==nil,'two players must not start')
+   else assert(sent and #sent.fight_list==count,'three to five players must start') end
+  end)
+ end
+end)""")
+ request('team_full_applications',50)
  request('treasure_status',43,flag=1)
  request('treasure_move',43,flag=2)
  request('treasure_sweep',43,flag=6)

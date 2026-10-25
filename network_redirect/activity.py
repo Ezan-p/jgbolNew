@@ -335,6 +335,8 @@ def query_lineup(role,req,r):
     data=dict(role_id=ident,role_name=role['role_name'] if own else '本地活动对手',level=role['level'] if own else r['battle_level'],
         vip_level=0,head_type=1,rank=0,owner_cheer_info={},title_info={},animal_info={},hole_train={},
         cortege_list=chars,cheer_cortege=[],skill_list=[],equip_list=[],ext_skill_list=[],ext_star_list=[])
+    from . import cheer
+    data.update(cheer.inspection(role, own))
     return [summon.event(11,data)]
 
 

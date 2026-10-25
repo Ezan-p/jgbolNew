@@ -16,7 +16,9 @@ def state(s):
     return a
 
 
-def team_applications(team):
+def team_applications(team,r):
+    # Keep waiting NPCs in the save, but do not offer approval when full.
+    if team and len(team['members'])>=r['team_size']:return {}
     # showJoinTeamPage overwrites each row.id with its table key.
     return {int(key):dict(row) for key,row in (team or {}).get('applications',{}).items()}
 
@@ -26,7 +28,7 @@ def team_info(role,a,g,r):
     if t:
         members=[dict(g['members'][rid],head_type=next((c['type'] for c in role['corteges'] if c.get('order')),5004),cortege_layer=a.get('layer',0),finish_fam_data=a.get('layer',0)) for rid in t['members'] if rid in g['members']]
     return dict(teams=members,captain=t.get('captain',role['role_id']) if t else 0,max_count=r['team_size'],free_times=r['team_daily'],fight_count=a['team_fights'],
-        apply_list=team_applications(t),last_search_time=0,max_layer=max(1,a.get('layer',0)),fam_id=1,fam_count=max(1,len(members)),can_support_fight=True)
+        apply_list=team_applications(t,r),last_search_time=0,max_layer=max(1,a.get('layer',0)),fam_id=1,fam_count=max(1,len(members)),can_support_fight=True)
 
 
 def team_list(role,a,g,r):
@@ -77,7 +79,12 @@ def settle(role,s,g,op,d,now,r):
                 if isinstance(selected,dict):selected=list(selected.values())
                 u.require(isinstance(selected,list) and selected and all(type(v)is int and v>0 for v in selected) and len(set(selected))==len(selected),'申请成员列表无效')
                 u.require(all(str(v) in pending and str(v) in g['members'] for v in selected),'申请不存在')
-                if op==28:u.require(len(a['team']['members'])+len(selected)<=r['team_size'],'队伍已满')
+                if op==28:
+                    slots=max(0,r['team_size']-len(a['team']['members']))
+                    u.require(slots>0,'队伍已满')
+                    # The original approval button can submit every checked NPC.
+                    # Admit as many as fit; leave the remainder waiting.
+                    selected=selected[:slots]
                 for ident in selected:
                     target=str(ident)
                     if op==28:a['team']['members'].append(target)
@@ -85,16 +92,24 @@ def settle(role,s,g,op,d,now,r):
             return [u.notice(op),u.reply(op,dict(result=1,team=team_info(role,a,g,r)))]
         if op==50:
             u.require(a['team'] is not None,'请先创建队伍')
-            return [u.reply(50,team_applications(a['team']))]
+            return [u.reply(50,team_applications(a['team'],r))]
         if op==73:return [u.reply(op,dict(result=1,team=team_list(role,a,g,r)))]
         if op==74:u.require(a['team'] is not None,'队伍不存在')
         return [u.reply(op if op in (44,50,74,75) else 44,dict(result=1 if a['team'] else 21,team=team_info(role,a,g,r) if a['team'] else team_list(role,a,g,r)))]
     if op in (41,42):
         u.require(a['team'] is not None,'请先创建队伍')
         if op==41:
+            members=a['team']['members']
+            u.require(r['team_min_fighters']<=len(members)<=r['team_size'],'秘境需要3至5名队员才能挑战')
+            fighters=d.get('fight_list')
+            if isinstance(fighters,dict):
+                u.require(set(fighters)==set(range(1,len(fighters)+1)),'出战名单格式无效')
+                fighters=[fighters[i] for i in range(1,len(fighters)+1)]
+            u.require(isinstance(fighters,list) and all(type(v)is int and v>0 for v in fighters),'出战名单格式无效')
+            u.require(len(fighters)==len(set(fighters)) and set(map(str,fighters))==set(members),'出战名单必须包含全部队员且不得重复')
             u.require(a['team_fights']<r['team_daily'],'秘境挑战次数已用完')
             result,packets,replay=simulate(role,s,r,journey.load_rules(),15,'仙盟秘境')
-            a['team_fights']+=1;a['team_record']=[replay]
+            a['team_fights']+=1;a['team_record']=[replay];a['team']['members']=[str(v) for v in fighters]
             if 1<=result<=3:
                 a['layer']=a.get('layer',0)+1
                 a['member_contributions']={key:a['layer'] for key in a['team']['members']}
