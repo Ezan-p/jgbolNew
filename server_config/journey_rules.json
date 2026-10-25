@@ -9,11 +9,20 @@
   "normal_flush_daily_limit": 0,
   "battle": {
     "max_actions": 240,
-    "defense_percent": 100,
-    "minimum_damage_percent": 10,
-    "skill_magic_percent": 50,
+    "minimum_damage_percent": 5,
     "first_hand": "challenger",
-    "timeout": "remaining_hp_ratio"
+    "timeout": "remaining_hp_ratio",
+    "spell_attack_ratio": 0.25,
+    "spell_magic_ratio": 3,
+    "intensity_curve": {
+      "low": 30,
+      "high": 450,
+      "low_multiplier": 1.2,
+      "high_multiplier": 1.8
+    },
+    "multi_target_limit": 8,
+    "skill_target_limits": {},
+    "formula_revision": "candidate-v1.1"
   },
   "defeat_companion_exp_percent": 50,
   "defeat_silver_percent": 0,

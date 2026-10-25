@@ -10,6 +10,14 @@ def simulate(role,s,r,jrules,ft,name,hp=None):
     if ft==15 and s.get('feast_fam_rate',0):
         for unit in units[0]:
             for key in ('hp','max_hp','gongji','fangyu','magic'):unit[key]=unit[key]*(100+s['feast_fam_rate'])//100
+    if ft in (15,27,28):
+        from .guild_offline import pets,pet_power
+        a=s.get('instances',{})
+        bonus=min(100,sum(pet_power(p) for p in pets(a))//100)
+        team=a.get('team') or {}
+        bonus+=max(0,len(team.get('members',[]))-1)*10 if ft==15 else 0
+        for unit in units[0]:
+            for key in ('hp','max_hp','gongji','fangyu','magic'):unit[key]=unit[key]*(100+bonus)//100
     if hp is not None:units[1][0].update(hp=hp,max_hp=hp)
     rules=copy.deepcopy(jrules);rules['battle']['max_actions']=min(60,rules['battle']['max_actions'])
     result,lineup,actions=journey.battle(role,{},rules,units=units,slots=8)
@@ -26,18 +34,24 @@ def fight(role,req,now,r,jrules):
         u.require(req['des_type'] in (1,2),'守护方式无效')
         if req['des_type']==2:u.pay(role,'gold_coin',r['tree_flush_gold'])
         else:u.require(now>=t.get('cooltime',0),'守护冷却中')
-        old=t.get('hp',r['tree_boss_hp']);result,packets,replay=simulate(role,s,r,jrules,ft,'神树守护',old)
+        full=r['tree_boss_hp']*(100+(t['level']-1)*10)//100
+        old=t.get('hp',full);result,packets,replay=simulate(role,s,r,jrules,ft,'神树守护',old)
         damage=sum(sum(max(0,v) for v in a['damage_list']) for a in replay['fight_result_msg']['fight_result'] if a['is_src'])
         # Damage is read from the authoritative replay, including unsuccessful attempts.
         damage=min(old,damage);t['hp']=old-damage;t['cooltime']=now+r['tree_fight_cooldown']
         rank=next((x for x in t['ranks'] if x['id']==role['role_id']),None)
         if rank is None:rank=dict(id=role['role_id'],name=role['role_name'],order=1,challenge_count=0,damage=0);t['ranks'].append(rank)
         rank['damage']+=damage;rank['challenge_count']+=1
+        used=s.get('tree_reward_count',0)
+        if used<r['tree_challenge_limit']:
+            u.contribution(role,r['tree_challenge_contrib']);s['tree_reward_count']=used+1
+        if req['des_type']==2:journey.grant(role,[5,1001,r['tree_paid_peaches'],1])
         t['ranks'].sort(key=lambda x:-x['damage'])
         for i,x in enumerate(t['ranks'],1):x['order']=i
         if not t['hp']:
             for p in r['tree_rewards']:journey.grant(role,p)
-            t.update(state=1,planted=0,hp=r['tree_boss_hp'])
+            bonus=max(1,4-rank['order']);u.contribution(role,bonus*r['tree_challenge_contrib'])
+            t.update(state=1,planted=0);t.pop('hp',None)
         return packets+[u.reply(16,u.tree_data(role,s,g,now,r)),summon.event(44,dict(fight_id=s['fight_id'],fight_type=ft))]
     if ft==19:
         from . import guild_escort

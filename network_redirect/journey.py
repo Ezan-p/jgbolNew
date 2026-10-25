@@ -9,7 +9,7 @@ import math
 from pathlib import Path
 import secrets
 
-from . import formation, summon
+from . import formation, summon, combat
 from .protocol import encode
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,9 +39,10 @@ def load_rules(path=ROOT / 'server_config/journey_rules.json'):
                         ('defeat_silver_percent', 0, 100)]:
         require(type(r.get(key)) is int and lo <= r[key] <= hi, '旅途配置无效：' + key)
     b = r.get('battle', {})
-    for key, lo, hi in [('max_actions', 16, 255), ('defense_percent', 0, 100),
-                        ('minimum_damage_percent', 1, 100), ('skill_magic_percent', 0, 100)]:
+    for key, lo, hi in [('max_actions', 16, 255), ('minimum_damage_percent', 1, 100),
+                        ('multi_target_limit', 1, 8)]:
         require(type(b.get(key)) is int and lo <= b[key] <= hi, '战斗配置无效：' + key)
+    combat.validate_rules(b)
     require(b.get('first_hand') == 'challenger' and b.get('timeout') == 'remaining_hp_ratio'
             and r.get('drop_policy') == 'independent_percent'
             and r.get('sweep_result') == 'historical_best_star'
@@ -191,6 +192,7 @@ def battle(role, cfg, rules, *, units=None, slots=8):
     ours, enemies = copy.deepcopy(units) if units is not None else fighters(role, cfg)
     from . import reborn_stars
     reborn_stars.attach_combat_traits(role, ours)
+    combat.attach_essences(role, ours)
     home_train = role.get('activity', {}).get('home', {}).get('train', {})
     if home_train:
         from .activity_home import TRAIN
@@ -208,32 +210,14 @@ def battle(role, cfg, rules, *, units=None, slots=8):
                 targets = [u for u in opposing if u['hp']]
                 if not actor or not targets or len(actions) >= b['max_actions']:
                     continue
-                sk, sk_level = 1, 1
-                for tid, level in actor['skills']:
-                    s = formation.SKILLS[tid]
-                    if int(s['use_mode(1-active，2-passive)']) == 1 and secrets.randbelow(100) < actor.get('skill_probabilities', {}).get(tid, int(s['use_probability'])):
-                        sk, sk_level = tid, level
-                        break
-                skill = formation.SKILLS[sk]
-                if int(skill['effect_target(1-single，2-multi)']) != 2:
-                    targets = targets[:1]
+                combat.begin_action(actor, round_no)
+                sk, sk_level = combat.select_skill(actor)
+                targets = targets[:combat.target_count(sk, b)]
                 damage = [0] * slots
                 for target in targets:
-                    power = actor['gongji']
-                    if sk != 1:
-                        power += reborn_stars.spell_power(float(skill['intensity']) + float(skill['upgrade_plus']) * (sk_level - 1), sk, actor.get('reborn_traits', {}))
-                        power += actor['magic'] * b['skill_magic_percent'] // 100
-                    # [B] Combine CSV training rate/flat bonuses in the local simulator.
-                    buffs = actor.get('training_bonuses', [(0,0)]*4)
-                    guards = target.get('training_bonuses', [(0,0)]*4)
-                    rate,flat = buffs[0 if sk == 1 else 2]
-                    power = power * (100+rate)//100 + flat
-                    rate,flat = guards[1 if sk == 1 else 3]
-                    defense = target['fangyu'] * (100+rate)//100 + flat
-                    hit = max(1, power * b['minimum_damage_percent'] // 100,
-                              power - defense * b['defense_percent'] // 100)
-                    hit = reborn_stars.combat_hit(hit, target['hp'], sk == 1, actor.get('reborn_traits', {}), target.get('reborn_traits', {}))
+                    hit = combat.damage(actor, target, sk, sk_level, b)
                     target['hp'] -= hit
+                    combat.after_hit(actor, target)
                     damage[target['order'] - 1] = hit
                 actions.append(dict(self_use=False, skill_type=sk, is_src=is_src, result=0,
                                     src_order=order, des_order=targets[0]['order'], cur_round=round_no,

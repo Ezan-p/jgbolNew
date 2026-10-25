@@ -46,7 +46,8 @@ def login_fields(text):
 
 
 class Backend:
-    def __init__(self, directory, port, emit):
+    def __init__(self, directory, port, emit, account="local-player"):
+        self.account = account
         self.welfare_rules = welfare.load_rules()
         self.welfare_replies = {}
         self.last_welfare_serial = 0
@@ -85,7 +86,7 @@ class Backend:
             self.db.commit()
         self.tickets = {}
         self.random_key = secrets.randbelow(0x7ffffffe) + 1
-        # One local account. Keep response numbering/replay across TCP reconnects.
+        # This instance owns one account, including response replay across reconnects.
         self.server_serial = 200000
         self.reply_history = deque(maxlen=256)
         self.summon_replies = {}
@@ -102,7 +103,8 @@ class Backend:
     def close(self):
         self.db.close()
 
-    def profile(self, account='local-player'):
+    def profile(self, account=None):
+        account = self.account if account is None else account
         row = self.db.execute('SELECT data FROM roles WHERE account=?', (account,)).fetchone()
         if row:
             role = json.loads(row[0])
@@ -134,7 +136,8 @@ class Backend:
         self.save(role, account)
         return role
 
-    def save(self, role, account='local-player'):
+    def save(self, role, account=None):
+        account = self.account if account is None else account
         vip.prepare(role, self.vip_rules)
         reborn.prepare(role, self.reborn_rules)
         immortal.prepare(role, self.immortal_rules)
@@ -357,7 +360,7 @@ class Backend:
         if mid == 3001:
             token = login_fields(data['data']).get('access_token')
             if data['id'] != 68 or not isinstance(token, str) or not secrets.compare_digest(token.encode(), self.token.encode()):
-                self.emit('game_auth_rejected', message='仅接受本地测试凭据')
+                self.emit('game_auth_rejected', message='仅接受已验证的本地账号凭据')
                 return [encode(3002, dict(auth_key=1, seed=0, server_port=0, account='', server_ip=''))]
             ticket = secrets.randbelow(0x7ffffff0) + 10
             seed = secrets.randbelow(0x7ffffffe) + 1
@@ -366,15 +369,17 @@ class Backend:
                 raise ValueError('Too many pending login tickets')
             self.tickets[ticket] = (seed, time.monotonic() + 60)
             return [encode(3002, dict(auth_key=ticket, seed=seed, server_port=self.port,
-                                     account='local-player', server_ip='127.0.0.1'))]
+                                     account=self.account, server_ip='127.0.0.1'))]
         if mid == 1001:
             entry = self.tickets.pop(data['auth_key'], None)
             if (not entry or entry[0] != data['seed'] or entry[1] < time.monotonic()
-                    or data['account'] != 'local-player'):
+                    or data['account'] != self.account):
                 return [encode(1002, {'result': 1})]
             state['authenticated'] = True
             self.server_serial = 200000
             self.reply_history.clear()
+            self.reborn_replies.clear()
+            self.last_reborn_serial = 0
             self.welfare_replies.clear()
             self.last_welfare_serial = 0
             self.vip_replies.clear()
@@ -399,7 +404,7 @@ class Backend:
             self.emit('game_login_ok', message='本地账号通过 LS→BS 认证')
             return [encode(1002, {'result': 0})] + self.bootstrap()
         if mid == 1016:
-            if data['account'] == 'local-player' and data['random_key'] == self.random_key:
+            if data['account'] == self.account and data['random_key'] == self.random_key:
                 state['authenticated'] = True
                 state['market_sale_time'] = market.sale_time(int(time.time()), self.market_rules)
                 return [encode(2996, {'ret': 0})] + self.bootstrap(reconnect=True)
@@ -492,10 +497,12 @@ class Backend:
             else:
                 events = guild.settle(role, data, now, self.guild_rules, login_fields, self.daily_rules)
             gs, current_guild = guild.prepare(role, now, self.guild_rules)
+            events += [summon.event(82,n) for n in gs.pop('pending_notices',[])]
             if mid == 1301 and current_guild and data['id'] in guild.MANAGEMENT:
                 current_guild['events'].append(role['role_name'] + '：' + guild.OP_LABELS.get(data['id'], '仙盟管理操作') + '（' + str(now) + '）')
                 current_guild['events'] = current_guild['events'][-100:]
-            attrs = [dict(type=t, value=role.get(k, 0)) for t, k in ((7, 'silver_coin'), (8, 'gold_coin'),
+            guild.offline.audit(before,role,now,data.get('id',data.get('fight_type',23)),self.guild_rules)
+            attrs = [dict(type=t, value=role.get(k, 0)) for t, k in ((141,'union_join_count'),(143,'union_apply_count'),(7, 'silver_coin'), (8, 'gold_coin'),
                 (101, 'strength'), (102, 'energy'), (144, 'union_id'), (145, 'union_rank'), (146, 'union_contrib'), (148, 'cur_union_contrib'), (147, 'union_store_flush_time'), (151, 'last_feast_grab_time'), (152, 'last_feast_grab_count'), (153, 'last_rece_award_time'), (154, 'train_tree_rate'), (155, 'contrib_plus_rate'), (156, 'last_west_book_time'), (157, 'west_book_count'), (158, 'last_stop_book_time'), (159, 'stop_book_count'))]
             replies = self.item_deltas(before, role) + self.inventory(role) + [
                 encode(1032, dict(id=role['role_id'], unit_type=1, attr_count=len(attrs), attr_list=attrs)),

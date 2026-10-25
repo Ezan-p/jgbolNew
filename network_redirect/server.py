@@ -1,6 +1,10 @@
 """Loopback-only HTTP/TLS/game listener; optional explicit local-account backend."""
 import asyncio
 import hashlib
+import json
+import secrets
+from pathlib import Path
+from http.cookies import SimpleCookie, CookieError
 import struct
 import time
 import uuid
@@ -97,7 +101,53 @@ class LandingServer:
                 path = urlsplit(target).path
                 host = next((h.split(':', 1)[1].strip() for h in headers if h.lower().startswith('host:')), '')
                 content_type = 'text/plain; charset=utf-8'
-                if method in ('GET', 'HEAD') and path == '/__redirect_health':
+                cookie_header = ''
+                if self.backend and hasattr(self.backend, 'authenticate') and path in ('/local-login', '/local-auth'):
+                    fields = {h.split(':', 1)[0].lower(): h.split(':', 1)[1].strip() for h in headers if ':' in h}
+                    if host != f'127.0.0.1:{self.port}':
+                        raise ValueError('Invalid authentication host')
+                    if method == 'GET' and path == '/local-login':
+                        cookies = SimpleCookie()
+                        try:
+                            cookies.load(fields.get('cookie', ''))
+                        except CookieError:
+                            pass
+                        has_remembered = bool(cookies.get('jgbol_remember') and cookies['jgbol_remember'].value)
+                        body = (Path(__file__).with_name('login.html').read_text()
+                                .replace('__CSRF__', self.backend.csrf)
+                                .replace('__AUTO_LOGIN__', 'true' if has_remembered else 'false')).encode()
+                        code, reason, content_type = 200, 'OK', 'text/html; charset=utf-8'
+                    elif method == 'POST' and path == '/local-auth':
+                        if not secrets.compare_digest(fields.get('x-local-csrf', ''), self.backend.csrf):
+                            raise ValueError('Invalid authentication request')
+                        if fields.get('origin', f'http://{host}') != f'http://{host}':
+                            raise ValueError('Cross-origin authentication denied')
+                        length = int(fields.get('content-length', '0'))
+                        if not 0 < length <= 4096 or 'transfer-encoding' in fields:
+                            raise ValueError('Invalid authentication body')
+                        raw = await asyncio.wait_for(reader.readexactly(length), timeout=10)
+                        payload = {}
+                        try:
+                            payload = json.loads(raw)
+                            if not isinstance(payload, dict):
+                                raise ValueError('请求格式错误')
+                            cookies = SimpleCookie()
+                            cookies.load(fields.get('cookie', ''))
+                            remembered = cookies.get('jgbol_remember')
+                            result = self.backend.authenticate(payload, remembered.value if remembered else '')
+                            if 'remember_token' in result:
+                                credential = result.pop('remember_token')
+                                age = 30 * 86400 if credential else 0
+                                cookie_header = f'Set-Cookie: jgbol_remember={credential}; Max-Age={age}; Path=/; HttpOnly; SameSite=Strict\r\n'
+                        except (ValueError, UnicodeError, CookieError) as exc:
+                            if isinstance(payload, dict) and payload.get('action') == 'resume':
+                                cookie_header = 'Set-Cookie: jgbol_remember=; Max-Age=0; Path=/; HttpOnly; SameSite=Strict\r\n'
+                            result = {'ok': False, 'error': str(exc)}
+                        body = json.dumps(result, ensure_ascii=False).encode()
+                        code, reason, content_type = 200, 'OK', 'application/json; charset=utf-8'
+                    else:
+                        code, reason, body = 405, 'Method Not Allowed', b'Method not allowed'
+                elif method in ('GET', 'HEAD') and path == '/__redirect_health':
                     code, reason, body = 200, 'OK', HEALTH
                 elif method in ('GET', 'HEAD') and path in LIST_PATHS:
                     code, reason, body = 200, 'OK', self.server_list
@@ -110,7 +160,7 @@ class LandingServer:
                 emit('http_request', method=method, host=host, path=path,
                           status=code, response_bytes=len(body), sha256=hashlib.sha256(body).hexdigest())
                 response = (f'HTTP/1.1 {code} {reason}\r\nContent-Length: {len(body)}\r\n'
-                            f'Content-Type: {content_type}\r\nConnection: close\r\n\r\n').encode()
+                            f'{cookie_header}Content-Type: {content_type}\r\nCache-Control: no-store\r\nX-Content-Type-Options: nosniff\r\nConnection: close\r\n\r\n').encode()
                 output.write(response + (b'' if method == 'HEAD' else body))
                 await output.drain()
             elif data[0] == 22 and data[1] == 3:

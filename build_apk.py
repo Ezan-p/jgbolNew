@@ -10,6 +10,9 @@ ROOT = Path(__file__).resolve().parent
 
 def build():
     config = json.loads((ROOT / 'game.json').read_text())
+    if config.get('apk_variant') == 'local-accounts':
+        from build_local import build as build_local
+        return build_local(ROOT / config['apk'])
     if config.get('apk_variant') == '360-from-3.79':
         from build_channel360 import build as build360
         return build360(output=ROOT / config['apk'],

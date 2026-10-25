@@ -1,11 +1,11 @@
 """冥仙精魄: original descriptions/drugs [A], deterministic local resolution [B].
 
 Events 121 carry healing/revival to the unmodified replay. Extra attacks are real
-1027 actions. The base damage formula remains the documented offline simulator.
+1027 actions. Damage uses the shared V1.1 candidate reconstruction.
 """
 import copy
 import secrets
-from . import formation, journey, summon, reborn_stars
+from . import formation, journey, summon, reborn_stars, combat
 DESC={int(x['type_id']):[int(v.rstrip('%')) for v in x['reduce_value'].split('|')] for x in summon.rows('specter_jp_desc.csv')}
 DRUGS={int(x['drug_type']):[list(map(int,t.split('|'))) for t in next(v for k,v in x.items() if k.startswith('effect1')).split('/')]
        for x in summon.rows('specter_extr_skill_drug.csv')}
@@ -26,6 +26,7 @@ def effects(row,pills):
 def battle(role,units,rules,effect_values,max_actions=80):
     ours,enemies=copy.deepcopy(units);b=rules['battle'];limit=min(max_actions,b['max_actions'])
     reborn_stars.attach_combat_traits(role, ours)
+    combat.attach_essences(role, ours)
     for side_index,side in enumerate((ours,enemies),1):
         for u in side:
             u['side']=side_index;u['extras']=effect_values.copy() if side_index==2 else {}
@@ -53,20 +54,12 @@ def battle(role,units,rules,effect_values,max_actions=80):
         index=len(actions)+1;skill=formation.SKILLS[sk];damage=[0]*8;react=[];total=0
         for target in targets:
             if not target['hp']:continue
-            power=actor['gongji']
-            if sk!=1:
-                power+=reborn_stars.spell_power(float(skill['intensity'])+float(skill['upgrade_plus'])*(level-1),sk,actor.get('reborn_traits',{}))
-                power+=actor['magic']*b['skill_magic_percent']//100
-            buffs=actor.get('training_bonuses',[(0,0)]*4);guards=target.get('training_bonuses',[(0,0)]*4)
-            rate,flat=buffs[0 if sk==1 else 2];power=power*(100+rate)//100+flat
-            # [B] Repeated armor break refreshes the strongest reduction, never stacks.
+            # [B] Armor break refreshes the strongest reduction, never stacks.
             target['armor_break']=max(target['armor_break'],actor['extras'].get(10102,0))
-            defense=target['base_fangyu']*(100-target['armor_break'])//100
-            rate,flat=guards[1 if sk==1 else 3];defense=defense*(100+rate)//100+flat
-            raw=max(1,power*b['minimum_damage_percent']//100,power-defense*b['defense_percent']//100)
-            if sk==1:raw=raw*(100+actor['extras'].get(10111,0))//100
-            raw=raw*(100-target['extras'].get(10106 if sk==1 else 10108,0))//100
-            hit=reborn_stars.combat_hit(max(1,raw*scale//100),target['hp'],sk==1,actor.get('reborn_traits',{}),target.get('reborn_traits',{}));target['hp']-=hit;total+=hit
+            target['fangyu']=combat.F(target['base_fangyu'])*(100-target['armor_break'])/100
+            hit=combat.damage(actor,target,sk,level,b,scale)
+            target['hp']-=hit;total+=hit
+            combat.after_hit(actor,target)
             damage[target['order']-1]=hit
             revive=target['extras'].get(10119,0)
             if not target['hp'] and revive and not target['revived']:
@@ -90,13 +83,9 @@ def battle(role,units,rules,effect_values,max_actions=80):
                 if not actor or not targets or len(actions)>=limit:continue
                 extra=actor['extras']
                 if round_no>=2 and extra.get(10110):heal(actor,actor['base_hp']*extra[10110]//100,10110,len(actions)+1)
-                actor['gongji']=actor['base_gongji']*(100+(round_no//2)*extra.get(10112,0))//100
-                sk,level=1,1
-                for tid,lv in actor['skills']:
-                    skill=formation.SKILLS[tid]
-                    if int(skill['use_mode(1-active，2-passive)'])==1 and secrets.randbelow(100)<actor.get('skill_probabilities',{}).get(tid,int(skill['use_probability'])):
-                        sk,level=tid,lv;break
-                if int(formation.SKILLS[sk]['effect_target(1-single，2-multi)'])!=2:targets=targets[:1]
+                combat.begin_action(actor,round_no)
+                sk,level=combat.select_skill(actor)
+                targets=targets[:combat.target_count(sk,b)]
                 attack(actor,targets,sk,level)
                 alive=[u for u in opposing if u['hp']]
                 if not actor['hp'] or not alive:continue

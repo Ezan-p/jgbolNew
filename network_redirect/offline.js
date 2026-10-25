@@ -1,4 +1,4 @@
-// Explicit local mode: inject a local CA, and a local account at the SDK bridge.
+// Local transport compatibility. Authentication lives in the patched APK.
 if (REDIRECT_CONFIG.offline) {
     let offlineReady = false;
     rpc.exports.offlinestatus = () => offlineReady && socketFixInstalled && curlCAInstalled;
@@ -37,22 +37,8 @@ if (REDIRECT_CONFIG.offline) {
             Java.use('javax.net.ssl.HttpsURLConnection').setDefaultSSLSocketFactory(context.getSocketFactory());
             event('local_ca_ready', {layer: 'java'});
 
-            const API = Java.use('com.syyx.sdkproxy.ThirdPartyAPI');
-            const Callback = Java.use('com.syyx.sdkproxy.ThirdPartyCallback');
-            const localLogin = function () {
-                Java.scheduleOnMainThread(function () {
-                    try {
-                        API.mAccessToken.value = REDIRECT_CONFIG.sdkToken;
-                        API.m_map.value.put('access_token', Java.use('java.lang.String').$new(REDIRECT_CONFIG.sdkToken));
-                        Java.cast(API.m_sEventCallback.value, Callback).onEvent(1, 0);
-                        event('local_sdk_login', {message: '本地测试账号已通过 SDK 桥接回调'});
-                    } catch (e) { event('offline_error', {message: String(e)}); }
-                });
-            };
-            API.login.implementation = localLogin;
-            API.switchAccount.implementation = localLogin;
             offlineReady = true;
-            event('local_sdk_ready', {message: '360 登录桥接已切换为本地测试账号'});
+            event('local_sdk_ready', {message: '本地账号服务就绪，登录由安装包内的本地窗口处理'});
             rpc.exports.tlsprobe = function () {
                 return new Promise(function (resolve, reject) {
                     Java.perform(function () {

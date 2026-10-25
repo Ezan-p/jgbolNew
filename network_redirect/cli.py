@@ -136,9 +136,9 @@ async def run(config, args):
         tls = None
         ca_path = '/data/local/tmp/jgbol-local-ca.pem'
         if args.offline:
-            from .backend import Backend
+            from .accounts import Accounts
             from .tls import LocalTLS
-            backend = Backend(config['runtime_dir'] / 'offline', args.port, emit)
+            backend = Accounts(config['runtime_dir'] / 'offline', args.port, emit)
             tls = await asyncio.to_thread(LocalTLS, config['runtime_dir'] / 'offline/tls')
             await asyncio.to_thread(adb, config, 'push', tls.ca, ca_path)
             await asyncio.to_thread(adb, config, 'shell', 'chmod', '644', ca_path)
@@ -151,8 +151,7 @@ async def run(config, args):
             raise RuntimeError(f'设备 tcp:{args.port} 已有 reverse 映射，拒绝接管')
         await asyncio.to_thread(adb, config, 'reverse', '--no-rebind', f'tcp:{args.port}', f'tcp:{args.port}')
         reverse_added = True
-        hook_config = dict(port=args.port, offline=args.offline, caPath=ca_path,
-                           sdkToken=backend.token if backend else '')
+        hook_config = dict(port=args.port, offline=args.offline, caPath=ca_path)
         if backend:
             from .summon import client_source
             hook_config['summonClientSource'] = client_source(backend.summon_rules)
@@ -317,7 +316,7 @@ def main(argv=None):
         s.add_argument('--probe', action='store_true', help='用独立测试 socket 验证 DNS、IPv4、IPv6 链路')
         s.add_argument('--duration', type=float, default=0)
         s.add_argument('--quiet', action='store_true')
-        s.add_argument('--offline', action='store_true', help='启用本地 TLS、SDK 测试账号和 LS/BS 业务接入')
+        s.add_argument('--offline', action='store_true', help='启用本地 TLS、账号注册登录和 LS/BS 业务接入')
     sub.add_parser('status')
     sub.add_parser('stop')
     args = p.parse_args(argv)

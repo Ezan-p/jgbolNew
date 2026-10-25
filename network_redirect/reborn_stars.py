@@ -1,4 +1,5 @@
 """Original wakeUI/CSV contracts; configurable local server decisions [B]."""
+from fractions import Fraction
 import secrets
 import time
 from decimal import Decimal
@@ -235,11 +236,11 @@ def spell_power(base, skill_id, traits):
 def combat_hit(hit, hp, normal, attack, defend):
     # [B] Base critical damage is 150%; rates from ext_star_config are percent.
     if normal and attack.get('crit', 0) > defend.get('resist', 0) and secrets.randbelow(1000000) < max(0, attack.get('crit', 0) - defend.get('resist', 0)) * 10000:
-        hit = int(hit * max(1, (150 + attack.get('crit_damage', 0) - defend.get('reduction', 0)) / 100))
+        hit = hit * max(1, (Fraction(150) + Fraction(str(attack.get('crit_damage', 0))) - Fraction(str(defend.get('reduction', 0)))) / 100)
     if hit >= hp and defend.get('survival_count', 0) and secrets.randbelow(1000000) < defend.get('survival', 0) * 10000:
         defend['survival_count'] -= 1
         hit = hp - 1
-    return min(hit, hp, 2147483647)
+    return int(min(hit, hp, 2147483647))
 
 
 def attach_combat_traits(role, units):

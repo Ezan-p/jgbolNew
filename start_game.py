@@ -39,7 +39,16 @@ def main(argv=None):
     else:
         raise RuntimeError('等待安卓启动超时：' + last_error)
     installed = adb(config, 'shell', 'pm', 'path', config['package'], timeout=30)
-    if not installed.startswith('package:'):
+    package_info = adb(config, 'shell', 'dumpsys', 'package', config['package'], timeout=30) if installed.startswith('package:') else ''
+    needs_install = not installed.startswith('package:') or (config.get('apk_variant') == 'local-accounts' and 'versionCode=89 ' not in package_info)
+    reset_done = False
+    if not args.client_only and (args.repair or (needs_install and config.get('apk_variant') == 'local-accounts')):
+        # Stop stale Frida before package replacement: Android's package watcher
+        # can otherwise crash while old injected system processes observe it.
+        from network_redirect.repair import reset_login
+        reset_login(config)
+        reset_done = True
+    if needs_install:
         manager.install()
     if args.client_only:
         if installed.startswith('package:'):
@@ -50,17 +59,14 @@ def main(argv=None):
         redirect = [str(config['python_path']), str(ROOT / 'redirect_game.py'),
                     '--config', str(config['config_path'])]
         print('启动本地登录服务并检查连接……', flush=True)
-        if args.repair:
-            from network_redirect.repair import reset_login
-            reset_login(config)
-        else:
+        if not reset_done:
             subprocess.run(redirect + ['stop'], check=True)
         subprocess.run(redirect + ['start', '--offline', '--probe'], check=True)
     url = f"http://127.0.0.1:{config['web_port']}"
     subprocess.run(['open', url], check=True)
     print('游戏已启动：' + url)
     if not args.client_only:
-        print('本地服务已就绪，在画面中点击“进入游戏”。')
+        print('本地服务已就绪，在画面中点击“进入游戏”，注册或登录本地账号。')
 
 
 if __name__ == '__main__':

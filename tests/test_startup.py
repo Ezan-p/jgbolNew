@@ -62,6 +62,19 @@ class LauncherTests(unittest.TestCase):
             start_game.main(argv)
         return manager.return_value, run
 
+    def test_local_upgrade_replaces_old_channel_install(self):
+        config = dict(apk=Path(__file__), package='game', python_path=Path('/runtime/python'),
+                      config_path=Path('/game.json'), web_port=8768, apk_variant='local-accounts')
+        for version, upgrades in [('versionCode=87 targetSdk=18', 1), ('versionCode=88 targetSdk=18', 1), ('versionCode=89 targetSdk=18', 0)]:
+            with patch.object(start_game, 'load_config', return_value=config), \
+                    patch.object(start_game, 'Manager') as manager, \
+                    patch.object(start_game, 'ready_device'), \
+                    patch.object(start_game, 'adb', side_effect=['package:game.apk', version]), \
+                    patch('network_redirect.repair.reset_login'), \
+                    patch.object(start_game.subprocess, 'run'):
+                start_game.main([])
+                self.assertEqual(manager.return_value.install.call_count, upgrades)
+
     def test_default_launch_requires_local_login_before_opening_browser(self):
         manager, run = self.launch([])
         manager.launch.assert_not_called()
