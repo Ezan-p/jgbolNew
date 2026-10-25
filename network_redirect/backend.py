@@ -193,6 +193,7 @@ class Backend:
             replies.append(summon.event(79, role['summon']['last_result']))
         replies.append(daily.hint(role, int(time.time()), self.daily_rules))
         replies.append(welfare.hint(role, int(time.time()), self.welfare_rules))
+        replies.append(welfare.mail_snapshot(role, int(time.time()), self.welfare_rules))
         self.save(role)
         return replies
 
@@ -420,6 +421,7 @@ class Backend:
             if previous_day != role['daily']['day']:
                 updates.append(daily.hint(role, now, self.daily_rules))
                 updates.append(welfare.hint(role, now, self.welfare_rules))
+                updates.append(welfare.mail_snapshot(role, now, self.welfare_rules))
                 self.save(role)
             return [encode(2999, dict(time=now, random_key=self.random_key, delay_time=0))] + self.number_replies(updates)
         if mid == 1105:
@@ -523,7 +525,7 @@ class Backend:
             before = copy.deepcopy(role)
             events = welfare.settle(role, mid, data, now, self.welfare_rules, login_fields)
             replies = self.item_deltas(before, role) + self.inventory(role) + summon.soul_snapshots(role) + [
-                welfare_attributes(role), vip.attrs(role), summon.event(80,dict(local_vip=vip.client_state(role)))] + events + [welfare.hint(role, now, self.welfare_rules)]
+                welfare_attributes(role), vip.attrs(role), summon.event(80,dict(local_vip=vip.client_state(role)))] + events + [welfare.hint(role, now, self.welfare_rules),welfare.mail_snapshot(role,now,self.welfare_rules)]
             self.save(role)
             self.emit('game_welfare_ok', message_id=mid, rules_revision=self.welfare_rules['revision'])
         except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:

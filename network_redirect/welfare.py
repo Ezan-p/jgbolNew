@@ -35,25 +35,32 @@ def prepare(role, now, r):
     if now>=s['start']+r['season_days']*86400:s.setdefault('end_level',s.get('last_level',role['level']))
     else:s['last_level']=role['level']
     for k in ('first_charge','first_charge_gift','take_charge_gift_time','buy_growup'):role.setdefault(k,0)
+    settle_anniversary_mail(role,now,r,s)
     return s
 
 
 def record_charge(role, gold, now, r, fund=False):
     s=prepare(role,now,r);key=str(daily.day(now,r))
-    s['charge_days'][key]=s['charge_days'].get(key,0)+gold
     role['first_charge_gift']=1
     if not fund and not role['first_charge']:
         role['first_charge']=1
         # [A] first-charge-double; [B] eligible local gold products, bonus excluded.
         role['gold_coin']+=gold
+    if now>=s['start']+r['season_days']*86400:return
+    s['charge_days'][key]=s['charge_days'].get(key,0)+gold
     for typ in (48,67):
-        if s['charge_days'][key] >= (r['any_charge_rmb']*r['gold_per_rmb'] if typ==67 else 1):
-            count=sum(v >= (r['any_charge_rmb']*r['gold_per_rmb'] if typ==67 else 1) for v in s['charge_days'].values())
+        if s['charge_days'][key] > 0:
+            count=sum(v>0 for v in s['charge_days'].values())
             for i,row in enumerate(r['nian'],1):
                 claim=f'{typ}:{i}'
                 if row['day']<=count and claim not in s['claims']:
                     for p in row['prizes']:journey.grant(role,p)
                     s['claims'].append(claim)
+    extra_count=s['charge_days'][key]//(r['any_charge_rmb']*r['gold_per_rmb'])
+    for i in range(1,extra_count+1):
+        if not claimed(s,67,1000+i,daily.day(now,r)):
+            for p in r['nian'][0]['prizes']:journey.grant(role,p)
+            mark(s,67,1000+i,daily.day(now,r))
 
 
 def claimed(s,a,i,day=None):return f'{a}:{i}'+(f':{day}' if day is not None else '') in s['claims']
@@ -102,17 +109,17 @@ def catalog(role,now,r):
     out[33]=dict(end_time=end,money=money,step_list=steps,prize_data=[dict(money=x['rmb'],prize_list=specs(x['prizes'])) for x in r['turn']],
         pay_flag=[2 if claimed(s,33,i) else 1 if money>=x['rmb'] else 0 for i,x in enumerate(r['turn'],1)],
         prize_ext_data=[dict(item=daily.spec(x['extra'][0]),attach_list=specs(x['extra'])) for x in r['turn']])
-    a=r['anniversary'];out[34]=dict(end_time=end,max_gold_count=a['max_gold'],min_money=a['min_rmb'],max_order=1,had_took30=money>=a['min_rmb'],
-        role_charge=dict(charge_gold=int(money*r['gold_per_rmb']),order=1 if money else 0,had_took=claimed(s,34,0)),prize_list=[specs(a['prizes']),specs(a['prizes'])])
+    a=r['anniversary'];out[34]=dict(end_time=end,max_gold_count=a['max_gold'],min_money=a['min_rmb'],max_order=1,had_took30='anniversary' in s.get('mails',{}),
+        role_charge=dict(charge_gold=money,order=1 if money else 0,had_took=claimed(s,34,0)),prize_list=[specs(a['prizes']),specs(a['prizes'])])
     c=r['common_login'];out[35]=dict(end_time=end,shop_end_time=end,login_days=count,had_took=claimed(s,35,1,d),buy_info=[claimed(s,35,i+2,d) for i in range(len(c['shop']))],
         prize_list=[specs(c['prizes']),[dict(daily.spec(x['prize']),min_vip_level=x['vip'],attach_price=x['price']) for x in c['shop']]])
     progress=s.get('task_progress',{}).get(str(d),{})
     ready=[x['id']==1 or progress.get(str(x['id']),0)>=x['count'] for x in friend_rules()]
     out[36]=dict(end_time=end,server_end_time=end,close_serial='LOCAL-1',old_serial='LOCAL-RETURN',day_tasks={x['id']:dict(had_took=claimed(s,36,x['id'],d),can_take=ready[i] and not claimed(s,36,x['id'],d)) for i,x in enumerate(friend_rules())})
-    for a in (48,67):out[a]=dict(end_time=end,days=sum(v>=(r['any_charge_rmb']*r['gold_per_rmb'] if a==67 else 1) for v in s['charge_days'].values()),had_took=today>=(r['any_charge_rmb'] if a==67 else 0.1),charge_prize=[dict(attach_list=specs(x['prizes'])) for x in r['nian']],other_prize=dict(must_list=specs(r['nian'][-1]['prizes']),rand_list=specs(r['nian'][0]['prizes'])))
+    for a in (48,67):out[a]=dict(end_time=end,days=sum(v>0 for v in s['charge_days'].values()),had_took=today>0,charge_prize=[dict(attach_list=specs(x['prizes'])) for x in r['nian']],other_prize=dict(must_list=specs(r['nian'][-1]['prizes']),rand_list=specs(r['nian'][0]['prizes'])))
     out[60]=dict(end_time=end,base_pay=r['high'][0]['rmb'],up_pay=r['high'][1]['rmb']-r['high'][0]['rmb'],total_charge_money=money,
         gift_list=[dict(status=status(s,60,i,money>=x['rmb']),prize_info=dict(consume_gold=x['price'],worth_gold=x['worth'],prize_list=specs(x['prizes']))) for i,x in enumerate(r['high'],1)])
-    days=sum(v>0 for v in s['charge_days'].values())
+    days=charge_streak(s,d)
     out[71]=dict(end_time=end,day=days,charge_rmb=today,
         charge_data=[dict(rmb=x['rmb'],status=status(s,71,i,today>=x['rmb'],d),prize_list=specs(x['prizes'])) for i,x in enumerate(r['charge'],1)],
         ext_charge_data=[dict(day=x['days'],linear_day=days,status=status(s,71,100*i,days>=x['days']),prize_list=specs(x['prizes'])) for i,x in enumerate(r['hole_extra'],1)])
@@ -122,7 +129,7 @@ def catalog(role,now,r):
     return out
 
 
-def handles(mid,req):return mid in (1127,1239,1352) or mid==1201 and req['flag']==6 or mid==1112 and req['event_id']==3
+def handles(mid,req):return mid in (1127,1239,1352,1102,1103) or mid==1201 and req['flag']==6 or mid==1112 and req['event_id']==3
 
 
 def hint(role,now,r):
@@ -145,6 +152,7 @@ def query(role,now,r):
 
 def settle(role,mid,req,now,r,parse):
     s=prepare(role,now,r);c=catalog(role,now,r);d=daily.day(now,r)
+    if mid in (1102,1103):return mail_request(role,mid,req,now,r,s)
     if mid==1127 and req['flag']==1:
         a=req['act_type'];f.require(a==0 or a in TYPES,'福利类型无效')
         return [query(role,now,r)] if a==0 else [summon.event(127,dict(flag=1,act_type=a,activity_data=c[a]))]
@@ -221,8 +229,10 @@ def settle(role,mid,req,now,r,parse):
         else:
             selected=c[33]['step_list'][k-1];f.require(selected>0 and i%10==selected,'转盘结果不匹配');take(i,[x['prizes'][selected-1]])
     elif a==34:
-        f.require(i==0,'返利编号无效');x=r['anniversary'];gold=min(x['max_gold'],c[34]['role_charge']['charge_gold']*x['rebate_percent']//100)
-        take(0,x['prizes']+([[11,0,gold,1]] if gold else []),c[34]['role_charge']['charge_gold']>=x['min_rmb']*r['gold_per_rmb'])
+        f.require(i==0,'返利编号无效');x=r['anniversary']
+        f.require(now>=s['start']+(r['season_days']-1)*86400-5,'返利尚未进入结算期')
+        gold=int(min(x['max_gold'],c[34]['role_charge']['charge_gold'])*10)
+        take(0,[[11,0,gold,1]],gold>0)
     elif a==35:
         f.require(1<=i<=len(r['common_login']['shop'])+1,'登录特惠编号无效')
         if i==1:take(i,r['common_login']['prizes'],period=d)
@@ -274,3 +284,46 @@ def track(role,mid,req,events,now,r):
     if mid==1061:gains[6]=req['sweep_count']
     progress=s.setdefault('task_progress',{}).setdefault(str(daily.day(now,r)),{})
     for k,n in gains.items():progress[str(k)]=progress.get(str(k),0)+n
+
+
+def charge_streak(s,day):
+    # A missed day breaks consecutive recharge; yesterday's streak is retained
+    # until today's first recharge, allowing an already earned milestone claim.
+    cursor=day if s['charge_days'].get(str(day),0)>0 else day-1
+    count=0
+    while s['charge_days'].get(str(cursor),0)>0:
+        count+=1;cursor-=1
+    s['max_streak']=max(s.get('max_streak',0),count)
+    return s['max_streak']
+
+
+def settle_anniversary_mail(role,now,r,s):
+    end=s['start']+r['season_days']*86400
+    if now<end-86400-5:return
+    mails=s.setdefault('mails',{})
+    if 'anniversary' in mails:return
+    money=sum(s['charge_days'].values())/r['gold_per_rmb']
+    if money<r['anniversary']['min_rmb']:return
+    # Single local participant is rank one; both original preview rows apply.
+    prizes=r['anniversary']['prizes']*2
+    mails['anniversary']=dict(mail_id=800000001,mail_title='感恩充值特惠奖励',
+        mail_body='充值达标及本地排行奖励，请领取附件。',recv_time=now,
+        send_time=now,prizes=prizes,claimed=False)
+
+
+def mail_snapshot(role,now,r):
+    s=prepare(role,now,r)
+    return summon.event(13,[m['mail_id'] for m in s.get('mails',{}).values()])
+
+
+def mail_request(role,mid,req,now,r,s):
+    mail=next((m for m in s.get('mails',{}).values() if m['mail_id']==req['mail_id']),None)
+    f.require(mail is not None,'邮件不存在')
+    if mid==1102:
+        ps=[] if mail['claimed'] else specs(mail['prizes'])
+        return [summon.event(14,dict(mail_id=mail['mail_id'],mail_title=mail['mail_title'],
+            mail_body=mail['mail_body'],recv_time=mail['recv_time'],send_time=mail['send_time'],
+            attach_count=len(ps),attach_list=ps,flag=req['flag']))]
+    f.require(not mail['claimed'],'邮件附件已领取')
+    prizes=[journey.grant(role,p) for p in mail['prizes']];mail['claimed']=True
+    return [summon.event(15,dict(result=1,mail_id=mail['mail_id'],attach_count=len(prizes),attach_list=prizes))]

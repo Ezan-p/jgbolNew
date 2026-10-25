@@ -71,7 +71,7 @@ class VipTests(unittest.TestCase):
         self.assertEqual(self.req(1051,**args)[-1][0],55)
     def test_recharge_replay_and_restart(self):
         self.req(1111,event_id=250,data='{item_id=3,order_id="test-order-0003"}')
-        r=self.b.profile();self.assertEqual((r['charge_gold'],r['vip_level'],r['gold_coin']),(1000,3,2060))
+        r=self.b.profile();self.assertEqual((r['charge_gold'],r['vip_level'],r['gold_coin']),(1000,3,2120))
         self.assertEqual(self.b.respond(self.packet,dict(authenticated=True)),self.reply)
         self.assertEqual(self.b.profile(),r)
         self.assertEqual(self.req(1111,event_id=250,data='{item_id=999,gold=999999}')[-1][0],55)
@@ -133,7 +133,7 @@ class VipTests(unittest.TestCase):
             before=self.b.profile()
             self.req(1111,event_id=250,data=summon.lua(dict(item_id=product['id'],order_id=f'original-ui-{index}')))
             after=self.b.profile()
-            self.assertEqual(after['gold_coin']-before['gold_coin'],base+bonus+(base if index==1 else 0)+(30 if index in (1,2) else 0))
+            self.assertEqual(after['gold_coin']-before['gold_coin'],base+bonus+(base if index==1 else 0)+(60 if index==1 else 0)+(30*(base//500) if index>1 else 0))
             self.assertEqual(after['charge_gold']-before['charge_gold'],base)
             self.assertEqual(after['xianling']['charge'],sum(x[0] for x in expected[:index]))
             self.req(1111,event_id=250,data=summon.lua(dict(item_id=product['id'],order_id=f'original-ui-{index}')))

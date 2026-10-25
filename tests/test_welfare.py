@@ -29,7 +29,7 @@ class WelfareTests(unittest.TestCase):
   self.assertLess(len(welfare.query(role,NOW,self.b.welfare_rules)),32768)
   self.assertTrue(self.b.bootstrap())
  def test_every_manual_reward_and_double_claim(self):
-  for a,i in [(16,0),(22,0),(23,0),(21,0),(21,10),(32,1),(32,2),(33,1),(34,0),(35,1),(35,2),(36,1),(60,1),(71,1),(71,100)]:
+  for a,i in [(16,0),(22,0),(23,0),(21,0),(21,10),(32,1),(32,2),(33,1),(35,1),(35,2),(36,1),(60,1),(71,1),(71,100)]:
    with self.subTest(a=a,i=i):
     self.ready();self.assertFalse(self.error(self.claim(a,i)))
     before=self.b.profile();self.assertTrue(self.error(self.claim(a,i)));self.assertEqual(before,self.b.profile())
@@ -56,16 +56,16 @@ class WelfareTests(unittest.TestCase):
   self.assertEqual(cat['charge_data'][0]['status'],2);self.assertEqual(cat['total_charge_data'][0]['status'],3)
  def test_fund_simulation_first_gift_not_double(self):
   self.assertFalse(self.error(self.req(1112,event_id=3,data='{item_id=8}')) and not self.b.profile().get('buy_growup'))
-  r=self.b.profile();self.assertEqual(r['buy_growup'],1);self.assertEqual(r['gold_coin'],30);self.assertEqual(r['first_charge'],0);self.assertEqual(r['first_charge_gift'],1)
+  r=self.b.profile();self.assertEqual(r['buy_growup'],1);self.assertEqual(r['gold_coin'],60);self.assertEqual(r['first_charge'],0);self.assertEqual(r['first_charge_gift'],1)
   self.assertFalse(self.error(self.req(1201,flag=6,id=0)));self.assertTrue(self.error(self.req(1201,flag=6,id=0)))
   self.assertTrue(self.error(self.req(1112,event_id=3,data='{item_id=8}')))
  def test_first_charge_double_only_once(self):
   self.req(1111,event_id=250,data='{item_id=101,order_id="welfare-order-001"}')
-  r=self.b.profile();self.assertEqual(r['gold_coin'],230);self.assertEqual(r['charge_gold'],100)
+  r=self.b.profile();self.assertEqual(r['gold_coin'],260);self.assertEqual(r['charge_gold'],100)
   self.req(1111,event_id=250,data='{item_id=101,order_id="welfare-order-001"}')
   self.assertEqual(r,self.b.profile())
   self.req(1111,event_id=250,data='{item_id=101,order_id="welfare-order-002"}')
-  self.assertEqual(self.b.profile()['gold_coin'],330)
+  self.assertEqual(self.b.profile()['gold_coin'],360)
  def test_upgrade_after_deadline_uses_frozen_level(self):
   self.ready();self.assertTrue(self.error(self.claim(7)))
   role=self.b.profile();role['welfare']['start']=NOW-31*86400;role['welfare']['last_level']=20;self.b.save(role)
@@ -90,6 +90,28 @@ class WelfareTests(unittest.TestCase):
   self.assertFalse(welfare.catalog(r,NOW,self.b.welfare_rules)[36]['day_tasks'][6]['can_take'])
   for _ in range(10):welfare.track(r,1026,{},[win],NOW,self.b.welfare_rules)
   self.assertTrue(welfare.catalog(r,NOW,self.b.welfare_rules)[36]['day_tasks'][6]['can_take'])
+ def test_anniversary_claim_window_and_original_multiplier(self):
+  self.ready();self.assertTrue(self.error(self.claim(34)))
+  role=self.b.profile();role['welfare']['start']=NOW-29*86400;self.b.save(role)
+  before=role['gold_coin'];self.assertFalse(self.error(self.claim(34)))
+  self.assertEqual(self.b.profile()['gold_coin']-before,10000)
+  self.assertTrue(self.error(self.claim(34)))
+ def test_anniversary_mail_and_claim_once(self):
+  role=self.ready();role['welfare']['start']=NOW-29*86400;self.b.save(role)
+  self.req(act_type=0,index=0,flag=1)
+  mail=self.b.profile()['welfare']['mails']['anniversary']
+  out=self.req(1102,mail_id=mail['mail_id'],flag=1)
+  content=next(d for m,d in out if m==2998 and 'mail_body' in d)
+  self.assertEqual(content['attach_count'],2)
+  before=self.b.profile()['gold_coin'];self.assertFalse(self.error(self.req(1103,mail_id=mail['mail_id'],flag=1)))
+  self.assertEqual(self.b.profile()['gold_coin']-before,600)
+  self.assertTrue(self.error(self.req(1103,mail_id=mail['mail_id'],flag=1)))
+ def test_consecutive_charge_days_break(self):
+  role=self.ready();s=role['welfare'];day=NOW//86400
+  s['charge_days']={str(day):100,str(day-2):100,str(day-3):100}
+  self.assertEqual(welfare.charge_streak(s,day),1)
+  s['charge_days'][str(day-1)]=100
+  self.assertEqual(welfare.charge_streak(s,day),4)
  def test_season_and_crossday(self):
   r=self.ready();s=r['welfare'];welfare.prepare(r,NOW,self.b.welfare_rules);self.assertEqual(len(s['login_days']),1)
   welfare.prepare(r,NOW+86400,self.b.welfare_rules);self.assertEqual(len(s['login_days']),2)
