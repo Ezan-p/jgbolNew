@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-25",
+  "original_module_sha256": "89df75b998a1903b7b7046d17561beb68bfc3f299ac2e7308a069a60abe674a3",
+  "original_source_lines": "trainingUI.createStartTrainingInfo:598-603",
+  "method": "Original client UI with cloned companion, level=1/2, culture_point=30, pending-preview fields=0; adb tap (763,470), intercept 1081/1082.",
+  "cases": [
+    {
+      "level": 1,
+      "sends": [],
+      "potential": 30,
+      "restored": true,
+      "interpretation": "Matches original disabled level-1 button"
+    },
+    {
+      "level": 2,
+      "sends": [],
+      "potential": 30,
+      "restored": true,
+      "interpretation": "Inconclusive: no captured request; overlapping test windows observed. Do not count as successful level-2 touch validation."
+    }
+  ],
+  "backend_regression": {
+    "command": "python -m unittest tests.test_formation tests.test_growth_values tests.test_reborn -q",
+    "passed": 55
+  },
+  "limitations": [
+    "Level-2 touch validation inconclusive; original bytecode explicitly enables button for level > 1.",
+    "Does not certify original server random training distribution."
+  ]
+}

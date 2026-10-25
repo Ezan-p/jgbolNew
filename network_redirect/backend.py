@@ -11,7 +11,7 @@ import struct
 import time
 
 from .protocol import encode, decode
-from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily, guild, vip, xianling, welfare, cheer
+from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily, guild, vip, xianling, welfare, cheer, monument, equipment
 
 
 # The client initializes these sections together in data.set_g_new_config.
@@ -19,8 +19,9 @@ from . import summon, formation, market, immortal, journey, activity, reborn, re
 CLIENT_CONFIG = '''{
     [4]=__PARTY_CONFIG__,
     [5]={},
+    [7]={collector=true,Bulletin=true,message=true,setting=true,service=true,relogin=true},
     [10]=__MARKET_CONFIG__,
-    [11]={open_flag=false,min_role_level=60},
+    [11]=__STONE_CONFIG__,
     [14]=__CHEER_CONFIG__,
     [15]=__IMMORTAL_CONFIG__,
     [24]={vip_shop=__XIANLING_HINT__,buff_data={buff_type=0}},
@@ -46,6 +47,9 @@ def login_fields(text):
 class Backend:
     def __init__(self, directory, port, emit, account="local-player"):
         self.account = account
+        self.monument_rules = monument.load_rules()
+        self.monument_replies = {}
+        self.last_monument_serial = 0
         self.welfare_rules = welfare.load_rules()
         self.welfare_replies = {}
         self.last_welfare_serial = 0
@@ -158,6 +162,7 @@ class Backend:
         guild.prepare(role, now, self.guild_rules)
         xianling.prepare(role, now)
         welfare.prepare(role, now, self.welfare_rules)
+        monument.prepare(role, now, self.monument_rules)
         role.update(summon.remaining(role, now))
         self.save(role)
         return dict(role, server_time=now, random_key=self.random_key)
@@ -172,6 +177,7 @@ class Backend:
         self.save(role)
         vip.prepare(role, self.vip_rules)
         config = CLIENT_CONFIG.replace('__MARKET_CONFIG__', summon.lua(goods))
+        config = config.replace('__STONE_CONFIG__', summon.lua(dict(open_flag=True, min_role_level=equipment.load_rules()['min_role_level'])))
         config = config.replace('__CHEER_CONFIG__', summon.lua(cheer.client_config(self.cheer_rules)))
         config = config.replace('__XIANLING_HINT__', summon.lua(xianling.hint(role,int(time.time()),self.xianling_rules)))
         config = config.replace('config_end=true', '[8]=' + summon.lua(guild.client_config(self.guild_rules)) + ',config_end=true')
@@ -181,9 +187,12 @@ class Backend:
         config = config.replace('__PARTY_CONFIG__', summon.lua(dict(party_top_list={},pay_consume_gold=self.activity_rules['party_fight_gold'])))
         config = config.replace('__IMMORTAL_CONFIG__', summon.lua(immortal.client_config(self.immortal_rules)))
         realm_config = reborn.client_config(self.reborn_rules)
+        for realm, values in realm_config.items():
+            values['rights']['open_stone_sys'] = realm >= equipment.load_rules()['reborn_min_realm']
         realm_config[self.cheer_rules['skill_realm']]['rights']['open_cheer_skill'] = True
         config = config.replace('config_end=true', '[31]=' + summon.lua(realm_config) + ',[32]={is_open=true,flag=true},config_end=true')
         config = config.replace('config_end=true', '[23]=' + summon.lua(self.formation_rules['equipment_advance']) + ',config_end=true')
+        config = config.replace('config_end=true', '[19]=' + summon.lua(monument.client_config(int(time.time()), self.monument_rules)) + ',config_end=true')
         login_snapshot = self.snapshot()
         # Original reverse skill levels use B in 1017 but signed I in 1032.
         # Bootstrap follows this bounded legacy snapshot with full-precision attributes.
@@ -194,6 +203,8 @@ class Backend:
         role = self.profile()
         replies += self.power_attributes(role)
         replies += cheer.attributes(role)
+        from . import equipment_crafting
+        replies.append(summon.event(98, equipment_crafting.random_list()))
         replies += summon.soul_snapshots(role)
         replies += immortal.handbook(role, self.immortal_rules)
         replies.append(summon.event(158, immortal.collection_snapshot(role)))
@@ -249,7 +260,17 @@ class Backend:
                      ((7, 'silver_coin'), (8, 'gold_coin'), (30, 'role_combat_power'), (39, 'max_combat_power'), (71, 'cortege_count'))]
             # Equipment panels keep the selected table throughout repeated
             # upgrades. Preserve it with deltas; full snapshots would detach it.
-            snapshots = [] if mid in (1052, 1073) else self.inventory(role)
+            snapshots = [] if mid in (1052, 1054, 1073) else self.inventory(role)
+            if mid == 1076:
+                # Update the selected spell table before the full inventory refresh.
+                snapshots.insert(0, encode(1032, dict(id=data['des_id'], unit_type=6, attr_count=1,
+                    attr_list=[dict(type=61, value=1)])))
+            if mid == 1054:
+                old_ids = {i['id'] for i in before['attachments']}
+                added = [i for i in role['attachments'] if i['id'] not in old_ids]
+                for start in range(0, len(added), 128):
+                    chunk = added[start:start + 128]
+                    snapshots.append(encode(1035, dict(first_send=False, attach_count=len(chunk), attach_list=chunk)))
             replies = self.companion_deltas(before, role) + self.item_deltas(before, role) + snapshots + summon.soul_snapshots(role) + immortal.handbook(role, self.immortal_rules) + [
                 encode(1032, dict(id=role['role_id'], unit_type=1, attr_count=len(attrs), attr_list=attrs))] + cheer.attributes(role) + events
             self.save(role)
@@ -308,10 +329,12 @@ class Backend:
                                 attach_count=len(items), attach_list=items))
 
     def item_deltas(self, before, after):
-        fields = {'level': 103, 'count': 102, 'equip_order': 105, 'equip_pos': 10,
+        fields = {'level': 103, 'star_level': 117, 'count': 102, 'equip_order': 105, 'equip_pos': 10,
                   'effect_value': 209, 'advance_level': 109, 'star_count': 110,
                   'cur_spirit_count': 111, 'is_lock': 116, 'reborn_bit': 113, 'cast_level': 115,
-                  'owner_id': 311, 'ext_awaken_pos': 313, 'prob_compen': 310}
+                  'owner_id': 311, 'ext_awaken_pos': 313, 'prob_compen': 310,
+                  'drill_count': 301, 'stone1_level': 302, 'stone2_level': 303,
+                  'stone3_level': 304, 'stone4_level': 305}
         old = {i['id']: i for i in before['attachments']}
         packets = []
         for item in after['attachments']:
@@ -407,6 +430,8 @@ class Backend:
             self.reply_history.clear()
             self.reborn_replies.clear()
             self.last_reborn_serial = 0
+            self.monument_replies.clear()
+            self.last_monument_serial = 0
             self.welfare_replies.clear()
             self.last_welfare_serial = 0
             self.vip_replies.clear()
@@ -468,6 +493,8 @@ class Backend:
                 return [packet for serial, packet in self.reply_history if serial > last]
             self.emit('game_replay_unavailable', message_id=mid, message='请求不在当前响应缓存范围内')
             return []
+        if monument.handles(mid, data):
+            return self.monuments(packet, mid, data)
         if welfare.handles(mid, data):
             return self.welfares(packet, mid, data)
         if vip.handles(mid, data) or mid == 1336 or mid == 1051 and data['item_type'] == 1249:
@@ -477,7 +504,8 @@ class Backend:
         if mid in daily.HANDLED:
             return self.dailies(packet, mid, data)
         if (mid in activity.HANDLED or (mid == 1026 and data['fight_type'] in activity.FIGHTS)
-                or (mid == 1051 and data['item_type'] in (1130,1131,1132,1133,1213,1214,1215,1216,1217))
+                or (mid == 1244 and data['fight_type'] == 2)
+                or (mid == 1051 and data['item_type'] in (1021,1130,1131,1132,1133,1213,1214,1215,1216,1217))
                 or (mid == 1059 and data['flag'] == 3)
                 or (mid == 1201 and data['flag'] in (1, 2))):
             return self.activities(packet, mid, data)
@@ -493,7 +521,7 @@ class Backend:
                 encode(2998, dict(id=1, data='{flag=%d}' % data['flag']))])
         if mid in reborn.HANDLED:
             return self.rebirth(packet, mid, data)
-        if mid in immortal.HANDLED:
+        if mid in immortal.HANDLED and mid != 1074:
             return self.immortals(packet, mid, data)
         if mid == 1087 or mid in formation.HANDLED:
             return self.formation(packet, mid, data)
@@ -505,6 +533,31 @@ class Backend:
         if data and data.get('serial_num'):
             return self.complete(data['serial_num'], [summon.event(55, {'op_string': '该功能尚未接入本地服务端（%d）' % mid})])
         return []
+
+    def monuments(self, packet, mid, data):
+        serial = data['serial_num']
+        cached = self.monument_replies.get(serial)
+        if cached and cached[0] == packet:
+            return cached[1]
+        if not serial or serial <= self.last_monument_serial:
+            return self.complete(serial, [summon.event(55, {'op_string': '名人山请求已过期，请刷新后重试'})])
+        try:
+            role = self.profile()
+            before = copy.deepcopy(role)
+            events = monument.settle(role, mid, data, int(time.time()), self.monument_rules,
+                                     self.guild_rules, self.activity_rules, self.journey_rules)
+            replies = self.item_deltas(before, role) + self.inventory(role) + [monument.attributes(role)] + events
+            self.save(role)
+            self.emit('game_monument_ok', message_id=mid, rules_revision=self.monument_rules['revision'])
+        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
+            replies = [summon.event(55, {'op_string': str(error) if isinstance(error, formation.Rejected) else '名人山数据无效，请刷新后重试'})]
+            self.emit('game_monument_rejected', message_id=mid, message=str(error))
+        replies = self.complete(serial, replies)
+        self.last_monument_serial = serial
+        self.monument_replies[serial] = (packet, replies)
+        if len(self.monument_replies) > 256:
+            del self.monument_replies[next(iter(self.monument_replies))]
+        return replies
 
     def guilds(self, packet, mid, data):
         serial = data['serial_num']
@@ -549,6 +602,18 @@ class Backend:
 
     def welfares(self, packet, mid, data):
         serial = data['serial_num']
+        if mid == 1102:
+            # Original getMoreSysMail sends serial 0: this is a read, not a
+            # serialized reward mutation. Do not consume the claim watermark.
+            try:
+                now = int(time.time())
+                role = self.profile()
+                state = welfare.prepare(role, now, self.welfare_rules)
+                replies = welfare.mail_request(role, mid, data, now, self.welfare_rules, state)
+                self.emit('game_mail_read', mail_id=data['mail_id'])
+            except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
+                replies = [summon.event(55, {'op_string': str(error) if isinstance(error, formation.Rejected) else '邮件数据无效'})]
+            return self.complete(serial, replies) if serial else self.number_replies(replies)
         cached = self.welfare_replies.get(serial)
         if cached and cached[0] == packet:
             return cached[1]

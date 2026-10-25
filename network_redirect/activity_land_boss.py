@@ -51,9 +51,10 @@ def settle(role,s,op,d,now,r,jrules):
         a.require(land.status(now,r)['cur_status']==1 and not s['travel'],'请先结束当前游历')
         n=min(5,r['land_daily_travel']-s['travel_count']);a.require(n>0,'今日游历次数已满');wins=0;gains={}
         for _ in range(n):
-            land.travel(s,r);target=s['travel'][0];result,_=land.simulate(role,s,r,jrules,target['level']);s['travel']=None
+            land.travel(s,r,role);target=s['travel'][0];result,_=land.simulate(role,s,r,jrules,target['level'],target=target.get('npc_id'));s['travel']=None
             if 1<=result<=3:
-                wins+=1;s['soul_count']+=r['land_travel_soul'];kind=secrets.randbelow(4)+1;land.charm(s,kind,5,1);gains[kind]=gains.get(kind,0)+1
+                wins+=1;land.gain(s,r['land_travel_soul']);kind=secrets.randbelow(4)+1;land.charm(s,kind,5,1);gains[kind]=gains.get(kind,0)+1
+        land.news(s,now,f'批量游历{n}次，获胜{wins}次，获得{wins*r["land_travel_soul"]}魂力。')
         return [response(22,win_count=wins,reward_soul=wins*r['land_travel_soul'],prize_list=[],
             reward_charm={k:{5:n} for k,n in gains.items()})]
     if op in (12,24):return [response(op,**query(s,r,op==24))]
@@ -67,6 +68,7 @@ def settle(role,s,op,d,now,r,jrules):
         a.require(type(layer)is int and 1<=layer<=min(r['land_boss_layers'],s[progress]+1) and d.get('flag')==1,'首领目标无效')
         a.require(s[key] is None,'请先完成或放弃上一轮翻牌')
         a.require(type(n)is int and 1<=n<=s['grid_count'],'参战神仙数量无效')
+        a.require(n<=sum(1 for c in role['corteges'] if 1<=c.get('order',0)<=8),'实际参战神仙不足')
         row=boss(s,r,hell,layer)
         if hell:
             a.require(layer in s['unlocked'] and row['can_fight_count']>0,'冥界未解锁或挑战次数不足')
@@ -78,6 +80,7 @@ def settle(role,s,op,d,now,r,jrules):
         reward=win and layer>s[progress]
         if win:
             s['total_score']+=newscore-old.get('score',0);s[history][str(layer)]=dict(score=newscore,cur_num=n)
+        land.news(s,now,f"{'冥界' if hell else '普通'}首领第{layer}层：{'胜利' if win else '未获胜'}。")
         if reward:
             s[key]=dict(layer=layer,cards=[],rewards=[copy.deepcopy(secrets.choice(r['land_card_rewards'])) for _ in range(3 if hell else 5)])
         return [summon.event(121,replay['fight_events']),response(4,fight_type=4 if hell else 3,des_level=layer,is_win=win,is_reward=reward,
@@ -98,7 +101,7 @@ def settle(role,s,op,d,now,r,jrules):
         a.require(s['boss_layer']>0 and not s['swept'] and s['boss'] is None,'没有可扫荡首领或今日已扫荡')
         s['swept']=True;gains=[]
         for layer in range(1,s['boss_layer']+1):
-            p=copy.deepcopy(r['land_card_rewards'][0]);gains.append(dict(layer=layer,prize_list=a.prizes(role,[p])))
+            p=copy.deepcopy(r['land_card_rewards'][0]);gains.append(a.prizes(role,[p]))
         return [response(13,sweep_list=gains)]
     if op in (28,29):
         # Original enum has no active request caller; return persisted history only.

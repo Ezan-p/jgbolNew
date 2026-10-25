@@ -54,9 +54,10 @@ def build(output=None):
     tree = ET.parse(manifest)
     ns = '{http://schemas.android.com/apk/res/android}'
     app = tree.getroot().find('application')
+    # ChargeActivity is also the original weekly browser; keep its declaration.
     for child in list(app):
         name = child.get(ns + 'name', '')
-        if name.startswith(('com.qihoo', 'QHOPENSDK', 'com.sygame.jingubang.ChargeActivity')):
+        if name.startswith(('com.qihoo', 'QHOPENSDK')):
             app.remove(child)
     for child in list(tree.getroot()):
         if child.tag == 'uses-permission' and child.get(ns + 'name', '').split('.')[-1] in (
@@ -65,7 +66,7 @@ def build(output=None):
             tree.getroot().remove(child)
     tree.write(manifest, encoding='utf-8', xml_declaration=True)
     metadata = directory / 'apktool.yml'
-    metadata.write_text(metadata.read_text().replace('versionCode: 87', 'versionCode: 89'))
+    metadata.write_text(metadata.read_text().replace('versionCode: 87', 'versionCode: 90'))
     unsigned = ROOT / '.runtime/local-unsigned.apk'
     aligned = ROOT / '.runtime/local-aligned.apk'
     apktool('b', '-p', framework, '-o', unsigned, directory)

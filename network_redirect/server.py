@@ -147,6 +147,10 @@ class LandingServer:
                         code, reason, content_type = 200, 'OK', 'application/json; charset=utf-8'
                     else:
                         code, reason, body = 405, 'Method Not Allowed', b'Method not allowed'
+                elif method in ('GET', 'HEAD') and path.rstrip('/') == '/dailypaper':
+                    from .monument import weekly_html
+                    code, reason, body = 200, 'OK', weekly_html()
+                    content_type = 'text/html; charset=utf-8'
                 elif method in ('GET', 'HEAD') and path == '/__redirect_health':
                     code, reason, body = 200, 'OK', HEALTH
                 elif method in ('GET', 'HEAD') and path in LIST_PATHS:

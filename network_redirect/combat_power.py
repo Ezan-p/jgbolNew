@@ -24,6 +24,10 @@ HOME_TRAIN = {(int(r['train_type']), int(r['level'])): r
 DIRECTIONS = ('heaven', 'earth', 'shake', 'sunda', 'water', 'fire', 'hill', 'pool')
 
 
+ATTRIBUTE_STAGES = ['base_and_culture', 'evolution', 'equipment', 'passive_skills', 'rebirth',
+                    'awakening_and_stars', 'fates_and_advance', 'collection_role_and_home',
+                    'title', 'home_training', 'pet', 'cheer', 'explicit_channels']
+
 SCORE_VERSION = '1.1'
 ESSENCE_CONFIG = json.loads((Path(__file__).resolve().parents[1] /
                             'server_config/essence_power_v1_1.json').read_text())
@@ -210,6 +214,13 @@ def recalculate(role, rules, now=None):
                   for s, b, g in zip(STATS, BASE_COLUMNS, GROWTH_COLUMNS)}
         trace = {}
         record(trace, 'base_and_culture', values)
+        # [A] feishengUI.createCharInfo:453-556: floor(growth * 3) per
+        # evolution, rounded BEFORE multiplying by the evolution count.
+        # Keep this separate from trained potential so recycling removes it
+        # and repeated settlement never compounds previously stored panels.
+        for stat, growth in zip(STATS, GROWTH_COLUMNS):
+            values[stat] += floor(Decimal(base[growth]) * 3) * c.get('evolve_level', 0)
+        record(trace, 'evolution', values)
         equipped = [i for i in role['attachments'] if
                     (i.get('innate_owner_id') == c['id']) or
                     (not i.get('innate_owner_id') and 1 <= c.get('order', 0) <= 8
@@ -229,6 +240,8 @@ def recalculate(role, rules, now=None):
                     if field in (1, 2, 3, 5):
                         s = {1: 'gongji', 2: 'fangyu', 3: 'magic', 5: 'hp'}[field]
                         passive_rates[s] += Decimal(item['effect_value']) / 100
+                    from .skill_insight import hp_percent
+                    passive_rates['hp'] += hp_percent(item) / 100
         record(trace, 'equipment', values)
         for stat in STATS:
             values[stat] *= 1 + passive_rates[stat]
@@ -248,6 +261,8 @@ def recalculate(role, rules, now=None):
                 if targets <= available:
                     s = {1: 'hp', 2: 'magic', 3: 'gongji', 4: 'fangyu'}[int(fate['effect_field[1-maxhp/2-maxmagic/3-gongji/4-fangyu]'])]
                     rates[s] += int(fate['effect_value'])
+        trace['advance_extra_base'] = {s: str(values[s]) for s in STATS}
+        trace['advance_extra_rates'] = {s: str(extra_rates[s]) for s in STATS}
         for s in STATS:
             values[s] *= 1 + Decimal(rates[s]) / 100 + extra_rates[s]
         record(trace, 'fates_and_advance', values)
@@ -295,6 +310,6 @@ def recalculate(role, rules, now=None):
     members = [c for c in role['corteges'] if 1 <= c.get('order', 0) <= 8]
     role['role_combat_power'] = bounded(sum(c.get('combat_power', 0) for c in members))
     role['max_combat_power'] = max(bounded(role.get('max_combat_power', 0)), role['role_combat_power'])
-    role['combat_power_breakdown'] = dict(mode='inferred', version=2, scoring_version=SCORE_VERSION, companions=reports,
+    role['combat_power_breakdown'] = dict(mode='inferred', version=2, attribute_policy=copy.deepcopy(rules['attribute_policy']), scoring_version=SCORE_VERSION, companions=reports,
         member_ids=[c['id'] for c in members], total=role['role_combat_power'],
         maximum=role['max_combat_power'], weights=dict(rules['combat_weights']))

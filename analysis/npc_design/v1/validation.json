@@ -1,0 +1,43 @@
+{
+  "revision": "npc-design-2026-10-25-v1",
+  "mode": "inferred",
+  "scoring_version": "1.1",
+  "representative_npcs": 240,
+  "calibrated_levels": 99,
+  "validated_calibration_npcs": 1485,
+  "level_tier_ranges": 495,
+  "battle_count": 540,
+  "battle_stop_reasons": {
+    "elimination": 518,
+    "event_budget": 22
+  },
+  "adjacent_tier_battles": {
+    "count": 240,
+    "higher_power_wins": 240,
+    "lower_power_wins": 0,
+    "unresolved": 0
+  },
+  "sample_battle_status": {
+    "smoke_passed": 61,
+    "replay_limit_observed": 14,
+    "not_sampled": 165
+  },
+  "checks": [
+    "unique_ids_and_types",
+    "slots_and_ownership",
+    "four_starters_four_battle_reserves",
+    "growth_and_rebirth_caps",
+    "realm_prerequisites",
+    "potential_conservation",
+    "equipment_and_stone_links",
+    "skill_and_essence_limits",
+    "awakening_prerequisites",
+    "score_sum",
+    "idempotence",
+    "non_overlapping_tiers_at_all_99_levels"
+  ],
+  "battle_scope": "5个等级、3流派同档对局及同流派相邻档对局，每组2种子、交换先后手；不等于胜率校准",
+  "official_power_verified": false,
+  "production_accounts_modified": false,
+  "online_routes_replaced": false
+}

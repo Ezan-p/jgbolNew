@@ -25,7 +25,7 @@ def query(role,s,g,d,now,r):
     q=d['query_type']
     if q==14:return [u.reply(18,dict(query_type=q,feast_data=feast_data(role,s,g,now,r)))]
     if q==15:
-        f=feast(s,g,now,r);rows=sorted(f.get('stats',{}).values(),key=lambda v:(-v['fortune'],-v['contribute'],v['id']))
+        rows=sorted((v for union in s['unions'].values() if union.get('feast',{}).get('day')==s['day'] for v in union['feast'].get('stats',{}).values()),key=lambda v:(-v['fortune'],-v['contribute'],v['id']))
         for i,row in enumerate(rows,1):row['rank']=i
         return [u.reply(18,dict(query_type=q,order=next((v['rank'] for v in rows if v['id']==role['role_id']),0),fortune_info=rows))]
     from . import guild_match

@@ -1,0 +1,873 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\751cd8ae1acef9a68dd2e7087f7d90c4.data'; root=proto7
+
+FUNCTION proto0 offset=0x4a source_lines=71-73 params=0
+UPVALUES ['CCLuaLog', 'string']
+00001 [L72] UGET     A=0 B=0 C=0 D=0 CCLuaLog
+00002 [L72] UGET     A=1 B=0 C=1 D=1 string
+00003 [L72] TGETS    A=1 B=1 C=0 D=256 'format'
+00004 [L72] KSTR     A=2 B=0 C=1 D=1 'Lua : fightrecordUI >>%s'
+00005 [L72] UGET     A=3 B=0 C=1 D=1 string
+00006 [L72] TGETS    A=3 B=3 C=0 D=768 'format'
+00007 [L72] VARG     A=4 B=0 C=0 D=0 
+00008 [L72] CALLM    A=3 B=0 C=0 D=0 
+00009 [L72] CALLM    A=1 B=0 C=1 D=1 
+00010 [L72] CALLM    A=0 B=1 C=0 D=256 
+00011 [L73] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto1 offset=0xc2 source_lines=84-204 params=0
+UPVALUES ['CCLayer', 'CCSprite', 'CCPointMake', 'pairs', 'CCLabelTTF']
+00001 [L86] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L86] TGETS    A=0 B=0 C=1 D=1 'd_mainUI'
+00003 [L86] TGETS    A=0 B=0 C=2 D=2 'g_scaleW'
+00004 [L87] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00005 [L87] TGETS    A=1 B=1 C=1 D=257 'd_mainUI'
+00006 [L87] TGETS    A=1 B=1 C=3 D=259 'g_scaleH'
+00007 [L88] GSET     A=0 B=0 C=2 D=2 'g_scaleW'
+00008 [L89] GSET     A=1 B=0 C=3 D=3 'g_scaleH'
+00009 [L91] GGET     A=2 B=0 C=4 D=4 'g_self'
+00010 [L91] UGET     A=3 B=0 C=0 D=0 CCLayer
+00011 [L91] MOV      A=4 B=0 C=3 D=3 
+00012 [L91] TGETS    A=3 B=3 C=6 D=774 'create'
+00013 [L91] CALL     A=3 B=2 C=2 D=514 
+00014 [L91] TSETS    A=3 B=2 C=5 D=517 'main_layer'
+00015 [L92] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00016 [L92] TGETS    A=2 B=2 C=7 D=519 'd_u'
+00017 [L92] TGETS    A=2 B=2 C=8 D=520 'createSwallowTouchLayer'
+00018 [L92] GGET     A=3 B=0 C=4 D=4 'g_self'
+00019 [L92] TGETS    A=3 B=3 C=5 D=773 'main_layer'
+00020 [L92] CALL     A=2 B=1 C=2 D=258 
+00021 [L93] GGET     A=2 B=0 C=4 D=4 'g_self'
+00022 [L93] TGETS    A=2 B=2 C=5 D=517 'main_layer'
+00023 [L95] GGET     A=3 B=0 C=0 D=0 'd_ms'
+00024 [L95] TGETS    A=3 B=3 C=7 D=775 'd_u'
+00025 [L95] TGETS    A=3 B=3 C=9 D=777 'createByStyles'
+00026 [L95] TDUP     A=4 B=0 C=10 D=10 {'kind': 'table', 'value': {'pic': 'v2/crossFightRecord/fightrecord_bg.png', 'scaleY': 1, 'x': 0.5, 'y': 0.5}}
+00027 [L95] CALL     A=3 B=2 C=2 D=514 
+00028 [L96] MOV      A=5 B=0 C=2 D=2 
+00029 [L96] TGETS    A=4 B=2 C=11 D=523 'addChild'
+00030 [L96] MOV      A=6 B=0 C=3 D=3 
+00031 [L96] CALL     A=4 B=1 C=3 D=259 
+00032 [L101] UGET     A=4 B=0 C=1 D=1 CCSprite
+00033 [L101] MOV      A=5 B=0 C=4 D=4 
+00034 [L101] TGETS    A=4 B=4 C=6 D=1030 'create'
+00035 [L101] KSTR     A=6 B=0 C=12 D=12 'v2/crossFightRecord/title.png'
+00036 [L101] CALL     A=4 B=2 C=3 D=515 
+00037 [L102] MOV      A=6 B=0 C=4 D=4 
+00038 [L102] TGETS    A=5 B=4 C=13 D=1037 'setAnchorPoint'
+00039 [L102] UGET     A=7 B=0 C=2 D=2 CCPointMake
+00040 [L102] KNUM     A=8 B=0 C=0 D=0 0.5
+00041 [L102] KSHORT   A=9 B=0 C=1 D=1 1
+00042 [L102] CALL     A=7 B=0 C=3 D=3 
+00043 [L102] CALLM    A=5 B=1 C=1 D=257 
+00044 [L103] GGET     A=5 B=0 C=0 D=0 'd_ms'
+00045 [L103] TGETS    A=5 B=5 C=7 D=1287 'd_u'
+00046 [L103] TGETS    A=5 B=5 C=14 D=1294 'setStyles'
+00047 [L103] MOV      A=6 B=0 C=4 D=4 
+00048 [L103] TDUP     A=7 B=0 C=15 D=15 {'kind': 'table', 'value': {'x': 0.5, 'y': 0.93}}
+00049 [L103] CALL     A=5 B=1 C=3 D=259 
+00050 [L104] MOV      A=6 B=0 C=4 D=4 
+00051 [L104] TGETS    A=5 B=4 C=16 D=1040 'setScale'
+00052 [L104] MOV      A=7 B=0 C=0 D=0 
+00053 [L104] CALL     A=5 B=1 C=3 D=259 
+00054 [L105] MOV      A=6 B=0 C=2 D=2 
+00055 [L105] TGETS    A=5 B=2 C=11 D=523 'addChild'
+00056 [L105] MOV      A=7 B=0 C=4 D=4 
+00057 [L105] CALL     A=5 B=1 C=3 D=259 
+00058 [L107] KNUM     A=5 B=0 C=1 D=1 0.845
+00059 [L108] KNUM     A=6 B=0 C=2 D=2 0.17
+00060 [L109] KNUM     A=7 B=0 C=3 D=3 0.135
+00061 [L112] UGET     A=8 B=0 C=1 D=1 CCSprite
+00062 [L112] MOV      A=9 B=0 C=8 D=8 
+00063 [L112] TGETS    A=8 B=8 C=6 D=2054 'create'
+00064 [L112] KSTR     A=10 B=0 C=17 D=17 'v2/crossFightRecord/rolename.png'
+00065 [L112] CALL     A=8 B=2 C=3 D=515 
+00066 [L113] MOV      A=10 B=0 C=8 D=8 
+00067 [L113] TGETS    A=9 B=8 C=13 D=2061 'setAnchorPoint'
+00068 [L113] UGET     A=11 B=0 C=2 D=2 CCPointMake
+00069 [L113] KNUM     A=12 B=0 C=0 D=0 0.5
+00070 [L113] KSHORT   A=13 B=0 C=1 D=1 1
+00071 [L113] CALL     A=11 B=0 C=3 D=3 
+00072 [L113] CALLM    A=9 B=1 C=1 D=257 
+00073 [L114] GGET     A=9 B=0 C=0 D=0 'd_ms'
+00074 [L114] TGETS    A=9 B=9 C=7 D=2311 'd_u'
+00075 [L114] TGETS    A=9 B=9 C=14 D=2318 'setStyles'
+00076 [L114] MOV      A=10 B=0 C=8 D=8 
+00077 [L114] TDUP     A=11 B=0 C=18 D=18 {'kind': 'table', 'value': {}}
+00078 [L114] TSETS    A=6 B=11 C=19 D=2835 'x'
+00079 [L114] TSETS    A=5 B=11 C=20 D=2836 'y'
+00080 [L114] CALL     A=9 B=1 C=3 D=259 
+00081 [L115] MOV      A=10 B=0 C=8 D=8 
+00082 [L115] TGETS    A=9 B=8 C=16 D=2064 'setScale'
+00083 [L115] MOV      A=11 B=0 C=0 D=0 
+00084 [L115] CALL     A=9 B=1 C=3 D=259 
+00085 [L116] MOV      A=10 B=0 C=2 D=2 
+00086 [L116] TGETS    A=9 B=2 C=11 D=523 'addChild'
+00087 [L116] MOV      A=11 B=0 C=8 D=8 
+00088 [L116] CALL     A=9 B=1 C=3 D=259 
+00089 [L120] UGET     A=9 B=0 C=1 D=1 CCSprite
+00090 [L120] MOV      A=10 B=0 C=9 D=9 
+00091 [L120] TGETS    A=9 B=9 C=6 D=2310 'create'
+00092 [L120] KSTR     A=11 B=0 C=21 D=21 'v2/crossFightRecord/vip.png'
+00093 [L120] CALL     A=9 B=2 C=3 D=515 
+00094 [L121] MOV      A=11 B=0 C=9 D=9 
+00095 [L121] TGETS    A=10 B=9 C=13 D=2317 'setAnchorPoint'
+00096 [L121] UGET     A=12 B=0 C=2 D=2 CCPointMake
+00097 [L121] KNUM     A=13 B=0 C=0 D=0 0.5
+00098 [L121] KSHORT   A=14 B=0 C=1 D=1 1
+00099 [L121] CALL     A=12 B=0 C=3 D=3 
+00100 [L121] CALLM    A=10 B=1 C=1 D=257 
+00101 [L122] GGET     A=10 B=0 C=0 D=0 'd_ms'
+00102 [L122] TGETS    A=10 B=10 C=7 D=2567 'd_u'
+00103 [L122] TGETS    A=10 B=10 C=14 D=2574 'setStyles'
+00104 [L122] MOV      A=11 B=0 C=9 D=9 
+00105 [L122] TDUP     A=12 B=0 C=22 D=22 {'kind': 'table', 'value': {}}
+00106 [L122] MULVN    A=13 B=7 C=4 D=1796 
+00107 [L122] ADDVV    A=13 B=6 C=13 D=1549 
+00108 [L122] TSETS    A=13 B=12 C=19 D=3091 'x'
+00109 [L122] TSETS    A=5 B=12 C=20 D=3092 'y'
+00110 [L122] CALL     A=10 B=1 C=3 D=259 
+00111 [L123] MOV      A=11 B=0 C=9 D=9 
+00112 [L123] TGETS    A=10 B=9 C=16 D=2320 'setScale'
+00113 [L123] MOV      A=12 B=0 C=0 D=0 
+00114 [L123] CALL     A=10 B=1 C=3 D=259 
+00115 [L124] MOV      A=11 B=0 C=2 D=2 
+00116 [L124] TGETS    A=10 B=2 C=11 D=523 'addChild'
+00117 [L124] MOV      A=12 B=0 C=9 D=9 
+00118 [L124] CALL     A=10 B=1 C=3 D=259 
+00119 [L127] UGET     A=10 B=0 C=1 D=1 CCSprite
+00120 [L127] MOV      A=11 B=0 C=10 D=10 
+00121 [L127] TGETS    A=10 B=10 C=6 D=2566 'create'
+00122 [L127] KSTR     A=12 B=0 C=23 D=23 'v2/crossFightRecord/dao.png'
+00123 [L127] CALL     A=10 B=2 C=3 D=515 
+00124 [L128] MOV      A=12 B=0 C=10 D=10 
+00125 [L128] TGETS    A=11 B=10 C=13 D=2573 'setAnchorPoint'
+00126 [L128] UGET     A=13 B=0 C=2 D=2 CCPointMake
+00127 [L128] KNUM     A=14 B=0 C=0 D=0 0.5
+00128 [L128] KSHORT   A=15 B=0 C=1 D=1 1
+00129 [L128] CALL     A=13 B=0 C=3 D=3 
+00130 [L128] CALLM    A=11 B=1 C=1 D=257 
+00131 [L129] GGET     A=11 B=0 C=0 D=0 'd_ms'
+00132 [L129] TGETS    A=11 B=11 C=7 D=2823 'd_u'
+00133 [L129] TGETS    A=11 B=11 C=14 D=2830 'setStyles'
+00134 [L129] MOV      A=12 B=0 C=10 D=10 
+00135 [L129] TDUP     A=13 B=0 C=24 D=24 {'kind': 'table', 'value': {}}
+00136 [L129] MULVN    A=14 B=7 C=5 D=1797 
+00137 [L129] ADDVV    A=14 B=6 C=14 D=1550 
+00138 [L129] TSETS    A=14 B=13 C=19 D=3347 'x'
+00139 [L129] TSETS    A=5 B=13 C=20 D=3348 'y'
+00140 [L129] CALL     A=11 B=1 C=3 D=259 
+00141 [L130] MOV      A=12 B=0 C=10 D=10 
+00142 [L130] TGETS    A=11 B=10 C=16 D=2576 'setScale'
+00143 [L130] MOV      A=13 B=0 C=0 D=0 
+00144 [L130] CALL     A=11 B=1 C=3 D=259 
+00145 [L131] MOV      A=12 B=0 C=2 D=2 
+00146 [L131] TGETS    A=11 B=2 C=11 D=523 'addChild'
+00147 [L131] MOV      A=13 B=0 C=10 D=10 
+00148 [L131] CALL     A=11 B=1 C=3 D=259 
+00149 [L133] UGET     A=11 B=0 C=1 D=1 CCSprite
+00150 [L133] MOV      A=12 B=0 C=11 D=11 
+00151 [L133] TGETS    A=11 B=11 C=6 D=2822 'create'
+00152 [L133] KSTR     A=13 B=0 C=25 D=25 'v2/crossFightRecord/fightpower.png'
+00153 [L133] CALL     A=11 B=2 C=3 D=515 
+00154 [L134] MOV      A=13 B=0 C=11 D=11 
+00155 [L134] TGETS    A=12 B=11 C=13 D=2829 'setAnchorPoint'
+00156 [L134] UGET     A=14 B=0 C=2 D=2 CCPointMake
+00157 [L134] KNUM     A=15 B=0 C=0 D=0 0.5
+00158 [L134] KSHORT   A=16 B=0 C=1 D=1 1
+00159 [L134] CALL     A=14 B=0 C=3 D=3 
+00160 [L134] CALLM    A=12 B=1 C=1 D=257 
+00161 [L135] GGET     A=12 B=0 C=0 D=0 'd_ms'
+00162 [L135] TGETS    A=12 B=12 C=7 D=3079 'd_u'
+00163 [L135] TGETS    A=12 B=12 C=14 D=3086 'setStyles'
+00164 [L135] MOV      A=13 B=0 C=11 D=11 
+00165 [L135] TDUP     A=14 B=0 C=26 D=26 {'kind': 'table', 'value': {}}
+00166 [L135] MULVN    A=15 B=7 C=6 D=1798 
+00167 [L135] ADDVV    A=15 B=6 C=15 D=1551 
+00168 [L135] TSETS    A=15 B=14 C=19 D=3603 'x'
+00169 [L135] TSETS    A=5 B=14 C=20 D=3604 'y'
+00170 [L135] CALL     A=12 B=1 C=3 D=259 
+00171 [L136] MOV      A=13 B=0 C=11 D=11 
+00172 [L136] TGETS    A=12 B=11 C=16 D=2832 'setScale'
+00173 [L136] MOV      A=14 B=0 C=0 D=0 
+00174 [L136] CALL     A=12 B=1 C=3 D=259 
+00175 [L137] MOV      A=13 B=0 C=2 D=2 
+00176 [L137] TGETS    A=12 B=2 C=11 D=523 'addChild'
+00177 [L137] MOV      A=14 B=0 C=11 D=11 
+00178 [L137] CALL     A=12 B=1 C=3 D=259 
+00179 [L139] UGET     A=12 B=0 C=1 D=1 CCSprite
+00180 [L139] MOV      A=13 B=0 C=12 D=12 
+00181 [L139] TGETS    A=12 B=12 C=6 D=3078 'create'
+00182 [L139] KSTR     A=14 B=0 C=27 D=27 'v2/crossFightRecord/time.png'
+00183 [L139] CALL     A=12 B=2 C=3 D=515 
+00184 [L140] MOV      A=14 B=0 C=12 D=12 
+00185 [L140] TGETS    A=13 B=12 C=13 D=3085 'setAnchorPoint'
+00186 [L140] UGET     A=15 B=0 C=2 D=2 CCPointMake
+00187 [L140] KNUM     A=16 B=0 C=0 D=0 0.5
+00188 [L140] KSHORT   A=17 B=0 C=1 D=1 1
+00189 [L140] CALL     A=15 B=0 C=3 D=3 
+00190 [L140] CALLM    A=13 B=1 C=1 D=257 
+00191 [L141] GGET     A=13 B=0 C=0 D=0 'd_ms'
+00192 [L141] TGETS    A=13 B=13 C=7 D=3335 'd_u'
+00193 [L141] TGETS    A=13 B=13 C=14 D=3342 'setStyles'
+00194 [L141] MOV      A=14 B=0 C=12 D=12 
+00195 [L141] TDUP     A=15 B=0 C=28 D=28 {'kind': 'table', 'value': {}}
+00196 [L141] MULVN    A=16 B=7 C=7 D=1799 
+00197 [L141] ADDVV    A=16 B=6 C=16 D=1552 
+00198 [L141] TSETS    A=16 B=15 C=19 D=3859 'x'
+00199 [L141] TSETS    A=5 B=15 C=20 D=3860 'y'
+00200 [L141] CALL     A=13 B=1 C=3 D=259 
+00201 [L142] MOV      A=14 B=0 C=12 D=12 
+00202 [L142] TGETS    A=13 B=12 C=16 D=3088 'setScale'
+00203 [L142] MOV      A=15 B=0 C=0 D=0 
+00204 [L142] CALL     A=13 B=1 C=3 D=259 
+00205 [L143] MOV      A=14 B=0 C=2 D=2 
+00206 [L143] TGETS    A=13 B=2 C=11 D=523 'addChild'
+00207 [L143] MOV      A=15 B=0 C=12 D=12 
+00208 [L143] CALL     A=13 B=1 C=3 D=259 
+00209 [L145] UGET     A=13 B=0 C=1 D=1 CCSprite
+00210 [L145] MOV      A=14 B=0 C=13 D=13 
+00211 [L145] TGETS    A=13 B=13 C=6 D=3334 'create'
+00212 [L145] KSTR     A=15 B=0 C=29 D=29 'v2/crossFightRecord/play.png'
+00213 [L145] CALL     A=13 B=2 C=3 D=515 
+00214 [L146] MOV      A=15 B=0 C=13 D=13 
+00215 [L146] TGETS    A=14 B=13 C=13 D=3341 'setAnchorPoint'
+00216 [L146] UGET     A=16 B=0 C=2 D=2 CCPointMake
+00217 [L146] KNUM     A=17 B=0 C=0 D=0 0.5
+00218 [L146] KSHORT   A=18 B=0 C=1 D=1 1
+00219 [L146] CALL     A=16 B=0 C=3 D=3 
+00220 [L146] CALLM    A=14 B=1 C=1 D=257 
+00221 [L147] GGET     A=14 B=0 C=0 D=0 'd_ms'
+00222 [L147] TGETS    A=14 B=14 C=7 D=3591 'd_u'
+00223 [L147] TGETS    A=14 B=14 C=14 D=3598 'setStyles'
+00224 [L147] MOV      A=15 B=0 C=13 D=13 
+00225 [L147] TDUP     A=16 B=0 C=30 D=30 {'kind': 'table', 'value': {}}
+00226 [L147] MULVN    A=17 B=7 C=8 D=1800 
+00227 [L147] ADDVV    A=17 B=6 C=17 D=1553 
+00228 [L147] TSETS    A=17 B=16 C=19 D=4115 'x'
+00229 [L147] TSETS    A=5 B=16 C=20 D=4116 'y'
+00230 [L147] CALL     A=14 B=1 C=3 D=259 
+00231 [L148] MOV      A=15 B=0 C=13 D=13 
+00232 [L148] TGETS    A=14 B=13 C=16 D=3344 'setScale'
+00233 [L148] MOV      A=16 B=0 C=0 D=0 
+00234 [L148] CALL     A=14 B=1 C=3 D=259 
+00235 [L149] MOV      A=15 B=0 C=2 D=2 
+00236 [L149] TGETS    A=14 B=2 C=11 D=523 'addChild'
+00237 [L149] MOV      A=16 B=0 C=13 D=13 
+00238 [L149] CALL     A=14 B=1 C=3 D=259 
+00239 [L153] MULVN    A=14 B=7 C=8 D=1800 
+00240 [L153] ADDVV    A=14 B=6 C=14 D=1550 
+00241 [L153] GSET     A=14 B=0 C=31 D=31 'button_x'
+00242 [L154] KNUM     A=14 B=0 C=9 D=9 0.745
+00243 [L154] GSET     A=14 B=0 C=32 D=32 'button_y'
+00244 [L155] KNUM     A=14 B=0 C=10 D=10 0.13
+00245 [L155] GSET     A=14 B=0 C=33 D=33 'button_y_step'
+00246 [L156] TDUP     A=14 B=0 C=34 D=34 {'kind': 'table', 'value': {'x': 0, 'y': 0}}
+00247 [L159] TDUP     A=15 B=0 C=35 D=35 {'kind': 'table', 'value': {'npic': 'v2/common/close1.png', 'spic': 'v2/common/close2.png', 'y': 1, 'x': 1}}
+00248 [L160] TDUP     A=16 B=0 C=36 D=36 {'kind': 'table', 'value': {1: 1, 2: 1}}
+00249 [L160] TSETS    A=16 B=15 C=37 D=3877 'anchor'
+00250 [L160] GGET     A=16 B=0 C=38 D=38 'menuClose'
+00251 [L160] TSETS    A=16 B=15 C=39 D=3879 'call_back'
+00252 [L160] TSETB    A=15 B=14 C=1 D=3585 
+00253 [L162] GGET     A=15 B=0 C=40 D=40 'updatefightRecord'
+00254 [L162] CALL     A=15 B=2 C=1 D=513 
+00255 [L163] UGET     A=16 B=0 C=3 D=3 pairs
+00256 [L163] MOV      A=17 B=0 C=15 D=15 
+00257 [L163] CALL     A=16 B=4 C=2 D=1026 
+00258 [L163] ISNEXT   A=19 B=128 C=16 D=32784 target=275
+00259 [L164] ADDVN    A=21 B=19 C=4 D=4868 
+00260 [L164] TDUP     A=22 B=0 C=41 D=41 {'kind': 'table', 'value': {'npic': 'v2/crossFightRecord/play1.png', 'spic': 'v2/crossFightRecord/play2.png'}}
+00261 [L164] GGET     A=23 B=0 C=31 D=31 'button_x'
+00262 [L164] TSETS    A=23 B=22 C=19 D=5651 'x'
+00263 [L164] GGET     A=23 B=0 C=32 D=32 'button_y'
+00264 [L164] GGET     A=24 B=0 C=33 D=33 'button_y_step'
+00265 [L164] SUBVN    A=25 B=19 C=4 D=4868 
+00266 [L164] MULVV    A=24 B=24 C=25 D=6169 
+00267 [L164] SUBVV    A=23 B=23 C=24 D=5912 
+00268 [L164] TSETS    A=23 B=22 C=20 D=5652 'y'
+00269 [L164] TDUP     A=23 B=0 C=42 D=42 {'kind': 'table', 'value': {1: 0.5, 2: 1}}
+00270 [L164] TSETS    A=23 B=22 C=37 D=5669 'anchor'
+00271 [L164] TSETS    A=19 B=22 C=43 D=5675 'tag'
+00272 [L164] GGET     A=23 B=0 C=44 D=44 'play_fightRecord'
+00273 [L164] TSETS    A=23 B=22 C=39 D=5671 'call_back'
+00274 [L164] TSETV    A=22 B=14 C=21 D=3605 
+00275 [L163] ITERN    A=19 B=3 C=3 D=771 
+00276 [L163] ITERL    A=19 B=127 C=238 D=32750 target=259
+00277 [L166] MOV      A=17 B=0 C=2 D=2 
+00278 [L166] TGETS    A=16 B=2 C=11 D=523 'addChild'
+00279 [L166] GGET     A=18 B=0 C=0 D=0 'd_ms'
+00280 [L166] TGETS    A=18 B=18 C=7 D=4615 'd_u'
+00281 [L166] TGETS    A=18 B=18 C=45 D=4653 'createMenu'
+00282 [L166] MOV      A=19 B=0 C=14 D=14 
+00283 [L166] CALL     A=18 B=0 C=2 D=2 
+00284 [L166] CALLM    A=16 B=1 C=1 D=257 
+00285 [L169] KSHORT   A=16 B=0 C=30 D=30 30
+00286 [L170] TDUP     A=17 B=0 C=46 D=46 {'kind': 'table', 'value': {1: 255, 2: 255, 3: 255}}
+00287 [L171] GGET     A=18 B=0 C=32 D=32 'button_y'
+00288 [L171] SUBVN    A=18 B=18 C=11 D=4619 
+00289 [L171] GSET     A=18 B=0 C=32 D=32 'button_y'
+00290 [L172] UGET     A=18 B=0 C=3 D=3 pairs
+00291 [L172] MOV      A=19 B=0 C=15 D=15 
+00292 [L172] CALL     A=18 B=4 C=2 D=1026 
+00293 [L172] ISNEXT   A=21 B=128 C=134 D=32902 target=428
+00294 [L173] UGET     A=23 B=0 C=4 D=4 CCLabelTTF
+00295 [L173] MOV      A=24 B=0 C=23 D=23 
+00296 [L173] TGETS    A=23 B=23 C=6 D=5894 'create'
+00297 [L173] TGETS    A=25 B=22 C=47 D=5679 'rolename'
+00298 [L173] KSTR     A=26 B=0 C=48 D=48 'arial'
+00299 [L173] MOV      A=27 B=0 C=16 D=16 
+00300 [L173] CALL     A=23 B=2 C=5 D=517 
+00301 [L174] UGET     A=24 B=0 C=4 D=4 CCLabelTTF
+00302 [L174] MOV      A=25 B=0 C=24 D=24 
+00303 [L174] TGETS    A=24 B=24 C=6 D=6150 'create'
+00304 [L174] TGETS    A=26 B=22 C=49 D=5681 'vip'
+00305 [L174] KSTR     A=27 B=0 C=48 D=48 'arial'
+00306 [L174] MOV      A=28 B=0 C=16 D=16 
+00307 [L174] CALL     A=24 B=2 C=5 D=517 
+00308 [L175] UGET     A=25 B=0 C=4 D=4 CCLabelTTF
+00309 [L175] MOV      A=26 B=0 C=25 D=25 
+00310 [L175] TGETS    A=25 B=25 C=6 D=6406 'create'
+00311 [L175] TGETS    A=27 B=22 C=50 D=5682 'dao'
+00312 [L175] KSTR     A=28 B=0 C=48 D=48 'arial'
+00313 [L175] MOV      A=29 B=0 C=16 D=16 
+00314 [L175] CALL     A=25 B=2 C=5 D=517 
+00315 [L176] UGET     A=26 B=0 C=4 D=4 CCLabelTTF
+00316 [L176] MOV      A=27 B=0 C=26 D=26 
+00317 [L176] TGETS    A=26 B=26 C=6 D=6662 'create'
+00318 [L176] TGETS    A=28 B=22 C=51 D=5683 'fightpower'
+00319 [L176] KSTR     A=29 B=0 C=48 D=48 'arial'
+00320 [L176] MOV      A=30 B=0 C=16 D=16 
+00321 [L176] CALL     A=26 B=2 C=5 D=517 
+00322 [L177] UGET     A=27 B=0 C=4 D=4 CCLabelTTF
+00323 [L177] MOV      A=28 B=0 C=27 D=27 
+00324 [L177] TGETS    A=27 B=27 C=6 D=6918 'create'
+00325 [L177] TGETS    A=29 B=22 C=52 D=5684 'fightstatus'
+00326 [L177] KSTR     A=30 B=0 C=48 D=48 'arial'
+00327 [L177] MOV      A=31 B=0 C=16 D=16 
+00328 [L177] CALL     A=27 B=2 C=5 D=517 
+00329 [L179] MOV      A=29 B=0 C=2 D=2 
+00330 [L179] TGETS    A=28 B=2 C=11 D=523 'addChild'
+00331 [L179] MOV      A=30 B=0 C=23 D=23 
+00332 [L179] CALL     A=28 B=1 C=3 D=259 
+00333 [L180] MOV      A=29 B=0 C=2 D=2 
+00334 [L180] TGETS    A=28 B=2 C=11 D=523 'addChild'
+00335 [L180] MOV      A=30 B=0 C=24 D=24 
+00336 [L180] CALL     A=28 B=1 C=3 D=259 
+00337 [L181] MOV      A=29 B=0 C=2 D=2 
+00338 [L181] TGETS    A=28 B=2 C=11 D=523 'addChild'
+00339 [L181] MOV      A=30 B=0 C=25 D=25 
+00340 [L181] CALL     A=28 B=1 C=3 D=259 
+00341 [L182] MOV      A=29 B=0 C=2 D=2 
+00342 [L182] TGETS    A=28 B=2 C=11 D=523 'addChild'
+00343 [L182] MOV      A=30 B=0 C=26 D=26 
+00344 [L182] CALL     A=28 B=1 C=3 D=259 
+00345 [L183] MOV      A=29 B=0 C=2 D=2 
+00346 [L183] TGETS    A=28 B=2 C=11 D=523 'addChild'
+00347 [L183] MOV      A=30 B=0 C=27 D=27 
+00348 [L183] CALL     A=28 B=1 C=3 D=259 
+00349 [L185] GGET     A=28 B=0 C=0 D=0 'd_ms'
+00350 [L185] TGETS    A=28 B=28 C=7 D=7175 'd_u'
+00351 [L185] TGETS    A=28 B=28 C=14 D=7182 'setStyles'
+00352 [L185] MOV      A=29 B=0 C=23 D=23 
+00353 [L185] TDUP     A=30 B=0 C=53 D=53 {'kind': 'table', 'value': {}}
+00354 [L185] TSETS    A=6 B=30 C=19 D=7699 'x'
+00355 [L185] GGET     A=31 B=0 C=32 D=32 'button_y'
+00356 [L185] SUBVN    A=32 B=21 C=4 D=5380 
+00357 [L185] GGET     A=33 B=0 C=33 D=33 'button_y_step'
+00358 [L185] MULVV    A=32 B=32 C=33 D=8225 
+00359 [L185] SUBVV    A=31 B=31 C=32 D=7968 
+00360 [L185] TSETS    A=31 B=30 C=20 D=7700 'y'
+00361 [L185] TDUP     A=31 B=0 C=54 D=54 {'kind': 'table', 'value': {1: 255, 2: 255, 3: 255}}
+00362 [L185] TSETS    A=31 B=30 C=55 D=7735 'color'
+00363 [L185] CALL     A=28 B=1 C=3 D=259 
+00364 [L186] GGET     A=28 B=0 C=0 D=0 'd_ms'
+00365 [L186] TGETS    A=28 B=28 C=7 D=7175 'd_u'
+00366 [L186] TGETS    A=28 B=28 C=14 D=7182 'setStyles'
+00367 [L186] MOV      A=29 B=0 C=24 D=24 
+00368 [L186] TDUP     A=30 B=0 C=56 D=56 {'kind': 'table', 'value': {}}
+00369 [L186] MULVN    A=31 B=7 C=4 D=1796 
+00370 [L186] ADDVV    A=31 B=6 C=31 D=1567 
+00371 [L186] TSETS    A=31 B=30 C=19 D=7699 'x'
+00372 [L186] GGET     A=31 B=0 C=32 D=32 'button_y'
+00373 [L186] SUBVN    A=32 B=21 C=4 D=5380 
+00374 [L186] GGET     A=33 B=0 C=33 D=33 'button_y_step'
+00375 [L186] MULVV    A=32 B=32 C=33 D=8225 
+00376 [L186] SUBVV    A=31 B=31 C=32 D=7968 
+00377 [L186] TSETS    A=31 B=30 C=20 D=7700 'y'
+00378 [L186] TSETS    A=17 B=30 C=55 D=7735 'color'
+00379 [L186] CALL     A=28 B=1 C=3 D=259 
+00380 [L187] GGET     A=28 B=0 C=0 D=0 'd_ms'
+00381 [L187] TGETS    A=28 B=28 C=7 D=7175 'd_u'
+00382 [L187] TGETS    A=28 B=28 C=14 D=7182 'setStyles'
+00383 [L187] MOV      A=29 B=0 C=25 D=25 
+00384 [L187] TDUP     A=30 B=0 C=57 D=57 {'kind': 'table', 'value': {}}
+00385 [L187] MULVN    A=31 B=7 C=5 D=1797 
+00386 [L187] ADDVV    A=31 B=6 C=31 D=1567 
+00387 [L187] TSETS    A=31 B=30 C=19 D=7699 'x'
+00388 [L187] GGET     A=31 B=0 C=32 D=32 'button_y'
+00389 [L187] SUBVN    A=32 B=21 C=4 D=5380 
+00390 [L187] GGET     A=33 B=0 C=33 D=33 'button_y_step'
+00391 [L187] MULVV    A=32 B=32 C=33 D=8225 
+00392 [L187] SUBVV    A=31 B=31 C=32 D=7968 
+00393 [L187] TSETS    A=31 B=30 C=20 D=7700 'y'
+00394 [L187] TSETS    A=17 B=30 C=55 D=7735 'color'
+00395 [L187] CALL     A=28 B=1 C=3 D=259 
+00396 [L188] GGET     A=28 B=0 C=0 D=0 'd_ms'
+00397 [L188] TGETS    A=28 B=28 C=7 D=7175 'd_u'
+00398 [L188] TGETS    A=28 B=28 C=14 D=7182 'setStyles'
+00399 [L188] MOV      A=29 B=0 C=26 D=26 
+00400 [L188] TDUP     A=30 B=0 C=58 D=58 {'kind': 'table', 'value': {}}
+00401 [L188] MULVN    A=31 B=7 C=6 D=1798 
+00402 [L188] ADDVV    A=31 B=6 C=31 D=1567 
+00403 [L188] TSETS    A=31 B=30 C=19 D=7699 'x'
+00404 [L188] GGET     A=31 B=0 C=32 D=32 'button_y'
+00405 [L188] SUBVN    A=32 B=21 C=4 D=5380 
+00406 [L188] GGET     A=33 B=0 C=33 D=33 'button_y_step'
+00407 [L188] MULVV    A=32 B=32 C=33 D=8225 
+00408 [L188] SUBVV    A=31 B=31 C=32 D=7968 
+00409 [L188] TSETS    A=31 B=30 C=20 D=7700 'y'
+00410 [L188] TSETS    A=17 B=30 C=55 D=7735 'color'
+00411 [L188] CALL     A=28 B=1 C=3 D=259 
+00412 [L189] GGET     A=28 B=0 C=0 D=0 'd_ms'
+00413 [L189] TGETS    A=28 B=28 C=7 D=7175 'd_u'
+00414 [L189] TGETS    A=28 B=28 C=14 D=7182 'setStyles'
+00415 [L189] MOV      A=29 B=0 C=27 D=27 
+00416 [L189] TDUP     A=30 B=0 C=59 D=59 {'kind': 'table', 'value': {}}
+00417 [L189] MULVN    A=31 B=7 C=7 D=1799 
+00418 [L189] ADDVV    A=31 B=6 C=31 D=1567 
+00419 [L189] TSETS    A=31 B=30 C=19 D=7699 'x'
+00420 [L189] GGET     A=31 B=0 C=32 D=32 'button_y'
+00421 [L189] SUBVN    A=32 B=21 C=4 D=5380 
+00422 [L189] GGET     A=33 B=0 C=33 D=33 'button_y_step'
+00423 [L189] MULVV    A=32 B=32 C=33 D=8225 
+00424 [L189] SUBVV    A=31 B=31 C=32 D=7968 
+00425 [L189] TSETS    A=31 B=30 C=20 D=7700 'y'
+00426 [L189] TSETS    A=17 B=30 C=55 D=7735 'color'
+00427 [L189] CALL     A=28 B=1 C=3 D=259 
+00428 [L172] ITERN    A=21 B=3 C=3 D=771 
+00429 [L172] ITERL    A=21 B=127 C=120 D=32632 target=294
+00430 [L192] KSHORT   A=18 B=0 C=25 D=25 25
+00431 [L192] GSET     A=18 B=0 C=60 D=60 'bottomLabel_size'
+00432 [L193] UGET     A=18 B=0 C=4 D=4 CCLabelTTF
+00433 [L193] MOV      A=19 B=0 C=18 D=18 
+00434 [L193] TGETS    A=18 B=18 C=6 D=4614 'create'
+00435 [L193] GGET     A=20 B=0 C=0 D=0 'd_ms'
+00436 [L193] TGETS    A=20 B=20 C=61 D=5181 'd_hz'
+00437 [L193] TGETS    A=20 B=20 C=62 D=5182 'gethz'
+00438 [L193] KSTR     A=21 B=0 C=63 D=63 'fight_record_unavaible'
+00439 [L193] CALL     A=20 B=2 C=2 D=514 
+00440 [L193] KSTR     A=21 B=0 C=48 D=48 'arial'
+00441 [L193] GGET     A=22 B=0 C=60 D=60 'bottomLabel_size'
+00442 [L193] CALL     A=18 B=2 C=5 D=517 
+00443 [L194] MOV      A=20 B=0 C=2 D=2 
+00444 [L194] TGETS    A=19 B=2 C=11 D=523 'addChild'
+00445 [L194] MOV      A=21 B=0 C=18 D=18 
+00446 [L194] CALL     A=19 B=1 C=3 D=259 
+00447 [L195] GGET     A=19 B=0 C=0 D=0 'd_ms'
+00448 [L195] TGETS    A=19 B=19 C=7 D=4871 'd_u'
+00449 [L195] TGETS    A=19 B=19 C=14 D=4878 'setStyles'
+00450 [L195] MOV      A=20 B=0 C=18 D=18 
+00451 [L195] TDUP     A=21 B=0 C=64 D=64 {'kind': 'table', 'value': {'x': 0.3, 'y': 0.08}}
+00452 [L195] TDUP     A=22 B=0 C=65 D=65 {'kind': 'table', 'value': {1: 0, 2: 0, 3: 0}}
+00453 [L195] TSETS    A=22 B=21 C=55 D=5431 'color'
+00454 [L195] CALL     A=19 B=1 C=3 D=259 
+00455 [L197] UGET     A=19 B=0 C=4 D=4 CCLabelTTF
+00456 [L197] MOV      A=20 B=0 C=19 D=19 
+00457 [L197] TGETS    A=19 B=19 C=6 D=4870 'create'
+00458 [L197] GGET     A=21 B=0 C=0 D=0 'd_ms'
+00459 [L197] TGETS    A=21 B=21 C=61 D=5437 'd_hz'
+00460 [L197] TGETS    A=21 B=21 C=62 D=5438 'gethz'
+00461 [L197] KSTR     A=22 B=0 C=66 D=66 'fight_record_only_5records'
+00462 [L197] CALL     A=21 B=2 C=2 D=514 
+00463 [L197] KSTR     A=22 B=0 C=48 D=48 'arial'
+00464 [L197] GGET     A=23 B=0 C=60 D=60 'bottomLabel_size'
+00465 [L197] CALL     A=19 B=2 C=5 D=517 
+00466 [L198] MOV      A=21 B=0 C=2 D=2 
+00467 [L198] TGETS    A=20 B=2 C=11 D=523 'addChild'
+00468 [L198] MOV      A=22 B=0 C=19 D=19 
+00469 [L198] CALL     A=20 B=1 C=3 D=259 
+00470 [L199] GGET     A=20 B=0 C=0 D=0 'd_ms'
+00471 [L199] TGETS    A=20 B=20 C=7 D=5127 'd_u'
+00472 [L199] TGETS    A=20 B=20 C=14 D=5134 'setStyles'
+00473 [L199] MOV      A=21 B=0 C=19 D=19 
+00474 [L199] TDUP     A=22 B=0 C=67 D=67 {'kind': 'table', 'value': {'x': 0.7, 'y': 0.08}}
+00475 [L199] TDUP     A=23 B=0 C=68 D=68 {'kind': 'table', 'value': {1: 0, 2: 0, 3: 0}}
+00476 [L199] TSETS    A=23 B=22 C=55 D=5687 'color'
+00477 [L199] CALL     A=20 B=1 C=3 D=259 
+00478 [L204] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto2 offset=0x101d source_lines=206-219 params=1
+UPVALUES ['cclog']
+00001 [L208] UGET     A=1 B=0 C=0 D=0 cclog
+00002 [L208] KSTR     A=2 B=0 C=0 D=0 'call show fightrecordUI'
+00003 [L208] CALL     A=1 B=1 C=2 D=258 
+00004 [L212] GGET     A=1 B=0 C=1 D=1 'g_self'
+00005 [L212] TGETS    A=1 B=1 C=2 D=258 'main_layer'
+00006 [L212] IST      A=0 B=0 C=1 D=1 
+00007 [L212] JMP      A=1 B=128 C=2 D=32770 target=10
+00008 [L213] GGET     A=1 B=0 C=3 D=3 'create'
+00009 [L213] CALL     A=1 B=1 C=1 D=257 
+00010 [L216] GGET     A=1 B=0 C=1 D=1 'g_self'
+00011 [L216] TSETS    A=0 B=1 C=4 D=260 'father_layer'
+00012 [L217] GGET     A=1 B=0 C=1 D=1 'g_self'
+00013 [L217] TGETS    A=1 B=1 C=4 D=260 'father_layer'
+00014 [L217] MOV      A=2 B=0 C=1 D=1 
+00015 [L217] TGETS    A=1 B=1 C=5 D=261 'addChild'
+00016 [L217] GGET     A=3 B=0 C=1 D=1 'g_self'
+00017 [L217] TGETS    A=3 B=3 C=2 D=770 'main_layer'
+00018 [L217] KSHORT   A=4 B=0 C=40 D=40 40
+00019 [L217] CALL     A=1 B=1 C=4 D=260 
+00020 [L219] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto3 offset=0x10ed source_lines=221-227 params=0
+UPVALUES ['cclog']
+00001 [L223] UGET     A=0 B=0 C=0 D=0 cclog
+00002 [L223] KSTR     A=1 B=0 C=0 D=0 'call close fightrecordUI'
+00003 [L223] CALL     A=0 B=1 C=2 D=258 
+00004 [L224] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00005 [L224] TGETS    A=0 B=0 C=2 D=2 'd_music_mgr'
+00006 [L224] TGETS    A=0 B=0 C=3 D=3 'playClickEffect'
+00007 [L224] CALL     A=0 B=1 C=1 D=257 
+00008 [L225] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00009 [L225] TGETS    A=0 B=0 C=4 D=4 'd_u'
+00010 [L225] TGETS    A=0 B=0 C=5 D=5 'remove'
+00011 [L225] GGET     A=1 B=0 C=6 D=6 'g_self'
+00012 [L225] TGETS    A=1 B=1 C=7 D=263 'main_layer'
+00013 [L225] CALL     A=0 B=1 C=2 D=258 
+00014 [L226] GGET     A=0 B=0 C=6 D=6 'g_self'
+00015 [L226] KPRI     A=1 B=0 C=0 D=0 
+00016 [L226] TSETS    A=1 B=0 C=7 D=7 'main_layer'
+00017 [L227] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto4 offset=0x11ae source_lines=229-233 params=0
+UPVALUES []
+00001 [L232] GGET     A=0 B=0 C=0 D=0 'g_fight_record'
+00002 [L232] RET1     A=0 B=0 C=2 D=2 
+
+FUNCTION proto5 offset=0x11d5 source_lines=234-245 params=1
+UPVALUES ['g_fight_index', 'table']
+00001 [L235] GGET     A=1 B=0 C=0 D=0 'menuClose'
+00002 [L235] CALL     A=1 B=1 C=1 D=257 
+00003 [L238] GGET     A=1 B=0 C=1 D=1 'd_ms'
+00004 [L238] TGETS    A=1 B=1 C=2 D=258 'd_event_mgr'
+00005 [L238] TGETS    A=1 B=1 C=3 D=259 'g_fight_info'
+00006 [L238] UGET     A=2 B=0 C=0 D=0 g_fight_index
+00007 [L238] GGET     A=3 B=0 C=4 D=4 'g_fight_record'
+00008 [L238] TGETV    A=3 B=3 C=0 D=768 
+00009 [L238] TGETS    A=3 B=3 C=5 D=773 'fightInfo'
+00010 [L238] TSETV    A=3 B=1 C=2 D=258 
+00011 [L239] UGET     A=1 B=0 C=1 D=1 table
+00012 [L239] TGETS    A=1 B=1 C=6 D=262 'insert'
+00013 [L239] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00014 [L239] TGETS    A=2 B=2 C=2 D=514 'd_event_mgr'
+00015 [L239] TGETS    A=2 B=2 C=7 D=519 'g_fight_id_list'
+00016 [L239] UGET     A=3 B=0 C=0 D=0 g_fight_index
+00017 [L239] CALL     A=1 B=1 C=3 D=259 
+00018 [L242] GGET     A=1 B=0 C=1 D=1 'd_ms'
+00019 [L242] TGETS    A=1 B=1 C=8 D=264 'd_guildFightUI'
+00020 [L242] TGETS    A=1 B=1 C=9 D=265 'set_fight_type'
+00021 [L242] GGET     A=2 B=0 C=1 D=1 'd_ms'
+00022 [L242] TGETS    A=2 B=2 C=10 D=522 'd_common_def'
+00023 [L242] TGETS    A=2 B=2 C=11 D=523 'fight_type'
+00024 [L242] TGETS    A=2 B=2 C=12 D=524 'fight_world_fight_record'
+00025 [L242] CALL     A=1 B=1 C=2 D=258 
+00026 [L243] GGET     A=1 B=0 C=1 D=1 'd_ms'
+00027 [L243] TGETS    A=1 B=1 C=8 D=264 'd_guildFightUI'
+00028 [L243] TGETS    A=1 B=1 C=13 D=269 'set_g_fight_record'
+00029 [L243] GGET     A=2 B=0 C=4 D=4 'g_fight_record'
+00030 [L243] TGETV    A=2 B=2 C=0 D=512 
+00031 [L243] CALL     A=1 B=1 C=2 D=258 
+00032 [L244] GGET     A=1 B=0 C=1 D=1 'd_ms'
+00033 [L244] TGETS    A=1 B=1 C=8 D=264 'd_guildFightUI'
+00034 [L244] TGETS    A=1 B=1 C=14 D=270 'callback_fight_record_end'
+00035 [L244] CALL     A=1 B=1 C=1 D=257 
+00036 [L245] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto6 offset=0x1389 source_lines=249-296 params=2
+UPVALUES ['pairs', 'g_fight_index', 'cclog', 'math', 'os', 'string']
+00001 [L251] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00002 [L251] TGETS    A=2 B=2 C=1 D=513 'd_lineupUI'
+00003 [L251] TGETS    A=2 B=2 C=2 D=514 'saveLastFightLevel'
+00004 [L251] CALL     A=2 B=1 C=1 D=257 
+00005 [L253] UGET     A=2 B=0 C=0 D=0 pairs
+00006 [L253] MOV      A=3 B=0 C=0 D=0 
+00007 [L253] CALL     A=2 B=4 C=2 D=1026 
+00008 [L253] ISNEXT   A=5 B=128 C=181 D=32949 target=190
+00009 [L254] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00010 [L254] TNEW     A=8 B=0 C=0 D=0 
+00011 [L254] TSETV    A=8 B=7 C=5 D=1797 
+00012 [L255] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00013 [L255] TGETV    A=7 B=7 C=5 D=1797 
+00014 [L255] TDUP     A=8 B=0 C=5 D=5 {'kind': 'table', 'value': {}}
+00015 [L255] TNEW     A=9 B=0 C=0 D=0 
+00016 [L255] TSETS    A=9 B=8 C=6 D=2054 'line_up_msg'
+00017 [L255] TNEW     A=9 B=0 C=0 D=0 
+00018 [L255] TSETS    A=9 B=8 C=7 D=2055 'fight_result_msg'
+00019 [L255] TSETS    A=8 B=7 C=4 D=1796 'fightInfo'
+00020 [L256] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00021 [L256] TGETV    A=7 B=7 C=5 D=1797 
+00022 [L256] TGETS    A=7 B=7 C=4 D=1796 'fightInfo'
+00023 [L256] TGETS    A=7 B=7 C=6 D=1798 'line_up_msg'
+00024 [L256] TGETV    A=8 B=0 C=5 D=5 
+00025 [L256] TGETS    A=8 B=8 C=9 D=2057 'fight_data'
+00026 [L256] TGETS    A=8 B=8 C=10 D=2058 'des_info'
+00027 [L256] TGETS    A=8 B=8 C=11 D=2059 'name'
+00028 [L256] TSETS    A=8 B=7 C=8 D=1800 'des_name'
+00029 [L257] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00030 [L257] TGETV    A=7 B=7 C=5 D=1797 
+00031 [L257] TGETS    A=7 B=7 C=4 D=1796 'fightInfo'
+00032 [L257] TGETS    A=7 B=7 C=6 D=1798 'line_up_msg'
+00033 [L257] TGETV    A=8 B=0 C=5 D=5 
+00034 [L257] TGETS    A=8 B=8 C=9 D=2057 'fight_data'
+00035 [L257] TGETS    A=8 B=8 C=13 D=2061 'src_info'
+00036 [L257] TGETS    A=8 B=8 C=11 D=2059 'name'
+00037 [L257] TSETS    A=8 B=7 C=12 D=1804 'src_name'
+00038 [L258] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00039 [L258] TGETV    A=7 B=7 C=5 D=1797 
+00040 [L258] TGETS    A=7 B=7 C=4 D=1796 'fightInfo'
+00041 [L258] TGETS    A=7 B=7 C=6 D=1798 'line_up_msg'
+00042 [L258] UGET     A=8 B=0 C=1 D=1 g_fight_index
+00043 [L258] ADDVN    A=8 B=8 C=0 D=2048 
+00044 [L258] TSETS    A=8 B=7 C=14 D=1806 'fight_id'
+00045 [L259] UGET     A=7 B=0 C=2 D=2 cclog
+00046 [L259] KSTR     A=8 B=0 C=15 D=15 'src='
+00047 [L259] TGETV    A=9 B=0 C=5 D=5 
+00048 [L259] TGETS    A=9 B=9 C=9 D=2313 'fight_data'
+00049 [L259] TGETS    A=9 B=9 C=13 D=2317 'src_info'
+00050 [L259] TGETS    A=9 B=9 C=11 D=2315 'name'
+00051 [L259] CAT      A=8 B=8 C=9 D=2057 
+00052 [L259] CALL     A=7 B=1 C=2 D=258 
+00053 [L260] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00054 [L260] TGETV    A=7 B=7 C=5 D=1797 
+00055 [L260] TGETS    A=7 B=7 C=4 D=1796 'fightInfo'
+00056 [L260] TGETS    A=7 B=7 C=6 D=1798 'line_up_msg'
+00057 [L260] TGETV    A=8 B=0 C=5 D=5 
+00058 [L260] TGETS    A=8 B=8 C=9 D=2057 'fight_data'
+00059 [L260] TGETS    A=8 B=8 C=17 D=2065 'lineup_list'
+00060 [L260] TSETS    A=8 B=7 C=16 D=1808 'lineup'
+00061 [L261] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00062 [L261] TGETV    A=7 B=7 C=5 D=1797 
+00063 [L261] TGETS    A=7 B=7 C=4 D=1796 'fightInfo'
+00064 [L261] TGETS    A=7 B=7 C=6 D=1798 'line_up_msg'
+00065 [L261] GGET     A=8 B=0 C=3 D=3 'g_fight_record'
+00066 [L261] TGETV    A=8 B=8 C=5 D=2053 
+00067 [L261] TGETS    A=8 B=8 C=4 D=2052 'fightInfo'
+00068 [L261] TGETS    A=8 B=8 C=6 D=2054 'line_up_msg'
+00069 [L261] TGETS    A=8 B=8 C=16 D=2064 'lineup'
+00070 [L261] LEN      A=8 B=0 C=8 D=8 
+00071 [L261] TSETS    A=8 B=7 C=18 D=1810 'line_up_count'
+00072 [L262] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00073 [L262] TGETV    A=7 B=7 C=5 D=1797 
+00074 [L262] TGETS    A=7 B=7 C=4 D=1796 'fightInfo'
+00075 [L262] TGETS    A=7 B=7 C=7 D=1799 'fight_result_msg'
+00076 [L262] TGETV    A=8 B=0 C=5 D=5 
+00077 [L262] TGETS    A=8 B=8 C=19 D=2067 'final_result'
+00078 [L262] TSETS    A=8 B=7 C=19 D=1811 'final_result'
+00079 [L266] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00080 [L266] TGETV    A=7 B=7 C=5 D=1797 
+00081 [L266] TGETS    A=7 B=7 C=4 D=1796 'fightInfo'
+00082 [L266] TGETS    A=7 B=7 C=7 D=1799 'fight_result_msg'
+00083 [L266] TGETS    A=8 B=0 C=20 D=20 'fight_type'
+00084 [L266] TSETS    A=8 B=7 C=20 D=1812 'fight_type'
+00085 [L267] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00086 [L267] TGETV    A=7 B=7 C=5 D=1797 
+00087 [L267] TGETS    A=7 B=7 C=4 D=1796 'fightInfo'
+00088 [L267] TGETS    A=7 B=7 C=7 D=1799 'fight_result_msg'
+00089 [L267] UGET     A=8 B=0 C=1 D=1 g_fight_index
+00090 [L267] ADDVN    A=8 B=8 C=0 D=2048 
+00091 [L267] TSETS    A=8 B=7 C=14 D=1806 'fight_id'
+00092 [L268] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00093 [L268] TGETV    A=7 B=7 C=5 D=1797 
+00094 [L268] TGETS    A=7 B=7 C=4 D=1796 'fightInfo'
+00095 [L268] TGETS    A=7 B=7 C=7 D=1799 'fight_result_msg'
+00096 [L268] TGETV    A=8 B=0 C=5 D=5 
+00097 [L268] TGETS    A=8 B=8 C=9 D=2057 'fight_data'
+00098 [L268] TGETS    A=8 B=8 C=22 D=2070 'result_list'
+00099 [L268] TSETS    A=8 B=7 C=21 D=1813 'fight_result'
+00100 [L269] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00101 [L269] TGETV    A=7 B=7 C=5 D=1797 
+00102 [L269] TGETS    A=7 B=7 C=4 D=1796 'fightInfo'
+00103 [L269] TGETS    A=7 B=7 C=7 D=1799 'fight_result_msg'
+00104 [L269] GGET     A=8 B=0 C=3 D=3 'g_fight_record'
+00105 [L269] TGETV    A=8 B=8 C=5 D=2053 
+00106 [L269] TGETS    A=8 B=8 C=4 D=2052 'fightInfo'
+00107 [L269] TGETS    A=8 B=8 C=7 D=2055 'fight_result_msg'
+00108 [L269] TGETS    A=8 B=8 C=21 D=2069 'fight_result'
+00109 [L269] LEN      A=8 B=0 C=8 D=8 
+00110 [L269] TSETS    A=8 B=7 C=23 D=1815 'fight_round'
+00111 [L272] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00112 [L272] TGETV    A=7 B=7 C=5 D=1797 
+00113 [L272] TGETV    A=8 B=0 C=5 D=5 
+00114 [L272] TGETS    A=8 B=8 C=9 D=2057 'fight_data'
+00115 [L272] TGETS    A=8 B=8 C=13 D=2061 'src_info'
+00116 [L272] TGETS    A=8 B=8 C=11 D=2059 'name'
+00117 [L272] TSETS    A=8 B=7 C=24 D=1816 'rolename'
+00118 [L273] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00119 [L273] TGETV    A=7 B=7 C=5 D=1797 
+00120 [L273] TGETV    A=8 B=0 C=5 D=5 
+00121 [L273] TGETS    A=8 B=8 C=9 D=2057 'fight_data'
+00122 [L273] TGETS    A=8 B=8 C=13 D=2061 'src_info'
+00123 [L273] TGETS    A=8 B=8 C=26 D=2074 'vip_level'
+00124 [L273] TSETS    A=8 B=7 C=25 D=1817 'vip'
+00125 [L274] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00126 [L274] TGETV    A=7 B=7 C=5 D=1797 
+00127 [L274] UGET     A=8 B=0 C=3 D=3 math
+00128 [L274] TGETS    A=8 B=8 C=28 D=2076 'floor'
+00129 [L274] TGETV    A=9 B=0 C=5 D=5 
+00130 [L274] TGETS    A=9 B=9 C=9 D=2313 'fight_data'
+00131 [L274] TGETS    A=9 B=9 C=13 D=2317 'src_info'
+00132 [L274] TGETS    A=9 B=9 C=29 D=2333 'tao_point'
+00133 [L274] CALL     A=8 B=2 C=2 D=514 
+00134 [L274] TSETS    A=8 B=7 C=27 D=1819 'dao'
+00135 [L275] GGET     A=7 B=0 C=3 D=3 'g_fight_record'
+00136 [L275] TGETV    A=7 B=7 C=5 D=1797 
+00137 [L275] UGET     A=8 B=0 C=3 D=3 math
+00138 [L275] TGETS    A=8 B=8 C=28 D=2076 'floor'
+00139 [L275] TGETV    A=9 B=0 C=5 D=5 
+00140 [L275] TGETS    A=9 B=9 C=9 D=2313 'fight_data'
+00141 [L275] TGETS    A=9 B=9 C=13 D=2317 'src_info'
+00142 [L275] TGETS    A=9 B=9 C=31 D=2335 'role_combat_power'
+00143 [L275] CALL     A=8 B=2 C=2 D=514 
+00144 [L275] TSETS    A=8 B=7 C=30 D=1822 'fightpower'
+00145 [L276] UGET     A=7 B=0 C=4 D=4 os
+00146 [L276] TGETS    A=7 B=7 C=32 D=1824 'date'
+00147 [L276] KSTR     A=8 B=0 C=33 D=33 '*t'
+00148 [L276] TGETV    A=9 B=0 C=5 D=5 
+00149 [L276] TGETS    A=9 B=9 C=9 D=2313 'fight_data'
+00150 [L276] TGETS    A=9 B=9 C=34 D=2338 'logtime'
+00151 [L276] CALL     A=7 B=2 C=3 D=515 
+00152 [L277] GGET     A=8 B=0 C=3 D=3 'g_fight_record'
+00153 [L277] TGETV    A=8 B=8 C=5 D=2053 
+00154 [L277] UGET     A=9 B=0 C=5 D=5 string
+00155 [L277] TGETS    A=9 B=9 C=36 D=2340 'format'
+00156 [L277] KSTR     A=10 B=0 C=37 D=37 '%02d'
+00157 [L277] TGETS    A=11 B=7 C=38 D=1830 'hour'
+00158 [L277] CALL     A=9 B=2 C=3 D=515 
+00159 [L277] KSTR     A=10 B=0 C=39 D=39 ':'
+00160 [L277] UGET     A=11 B=0 C=5 D=5 string
+00161 [L277] TGETS    A=11 B=11 C=36 D=2852 'format'
+00162 [L277] KSTR     A=12 B=0 C=37 D=37 '%02d'
+00163 [L277] TGETS    A=13 B=7 C=40 D=1832 'min'
+00164 [L277] CALL     A=11 B=2 C=3 D=515 
+00165 [L277] KSTR     A=12 B=0 C=39 D=39 ':'
+00166 [L277] UGET     A=13 B=0 C=5 D=5 string
+00167 [L277] TGETS    A=13 B=13 C=36 D=3364 'format'
+00168 [L277] KSTR     A=14 B=0 C=37 D=37 '%02d'
+00169 [L277] TGETS    A=15 B=7 C=41 D=1833 'sec'
+00170 [L277] CALL     A=13 B=2 C=3 D=515 
+00171 [L277] CAT      A=9 B=9 C=13 D=2317 
+00172 [L277] TSETS    A=9 B=8 C=35 D=2083 'fightstatus'
+00173 [L283] TGETV    A=8 B=0 C=5 D=5 
+00174 [L283] TGETS    A=8 B=8 C=9 D=2057 'fight_data'
+00175 [L283] TGETS    A=8 B=8 C=42 D=2090 'elite_logic'
+00176 [L283] ISF      A=0 B=0 C=8 D=8 
+00177 [L283] JMP      A=9 B=128 C=6 D=32774 target=184
+00178 [L284] TGETV    A=8 B=0 C=5 D=5 
+00179 [L284] TGETS    A=8 B=8 C=9 D=2057 'fight_data'
+00180 [L284] TGETS    A=8 B=8 C=42 D=2090 'elite_logic'
+00181 [L284] UGET     A=9 B=0 C=1 D=1 g_fight_index
+00182 [L284] ADDVN    A=9 B=9 C=0 D=2304 
+00183 [L284] TSETS    A=9 B=8 C=14 D=2062 'fight_id'
+00184 [L288] GGET     A=8 B=0 C=3 D=3 'g_fight_record'
+00185 [L288] TGETV    A=8 B=8 C=5 D=2053 
+00186 [L288] TGETV    A=9 B=0 C=5 D=5 
+00187 [L288] TGETS    A=9 B=9 C=9 D=2313 'fight_data'
+00188 [L288] TGETS    A=9 B=9 C=42 D=2346 'elite_logic'
+00189 [L288] TSETS    A=9 B=8 C=43 D=2091 'extra_logic'
+00190 [L253] ITERN    A=5 B=3 C=3 D=771 
+00191 [L253] ITERL    A=5 B=127 C=73 D=32585 target=9
+00192 [L296] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto7 offset=0x1965 source_lines=0-298 params=0
+UPVALUES []
+00001 [L7] GGET     A=0 B=0 C=0 D=0 'require'
+00002 [L8] GGET     A=1 B=0 C=1 D=1 'bits'
+00003 [L9] GGET     A=2 B=0 C=2 D=2 'sqlite'
+00004 [L10] GGET     A=3 B=0 C=3 D=3 'type'
+00005 [L11] GGET     A=4 B=0 C=4 D=4 'print'
+00006 [L12] GGET     A=5 B=0 C=5 D=5 'tostring'
+00007 [L13] GGET     A=6 B=0 C=6 D=6 'pairs'
+00008 [L14] GGET     A=7 B=0 C=7 D=7 'ipairs'
+00009 [L15] GGET     A=8 B=0 C=8 D=8 'string'
+00010 [L16] GGET     A=9 B=0 C=9 D=9 'table'
+00011 [L17] GGET     A=10 B=0 C=10 D=10 'math'
+00012 [L19] GGET     A=11 B=0 C=11 D=11 'main_server'
+00013 [L20] GGET     A=12 B=0 C=12 D=12 '_G'
+00014 [L21] MOV      A=13 B=0 C=1 D=1 
+00015 [L22] GGET     A=14 B=0 C=13 D=13 'tonumber'
+00016 [L23] GGET     A=15 B=0 C=14 D=14 'os'
+00017 [L24] GGET     A=16 B=0 C=15 D=15 'io'
+00018 [L25] GGET     A=17 B=0 C=16 D=16 'tolua'
+00019 [L26] GGET     A=18 B=0 C=17 D=17 'ccp'
+00020 [L30] GGET     A=19 B=0 C=18 D=18 'class'
+00021 [L31] GGET     A=20 B=0 C=19 D=19 'CCArray'
+00022 [L32] GGET     A=21 B=0 C=20 D=20 'CCDirector'
+00023 [L33] GGET     A=22 B=0 C=21 D=21 'CCLayer'
+00024 [L34] GGET     A=23 B=0 C=22 D=22 'CCMenu'
+00025 [L35] GGET     A=24 B=0 C=23 D=23 'CCSprite'
+00026 [L36] GGET     A=25 B=0 C=24 D=24 'CCLayerColor'
+00027 [L37] GGET     A=26 B=0 C=25 D=25 'ccc4'
+00028 [L38] GGET     A=27 B=0 C=26 D=26 'ccc3'
+00029 [L39] GGET     A=28 B=0 C=27 D=27 'CCMenuItemImage'
+00030 [L40] GGET     A=29 B=0 C=28 D=28 'ccpAdd'
+00031 [L41] GGET     A=30 B=0 C=29 D=29 'CCLuaLog'
+00032 [L42] GGET     A=31 B=0 C=30 D=30 'CCFileUtils'
+00033 [L43] GGET     A=32 B=0 C=31 D=31 'CCSizeMake'
+00034 [L44] GGET     A=33 B=0 C=32 D=32 'CCScrollView'
+00035 [L45] GGET     A=34 B=0 C=33 D=33 'CCNode'
+00036 [L46] GGET     A=35 B=0 C=34 D=34 'CCLabelTTF'
+00037 [L47] GGET     A=36 B=0 C=35 D=35 'kCCTextAlignmentLeft'
+00038 [L48] GGET     A=37 B=0 C=36 D=36 'CCString'
+00039 [L49] GGET     A=38 B=0 C=37 D=37 'd_ms'
+00040 [L49] TGETS    A=38 B=38 C=38 D=9766 'd_hz'
+00041 [L49] TGETS    A=38 B=38 C=39 D=9767 'gethz'
+00042 [L50] GGET     A=39 B=0 C=40 D=40 'CCPointMake'
+00043 [L52] MOV      A=40 B=0 C=4 D=4 
+00044 [L53] TGETS    A=41 B=9 C=41 D=2345 'concat'
+00045 [L54] TGETS    A=42 B=9 C=42 D=2346 'insert'
+00046 [L55] TGETS    A=43 B=8 C=43 D=2091 'rep'
+00047 [L56] MOV      A=44 B=0 C=3 D=3 
+00048 [L57] MOV      A=45 B=0 C=6 D=6 
+00049 [L58] MOV      A=46 B=0 C=5 D=5 
+00050 [L59] GGET     A=47 B=0 C=44 D=44 'next'
+00051 [L61] GGET     A=48 B=0 C=45 D=45 'module'
+00052 [L61] KSTR     A=49 B=0 C=46 D=46 'ui.fightrecordUI'
+00053 [L61] CALL     A=48 B=1 C=2 D=258 
+00054 [L65] MOV      A=48 B=0 C=0 D=0 
+00055 [L65] KSTR     A=49 B=0 C=47 D=47 'ms'
+00056 [L65] CALL     A=48 B=2 C=2 D=514 
+00057 [L65] GSET     A=48 B=0 C=37 D=37 'd_ms'
+00058 [L67] GGET     A=48 B=0 C=37 D=37 'd_ms'
+00059 [L67] IST      A=0 B=0 C=48 D=48 
+00060 [L67] JMP      A=48 B=128 C=3 D=32771 target=64
+00061 [L68] MOV      A=48 B=0 C=30 D=30 
+00062 [L68] KSTR     A=49 B=0 C=48 D=48 'Lua : fightrecordUI >> fightrecordUI load d_ms fail.'
+00063 [L68] CALL     A=48 B=1 C=2 D=258 
+00064 [L73] FNEW     A=48 B=0 C=49 D=49 {'kind': 'proto', 'id': 0}
+00065 [L75] GGET     A=49 B=0 C=37 D=37 'd_ms'
+00066 [L75] TGETS    A=49 B=49 C=50 D=12594 'd_common_def'
+00067 [L75] TGETS    A=49 B=49 C=51 D=12595 'object_type'
+00068 [L76] GGET     A=50 B=0 C=37 D=37 'd_ms'
+00069 [L76] TGETS    A=50 B=50 C=50 D=12850 'd_common_def'
+00070 [L76] TGETS    A=50 B=50 C=52 D=12852 'item_main_type'
+00071 [L78] GGET     A=51 B=0 C=37 D=37 'd_ms'
+00072 [L78] TGETS    A=51 B=51 C=50 D=13106 'd_common_def'
+00073 [L78] TGETS    A=51 B=51 C=53 D=13109 'buy_item_result'
+00074 [L80] TNEW     A=52 B=0 C=0 D=0 
+00075 [L80] GSET     A=52 B=0 C=54 D=54 'g_self'
+00076 [L81] KNUM     A=52 B=0 C=0 D=0 200300
+00077 [L82] TNEW     A=53 B=0 C=0 D=0 
+00078 [L82] GSET     A=53 B=0 C=55 D=55 'g_fight_record'
+00079 [L204] FNEW     A=53 B=0 C=56 D=56 {'kind': 'proto', 'id': 1}
+00080 [L84] GSET     A=53 B=0 C=57 D=57 'create'
+00081 [L219] FNEW     A=53 B=0 C=58 D=58 {'kind': 'proto', 'id': 2}
+00082 [L206] GSET     A=53 B=0 C=59 D=59 'show'
+00083 [L227] FNEW     A=53 B=0 C=60 D=60 {'kind': 'proto', 'id': 3}
+00084 [L221] GSET     A=53 B=0 C=61 D=61 'menuClose'
+00085 [L233] FNEW     A=53 B=0 C=62 D=62 {'kind': 'proto', 'id': 4}
+00086 [L229] GSET     A=53 B=0 C=63 D=63 'updatefightRecord'
+00087 [L245] FNEW     A=53 B=0 C=64 D=64 {'kind': 'proto', 'id': 5}
+00088 [L234] GSET     A=53 B=0 C=65 D=65 'play_fightRecord'
+00089 [L296] FNEW     A=53 B=0 C=66 D=66 {'kind': 'proto', 'id': 6}
+00090 [L249] GSET     A=53 B=0 C=67 D=67 'save_fight_record'
+00091 [L296] UCLO     A=0 B=128 C=0 D=32768 target=92
+00092 [L296] RET0     A=0 B=0 C=1 D=1 

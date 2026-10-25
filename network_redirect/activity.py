@@ -12,7 +12,7 @@ from .protocol import encode
 ROOT = Path(__file__).resolve().parents[1]
 require = formation.require
 ENUMS = json.loads((ROOT/'analysis/evidence/activity_enums.json').read_text())
-HANDLED = {1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1329, 1333, 1348, 1349, 1353}
+HANDLED = {1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1303, 1329, 1333, 1348, 1349, 1353}
 FIGHTS = {2, 3, 4, 5, 6, 10, 11}
 PRAY = {int(r['pray_times']): int(r['spirit_coins']) for r in summon.rows('pray_spirit_config.csv')}
 QUALITY = {int(r['cortege_quality']): r for r in summon.rows('cortege_quality.csv')}
@@ -113,6 +113,8 @@ def prepare(role,now,r):
     from . import vip
     role.update(top_order=s['rank_order'],top_score=s['rank_score'],top_fight_limit=vip.limit(role,vip.RANK,r['rank_daily_limit']),
                 rape_flush_limit=vip.limit(role,vip.RAPE,r['rape_free_refreshes']),convert_fight_limit=vip.limit(role,vip.CONVERT,r['convert_daily_limit']))
+    from . import activity_rank
+    activity_rank.prepare(role,now,r)
     return s
 
 
@@ -238,13 +240,8 @@ def pray(role,req,r):
 
 
 def rank(role,r):
-    s=role['activity'];order=s['rank_order']
-    rows=[dict(id=10000+o,type=2,order=o,level=max(1,r['battle_level']),name='本地守榜者'+str(o),cortege=r['battle_npc'],cortege_layer=0,
-               top_relation=2,combat_power=100) for o in sorted(set(max(1,order-v) for v in (1,2,5,10,20))) if o!=order]
-    eligible=sum(1<<(i-2) for i,row in EXCHANGE.items() if int(row['promote_order']) and s.get('rank_reached_order',100000)<=int(row['promote_order']))
-    claimed=sum(1<<(i-2) for i in s.get('rank_promotions',[]))
-    return encode(1022,dict(need_update=True,self_order=order,self_score=s['rank_score'],promote_time=eligible,
-             promote_prize=claimed,fight_count=max(0,role['top_fight_limit']-s['rank_count']),show_count=len(rows),show_list=rows))
+    from . import activity_rank
+    return activity_rank.board(role)
 
 
 def rank_score(order,column):
@@ -316,13 +313,21 @@ def trial_query(role,req,now,r):
 
 def query_lineup(role,req,r):
     s=role['activity'];ident=req['des_id']
+    from . import activity_rank, activity_land_npc
+    if 940000<=ident<943000:
+        require(req['des_type']==1,'逐鹿阵容目标类型无效')
+        packet=activity_land_npc.inspection(role,ident)
+        require(packet is not None,'逐鹿对手已失效')
+        return [packet]
+    if ident in activity_rank.catalog():
+        require(req['des_type'] in (1,2),'阵容目标类型无效')
+        return [activity_rank.inspection(role,ident)]
     own=ident==role['role_id']
     gs=role.get('guild',{});g=gs.get('unions',{}).get(str(int(role.get('union_id',0))))
     if g and (str(int(ident)) in g['members'] or ident in range(90001,90007) or ident in range(91001,91004)):
         from . import guild,guild_match
         return [summon.event(11,guild_match.lineup(role,ident,guild.load_rules()))]
-    valid=own or req['des_type']==2 and (10000<ident<10000+s['rank_order'] or
-        any(str(int(ident)) in b['form_list'].get('2',{}) for b in (s['rape_boards'] or [])))
+    valid=own or req['des_type']==2 and any(str(int(ident)) in b['form_list'].get('2',{}) for b in (s['rape_boards'] or []))
     require(valid,'阵容目标不存在')
     if own:chars=copy.deepcopy([c for c in role['corteges'] if c.get('order')])
     else:
@@ -342,13 +347,12 @@ def query_lineup(role,req,r):
 
 def battle(role,req,now,r,jrules,frules):
     ft=req['fight_type'];s=role['activity'];target=None
+    if ft==2:
+        from . import activity_rank
+        return activity_rank.battle(role,req,now,r,jrules)
     require(role['level']>={2:6,3:8,4:5,5:12,6:13,10:16,11:1}[ft],'等级不足')
     if ft==4:
         require(role['rule_index']<role['level']-4,'修炼次数已用完')
-    elif ft==2:
-        require(s['rank_count']<role['top_fight_limit'],'今日封神榜次数已用完')
-        target=req['des_value'];require(target in {max(1,s['rank_order']-v) for v in (1,2,5,10,20)} and target<s['rank_order'] and req['des_id']==10000+target and req['des_type']==2,'封神榜对手已变化')
-        spend(role,'energy',1);s['rank_count']+=1
     elif ft==3:
         rape_board(role,now,r);idx=req['des_value']
         require(1<=idx<=3,'渡劫阵位无效')
@@ -401,12 +405,6 @@ def battle(role,req,now,r,jrules,frules):
         role['rule_index']+=1
         for key,field,attr in [('hp','max_hp_plus',75),('gongji','gongji_plus',77),('fangyu','fangyu_plus',78),('magic','max_magic_plus',76)]:
             role[field]+=r['train_increase'][key];events.append(summon.event(5,dict(addition_field=attr,addition_value=r['train_increase'][key])))
-    elif ft==2:
-        score=rank_score(target,'score') if win else 0
-        if win:s['rank_order']=target;s['rank_score']+=score;s['rank_reached_order']=target
-        reward=dict(prize_spec([13,0,score,1]),flag=True)
-        events += [rank(role,r),summon.event(33,[reward,dict(prize_spec([5,1001,1,1]),flag=False),
-                                                 dict(prize_spec([12,0,r['battle_silver'],1]),flag=False)])]
     elif ft==3:
         if win:target['has_win']=True
         idx=req['des_value'];b=s['rape_boards'][idx-1];passed=all(v['has_win'] for rows in b['form_list'].values() for v in rows.values())
@@ -455,6 +453,9 @@ def battle(role,req,now,r,jrules,frules):
 
 def settle(role,mid,req,now,r,jrules,frules,parse):
     s=prepare(role,now,r)
+    if mid in (1021,1203,1244) or mid==1026 and req['fight_type']==2 or mid==1201 and req['flag']==2 or mid==1051 and req['item_type']==1021:
+        from . import activity_rank
+        return activity_rank.settle(role,mid,req,now,r,jrules)
     if mid==1208:
         from .activity_fish import settle as fish
         return fish(role,req,now,r)
@@ -473,6 +474,9 @@ def settle(role,mid,req,now,r,jrules,frules,parse):
     if mid==1329:
         from . import activity_abyss
         return activity_abyss.settle(role,req,now,r,jrules,parse)
+    if mid==1303:
+        from . import activity_land_team
+        return activity_land_team.settle(role,req,now,r,parse)
     if mid==1302:
         from . import activity_land
         return activity_land.settle(role,req,now,r,jrules,parse)
@@ -492,17 +496,6 @@ def settle(role,mid,req,now,r,jrules,frules,parse):
     if mid==1039:return query_lineup(role,req,r)
     if mid==1064:return trial_query(role,req,now,r)
     if mid==1026:return battle(role,req,now,r,jrules,frules)
-    if mid==1203:
-        cfg=EXCHANGE.get(req['exchange_type']);require(cfg is not None,'积分兑换项目无效')
-        cost=int(cfg['score']);promotion=int(cfg['promote_order'])
-        require(s['rank_score']>=cost,'积分不足')
-        if promotion:
-            claims=s.setdefault('rank_promotions',[])
-            require(s['rank_order']<=promotion and req['exchange_type'] not in claims,'未达晋升名次或已领取')
-            claims.append(req['exchange_type'])
-        s['rank_score']-=cost
-        spec=[[int(v) for v in x.split('|')]+[1] for x in cfg['prize_list(object_type|sub_type|count/...)'].split('/')]
-        return [rank(role,r),summon.event(36,prizes(role,spec))]
     if mid==1072:
         require(role['level']>=25 or role.get('vip_level',0)>=5,'渡劫扫荡需25级或VIP5')
         rape_board(role,now,r)
@@ -522,8 +515,6 @@ def settle(role,mid,req,now,r,jrules,frules,parse):
         data={i:v for i,v in enumerate(results,1)}
         data['pass_all_form']=all(all(v['has_win'] for rows in b['form_list'].values() for v in rows.values()) for b in s['rape_boards'])
         return [summon.event(114,data)]
-    if mid==1021:
-        require(role['level']>=6,'封神榜需6级');return [rank(role,r)]
     if mid==1029:
         require(role['level']>=8 and req['flag'] in (1,2,3),'渡劫请求无效')
         if req['flag']!=1:
@@ -581,11 +572,6 @@ def settle(role,mid,req,now,r,jrules,frules,parse):
         role['gongji_plus_rate']=s['party_bonus']*10
         return [summon.event(32,{})]
     if mid==1201:
-        if req['flag']==2:
-            require(s['rank_count']>0 and not s['rank_claimed'],'尚未参战或今日已领奖')
-            score=rank_score(s['rank_order'],'day_score')
-            s['rank_claimed']=True;s['rank_score']+=score;role['top_day_prize_time']=now
-            return [rank(role,r),summon.event(34,dict(attach_count=score))]
         require(req['flag']==1 and s['party_count']+s['party_paid']>0 and not s['party_claimed'],'暂无可领取的蟠桃奖励')
         s['party_claimed']=True
         role['party_take_prize']=1
@@ -598,11 +584,14 @@ def attributes(role):
               73:'rule_index',75:'max_hp_plus',76:'max_magic_plus',77:'gongji_plus',78:'fangyu_plus',
               48:'convert_fight_limit',49:'convert_fight_count',50:'convert_fight_time',
               61:'top_fight_limit',62:'rape_flush_limit',112:'party_fight_count',113:'party_fight_count_plus',
-              132:'top_day_prize_time',30:'role_combat_power',10:'spirit_retain',85:'gongji_plus_rate',124:'party_take_prize'}
+              132:'top_day_prize_time',133:'top_fight_time',134:'top_fight_count',136:'top_fight_count_plus',137:'top_first_promote_time',138:'top_first_promote_prize',30:'role_combat_power',10:'spirit_retain',85:'gongji_plus_rate',124:'party_take_prize'}
     role['top_score']=role['activity']['rank_score'];role['top_order']=role['activity']['rank_order']
     fields.update({582:'drug_level',583:'drug_exp',584:'drug_study_flag',585:'drug_study_flag2',614:'hole_hp_plus',131:'top_score',3:'level',5:'cur_exp',6:'next_exp'})
     for i,key in enumerate(('gongji','fangyu','fashang','fakang'),1):
         name='train_'+key+'_index';fields[615+i]=name
         role[name]=role['activity'].get('home',{}).get('train',{}).get(str(i),{}).get('level',0)
-    attrs=[dict(type=t,value=int(role.get(k,0))) for t,k in fields.items()]
+    # Original 1032 handler writes field 134 directly to the remaining-count label.
+    values={t:int(role.get(k,0)) for t,k in fields.items()}
+    values[134]=max(0,role['top_fight_limit']+role.get('top_fight_count_plus',0)-role['activity']['rank_count'])
+    attrs=[dict(type=t,value=value) for t,value in values.items()]
     return [encode(1032,dict(id=role['role_id'],unit_type=1,attr_count=len(attrs),attr_list=attrs))]

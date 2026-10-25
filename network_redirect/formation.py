@@ -39,7 +39,7 @@ with (ROOT / 'analysis/configs/equip_advance_worth.csv').open(encoding='utf-8-si
 STATS = ('hp', 'gongji', 'fangyu', 'magic')
 BASE_COLUMNS = ('base_max_hp', 'base_gongji', 'base_fangyu', 'base_max_magic')
 GROWTH_COLUMNS = ('base_maxhp_plus', 'base_gongji_plus', 'base_fangyu_plus', 'base_maxmagic_plus')
-HANDLED = {1024, 1025, 1037, 1052, 1059, 1071, 1073, 1081, 1082, 1083, 1084, 1089, 1343}
+HANDLED = {1076, 1212, 1053, 1055, 1056, 1074, 1079, 1225, 1054, 1024, 1025, 1037, 1052, 1059, 1071, 1073, 1081, 1082, 1083, 1084, 1089, 1343}
 
 
 class Rejected(ValueError):
@@ -80,6 +80,12 @@ def load_rules(path=ROOT / 'server_config/formation_rules.json'):
     policy = rules.get('combat_power', {})
     if not isinstance(policy, dict) or set(policy) - {'title', 'pet', 'cheer', 'explicit_channels'} or any(type(v) is not bool for v in policy.values()):
         raise ValueError('战力来源开关必须是布尔值')
+    policy = rules.get('attribute_policy', {})
+    from .combat_power import ATTRIBUTE_STAGES
+    require(policy.get('advance_extra_base') == 'pre_fate_panel'
+            and policy.get('advance_extra_tiers') == 'highest_unlocked'
+            and policy.get('stages') == ATTRIBUTE_STAGES
+            and policy.get('rounding') == 'floor_before_collection_and_final', '属性乘区配置无效')
     return rules
 
 
@@ -108,11 +114,8 @@ def skill_effect(item):
 
 
 def equip_effect(item):
-    cfg = ITEMS[item['type_id']]
-    column = {1: 'gongji_plus', 2: 'fangyu_plus', 3: 'maxhp_plus'}[int(cfg['main_type'])]
-    base = Decimal(cfg[column]) + Decimal(cfg['upgrade_plus']) * (item.get('level', 1) - 1)
-    percent, plus, _ = advance_worth(item)
-    return floor(base * (1 + percent) + plus)
+    from . import equipment
+    return equipment.effect(item)
 
 
 def advance_worth(item):
@@ -170,6 +173,9 @@ def prepare(role, rules):
         claimed.add(item['id'])
         item.update(innate_owner_id=c['id'], owner_id=c['id'], equip_order=c.get('order', 0) or (c.get('cheer_order', 0) + 8 if c.get('cheer_order') else 0), equip_pos=1)
         item['effect_value'] = skill_effect(item)
+    for item in role['attachments']:
+        if item.get('attach_type') == 5 and int(ITEMS.get(item.get('type_id'), {}).get('main_type', 0)) in (1, 2, 3):
+            item['effect_value'] = equip_effect(item)
     from . import cheer
     cheer.prepare(role)
     recalculate(role, rules)
@@ -299,7 +305,8 @@ def enhance_skill(role, req, rules, parse):
     for identity in ids:
         material = lookup(role, 'attachments', identity)
         require(material['id'] != item['id'] and material['attach_type'] == 6 and not material.get('protogenic')
-                and not material.get('equip_order') and not material.get('is_lock'), '已装备、自带或锁定法术不能作为材料')
+                and not material.get('equip_order') and not material.get('owner_id') and not material.get('is_lock')
+                and not material.get('upgrade_level') and not material.get('awaken'), '已装备、自带或锁定法术不能作为材料')
         quality = int(SKILLS[material['type_id']]['quality'])
         require(material['level'] in SKILL_WORTH, '材料法术等级无效')
         worth += Decimal(SKILL_WORTH[material['level']]['quality_worth%d' % quality].strip())
@@ -361,6 +368,9 @@ def training(role, mid, req, rules):
         c.update(train_increase_field=0, train_decrease_field=0, train_change_value=0)
         return [(4, dict(cortege_id=c['id'], train_result=2 if req['confirm'] else 3))]
     require(not pending, '请先保存或放弃上次培养结果')
+    # Original trainingUI.createStartTrainingInfo:598-603 disables the
+    # training button at companion level 1, even with evolution potential.
+    require(c['level'] > 1, '神仙升至2级后才能培养')
     require(req['train_type'] in (1, 2), '培养类型无效')
     attempts = 10 if req['train_type'] == 2 else 1
     points = attempts * cfg['intensive_points' if req['intensive'] else 'ordinary_points']
@@ -511,8 +521,17 @@ def settle(role, mid, req, rules, parse):
         result = bind(role, req)
     elif mid == 1052:
         result = enhance_equipment(role, req, rules)
+    elif mid in (1053, 1055, 1056, 1074, 1079, 1225):
+        from . import equipment_crafting
+        result = equipment_crafting.settle(role, mid, req, parse)
+    elif mid == 1054:
+        from . import equipment
+        result = equipment.settle(role, req)
     elif mid == 1071:
         result = enhance_skill(role, req, rules, parse)
+    elif mid in (1076, 1212):
+        from . import skill_insight
+        result = skill_insight.insight(role, req) if mid == 1076 else skill_insight.convert(role, req)
     elif mid == 1073:
         result = advance_equipment(role, req, rules)
     elif mid in (1081, 1082):

@@ -91,21 +91,9 @@ def verify(role,mail,rules):
     return 'preview, claim, duplicate rejection, three maxed equipment paths, full ascension/rebirth materials, guaranteed level-10 skill passed'
 
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument('--account',required=True);ap.add_argument('--send',action='store_true');args=ap.parse_args()
-    db=sqlite3.connect(ROOT/'.runtime/offline/game.sqlite3',timeout=30)
-    prizes,limits=build();now=int(time.time());rules=w.load_rules()
-    mail=dict(mail_id=MID,mail_title='开服大礼包',mail_body='四位神仙；元始天尊满飞升、九转材料；无上至尊初始三件及满进阶、封神、铸造材料；五星主动袖里乾坤、被动指地成钢及满级法术素材；天翼虎与养成丹药；金紫精魄各五；仙佛密卷和培元丹。转生仍需满足境界条件。',recv_time=now,send_time=now,prizes=prizes,claimed=False)
-    if args.send:db.execute('BEGIN IMMEDIATE')
-    raw=db.execute('select data from roles where account=?',(args.account,)).fetchone();assert raw,'account not found'
-    role=json.loads(raw[0]);assert KEY not in role.get('welfare',{}).get('mails',{}),'already sent'
-    result=verify(role,mail,rules)
-    report=dict(account=args.account,role_name=role['role_name'],limits=limits,mail=mail,verification=result)
-    if args.send:
-        directory=ROOT/'.runtime/offline/backups';directory.mkdir(exist_ok=True)
-        (directory/f'{args.account}-{KEY}-before.json').write_text(raw[0])
-        w.prepare(role,now,rules).setdefault('mails',{})[KEY]=mail
-        db.execute('update roles set data=? where account=?',(json.dumps(role,ensure_ascii=False),args.account));db.commit()
-        assert json.loads(db.execute('select data from roles where account=?',(args.account,)).fetchone()[0])['welfare']['mails'][KEY]==mail
-    out=ROOT/'analysis/evidence/launch_gift_20261025.json';out.write_text(json.dumps(report,ensure_ascii=False,indent=2))
-    print(json.dumps(dict(sent=args.send,account=args.account,attachment_types=len(prizes),limits=limits,verification=result),ensure_ascii=False))
+    # Preserve the historical command while sharing locking, backup and deduplication.
+    from network_redirect.system_mail import main as send_mail
+    sys.argv.append('--launch-gift')
+    send_mail()
+
 if __name__=='__main__':main()

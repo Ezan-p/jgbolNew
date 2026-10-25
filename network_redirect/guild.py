@@ -38,7 +38,7 @@ def client_config(r):
     rights={int(k):v for k,v in r['rank_rights'].items()}
     return dict(const_config=dict(create_level=r['create_level'],join_level=r['join_level'],apply_level=r['join_level'],
         create_cost_gold=r['create_cost_gold'],change_name_cost=r['change_name_cost'],union_top_level=r['max_level'],
-        open_search_gold=True,open_union_match=True,open_world_match=True,open_feast=True,open_west=True,
+        open_search_gold=True,open_union_match=1,open_world_match=1,open_feast=1,open_west=True,
         west_min_role_level=r['join_level'],open_feast_level=1),
         right_config={k:dict(right_list={n:True for n in v}) for k,v in rights.items()},
         level_config={i:dict(popularity_limit=i*r['level_popularity'],max_count=min(100,r['member_limit']+(i-1)*r['member_growth'])) for i in range(1,r['max_level']+1)},west_config={**r['west_config'],'book_worth_config':{int(k):v for k,v in r['west_config']['book_worth_config'].items()}})
@@ -164,6 +164,19 @@ def settle(role,req,now,r,parse,daily_rules):
         g['members'][rid]=dict(id=role['role_id'],name=role['role_name'],rank=rank,level=role['level'],contrib=0,head_type=role.get('head_type',1),totalcontrib=0,jointime=now,lastlogin=now,online=True,toporder=0,logout_time=0,combat_power=role.get('role_combat_power',0))
         role.update(union_id=g['id'],union_rank=rank,union_name=g['name'],union_contrib=0,cur_union_contrib=0)
         return ([notice(7,role_id=int(rid))] if op==4 else [])+[notice(1 if op==1 else 8),reply(18,dict(query_type=1,union_info=info(g,r),role_info=member(role,g,r)))]
+    if op == 18 and d.get('query_type') == 15:
+        from . import guild_activities
+        return guild_activities.query(role,s,g,d,now,r)
+    # [A] Monument opens public schedules/fortune without a membership check.
+    # [B] A nonmember observes the existing public guild; this never joins it.
+    if g is None and (op == 18 and d.get('query_type') in (8,9,10,15,18) or
+                      op == 58 and d.get('query_type') in (20,21,22,26,30)):
+        public = min(s['unions'].values(), key=lambda v: v['id'])
+        if op == 58:
+            from . import guild_match
+            return guild_match.query(role,s,public,d,now,r,True)
+        from . import guild_activities
+        return guild_activities.query(role,s,public,d,now,r)
     require(g is not None and rid in g['members'],'请先加入仙盟')
     if op==18:
         q=d.get('query_type');out=dict(query_type=q,result=1)

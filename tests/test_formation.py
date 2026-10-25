@@ -198,6 +198,9 @@ class FormationTests(unittest.TestCase):
 
     def test_training_preview_giveup_save_and_reconnect(self):
         self.add_item(1001, 100)
+        role = self.backend.profile()
+        role['corteges'][0]['level'] = 2
+        self.backend.save(role)
         before = self.backend.profile()
         with patch('network_redirect.formation.secrets.choice', return_value='gongji'):
             rows = self.ok(1081, cortege_id=self.ids[0], train_type=2, intensive=True)
@@ -220,9 +223,52 @@ class FormationTests(unittest.TestCase):
     def test_training_insufficient_gold_does_not_consume_peaches(self):
         self.add_item(1001, 50)
         role = self.backend.profile()
+        role['corteges'][0]['level'] = 2
         role['gold_coin'] = 0
         self.backend.save(role)
         self.rejected(1081, cortege_id=self.ids[0], train_type=2, intensive=True)
+
+    def test_training_level_one_with_evolution_potential_is_disabled(self):
+        self.add_item(1001, 100)
+        role = self.backend.profile()
+        role['corteges'][0].update(level=1, evolve_level=1, culture_point=30)
+        self.backend.save(role)
+        for train_type in (1, 2):
+            for intensive in (False, True):
+                self.rejected(1081, cortege_id=self.ids[0],
+                              train_type=train_type, intensive=intensive)
+                self.assertIn('2级', str(self.events([decode(p) for p in self.replies])))
+
+    def test_training_level_two_all_four_modes(self):
+        self.add_item(1001, 200)
+        role = self.backend.profile()
+        role['corteges'][0]['level'] = 2
+        self.backend.save(role)
+        for train_type in (1, 2):
+            for intensive in (False, True):
+                with self.subTest(train_type=train_type, intensive=intensive):
+                    before = self.backend.profile()
+                    points = (10 if train_type == 2 else 1) * (3 if intensive else 1)
+                    with patch('network_redirect.formation.secrets.choice', return_value='gongji'):
+                        rows = self.ok(1081, cortege_id=self.ids[0],
+                                       train_type=train_type, intensive=intensive)
+                    self.assertEqual(self.events(rows)[0][1]['train_point'], points)
+                    self.assertEqual(self.backend.profile()['corteges'][0]['culture_point'],
+                                     before['corteges'][0]['culture_point'])
+                    self.ok(1082, cortege_id=self.ids[0], confirm=True)
+                    after = self.backend.profile()['corteges'][0]
+                    self.assertEqual(after['gongji_plus'], before['corteges'][0]['gongji_plus'] + points)
+                    self.assertEqual(after['culture_point'], before['corteges'][0]['culture_point'] - points)
+
+    def test_legacy_level_one_training_can_still_be_resolved(self):
+        for confirm in (False, True):
+            role = self.backend.profile()
+            c = role['corteges'][0]
+            c.update(level=1, pending_training=dict(points=1, deltas={'gongji': 1}),
+                     train_increase_field=88, train_decrease_field=90, train_change_value=1)
+            self.backend.save(role)
+            self.ok(1082, cortege_id=self.ids[0], confirm=confirm)
+            self.assertNotIn('pending_training', self.backend.profile()['corteges'][0])
 
     def test_evolve_and_compose_use_original_csv(self):
         role = self.backend.profile()
@@ -237,6 +283,33 @@ class FormationTests(unittest.TestCase):
         c = next(c for c in role['corteges'] if c['type'] == 5005)
         self.assertTrue(any(i.get('innate_owner_id') == c['id'] for i in role['attachments']))
         self.rejected(1083, type_id=5005)
+
+    def test_evolution_direct_stats_wire_recycle_and_reconnect(self):
+        self.add_item(1002, 1)
+        role = self.backend.profile()
+        role['souls'] = {'5004': 75}
+        self.backend.save(role)
+        before = self.backend.profile()['corteges'][0]
+        # Original 5004 growth: HP 36.58, attack 14.06, defense 9.03,
+        # magic 9.88. The UI floors each growth * 3 BEFORE accumulation.
+        gains = dict(hp=109, gongji=42, fangyu=27, magic=29)
+        for n in (1, 2):
+            rows = self.ok(1084, flag=0, cortege_id=self.ids[0])
+            c = self.backend.profile()['corteges'][0]
+            for stat, gain in gains.items():
+                self.assertEqual(c[stat], before[stat] + gain * n)
+            delta = next(d for m, _, d in rows if m == 1032 and d['unit_type'] == 4 and d['id'] == c['id'])
+            self.assertIn(dict(type=61, value=c['hp']), delta['attr_list'])
+            self.assertEqual(self.backend.respond(self.packet, self.state), self.replies)
+            self.assertEqual(self.backend.profile()['corteges'][0], c)
+        self.backend.close()
+        self.backend = Backend(Path(self.directory.name), 18770, lambda *a, **k: None)
+        self.assertEqual(self.backend.profile()['corteges'][0], c)
+        self.ok(1084, flag=1, cortege_id=self.ids[0])
+        c = self.backend.profile()['corteges'][0]
+        for stat in gains:
+            self.assertEqual(c[stat], before[stat])
+        self.assertEqual(c['culture_point'], before['culture_point'])
 
     def test_large_inventory_is_chunked_and_complete(self):
         role = self.backend.profile()

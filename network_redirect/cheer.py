@@ -197,6 +197,8 @@ def bonuses(role, c, values, pending):
                 stat = {1: 'gongji', 2: 'fangyu', 3: 'magic', 5: 'hp'}[field]
                 rate = Decimal(SKILL[min(500, role.get(name + '_skill_level', 0))]['plus_rate'])
                 values[stat] += pending[c['id']][stat] * Decimal(f.skill_effect(item)) / 100 * rate
+                from .skill_insight import hp_percent
+                values['hp'] += pending[c['id']]['hp'] * hp_percent(item) / 100 * rate
 
 
 def market_goods(role):

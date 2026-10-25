@@ -10,7 +10,7 @@ from network_redirect.protocol import encode, decode
 ROOT=Path(__file__).resolve().parents[2]
 with tempfile.TemporaryDirectory() as tmp:
  b=Backend(Path(tmp),18790,lambda *a,**k:None);role=b.profile()
- role.update(level=99,reborn_layer=4,silver_coin=100000000,gold_coin=100000)
+ role.update(level=99,reborn_layer=4,silver_coin=100000000,gold_coin=100000,souls={'5022':75})
  role['corteges']=[summon.companion(role,5022)];c=role['corteges'][0];c.update(order=1,level=165)
  for t in [1329,1330,1333,1334,1335,1310,10000,10101,10117,10118,10300]:summon.add_item(role,t,10000)
  eq=dict(id=f.new_id(role),attach_type=5,type_id=2001,count=1,level=1,advance_level=10,equip_order=0,equip_pos=0)
@@ -24,7 +24,7 @@ with tempfile.TemporaryDirectory() as tmp:
  # Decode inventory so every optional field is present exactly as on the wire.
  inventory=[(decode(p)[0],decode(p)[2]) for p in b.inventory(role)]
  header="""local ms=assert(package.loaded.ms)
-local saved={player=ms.d_mainUI.g_playerInfo,corts=ms.d_lineupUI.g_characterInfo,items=ms.d_packageUI.g_packageItemsInfo,config=ms.d_roleRebornUI.g_reborn_condition,send=ms.d_u.main_server_send_msg,report=ms.MS_report_error,info=ms.d_info.show}
+local saved={player=ms.d_mainUI.g_playerInfo,corts=ms.d_lineupUI.g_characterInfo,items=ms.d_packageUI.g_packageItemsInfo,souls=ms.d_data.g_soulsInfoTable,soultypes=ms.d_data.g_soulsTypeTable,config=ms.d_roleRebornUI.g_reborn_condition,send=ms.d_u.main_server_send_msg,report=ms.MS_report_error,info=ms.d_info.show}
 ms.d_u.main_server_send_msg=function(...) return end
 local errors='';reborn_fixture_results={};reborn_fixture_restored=false
 ms.MS_report_error=function(e) errors=errors..'\\n'..tostring(e) end
@@ -35,9 +35,11 @@ local function apply(mid,d)
  if mid==1032 then ms.d_event_mgr.msg_modify_attr_1032(nil,d,nil)
  elseif mid==1034 then ms.d_lineupUI.getDateFormServer(d)
  elseif mid==1035 then ms.d_packageUI.getDateFormServer(d)
+ elseif mid==1046 then ms.d_data.recvSoulsDataFromServer(d)
  elseif mid==2998 then
   local p=assert(loadstring('return '..d.data))()
-  if d.id==172 then ms.d_ascensionUI.onGetResult(p)
+  if d.id==50 then ms.d_feishengUI.getFeiShengRes()
+  elseif d.id==172 then ms.d_ascensionUI.onGetResult(p)
   elseif d.id==183 then ms.d_wakeUI.onGetResult(p)
   elseif d.id==186 then ms.d_wakeUI.onEquipResult(p)
   elseif d.id==187 then ms.d_wakeUI.onUnloadResult(p)
@@ -54,6 +56,8 @@ end
  lines.append('ms.d_roleRebornUI.initData('+summon.lua(r.client_config(b.reborn_rules))+')')
  lines.append('ms.d_wakeUI.onGetConfig({is_open=true,flag=true})')
  for mid,d in inventory:lines.append('apply('+str(mid)+','+summon.lua(d)+')')
+ for packet in summon.soul_snapshots(role):
+  mid,_,d=decode(packet);lines.append('apply('+str(mid)+','+summon.lua(d)+')')
  lines+= ["local function cort() return ms.d_lineupUI.g_characterInfo[1] end", "local function equip() for _,i in ipairs(ms.d_packageUI.g_packageItemsInfo) do if i.id=="+str(eq['id'])+" then return i end end end"]
  lines.append("step('realm_page',function() ms.d_mainUI.show();ms.d_roleRebornUI.show() end)")
  lines.append("step('realm_details',function() ms.d_roleRebornUI.MenuPopRebornLayer() end)")
@@ -66,7 +70,7 @@ end
   for packet in packets:
    m,_,d=decode(packet)
    assert not (m==2998 and d['id']==55), (name,d)
-   if m in (1032,1034,1035,2998):body.append('apply('+str(m)+','+summon.lua(d)+')')
+   if m in (1032,1034,1035,1046,2998):body.append('apply('+str(m)+','+summon.lua(d)+')')
   lines.append("step("+summon.lua(name)+",function() "+';'.join(body)+" end)")
  request('first_vein_callback',1328,reborn_type=2,id=1,data=summon.lua(dict(cortege_id=c['id'],material_list={10000:300})))
  role=b.profile();role['corteges'][0]['reborn_vein_level']=9;b.save(role)
@@ -78,7 +82,7 @@ end
  request('equipment_rebirth_callback',1328,reborn_type=3,id=5,data=summon.lua(dict(equip_id=eq['id'],equip_order=0)))
  lines.append("step('equipment_cast',function() ms.d_equipAscUI.pressClose();ms.d_equipCastUI.show(ms.d_mainUI.g_mainUI.main_layer,1000,equip()) end)")
  request('equipment_cast_callback',1328,reborn_type=3,id=6,data=summon.lua(dict(equip_id=eq['id'],equip_order=0)))
- lines.append("step('divination_enter',function() ms.d_equipCastUI.pressClose();ms.d_wakeUI.enterDivine(ms.d_mainUI.g_mainUI.main_layer) end)")
+ lines.append("step('divination_enter',function() ms.d_mainUI.show();ms.d_wakeUI.g_self.isFromLineup=false;ms.d_wakeUI.enterDivine(ms.d_mainUI.g_mainUI.main_layer) end)")
  request('divination_query',1337,event_type=1,data='{}')
  request('divination_single',1337,event_type=2,data='{}')
  request('divination_quick',1337,event_type=3,data='{}')
@@ -94,13 +98,27 @@ end
  request('star_unload_callback',1339,des_cortege_id=c['id'],element_id=1)
  lines.append("step('awaken_restore_page',function() ms.d_wakeUI.showTalantRestore(ms.d_wakeUI.g_wakeUI.main_layer,ms.d_wakeUI.g_self.des_skill.awaken) end)")
  request('awaken_restore_callback',1342,des_id=sid)
+ evolution_inventory=[(decode(p)[0],decode(p)[2]) for p in b.inventory(b.profile())]
+ lines.append("step('evolution_page',function() ms.d_mainUI.show();ms.d_feishengUI.show(cort().type) end)")
+ request('evolution_callback',1084,flag=0,cortege_id=c['id'])
+ expected=b.profile()['corteges'][0]
+ lines.append("step('evolution_panel_values',function() local c=cort();"+';'.join(
+  'assert(c.'+key+'=='+str(expected[key])+','+summon.lua('evolution '+key+' mismatch')+')'
+  for key in ('hp','gongji','fangyu','magic','evolve_level','culture_point'))+" end)")
  if '--wake-only' in sys.argv:
-  lines.append('local filtered={};for i=20,#cases do filtered[#filtered+1]=cases[i] end;cases=filtered')
+  lines.append('local filtered={};for i=20,27 do filtered[#filtered+1]=cases[i] end;cases=filtered')
   for mid,d in wake_inventory:lines.append('apply('+str(mid)+','+summon.lua(d)+')')
+ if '--divine-only' in sys.argv:
+  lines.append('local filtered={};for i=13,19 do filtered[#filtered+1]=cases[i] end;cases=filtered')
+ if '--evolution-only' in sys.argv:
+  for mid,d in evolution_inventory:
+   lines.append('apply('+str(mid)+','+summon.lua(d)+')')
+  lines.append('local filtered={};for i=28,30 do filtered[#filtered+1]=cases[i] end;cases=filtered')
  lines.append("""local function restore()
  ms.d_u.main_server_send_msg=saved.send;ms.MS_report_error=saved.report;ms.d_info.show=saved.info
  ms.d_mainUI.g_playerInfo=saved.player
  ms.d_lineupUI.g_characterInfo=saved.corts;ms.d_packageUI.g_packageItemsInfo=saved.items
+ ms.d_data.g_soulsInfoTable=saved.souls;ms.d_data.g_soulsTypeTable=saved.soultypes
  ms.d_roleRebornUI.g_reborn_condition=saved.config
  ms.d_packageUI.g_isPackageSorted=false;ms.d_packageUI.sortItems();ms.d_lineupUI.sortcharacterInfo()
  ms.d_mainUI.show();reborn_fixture_restored=true

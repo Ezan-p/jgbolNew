@@ -107,6 +107,14 @@ class RebornTests(unittest.TestCase):
         for kind,op,data in [(2,2,dict(cortege_id=self.cid)),(2,1,dict(cortege_id=-1)),(2,4,{}),(3,3,{})]:
             before=self.role();self.assertEqual(self.op(kind,op,**data)[-1][0],55);self.assertEqual(before,self.role())
 
+    def test_malformed_payload_completes_without_mutating_save(self):
+        for payload in ('true', '123', '"bad"'):
+            for mid, args in ((1328, dict(reborn_type=2, id=1)),
+                              (1337, dict(event_type=6))):
+                before = self.role()
+                self.assertEqual(self.req(mid, data=payload, **args)[-1][0], 55)
+                self.assertEqual(self.role(), before)
+
     def test_change_attributes_cost_and_deltas(self):
         self.ready();before=self.role();old=before['corteges'][0]['gongji']
         self.assertEqual(self.op(2,3,cortege_id=self.cid,des_type=1)[-1][0],172)

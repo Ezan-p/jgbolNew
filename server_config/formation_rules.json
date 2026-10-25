@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "mode": "inferred",
-  "revision": "2026-10-25.combat-power.1.1",
+  "revision": "2026-10-25.equipment-policy.2",
   "culture_per_level": 5,
   "skill_failure_compensation": 1,
   "equipment_batch_count": 10,
@@ -35,5 +35,26 @@
     "pet": true,
     "cheer": true,
     "explicit_channels": true
+  },
+  "attribute_policy": {
+    "revision": "equipment-policy.2",
+    "advance_extra_base": "pre_fate_panel",
+    "advance_extra_tiers": "highest_unlocked",
+    "stages": [
+      "base_and_culture",
+      "evolution",
+      "equipment",
+      "passive_skills",
+      "rebirth",
+      "awakening_and_stars",
+      "fates_and_advance",
+      "collection_role_and_home",
+      "title",
+      "home_training",
+      "pet",
+      "cheer",
+      "explicit_channels"
+    ],
+    "rounding": "floor_before_collection_and_final"
   }
 }

@@ -40,16 +40,17 @@ def query(role,s,g,d,now,r,cross=False):
     mapping={20:8,21:9,22:10,23:13,24:16,25:17,26:18,27:19,28:12,30:100,32:100}
     typ=mapping.get(q,q);out=dict(query_type=q,result=1)
     if cross and q==30:
-        out.update(union_list={g['id']:dict(u.info(g,r),order=1,leaderid=role['role_id'],leader_name=role['role_name'],score=m['score'])},last_champion=m.get('history',[])[-1]['ranking'][0] if m.get('history') else {})
+        leader=next((v for v in g['members'].values() if v['rank']==1),None)
+        out.update(union_list=[dict(u.info(g,r),order=1,leaderid=leader['id'] if leader else 0,score=m['score'])],last_champion=champions(role,s,g,r,cross)[0])
     elif typ==100:out['enter_data']=enter(role,s,g,now,r,cross)
     elif typ in (11,12,13):out.update(targets(role,s,g,r,cross))
-    elif typ==9:out.update(schedule_list=dict(champion_list=tournament(role,s,g,r,cross)[:1],match_member=tournament(role,s,g,r,cross),begin_time=s['day']*86400-r['timezone_offset_hours']*3600,end_time=(s['day']+1)*86400-r['timezone_offset_hours']*3600),had_signup=m['signed'],match_list=tournament(role,s,g,r,cross))
+    elif typ==9:out.update(schedule_list=dict(champion_list=champions(role,s,g,r,cross),match_member=tournament(role,s,g,r,cross),begin_time=s['day']*86400-r['timezone_offset_hours']*3600,end_time=(s['day']+1)*86400-r['timezone_offset_hours']*3600),had_signup=m['signed'],match_list=tournament(role,s,g,r,cross))
     elif typ==8:
         pair=enter(role,s,g,now,r,cross)['against_data']
         for side,ident in (('src',g['id']),('des',90001)):pair[side].update(union_id=ident,id=ident,leader_id=int(role['role_id']) if side=='src' else 90001,match_type=CLIENT_MATCH_STAGE,level=g['level'] if side=='src' else 1,order=1,score=0)
         start=s['day']*86400-r['timezone_offset_hours']*3600
         out.update(bet_time_info=dict(begin_time=start,end_time=0 if m['fights'] or m['claimed'] else start+86400),bet_list={int(role['role_id']) if ident==g['id'] else ident:True for ident in m['bets'].values()},lineup_list={i:[pair] for i in range(1,8)},bet_info_list={i:{1:dict(silver_count=0,pantao_count=0)} for i in range(1,8)},match_type=CLIENT_MATCH_STAGE)
-    elif typ in (10,18):out.update(teams=tournament(role,s,g,r,cross),champion_list=tournament(role,s,g,r,cross)[:1],lineup_list=tournament(role,s,g,r,cross))
+    elif typ in (10,18):out.update(teams=tournament(role,s,g,r,cross),champion_list=champions(role,s,g,r,cross),lineup_list=tournament(role,s,g,r,cross))
     elif typ==17:out.update(member_score={1:[dict(name=role['role_name'],score_point=m['merit'],win_count=m['wins'],total_count=m['fights'])],2:targets(role,s,g,r,cross)['des_member_list']},src_direction=1,des_direction=2)
     elif typ==19:out.update(member_list=[dict(name=role['role_name'],score_point=m['score'],win_count=m['wins'],total_count=m['fights'],prize_count=1)])
     elif typ==16:out.update(union_score=dict(my_order=next(v['order'] for v in tournament(role,s,g,r,cross) if v['id']==g['id']),top_list=tournament(role,s,g,r,cross)))
@@ -147,3 +148,13 @@ def tournament(role,s,g,r,cross=False):
     rows.sort(key=lambda row:(-row['score'],row['id']))
     for i,row in enumerate(rows,1):row['order']=i
     return rows
+
+
+def champions(role,s,g,r,cross=False):
+    """[B] Current offline champion card, [A] original detail-page field names."""
+    winner=tournament(role,s,g,r,cross)[0]
+    own=winner['id']==g['id']
+    leader=next((m for m in g['members'].values() if m['rank']==1),None) if own else None
+    return [dict(winner,week=s['day'],area='本地区' if own else '本地模拟区',
+                 level=g['level'] if own else 1,popularity=g['popularity'] if own else 0,
+                 leader_name=leader['name'] if leader else '离线盟主',top_member=[])]

@@ -1,0 +1,90 @@
+{
+  "client": "3.87",
+  "inputs": [
+    {
+      "logical": "csv_config/skill_advaced_conf.csv",
+      "sha256": "81effe54ba7c4411e8ecc9d0098c9600e9a645895befb1514841094ff6ad3349",
+      "rows": 8,
+      "all_cells_match": true
+    },
+    {
+      "logical": "lua/ui/skillUpgradeUI.lua",
+      "sha256": "3364fe63f82302909dcc6bec83894a02ac61411f8e0782780831e59930d6ef05"
+    },
+    {
+      "logical": "lua/ui/packageUI.lua",
+      "sha256": "6f5e7e86418fdef9c1ca32aa9cc3c2fc7966d2c8735cae4cbd0982d3ae1f261d"
+    },
+    {
+      "logical": "lua/ui/qiankunnizhuan.lua",
+      "sha256": "135ad46100ffb12cea901d049328348d2d2013b6bdbb731cd8f848a39cf71834"
+    }
+  ],
+  "recipes": [
+    {
+      "type_id": "43",
+      "min_level": "10",
+      "material_list": "6|43|1|1/6|45|1|1",
+      "hp_plus": "10"
+    },
+    {
+      "type_id": "42",
+      "min_level": "10",
+      "material_list": "6|42|1|1/6|46|1|1",
+      "hp_plus": "10"
+    },
+    {
+      "type_id": "22",
+      "min_level": "10",
+      "material_list": "6|22|1|1/6|25|1|1",
+      "hp_plus": "10"
+    },
+    {
+      "type_id": "23",
+      "min_level": "10",
+      "material_list": "6|23|1|1/6|27|1|1",
+      "hp_plus": "10"
+    },
+    {
+      "type_id": "31",
+      "min_level": "10",
+      "material_list": "6|31|1|1/6|34|1|1",
+      "hp_plus": "10"
+    },
+    {
+      "type_id": "32",
+      "min_level": "10",
+      "material_list": "6|32|1|1/6|35|1|1",
+      "hp_plus": "10"
+    },
+    {
+      "type_id": "51",
+      "min_level": "10",
+      "material_list": "6|51|1|1/6|25|1|1",
+      "hp_plus": "10"
+    },
+    {
+      "type_id": "52",
+      "min_level": "10",
+      "material_list": "6|52|1|1/6|27|1|1",
+      "hp_plus": "10"
+    }
+  ],
+  "policy": {
+    "schema_version": 1,
+    "mode": "inferred",
+    "hp_percent": 12,
+    "evidence": "3.87 packageUI L1159 displays 12%; original skill_advaced_conf.csv hp_plus=10 conflicts. Prefer client display; server formula unavailable.",
+    "policy": "Guaranteed insight, no currency fee; higher level materials consumed whole. Conversion uses uniform candidate selection, preserves spell level and failure compensation. HP adds to passive percentages; cheer applies slot multiplier."
+  },
+  "official_server_available": false,
+  "original_protocols": [
+    1076,
+    1212
+  ],
+  "events": [
+    156,
+    89
+  ],
+  "conflict": "CSV hp_plus=10; packageUI L1159 displays constant 12%. Server stacking unknown."
+}

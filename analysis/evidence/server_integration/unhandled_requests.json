@@ -1,0 +1,2085 @@
+{
+  "audit_time": "2026-10-25T20:50:12.672744+08:00",
+  "scope": "当前工作区源代码；未启动模拟器，未连接官方服务器，未读写玩家存档",
+  "method": "仅对人工筛选的无路由候选调用真实 Backend.respond；使用未初始化实例，替换 emit 与 complete，不创建数据库；请求合法编码，serial_num=1，其余字段为零/空；证明分发落入未实现，不证明界面当前可见或完整业务验收",
+  "missing_request_count": 59,
+  "missing_requests": [
+    {
+      "id": 1010,
+      "name": "msg_change_password",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/playerCenterUI.lua.txt:1213"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1010,
+            "bytes": 78,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1010,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1010）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1011,
+      "name": "msg_register_account",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/playerCenterUI.lua.txt:788"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1011,
+            "bytes": 79,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1011,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1011）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1304,
+      "name": "msg_register_real",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/playerCenterUI.lua.txt:2055"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1304,
+            "bytes": 48,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1304,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1304）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1307,
+      "name": "msg_role_property",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/mainUI.lua.txt:7921"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1307,
+            "bytes": 15,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1307,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1307）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1012,
+      "name": "msg_activate_account",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/playerCenterUI.lua.txt:1639"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1012,
+            "bytes": 79,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1012,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1012）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1031,
+      "name": "msg_modify_player_name",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/commonLayerUI.lua.txt:637"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1031,
+            "bytes": 46,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1031,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1031）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1060,
+      "name": "msg_skip_rape_back",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/messageUI.lua.txt:4595"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1060,
+            "bytes": 22,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1060,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1060）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1067,
+      "name": "msg_query_achievements",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/charPositionUI.lua.txt:12496"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1067,
+            "bytes": 23,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1067,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1067）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1068,
+      "name": "msg_visit_land_father",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/godBlessUI.lua.txt:840",
+        "analysis/evidence/lua_named/lua/ui/godBlessUI.lua.txt:2226"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1068,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1068,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1068）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1069,
+      "name": "msg_change_head_type",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/runeUI.lua.txt:642"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1069,
+            "bytes": 19,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1069,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1069）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1070,
+      "name": "msg_change_genius",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/runeUI.lua.txt:1336"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1070,
+            "bytes": 18,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1070,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1070）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1344,
+      "name": "msg_cross_fight",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/undergoLineupUI.lua.txt:3488",
+        "analysis/evidence/lua_named/lua/ui/undergoLineupUI.lua.txt:6764",
+        "analysis/evidence/lua_named/lua/ui/undergoLineupUI.lua.txt:6799",
+        "analysis/evidence/lua_named/lua/ui/undergoLineupUI.lua.txt:6823",
+        "analysis/evidence/lua_named/lua/ui/undergoLineupUI.lua.txt:6851",
+        "analysis/evidence/lua_named/lua/ui/undergoLineupUI.lua.txt:6879",
+        "analysis/evidence/lua_named/lua/ui/undergoLineupUI.lua.txt:6905",
+        "analysis/evidence/lua_named/lua/ui/undergoLineupUI.lua.txt:6935",
+        "analysis/evidence/lua_named/lua/ui/undergoLineupUI.lua.txt:6959",
+        "analysis/evidence/lua_named/lua/ui/crossServerUI.lua.txt:5282",
+        "analysis/evidence/lua_named/lua/ui/crossServerUI.lua.txt:8558",
+        "analysis/evidence/lua_named/lua/ui/crossServerUI.lua.txt:8593",
+        "analysis/evidence/lua_named/lua/ui/crossServerUI.lua.txt:8617",
+        "analysis/evidence/lua_named/lua/ui/crossServerUI.lua.txt:8645",
+        "analysis/evidence/lua_named/lua/ui/crossServerUI.lua.txt:8673",
+        "analysis/evidence/lua_named/lua/ui/crossServerUI.lua.txt:8699",
+        "analysis/evidence/lua_named/lua/ui/crossServerUI.lua.txt:8729",
+        "analysis/evidence/lua_named/lua/ui/crossServerUI.lua.txt:8753",
+        "analysis/evidence/lua_named/lua/ui/crossServerUI.lua.txt:8781"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1344,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1344,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1344）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1345,
+      "name": "msg_hero_back",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/returnUI.lua.txt:61"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1345,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1345,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1345）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1078,
+      "name": "msg_title_op",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/charPositionUI.lua.txt:2269",
+        "analysis/evidence/lua_named/lua/ui/honorUI.lua.txt:967"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1078,
+            "bytes": 23,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1078,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1078）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1086,
+      "name": "msg_cortege_consume",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/cortegeRecycleUI.lua.txt:2334"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1086,
+            "bytes": 55,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1086,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1086）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1088,
+      "name": "msg_sell_items",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/data.lua.txt:8301"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1088,
+            "bytes": 15,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1088,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1088）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1091,
+      "name": "msg_search_player_request",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/followUI.lua.txt:1840",
+        "analysis/evidence/lua_named/lua/ui/followUI.lua.txt:1879"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1091,
+            "bytes": 49,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1091,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1091）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1093,
+      "name": "msg_attention_player",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/followUI.lua.txt:2374",
+        "analysis/evidence/lua_named/lua/ui/followUI.lua.txt:2440",
+        "analysis/evidence/lua_named/lua/ui/followUI.lua.txt:2477",
+        "analysis/evidence/lua_named/lua/ui/shilianUI.lua.txt:2001",
+        "analysis/evidence/lua_named/lua/ui/chatUI.lua.txt:2117",
+        "analysis/evidence/lua_named/lua/ui/chatUI.lua.txt:2250",
+        "analysis/evidence/lua_named/lua/ui/chatUI.lua.txt:2414",
+        "analysis/evidence/lua_named/lua/ui/messageUI.lua.txt:1090",
+        "analysis/evidence/lua_named/lua/ui/messageUI.lua.txt:3297"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1093,
+            "bytes": 56,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1093,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1093）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1096,
+      "name": "msg_report_player",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/chatUI.lua.txt:2380"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1096,
+            "bytes": 59,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1096,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1096）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1099,
+      "name": "msg_remove_A_to_B",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/chatUI.lua.txt:4368"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1099,
+            "bytes": 14,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1099,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1099）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1101,
+      "name": "msg_invite_request",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/friendsUI.lua.txt:413",
+        "analysis/evidence/lua_named/lua/ui/systemSetUI.lua.txt:1778"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1101,
+            "bytes": 33,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1101,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1101）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1104,
+      "name": "msg_pickup_gift_attach",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/friendsUI.lua.txt:1582",
+        "analysis/evidence/lua_named/lua/ui/systemSetUI.lua.txt:1714"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1104,
+            "bytes": 47,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1104,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1104）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1204,
+      "name": "msg_new_role_guide",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/summonUI.lua.txt:2101",
+        "analysis/evidence/lua_named/lua/ui/charPositionUI.lua.txt:9139",
+        "analysis/evidence/lua_named/lua/ui/charPositionUI.lua.txt:12146",
+        "analysis/evidence/lua_named/lua/ui/mapUI.lua.txt:779",
+        "analysis/evidence/lua_named/lua/ui/endlessFightUI.lua.txt:166",
+        "analysis/evidence/lua_named/lua/ui/activityUI.lua.txt:4992",
+        "analysis/evidence/lua_named/lua/ui/activityUI.lua.txt:5033",
+        "analysis/evidence/lua_named/lua/ui/activityUI.lua.txt:5074",
+        "analysis/evidence/lua_named/lua/ui/tianShuUI.lua.txt:1205",
+        "analysis/evidence/lua_named/lua/ui/tianShuUI.lua.txt:1615",
+        "analysis/evidence/lua_named/lua/ui/guideUI.lua.txt:2735",
+        "analysis/evidence/lua_named/lua/ui/guideUI.lua.txt:5369",
+        "analysis/evidence/lua_named/lua/ui/crossDoomUI.lua.txt:448",
+        "analysis/evidence/lua_named/lua/ui/formationUI.lua.txt:4099"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1204,
+            "bytes": 20,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1204,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1204）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1207,
+      "name": "msg_client_gold_rush",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/goldRushUI.lua.txt:748"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1207,
+            "bytes": 15,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1207,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1207）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1226,
+      "name": "msg_hunt_soul",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:1622",
+        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4345",
+        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4366",
+        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4419",
+        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4444",
+        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4465",
+        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4486",
+        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4506",
+        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4525"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1226,
+            "bytes": 23,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1226,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1226）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1227,
+      "name": "msg_sky_pavilion",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/destinyUI.lua.txt:125"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1227,
+            "bytes": 31,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1227,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1227）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1214,
+      "name": "msg_lantern_activity",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/lanternRiddleUI.lua.txt:1398",
+        "analysis/evidence/lua_named/lua/ui/lanternRiddleUI.lua.txt:1647",
+        "analysis/evidence/lua_named/lua/ui/activityUI.lua.txt:5348"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1214,
+            "bytes": 48,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1214,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1214）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1215,
+      "name": "msg_spring_charge_prize",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/chargePresentUI.lua.txt:135"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1215,
+            "bytes": 18,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1215,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1215）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1216,
+      "name": "msg_query_charge_prize",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/activityUI.lua.txt:5165"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1216,
+            "bytes": 15,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1216,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1216）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1217,
+      "name": "msg_query_consume_gold_prize",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/promotionUI.lua.txt:97"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1217,
+            "bytes": 15,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1217,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1217）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1218,
+      "name": "msg_take_consume_gold_prize",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/promotionUI.lua.txt:185"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1218,
+            "bytes": 18,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1218,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1218）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1219,
+      "name": "msg_week_activity",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/mondayUI.lua.txt:345",
+        "analysis/evidence/lua_named/lua/ui/mondayUI.lua.txt:494",
+        "analysis/evidence/lua_named/lua/ui/activityUI.lua.txt:5146"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1219,
+            "bytes": 17,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1219,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1219）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1220,
+      "name": "msg_query_activity_info",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/messageUI.lua.txt:6077"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1220,
+            "bytes": 22,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1220,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1220）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1222,
+      "name": "msg_query_labourday_info",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/richmanUI.lua.txt:2838"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1222,
+            "bytes": 15,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1222,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1222）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1223,
+      "name": "msg_exchange_labourday_prize",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/richmanUI.lua.txt:2857"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1223,
+            "bytes": 22,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1223,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1223）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1224,
+      "name": "msg_roll_labourday_miles",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/richmanUI.lua.txt:2902"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1224,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1224,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1224）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1134,
+      "name": "msg_furnace",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/alchemyUI.lua.txt:57"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1134,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1134,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1134）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1129,
+      "name": "msg_use_map_flush",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/mysteryUI.lua.txt:1513"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1129,
+            "bytes": 14,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1129,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1129）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1130,
+      "name": "msg_buy_mystery_item",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/mysteryUI.lua.txt:1479"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1130,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1130,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1130）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1131,
+      "name": "msg_query_take_item",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/levelUpBuffUI.lua.txt:745"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1131,
+            "bytes": 20,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1131,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1131）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1132,
+      "name": "msg_valentine_activity",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/guessUI.lua.txt:947",
+        "analysis/evidence/lua_named/lua/ui/guessUI.lua.txt:1031",
+        "analysis/evidence/lua_named/lua/ui/activityUI.lua.txt:5371"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1132,
+            "bytes": 48,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1132,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1132）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1243,
+      "name": "msg_random_monday_prize",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/mondayUI.lua.txt:511"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1243,
+            "bytes": 15,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1243,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1243）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1133,
+      "name": "msg_amrita",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/newPromotionUI.lua.txt:199",
+        "analysis/evidence/lua_named/lua/ui/newPromotionUI.lua.txt:242"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1133,
+            "bytes": 26,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1133,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1133）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1350,
+      "name": "msg_free_fight_event",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/arenaUI.lua.txt:97",
+        "analysis/evidence/lua_named/lua/ui/arenaUI.lua.txt:108"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1350,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1350,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1350）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1331,
+      "name": "msg_summer_activity",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/summerUI.lua.txt:7611",
+        "analysis/evidence/lua_named/lua/ui/summerUI.lua.txt:7622"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1331,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1331,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1331）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1351,
+      "name": "msg_rulai_activity",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/turntableUI.lua.txt:251",
+        "analysis/evidence/lua_named/lua/ui/turntableUI.lua.txt:399",
+        "analysis/evidence/lua_named/lua/ui/turntableUI.lua.txt:1266"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1351,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1351,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1351）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1334,
+      "name": "msg_yuanshi_activity",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/twoYearsCelebrateUI.lua.txt:51",
+        "analysis/evidence/lua_named/lua/ui/twoYearsCelebrateUI.lua.txt:315",
+        "analysis/evidence/lua_named/lua/ui/twoYearsCelebrateUI.lua.txt:368",
+        "analysis/evidence/lua_named/lua/ui/twoYearsCelebrateUI.lua.txt:1924",
+        "analysis/evidence/lua_named/lua/ui/twoYearsCelebrateUI.lua.txt:1991",
+        "analysis/evidence/lua_named/lua/ui/twoYearsCelebrateUI.lua.txt:2536"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1334,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1334,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1334）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1335,
+      "name": "msg_world_imperial",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/answerUI.lua.txt:447",
+        "analysis/evidence/lua_named/lua/ui/answerUI.lua.txt:458"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1335,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1335,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1335）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1308,
+      "name": "msg_weekend_event",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/miniGameUI.lua.txt:522"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1308,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1308,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1308）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1309,
+      "name": "msg_nine_sky",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/towerUI.lua.txt:77"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1309,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1309,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1309）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1346,
+      "name": "msg_save_monkey",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/saveMonkeyUI.lua.txt:1807",
+        "analysis/evidence/lua_named/lua/ui/saveMonkeyUI.lua.txt:2791",
+        "analysis/evidence/lua_named/lua/ui/saveMonkeyUI.lua.txt:2821",
+        "analysis/evidence/lua_named/lua/ui/saveMonkeyUI.lua.txt:2849",
+        "analysis/evidence/lua_named/lua/ui/saveMonkeyUI.lua.txt:2874",
+        "analysis/evidence/lua_named/lua/ui/saveMonkeyUI.lua.txt:2901",
+        "analysis/evidence/lua_named/lua/ui/saveMonkeyUI.lua.txt:2926",
+        "analysis/evidence/lua_named/lua/ui/saveMonkeyUI.lua.txt:2952",
+        "analysis/evidence/lua_named/lua/ui/saveMonkeyUI.lua.txt:2978"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1346,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1346,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1346）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1310,
+      "name": "msg_spirit_gossip",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/lingUI.lua.txt:435"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1310,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1310,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1310）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1330,
+      "name": "msg_animal_event",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/petUI.lua.txt:1100"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1330,
+            "bytes": 17,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1330,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1330）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1303,
+      "name": "msg_team_event",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/landTeamUI.lua.txt:420",
+        "analysis/evidence/lua_named/lua/ui/teamUI.lua.txt:481"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1303,
+            "bytes": 17,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1303,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1303）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1323,
+      "name": "msg_longevity_hill",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/kickUI.lua.txt:165"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1323,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1323,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1323）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1324,
+      "name": "msg_pile_snowman",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/snowmanUI.lua.txt:34"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1324,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1324,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1324）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1325,
+      "name": "msg_analysis_dream",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/dreamUI.lua.txt:97"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1325,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1325,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1325）\"}"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 1326,
+      "name": "msg_update_version",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/mainUI.lua.txt:214"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1326,
+            "bytes": 14,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1326,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": []
+      }
+    },
+    {
+      "id": 1327,
+      "name": "msg_monster_nian",
+      "client_references": [
+        "analysis/evidence/lua_named/lua/ui/omenUI.lua.txt:30"
+      ],
+      "sampled_routes": [],
+      "probe": {
+        "logs": [
+          {
+            "kind": "game_request",
+            "message_id": 1327,
+            "bytes": 16,
+            "authenticated": true
+          },
+          {
+            "kind": "game_unimplemented",
+            "message_id": 1327,
+            "message": "尚未实现的业务消息；不返回伪成功"
+          }
+        ],
+        "responses": [
+          [
+            2998,
+            {
+              "serial_num": 0,
+              "id": 55,
+              "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1327）\"}"
+            }
+          ]
+        ]
+      }
+    }
+  ],
+  "sha256": {
+    "network_redirect/repair.py": "0f17702efd60780149b86a904566a66b1c5351306cb41476093108690429bdb4",
+    "network_redirect/equipment.py": "103002018454bf058608b773ac5b9e0148e4b6163544863f6d2e60aeb935cd7f",
+    "network_redirect/guild_escort.py": "ba0d9731bd2312bd85e9d1cc3a9a1c6066f366bd874e89789036b319e186cc1f",
+    "network_redirect/activity_abyss_random.py": "38d6515cb02d2b9d13619fd7f1a8c293dc48c3f5c121f7fc28885fe4bf353b9f",
+    "network_redirect/equipment_crafting.py": "a91e93b852c9ca4638cbae0ba09cfdd6a1f282479631461a6e7cc275828b1807",
+    "network_redirect/activity_home.py": "8547ca25ccbaa80b1fcfd54145153ce440ea3a2fbf3934afb4dca6f38f8d2da5",
+    "network_redirect/server.py": "a2108884e8adf97ca4c44685e02d93c0381b943ffa6885a7857edf4a8b24f710",
+    "network_redirect/guild_instances.py": "0c2db3525b347b2120609ca5cb6a4372841a906316a1eb92521ad8525dc30539",
+    "network_redirect/guild_match.py": "441493952b2f0db0ea172689c18fe5c0cc6eb394a464681c6a51cd94b9fb7a66",
+    "network_redirect/backend.py": "0bd4eaf89b08d2ab531c09af803f425126b32a0553a1e099352cdf671dc4a9dd",
+    "network_redirect/activity_abyss_combat.py": "2cb03858360abc2f0a7f9e90f09719854f737ec543d511c35b4fa3ad9b65897f",
+    "network_redirect/cheer.py": "60f507d146aa0d41c61f6f44877987c380eca243de2a0fadfb9aa09fd4a52d37",
+    "network_redirect/guild_combat.py": "d568e22b5fa7817729db4bc7e9c75525e6b88b7177eb176a420cedaacaccd7c2",
+    "network_redirect/accounts.py": "ab6835448b9fa9838210ddc441142731ce05fe17ef6a7acce437afa60e8a6f34",
+    "network_redirect/guild_offline.py": "bc21c723b884f14932ca6d4f6e0d22c3c6a9d5c77f9811fd547efd7d41d1e7a8",
+    "network_redirect/market.py": "add406a52f5cdb601caf8a0be98a389d37884338aec963eb20a20de260095a24",
+    "network_redirect/reborn_stars.py": "e9e58431f1dba25be59f57c2eb5511a8556f3850c50a32b3184253e886c1fe04",
+    "network_redirect/combat.py": "4325daa9a6b0d8e8577be28db1c857a2541ca45461fee882fd73c9901ada275a",
+    "network_redirect/activity_land_boss.py": "c46dc27819790f7d6a766571521345b6f3fe3fb1bca29d200a4a61c6e9542262",
+    "network_redirect/formation.py": "7ffc34c0eece735ec28950608ce6a62a1e076a17038df06738aaab4119d683f2",
+    "network_redirect/protocol.py": "4afe49df476c9148e5066dc3f3af6fcf5bac2f2bfa65d2347b7136a44a1038af",
+    "network_redirect/activity_drug.py": "33e969348732f23cac79b47ed464249f9c66b2ed2e0ace95bb0c45b51aea1527",
+    "network_redirect/summon.py": "0889d350131e6cbe10a3d9b246f493ba9b4d29d280f3b8ce0565496b1cb5f480",
+    "network_redirect/combat_engine.py": "805477b5a98e265b2c0d9559849f0a6674a619b1d70eb6257044be89fd8f17a6",
+    "network_redirect/activity.py": "91655b02d1cf3692c53c98f2deaef81ed722a75a858831366b512ead2502a1e7",
+    "network_redirect/__init__.py": "72fc18cd7029757583f45b64e758fd2ba74945c36c8473ff9a8ebc5035491e4c",
+    "network_redirect/guild_hunt.py": "756280a4a23de5ee0ff12c6d86e700f5b8162ac93fb42898190de5c191875a18",
+    "network_redirect/activity_babel.py": "c1ab925ece9210367cdd37ceb04888cb2ad2a3f70edb7c5b7a040eb921529e53",
+    "network_redirect/activity_home_pets.py": "1b791417545df2197f788ad1cbcdb446c6783f7161e17727ec38346335f8a2cb",
+    "network_redirect/tls.py": "90e8a8eb9f53d3520876a5fb8b0a5579aa2e7a42f86b21297111ea7637d98012",
+    "network_redirect/activity_spring.py": "180c758eca19bb2891d8a43650bdab99f8968694d5f94f67b90c81d2b03283c8",
+    "network_redirect/xianling.py": "d185fea3cbbbcd32ffe06e45e3f3191ba4822b33f85bb72cfa27dbcb0dcc1614",
+    "network_redirect/activity_seasonal.py": "dc0dc403f398b24984151a154f66e72b5c244c2238f9d7ec859d62e474206190",
+    "network_redirect/vip.py": "9588b84661005ece1e5b54fd7760d6d8c1a5eba394a756881b6870d9f5bb7c0e",
+    "network_redirect/cli.py": "d66ec08d8478243bcdd5459581f041f5d2ffb399127cd620a6b05a99a4912e15",
+    "network_redirect/journey.py": "0733696c4ad705a4e7e1b1bfeed823993ba4eb2602cce389d3162644ce27698f",
+    "network_redirect/reborn.py": "bb3be3119bbd8ef0a7f859b4ba50c527aeb151f33f49e61d5be8658c93bd7927",
+    "network_redirect/activity_undergo.py": "4c14f6ecef6141d58428c8407c89dc2b4bc3dcd786d9d7a6e7f5bb38399d4eac",
+    "network_redirect/activity_abyss.py": "c3c7e75ed3a9d380bb7347e15365edb0dcaebe91c8560e3844032d26f8874485",
+    "network_redirect/welfare.py": "952110de52348b395099420100d227dbd416550aed4317841d667cb729241b41",
+    "network_redirect/system_mail.py": "2343eb284ae985bc28089022cd185959d5a1789977c5e9f1de0645c0741856e6",
+    "network_redirect/monument.py": "2ac43d1c44150379826e1cb9a17746b0fedd070b2411ca1a44d0a61e2db50155",
+    "network_redirect/daily.py": "54fcb4d5f49f2f2f3f8bbe1ffff88c4ac7af8910707d1d4612fbeaef7a4128a2",
+    "network_redirect/combat_power.py": "559a3d36fa5135dda0231c30a75c99e735b3b12c128eaa8087a865c91bcf3a66",
+    "network_redirect/activity_land.py": "8981d509e657b15b478724c9f8484893e995fd81811078b6d67ba80eeb202672",
+    "network_redirect/activity_treasure.py": "224a21e2bf2435dfa6bb99d76500a7202d542a6171073372ca7701a6c62110e9",
+    "network_redirect/activity_fish.py": "95e8d0981b3120b7b3ec814db959088378a7b246ec0527ae08196ac808459f1d",
+    "network_redirect/guild.py": "66273c32bfe911d897868b7139c0fdf4e569034956d625a4e18a6df15f4cc7eb",
+    "network_redirect/skill_insight.py": "2c79c9f87edde9207efd158a6bc825bbe91a967549364409c12ec2eba0c4c4da",
+    "network_redirect/guild_activities.py": "8643d1f369e470fc8f9fb2e24977a179795a4e3ad4cf503b79ca5177679a53b8",
+    "network_redirect/immortal.py": "d41a2fff74a890883bffc3845907764ece5eefb47edca6bf1b13e005b8de1729",
+    "network_redirect/activity_home_friends.py": "08a53b3cd034d486bbf293d745060a66ec8388a3fbc471c8f8f6aa0b466964fd",
+    "network_redirect/vip_client.lua": "d82d5ee769370683f476800b847086cb77907a7f9e3f45aea3447ac4e843a7d8",
+    "network_redirect/equipment_client.lua": "282d4c59f83e5f68491e998410a0fbd2150156b65a13f7bd701136bfec3842ac",
+    "network_redirect/welfare_client.lua": "88b286be8a50f17d79cdeae4b32ac888a912aec22df89db4b28518274994d9d3",
+    "network_redirect/summon_client.lua": "19066b02f626cc03fe29187ffce2ecc0644398fec40ea6b2e4115f5e058874c8",
+    "network_redirect/reborn_client.lua": "d5962626af2a9665685ad08d4e7f9d11391e4d7ab0b243c403c67669a9725f39",
+    "network_redirect/monument_client.lua": "4da2609658e34b55231f196ecaf3210440829ffb1c7c4401d3a6db7136e13e09",
+    "analysis/evidence/protocol_tables.json": "f1b68fbfff2fc58751f223dbb4fe9062cf846d626a5be8ccfdb354f3f603099b"
+  }
+}

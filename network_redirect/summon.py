@@ -94,7 +94,11 @@ def client_source(rules):
     vip_source = Path(__file__).with_name('vip_client.lua').read_text(encoding='utf-8')
     vip_source = vip_source.replace('__VIP_PRODUCTS__', lua(vip.load_rules()['products']))
     welfare_source = Path(__file__).with_name('welfare_client.lua').read_text(encoding='utf-8')
-    return vip_source + '\n' + welfare_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
+    monument_source = Path(__file__).with_name('monument_client.lua').read_text(encoding='utf-8')
+    equipment_source = Path(__file__).with_name('equipment_client.lua').read_text(encoding='utf-8')
+    reborn_source = Path(__file__).with_name('reborn_client.lua').read_text(encoding='utf-8')
+    rank_source = Path(__file__).with_name('rank_client.lua').read_text(encoding='utf-8')
+    return rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
 
 
 def lua(value):
@@ -171,6 +175,12 @@ def next_id(role):
 
 
 def add_item(role, type_id, count):
+    # Original stones are individual objects (can_stack=0); material selection
+    # transmits one ID per stone, with no quantity field.
+    if type_id in (1090, 1091, 1092):
+        for _ in range(count):
+            role['attachments'].append(dict(id=next_id(role), attach_type=5, type_id=type_id, count=1, level=1))
+        return
     for item in role['attachments']:
         if (item['attach_type'] == 5 and item['type_id'] == type_id
                 and not item.get('owner_id') and not item.get('is_lock')

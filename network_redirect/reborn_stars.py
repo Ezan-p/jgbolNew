@@ -50,6 +50,7 @@ def divination(role, req, rules, parse, now=None):
     op = req['event_type']
     f.require(op in range(1, 7), '占星操作无效')
     data = parse(req['data'])
+    f.require(isinstance(data, dict), '占星数据须为参数表')
     prizes = []
     if op in (2, 3):
         f.require(state['divi_count'] > 0, '占星次数不足')
@@ -174,7 +175,7 @@ def awaken(role, mid, req, rules):
     materials = [f.lookup(role, 'attachments', i) for i in ids]
     required = sorted(int(x.split('|')[1]) for x in list(row.values())[2].split('/'))
     f.require(sorted(x['type_id'] for x in materials) == required, '觉醒法术种类不符')
-    f.require(all(x['attach_type'] == 6 and not x.get('protogenic') and not x.get('equip_order') and not x.get('owner_id') and not x.get('is_lock') for x in materials), '觉醒材料不可使用')
+    f.require(all(x['attach_type'] == 6 and not x.get('protogenic') and not x.get('equip_order') and not x.get('owner_id') and not x.get('is_lock') and not x.get('upgrade_level') for x in materials), '觉醒材料不可使用')
     item['awaken_materials'] = materials
     role['attachments'] = [x for x in role['attachments'] if x['id'] not in ids]
     item['awaken'] = kind

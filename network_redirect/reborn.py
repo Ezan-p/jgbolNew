@@ -36,6 +36,7 @@ def load_rules(path=ROOT / 'server_config/reborn_rules.json'):
         f.require(type(r[k]) is int and (0 if k == 'buy_limit' else 1) <= r[k] <= 10000, '占星配置无效')
     f.require(type(r['equip_realm']) is int and 0 <= r['equip_realm'] <= 4, '装备境界配置无效')
     f.require(r['divination_min_level'] in f.LEVELS and 0 <= r['divination_advance_percent'] <= 100, '占星门槛配置无效')
+    f.require(r.get('equip_initial_cast_level') == 1, '封神初始铸造等级配置无效')
     return r
 
 
@@ -63,7 +64,7 @@ def prepare(role, rules):
         c.setdefault('reborn_plus_type', int(CORTS.get(c['type'], {}).get('plus_type', 1)))
     for item in role['attachments']:
         if item.get('reborn_bit') and item['type_id'] in f.ITEMS and int(f.ITEMS[item['type_id']]['main_type']) in EQUIP:
-            item['cast_level'] = max(1, item.get('cast_level', 0))
+            item['cast_level'] = max(rules['equip_initial_cast_level'], item.get('cast_level', 0))
     i = min(role['reborn_layer'], 3)
     need = rules['realms'][i]['required_layer']
     role['maxlayer_reborn_count'] = sum(c.get('reborn_layer', 0) >= need for c in role['corteges']) if need else 0
@@ -93,6 +94,7 @@ def settle(role, req, rules, parse):
     op, kind = req['id'], req['reborn_type']
     f.require((kind, op) in {(1, 4), (2, 1), (2, 2), (2, 3), (3, 5), (3, 6)}, '转生操作无效')
     d = parse(req['data'])
+    f.require(isinstance(d, dict), '转生数据须为参数表')
     if kind == 1:
         layer = role.get('reborn_layer', 0)
         f.require(layer < 4, '主角境界已满')
@@ -152,13 +154,14 @@ def settle(role, req, rules, parse):
             f.require(role.get('reborn_layer', 0) >= rules['equip_realm'], '主角境界不足')
             f.require(item.get('advance_level', 0) == 10 and not item.get('reborn_bit', 0), '装备需满阶且未转生')
             consume(role, list(EQUIP[main].values())[1])
-            item.update(reborn_bit=1, cast_level=1)
+            item.update(reborn_bit=1, cast_level=rules['equip_initial_cast_level'])
         else:
             f.require(item.get('reborn_bit', 0) > 0, '装备须先转生')
             nxt = item.get('cast_level', 0) + 1
             f.require((main, nxt) in CAST, '装备铸造已满级')
             consume(role, list(CAST[main, nxt].values())[2])
             item['cast_level'] = nxt
+        item['effect_value'] = f.equip_effect(item)
     prepare(role, rules)
     return [summon.event(172, dict(flag=op))]
 
@@ -185,19 +188,20 @@ def bonuses(role, c, values, equipped):
         main = int(f.ITEMS.get(item['type_id'], {}).get('main_type', 0))
         if main not in EQUIP or not item.get('reborn_bit'):
             continue
-        for stat, value in stat_pairs(EQUIP[main]['plus_value']):
-            values[STAT[int(stat)]] *= 1 + value / 100
+        # Individual equipment effects belong to its base, not the companion.
         level = item.get('cast_level', 0)
         if (main, level) in CAST:
             casts.append(level)
-            for stat, value in stat_pairs(list(CAST[main, level].values())[3]):
-                s = STAT[(int(stat) - 1) % 4 + 1]
-                values[s] = values[s] * (1 + value / 100) if stat <= 4 else values[s] + value
     types = {x['type_id'] for x in equipped if x.get('reborn_bit')}
     for row in FATES:
         if set(map(int, row['equip_list'].split('|'))) <= types:
             for stat, value in stat_pairs(row['effect_list']):
                 values[STAT[int(stat)]] *= 1 + value / 100
-    if len(casts) == 3:
-        for stat, value in stat_pairs(CHAIN[min(casts)]):
+    # charPositionUI:2020-2050 selects the six-star chain instead of cast chain.
+    six_star = {int(f.ITEMS[i['type_id']]['main_type']) for i in equipped
+                if i.get('attach_type') == 5 and i['type_id'] in f.ITEMS
+                and int(f.ITEMS[i['type_id']]['main_type']) in (1, 2, 3) and i.get('star_level') == 1}
+    chain = 5 if six_star == {1, 2, 3} else min(casts) if len(casts) == 3 else 0
+    if chain:
+        for stat, value in stat_pairs(CHAIN[chain]):
             values[STAT[int(stat) - 4]] += value

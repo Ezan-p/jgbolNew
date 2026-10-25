@@ -75,9 +75,11 @@ class ActivityTests(ActivityCase):
         r=self.b.profile();self.assertEqual(r['rule_index'],56);self.assertEqual(r['corteges'][0]['hp'],hp+20)
         self.assertEqual(self.req(1026,fight_type=4,des_type=1)[0][0],55)
     def test_rank_fight_claim_and_exchange_original_csv(self):
-        self.ok(self.req(1021,flag=0));self.ok(self.req(1026,fight_type=2,des_type=2,des_value=99,des_id=10099))
+        self.ok(self.req(1021,flag=0));self.ok(self.req(1026,fight_type=2,des_type=2,des_value=99,des_id=930099))
         r=self.b.profile();self.assertEqual(r['activity']['rank_order'],99)
-        self.ok(self.req(1201,flag=2));self.assertEqual(self.req(1201,flag=2)[0][0],55)
+        self.assertEqual(self.req(1201,flag=2)[0][0],55)
+        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+            self.ok(self.req(1201,flag=2));self.assertEqual(self.req(1201,flag=2)[0][0],55)
         self.ok(self.req(1203,exchange_type=7));before=self.b.profile()
         self.assertEqual(self.req(1203,exchange_type=7)[0][0],55);self.assertEqual(before,self.b.profile())
     def test_rank_rejects_forged_target_and_insufficient_energy(self):
@@ -157,8 +159,8 @@ class ActivityTests(ActivityCase):
     def test_query_lineup_and_rank_challenge_relation(self):
         self.ok(self.req(1021,flag=0))
         ranks=next(d for m,_,d in self.decoded if m==1022)
-        self.assertTrue(all(x['top_relation']==2 for x in ranks['show_list']))
-        out=self.req(1039,des_type=2,des_id=10099);self.ok(out)
+        self.assertEqual(sum(x['top_relation']==2 for x in ranks['show_list']),5)
+        out=self.req(1039,des_type=2,des_id=930099);self.ok(out)
         self.assertIn('owner_cheer_info',out[-1][1]);self.assertIn('type_id',out[-1][1]['cortege_list'][1])
     def test_babel_movement_rewards_persist_and_teleport_validation(self):
         self.ok(self.req(1353,id=1,data='{}'))
@@ -457,12 +459,12 @@ class LandTests(ActivityCase):
         self.ok(self.land(3));self.assertEqual(before,self.b.profile())
         self.assertEqual(self.land(4,flag=1,des_type=1,des_id=999)[0][0],55);self.assertEqual(before,self.b.profile())
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
-        out=self.land(4,flag=1,des_type=1,des_id=1);self.ok(out)
+        out=self.land(4,flag=1,des_type=1,des_id=942001);self.ok(out)
         d=out[-1][1];self.assertTrue(d['is_win']);self.assertEqual(d['soul_count'],100)
         replay=d['final_result_list'][1];self.assertEqual(replay['fight_result_msg']['fight_type'],21)
         for row in replay['line_up_msg']['lineup'].values():
             for key in ('src_hp','src_max_hp','des_hp','des_max_hp'):self.assertIn(key,row)
-        self.assertEqual(self.land(4,flag=1,des_type=1,des_id=1)[0][0],55)
+        self.assertEqual(self.land(4,flag=1,des_type=1,des_id=942001)[0][0],55)
         s=self.b.profile()['activity']['land'];self.assertEqual(s['soul_count'],100);self.assertEqual(s['travel_count'],1)
     def test_charm_unlock_equip_unequip_and_atomic_compose(self):
         self.ok(self.land(1));r=self.b.profile();s=r['activity']['land'];s['soul_count']=10000;s['bag']={'1':{'5':4}};self.b.save(r)
@@ -497,7 +499,8 @@ class LandTests(ActivityCase):
     def test_tower_capture_ticks_no_double_and_leave(self):
         when=NOW+8*3600
         with patch('network_redirect.backend.time.time',return_value=when):
-            self.ok(self.land(1));self.ok(self.land(11,tower_id=11));self.ok(self.land(4,flag=1,des_type=2,des_id=11))
+            self.ok(self.land(1));self.ok(self.req(1303,id=1,op_type=1,data='{}'))
+            self.ok(self.land(11,tower_id=11));self.ok(self.land(4,flag=1,des_type=2,des_id=11))
             self.assertEqual(self.b.profile()['activity']['land']['tower_id'],11)
         with patch('network_redirect.backend.time.time',return_value=when+600):
             self.ok(self.land(1));self.assertEqual(self.b.profile()['activity']['land']['soul_count'],100)
