@@ -12,8 +12,8 @@ from .protocol import encode
 ROOT = Path(__file__).resolve().parents[1]
 require = formation.require
 ENUMS = json.loads((ROOT/'analysis/evidence/activity_enums.json').read_text())
-HANDLED = {1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1303, 1329, 1333, 1348, 1349, 1353}
-FIGHTS = {2, 3, 4, 5, 6, 10, 11}
+HANDLED = {1060, 1330, 1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1303, 1329, 1333, 1348, 1349, 1353}
+FIGHTS = {2, 3, 4, 5, 6, 10, 11, 12}
 PRAY = {int(r['pray_times']): int(r['spirit_coins']) for r in summon.rows('pray_spirit_config.csv')}
 QUALITY = {int(r['cortege_quality']): r for r in summon.rows('cortege_quality.csv')}
 EXCHANGE = {int(r['index']):r for r in summon.rows('top_score_exchange.csv')}
@@ -249,14 +249,8 @@ def rank_score(order,column):
 
 
 def rape_board(role,now,r,update=1):
-    s=role['activity']
-    if s['rape_boards'] is None:
-        s['rape_boards']=[dict(skill_type=tid,skill_count=1,form_list={'2':{str(i*10+j):dict(
-            show_type=r['battle_npc'],level=r['battle_level'],name='本地渡劫守卫',has_win=False,top_order=0,cortege_layer=0)
-            for j in range(1,4)}}) for i,tid in enumerate(r['rape_skills'],1)]
-    boards=copy.deepcopy(s['rape_boards'])
-    for b in boards:b['form_list']={int(t):{int(i):v for i,v in rows.items()} for t,rows in b['form_list'].items()}
-    return dict(time=now,update_type=update,used_count=s['rape_refreshes'],free_count=role['rape_flush_limit'],gold_cost=r['rape_refresh_gold'],rape_list=boards)
+    from . import activity_rape
+    return activity_rape.board(role,now,r,update)
 
 
 def duty_data(role,r,result=2):
@@ -313,6 +307,11 @@ def trial_query(role,req,now,r):
 
 def query_lineup(role,req,r):
     s=role['activity'];ident=req['des_id']
+    from . import activity_rape
+    packet=activity_rape.inspection(role,ident)
+    if packet is not None:
+        require(req['des_type'] in (1,2),'渡劫阵容类型无效')
+        return [packet]
     from . import activity_rank, activity_land_npc
     if 940000<=ident<943000:
         require(req['des_type']==1,'逐鹿阵容目标类型无效')
@@ -347,17 +346,15 @@ def query_lineup(role,req,r):
 
 def battle(role,req,now,r,jrules,frules):
     ft=req['fight_type'];s=role['activity'];target=None
+    if ft in (3,12):
+        from . import activity_rape
+        return activity_rape.battle(role,req,now,r,jrules)
     if ft==2:
         from . import activity_rank
         return activity_rank.battle(role,req,now,r,jrules)
     require(role['level']>={2:6,3:8,4:5,5:12,6:13,10:16,11:1}[ft],'等级不足')
     if ft==4:
         require(role['rule_index']<role['level']-4,'修炼次数已用完')
-    elif ft==3:
-        rape_board(role,now,r);idx=req['des_value']
-        require(1<=idx<=3,'渡劫阵位无效')
-        target=s['rape_boards'][idx-1]['form_list'].get(str(req['des_type']),{}).get(str(int(req['des_id'])))
-        require(target is not None and not target['has_win'],'对手不存在或已击败');spend(role,'energy',1)
     elif ft==5:
         d=s.get('duty');require(d is not None and req['des_value']==d['round'] and req['des_type'] in (1,2,3),'请先开始天命之战')
         require(d['round']<=r['duty_round_limit'],'已完成本轮天命之战')
@@ -405,13 +402,6 @@ def battle(role,req,now,r,jrules,frules):
         role['rule_index']+=1
         for key,field,attr in [('hp','max_hp_plus',75),('gongji','gongji_plus',77),('fangyu','fangyu_plus',78),('magic','max_magic_plus',76)]:
             role[field]+=r['train_increase'][key];events.append(summon.event(5,dict(addition_field=attr,addition_value=r['train_increase'][key])))
-    elif ft==3:
-        if win:target['has_win']=True
-        idx=req['des_value'];b=s['rape_boards'][idx-1];passed=all(v['has_win'] for rows in b['form_list'].values() for v in rows.values())
-        if passed and win:journey.grant(role,(6,b['skill_type'],1,1))
-        events.append(summon.event(41,dict(fight_result=result,form_index=idx,pass_one_form=passed,
-            pass_all_form=all(all(v['has_win'] for rows in b['form_list'].values() for v in rows.values()) for b in s['rape_boards']),
-            skill_count=1 if passed and win else 0,skill_type=b['skill_type'])))
     elif ft==5:
         d=s['duty']
         if win:
@@ -453,6 +443,12 @@ def battle(role,req,now,r,jrules,frules):
 
 def settle(role,mid,req,now,r,jrules,frules,parse):
     s=prepare(role,now,r)
+    if mid in (1029,1041,1060,1072) or mid==1026 and req['fight_type'] in (3,12):
+        from . import activity_rape
+        return activity_rape.settle(role,mid,req,now,r,jrules,parse)
+    if mid == 1330:
+        from . import pets
+        return pets.settle(role,req,now,r,parse)
     if mid in (1021,1203,1244) or mid==1026 and req['fight_type']==2 or mid==1201 and req['flag']==2 or mid==1051 and req['item_type']==1021:
         from . import activity_rank
         return activity_rank.settle(role,mid,req,now,r,jrules)
@@ -496,41 +492,6 @@ def settle(role,mid,req,now,r,jrules,frules,parse):
     if mid==1039:return query_lineup(role,req,r)
     if mid==1064:return trial_query(role,req,now,r)
     if mid==1026:return battle(role,req,now,r,jrules,frules)
-    if mid==1072:
-        require(role['level']>=25 or role.get('vip_level',0)>=5,'渡劫扫荡需25级或VIP5')
-        rape_board(role,now,r)
-        pending=[(i,t,int(ident),j) for i,b in enumerate(s['rape_boards'],1) for t,rows in b['form_list'].items()
-                 for j,(ident,v) in enumerate(rows.items(),1) if not v['has_win']]
-        require(pending and role['energy']>0,'没有可扫荡的对手或精力不足')
-        pending=pending[:role['energy']]
-        spend(role,'gold_coin',0 if role.get('vip_level',0)>=5 else len(pending))
-        results=[]
-        from .protocol import decode
-        for idx,t,ident,j in pending:
-            output=battle(role,dict(fight_type=3,des_value=idx,des_type=int(t),des_id=ident),now,r,jrules,frules)
-            for packet in output:
-                m,_,data=decode(packet)
-                if m==2998 and data['id']==41:
-                    result=parse(data['data']);result['index']=j;results.append(result)
-        data={i:v for i,v in enumerate(results,1)}
-        data['pass_all_form']=all(all(v['has_win'] for rows in b['form_list'].values() for v in rows.values()) for b in s['rape_boards'])
-        return [summon.event(114,data)]
-    if mid==1029:
-        require(role['level']>=8 and req['flag'] in (1,2,3),'渡劫请求无效')
-        if req['flag']!=1:
-            if req['flag']==2:require(s['rape_refreshes']<role['rape_flush_limit'],'免费刷新次数已用完')
-            else:spend(role,'gold_coin',r['rape_refresh_gold'])
-            s['rape_refreshes']+=1;s['rape_boards']=None
-        return [summon.event(40,rape_board(role,now,r,req['flag']))]
-    if mid==1041:
-        require(role['level']>=8,'渡劫需8级');rape_board(role,now,r)
-        idx=req['form_index'];require(1<=idx<=3,'阵位无效')
-        rows=s['rape_boards'][idx-1]['form_list'].get(str(req['object_type']),{})
-        old=rows.get(str(int(req['object_id'])));require(old is not None and not old['has_win'],'不可刷新该对手')
-        spend(role,'gold_coin',r['rape_single_refresh_gold']);new=copy.deepcopy(old)
-        nid=max(map(int,rows))+1;del rows[str(int(req['object_id']))];rows[str(nid)]=new
-        return [summon.event(40,dict(update_type=5,form_index=idx,old_type=req['object_type'],old_id=req['object_id'],
-            new_type=req['object_type'],new_id=nid,new_show_type=new['show_type'],new_top_order=0,new_level=new['level'],new_name=new['name'],cortege_layer=0))]
     if mid==1043:
         require(role['level']>=12,'天命之战需12级');op=req['plus_type']
         if op==0:

@@ -1,0 +1,38 @@
+{
+  "client": "3.87",
+  "official_server_available": false,
+  "inputs": [
+    {
+      "logical": "lua/ui/crossDoomUI.lua",
+      "sha256": "e09aebc6e1e61432e105b4d27ec8b434b6695c033acb3df9a398ae5e0785190f"
+    },
+    {
+      "logical": "lua/ui/messageUI.lua",
+      "sha256": "5e845d4a605455405d24582aecd98437f4ebe9d58f98a27f010669d2399c13be"
+    },
+    {
+      "logical": "v2/crossDoom/info1.png",
+      "sha256": "c1c0800926f2a5be2255888b5a0c3f6d389f50a04fe4fae112d039073a5c5b94"
+    },
+    {
+      "logical": "v2/crossDoom/info2.png",
+      "sha256": "842cd02b4130d7e904234e4ea6edfd81cd5c617b2b27002cc063062cf4d38440"
+    }
+  ],
+  "verified": [
+    "original info1/info2 images describe victory skills plus extra rewards for clearing a column",
+    "form_list[1] and form_list[2] are both traversed",
+    "descending rand determines guard display order",
+    "form_type drives dice; ordered consecutive values are straight; equal values are triple",
+    "request 1060 carries request_id; fight 12 uses request_id as des_id and skill_type as des_value",
+    "events 40/41/77/78/84/114 are native callbacks"
+  ],
+  "inferred": [
+    "three guards per form",
+    "55/70/85 percent power matching",
+    "uniform six-sided dice",
+    "straight doubles skills; triple auto clears",
+    "quality-weighted skill drops",
+    "one optional revenge per day after loss; expires after 24 hours"
+  ]
+}

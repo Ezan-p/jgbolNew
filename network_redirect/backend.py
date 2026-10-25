@@ -11,6 +11,7 @@ import struct
 import time
 
 from .protocol import encode, decode
+from . import role_profile
 from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily, guild, vip, xianling, welfare, cheer, monument, equipment
 
 
@@ -47,6 +48,9 @@ def login_fields(text):
 class Backend:
     def __init__(self, directory, port, emit, account="local-player"):
         self.account = account
+        self.profile_rules = role_profile.load_rules()
+        self.profile_replies = {}
+        self.last_profile_serial = 0
         self.monument_rules = monument.load_rules()
         self.monument_replies = {}
         self.last_monument_serial = 0
@@ -120,6 +124,7 @@ class Backend:
             if 'attachments' not in role:
                 role['attachments'] = []
                 changed = True
+            role_profile.prepare(role, self.profile_rules)
             cheer.prepare(role, self.cheer_rules)
             changed = formation.prepare(role, self.formation_rules) or changed
             changed = immortal.prepare(role, self.immortal_rules) or changed
@@ -143,6 +148,7 @@ class Backend:
 
     def save(self, role, account=None):
         account = self.account if account is None else account
+        role_profile.prepare(role, self.profile_rules)
         cheer.prepare(role, self.cheer_rules)
         vip.prepare(role, self.vip_rules)
         reborn.prepare(role, self.reborn_rules)
@@ -428,6 +434,8 @@ class Backend:
             state['authenticated'] = True
             self.server_serial = 200000
             self.reply_history.clear()
+            self.profile_replies.clear()
+            self.last_profile_serial = 0
             self.reborn_replies.clear()
             self.last_reborn_serial = 0
             self.monument_replies.clear()
@@ -493,6 +501,8 @@ class Backend:
                 return [packet for serial, packet in self.reply_history if serial > last]
             self.emit('game_replay_unavailable', message_id=mid, message='请求不在当前响应缓存范围内')
             return []
+        if mid in role_profile.HANDLED:
+            return self.role_profiles(packet, mid, data)
         if monument.handles(mid, data):
             return self.monuments(packet, mid, data)
         if welfare.handles(mid, data):
@@ -533,6 +543,42 @@ class Backend:
         if data and data.get('serial_num'):
             return self.complete(data['serial_num'], [summon.event(55, {'op_string': '该功能尚未接入本地服务端（%d）' % mid})])
         return []
+
+    def role_profiles(self, packet, mid, data):
+        serial = data['serial_num']
+        cached = self.profile_replies.get(serial)
+        if cached and cached[0] == packet:
+            return cached[1]
+        if not serial or serial <= self.last_profile_serial:
+            return self.complete(serial, [summon.event(55, {'op_string': '角色资料请求已过期，请刷新后重试'})])
+        try:
+            role = self.profile()
+            before = copy.deepcopy(role)
+            # Acquire the write lock before checking names to prevent cross-account races.
+            self.db.execute('BEGIN IMMEDIATE')
+            records = [(account, json.loads(raw)) for account, raw in self.db.execute('SELECT account,data FROM roles')]
+            names = [r['role_name'] for account, r in records if account != self.account]
+            target = None
+            if mid == 1078 and data['flag'] == 2:
+                target = next((r for account, r in records if r['role_id'] == data['des_id']), None)
+                if target is not None:
+                    role_profile.prepare(target, self.profile_rules)
+            events = role_profile.settle(role, mid, data, int(time.time()), self.profile_rules, names, target)
+            formation.recalculate(role, self.formation_rules)
+            replies = self.item_deltas(before, role) + [role_profile.attributes(role)]
+            replies += self.panel_attributes(role) + self.power_attributes(role) + events
+            self.save(role)
+            self.emit('game_profile_ok', message_id=mid, rules_revision=self.profile_rules['revision'])
+        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
+            self.db.rollback()
+            replies = [summon.event(55, {'op_string': str(error) if isinstance(error, formation.Rejected) else '角色资料数据无效，请刷新后重试'})]
+            self.emit('game_profile_rejected', message_id=mid, message=str(error))
+        replies = self.complete(serial, replies)
+        self.last_profile_serial = serial
+        self.profile_replies[serial] = (packet, replies)
+        if len(self.profile_replies) > 256:
+            del self.profile_replies[next(iter(self.profile_replies))]
+        return replies
 
     def monuments(self, packet, mid, data):
         serial = data['serial_num']

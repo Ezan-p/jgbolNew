@@ -72,7 +72,10 @@ def settle(role,s,g,op,d,now,r):
         else:u.pay(role,'gold_coin',r['catch_gold'])
         f['tries']-=1
         tid=f['type_id'];caught=offline.roll(s,100)<min(100,r['catch_success_percent']+(r['catch_item_bonus'] if has_item else 0))
-        if caught:offline.add_pet(a,tid,s,r)
+        if caught:
+            captured=offline.add_pet(a,tid,s,r)
+            from .journey import grant
+            grant(role,[15,tid,1,captured['quality']])
         flag=1 if caught else 3 if f['tries']==0 else 2
         left=f['tries']
         if caught or not left:a['field']=None

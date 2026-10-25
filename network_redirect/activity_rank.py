@@ -247,7 +247,8 @@ def settle(role, mid, req, now, arules, jrules):
             result=v['fight_result_msg']['final_result']
             label=('守' if v['defence'] else '攻')+('胜' if 1<=result<=3 else '败' if result>=4 else '平')+'·'+v['name'].removeprefix('离线·')
             meta.append(dict(label=label,power=v.get('target_power',0)))
-        return [summon.event(80,dict(local_rank_records=meta))]+record_packets(dict(records=s['rank_records']))
+        return [summon.event(80,dict(local_rank_records=meta)),record_packets(dict(records=s['rank_records']))[0],
+                summon.event(80,dict(local_rank_show_records=True))]
     if mid == 1051:
         n = req['item_count'] or 1
         require(1 <= n <= 100 and req['des_type'] in (0,1) and req['des_id'] in (0,role['role_id']), '封神令牌使用参数无效')

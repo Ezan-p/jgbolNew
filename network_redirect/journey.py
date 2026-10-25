@@ -189,7 +189,12 @@ def fighters(role, cfg):
 
 def battle(role, cfg, rules, *, units=None, slots=8):
     """[B] Server turn simulation; no client-supplied victory or damage trusted."""
-    return combat_engine.Battle(role, units if units is not None else fighters(role, cfg), rules, slots).run()
+    from . import role_profile
+    prepared, talent = role_profile.talent_units(role, units if units is not None else fighters(role, cfg),
+                                                 int(cfg.get('genius_prob') or 0))
+    result, lineup, actions = combat_engine.Battle(role, prepared, rules, slots).run()
+    actions.talent = talent
+    return result, lineup, actions
 
 
 def grant(role, spec):
@@ -224,13 +229,9 @@ def grant(role, spec):
         require(tid in activity_home_pets.BASE and level in (1, 2, 3, 4), '未知灵兽或品质')
         role.setdefault('activity', {})
         home = activity_home.state(role, int(time.time()), activity.load_rules())
-        row = activity_home_pets.BASE[tid]
+        from . import pets
         for _ in range(count):
-            identity = max((p['id'] for p in home['pets']), default=0) + 1
-            home['pets'].append(dict(id=identity, type_id=tid, main_type=int(row['main_type']),
-                quality=level, level=1, order=0, cur_exp=0, star_level=0,
-                train_levels=[0]*4,
-                grow_values=[int(row['base_'+k]) for k in activity_home_pets.ATTR]))
+            pets.add(home, tid, level)
     else:
         raise formation.Rejected('未知奖励类型：' + str(typ))
     return dict(object_type=typ, attach_type=tid, attach_count=count, attach_level=level)
@@ -409,4 +410,4 @@ def settle(role, mid, req, now, rules, formation_rules, activity_rules=None):
             encode(1027, dict(fight_id=fid, fight_type=ft, final_result=result, fight_round=len(actions), fight_result=actions)),
             summon.event(45, dict(fight_id=fid, obj_type=1, exp_plus=outcome['role_add_exp'])),
             summon.event(45, dict(fight_id=fid, obj_type=4, exp_list=outcome['exp_list']))] + prizes + [
-            summon.event(44, dict(fight_id=fid, fight_type=ft))]
+            summon.event(44, dict(fight_id=fid, fight_type=ft, **getattr(actions, 'talent', {})))]

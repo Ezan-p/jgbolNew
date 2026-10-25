@@ -85,13 +85,19 @@ class ActivityTests(ActivityCase):
     def test_rank_rejects_forged_target_and_insufficient_energy(self):
         before=self.b.profile();self.assertEqual(self.req(1026,fight_type=2,des_type=2,des_value=1,des_id=77)[0][0],55)
         self.assertEqual(before,self.b.profile())
-    def test_rape_fight_full_board_grants_skill_once(self):
+    @patch('network_redirect.activity_rape.roll_forms', return_value=[1,3,5])
+    @patch('network_redirect.activity_rape.journey.battle', return_value=(1,[],[]))
+    def test_rape_fight_full_board_grants_skill_once(self, *_):
         self.ok(self.req(1029,flag=1))
-        for ident in (11,12,13):self.ok(self.req(1026,fight_type=3,des_type=2,des_value=1,des_id=ident))
+        ids=list(map(int,self.b.profile()['activity']['rape_boards'][0]['form_list']['2']))
+        for ident in ids:self.ok(self.req(1026,fight_type=3,des_type=2,des_value=1,des_id=ident))
         r=self.b.profile();self.assertTrue(all(x['has_win'] for x in r['activity']['rape_boards'][0]['form_list']['2'].values()))
-        before=self.b.profile();self.assertEqual(self.req(1026,fight_type=3,des_type=2,des_value=1,des_id=13)[0][0],55);self.assertEqual(before,self.b.profile())
-    def test_rape_refresh_and_sweep(self):
-        self.ok(self.req(1029,flag=1));self.ok(self.req(1041,form_index=1,object_type=2,object_id=11))
+        before=self.b.profile();self.assertEqual(self.req(1026,fight_type=3,des_type=2,des_value=1,des_id=ids[-1])[0][0],55);self.assertEqual(before,self.b.profile())
+    @patch('network_redirect.activity_rape.roll_forms', return_value=[1,3,5])
+    def test_rape_refresh_and_sweep(self, *_):
+        self.ok(self.req(1029,flag=1))
+        ident=int(next(iter(self.b.profile()['activity']['rape_boards'][0]['form_list']['2'])))
+        self.ok(self.req(1041,form_index=1,object_type=2,object_id=ident))
         self.ok(self.req(1072));self.assertEqual(self.decoded[-2][2]['id'],114)
         for _ in range(self.b.activity_rules['rape_free_refreshes']):self.ok(self.req(1029,flag=2))
         self.assertEqual(self.req(1029,flag=2)[0][0],55)
@@ -221,7 +227,7 @@ class HomeAbyssTests(ActivityCase):
         self.assertNotIn('main_type',data['update_list'][1])
         self.ok(self.req(1348,id=21,data='{pet_id=1,des_type=202}'))
         changed=self.b.profile()['activity']['home']['pets'][0]
-        self.assertEqual(changed['type_id'],202);self.assertEqual(changed['grow_values'],[17,9,27,22])
+        self.assertEqual(changed['type_id'],202);self.assertEqual(changed['grow_values'],[v+d for v,d in zip(pet['grow_values'],[-9,-14,15,9])])
         before=self.b.profile();self.assertEqual(self.req(1348,id=21,data='{pet_id=1,des_type=202}')[0][0],55);self.assertEqual(before,self.b.profile())
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.ok(self.req(1348,id=21,data='{pet_id=1,des_type=201}'))

@@ -12,10 +12,13 @@ def initialize(s,r):
     s.setdefault('pets',[]);s.setdefault('pet_growth',{})
     # Missing acquisition service: a one-time starter when the spirit hall opens.
     if s['build']['5'] and not s.get('pet_starter_given'):
-        tid=r['home_starter_pet'];row=BASE[tid]
-        s['pets'].append(dict(id=1,type_id=tid,main_type=int(row['main_type']),quality=2,level=1,
-            order=1,cur_exp=0,star_level=0,train_levels=[0]*4,
-            grow_values=[int(row['base_'+k]) for k in ATTR]))
+        from . import pets
+        # Defer the gift at capacity so queries and consuming pets remain usable.
+        if len(s['pets']) >= pets.load_rules()['capacity']:
+            return
+        active=any(p['order'] for p in s['pets'])
+        pet=pets.add(s,r['home_starter_pet'],2)
+        pet['order']=0 if active else 1
         s['pet_starter_given']=True
 
 
@@ -26,6 +29,7 @@ def wire(pet):
     data=copy.deepcopy(pet)
     # addInfo exits early when main_type is present, leaving name/next_exp unset.
     data.pop('main_type',None)
+    data.setdefault('prob_compen',0)
     return data
 
 

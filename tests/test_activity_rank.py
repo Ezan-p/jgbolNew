@@ -55,7 +55,12 @@ class RankTests(ActivityCase):
         self.fight();before=self.b.profile()
         self.assertEqual(self.b.respond(self.packet,self.state),self.replies);self.assertEqual(before,self.b.profile())
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
-        self.assertEqual(before,self.b.profile());self.ok(self.req(1244,fight_type=2));self.assertEqual(before,self.b.profile())
+        self.assertEqual(before,self.b.profile());events=self.req(1244,fight_type=2);self.ok(events);self.assertEqual(before,self.b.profile())
+        self.assertIn(152,[e for e,d in events]);self.assertNotIn(44,[e for e,d in events])
+        meta=next(d['local_rank_records'] for e,d in events if e==80 and 'local_rank_records' in d)
+        self.assertEqual(meta[1]['label'],'攻胜·99·固守')
+        self.assertEqual(meta[1]['power'],rank.catalog()[930099]['role']['role_combat_power'])
+        self.assertTrue(any(e==80 and d.get('local_rank_show_records') for e,d in events))
 
     def test_loss_no_prize_or_promotion(self):
         r=self.b.profile();r['activity']['rank_order']=2;r['activity']['rank_slots']={};self.b.save(r)

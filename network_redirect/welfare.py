@@ -147,7 +147,7 @@ def hint(role,now,r):
 
 def query(role,now,r):
     c=catalog(role,now,r)
-    return summon.event(127,dict(flag=1,order_list=r['order'],all_activity=c))
+    return summon.event(127,dict(flag=1,animal_open=True,order_list=r['order'],all_activity=c))
 
 
 def settle(role,mid,req,now,r,parse):

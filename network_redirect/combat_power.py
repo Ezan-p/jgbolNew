@@ -17,7 +17,6 @@ DEFAULT_POLICY = dict(title=True, pet=True, cheer=True, explicit_channels=True)
 TITLES = {int(r['title_id']): r for r in summon.rows('title_config.csv')}
 PETS = {int(r['type_id']): {k.split('(')[0]: v for k, v in r.items()}
         for r in summon.rows('animal_base.csv')}
-PET_TRAIN = {int(r['star_level']): r for r in summon.rows('animal_train_config.csv')}
 CHEER = {(int(r['cheer_order']), int(r['level'])): r for r in summon.rows('cortege_cheer_config.csv')}
 HOME_TRAIN = {(int(r['train_type']), int(r['level'])): r
               for r in summon.rows('hole/hole_train_config.csv')}
@@ -99,7 +98,7 @@ def add_title(role, values, now):
     end = role.get('title_endtime', 0)
     if (end and now >= end) or (int(row['category(1permanent|2tmp)']) == 2 and not end):
         return
-    for stat in row['plus_list'].split('|'):
+    for stat in filter(None, row['plus_list'].split('|')):
         if int(stat) in ATTR:
             values[ATTR[int(stat)]] += Decimal(row['plus_value'])
 
@@ -111,29 +110,35 @@ def add_pet(role, c, values):
     pet = next((p for p in pets if p.get('order') == 1), None)
     if not pet or pet['type_id'] not in PETS:
         return
+    from . import pets as rules
     row = PETS[pet['type_id']]
-    train = PET_TRAIN.get(pet.get('star_level', 0), {})
+    main = int(row['main_type'])
+    control = rules.CONTROL[main, pet.get('quality', 1)]
+    star = pet.get('star_level', 0)
+    train = rules.STAR[star]
     growth = pet.get('grow_values', [int(row['base_' + ATTR[n]]) for n in range(1, 5)])
-    if len(growth) != 4:
-        raise ValueError('灵兽成长属性必须有四项')
-    attrs = {n: Decimal(str(growth[n - 1])) for n in range(1, 5)}
-    for pair in train.get('star_plus(plus_type|plus_value/..)', '0|0').split('/'):
-        stat, value = pair.split('|')
-        if int(stat) in attrs:
-            attrs[int(stat)] += Decimal(value)
     stages = pet.get('train_levels', [0] * 4)
-    if len(stages) != 4:
-        raise ValueError('灵兽培养阶段必须有四项')
-    for n in attrs:
-        attrs[n] *= 1 + Decimal(train.get('each_stage_plus(percent)', '0')) * stages[n - 1] / 100
-    for entry in row['plus_order'].split('/'):
+    if len(growth) != 4 or len(stages) != 4:
+        raise ValueError('灵兽成长与培养属性必须有四项')
+    rates = rules.load_rules()['plus_rate_list']
+    attrs = {n: Decimal(str(growth[n-1])) * pet.get('level', 1) * Decimal(str(rates[n-1])) for n in range(1, 5)}
+    stars = dict(tuple(map(int, pair.split('|'))) for pair in train['star_plus'].split('/'))
+    previous = sum(Decimal(rules.STAR[n]['each_stage_plus'])*4 for n in range(star))
+    # Original plus_order is a list of formation-position/attribute pairs.
+    for direction, entry in enumerate(row['plus_order'].split('/'), 1):
+        if direction > int(control['max_open_pos']):
+            break
         pos, stat = map(int, entry.split('|'))
-        if pos == c['order'] and stat in attrs:
-            values[ATTR[stat]] += attrs[stat]
-    for entry in row['special_property'].split('/'):
-        pos, src, dst, rate = entry.split('|')
-        if int(pos) == c['order'] and int(src) in attrs and int(dst) in attrs:
-            values[ATTR[int(dst)]] += attrs[int(src)] * Decimal(rate) / 100
+        if pos != c['order']:
+            continue
+        value = attrs[stat]
+        if control['open_special'] == 'Y':
+            for special in row['special_property'].split('/'):
+                target, source, _, divisor = map(int, special.split('|'))
+                if target == pos and source in attrs and divisor:
+                    value += attrs[source] / divisor
+        rate = previous + Decimal(train['each_stage_plus']) * stages[direction-1]
+        values[ATTR[stat]] += floor(value * (1 + rate/100) + stars.get(direction, 0))
 
 
 def add_cheer(role, c, values, pending):

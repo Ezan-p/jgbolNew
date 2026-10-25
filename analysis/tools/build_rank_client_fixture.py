@@ -12,10 +12,18 @@ ROOT=Path(__file__).resolve().parents[2]
 NOW=1792933200
 lines=['''local ms=assert(package.loaded.ms)
 assert(not rank_fixture_restore and not land_fixture_restore,'another fixture is active; restore it before rank testing')
-local saved={player=ms.d_mainUI.g_playerInfo,send=ms.d_u.main_server_send_msg,report=ms.MS_report_error,config=ms.d_data.g_new_config,time=ms.d_time.getTime}
+local saved={player=ms.d_mainUI.g_playerInfo,send=ms.d_u.main_server_send_msg,report=ms.MS_report_error,config=ms.d_data.g_new_config,time=ms.d_time.getTime,dispatch=ms.d_event_mgr.g_msg_fun,rankInstalled=ms.d_rankUI._localRankRestore~=nil}
+if saved.rankInstalled then ms.d_rankUI._localRankRestore() end
 ms.d_mainUI.g_playerInfo=ms.d_c.table_copy(saved.player)
 ms.d_data.g_new_config=ms.d_c.table_copy(saved.config)
-ms.d_u.main_server_send_msg=function(...) end
+ms.d_u.main_server_send_msg=function(mid,...)
+ if mid==2999 then return saved.send(mid,...) end
+end
+-- Keep heartbeat transport, but isolate real-account attribute/UI pushes.
+local dispatch={}
+for mid,fn in pairs(saved.dispatch) do dispatch[mid]=mid==2999 and fn or function() end end
+ms.d_event_mgr.g_msg_fun=dispatch
+ms.d_fightrecordUI.g_self.main_layer=nil
 rank_fixture_errors='';rank_fixture_results={}
 ms.MS_report_error=function(e) rank_fixture_errors=rank_fixture_errors..'\\n'..tostring(e) end
 local cases={};local index=0
@@ -31,7 +39,10 @@ function rank_fixture_restore()
  if ms.d_rankUI._localRankRestore then ms.d_rankUI._localRankRestore() end
  ms.d_mainUI.g_playerInfo=saved.player;ms.d_data.g_new_config=saved.config
  ms.d_u.main_server_send_msg=saved.send;ms.MS_report_error=saved.report;ms.d_time.getTime=saved.time
+ ms.d_event_mgr.g_msg_fun=saved.dispatch
  rank_fixture_restore=nil
+ if saved.rankInstalled then rank_fixture_reinstall() end
+ rank_fixture_reinstall=nil
  ms.d_mainUI.show()
  return 'rank fixture restored'
 end
@@ -44,7 +55,7 @@ function rank_fixture_next()
  return cases[index].name..': '..rank_fixture_errors
 end
 ''']
-lines.append((ROOT/'network_redirect/rank_client.lua').read_text())
+lines.append('local function installRankPatch()\n'+(ROOT/'network_redirect/rank_client.lua').read_text()+'\nend\ninstallRankPatch()\nrank_fixture_reinstall=installRankPatch')
 lines.append((ROOT/'network_redirect/monument_client.lua').read_text())
 with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time',return_value=NOW):
  b=Backend(Path(tmp),18770,lambda *a,**k:None);r=b.profile();r.update(level=60,energy=100,gold_coin=10000,silver_coin=10000)
