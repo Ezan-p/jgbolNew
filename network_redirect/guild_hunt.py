@@ -1,7 +1,7 @@
 """Guild beast quests and wilderness: persistent inferred local progression."""
 from . import guild as u,daily,journey
 from .guild_instances import state
-from .guild_combat import simulate
+from .guild_combat import simulate, record_events
 from . import guild_offline as offline
 
 
@@ -42,6 +42,7 @@ def settle(role,s,g,op,d,now,r):
         won=True;out=[]
         if typ==2:
             result,packets,replay=simulate(role,s,r,journey.load_rules(),28,'仙盟任务守卫');won=1<=result<=3
+            out.extend(record_events([replay]))
             out.append(u.reply(85,dict(result=1,fight_result_list=[replay],free_times=1,fight_count=1,task_index=idx)))
         prizes=[]
         if won:

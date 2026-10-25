@@ -167,52 +167,8 @@ def prepare(role, rules):
 
 
 def recalculate(role, rules):
-    """[B] Server formula using [A] base/growth/equipment/fate coefficients."""
-    from . import reborn, reborn_stars
-    active_types = {c['type'] for c in role['corteges'] if c.get('order', 0) or c.get('cheer_order', 0)}
-    for c in role['corteges']:
-        base = BASES.get(c['type'])
-        if not base:
-            continue
-        values = {s: Decimal(base[b]) + Decimal(base[g]) * (c['level'] - 1) + c.get(s + '_plus', 0)
-                  for s, b, g in zip(STATS, BASE_COLUMNS, GROWTH_COLUMNS)}
-        equipped = [i for i in role['attachments'] if c.get('order', 0) and i.get('equip_order') == c['order']]
-        extra_rates = {s: Decimal(0) for s in STATS}
-        for item in equipped:
-            if item['attach_type'] == 5 and item['type_id'] in ITEMS and int(ITEMS[item['type_id']]['main_type']) in (1, 2, 3):
-                item['effect_value'] = equip_effect(item)
-                values[{1: 'gongji', 2: 'fangyu', 3: 'hp'}[int(ITEMS[item['type_id']]['main_type'])]] += item['effect_value']
-                extra_rates[{1: 'gongji', 2: 'fangyu', 3: 'hp'}[int(ITEMS[item['type_id']]['main_type'])]] += advance_worth(item)[2]
-            elif item['attach_type'] == 6 and item['type_id'] in SKILLS:
-                item['effect_value'] = skill_effect(item)
-                cfg = SKILLS[item['type_id']]
-                if int(cfg['use_mode(1-active，2-passive)']) == 2:
-                    field = int(cfg['effect_field(1-gongji，2-fangyu，3-magic，4-intensity，5-hp)'])
-                    if field in (1, 2, 3, 5):
-                        s = {1: 'gongji', 2: 'fangyu', 3: 'magic', 5: 'hp'}[field]
-                        values[s] *= 1 + Decimal(item['effect_value']) / 100
-        reborn.bonuses(role, c, values, equipped)
-        reborn_stars.bonuses(role, c, values)
-        rates = {s: 0 for s in STATS}
-        if c.get('order', 0):
-            for f in FATES:
-                if int(f['cortege_type[effected_cortege]']) != c['type']:
-                    continue
-                targets = set(map(int, f['target_object_type[1/2/3]'].split('/')))
-                kind = int(f['tartege_type[4-cortege/5-equip/6-skill]'])
-                available = active_types if kind == 4 else {i['type_id'] for i in equipped if i['attach_type'] == kind}
-                if targets <= available:
-                    s = {1: 'hp', 2: 'magic', 3: 'gongji', 4: 'fangyu'}[int(f['effect_field[1-maxhp/2-maxmagic/3-gongji/4-fangyu]'])]
-                    rates[s] += int(f['effect_value'])
-        for s in STATS:
-            c[s] = max(0, floor(values[s] * (1 + Decimal(rates[s]) / 100 + extra_rates[s])))
-            c[s] += role.get('collection_bonuses', {}).get(s, 0)
-            # Activity training is a persistent role-wide additive bonus [B].
-            c[s] += role.get({'hp':'max_hp_plus','magic':'max_magic_plus'}.get(s,s+'_plus'),0)
-        # [B] Prosperity is the role's flat cave HP bonus.
-        c['hp'] += role.get('hole_hp_plus', 0)
-        c['combat_power'] = sum(c[s] * rules['combat_weights'][s] for s in STATS)
-    role['role_combat_power'] = sum(c.get('combat_power', 0) for c in role['corteges'] if c.get('order', 0))
+    from . import combat_power
+    combat_power.recalculate(role, rules)
 
 
 def change_order(role, req):

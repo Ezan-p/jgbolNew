@@ -421,7 +421,7 @@ def battle(role,req,now,r,jrules,frules):
         else:d['phase']='finished'
         events.append(summon.event(19,duty_data(role,r,8 if win else 9)))
     elif ft==6:
-        damage=sum(sum(a['damage_list']) for a in actions if a['is_src']);s['party_damage']+=damage
+        damage=journey.combat_engine.total_damage(actions);s['party_damage']+=damage
         info=party_info(role,r);info.update(fight_prize=prizes(role,r['party_rewards']),cur_damage=damage)
         events.append(summon.event(29,info))
     elif ft==10 and win:
@@ -439,14 +439,14 @@ def battle(role,req,now,r,jrules,frules):
         while len(cards)<3:cards.append([typ,n])
         events.append(summon.event(70,dict(prize_list=cards,attach_list=gain)))
     elif ft==11:
-        damage=sum(sum(a['damage_list']) for a in actions if a['is_src'])
+        damage=journey.combat_engine.total_damage(actions)
         trial['hp']=max(0,trial['hp']-damage);trial['is_dead']=trial['hp']==0
         trial['damage']+=damage
         events.append(summon.event(75,dict(flag=8,result=7 if trial['is_dead'] else 1,
             train_data=dict(prize=[],hp=trial['hp'],train_times=s['trial_count'],last_train_time=s['trial_next'],
                 friend_damage_list=[dict(name=role['role_name'],damage=trial['damage'])]))))
     if win and ft in (2,3):role['silver_coin']+=r['battle_silver']
-    return [encode(1028,dict(fight_id=fid,first_hand=1,des_name='本地活动对手',lineup_count=len(lineup),lineup=lineup)),
+    return journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name='本地活动对手',lineup_count=len(lineup),lineup=lineup)),
         encode(1027,dict(fight_id=fid,fight_type=ft,final_result=result,fight_round=len(actions),fight_result=actions))]+events+[
         summon.event(44,dict(fight_id=fid,fight_type=ft))]
 

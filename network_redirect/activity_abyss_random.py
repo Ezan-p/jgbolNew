@@ -73,10 +73,10 @@ def settle(role,s,d,now,r,jrules):
             ours,enemies=journey.fighters(role,dict(cortege_list=f"{r['battle_npc']}|1"))
             enemies=enemies[:1];enemies[0].update(hp=e['hp'],max_hp=e['hp'])
             result,lineup,actions=journey.battle(role,{},jrules,units=(ours,enemies))
-            damage=sum(sum(x['damage_list']) for x in actions if x['is_src'])
+            damage=journey.combat_engine.total_damage(actions)
             e['hp']=max(0,e['hp']-damage);e['attempts']+=1;won=e['hp']==0;done=won;data=view(e,r)
             role['activity']['fight_id']+=1;fid=role['activity']['fight_id']
-            packets=[encode(1028,dict(fight_id=fid,first_hand=1,des_name='魂仙',lineup_count=len(lineup),lineup=lineup)),
+            packets=journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name='魂仙',lineup_count=len(lineup),lineup=lineup)),
                 encode(1027,dict(fight_id=fid,fight_type=25,final_result=result,fight_round=len(actions),fight_result=actions))]
     if won:data['prize_list']=a.prizes(role,[copy.deepcopy(secrets.choice(r['abyss_event_rewards']))])
     if done:s['events'].pop(0);s['events_finished']+=1

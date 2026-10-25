@@ -1,7 +1,7 @@
 """逐鹿首领、翻牌、扫荡、符咒合成 [A] contracts / [B] missing server rules."""
 import copy
 import secrets
-from . import activity as a
+from . import activity as a, summon
 from . import activity_land as land
 
 
@@ -80,7 +80,7 @@ def settle(role,s,op,d,now,r,jrules):
             s['total_score']+=newscore-old.get('score',0);s[history][str(layer)]=dict(score=newscore,cur_num=n)
         if reward:
             s[key]=dict(layer=layer,cards=[],rewards=[copy.deepcopy(secrets.choice(r['land_card_rewards'])) for _ in range(3 if hell else 5)])
-        return [response(4,fight_type=4 if hell else 3,des_level=layer,is_win=win,is_reward=reward,
+        return [summon.event(121,replay['fight_events']),response(4,fight_type=4 if hell else 3,des_level=layer,is_win=win,is_reward=reward,
             return_soul=0,card_list=[],cost_gold_list=r['land_card_gold'],final_result_list=[replay])]
     if op in (14,23):
         key='hell' if op==23 else 'boss';pending=s[key];idx=d.get('index')

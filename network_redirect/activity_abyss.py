@@ -168,7 +168,7 @@ def settle(role,req,now,r,jrules,parse):
                 typ,tid,lv,n=map(int,token.split('|'));specs.append([typ,tid,n,lv])
             gain=a.prizes(role,specs);s['complete']=s['boss']==max(BOSSES);s['boss']=min(max(BOSSES),s['boss']+1);s['pills']={};s['reductions']=[0]*4
         role['activity']['fight_id']+=1;fid=role['activity']['fight_id']
-        extra_packet=summon.event(121,dict({i:e for i,e in enumerate(fight_events,1)},fight_id=fid))
+        extra_packet=journey.combat_engine.event_packets(actions,fid)[0]
         return [extra_packet,encode(1028,dict(fight_id=fid,first_hand=1,des_name='冥仙',lineup_count=len(lineup),lineup=lineup)),
             encode(1027,dict(fight_id=fid,fight_type=26,final_result=result,fight_round=len(actions),fight_result=actions)),
             response(6,is_win=win,prize_list=gain,**boss(role,s,now)),summon.event(44,dict(fight_id=fid,fight_type=26))]

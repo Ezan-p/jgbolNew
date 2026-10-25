@@ -4,6 +4,30 @@ from . import guild as u, journey, summon
 from .protocol import encode,decode
 
 
+def replay_damage(replay):
+    return replay.get('damage_total', journey.combat_engine.total_damage(replay['fight_result_msg']['fight_result']))
+
+
+def record_events(records):
+    # Rehydrate numeric Lua array keys after JSON persistence.
+    packets = []
+    for replay in records:
+        data = replay.get('fight_events')
+        if data:
+            packets.append(summon.event(121, {int(k) if str(k).isdigit() else k: v for k, v in data.items()}))
+    return packets
+
+
+def recent_records(records):
+    """Keep complete newest replays within the native Lua event packet budget."""
+    selected = []
+    for replay in reversed(records):
+        if len(summon.lua([replay] + selected).encode('utf-8')) > 28000:
+            break
+        selected.insert(0, replay)
+    return selected
+
+
 def simulate(role,s,r,jrules,ft,name,hp=None):
     u.require(any(c.get('order') for c in role['corteges']),'请先上阵神仙')
     units=journey.fighters(role,dict(cortege_list=f"{r['battle_npc']}|{r['battle_level']}"))
@@ -20,11 +44,14 @@ def simulate(role,s,r,jrules,ft,name,hp=None):
             for key in ('hp','max_hp','gongji','fangyu','magic'):unit[key]=unit[key]*(100+bonus)//100
     if hp is not None:units[1][0].update(hp=hp,max_hp=hp)
     rules=copy.deepcopy(jrules);rules['battle']['max_actions']=min(60,rules['battle']['max_actions'])
+    rules['battle']['mechanics']['event_budget_bytes']=1000
     result,lineup,actions=journey.battle(role,{},rules,units=units,slots=8)
     s['fight_id']=s.get('fight_id',0)+1;fid=s['fight_id']
     packets=[encode(1028,dict(fight_id=fid,first_hand=1,des_name=name,lineup_count=len(lineup),lineup=lineup)),
              encode(1027,dict(fight_id=fid,fight_type=ft,final_result=result,fight_round=len(actions),fight_result=actions))]
-    return result,packets,dict(line_up_msg=decode(packets[0])[2],fight_result_msg=decode(packets[1])[2])
+    return result,journey.combat_engine.event_packets(actions,fid)+packets,dict(
+        line_up_msg=decode(packets[0])[2],fight_result_msg=decode(packets[1])[2],
+        fight_events=journey.combat_engine.event_data(actions,fid),damage_total=journey.combat_engine.total_damage(actions))
 
 
 def fight(role,req,now,r,jrules):
@@ -36,7 +63,7 @@ def fight(role,req,now,r,jrules):
         else:u.require(now>=t.get('cooltime',0),'守护冷却中')
         full=r['tree_boss_hp']*(100+(t['level']-1)*10)//100
         old=t.get('hp',full);result,packets,replay=simulate(role,s,r,jrules,ft,'神树守护',old)
-        damage=sum(sum(max(0,v) for v in a['damage_list']) for a in replay['fight_result_msg']['fight_result'] if a['is_src'])
+        damage=replay_damage(replay)
         # Damage is read from the authoritative replay, including unsuccessful attempts.
         damage=min(old,damage);t['hp']=old-damage;t['cooltime']=now+r['tree_fight_cooldown']
         rank=next((x for x in t['ranks'] if x['id']==role['role_id']),None)

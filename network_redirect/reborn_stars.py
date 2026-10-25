@@ -245,6 +245,6 @@ def combat_hit(hit, hp, normal, attack, defend):
 
 def attach_combat_traits(role, units):
     for unit in units:
-        c = next((c for c in role.get('corteges', []) if c.get('order') == unit['order'] and c['type'] == unit['type']), None)
+        c = next((c for c in role.get('corteges', []) if (c['id'] == unit['companion_id'] if unit.get('companion_id') else c.get('order') == unit['order'] and c['type'] == unit['type'])), None)
         if c:
             unit['reborn_traits'] = combat_traits(role, c)

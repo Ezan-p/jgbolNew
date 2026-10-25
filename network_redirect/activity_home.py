@@ -202,7 +202,7 @@ def settle(role,req,now,r,jrules,parse):
         a.require(any(c.get('order') for c in role['corteges']),'请先上阵神仙')
         result,lineup,actions=journey.battle(role,cfg,jrules);s['passed']=1<=result<=3
         role['activity']['fight_id']+=1;fid=role['activity']['fight_id']
-        return [encode(1028,dict(fight_id=fid,first_hand=1,des_name='红尘劫',lineup_count=len(lineup),lineup=lineup)),
+        return journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name='红尘劫',lineup_count=len(lineup),lineup=lineup)),
             encode(1027,dict(fight_id=fid,fight_type=34,final_result=result,fight_round=len(actions),fight_result=actions)),
             response(25,dict(has_passed=s['passed'],fight_count=s['fight_count'])),summon.event(44,dict(fight_id=fid,fight_type=34))]
     a.require(False,'洞府操作无效或该限时福利尚未配置')

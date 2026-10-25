@@ -87,10 +87,11 @@ def simulate(role,s,r,jrules,level,count=1,cur_num=None):
         for i,key in enumerate(('gongji','fangyu','hp','magic'),1):u[key]=u[key]*(100+info(s,r)['charm_plus'][i])//100
         u['max_hp']=u['hp']
     replay_rules=copy.deepcopy(jrules);replay_rules['battle']['max_actions']=min(r['land_max_actions'],jrules['battle']['max_actions'])
+    replay_rules['battle']['mechanics']['event_budget_bytes']=1000
     result,lineup,actions=journey.battle(role,{},replay_rules,units=(ours,enemies))
     role['activity']['fight_id']+=1;fid=role['activity']['fight_id']
     # [A] landUI consumes nested Lua replay messages, not independent 1027 packets.
-    return result,dict(line_up_msg=decode(encode(1028,dict(fight_id=fid,first_hand=1,des_name='逐鹿守卫',lineup_count=len(lineup),lineup=lineup)))[2],
+    return result,dict(fight_events=journey.combat_engine.event_data(actions,fid),line_up_msg=decode(encode(1028,dict(fight_id=fid,first_hand=1,des_name='逐鹿守卫',lineup_count=len(lineup),lineup=lineup)))[2],
         fight_result_msg=decode(encode(1027,dict(fight_id=fid,fight_type=21,final_result=result,fight_round=len(actions),fight_result=actions)))[2])
 
 
@@ -135,7 +136,7 @@ def settle(role,req,now,r,jrules,parse):
         if win:
             s['soul_count']+=reward;kind=secrets.randbelow(4)+1;charm(s,kind,5,1);drop=dict(key=kind,value=5)
         s['travel']=None
-        return [response(4,s,r,fight_type=1,is_win=win,soul_count=reward,charm_data=drop,final_result_list=[replay])]
+        return [summon.event(121,replay['fight_events']),response(4,s,r,fight_type=1,is_win=win,soul_count=reward,charm_data=drop,final_result_list=[replay])]
     if op==6:return [response(6,s,r,charm_get=bag(s),exchange_consume=r['land_charm_exchange'])]
     if op==7:
         idx=d.get('index');a.require(type(idx)is int and idx in CHARMS,'符咒位置无效');row=CHARMS[idx]
@@ -188,6 +189,6 @@ def settle(role,req,now,r,jrules,parse):
         a.require(d.get('flag')==1,'攻塔参数无效')
         result,replay=simulate(role,s,r,jrules,s['map_level']*5,count=s['map_level']);s['attack_count']+=1;win=1<=result<=3
         if win:s['tower_id']=tid;t.update(owner_type=1,owner_name=role['role_name'],last_tick=now,expire=now+r['land_tower_duration'])
-        return [response(4,s,r,fight_type=2,des_id=tid,is_win=win,final_result_list=[replay])]
+        return [summon.event(121,replay['fight_events']),response(4,s,r,fight_type=2,des_id=tid,is_win=win,final_result_list=[replay])]
     from .activity_land_boss import settle as boss_settle
     return boss_settle(role,s,op,d,now,r,jrules)

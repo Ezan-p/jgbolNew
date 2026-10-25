@@ -81,7 +81,7 @@ def settle(role,req,now,r,jrules,frules,parse):
     ours=[]
     for pos,cid in positions.items():
         c=next((c for c in role['corteges'] if c['id']==cid),None);a.require(c is not None,'神仙不属于当前角色')
-        unit=dict(type=c['type'],order=pos,level=c['level'],evolve=c.get('evolve_level',0),reborn=c.get('reborn_layer',0),
+        unit=dict(companion_id=c['id'],type=c['type'],order=pos,level=c['level'],evolve=c.get('evolve_level',0),reborn=c.get('reborn_layer',0),
                   **{k:max(1,int(c[k])) for k in formation.STATS})
         unit['max_hp']=unit['hp'];unit['skills']=[(x['type_id'],x['level']) for x in role['attachments']
             if x['attach_type']==6 and c.get('order') and x.get('equip_order')==c['order'] and x.get('equip_pos')]
@@ -117,7 +117,7 @@ def settle(role,req,now,r,jrules,frules,parse):
     xp,exps,money=journey.experience(role,rewardcfg,win,jrules,frules)
     for c in role['corteges']:c['order']=original[c['id']]
     role['activity']['fight_id']+=1;fid=role['activity']['fight_id'];ft=29+mode
-    return [encode(1141,dict(fight_id=fid,first_hand=1,des_name='历劫守卫',lineup_count=len(lineup),lineup=lineup)),
+    return journey.combat_engine.event_packets(actions,fid)+[encode(1141,dict(fight_id=fid,first_hand=1,des_name='历劫守卫',lineup_count=len(lineup),lineup=lineup)),
         encode(1140,dict(fight_id=fid,fight_type=ft,final_result=result,fight_round=len(actions),fight_result=actions)),
         response(6,detail(s)),summon.event(44,dict(fight_id=fid,fight_type=ft,
             role_add_exp=xp,exp_list=exps,silver_coin=money,rewards=gain,send_prize_list=gain))]

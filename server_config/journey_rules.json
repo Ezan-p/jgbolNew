@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "mode": "inferred",
-  "revision": "2026-10-24-journey-1",
+  "revision": "2026-10-25-combat-2",
   "timezone_offset_hours": 8,
   "strength_recovery_seconds": 360,
   "energy_recovery_seconds": 900,
@@ -22,7 +22,23 @@
     },
     "multi_target_limit": 8,
     "skill_target_limits": {},
-    "formula_revision": "candidate-v1.1"
+    "formula_revision": "candidate-v1.1",
+    "mechanics": {
+      "revision": "inferred-v2",
+      "penetration_proc_bonus": {
+        "normal": 3,
+        "advanced": 6
+      },
+      "poison_max_damage": 10000,
+      "rulai_shield_probability": 25,
+      "normal_revive_limit": 1,
+      "advanced_revive_limit": 2,
+      "event_budget_bytes": 12000
+    },
+    "formation_target_limits": {
+      "8": 8,
+      "9": 9
+    }
   },
   "defeat_companion_exp_percent": 50,
   "defeat_silver_percent": 0,

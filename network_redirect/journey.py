@@ -9,7 +9,7 @@ import math
 from pathlib import Path
 import secrets
 
-from . import formation, summon, combat
+from . import formation, summon, combat, combat_engine
 from .protocol import encode
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -166,7 +166,7 @@ def fighters(role, cfg):
     for c in sorted(role['corteges'], key=lambda c: c.get('order', 0)):
         if not 1 <= c.get('order', 0) <= 8:
             continue
-        unit = dict(type=c['type'], order=c['order'], level=c['level'], evolve=c.get('evolve_level', 0),
+        unit = dict(companion_id=c['id'], type=c['type'], order=c['order'], level=c['level'], evolve=c.get('evolve_level', 0),
                     reborn=c.get('reborn_layer', 0), **{s: max(1, int(c[s])) for s in formation.STATS})
         unit['skills'] = [(i['type_id'], i['level']) for i in role['attachments'] if i['attach_type'] == 6
                           and i.get('equip_order') == c['order'] and i.get('equip_pos', 0) > 0]
@@ -189,54 +189,7 @@ def fighters(role, cfg):
 
 def battle(role, cfg, rules, *, units=None, slots=8):
     """[B] Server turn simulation; no client-supplied victory or damage trusted."""
-    ours, enemies = copy.deepcopy(units) if units is not None else fighters(role, cfg)
-    from . import reborn_stars
-    reborn_stars.attach_combat_traits(role, ours)
-    combat.attach_essences(role, ours)
-    home_train = role.get('activity', {}).get('home', {}).get('train', {})
-    if home_train:
-        from .activity_home import TRAIN
-        bonuses = [tuple(map(int, TRAIN[i,home_train[str(i)]['level']]['worth'].split('|')))
-                   if home_train[str(i)]['level'] else (0,0) for i in range(1,5)]
-        for u in ours:u['training_bonuses'] = bonuses
-    initial = copy.deepcopy((ours, enemies))
-    actions, round_no = [], 0
-    b = rules['battle']
-    while any(u['hp'] for u in ours) and any(u['hp'] for u in enemies) and len(actions) < b['max_actions']:
-        round_no += 1
-        for order in range(1, slots + 1):
-            for is_src, side, opposing in ((True, ours, enemies), (False, enemies, ours)):
-                actor = next((u for u in side if u['order'] == order and u['hp']), None)
-                targets = [u for u in opposing if u['hp']]
-                if not actor or not targets or len(actions) >= b['max_actions']:
-                    continue
-                combat.begin_action(actor, round_no)
-                sk, sk_level = combat.select_skill(actor)
-                targets = targets[:combat.target_count(sk, b)]
-                damage = [0] * slots
-                for target in targets:
-                    hit = combat.damage(actor, target, sk, sk_level, b)
-                    target['hp'] -= hit
-                    combat.after_hit(actor, target)
-                    damage[target['order'] - 1] = hit
-                actions.append(dict(self_use=False, skill_type=sk, is_src=is_src, result=0,
-                                    src_order=order, des_order=targets[0]['order'], cur_round=round_no,
-                                    damage_count=slots, damage_list=damage))
-    oh, eh = sum(u['hp'] for u in ours), sum(u['hp'] for u in enemies)
-    om, em = sum(u['max_hp'] for u in ours), sum(u['max_hp'] for u in enemies)
-    # [B] On bounded replay timeout compare remaining HP ratios; equal is a draw.
-    result = stars(oh, om) if oh * em > eh * om else 7 - stars(eh, em) if oh * em < eh * om else 0
-    lineup = []
-    for order in range(1, max(u['order'] for u in ours + enemies) + 1):
-        row = {}
-        for prefix, side in zip(('src', 'des'), initial):
-            u = next((u for u in side if u['order'] == order), None)
-            if u:
-                row.update({prefix + '_' + key: u[key] for key in ('type', 'evolve', 'hp', 'max_hp', 'magic', 'reborn')})
-                if prefix == 'des':
-                    row['des_level'] = u['level']
-        lineup.append(row)
-    return result, lineup, actions
+    return combat_engine.Battle(role, units if units is not None else fighters(role, cfg), rules, slots).run()
 
 
 def grant(role, spec):
@@ -438,7 +391,7 @@ def settle(role, mid, req, now, rules, formation_rules, activity_rules=None):
     outcome, prizes = attempt(role, kind, gid, cfg, result, now, rules, formation_rules, activity_rules)
     role['journey']['fight_id'] = role['journey']['fight_id'] % 0x7ffffffe + 1
     fid, ft = role['journey']['fight_id'], req['fight_type']
-    return [encode(1028, dict(fight_id=fid, first_hand=1, des_name='旅途', lineup_count=len(lineup), lineup=lineup)),
+    return combat_engine.event_packets(actions, fid) + [encode(1028, dict(fight_id=fid, first_hand=1, des_name='旅途', lineup_count=len(lineup), lineup=lineup)),
             encode(1027, dict(fight_id=fid, fight_type=ft, final_result=result, fight_round=len(actions), fight_result=actions)),
             summon.event(45, dict(fight_id=fid, obj_type=1, exp_plus=outcome['role_add_exp'])),
             summon.event(45, dict(fight_id=fid, obj_type=4, exp_list=outcome['exp_list']))] + prizes + [

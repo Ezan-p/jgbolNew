@@ -328,7 +328,7 @@ class HomeAbyssTests(ActivityCase):
     def test_abyss_random_soul_boss_uses_server_damage_and_free_limit(self):
         from network_redirect.activity_abyss_random import create
         r=self.b.profile();r['level']=80;self.b.save(r);self.ok(self.req(1329,id=1,data='{}'))
-        r=self.b.profile();e=create(3,self.b.activity_rules);e['hp']=1000000;r['activity']['abyss']['events']=[e];self.b.save(r)
+        r=self.b.profile();e=create(3,self.b.activity_rules);e['hp']=100000000;r['activity']['abyss']['events']=[e];self.b.save(r)
         self.ok(self.req(1329,id=4,data='{op_type=0}'));gold=self.b.profile()['gold_coin']
         for i in range(4):
             hp=self.b.profile()['activity']['abyss']['events'][0]['hp']

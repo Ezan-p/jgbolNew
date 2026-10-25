@@ -1,6 +1,6 @@
 """Offline guild team dungeon and spirit-beast training, original callback shapes."""
 from . import guild as u,journey,daily,summon
-from .guild_combat import simulate
+from .guild_combat import simulate, replay_damage, record_events, recent_records
 from . import guild_offline as offline
 
 
@@ -99,7 +99,7 @@ def settle(role,s,g,op,d,now,r):
                 a['layer']=a.get('layer',0)+1
                 a['member_contributions']={key:a['layer'] for key in a['team']['members']}
                 for p in r['team_rewards']:journey.grant(role,p)
-        return [u.reply(op,dict(result=1,free_times=r['team_daily'],fight_count=a['team_fights'],fight_result_list=a.get('team_record',[])))]
+        return record_events(a.get('team_record',[]))+[u.reply(op,dict(result=1,free_times=r['team_daily'],fight_count=a['team_fights'],fight_result_list=a.get('team_record',[])))]
     if op==43:
         from . import activity
         flag=d.get('flag');u.require(type(flag)is int and flag in range(1,8),'寻宝操作无效')
@@ -142,11 +142,11 @@ def settle(role,s,g,op,d,now,r):
             u.require(a['train_open'] and now<a['train_end'],'试炼未开启或已过期')
             u.require(a['train_support']<r['train_support_limit'],'援助次数已用完');a['train_support']+=1
         result,packets,replay=simulate(role,s,r,journey.load_rules(),27,'仙盟灵兽试炼',a['train_hp'])
-        damage=min(a['train_hp'],sum(sum(max(0,v) for v in row['damage_list']) for row in replay['fight_result_msg']['fight_result'] if row['is_src']))
+        damage=min(a['train_hp'],replay_damage(replay))
         a['train_hp']-=damage;a['train_done']=a['train_hp']==0;a['train_record'].append(replay)
         row=a['train_damage'].setdefault(rid,dict(id=int(rid),name=role['role_name'],damage=0));row['damage']+=damage
-        return [u.reply(op,dict(result=1,support=a['train_support'],free_times=1,fight_count=len(a['train_record']),fight_result_list=a['train_record'])),u.reply(79,train_info(role,a,g,now,r))]
-    if op==95:return [u.reply(op,dict(result=1,free_times=1,fight_count=1 if a['train_record'] else 0,fight_result_list=a['train_record']))]
+        return record_events(recent_records(a['train_record']))+[u.reply(op,dict(result=1,support=a['train_support'],free_times=1,fight_count=len(a['train_record']),fight_result_list=recent_records(a['train_record']))),u.reply(79,train_info(role,a,g,now,r))]
+    if op==95:return record_events(recent_records(a['train_record']))+[u.reply(op,dict(result=1,free_times=1,fight_count=1 if a['train_record'] else 0,fight_result_list=recent_records(a['train_record'])))]
     if op==81:
         u.authorize(role,r,27);target=d.get('appoint_role');u.require(str(target) in g['members'],'指定成员不存在');a['appoint']=target
         return [u.reply(op,dict(result=1,name=g['members'][str(target)]['name']))]

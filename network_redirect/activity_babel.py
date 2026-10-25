@@ -112,9 +112,9 @@ def settle(role,req,now,r,jrules,parse):
         a.require(any(c.get('order') for c in role['corteges']),'请先上阵神仙')
         result,lineup,actions=journey.battle(role,dict(cortege_list=f"{r['battle_npc']}|{max(1,s['cur_floor']*2)}"),jrules)
         role['activity']['fight_id']+=1;fid=role['activity']['fight_id'];fighting=True
-        events=[encode(1028,dict(fight_id=fid,first_hand=1,des_name='通天塔守卫',lineup_count=len(lineup),lineup=lineup)),
+        events=journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name='通天塔守卫',lineup_count=len(lineup),lineup=lineup)),
                 encode(1027,dict(fight_id=fid,fight_type=200,final_result=result,fight_round=len(actions),fight_result=actions))]
-        lost=sum(sum(x['damage_list']) for x in actions if not x['is_src'])
+        lost=journey.combat_engine.total_damage(actions,2)
         maximum=sum(x.get('src_max_hp',0) for x in lineup)
         s['life']=max(0,s['life']-max(1,100*lost//max(1,maximum)))
         if not 1<=result<=3:
