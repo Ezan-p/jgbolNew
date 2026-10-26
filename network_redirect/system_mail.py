@@ -26,7 +26,13 @@ def deliver(role, key, title, body, prizes, now, rules, mail_id=None):
         if kind == 4: f.require(count == 1 and level == 1, '神仙附件须为单个初始神仙')
         if kind in (6,15): f.require(count <= 500, '实体附件数量过多')
         if kind == 6: f.require(tid in f.SKILLS and level <= int(f.SKILLS[tid]['top_level']), '法术等级无效')
-        if kind == 5: f.require(tid in f.ITEMS and level <= max(1,int(f.ITEMS[tid]['top_level'])), '物品等级无效')
+        if kind == 5:
+            from . import equipment
+            # Gem levels live in stone_cost_worth, not item_base.top_level (=1).
+            valid_level = ((equipment.STONES[tid], level) in equipment.STONE_VALUES
+                           or (equipment.STONES[tid], level) in equipment.STONE_REBORN) if tid in equipment.STONES else (
+                               tid in f.ITEMS and level <= max(1, int(f.ITEMS[tid]['top_level'])))
+            f.require(valid_level, '物品等级无效')
     trial = copy.deepcopy(role)
     state = welfare.prepare(trial, now, rules)
     mails = state.setdefault('mails', {})

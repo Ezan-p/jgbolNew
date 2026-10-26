@@ -149,3 +149,38 @@ class PartyTests(ActivityCase):
                 self.assertGreater(h['self_order'],0)
                 self.assertEqual(self.b.profile()['party_take_prize'],0)
         with patch('network_redirect.backend.time.time',return_value=NOW+9*86400):self.ok(self.req(1201,flag=1))
+
+    def test_original_hours_boundaries_and_close_settlement(self):
+        self.assertEqual(self.b.activity_rules['party_period'],[39600,46800])
+        r=self.b.profile();r['activity']['party']['clock']=NOW-3601;self.b.save(r)
+        for timestamp,allowed in ((NOW-3601,False),(NOW-3600,True),(NOW+3599,True),(NOW+3600,False)):
+            with patch('network_redirect.backend.time.time',return_value=timestamp):
+                result=self.req(1026,fight_type=6)
+                if allowed:self.ok(result)
+                else:self.assertEqual(result[0][0],55)
+        with patch('network_redirect.backend.time.time',return_value=NOW+3600):
+            h=dict(self.req(1049,query_type=2))[30]
+            self.assertEqual(h['fight_count'],2)
+            self.assertTrue(self.b.profile()['activity']['party']['closed'])
+            self.assertEqual(self.req(1202,flag=1)[0][0],55)
+
+    def test_boss_pool_wave_stability_restart_and_actual_lineup(self):
+        r=self.b.profile();p=r['activity']['party'];p['count']=1
+        seen={}
+        # Advance whole waves without changing NPC progress at this timestamp.
+        for wave in range(30):
+            p['damage']=wave*party.rules()['boss_hp']
+            info=party.info(r,self.b.activity_rules)
+            self.assertEqual(info,party.info(copy.deepcopy(r),self.b.activity_rules))
+            seen.setdefault(info['boss_type'],copy.deepcopy(r))
+        self.assertEqual(set(seen),{4020,5025,3015})
+        for tid,r in seen.items():
+            self.b.save(r)
+            expected=party.info(self.b.profile(),self.b.activity_rules)
+            self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+            actual=dict(self.req(1049,query_type=1))[29]
+            self.assertEqual((actual['boss_type'],actual['name']),(tid,expected['name']))
+            self.fight()
+            lineup=next(d for m,_,d in self.decoded if m==1028)
+            self.assertEqual(lineup['des_name'],expected['name'])
+            self.assertEqual([x['des_type'] for x in lineup['lineup'] if x['des_type']],[tid])

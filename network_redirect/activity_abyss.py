@@ -90,7 +90,8 @@ def state(role,now,r):
 
 
 def specter(s,now):return dict(cur_layer=s['layer'],boss_layer=s['boss'],crystal_count=s['crystals'],event_count=len(s['events']),
-    tool_rate=2 if now<s['double_end'] else 1,tool_end_time=s['double_end'],fight_boss_times=s['boss_count'],max_fight_count=5)
+    tool_rate=2 if now<s['double_end'] else 1,tool_end_time=s['double_end'],fight_boss_times=s['boss_count'],max_fight_count=5,
+    complete=bool(s.get('complete')))
 
 
 def hook(s,now,r):
@@ -153,7 +154,8 @@ def settle(role,req,now,r,jrules,parse):
     if op==7:
         top=d.get('top_type',1);a.require(type(top)is int and top in (1,2),'九幽榜单类型无效')
         from .activity_abyss_npc import standings
-        return [response(7,**standings(role,s,now,r))]
+        data=standings(role,s,now,r);data['top_type']=top
+        return [response(7,**data)]
     if op in (1,2):
         if op==2:
             dest=d.get('des_area');a.require(type(dest)is int and 1<=dest<=s['boss'] and dest in HANG,'该层尚未解锁');s['layer']=dest
@@ -230,6 +232,7 @@ def settle(role,req,now,r,jrules,parse):
             s.setdefault('fight_news',[]).append(record);s['fight_news']=s['fight_news'][-20:]
             news(s,record['tip'],now)
             s['complete']=s['boss']==max(BOSSES);s['boss']=min(max(BOSSES),s['boss']+1);s['pills']={};s['reductions']=[0]*4
+            if s['complete']:news(s,'九幽八十一层全部通关！仍可选择已开放层数挂机、处理随机事件和兑换奖励。',now)
         role['activity']['fight_id']+=1;fid=role['activity']['fight_id']
         extra_packet=journey.combat_engine.event_packets(actions,fid)[0]
         return [extra_packet,encode(1028,dict(fight_id=fid,first_hand=1,des_name='冥仙',lineup_count=len(lineup),lineup=lineup)),

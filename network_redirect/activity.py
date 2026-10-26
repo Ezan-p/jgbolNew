@@ -12,7 +12,7 @@ from .protocol import encode
 ROOT = Path(__file__).resolve().parents[1]
 require = formation.require
 ENUMS = json.loads((ROOT/'analysis/evidence/activity_enums.json').read_text())
-HANDLED = {1060, 1330, 1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1303, 1329, 1333, 1348, 1349, 1350, 1353}
+HANDLED = {1227, 1060, 1330, 1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1303, 1329, 1333, 1348, 1349, 1350, 1353}
 FIGHTS = {2, 3, 4, 5, 6, 10, 11, 12}
 EXCHANGE = {int(r['index']):r for r in summon.rows('top_score_exchange.csv')}
 RANK_SCORE = summon.rows('top_score.csv')
@@ -39,7 +39,8 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     require(isinstance(r.get('land_card_gold'),list) and len(r['land_card_gold'])==5 and r['land_card_gold'][0]==0 and all(type(v)is int and 0<=v<=100000 for v in r['land_card_gold']),'逐鹿翻牌费用无效')
     require(r['rank_initial_order']<=65535 and r['rank_daily_limit']<=255,'活动次数超过协议范围')
     require(r['duty_daily_runs']==3,'原版天命界面固定每日3次')
-    from . import duty_balance, activity_convert, activity_practice
+    from . import duty_balance, activity_convert, activity_practice, activity_pavilion
+    activity_pavilion.load_rules()
     duty_balance.rules()
     activity_convert.load_rules()
     activity_practice.load_rules()
@@ -90,7 +91,7 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
             else:require(type(goods.get('cost'))is int and 0<goods['cost']<=1000000,'活动商品价格无效')
     require(len(r['fish_shop'])%5==0 and len({x['reward'][1] for x in r['fish_shop']})==len(r['fish_shop']),'东海商品须为完整五项分页且类型不重复')
     require(5<=len(r['fish_pool'])<=20 and len(r['fish_pool'])%5==0,'原版东海奖池预览需要每行五项完整配置')
-    require(set(r.get('babel_energy_items',{}))=={'20016','20017','20018','20019'} and all(type(v)is int and 1<=v<=100 for v in r['babel_energy_items'].values()),'通天塔恢复配置无效')
+    require(r.get('babel_energy_items')=={'20016':10,'20017':25,'20018':80,'20019':200} and all(type(v) is int for v in r['babel_energy_items'].values()),'通天塔恢复配置须符合原版仙露数值')
     require(r['abyss_tick_seconds']<=r['abyss_offline_cap_seconds'] and r['abyss_offline_cap_seconds']//r['abyss_tick_seconds']<=2000,'挂机结算周期过长')
     return r
 
@@ -105,6 +106,9 @@ def prepare(role,now,r,peers=None):
     for k,v in dict(drug_level=1,drug_exp=0,drug_study_flag=0,drug_study_flag2=0).items():role.setdefault(k,v)
     role.setdefault('rule_index',0)
     for k in ('max_hp_plus','gongji_plus','fangyu_plus','max_magic_plus'):role.setdefault(k,0)
+    if 'babel' in s:
+        from . import activity_babel
+        activity_babel.state(role,now,r)
     if 'home' in s:
         from . import activity_home
         activity_home.state(role,now,r)
@@ -164,12 +168,14 @@ def feed_data(role,r):
                 feed_count=max((v['count'] for v in f.values()),default=0))
 
 
-def statuses(role,now,r,flag):
+def statuses(role,now,r,flag,peers=None):
     from .activity_land import status as land_status
     s=role['activity']
     if flag==0:
+        from . import activity_pavilion
         from .activity_seasonal import status as seasonal_status
         return summon.event(47,dict(visit_list=visit_list(role,r),feed_data=feed_data(role,r),
+                                   pavilion_data=activity_pavilion.status(role,now,peers),
                                    spring_info=dict(start_time=0,end_time=0),
                                    imperial_exam=dict(start_time=0,end_time=0),**seasonal_status(role,now,r)))
     require(flag==1,'未知活动页')
@@ -357,11 +363,14 @@ def battle(role,req,now,r,jrules,frules):
         s['trial_count']+=1;s['trial_next']=now+r['trial_cooldown_seconds']
     require(any(c.get('order') for c in role['corteges']),'请先上阵神仙')
     cfg=dict(cortege_list=f"{r['battle_npc']}|{r['battle_level']}")
+    if ft==6:
+        from . import activity_party
+        boss=activity_party.info(role,r)
+        cfg=dict(cortege_list=f"{boss['boss_type']}|{boss['boss_level']}")
     units=journey.fighters(role,cfg)
     if ft==6:
         for u in units[0]:u['gongji']=u['gongji']*(100+s['party_bonus']*10)//100
-        from . import activity_party
-        hp=activity_party.info(role,r)['cur_hp']
+        hp=boss['cur_hp']
         units[1][0].update(hp=hp,max_hp=activity_party.rules()['boss_hp'])
     if ft==11:units[1][0].update(hp=trial['hp'],max_hp=trial['max_hp'])
     result,lineup,actions=journey.battle(role,cfg,jrules,units=units);win=1<=result<=3
@@ -380,13 +389,16 @@ def battle(role,req,now,r,jrules,frules):
             train_data=dict(prize=[],hp=trial['hp'],train_times=s['trial_count'],last_train_time=s['trial_next'],
                 friend_damage_list=[dict(name=role['role_name'],damage=trial['damage'])]))))
     if win and ft in (2,3):role['silver_coin']+=r['battle_silver']
-    return journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name='本地活动对手',lineup_count=len(lineup),lineup=lineup)),
+    return journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name=boss['name'] if ft==6 else '本地活动对手',lineup_count=len(lineup),lineup=lineup)),
         encode(1027,dict(fight_id=fid,fight_type=ft,final_result=result,fight_round=len(actions),fight_result=actions))]+events+[
         summon.event(44,dict(fight_id=fid,fight_type=ft))]
 
 
 def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     s=prepare(role,now,r,peers)
+    if mid==1227:
+        from . import activity_pavilion
+        return activity_pavilion.settle(role,req,now,peers)
     if mid == 1350:
         from . import activity_arena
         return activity_arena.settle(role,req,now,r,jrules,parse)
@@ -448,7 +460,7 @@ def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     if mid==1353:
         from . import activity_babel
         return activity_babel.settle(role,req,now,r,jrules,parse)
-    if mid==1205:return [statuses(role,now,r,req['flag'])]
+    if mid==1205:return [statuses(role,now,r,req['flag'],peers)]
     if mid==1040:return feed(role,req,now,r)
     if mid==1030:return visit(role,req,r)
     if mid==1085:

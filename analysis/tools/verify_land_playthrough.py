@@ -45,7 +45,7 @@ class RecordedLand(OfflineLandTests):
             trace.append(row)
         return result
 
-names=['tests.test_activity_land_players','tests.test_activity','tests.test_daily',
+names=['tests.test_activity_land_players','tests.test_activity_land_tower','tests.test_activity','tests.test_daily',
        'tests.test_npc_players','tests.test_role_profile','tests.test_combat_engine',
        'tests.test_combat_lanes','tests.test_offline_backend','tests.test_system_mail']
 suite=unittest.TestSuite()

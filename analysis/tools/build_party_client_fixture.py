@@ -32,7 +32,7 @@ local function check(name,fn)
  errors='';local ok,err=xpcall(fn,debug.traceback)
  party_fixture_results[#party_fixture_results+1]={name=name,ok=ok and errors=='',error=(err or '')..errors}
 end
-ui.setPeriod({{begin_seconds=0,end_seconds=86400}})
+ui.setPeriod({{begin_seconds=39600,end_seconds=46800}})
 check('entry',function() ui.show() end)
 '''
 script += '\nlocal live='+summon.lua(live)+'\nlocal history='+summon.lua(history)+'\nlocal weekly='+summon.lua(weekly)+'\n'

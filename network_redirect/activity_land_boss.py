@@ -2,7 +2,7 @@
 import copy
 import secrets
 import math
-from . import activity as a, summon, journey, combat_power, formation
+from . import activity as a, summon, activity_land_encounters as encounters
 from . import activity_land as land
 
 
@@ -30,10 +30,8 @@ def migrate_scores(s):
 
 def boss(s,r,hell=False,layer=None):
     passed=s['inv_boss_layer' if hell else 'boss_layer'];layer=layer or min(passed+1,r['land_boss_layers'])
-    count=min(8,1+(layer-1)//8)
-    _,army=journey.fighters({'corteges':[]},dict(cortege_list='/'.join([f"{r['battle_npc']}|{layer*(3 if hell else 2)}"]*count)))
-    power=sum(combat_power.score_panel(u,formation.load_rules()['combat_weights']) for u in army)
-    return dict(boss_layer=layer,type_id=r['battle_npc'],fight_power=power,cortege_count=count,
+    enemy=encounters.encounter(layer,hell)
+    return dict(boss_layer=layer,type_id=enemy['type_id'],name=enemy['name'],fight_power=enemy['power'],cortege_count=len(enemy['units']),
         need_soul=r['land_boss_soul']*layer,score=score(s,s['grid_count']),isweeken=False,is_open=not hell or layer in s['unlocked'],
         unlock_layer=layer,unlock_soul=r['land_hell_unlock_soul'],can_fight_count=r['land_hell_daily']-s['hell_counts'].get(str(layer),0),
         fight_count_limit=r['land_hell_daily'],cur_num=s['grid_count'])
@@ -100,7 +98,8 @@ def settle(role,s,op,d,now,r,jrules):
             a.require(layer in s['unlocked'] and row['can_fight_count']>0,'冥界未解锁或挑战次数不足')
             s['hell_counts'][str(layer)]=s['hell_counts'].get(str(layer),0)+1
         a.spend(s,'soul_count',row['need_soul'])
-        result,replay=land.simulate(role,s,r,jrules,layer*(3 if hell else 2),row['cortege_count'],n);win=1<=result<=3
+        result,replay=land.simulate(role,s,r,jrules,layer*(3 if hell else 2),row['cortege_count'],n,
+                                  encounter=encounters.encounter(layer,hell));win=1<=result<=3
         old=s[history].get(str(layer),{});earned=score(s,n)
         newscore=max(old.get('score',0),earned) if win else old.get('score',0)
         reward=win and layer>s[progress]

@@ -78,7 +78,9 @@ class LandPlayersTests(ActivityCase):
         from network_redirect import combat_power, formation
         for hell in (False,True):
             row=bosses.boss(s,r,hell,64)
-            _,units=journey.fighters({'corteges':[]},dict(cortege_list='/'.join([f"{r['battle_npc']}|{64*(3 if hell else 2)}"]*8)))
+            from network_redirect import activity_land_encounters
+            units=activity_land_encounters.encounter(64,hell)['units']
+            self.assertEqual(row['type_id'],units[0]['type'])
             self.assertEqual(row['fight_power'],sum(combat_power.score_panel(u,formation.load_rules()['combat_weights']) for u in units))
 
     def test_ranking_stable_real_id_and_elapsed_week_progress(self):

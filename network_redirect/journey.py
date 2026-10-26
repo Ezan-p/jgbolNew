@@ -206,6 +206,9 @@ def grant(role, spec):
         require(tid in formation.ITEMS, '未知奖励物品')
         if level == 1:
             summon.add_item(role, tid, count)
+        elif formation.ITEMS[tid]['can_stack'] == '0':
+            for _ in range(count):
+                role['attachments'].append(dict(id=formation.new_id(role), attach_type=5, type_id=tid, level=level, count=1))
         else:
             role['attachments'].append(dict(id=formation.new_id(role), attach_type=5, type_id=tid, level=level, count=count))
     elif typ == 6:

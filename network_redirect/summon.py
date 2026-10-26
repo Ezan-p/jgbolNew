@@ -103,8 +103,12 @@ def client_source(rules):
     rank_source = Path(__file__).with_name('rank_client.lua').read_text(encoding='utf-8')
     pet_source = Path(__file__).with_name('pet_client.lua').read_text(encoding='utf-8')
     taixu_source = Path(__file__).with_name('taixu_client.lua').read_text(encoding='utf-8')
+    babel_source = Path(__file__).with_name('babel_client.lua').read_text(encoding='utf-8')
     home_source = Path(__file__).with_name('home_client.lua').read_text(encoding='utf-8')
-    return pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
+    pavilion_source = Path(__file__).with_name('pavilion_client.lua').read_text(encoding='utf-8')
+    from . import activity_pavilion
+    pavilion_source = pavilion_source.replace('__PAVILION_TABLES__', lua(activity_pavilion.client_tables()))
+    return pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
 
 
 def lua(value):

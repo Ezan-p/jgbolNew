@@ -54,7 +54,7 @@ def choose(role, s, index=0, fixed=False, excluded=()):
 
 def view(key, count, ident, soul=0):
     n = catalog()[key]; role=n['role']; army=units(key,count); head=army[0]
-    return dict(id=ident, npc_id=key, npc_player_id=role['role_id'], object_type=1, type_id=head['type'], head_type=head['type'],
+    return dict(id=ident, role_id=ident, npc_id=key, npc_player_id=role['role_id'], object_type=1, type_id=head['type'], head_type=head['type'],
                 name=role.get('role_name',role.get('name','离线修士')), union_name='离线修士', cortege_layer=head['reborn'],
                 cortege_count=len(army), fight_power=power(n,count), power=power(n,count),
                 expect_soul=soul, level=role['level'], had_soulcount=0)

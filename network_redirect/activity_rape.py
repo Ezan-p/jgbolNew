@@ -13,7 +13,8 @@ def rules():
     a.require(r['mode']=='inferred' and len(r['power_percent'])==3 and all(type(v)is int and 1<=v<=150 for v in r['power_percent']), '渡劫匹配配置无效')
     a.require(r.get('guards_from_dice') is True and 1<=r['straight_skill_count']<=10 and r['triple_auto_pass'] is False, '渡劫奖盘配置无效')
     a.require(1<=r['revenge_lifetime']<=86400 and set(r['skill_quality_weights'])==set('12345') and all(type(v)is int and 1<=v<=100 for v in r['skill_quality_weights'].values()), '渡劫奖池配置无效')
-    a.require(all(type(r.get(k)) is int and 1<=r[k]<=100 for k in ('match_candidates','match_tolerance_percent','recent_npc_limit')), '渡劫NPC随机池配置无效')
+    a.require(all(type(r.get(k)) is int and 1<=r[k]<=100 for k in ('match_candidates','match_tolerance_percent'))
+              and type(r.get('recent_npc_limit')) is int and 1<=r['recent_npc_limit']<=512, '渡劫NPC随机池配置无效')
     return r
 
 
@@ -26,7 +27,11 @@ def choose(role, index, excluded=(), used=()):
 
 
 def opponent(role, index, excluded=(), used=()):
-    key = choose(role, index, excluded, used); n = npcs.catalog()[key]['role']
+    return opponent_data(choose(role, index, excluded, used))
+
+
+def opponent_data(key):
+    n = npcs.catalog()[key]['role']
     head = next(c for c in n['corteges'] if c.get('order') == 1)
     return dict(npc_id=key, npc_player_id=n['role_id'], show_type=head['type'], level=n['level'], name=n['role_name'],
                 has_win=False, top_order=0, cortege_layer=head.get('evolve_level',0), power=n['role_combat_power'])
@@ -48,6 +53,9 @@ def ensure(role, now, r):
     s = role['activity']
     s.setdefault('rape_total_refreshes',s.get('rape_refreshes',0))
     boards = s.get('rape_boards')
+    if 'rape_recent_npcs' not in s:
+        npcs.remember(role,[t['npc_id'] for b in boards or [] for rows in b['form_list'].values()
+                            for t in rows.values() if t.get('npc_id')],rules())
     if boards is None:
         dice = roll_forms()
         straight = dice[1]-dice[0] == dice[2]-dice[1] and abs(dice[1]-dice[0]) == 1
@@ -62,6 +70,9 @@ def ensure(role, now, r):
         s['rape_boards']=boards
         npcs.remember(role,used,rules())
     # Upgrade old boards in place without erasing victories or issuing rewards again.
+    used=[t['npc_id'] for b in boards for rows in b['form_list'].values()
+          for t in rows.values() if t.get('npc_id')]
+    migrated=[]
     for i,b in enumerate(boards):
         if b.get('version',1)<2:
             # Keep legacy progress and already-issued rewards; align the die with
@@ -75,7 +86,12 @@ def ensure(role, now, r):
             for j,t in enumerate(rows.values()):
                 t.setdefault('index',j+1);t.setdefault('rand',3-j)
                 if 'npc_id' not in t:
-                    won=t['has_win'];t.update(opponent(role,j));t['has_win']=won
+                    won=t['has_win'];t.update(opponent(role,j,used=used));t['has_win']=won
+                    used.append(t['npc_id']);migrated.append(t['npc_id'])
+                elif 'npc_player_id' not in t:
+                    won=t['has_win'];t.update(opponent_data(t['npc_id']));t['has_win']=won
+    if migrated:
+        npcs.remember(role,migrated,rules())
     s.setdefault('rape_revenge',{})
     s['rape_revenge']={k:v for k,v in s['rape_revenge'].items() if now-v['time']<rules()['revenge_lifetime']}
     return boards

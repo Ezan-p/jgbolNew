@@ -18,21 +18,25 @@ def catalog():
 def candidates(role, index, rules, excluded=()):
     own = max(1, sum(c.get('combat_power', 0) for c in role['corteges'] if 1 <= c.get('order', 0) <= 8))
     target = own * rules['power_percent'][index % 3] // 100
-    excluded = set(excluded)
     pool = [n for n in catalog().values()
-            if n['role']['level'] <= role['level'] and n['npc_id'] not in excluded]
+            if n['role']['level'] <= role['level']]
     formation.require(bool(pool), '没有符合等级的渡劫NPC')
     pool.sort(key=lambda n: (abs(n['role']['role_combat_power']-target),
                              abs(n['role']['level']-role['level']), n['npc_id']))
     best = abs(pool[0]['role']['role_combat_power']-target)
     tolerance = max(1, target * rules['match_tolerance_percent'] // 100)
+    # Anchor difficulty before excluding the old opponent. A paid refresh must
+    # not move the window to a distant, stronger NPC in a sparse catalog.
+    excluded = set(excluded)
     return [n['npc_id'] for n in pool[:rules['match_candidates']]
-            if abs(n['role']['role_combat_power']-target) <= best+tolerance]
+            if n['npc_id'] not in excluded
+            and abs(n['role']['role_combat_power']-target) <= best+tolerance]
 
 
 def choose(role, index, rules, excluded=(), used=()):
     import secrets
     pool = candidates(role, index, rules, excluded)
+    formation.require(bool(pool), '当前战力范围内没有其他渡劫NPC')
     recent = set(role.get('activity', {}).get('rape_recent_npcs', []))
     # Never widen the strength window just to hide repetition in sparse pools.
     unused = [key for key in pool if key not in used]

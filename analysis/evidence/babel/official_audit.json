@@ -1,0 +1,2875 @@
+{
+  "date": "2026-10-26",
+  "official_server_available": false,
+  "classification": {
+    "A": [
+      "36级入口；1353/event203；1028/1027/44战报，类型200",
+      "周一0点重置进度、发周榜奖励；钥匙和道具保留",
+      "每日0点恢复生命；仙力每半小时恢复；仙露无仙力上限限制",
+      "仙露20016—20019恢复10/25/80/200点",
+      "同层按到达时间排名；榜奖界面显示通天币",
+      "恢复生命200元宝；传送20元宝；商店刷新200通天币",
+      "金银铜箱与钥匙对应；石块耗锤、篝火耗道符",
+      "原包12档1—60层道具池；商店limit是总限购，客户端扣my_exchange"
+    ],
+    "B": [
+      "5×8固定布局与3×3探索视野；60层封顶依据已恢复奖励表",
+      "本层守塔者必须击败；终层楼梯结算一次并变为空地",
+      "初始生命/仙力100；半小时恢复1；生命损失公式",
+      "NPC阵容按固定目标战力选择，保留资料库属性和技能",
+      "掉落等概率按CSV条目抽取；每箱/守卫/终点50通天币",
+      "六格商品、价格、限购、每日一次刷新；刷新补货而不换商品",
+      "30名NPC确定性周进度；周奖2000/1500/1000/500/200通天币",
+      "结算上次参与周，系统永久邮件领取，不补造未参与周奖励",
+      "手动reset仅回到一层，不刷新已领取内容；允许传送本周已达任意层"
+    ]
+  },
+  "files": [
+    {
+      "path": "analysis/evidence/lua_named/lua/ui/tongtiantaUI.lua.txt",
+      "sha256": "af49f1a93a5bee698233c0d8621d43ef2d2e1e84884b8985c5baa258eca28a8f"
+    },
+    {
+      "path": "analysis/configs/babel_tower_floor_prize.csv",
+      "sha256": "f7222647fb1d596d2ad0729e8bf80ba053ff8f99433dc13db090c879573fe1ac"
+    },
+    {
+      "path": "analysis/configs/item_name.csv",
+      "sha256": "107da82bd2e8050c6e44dd8da0875f874a56de4cd29db58bc6a4959d3072e685"
+    },
+    {
+      "path": "jgbol3.87/assets/release_/08b0428edce64d19f304d30c3829ec87.data",
+      "sha256": "e04af124a848226b08c5a73069666e5eb5fd96294725e380a3e187e7a63b4dc4"
+    },
+    {
+      "path": "analysis/npc_design/players/catalog.json",
+      "sha256": "a0febff1a5a68a3d4f053c11c58a4bea24e88912eb9576208759c687030ccba3"
+    },
+    {
+      "path": "server_config/activity_rules.json",
+      "sha256": "8cf455a8640eba1df653ef131247dc6dcbee81fafa61822755c23a6971d73a7a"
+    }
+  ],
+  "schedule": [
+    {
+      "floor": 1,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l27_t5_attack",
+          "name": "朝露空海",
+          "level": 27,
+          "power": 6525
+        },
+        "20011": {
+          "npc_id": "npc_v2_l27_t5_attack",
+          "name": "朝露空海",
+          "level": 27,
+          "power": 6525
+        },
+        "20010": {
+          "npc_id": "npc_v2_l35_t5_attack",
+          "name": "飞白青玄",
+          "level": 35,
+          "power": 7928
+        },
+        "20015": {
+          "npc_id": "npc_v2_l27_t5_attack",
+          "name": "朝露空海",
+          "level": 27,
+          "power": 6525
+        },
+        "20014": {
+          "npc_id": "npc_v2_l35_t5_attack",
+          "name": "飞白青玄",
+          "level": 35,
+          "power": 7928
+        },
+        "20013": {
+          "npc_id": "npc_v2_l39_t5_magic",
+          "name": "落星明玉",
+          "level": 39,
+          "power": 9239
+        },
+        "9": {
+          "npc_id": "npc_v2_l33_t5_attack",
+          "name": "青云松雪",
+          "level": 33,
+          "power": 9919
+        }
+      }
+    },
+    {
+      "floor": 2,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l27_t5_attack",
+          "name": "朝露空海",
+          "level": 27,
+          "power": 6525
+        },
+        "20011": {
+          "npc_id": "npc_v2_l24_t5_attack",
+          "name": "隐泉海雨",
+          "level": 24,
+          "power": 6883
+        },
+        "20010": {
+          "npc_id": "npc_v2_l31_t5_magic",
+          "name": "临风苍水",
+          "level": 31,
+          "power": 8584
+        },
+        "20015": {
+          "npc_id": "npc_v2_l24_t5_attack",
+          "name": "隐泉海雨",
+          "level": 24,
+          "power": 6883
+        },
+        "20014": {
+          "npc_id": "npc_v2_l31_t5_magic",
+          "name": "临风苍水",
+          "level": 31,
+          "power": 8584
+        },
+        "20013": {
+          "npc_id": "npc_v2_l33_t5_attack",
+          "name": "青云松雪",
+          "level": 33,
+          "power": 9919
+        },
+        "9": {
+          "npc_id": "npc_v2_l32_t5_attack",
+          "name": "远山雪星",
+          "level": 32,
+          "power": 10656
+        }
+      }
+    },
+    {
+      "floor": 3,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l27_t5_attack",
+          "name": "朝露空海",
+          "level": 27,
+          "power": 6525
+        },
+        "20011": {
+          "npc_id": "npc_v2_l35_t5_attack",
+          "name": "飞白青玄",
+          "level": 35,
+          "power": 7928
+        },
+        "20010": {
+          "npc_id": "npc_v2_l39_t5_magic",
+          "name": "落星明玉",
+          "level": 39,
+          "power": 9239
+        },
+        "20015": {
+          "npc_id": "npc_v2_l35_t5_attack",
+          "name": "飞白青玄",
+          "level": 35,
+          "power": 7928
+        },
+        "20014": {
+          "npc_id": "npc_v2_l39_t5_magic",
+          "name": "落星明玉",
+          "level": 39,
+          "power": 9239
+        },
+        "20013": {
+          "npc_id": "npc_v2_l32_t5_attack",
+          "name": "远山雪星",
+          "level": 32,
+          "power": 10656
+        },
+        "9": {
+          "npc_id": "npc_v2_l46_t5_endurance",
+          "name": "凌波雨川",
+          "level": 46,
+          "power": 11571
+        }
+      }
+    },
+    {
+      "floor": 4,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l27_t5_attack",
+          "name": "朝露空海",
+          "level": 27,
+          "power": 6525
+        },
+        "20011": {
+          "npc_id": "npc_v2_l35_t5_attack",
+          "name": "飞白青玄",
+          "level": 35,
+          "power": 7928
+        },
+        "20010": {
+          "npc_id": "npc_v2_l33_t5_attack",
+          "name": "青云松雪",
+          "level": 33,
+          "power": 9919
+        },
+        "20015": {
+          "npc_id": "npc_v2_l35_t5_attack",
+          "name": "飞白青玄",
+          "level": 35,
+          "power": 7928
+        },
+        "20014": {
+          "npc_id": "npc_v2_l33_t5_attack",
+          "name": "青云松雪",
+          "level": 33,
+          "power": 9919
+        },
+        "20013": {
+          "npc_id": "npc_v2_l46_t5_endurance",
+          "name": "凌波雨川",
+          "level": 46,
+          "power": 11571
+        },
+        "9": {
+          "npc_id": "npc_v2_l43_t5_magic",
+          "name": "醉竹月瑶",
+          "level": 43,
+          "power": 12455
+        }
+      }
+    },
+    {
+      "floor": 5,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l24_t5_attack",
+          "name": "隐泉海雨",
+          "level": 24,
+          "power": 6883
+        },
+        "20011": {
+          "npc_id": "npc_v2_l31_t5_magic",
+          "name": "临风苍水",
+          "level": 31,
+          "power": 8584
+        },
+        "20010": {
+          "npc_id": "npc_v2_l32_t5_attack",
+          "name": "远山雪星",
+          "level": 32,
+          "power": 10656
+        },
+        "20015": {
+          "npc_id": "npc_v2_l31_t5_magic",
+          "name": "临风苍水",
+          "level": 31,
+          "power": 8584
+        },
+        "20014": {
+          "npc_id": "npc_v2_l32_t5_attack",
+          "name": "远山雪星",
+          "level": 32,
+          "power": 10656
+        },
+        "20013": {
+          "npc_id": "npc_v2_l50_t5_attack",
+          "name": "听雨清玄",
+          "level": 50,
+          "power": 12266
+        },
+        "9": {
+          "npc_id": "npc_v2_l63_t5_attack",
+          "name": "隐泉玄川",
+          "level": 63,
+          "power": 13419
+        }
+      }
+    },
+    {
+      "floor": 6,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l35_t5_attack",
+          "name": "飞白青玄",
+          "level": 35,
+          "power": 7928
+        },
+        "20011": {
+          "npc_id": "npc_v2_l39_t5_magic",
+          "name": "落星明玉",
+          "level": 39,
+          "power": 9239
+        },
+        "20010": {
+          "npc_id": "npc_v2_l46_t5_endurance",
+          "name": "凌波雨川",
+          "level": 46,
+          "power": 11571
+        },
+        "20015": {
+          "npc_id": "npc_v2_l39_t5_magic",
+          "name": "落星明玉",
+          "level": 39,
+          "power": 9239
+        },
+        "20014": {
+          "npc_id": "npc_v2_l46_t5_endurance",
+          "name": "凌波雨川",
+          "level": 46,
+          "power": 11571
+        },
+        "20013": {
+          "npc_id": "npc_v2_l49_t5_magic",
+          "name": "听雨雪苍",
+          "level": 49,
+          "power": 13305
+        },
+        "9": {
+          "npc_id": "npc_v2_l57_t5_attack",
+          "name": "飞白长岚",
+          "level": 57,
+          "power": 14387
+        }
+      }
+    },
+    {
+      "floor": 7,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l24_t5_endurance",
+          "name": "寒江花岚",
+          "level": 24,
+          "power": 8199
+        },
+        "20011": {
+          "npc_id": "npc_v2_l33_t5_attack",
+          "name": "青云松雪",
+          "level": 33,
+          "power": 9919
+        },
+        "20010": {
+          "npc_id": "npc_v2_l43_t5_magic",
+          "name": "醉竹月瑶",
+          "level": 43,
+          "power": 12455
+        },
+        "20015": {
+          "npc_id": "npc_v2_l33_t5_attack",
+          "name": "青云松雪",
+          "level": 33,
+          "power": 9919
+        },
+        "20014": {
+          "npc_id": "npc_v2_l43_t5_magic",
+          "name": "醉竹月瑶",
+          "level": 43,
+          "power": 12455
+        },
+        "20013": {
+          "npc_id": "npc_v2_l25_t5_attack",
+          "name": "落星山星",
+          "level": 25,
+          "power": 14298
+        },
+        "9": {
+          "npc_id": "npc_v2_l40_t5_endurance",
+          "name": "清霜竹霜",
+          "level": 40,
+          "power": 15582
+        }
+      }
+    },
+    {
+      "floor": 8,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l31_t5_magic",
+          "name": "临风苍水",
+          "level": 31,
+          "power": 8584
+        },
+        "20011": {
+          "npc_id": "npc_v2_l32_t5_attack",
+          "name": "远山雪星",
+          "level": 32,
+          "power": 10656
+        },
+        "20010": {
+          "npc_id": "npc_v2_l49_t5_magic",
+          "name": "听雨雪苍",
+          "level": 49,
+          "power": 13305
+        },
+        "20015": {
+          "npc_id": "npc_v2_l32_t5_attack",
+          "name": "远山雪星",
+          "level": 32,
+          "power": 10656
+        },
+        "20014": {
+          "npc_id": "npc_v2_l49_t5_magic",
+          "name": "听雨雪苍",
+          "level": 49,
+          "power": 13305
+        },
+        "20013": {
+          "npc_id": "npc_v2_l87_t5_endurance",
+          "name": "飞白岚雨",
+          "level": 87,
+          "power": 15330
+        },
+        "9": {
+          "npc_id": "npc_v2_l45_t5_attack",
+          "name": "落星风云",
+          "level": 45,
+          "power": 16725
+        }
+      }
+    },
+    {
+      "floor": 9,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l34_t5_endurance",
+          "name": "隐泉海霜",
+          "level": 34,
+          "power": 9388
+        },
+        "20011": {
+          "npc_id": "npc_v2_l46_t5_endurance",
+          "name": "凌波雨川",
+          "level": 46,
+          "power": 11571
+        },
+        "20010": {
+          "npc_id": "npc_v2_l57_t5_attack",
+          "name": "飞白长岚",
+          "level": 57,
+          "power": 14387
+        },
+        "20015": {
+          "npc_id": "npc_v2_l46_t5_endurance",
+          "name": "凌波雨川",
+          "level": 46,
+          "power": 11571
+        },
+        "20014": {
+          "npc_id": "npc_v2_l57_t5_attack",
+          "name": "飞白长岚",
+          "level": 57,
+          "power": 14387
+        },
+        "20013": {
+          "npc_id": "npc_v1_l24_t5_attack",
+          "name": "流霞明瑶",
+          "level": 24,
+          "power": 16447
+        },
+        "9": {
+          "npc_id": "npc_v2_l27_t5_magic",
+          "name": "观海雪明",
+          "level": 27,
+          "power": 17924
+        }
+      }
+    },
+    {
+      "floor": 10,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l42_t5_endurance",
+          "name": "寒江青竹",
+          "level": 42,
+          "power": 10143
+        },
+        "20011": {
+          "npc_id": "npc_v2_l43_t5_magic",
+          "name": "醉竹月瑶",
+          "level": 43,
+          "power": 12455
+        },
+        "20010": {
+          "npc_id": "npc_v2_l40_t5_endurance",
+          "name": "清霜竹霜",
+          "level": 40,
+          "power": 15582
+        },
+        "20015": {
+          "npc_id": "npc_v2_l43_t5_magic",
+          "name": "醉竹月瑶",
+          "level": 43,
+          "power": 12455
+        },
+        "20014": {
+          "npc_id": "npc_v2_l40_t5_endurance",
+          "name": "清霜竹霜",
+          "level": 40,
+          "power": 15582
+        },
+        "20013": {
+          "npc_id": "npc_v2_l71_t5_magic",
+          "name": "长歌青松",
+          "level": 71,
+          "power": 17799
+        },
+        "9": {
+          "npc_id": "npc_v2_l78_t5_endurance",
+          "name": "栖鹤霜星",
+          "level": 78,
+          "power": 19391
+        }
+      }
+    },
+    {
+      "floor": 11,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l34_t5_magic",
+          "name": "清霜河星",
+          "level": 34,
+          "power": 10940
+        },
+        "20011": {
+          "npc_id": "npc_v2_l49_t5_magic",
+          "name": "听雨雪苍",
+          "level": 49,
+          "power": 13305
+        },
+        "20010": {
+          "npc_id": "npc_v2_l45_t5_attack",
+          "name": "落星风云",
+          "level": 45,
+          "power": 16725
+        },
+        "20015": {
+          "npc_id": "npc_v2_l49_t5_magic",
+          "name": "听雨雪苍",
+          "level": 49,
+          "power": 13305
+        },
+        "20014": {
+          "npc_id": "npc_v2_l45_t5_attack",
+          "name": "落星风云",
+          "level": 45,
+          "power": 16725
+        },
+        "20013": {
+          "npc_id": "npc_v2_l53_t5_magic",
+          "name": "醉竹竹苍",
+          "level": 53,
+          "power": 19180
+        },
+        "9": {
+          "npc_id": "npc_v2_l63_t5_endurance",
+          "name": "远山雨海",
+          "level": 63,
+          "power": 20826
+        }
+      }
+    },
+    {
+      "floor": 12,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l46_t5_endurance",
+          "name": "凌波雨川",
+          "level": 46,
+          "power": 11571
+        },
+        "20011": {
+          "npc_id": "npc_v2_l25_t5_attack",
+          "name": "落星山星",
+          "level": 25,
+          "power": 14298
+        },
+        "20010": {
+          "npc_id": "npc_v2_l50_t5_endurance",
+          "name": "浮岚瑶风",
+          "level": 50,
+          "power": 17906
+        },
+        "20015": {
+          "npc_id": "npc_v2_l25_t5_attack",
+          "name": "落星山星",
+          "level": 25,
+          "power": 14298
+        },
+        "20014": {
+          "npc_id": "npc_v2_l50_t5_endurance",
+          "name": "浮岚瑶风",
+          "level": 50,
+          "power": 17906
+        },
+        "20013": {
+          "npc_id": "npc_v2_l49_t5_attack",
+          "name": "听雨岚河",
+          "level": 49,
+          "power": 20444
+        },
+        "9": {
+          "npc_id": "npc_v2_l69_t5_endurance",
+          "name": "长歌青玄",
+          "level": 69,
+          "power": 22357
+        }
+      }
+    },
+    {
+      "floor": 13,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l52_t5_attack",
+          "name": "流霞水松",
+          "level": 52,
+          "power": 12491
+        },
+        "20011": {
+          "npc_id": "npc_v2_l87_t5_endurance",
+          "name": "飞白岚雨",
+          "level": 87,
+          "power": 15330
+        },
+        "20010": {
+          "npc_id": "npc_v2_l36_t5_attack",
+          "name": "问道雨月",
+          "level": 36,
+          "power": 19203
+        },
+        "20015": {
+          "npc_id": "npc_v2_l87_t5_endurance",
+          "name": "飞白岚雨",
+          "level": 87,
+          "power": 15330
+        },
+        "20014": {
+          "npc_id": "npc_v2_l36_t5_attack",
+          "name": "问道雨月",
+          "level": 36,
+          "power": 19203
+        },
+        "20013": {
+          "npc_id": "npc_v2_l81_t5_attack",
+          "name": "栖鹤雨瑶",
+          "level": 81,
+          "power": 22072
+        },
+        "9": {
+          "npc_id": "npc_v2_l55_t5_magic",
+          "name": "朝露川月",
+          "level": 55,
+          "power": 24043
+        }
+      }
+    },
+    {
+      "floor": 14,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l63_t5_attack",
+          "name": "隐泉玄川",
+          "level": 63,
+          "power": 13419
+        },
+        "20011": {
+          "npc_id": "npc_v1_l24_t5_attack",
+          "name": "流霞明瑶",
+          "level": 24,
+          "power": 16447
+        },
+        "20010": {
+          "npc_id": "npc_v2_l72_t5_attack",
+          "name": "观海青清",
+          "level": 72,
+          "power": 20746
+        },
+        "20015": {
+          "npc_id": "npc_v1_l24_t5_attack",
+          "name": "流霞明瑶",
+          "level": 24,
+          "power": 16447
+        },
+        "20014": {
+          "npc_id": "npc_v2_l72_t5_attack",
+          "name": "观海青清",
+          "level": 72,
+          "power": 20746
+        },
+        "20013": {
+          "npc_id": "npc_v2_l37_t5_magic",
+          "name": "临风河秋",
+          "level": 37,
+          "power": 23652
+        },
+        "9": {
+          "npc_id": "npc_v2_l67_t5_attack",
+          "name": "醉竹琴空",
+          "level": 67,
+          "power": 25810
+        }
+      }
+    },
+    {
+      "floor": 15,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l75_t5_endurance",
+          "name": "渡川长玉",
+          "level": 75,
+          "power": 14460
+        },
+        "20011": {
+          "npc_id": "npc_v2_l71_t5_magic",
+          "name": "长歌青松",
+          "level": 71,
+          "power": 17799
+        },
+        "20010": {
+          "npc_id": "npc_v2_l61_t5_magic",
+          "name": "隐泉长瑶",
+          "level": 61,
+          "power": 22243
+        },
+        "20015": {
+          "npc_id": "npc_v2_l71_t5_magic",
+          "name": "长歌青松",
+          "level": 71,
+          "power": 17799
+        },
+        "20014": {
+          "npc_id": "npc_v2_l61_t5_magic",
+          "name": "隐泉长瑶",
+          "level": 61,
+          "power": 22243
+        },
+        "20013": {
+          "npc_id": "npc_v2_l67_t5_attack",
+          "name": "醉竹琴空",
+          "level": 67,
+          "power": 25810
+        },
+        "9": {
+          "npc_id": "npc_v2_l24_t4_magic",
+          "name": "望月月霜",
+          "level": 24,
+          "power": 27856
+        }
+      }
+    },
+    {
+      "floor": 16,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l40_t5_endurance",
+          "name": "清霜竹霜",
+          "level": 40,
+          "power": 15582
+        },
+        "20011": {
+          "npc_id": "npc_v2_l53_t5_magic",
+          "name": "醉竹竹苍",
+          "level": 53,
+          "power": 19180
+        },
+        "20010": {
+          "npc_id": "npc_v2_l55_t5_magic",
+          "name": "朝露川月",
+          "level": 55,
+          "power": 24043
+        },
+        "20015": {
+          "npc_id": "npc_v2_l53_t5_magic",
+          "name": "醉竹竹苍",
+          "level": 53,
+          "power": 19180
+        },
+        "20014": {
+          "npc_id": "npc_v2_l55_t5_magic",
+          "name": "朝露川月",
+          "level": 55,
+          "power": 24043
+        },
+        "20013": {
+          "npc_id": "npc_v1_l24_t4_endurance",
+          "name": "醉竹雪长",
+          "level": 24,
+          "power": 27560
+        },
+        "9": {
+          "npc_id": "npc_v2_l44_t5_attack",
+          "name": "问道河雨",
+          "level": 44,
+          "power": 29947
+        }
+      }
+    },
+    {
+      "floor": 17,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l45_t5_attack",
+          "name": "落星风云",
+          "level": 45,
+          "power": 16725
+        },
+        "20011": {
+          "npc_id": "npc_v2_l72_t5_attack",
+          "name": "观海青清",
+          "level": 72,
+          "power": 20746
+        },
+        "20010": {
+          "npc_id": "npc_v2_l67_t5_attack",
+          "name": "醉竹琴空",
+          "level": 67,
+          "power": 25810
+        },
+        "20015": {
+          "npc_id": "npc_v2_l72_t5_attack",
+          "name": "观海青清",
+          "level": 72,
+          "power": 20746
+        },
+        "20014": {
+          "npc_id": "npc_v2_l67_t5_attack",
+          "name": "醉竹琴空",
+          "level": 67,
+          "power": 25810
+        },
+        "20013": {
+          "npc_id": "npc_v2_l46_t5_magic",
+          "name": "临风岚风",
+          "level": 46,
+          "power": 29658
+        },
+        "9": {
+          "npc_id": "npc_v2_l80_t5_attack",
+          "name": "临风长琴",
+          "level": 80,
+          "power": 32519
+        }
+      }
+    },
+    {
+      "floor": 18,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l27_t5_magic",
+          "name": "观海雪明",
+          "level": 27,
+          "power": 17924
+        },
+        "20011": {
+          "npc_id": "npc_v2_l61_t5_magic",
+          "name": "隐泉长瑶",
+          "level": 61,
+          "power": 22243
+        },
+        "20010": {
+          "npc_id": "npc_v2_l24_t4_magic",
+          "name": "望月月霜",
+          "level": 24,
+          "power": 27856
+        },
+        "20015": {
+          "npc_id": "npc_v2_l61_t5_magic",
+          "name": "隐泉长瑶",
+          "level": 61,
+          "power": 22243
+        },
+        "20014": {
+          "npc_id": "npc_v2_l24_t4_magic",
+          "name": "望月月霜",
+          "level": 24,
+          "power": 27856
+        },
+        "20013": {
+          "npc_id": "npc_v2_l59_t5_magic",
+          "name": "凌波川松",
+          "level": 59,
+          "power": 31660
+        },
+        "9": {
+          "npc_id": "npc_v2_l65_t5_magic",
+          "name": "凌波云清",
+          "level": 65,
+          "power": 34721
+        }
+      }
+    },
+    {
+      "floor": 19,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l78_t5_endurance",
+          "name": "栖鹤霜星",
+          "level": 78,
+          "power": 19391
+        },
+        "20011": {
+          "npc_id": "npc_v2_l55_t5_magic",
+          "name": "朝露川月",
+          "level": 55,
+          "power": 24043
+        },
+        "20010": {
+          "npc_id": "npc_v2_l28_t4_attack",
+          "name": "临风鹤玉",
+          "level": 28,
+          "power": 29903
+        },
+        "20015": {
+          "npc_id": "npc_v2_l55_t5_magic",
+          "name": "朝露川月",
+          "level": 55,
+          "power": 24043
+        },
+        "20014": {
+          "npc_id": "npc_v2_l28_t4_attack",
+          "name": "临风鹤玉",
+          "level": 28,
+          "power": 29903
+        },
+        "20013": {
+          "npc_id": "npc_v2_l28_t4_magic",
+          "name": "浮岚青秋",
+          "level": 28,
+          "power": 34333
+        },
+        "9": {
+          "npc_id": "npc_v2_l90_t5_endurance",
+          "name": "云溪河海",
+          "level": 90,
+          "power": 37404
+        }
+      }
+    },
+    {
+      "floor": 20,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l63_t5_endurance",
+          "name": "远山雨海",
+          "level": 63,
+          "power": 20826
+        },
+        "20011": {
+          "npc_id": "npc_v2_l67_t5_attack",
+          "name": "醉竹琴空",
+          "level": 67,
+          "power": 25810
+        },
+        "20010": {
+          "npc_id": "npc_v2_l80_t5_attack",
+          "name": "临风长琴",
+          "level": 80,
+          "power": 32519
+        },
+        "20015": {
+          "npc_id": "npc_v2_l67_t5_attack",
+          "name": "醉竹琴空",
+          "level": 67,
+          "power": 25810
+        },
+        "20014": {
+          "npc_id": "npc_v2_l80_t5_attack",
+          "name": "临风长琴",
+          "level": 80,
+          "power": 32519
+        },
+        "20013": {
+          "npc_id": "npc_v2_l81_t5_magic",
+          "name": "渡川清秋",
+          "level": 81,
+          "power": 36937
+        },
+        "9": {
+          "npc_id": "npc_v2_l54_t5_attack",
+          "name": "凌波松风",
+          "level": 54,
+          "power": 40189
+        }
+      }
+    },
+    {
+      "floor": 21,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l68_t5_attack",
+          "name": "清霜云剑",
+          "level": 68,
+          "power": 22451
+        },
+        "20011": {
+          "npc_id": "npc_v2_l49_t5_endurance",
+          "name": "望月剑瑶",
+          "level": 49,
+          "power": 27638
+        },
+        "20010": {
+          "npc_id": "npc_v2_l65_t5_magic",
+          "name": "凌波云清",
+          "level": 65,
+          "power": 34721
+        },
+        "20015": {
+          "npc_id": "npc_v2_l49_t5_endurance",
+          "name": "望月剑瑶",
+          "level": 49,
+          "power": 27638
+        },
+        "20014": {
+          "npc_id": "npc_v2_l65_t5_magic",
+          "name": "凌波云清",
+          "level": 65,
+          "power": 34721
+        },
+        "20013": {
+          "npc_id": "npc_v2_l57_t5_endurance",
+          "name": "听雨岚瑶",
+          "level": 57,
+          "power": 39446
+        },
+        "9": {
+          "npc_id": "npc_v2_l72_t5_magic",
+          "name": "流霞苍雪",
+          "level": 72,
+          "power": 43253
+        }
+      }
+    },
+    {
+      "floor": 22,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l74_t5_attack",
+          "name": "落星山河",
+          "level": 74,
+          "power": 24249
+        },
+        "20011": {
+          "npc_id": "npc_v1_l24_t4_attack",
+          "name": "朝露明松",
+          "level": 24,
+          "power": 29689
+        },
+        "20010": {
+          "npc_id": "npc_v2_l78_t5_attack",
+          "name": "松间水花",
+          "level": 78,
+          "power": 37239
+        },
+        "20015": {
+          "npc_id": "npc_v1_l24_t4_attack",
+          "name": "朝露明松",
+          "level": 24,
+          "power": 29689
+        },
+        "20014": {
+          "npc_id": "npc_v2_l78_t5_attack",
+          "name": "松间水花",
+          "level": 78,
+          "power": 37239
+        },
+        "20013": {
+          "npc_id": "npc_v1_l65_t5_endurance",
+          "name": "望月青鹤",
+          "level": 65,
+          "power": 42763
+        },
+        "9": {
+          "npc_id": "npc_v1_l90_t5_endurance",
+          "name": "听雨月霜",
+          "level": 90,
+          "power": 46465
+        }
+      }
+    },
+    {
+      "floor": 23,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l24_t4_endurance",
+          "name": "云溪秋水",
+          "level": 24,
+          "power": 26001
+        },
+        "20011": {
+          "npc_id": "npc_v2_l59_t5_magic",
+          "name": "凌波川松",
+          "level": 59,
+          "power": 31660
+        },
+        "20010": {
+          "npc_id": "npc_v2_l55_t5_endurance",
+          "name": "流霞清山",
+          "level": 55,
+          "power": 40113
+        },
+        "20015": {
+          "npc_id": "npc_v2_l59_t5_magic",
+          "name": "凌波川松",
+          "level": 59,
+          "power": 31660
+        },
+        "20014": {
+          "npc_id": "npc_v2_l55_t5_endurance",
+          "name": "流霞清山",
+          "level": 55,
+          "power": 40113
+        },
+        "20013": {
+          "npc_id": "npc_v2_l74_t5_magic",
+          "name": "隐泉岚竹",
+          "level": 74,
+          "power": 46231
+        },
+        "9": {
+          "npc_id": "npc_v2_l34_t4_magic",
+          "name": "观海玄川",
+          "level": 34,
+          "power": 49832
+        }
+      }
+    },
+    {
+      "floor": 24,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v1_l36_t5_magic",
+          "name": "寒江雪鹤",
+          "level": 36,
+          "power": 27862
+        },
+        "20011": {
+          "npc_id": "npc_v2_l28_t4_magic",
+          "name": "浮岚青秋",
+          "level": 28,
+          "power": 34333
+        },
+        "20010": {
+          "npc_id": "npc_v2_l72_t5_magic",
+          "name": "流霞苍雪",
+          "level": 72,
+          "power": 43253
+        },
+        "20015": {
+          "npc_id": "npc_v2_l28_t4_magic",
+          "name": "浮岚青秋",
+          "level": 28,
+          "power": 34333
+        },
+        "20014": {
+          "npc_id": "npc_v2_l72_t5_magic",
+          "name": "流霞苍雪",
+          "level": 72,
+          "power": 43253
+        },
+        "20013": {
+          "npc_id": "npc_v2_l90_t5_magic",
+          "name": "清霜琴山",
+          "level": 90,
+          "power": 49475
+        },
+        "9": {
+          "npc_id": "npc_v2_l86_t5_magic",
+          "name": "临风空剑",
+          "level": 86,
+          "power": 54027
+        }
+      }
+    },
+    {
+      "floor": 25,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l38_t5_magic",
+          "name": "流霞长明",
+          "level": 38,
+          "power": 30035
+        },
+        "20011": {
+          "npc_id": "npc_v2_l81_t5_magic",
+          "name": "渡川清秋",
+          "level": 81,
+          "power": 36937
+        },
+        "20010": {
+          "npc_id": "npc_v2_l24_t3_magic",
+          "name": "隐泉玉花",
+          "level": 24,
+          "power": 46293
+        },
+        "20015": {
+          "npc_id": "npc_v2_l81_t5_magic",
+          "name": "渡川清秋",
+          "level": 81,
+          "power": 36937
+        },
+        "20014": {
+          "npc_id": "npc_v2_l24_t3_magic",
+          "name": "隐泉玉花",
+          "level": 24,
+          "power": 46293
+        },
+        "20013": {
+          "npc_id": "npc_v2_l82_t5_endurance",
+          "name": "松间山水",
+          "level": 82,
+          "power": 53166
+        },
+        "9": {
+          "npc_id": "npc_v2_l25_t3_attack",
+          "name": "松间松瑶",
+          "level": 25,
+          "power": 57786
+        }
+      }
+    },
+    {
+      "floor": 26,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l80_t5_attack",
+          "name": "临风长琴",
+          "level": 80,
+          "power": 32519
+        },
+        "20011": {
+          "npc_id": "npc_v2_l55_t5_endurance",
+          "name": "流霞清山",
+          "level": 55,
+          "power": 40113
+        },
+        "20010": {
+          "npc_id": "npc_v2_l34_t4_magic",
+          "name": "观海玄川",
+          "level": 34,
+          "power": 49832
+        },
+        "20015": {
+          "npc_id": "npc_v2_l55_t5_endurance",
+          "name": "流霞清山",
+          "level": 55,
+          "power": 40113
+        },
+        "20014": {
+          "npc_id": "npc_v2_l34_t4_magic",
+          "name": "观海玄川",
+          "level": 34,
+          "power": 49832
+        },
+        "20013": {
+          "npc_id": "npc_v2_l29_t3_endurance",
+          "name": "长歌花雨",
+          "level": 29,
+          "power": 57207
+        },
+        "9": {
+          "npc_id": "npc_v2_l45_t4_attack",
+          "name": "踏雪玉水",
+          "level": 45,
+          "power": 61867
+        }
+      }
+    },
+    {
+      "floor": 27,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l29_t4_magic",
+          "name": "凌波海风",
+          "level": 29,
+          "power": 34861
+        },
+        "20011": {
+          "npc_id": "npc_v1_l65_t5_endurance",
+          "name": "望月青鹤",
+          "level": 65,
+          "power": 42763
+        },
+        "20010": {
+          "npc_id": "npc_v2_l86_t5_magic",
+          "name": "临风空剑",
+          "level": 86,
+          "power": 54027
+        },
+        "20015": {
+          "npc_id": "npc_v1_l65_t5_endurance",
+          "name": "望月青鹤",
+          "level": 65,
+          "power": 42763
+        },
+        "20014": {
+          "npc_id": "npc_v2_l86_t5_magic",
+          "name": "临风空剑",
+          "level": 86,
+          "power": 54027
+        },
+        "20013": {
+          "npc_id": "npc_v2_l45_t4_attack",
+          "name": "踏雪玉水",
+          "level": 45,
+          "power": 61867
+        },
+        "9": {
+          "npc_id": "npc_v2_l53_t4_endurance",
+          "name": "清霜雪花",
+          "level": 53,
+          "power": 66864
+        }
+      }
+    },
+    {
+      "floor": 28,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l27_t4_magic",
+          "name": "临风风雪",
+          "level": 27,
+          "power": 37503
+        },
+        "20011": {
+          "npc_id": "npc_v2_l74_t5_magic",
+          "name": "隐泉岚竹",
+          "level": 74,
+          "power": 46231
+        },
+        "20010": {
+          "npc_id": "npc_v2_l25_t3_attack",
+          "name": "松间松瑶",
+          "level": 25,
+          "power": 57786
+        },
+        "20015": {
+          "npc_id": "npc_v2_l74_t5_magic",
+          "name": "隐泉岚竹",
+          "level": 74,
+          "power": 46231
+        },
+        "20014": {
+          "npc_id": "npc_v2_l25_t3_attack",
+          "name": "松间松瑶",
+          "level": 25,
+          "power": 57786
+        },
+        "20013": {
+          "npc_id": "npc_v2_l44_t4_magic",
+          "name": "寻仙河风",
+          "level": 44,
+          "power": 66226
+        },
+        "9": {
+          "npc_id": "npc_v2_l59_t4_endurance",
+          "name": "寻仙星风",
+          "level": 59,
+          "power": 72362
+        }
+      }
+    },
+    {
+      "floor": 29,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v1_l60_t5_endurance",
+          "name": "醉竹水瑶",
+          "level": 60,
+          "power": 40360
+        },
+        "20011": {
+          "npc_id": "npc_v2_l34_t4_magic",
+          "name": "观海玄川",
+          "level": 34,
+          "power": 49832
+        },
+        "20010": {
+          "npc_id": "npc_v2_l45_t4_attack",
+          "name": "踏雪玉水",
+          "level": 45,
+          "power": 61867
+        },
+        "20015": {
+          "npc_id": "npc_v2_l34_t4_magic",
+          "name": "观海玄川",
+          "level": 34,
+          "power": 49832
+        },
+        "20014": {
+          "npc_id": "npc_v2_l45_t4_attack",
+          "name": "踏雪玉水",
+          "level": 45,
+          "power": 61867
+        },
+        "20013": {
+          "npc_id": "npc_v2_l32_t3_attack",
+          "name": "青云苍剑",
+          "level": 32,
+          "power": 71423
+        },
+        "9": {
+          "npc_id": "npc_v2_l42_t4_attack",
+          "name": "问道竹水",
+          "level": 42,
+          "power": 77600
+        }
+      }
+    },
+    {
+      "floor": 30,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l89_t5_attack",
+          "name": "落星风岚",
+          "level": 89,
+          "power": 43479
+        },
+        "20011": {
+          "npc_id": "npc_v2_l82_t5_endurance",
+          "name": "松间山水",
+          "level": 82,
+          "power": 53166
+        },
+        "20010": {
+          "npc_id": "npc_v2_l53_t4_endurance",
+          "name": "清霜雪花",
+          "level": 53,
+          "power": 66864
+        },
+        "20015": {
+          "npc_id": "npc_v2_l82_t5_endurance",
+          "name": "松间山水",
+          "level": 82,
+          "power": 53166
+        },
+        "20014": {
+          "npc_id": "npc_v2_l53_t4_endurance",
+          "name": "清霜雪花",
+          "level": 53,
+          "power": 66864
+        },
+        "20013": {
+          "npc_id": "npc_v2_l26_t2_magic",
+          "name": "寻仙川玉",
+          "level": 26,
+          "power": 76776
+        },
+        "9": {
+          "npc_id": "npc_v2_l48_t4_attack",
+          "name": "问道玄瑶",
+          "level": 48,
+          "power": 83679
+        }
+      }
+    },
+    {
+      "floor": 31,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v1_l24_t3_magic",
+          "name": "流霞山雨",
+          "level": 24,
+          "power": 46750
+        },
+        "20011": {
+          "npc_id": "npc_v2_l42_t4_endurance",
+          "name": "朝露秋月",
+          "level": 42,
+          "power": 57465
+        },
+        "20010": {
+          "npc_id": "npc_v2_l25_t2_attack",
+          "name": "醉竹岚水",
+          "level": 25,
+          "power": 71880
+        },
+        "20015": {
+          "npc_id": "npc_v2_l42_t4_endurance",
+          "name": "朝露秋月",
+          "level": 42,
+          "power": 57465
+        },
+        "20014": {
+          "npc_id": "npc_v2_l25_t2_attack",
+          "name": "醉竹岚水",
+          "level": 25,
+          "power": 71880
+        },
+        "20013": {
+          "npc_id": "npc_v2_l34_t3_magic",
+          "name": "栖鹤竹玄",
+          "level": 34,
+          "power": 82623
+        },
+        "9": {
+          "npc_id": "npc_v2_l50_t4_endurance",
+          "name": "松间清月",
+          "level": 50,
+          "power": 89866
+        }
+      }
+    },
+    {
+      "floor": 32,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l34_t4_magic",
+          "name": "观海玄川",
+          "level": 34,
+          "power": 49832
+        },
+        "20011": {
+          "npc_id": "npc_v2_l45_t4_attack",
+          "name": "踏雪玉水",
+          "level": 45,
+          "power": 61867
+        },
+        "20010": {
+          "npc_id": "npc_v2_l46_t4_attack",
+          "name": "浮岚长雪",
+          "level": 46,
+          "power": 77410
+        },
+        "20015": {
+          "npc_id": "npc_v2_l45_t4_attack",
+          "name": "踏雪玉水",
+          "level": 45,
+          "power": 61867
+        },
+        "20014": {
+          "npc_id": "npc_v2_l46_t4_attack",
+          "name": "浮岚长雪",
+          "level": 46,
+          "power": 77410
+        },
+        "20013": {
+          "npc_id": "npc_v2_l66_t4_attack",
+          "name": "隐泉长风",
+          "level": 66,
+          "power": 89079
+        },
+        "9": {
+          "npc_id": "npc_v2_l68_t4_magic",
+          "name": "远山空花",
+          "level": 68,
+          "power": 96656
+        }
+      }
+    },
+    {
+      "floor": 33,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l86_t5_magic",
+          "name": "临风空剑",
+          "level": 86,
+          "power": 54027
+        },
+        "20011": {
+          "npc_id": "npc_v2_l53_t4_endurance",
+          "name": "清霜雪花",
+          "level": 53,
+          "power": 66864
+        },
+        "20010": {
+          "npc_id": "npc_v2_l27_t2_magic",
+          "name": "青云雪松",
+          "level": 27,
+          "power": 82864
+        },
+        "20015": {
+          "npc_id": "npc_v2_l53_t4_endurance",
+          "name": "清霜雪花",
+          "level": 53,
+          "power": 66864
+        },
+        "20014": {
+          "npc_id": "npc_v2_l27_t2_magic",
+          "name": "青云雪松",
+          "level": 27,
+          "power": 82864
+        },
+        "20013": {
+          "npc_id": "npc_v2_l60_t4_magic",
+          "name": "浮岚河风",
+          "level": 60,
+          "power": 95625
+        },
+        "9": {
+          "npc_id": "npc_v2_l73_t4_endurance",
+          "name": "落星苍玄",
+          "level": 73,
+          "power": 104312
+        }
+      }
+    },
+    {
+      "floor": 34,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l40_t4_endurance",
+          "name": "踏雪水归",
+          "level": 40,
+          "power": 58419
+        },
+        "20011": {
+          "npc_id": "npc_v2_l33_t3_attack",
+          "name": "栖鹤竹明",
+          "level": 33,
+          "power": 71650
+        },
+        "20010": {
+          "npc_id": "npc_v2_l70_t4_magic",
+          "name": "醉竹明长",
+          "level": 70,
+          "power": 89622
+        },
+        "20015": {
+          "npc_id": "npc_v2_l33_t3_attack",
+          "name": "栖鹤竹明",
+          "level": 33,
+          "power": 71650
+        },
+        "20014": {
+          "npc_id": "npc_v2_l70_t4_magic",
+          "name": "醉竹明长",
+          "level": 70,
+          "power": 89622
+        },
+        "20013": {
+          "npc_id": "npc_v1_l80_t4_attack",
+          "name": "青云松秋",
+          "level": 80,
+          "power": 103105
+        },
+        "9": {
+          "npc_id": "npc_v2_l90_t4_magic",
+          "name": "问道清松",
+          "level": 90,
+          "power": 112055
+        }
+      }
+    },
+    {
+      "floor": 35,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l50_t4_attack",
+          "name": "醉竹雪水",
+          "level": 50,
+          "power": 63173
+        },
+        "20011": {
+          "npc_id": "npc_v2_l55_t4_endurance",
+          "name": "松间山鹤",
+          "level": 55,
+          "power": 77069
+        },
+        "20010": {
+          "npc_id": "npc_v2_l70_t4_endurance",
+          "name": "清霜星月",
+          "level": 70,
+          "power": 96421
+        },
+        "20015": {
+          "npc_id": "npc_v2_l55_t4_endurance",
+          "name": "松间山鹤",
+          "level": 55,
+          "power": 77069
+        },
+        "20014": {
+          "npc_id": "npc_v2_l70_t4_endurance",
+          "name": "清霜星月",
+          "level": 70,
+          "power": 96421
+        },
+        "20013": {
+          "npc_id": "npc_v2_l83_t4_endurance",
+          "name": "凌波长风",
+          "level": 83,
+          "power": 110565
+        },
+        "9": {
+          "npc_id": "npc_v2_l47_t3_endurance",
+          "name": "落星川苍",
+          "level": 47,
+          "power": 120515
+        }
+      }
+    },
+    {
+      "floor": 36,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l45_t4_endurance",
+          "name": "长歌山明",
+          "level": 45,
+          "power": 67443
+        },
+        "20011": {
+          "npc_id": "npc_v2_l27_t2_magic",
+          "name": "青云雪松",
+          "level": 27,
+          "power": 82864
+        },
+        "20010": {
+          "npc_id": "npc_v2_l69_t4_magic",
+          "name": "寻仙云月",
+          "level": 69,
+          "power": 103455
+        },
+        "20015": {
+          "npc_id": "npc_v2_l27_t2_magic",
+          "name": "青云雪松",
+          "level": 27,
+          "power": 82864
+        },
+        "20014": {
+          "npc_id": "npc_v2_l69_t4_magic",
+          "name": "寻仙云月",
+          "level": 69,
+          "power": 103455
+        },
+        "20013": {
+          "npc_id": "npc_v2_l87_t4_endurance",
+          "name": "朝露花鹤",
+          "level": 87,
+          "power": 119160
+        },
+        "9": {
+          "npc_id": "npc_v1_l50_t3_magic",
+          "name": "醉竹秋苍",
+          "level": 50,
+          "power": 129688
+        }
+      }
+    },
+    {
+      "floor": 37,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l58_t4_attack",
+          "name": "飞白鹤清",
+          "level": 58,
+          "power": 72439
+        },
+        "20011": {
+          "npc_id": "npc_v2_l66_t4_attack",
+          "name": "隐泉长风",
+          "level": 66,
+          "power": 89079
+        },
+        "20010": {
+          "npc_id": "npc_v2_l33_t2_endurance",
+          "name": "醉竹归星",
+          "level": 33,
+          "power": 111371
+        },
+        "20015": {
+          "npc_id": "npc_v2_l66_t4_attack",
+          "name": "隐泉长风",
+          "level": 66,
+          "power": 89079
+        },
+        "20014": {
+          "npc_id": "npc_v2_l33_t2_endurance",
+          "name": "醉竹归星",
+          "level": 33,
+          "power": 111371
+        },
+        "20013": {
+          "npc_id": "npc_v2_l35_t2_attack",
+          "name": "醉竹明琴",
+          "level": 35,
+          "power": 128328
+        },
+        "9": {
+          "npc_id": "npc_v1_l30_t2_attack",
+          "name": "踏雪岚清",
+          "level": 30,
+          "power": 138853
+        }
+      }
+    },
+    {
+      "floor": 38,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l42_t4_attack",
+          "name": "问道竹水",
+          "level": 42,
+          "power": 77600
+        },
+        "20011": {
+          "npc_id": "npc_v2_l82_t4_endurance",
+          "name": "栖鹤琴剑",
+          "level": 82,
+          "power": 95908
+        },
+        "20010": {
+          "npc_id": "npc_v2_l85_t4_attack",
+          "name": "青云瑶花",
+          "level": 85,
+          "power": 119887
+        },
+        "20015": {
+          "npc_id": "npc_v2_l82_t4_endurance",
+          "name": "栖鹤琴剑",
+          "level": 82,
+          "power": 95908
+        },
+        "20014": {
+          "npc_id": "npc_v2_l85_t4_attack",
+          "name": "青云瑶花",
+          "level": 85,
+          "power": 119887
+        },
+        "20013": {
+          "npc_id": "npc_v2_l48_t3_endurance",
+          "name": "远山秋风",
+          "level": 48,
+          "power": 137975
+        },
+        "9": {
+          "npc_id": "npc_v2_l53_t3_endurance",
+          "name": "落星竹剑",
+          "level": 53,
+          "power": 150569
+        }
+      }
+    },
+    {
+      "floor": 39,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l75_t4_magic",
+          "name": "云溪霜苍",
+          "level": 75,
+          "power": 84080
+        },
+        "20011": {
+          "npc_id": "npc_v1_l80_t4_attack",
+          "name": "青云松秋",
+          "level": 80,
+          "power": 103105
+        },
+        "20010": {
+          "npc_id": "npc_v2_l47_t3_magic",
+          "name": "栖鹤归鹤",
+          "level": 47,
+          "power": 129108
+        },
+        "20015": {
+          "npc_id": "npc_v1_l80_t4_attack",
+          "name": "青云松秋",
+          "level": 80,
+          "power": 103105
+        },
+        "20014": {
+          "npc_id": "npc_v2_l47_t3_magic",
+          "name": "栖鹤归鹤",
+          "level": 47,
+          "power": 129108
+        },
+        "20013": {
+          "npc_id": "npc_v2_l53_t3_magic",
+          "name": "栖鹤秋青",
+          "level": 53,
+          "power": 148760
+        },
+        "9": {
+          "npc_id": "npc_v2_l57_t3_attack",
+          "name": "渡川岚川",
+          "level": 57,
+          "power": 161376
+        }
+      }
+    },
+    {
+      "floor": 40,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v1_l80_t4_magic",
+          "name": "栖鹤琴玉",
+          "level": 80,
+          "power": 90150
+        },
+        "20011": {
+          "npc_id": "npc_v2_l44_t3_attack",
+          "name": "青云长玄",
+          "level": 44,
+          "power": 111104
+        },
+        "20010": {
+          "npc_id": "npc_v1_l30_t2_attack",
+          "name": "踏雪岚清",
+          "level": 30,
+          "power": 138853
+        },
+        "20015": {
+          "npc_id": "npc_v2_l44_t3_attack",
+          "name": "青云长玄",
+          "level": 44,
+          "power": 111104
+        },
+        "20014": {
+          "npc_id": "npc_v1_l30_t2_attack",
+          "name": "踏雪岚清",
+          "level": 30,
+          "power": 138853
+        },
+        "20013": {
+          "npc_id": "npc_v1_l36_t2_magic",
+          "name": "望月川月",
+          "level": 36,
+          "power": 159869
+        },
+        "9": {
+          "npc_id": "npc_v2_l29_t1_endurance",
+          "name": "流霞河水",
+          "level": 29,
+          "power": 173662
+        }
+      }
+    },
+    {
+      "floor": 41,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v1_l36_t3_magic",
+          "name": "落星清长",
+          "level": 36,
+          "power": 97156
+        },
+        "20011": {
+          "npc_id": "npc_v2_l42_t3_attack",
+          "name": "醉竹河山",
+          "level": 42,
+          "power": 119578
+        },
+        "20010": {
+          "npc_id": "npc_v2_l25_t1_attack",
+          "name": "落星清星",
+          "level": 25,
+          "power": 149135
+        },
+        "20015": {
+          "npc_id": "npc_v2_l42_t3_attack",
+          "name": "醉竹河山",
+          "level": 42,
+          "power": 119578
+        },
+        "20014": {
+          "npc_id": "npc_v2_l25_t1_attack",
+          "name": "落星清星",
+          "level": 25,
+          "power": 149135
+        },
+        "20013": {
+          "npc_id": "npc_v2_l52_t3_attack",
+          "name": "望月月空",
+          "level": 52,
+          "power": 171712
+        },
+        "9": {
+          "npc_id": "npc_v2_l58_t3_attack",
+          "name": "流霞秋月",
+          "level": 58,
+          "power": 185998
+        }
+      }
+    },
+    {
+      "floor": 42,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l63_t4_magic",
+          "name": "落星川水",
+          "level": 63,
+          "power": 104407
+        },
+        "20011": {
+          "npc_id": "npc_v2_l44_t3_magic",
+          "name": "隐泉竹星",
+          "level": 44,
+          "power": 128608
+        },
+        "20010": {
+          "npc_id": "npc_v2_l26_t1_magic",
+          "name": "清霜鹤玉",
+          "level": 26,
+          "power": 160540
+        },
+        "20015": {
+          "npc_id": "npc_v2_l44_t3_magic",
+          "name": "隐泉竹星",
+          "level": 44,
+          "power": 128608
+        },
+        "20014": {
+          "npc_id": "npc_v2_l26_t1_magic",
+          "name": "清霜鹤玉",
+          "level": 26,
+          "power": 160540
+        },
+        "20013": {
+          "npc_id": "npc_v2_l58_t3_attack",
+          "name": "流霞秋月",
+          "level": 58,
+          "power": 185998
+        },
+        "9": {
+          "npc_id": "npc_v2_l45_t2_magic",
+          "name": "凌波雨明",
+          "level": 45,
+          "power": 200579
+        }
+      }
+    },
+    {
+      "floor": 43,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l90_t4_magic",
+          "name": "问道清松",
+          "level": 90,
+          "power": 112055
+        },
+        "20011": {
+          "npc_id": "npc_v2_l48_t3_endurance",
+          "name": "远山秋风",
+          "level": 48,
+          "power": 137975
+        },
+        "20010": {
+          "npc_id": "npc_v2_l28_t1_magic",
+          "name": "清霜山月",
+          "level": 28,
+          "power": 173016
+        },
+        "20015": {
+          "npc_id": "npc_v2_l48_t3_endurance",
+          "name": "远山秋风",
+          "level": 48,
+          "power": 137975
+        },
+        "20014": {
+          "npc_id": "npc_v2_l28_t1_magic",
+          "name": "清霜山月",
+          "level": 28,
+          "power": 173016
+        },
+        "20013": {
+          "npc_id": "npc_v2_l60_t3_magic",
+          "name": "寻仙清青",
+          "level": 60,
+          "power": 198900
+        },
+        "9": {
+          "npc_id": "npc_v2_l35_t1_endurance",
+          "name": "渡川瑶海",
+          "level": 35,
+          "power": 216426
+        }
+      }
+    },
+    {
+      "floor": 44,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l38_t3_endurance",
+          "name": "落星山霜",
+          "level": 38,
+          "power": 120753
+        },
+        "20011": {
+          "npc_id": "npc_v2_l53_t3_magic",
+          "name": "栖鹤秋青",
+          "level": 53,
+          "power": 148760
+        },
+        "20010": {
+          "npc_id": "npc_v2_l58_t3_attack",
+          "name": "流霞秋月",
+          "level": 58,
+          "power": 185998
+        },
+        "20015": {
+          "npc_id": "npc_v2_l53_t3_magic",
+          "name": "栖鹤秋青",
+          "level": 53,
+          "power": 148760
+        },
+        "20014": {
+          "npc_id": "npc_v2_l58_t3_attack",
+          "name": "流霞秋月",
+          "level": 58,
+          "power": 185998
+        },
+        "20013": {
+          "npc_id": "npc_v2_l69_t3_endurance",
+          "name": "远山空竹",
+          "level": 69,
+          "power": 213650
+        },
+        "9": {
+          "npc_id": "npc_v2_l84_t3_endurance",
+          "name": "隐泉归雪",
+          "level": 84,
+          "power": 231984
+        }
+      }
+    },
+    {
+      "floor": 45,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l43_t3_endurance",
+          "name": "凌波秋玄",
+          "level": 43,
+          "power": 129763
+        },
+        "20011": {
+          "npc_id": "npc_v2_l55_t3_endurance",
+          "name": "落星空月",
+          "level": 55,
+          "power": 160111
+        },
+        "20010": {
+          "npc_id": "npc_v1_l60_t3_attack",
+          "name": "飞白松风",
+          "level": 60,
+          "power": 200479
+        },
+        "20015": {
+          "npc_id": "npc_v2_l55_t3_endurance",
+          "name": "落星空月",
+          "level": 55,
+          "power": 160111
+        },
+        "20014": {
+          "npc_id": "npc_v1_l60_t3_attack",
+          "name": "飞白松风",
+          "level": 60,
+          "power": 200479
+        },
+        "20013": {
+          "npc_id": "npc_v2_l78_t3_endurance",
+          "name": "临风山云",
+          "level": 78,
+          "power": 230182
+        },
+        "9": {
+          "npc_id": "npc_v1_l90_t3_attack",
+          "name": "松间青秋",
+          "level": 90,
+          "power": 248640
+        }
+      }
+    },
+    {
+      "floor": 46,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l26_t1_endurance",
+          "name": "观海归雪",
+          "level": 26,
+          "power": 141050
+        },
+        "20011": {
+          "npc_id": "npc_v2_l52_t3_attack",
+          "name": "望月月空",
+          "level": 52,
+          "power": 171712
+        },
+        "20010": {
+          "npc_id": "npc_v2_l64_t3_attack",
+          "name": "云溪云青",
+          "level": 64,
+          "power": 215606
+        },
+        "20015": {
+          "npc_id": "npc_v2_l52_t3_attack",
+          "name": "望月月空",
+          "level": 52,
+          "power": 171712
+        },
+        "20014": {
+          "npc_id": "npc_v2_l64_t3_attack",
+          "name": "云溪云青",
+          "level": 64,
+          "power": 215606
+        },
+        "20013": {
+          "npc_id": "npc_v2_l85_t3_magic",
+          "name": "青云竹风",
+          "level": 85,
+          "power": 247320
+        },
+        "9": {
+          "npc_id": "npc_v2_l51_t2_attack",
+          "name": "问道剑清",
+          "level": 51,
+          "power": 266944
+        }
+      }
+    },
+    {
+      "floor": 47,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l53_t3_endurance",
+          "name": "落星竹剑",
+          "level": 53,
+          "power": 150569
+        },
+        "20011": {
+          "npc_id": "npc_v2_l58_t3_attack",
+          "name": "流霞秋月",
+          "level": 58,
+          "power": 185998
+        },
+        "20010": {
+          "npc_id": "npc_v2_l71_t3_attack",
+          "name": "远山瑶花",
+          "level": 71,
+          "power": 231815
+        },
+        "20015": {
+          "npc_id": "npc_v2_l58_t3_attack",
+          "name": "流霞秋月",
+          "level": 58,
+          "power": 185998
+        },
+        "20014": {
+          "npc_id": "npc_v2_l71_t3_attack",
+          "name": "远山瑶花",
+          "level": 71,
+          "power": 231815
+        },
+        "20013": {
+          "npc_id": "npc_v2_l51_t2_attack",
+          "name": "问道剑清",
+          "level": 51,
+          "power": 266944
+        },
+        "9": {
+          "npc_id": "npc_v2_l54_t2_attack",
+          "name": "长歌雨玄",
+          "level": 54,
+          "power": 287762
+        }
+      }
+    },
+    {
+      "floor": 48,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l57_t3_attack",
+          "name": "渡川岚川",
+          "level": 57,
+          "power": 161376
+        },
+        "20011": {
+          "npc_id": "npc_v1_l30_t1_magic",
+          "name": "寒江剑霜",
+          "level": 30,
+          "power": 199502
+        },
+        "20010": {
+          "npc_id": "npc_v1_l90_t3_attack",
+          "name": "松间青秋",
+          "level": 90,
+          "power": 248640
+        },
+        "20015": {
+          "npc_id": "npc_v1_l30_t1_magic",
+          "name": "寒江剑霜",
+          "level": 30,
+          "power": 199502
+        },
+        "20014": {
+          "npc_id": "npc_v1_l90_t3_attack",
+          "name": "松间青秋",
+          "level": 90,
+          "power": 248640
+        },
+        "20013": {
+          "npc_id": "npc_v2_l55_t2_endurance",
+          "name": "凌波云竹",
+          "level": 55,
+          "power": 286598
+        },
+        "9": {
+          "npc_id": "npc_v2_l59_t2_attack",
+          "name": "云溪玉长",
+          "level": 59,
+          "power": 311718
+        }
+      }
+    },
+    {
+      "floor": 49,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l26_t1_attack",
+          "name": "醉竹月苍",
+          "level": 26,
+          "power": 174567
+        },
+        "20011": {
+          "npc_id": "npc_v1_l65_t3_attack",
+          "name": "隐泉花琴",
+          "level": 65,
+          "power": 214340
+        },
+        "20010": {
+          "npc_id": "npc_v2_l51_t2_attack",
+          "name": "问道剑清",
+          "level": 51,
+          "power": 266944
+        },
+        "20015": {
+          "npc_id": "npc_v1_l65_t3_attack",
+          "name": "隐泉花琴",
+          "level": 65,
+          "power": 214340
+        },
+        "20014": {
+          "npc_id": "npc_v2_l51_t2_attack",
+          "name": "问道剑清",
+          "level": 51,
+          "power": 266944
+        },
+        "20013": {
+          "npc_id": "npc_v2_l53_t2_attack",
+          "name": "寻仙归花",
+          "level": 53,
+          "power": 308651
+        },
+        "9": {
+          "npc_id": "npc_v2_l57_t2_attack",
+          "name": "观海海琴",
+          "level": 57,
+          "power": 338073
+        }
+      }
+    },
+    {
+      "floor": 50,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l43_t2_endurance",
+          "name": "凌波花水",
+          "level": 43,
+          "power": 187804
+        },
+        "20011": {
+          "npc_id": "npc_v2_l76_t3_endurance",
+          "name": "浮岚霜雪",
+          "level": 76,
+          "power": 230836
+        },
+        "20010": {
+          "npc_id": "npc_v2_l54_t2_attack",
+          "name": "长歌雨玄",
+          "level": 54,
+          "power": 287762
+        },
+        "20015": {
+          "npc_id": "npc_v2_l76_t3_endurance",
+          "name": "浮岚霜雪",
+          "level": 76,
+          "power": 230836
+        },
+        "20014": {
+          "npc_id": "npc_v2_l54_t2_attack",
+          "name": "长歌雨玄",
+          "level": 54,
+          "power": 287762
+        },
+        "20013": {
+          "npc_id": "npc_v2_l56_t2_attack",
+          "name": "听雨岚风",
+          "level": 56,
+          "power": 330566
+        },
+        "9": {
+          "npc_id": "npc_v2_l39_t1_attack",
+          "name": "凌波河瑶",
+          "level": 39,
+          "power": 361740
+        }
+      }
+    },
+    {
+      "floor": 51,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l49_t2_magic",
+          "name": "清霜空花",
+          "level": 49,
+          "power": 201741
+        },
+        "20011": {
+          "npc_id": "npc_v2_l86_t3_endurance",
+          "name": "远山清玉",
+          "level": 86,
+          "power": 248420
+        },
+        "20010": {
+          "npc_id": "npc_v2_l59_t2_attack",
+          "name": "云溪玉长",
+          "level": 59,
+          "power": 311718
+        },
+        "20015": {
+          "npc_id": "npc_v2_l86_t3_endurance",
+          "name": "远山清玉",
+          "level": 86,
+          "power": 248420
+        },
+        "20014": {
+          "npc_id": "npc_v2_l59_t2_attack",
+          "name": "云溪玉长",
+          "level": 59,
+          "power": 311718
+        },
+        "20013": {
+          "npc_id": "npc_v2_l44_t1_magic",
+          "name": "远山苍风",
+          "level": 44,
+          "power": 357742
+        },
+        "9": {
+          "npc_id": "npc_v2_l44_t1_attack",
+          "name": "隐泉霜雨",
+          "level": 44,
+          "power": 387043
+        }
+      }
+    },
+    {
+      "floor": 52,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l81_t3_endurance",
+          "name": "远山岚长",
+          "level": 81,
+          "power": 217096
+        },
+        "20011": {
+          "npc_id": "npc_v2_l51_t2_attack",
+          "name": "问道剑清",
+          "level": 51,
+          "power": 266944
+        },
+        "20010": {
+          "npc_id": "npc_v2_l56_t2_attack",
+          "name": "听雨岚风",
+          "level": 56,
+          "power": 330566
+        },
+        "20015": {
+          "npc_id": "npc_v2_l51_t2_attack",
+          "name": "问道剑清",
+          "level": 51,
+          "power": 266944
+        },
+        "20014": {
+          "npc_id": "npc_v2_l56_t2_attack",
+          "name": "听雨岚风",
+          "level": 56,
+          "power": 330566
+        },
+        "20013": {
+          "npc_id": "npc_v2_l62_t2_magic",
+          "name": "临风玉花",
+          "level": 62,
+          "power": 386234
+        },
+        "9": {
+          "npc_id": "npc_v1_l65_t2_magic",
+          "name": "问道长鹤",
+          "level": 65,
+          "power": 416532
+        }
+      }
+    },
+    {
+      "floor": 53,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l84_t3_magic",
+          "name": "听雨琴玄",
+          "level": 84,
+          "power": 233391
+        },
+        "20011": {
+          "npc_id": "npc_v2_l54_t2_attack",
+          "name": "长歌雨玄",
+          "level": 54,
+          "power": 287762
+        },
+        "20010": {
+          "npc_id": "npc_v1_l50_t2_attack",
+          "name": "隐泉雪琴",
+          "level": 50,
+          "power": 359553
+        },
+        "20015": {
+          "npc_id": "npc_v2_l54_t2_attack",
+          "name": "长歌雨玄",
+          "level": 54,
+          "power": 287762
+        },
+        "20014": {
+          "npc_id": "npc_v1_l50_t2_attack",
+          "name": "隐泉雪琴",
+          "level": 50,
+          "power": 359553
+        },
+        "20013": {
+          "npc_id": "npc_v2_l60_t2_endurance",
+          "name": "听雨明风",
+          "level": 60,
+          "power": 412662
+        },
+        "9": {
+          "npc_id": "npc_v2_l76_t2_magic",
+          "name": "听雨山竹",
+          "level": 76,
+          "power": 450019
+        }
+      }
+    },
+    {
+      "floor": 54,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l90_t3_endurance",
+          "name": "隐泉河川",
+          "level": 90,
+          "power": 252627
+        },
+        "20011": {
+          "npc_id": "npc_v2_l53_t2_attack",
+          "name": "寻仙归花",
+          "level": 53,
+          "power": 308651
+        },
+        "20010": {
+          "npc_id": "npc_v2_l44_t1_attack",
+          "name": "隐泉霜雨",
+          "level": 44,
+          "power": 387043
+        },
+        "20015": {
+          "npc_id": "npc_v2_l53_t2_attack",
+          "name": "寻仙归花",
+          "level": 53,
+          "power": 308651
+        },
+        "20014": {
+          "npc_id": "npc_v2_l44_t1_attack",
+          "name": "隐泉霜雨",
+          "level": 44,
+          "power": 387043
+        },
+        "20013": {
+          "npc_id": "npc_v1_l36_t1_attack",
+          "name": "朝露鹤明",
+          "level": 36,
+          "power": 445328
+        },
+        "9": {
+          "npc_id": "npc_v2_l59_t1_endurance",
+          "name": "流霞明岚",
+          "level": 59,
+          "power": 483742
+        }
+      }
+    },
+    {
+      "floor": 55,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l51_t2_endurance",
+          "name": "问道瑶琴",
+          "level": 51,
+          "power": 271615
+        },
+        "20011": {
+          "npc_id": "npc_v2_l56_t2_attack",
+          "name": "听雨岚风",
+          "level": 56,
+          "power": 330566
+        },
+        "20010": {
+          "npc_id": "npc_v1_l65_t2_magic",
+          "name": "问道长鹤",
+          "level": 65,
+          "power": 416532
+        },
+        "20015": {
+          "npc_id": "npc_v2_l56_t2_attack",
+          "name": "听雨岚风",
+          "level": 56,
+          "power": 330566
+        },
+        "20014": {
+          "npc_id": "npc_v1_l65_t2_magic",
+          "name": "问道长鹤",
+          "level": 65,
+          "power": 416532
+        },
+        "20013": {
+          "npc_id": "npc_v2_l72_t2_endurance",
+          "name": "寒江风瑶",
+          "level": 72,
+          "power": 479139
+        },
+        "9": {
+          "npc_id": "npc_v2_l79_t2_attack",
+          "name": "松间清雪",
+          "level": 79,
+          "power": 521222
+        }
+      }
+    },
+    {
+      "floor": 56,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l37_t1_magic",
+          "name": "落星花云",
+          "level": 37,
+          "power": 293595
+        },
+        "20011": {
+          "npc_id": "npc_v2_l44_t1_magic",
+          "name": "远山苍风",
+          "level": 44,
+          "power": 357742
+        },
+        "20010": {
+          "npc_id": "npc_v2_l46_t1_attack",
+          "name": "寒江秋月",
+          "level": 46,
+          "power": 448010
+        },
+        "20015": {
+          "npc_id": "npc_v2_l44_t1_magic",
+          "name": "远山苍风",
+          "level": 44,
+          "power": 357742
+        },
+        "20014": {
+          "npc_id": "npc_v2_l46_t1_attack",
+          "name": "寒江秋月",
+          "level": 46,
+          "power": 448010
+        },
+        "20013": {
+          "npc_id": "npc_v2_l85_t2_magic",
+          "name": "远山青秋",
+          "level": 85,
+          "power": 515787
+        },
+        "9": {
+          "npc_id": "npc_v2_l89_t2_attack",
+          "name": "踏雪雪苍",
+          "level": 89,
+          "power": 557537
+        }
+      }
+    },
+    {
+      "floor": 57,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l55_t2_attack",
+          "name": "望月青星",
+          "level": 55,
+          "power": 312609
+        },
+        "20011": {
+          "npc_id": "npc_v2_l62_t2_magic",
+          "name": "临风玉花",
+          "level": 62,
+          "power": 386234
+        },
+        "20010": {
+          "npc_id": "npc_v1_l70_t2_endurance",
+          "name": "凌波花瑶",
+          "level": 70,
+          "power": 482142
+        },
+        "20015": {
+          "npc_id": "npc_v2_l62_t2_magic",
+          "name": "临风玉花",
+          "level": 62,
+          "power": 386234
+        },
+        "20014": {
+          "npc_id": "npc_v1_l70_t2_endurance",
+          "name": "凌波花瑶",
+          "level": 70,
+          "power": 482142
+        },
+        "20013": {
+          "npc_id": "npc_v2_l89_t2_attack",
+          "name": "踏雪雪苍",
+          "level": 89,
+          "power": 557537
+        },
+        "9": {
+          "npc_id": "npc_v2_l81_t2_magic",
+          "name": "醉竹星归",
+          "level": 81,
+          "power": 600705
+        }
+      }
+    },
+    {
+      "floor": 58,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l57_t2_attack",
+          "name": "观海海琴",
+          "level": 57,
+          "power": 338073
+        },
+        "20011": {
+          "npc_id": "npc_v2_l49_t1_magic",
+          "name": "清霜玄明",
+          "level": 49,
+          "power": 415440
+        },
+        "20010": {
+          "npc_id": "npc_v2_l67_t2_attack",
+          "name": "观海琴青",
+          "level": 67,
+          "power": 517585
+        },
+        "20015": {
+          "npc_id": "npc_v2_l49_t1_magic",
+          "name": "清霜玄明",
+          "level": 49,
+          "power": 415440
+        },
+        "20014": {
+          "npc_id": "npc_v2_l67_t2_attack",
+          "name": "观海琴青",
+          "level": 67,
+          "power": 517585
+        },
+        "20013": {
+          "npc_id": "npc_v1_l65_t2_attack",
+          "name": "临风雨河",
+          "level": 65,
+          "power": 597748
+        },
+        "9": {
+          "npc_id": "npc_v2_l85_t2_attack",
+          "name": "朝露玉归",
+          "level": 85,
+          "power": 648536
+        }
+      }
+    },
+    {
+      "floor": 59,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l46_t1_endurance",
+          "name": "踏雪水山",
+          "level": 46,
+          "power": 362797
+        },
+        "20011": {
+          "npc_id": "npc_v2_l73_t2_magic",
+          "name": "寒江松霜",
+          "level": 73,
+          "power": 446331
+        },
+        "20010": {
+          "npc_id": "npc_v2_l89_t2_attack",
+          "name": "踏雪雪苍",
+          "level": 89,
+          "power": 557537
+        },
+        "20015": {
+          "npc_id": "npc_v2_l73_t2_magic",
+          "name": "寒江松霜",
+          "level": 73,
+          "power": 446331
+        },
+        "20014": {
+          "npc_id": "npc_v2_l89_t2_attack",
+          "name": "踏雪雪苍",
+          "level": 89,
+          "power": 557537
+        },
+        "20013": {
+          "npc_id": "npc_v2_l90_t2_magic",
+          "name": "长歌河明",
+          "level": 90,
+          "power": 640501
+        },
+        "9": {
+          "npc_id": "npc_v2_l80_t2_endurance",
+          "name": "临风水岚",
+          "level": 80,
+          "power": 692277
+        }
+      }
+    },
+    {
+      "floor": 60,
+      "enemies": {
+        "20012": {
+          "npc_id": "npc_v2_l63_t2_magic",
+          "name": "凌波长岚",
+          "level": 63,
+          "power": 392455
+        },
+        "20011": {
+          "npc_id": "npc_v2_l60_t2_attack",
+          "name": "流霞秋星",
+          "level": 60,
+          "power": 479634
+        },
+        "20010": {
+          "npc_id": "npc_v2_l81_t2_magic",
+          "name": "醉竹星归",
+          "level": 81,
+          "power": 600705
+        },
+        "20015": {
+          "npc_id": "npc_v2_l60_t2_attack",
+          "name": "流霞秋星",
+          "level": 60,
+          "power": 479634
+        },
+        "20014": {
+          "npc_id": "npc_v2_l81_t2_magic",
+          "name": "醉竹星归",
+          "level": 81,
+          "power": 600705
+        },
+        "20013": {
+          "npc_id": "npc_v2_l80_t2_endurance",
+          "name": "临风水岚",
+          "level": 80,
+          "power": 692277
+        },
+        "9": {
+          "npc_id": "npc_v2_l90_t2_endurance",
+          "name": "流霞花云",
+          "level": 90,
+          "power": 766189
+        }
+      }
+    }
+  ]
+}

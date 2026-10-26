@@ -1,0 +1,238 @@
+{
+  "client": "3.87",
+  "official_server_available": false,
+  "inputs": [
+    {
+      "logical": "csv_config/exchange_zone.csv",
+      "original": "jgbol3.87/assets/release_/593d60d817729db8e8d75ded6e43a487.data",
+      "sha256": "0f53a409a42ff71896c2ccbe009e37f600eb670a3b7e64b18b105d39cbd5d1df",
+      "extracted_identical": true
+    },
+    {
+      "logical": "csv_config/gift_config.csv",
+      "original": "jgbol3.87/assets/release_/4d02a335388caca25da5e6a2a50910e4.data",
+      "sha256": "c01fe7b869098e13b71e89b943941992999ff6e172ee4954604d2641d953493a",
+      "extracted_identical": true
+    },
+    {
+      "logical": "csv_config/item_name.csv",
+      "original": "jgbol3.87/assets/release_/70cb741174c493cf0a6d5de29ad7894c.data",
+      "sha256": "107da82bd2e8050c6e44dd8da0875f874a56de4cd29db58bc6a4959d3072e685",
+      "extracted_identical": true
+    },
+    {
+      "logical": "csv_config/stone_cost_worth.csv",
+      "original": "jgbol3.87/assets/release_/0a16b5948cefb130985b48a1377c7d6d.data",
+      "sha256": "8a441d12ec13e02f8331ffe580d770791048ab2ecfc2d979b90158142aa1944a",
+      "extracted_identical": true
+    },
+    {
+      "logical": "lua/ui/destinyUI.lua",
+      "original": "jgbol3.87/assets/release_/d204815c279aad7a9e4572ab8f02af26.data",
+      "sha256": "6fbd54e35b6b5db1e2ed6fa3c73973065df6b4306c0e1a618e87172a72d24f45"
+    },
+    {
+      "logical": "lua/ui/activityUI.lua",
+      "original": "jgbol3.87/assets/release_/f94624a6c6a5f4034d0fdf2e315f0904.data",
+      "sha256": "b62f2dffa9e3707ce73f2b5fedbb147433544d735ec722519d377a31698f134f"
+    },
+    {
+      "logical": "lua/common/common_def.lua",
+      "original": "jgbol3.87/assets/release_/13a640e1f35a7599fe90dd31c8098b15.data",
+      "sha256": "15a4299fc92c50adda7682a4775f2e278e135f49f12d126e105a03d097d9ecf8"
+    }
+  ],
+  "A": [
+    "1227 serial_num:I flag:B count/index/ten_card/five_card:I; event195 flags1/2/3",
+    "activityUI L263 pavilion_data; destinyUI L102-109 begin_time<now<end_time",
+    "destinyUI L155 item1141, L621/623 cards1142=5/1143=10, L840 total cards<=gift count",
+    "destinyUI L368: 1 RMB = 1 brick; String2 destiny12 first exchange bonus delivered by mail",
+    "exchange_zone: 9 goods, native prices/limits/attachments/gifts; no nonempty first_prize or second_prize; need_buy_count=0",
+    "gift_config type1 six recharge bonus rows; type2 four thresholds based on server-wide bricks (destinyUI L441)",
+    "destinyUI L902-907 clamps discounted total to zero; L955 decrements count after reward dismissal"
+  ],
+  "B": [
+    "7-day recurring local period starting Monday UTC+8; principal/10 RMB; no history retroactivity",
+    "type1 milestones paid once each per period; base and bonus delivered together by permanent mail",
+    "server total uses actual current-period local-account bricks earned (including unclaimed mail), no simulated strangers",
+    "each account may claim four public gifts once, including non-paying accounts",
+    "index1 gains one extra purchase per 300 RMB, max10; all counters reset each period; currency/cards persist",
+    "no global gift escalation invented because original shipped table has no threshold or alternative reward"
+  ],
+  "shop": {
+    "1": {
+      "index": "1",
+      "max_buy_count": "3",
+      "goldon_count": "300",
+      "attach_list": "5|1249|1|150/12|1|1|50000000",
+      "need_buy_count": "0",
+      "gift_prize": "5|1246|1|10",
+      "first_prize(根据gift_prize分两个档次发送)": "",
+      "second_prize": "",
+      "name(飞升和培养位置不能改，改动就出大事)": "飞升礼包",
+      "desc": "feisheng"
+    },
+    "2": {
+      "index": "2",
+      "max_buy_count": "1",
+      "goldon_count": "150",
+      "attach_list": "5|14301|1|1/5|10300|1|5000",
+      "need_buy_count": "0",
+      "gift_prize": "5|1369|1|3",
+      "first_prize(根据gift_prize分两个档次发送)": "",
+      "second_prize": "",
+      "name(飞升和培养位置不能改，改动就出大事)": "命星礼包",
+      "desc": "mingxing"
+    },
+    "3": {
+      "index": "3",
+      "max_buy_count": "15",
+      "goldon_count": "20",
+      "attach_list": "5|1333|1|3/5|1327|1|10",
+      "need_buy_count": "0",
+      "gift_prize": "5|1323|1|10",
+      "first_prize(根据gift_prize分两个档次发送)": "",
+      "second_prize": "",
+      "name(飞升和培养位置不能改，改动就出大事)": "升阶礼包",
+      "desc": "shengjie"
+    },
+    "4": {
+      "index": "4",
+      "max_buy_count": "30",
+      "goldon_count": "30",
+      "attach_list": "5|1330|1|20/5|1329|1|3",
+      "need_buy_count": "0",
+      "gift_prize": "5|1329|1|10",
+      "first_prize(根据gift_prize分两个档次发送)": "",
+      "second_prize": "",
+      "name(飞升和培养位置不能改，改动就出大事)": "转生礼包",
+      "desc": "zhuansheng"
+    },
+    "5": {
+      "index": "5",
+      "max_buy_count": "4",
+      "goldon_count": "80",
+      "attach_list": "5|10001|1|15/5|1342|1|1",
+      "need_buy_count": "0",
+      "gift_prize": "5|10001|1|20",
+      "first_prize(根据gift_prize分两个档次发送)": "",
+      "second_prize": "",
+      "name(飞升和培养位置不能改，改动就出大事)": "精魄礼包",
+      "desc": "jingpo"
+    },
+    "6": {
+      "index": "6",
+      "max_buy_count": "2",
+      "goldon_count": "80",
+      "attach_list": "5|6005|1|10/5|1095|1|1",
+      "need_buy_count": "0",
+      "gift_prize": "5|6005|1|40",
+      "first_prize(根据gift_prize分两个档次发送)": "",
+      "second_prize": "",
+      "name(飞升和培养位置不能改，改动就出大事)": "被动礼包",
+      "desc": "beidong"
+    },
+    "7": {
+      "index": "7",
+      "max_buy_count": "2",
+      "goldon_count": "150",
+      "attach_list": "5|6002|1|15/5|6003|1|15",
+      "need_buy_count": "0",
+      "gift_prize": "5|1326|1|1",
+      "first_prize(根据gift_prize分两个档次发送)": "",
+      "second_prize": "",
+      "name(飞升和培养位置不能改，改动就出大事)": "装备礼包",
+      "desc": "zhuangbei"
+    },
+    "8": {
+      "index": "8",
+      "max_buy_count": "10",
+      "goldon_count": "80",
+      "attach_list": "5|1090|9|1/5|1091|9|1",
+      "need_buy_count": "0",
+      "gift_prize": "5|1092|8|1",
+      "first_prize(根据gift_prize分两个档次发送)": "",
+      "second_prize": "",
+      "name(飞升和培养位置不能改，改动就出大事)": "灵石礼包",
+      "desc": "lingshi"
+    },
+    "9": {
+      "index": "9",
+      "max_buy_count": "9999",
+      "goldon_count": "1",
+      "attach_list": "5|1421|1|3",
+      "need_buy_count": "0",
+      "gift_prize": "5|1343|1|50",
+      "first_prize(根据gift_prize分两个档次发送)": "",
+      "second_prize": "",
+      "name(飞升和培养位置不能改，改动就出大事)": "培养礼包",
+      "desc": "peiyang"
+    }
+  },
+  "gifts": {
+    "1": {
+      "1": {
+        "gift_type": "1",
+        "index": "1",
+        "money": "10",
+        "gift_list": "5|1141|1|10"
+      },
+      "2": {
+        "gift_type": "1",
+        "index": "2",
+        "money": "200",
+        "gift_list": "5|1141|1|40"
+      },
+      "3": {
+        "gift_type": "1",
+        "index": "3",
+        "money": "500",
+        "gift_list": "5|1141|1|100"
+      },
+      "4": {
+        "gift_type": "1",
+        "index": "4",
+        "money": "1000",
+        "gift_list": "5|1141|1|200"
+      },
+      "5": {
+        "gift_type": "1",
+        "index": "5",
+        "money": "2000",
+        "gift_list": "5|1141|1|300"
+      },
+      "6": {
+        "gift_type": "1",
+        "index": "6",
+        "money": "5000",
+        "gift_list": "5|1141|1|500"
+      }
+    },
+    "2": {
+      "1": {
+        "gift_type": "2",
+        "index": "1",
+        "money": "10",
+        "gift_list": "5|1142|1|1/5|1032|1|5/12|1|1|500000"
+      },
+      "2": {
+        "gift_type": "2",
+        "index": "2",
+        "money": "100",
+        "gift_list": "5|1142|1|1/5|1033|1|5/12|1|1|1000000"
+      },
+      "3": {
+        "gift_type": "2",
+        "index": "3",
+        "money": "500",
+        "gift_list": "5|1143|1|1/5|1033|1|5/5|1032|1|5"
+      },
+      "4": {
+        "gift_type": "2",
+        "index": "4",
+        "money": "1000",
+        "gift_list": "5|1143|1|1/5|1033|1|10/5|1032|1|10"
+      }
+    }
+  }
+}

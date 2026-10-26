@@ -3,7 +3,11 @@
 local ms=package.loaded.ms
 local output={}
 local ok,err=xpcall(function()
- for i=1,19 do output[#output+1]=land_fixture_next() end
+ for i=1,100 do
+  local value=land_fixture_next()
+  if value=='finished' then break end
+  output[#output+1]=value
+ end
  local land=ms.d_landUI
  local old=land.g_self
  land.g_self={prey_info={max_level_score=3000,grid_count=8},charmList={}}
@@ -22,6 +26,7 @@ local ok,err=xpcall(function()
  assert(score_ok,score_err)
 end,debug.traceback)
 local restored,restore_err=pcall(land_fixture_restore)
+output[#output+1]='checks_passed: '..tostring(ok)
 output[#output+1]='restored: '..tostring(restored)
 if not restored then output[#output+1]=tostring(restore_err) end
 if not ok then output[#output+1]=tostring(err) end

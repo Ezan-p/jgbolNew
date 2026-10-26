@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-26",
+  "passed": false,
+  "status": "blocked_runtime",
+  "original_cocos_checked": false,
+  "attempts": [
+    {
+      "result": "No Lua frame observed",
+      "note": "No fixture completion result was received; game was observed exited afterward. This does not establish whether execution began."
+    },
+    {
+      "result": "frida.ProcessNotRespondingError: unexpectedly timed out trying to sync up with agent",
+      "note": "Retried after starting emulator-5562 local game; attach failed before executing fixture."
+    }
+  ],
+  "fixture": "analysis/tools/build_abyss_client_fixture.py",
+  "harness": "analysis/tools/abyss_client_harness.lua",
+  "backend_validation": "related_tests.log",
+  "playthrough": "playthrough.json"
+}

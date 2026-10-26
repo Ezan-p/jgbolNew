@@ -1,4 +1,4 @@
-"""Isolated 81-floor wire playthrough using a real catalog army and battle engine."""
+"""81-floor wire progression: catalog army plus explicit test-only growth bonuses."""
 import copy
 import itertools
 import json
@@ -22,6 +22,13 @@ def main():
         role=backend.profile();identity=role['role_id']
         role.update(copy.deepcopy(npc_players.get(key)['role']))
         role.update(role_id=identity,role_name='九幽通关验证',gold_coin=1000000,silver_coin=1000000,drug_level=36)
+        # This fixture tests all floors/rewards/protocols, not time-to-progression
+        # balance. Only the disposable player's growth is boosted. Original
+        # enemies, medicines, damage calculation and outcomes stay untouched.
+        for unit in role['corteges']:
+            if unit.get('order'):
+                for stat,value in (('hp_plus',10000000),('gongji_plus',1000000),('magic_plus',1000000)):
+                    unit[stat]=unit.get(stat,0)+value
         activity.prepare(role,now,backend.activity_rules)
         for tid in (1644,1648,1652,1656,1657,1658,1659,1660):summon.add_item(role,tid,200)
         backend.save(role)
@@ -72,6 +79,8 @@ def main():
         result=dict(passed=True,date='2026-10-26',army=key,floors=81,wins=len(trace),requests=serial-100000,
                     simulated_days=1+(trace[-1]['time']-trace[0]['time'])//86400,
                     source='Original boss CSV; real combat engine; temporary database; preloaded catalog army and medicines.',
+                    fixture_growth_per_fielded_unit=dict(hp_plus=10000000,gongji_plus=1000000,magic_plus=1000000),
+                    balance_claim=False,
                     restart_at_floor=40,final_rank=rank['my_top'],steps=trace)
         backend.close()
     out=ROOT/'analysis/evidence/abyss';out.mkdir(parents=True,exist_ok=True)

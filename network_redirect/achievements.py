@@ -352,6 +352,7 @@ def record_events(role, events, now, parse):
             if d.get('result') == 0:
                 for ident in (121, 417, 418, 419, 420, 421): add(role, ident)
         if event == 43 and d.get('feed_result') == 2: add(role, 108)
+        if event == 195 and d.get('flag') == 2 and d.get('count', 0) > 0: add(role, 125)
         if event == 116 and d.get('flag') == 1 and d.get('result') == 1: add(role, 123)
         if event == 23:
             results = d.get('event_data', {1: d})

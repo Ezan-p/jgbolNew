@@ -1,0 +1,27 @@
+{
+  "revision": "offline-rape-4-players",
+  "catalog_players": 1725,
+  "eligible_players": 1709,
+  "excluded_replay_limit": 16,
+  "specialist_tests": 23,
+  "related_tests": 125,
+  "tests_passed": 148,
+  "real_battles": 36,
+  "wins": 33,
+  "losses": 3,
+  "unresolved": 0,
+  "native_ui_verified": false,
+  "matching": {
+    "candidates": 72,
+    "tolerance_percent": 20,
+    "recent_unique_players": 108
+  },
+  "randomness_regression": "Seed 2610: level 60 T3 sample, 8 boards of 4/6/2 guards, no duplicates within each board, no overlap between first two boards, more than 48 distinct NPCs across 8 boards",
+  "diversity_comparison": "analysis/evidence/rape/matchmaking_validation.json",
+  "test_commands": [
+    "PYTHONPATH=tests .runtime/venv/bin/python -m unittest tests.test_activity_rape_players tests.test_activity_rape -q",
+    "PYTHONPATH=tests .runtime/venv/bin/python -m unittest tests.test_activity tests.test_daily tests.test_vip tests.test_summon tests.test_npc_players -q",
+    ".runtime/venv/bin/python analysis/tools/verify_rape_playthrough.py",
+    ".runtime/venv/bin/python analysis/tools/verify_rape_matchmaking.py"
+  ]
+}

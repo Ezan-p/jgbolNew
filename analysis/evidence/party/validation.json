@@ -49,5 +49,27 @@
   "limitations": [
     "原服结算配置缺失，推测规则详见文档",
     "客户端检查覆盖原版界面回调，未逐帧验收全部战斗动画"
-  ]
+  ],
+  "hours_and_boss_adjustment": {
+    "party_tests": 15,
+    "result": "passed",
+    "hours": "Asia/Shanghai 11:00 <= time < 13:00",
+    "bosses": {
+      "4020": "风伯",
+      "5025": "太上老君",
+      "3015": "福星"
+    },
+    "checks": [
+      "开放前及开放瞬间",
+      "结束前及结束瞬间",
+      "关闭后日榜结算",
+      "三种首领实际协议阵容和名称",
+      "同轮查询和重启一致性"
+    ],
+    "client_ui_rerun": false,
+    "activity_regression": {
+      "tests": 64,
+      "result": "passed"
+    }
+  }
 }

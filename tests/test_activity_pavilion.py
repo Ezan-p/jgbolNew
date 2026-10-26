@@ -1,0 +1,206 @@
+"""Real 1227 packets, original catalog, local recharge/mail, limits and rollback."""
+import copy
+import json
+from pathlib import Path
+import tempfile
+import unittest
+from unittest.mock import patch
+
+from test_activity import ActivityCase, NOW
+from network_redirect import activity_pavilion as p, formation, summon
+from network_redirect.backend import Backend
+from network_redirect.protocol import encode, decode
+
+
+class PavilionTests(ActivityCase):
+    def test_client_uses_same_original_catalog_with_normalized_headers(self):
+        tables = p.client_tables()
+        for row in tables['csv_config/exchange_zone.csv']:
+            source = p.SHOP[int(row['index'])]
+            self.assertEqual(row['goldon_count'], source['goldon_count'])
+            self.assertEqual(row['attach_list'], source['attach_list'])
+            self.assertEqual(row['max_buy_count'], source['max_buy_count'])
+            self.assertIn('name', row); self.assertEqual(row['first_prize'], '')
+        source = summon.client_source(self.b.summon_rules)
+        self.assertNotIn('__PAVILION_TABLES__', source)
+        self.assertIn('csv_config/exchange_zone.csv', source)
+
+    def test_gem_mail_supported_levels_and_nonstacking(self):
+        from network_redirect import system_mail, journey
+        role = self.b.profile()
+        system_mail.deliver(role, key='pavilion-gem-test', title='灵石', body='测试',
+                            prizes=[[5,1092,2,8]], now=NOW, rules=self.b.welfare_rules)
+        before = copy.deepcopy(role)
+        with self.assertRaises(formation.Rejected):
+            system_mail.deliver(role, key='pavilion-gem-invalid', title='灵石', body='测试',
+                                prizes=[[5,1092,1,255]], now=NOW, rules=self.b.welfare_rules)
+        self.assertEqual(role, before)
+        journey.grant(role, [5,1090,3,9])
+        stones = [i for i in role['attachments'] if i['type_id']==1090 and i['level']==9]
+        self.assertEqual(len(stones), 3)
+        self.assertEqual(len({i['id'] for i in stones}), 3)
+        self.assertTrue(all(i['count']==1 for i in stones))
+
+    def call(self, flag=1, **kw):
+        return self.req(1227, **dict(dict(flag=flag, index=0, count=0, ten_card=0, five_card=0), **kw))
+
+    def data(self, events):
+        self.ok(events)
+        return next(d for e, d in events if e == 195)
+
+    def amount(self, tid):
+        return sum(i['count'] for i in self.b.profile()['attachments'] if i['attach_type'] == 5 and i['type_id'] == tid)
+
+    def stock(self, *items):
+        r = self.b.profile()
+        for tid, count in items: summon.add_item(r, tid, count)
+        self.b.save(r)
+
+    def charge(self, order='pavilion-order', product=106):
+        return self.req(1111, event_id=250, data=summon.lua(dict(item_id=product, order_id=order)))
+
+    def claim_mails(self):
+        mails = self.b.profile()['welfare'].get('mails', {})
+        for key, mail in mails.items():
+            if key.startswith('pavilion-') and not mail['claimed']:
+                self.ok(self.req(1103, mail_id=mail['mail_id']))
+
+    def test_entry_status_native_catalog(self):
+        events = self.req(1205, flag=0); self.ok(events)
+        status = next(d for e, d in events if e == 47)['pavilion_data']
+        self.assertLess(status['begin_time'], NOW); self.assertGreater(status['end_time'], NOW)
+        d = self.data(self.call())
+        self.assertEqual(len(d['exchange_info']), 9)
+        self.assertEqual(len(d['charge_info']), 4)
+        for i, row in p.SHOP.items():
+            self.assertEqual(d['exchange_info'][i]['left_buy_count'], int(row['max_buy_count']))
+        self.assertFalse(d['had_prize'])
+
+    def test_all_nine_original_rewards_and_first_mail(self):
+        self.stock((1141, 3000))
+        for index, row in p.SHOP.items():
+            d = self.data(self.call(2, index=index, count=1))
+            expected = p.specs(row['attach_list'])
+            self.assertEqual([[v['object_type'],v['attach_type'],v['attach_count'],v['attach_level']]
+                              for v in d['attach_list'].values()], expected)
+            mails = [m for key,m in self.b.profile()['welfare']['mails'].items()
+                     if key.startswith('pavilion-first-') and key.endswith('-'+str(index))]
+            self.assertEqual(len(mails), 1)
+            self.assertEqual(mails[0]['prizes'], p.specs(row['gift_prize']))
+        self.claim_mails()
+        self.assertEqual(self.b.profile()['achievements']['totals']['125'], 1)
+        # Original level-9/8 stones must retain their CSV levels, not become piles of level-1 stones.
+        self.assertTrue(any(i['type_id']==1090 and i['level']==9 for i in self.b.profile()['attachments']))
+
+    def test_discount_batch_one_card_per_gift_and_zero_floor(self):
+        self.stock((1141, 200), (1142, 3), (1143, 3))
+        before = self.amount(1141)
+        self.data(self.call(2, index=3, count=3, five_card=1, ten_card=2))
+        self.assertEqual(self.amount(1141), before - 35)
+        self.assertEqual(self.amount(1142), 2); self.assertEqual(self.amount(1143), 1)
+        self.data(self.call(2, index=9, count=1, ten_card=1))
+        self.assertEqual(self.amount(1141), before - 35)
+        old = self.b.profile()
+        self.assertEqual(self.call(2, index=9, count=1, five_card=2)[0][0], 55)
+        self.assertEqual(old, self.b.profile())
+
+    def test_limits_first_bonus_once_duplicate_and_changed_serial(self):
+        self.stock((1141, 1000))
+        self.data(self.call(2, index=3, count=10))
+        packet, replies, before = self.packet, self.replies, self.b.profile()
+        self.assertEqual(self.b.respond(packet, self.state), replies)
+        self.assertEqual(before, self.b.profile())
+        bad = encode(1227, dict(serial_num=self.serial, flag=2, index=3, count=1))
+        self.assertEqual(decode(self.b.respond(bad, self.state)[0])[2]['id'], 55)
+        self.data(self.call(2, index=3, count=5))
+        before = self.b.profile()
+        self.assertEqual(len([k for k in before['welfare']['mails'] if k.startswith('pavilion-first-')]), 1)
+        self.assertEqual(self.call(2, index=3, count=1)[0][0], 55)
+        self.assertEqual(before, self.b.profile())
+
+    def test_recharge_mail_base_bonus_claim_all_gifts_order_idempotence(self):
+        self.charge()
+        s = self.b.profile()['pavilion']
+        self.assertEqual(s['charge_gold'], 10000)
+        self.assertEqual(s['bricks_earned'], 1350)  # 1000 + 10 + 40 + 100 + 200
+        self.assertEqual(self.amount(1141), 0)  # native text promises mail delivery
+        self.claim_mails(); self.assertEqual(self.amount(1141), 1350)
+        d = self.data(self.call())
+        self.assertTrue(d['had_prize']); self.assertEqual(d['charge_money'], 1000)
+        self.assertEqual(d['exchange_info'][1]['left_buy_count'], 6)
+        self.assertEqual(d['exchange_info'][1]['plus_times'], 3)
+        for index in range(1, 5): self.data(self.call(3, index=index))
+        self.assertFalse(self.data(self.call())['had_prize'])
+        self.assertEqual(self.amount(1142), 2); self.assertEqual(self.amount(1143), 2)
+        before = self.b.profile(); self.charge()
+        self.assertEqual(self.b.profile()['pavilion'], before['pavilion'])
+        self.assertEqual(self.amount(1141), 1350)
+        for index in range(1, 5): self.assertEqual(self.call(3, index=index)[0][0], 55)
+
+    def test_bad_inputs_locked_and_insufficient_atomic(self):
+        for kw in (dict(flag=0),dict(flag=4),dict(flag=1,count=1),dict(flag=3,index=1),
+                   dict(flag=2,index=99,count=1),dict(flag=2,index=1,count=0),
+                   dict(flag=2,index=9,count=10000),dict(flag=2,index=1,count=1)):
+            old = self.b.profile(); self.assertEqual(self.call(**kw)[0][0], 55)
+            self.assertEqual(self.b.profile(), old)
+        self.stock((1141, 300), (1143, 1))
+        r = self.b.profile()
+        for i in r['attachments']:
+            if i['type_id']==1143:i['is_lock']=True
+        self.b.save(r); old=self.b.profile()
+        self.assertEqual(self.call(2,index=1,count=1,ten_card=1)[0][0],55)
+        self.assertEqual(self.b.profile(),old)
+        for i in r['attachments']:
+            if i['type_id']==1141:i['is_lock']=True
+        self.b.save(r); old=self.b.profile()
+        self.assertEqual(self.call(2,index=1,count=1)[0][0],55)
+        self.assertEqual(self.b.profile(),old)
+
+    def test_restart_week_rollover_mail_persists_and_clock_rollback(self):
+        self.charge(); self.claim_mails(); self.data(self.call(2,index=2,count=1))
+        self.data(self.call(3,index=1)); before=self.b.profile()
+        self.b.close(); self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.assertEqual(self.b.profile(),before)
+        end=before['pavilion']['end']
+        with patch('network_redirect.backend.time.time',return_value=end):
+            d=self.data(self.call())
+            self.assertEqual(d['exchange_info'][2]['left_buy_count'],1)
+            self.assertFalse(d['had_prize']); self.assertEqual(d['charge_money'],0)
+            self.assertEqual(self.b.profile()['welfare']['mails'],before['welfare']['mails'])
+        before=self.b.profile(); self.assertEqual(self.call()[0][0],55)
+        self.assertEqual(self.b.profile(),before)
+
+    def test_actual_local_peer_contribution_and_period_isolation(self):
+        peer=copy.deepcopy(self.b.profile()); peer['role_id']+=1
+        p.record_charge(peer,10000,NOW)
+        self.b.db.execute('INSERT INTO roles VALUES (?,?)',('pavilion-peer',json.dumps(peer)))
+        self.b.db.commit()
+        self.assertTrue(self.data(self.call())['had_prize'])
+        self.data(self.call(3,index=4))
+        self.assertEqual(self.b.profile()['pavilion']['charge_gold'],0)
+        end=self.b.profile()['pavilion']['end']
+        with patch('network_redirect.backend.time.time',return_value=end):
+            self.assertFalse(self.data(self.call())['had_prize'])
+
+    def test_encoding_and_mail_failure_roll_back_resources(self):
+        self.stock((1141,500))
+        old=self.b.profile()
+        with patch('network_redirect.activity_pavilion.mail', side_effect=formation.Rejected('mail failed')):
+            self.assertEqual(self.call(2,index=1,count=1)[0][0],55)
+        self.assertEqual(old,self.b.profile())
+        with patch('network_redirect.backend.activity.attributes',side_effect=ValueError('encode failed')):
+            self.assertEqual(self.call(2,index=1,count=1)[0][0],55)
+        self.assertEqual(old,self.b.profile())
+
+    def test_disabled_and_invalid_config(self):
+        r=p.load_rules()
+        with patch.object(p,'load_rules',return_value=dict(r,enabled=False)):
+            self.assertFalse(p.status(self.b.profile(),NOW)['end_time'])
+            self.assertEqual(self.call()[0][0],55)
+        for key,value in [('gold_per_rmb',0),('enabled',1),('mode','official'),('period_days',True),('batch_limit',10000)]:
+            with tempfile.TemporaryDirectory() as tmp:
+                path=Path(tmp)/'bad.json'; path.write_text(json.dumps(dict(r,**{key:value})))
+                with self.assertRaises(formation.Rejected):p.load_rules(path)
+
+
+if __name__=='__main__': unittest.main()

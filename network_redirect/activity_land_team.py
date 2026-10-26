@@ -14,7 +14,7 @@ def summary(role,s,now,r):
 def member(role,s):
     army=sorted((c for c in role['corteges'] if 1<=c.get('order',0)<=8),key=lambda c:c['order'])
     head=army[0] if army else dict(type=1,reborn_layer=0)
-    return dict(id=role['role_id'],name=role['role_name'],head_type=head['type'],type_id=head['type'],
+    return dict(id=role['role_id'],role_id=role['role_id'],name=role['role_name'],head_type=head['type'],type_id=head['type'],
                 cortege_layer=head.get('reborn_layer',0),power=sum(c.get('combat_power',0) for c in army[:s['grid_count']]),
                 cortege_count=min(len(army),s['grid_count']),level=role['level'])
 

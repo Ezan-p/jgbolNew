@@ -16,6 +16,9 @@ def rules():
     require(r['mode'] == 'inferred', '蟠桃配置须标记推测规则')
     for k, maximum in [('npc_count', 99), ('boss_hp', 100000000), ('lucky_per_fight', 1000)]:
         require(type(r[k]) is int and 1 <= r[k] <= maximum, '蟠桃配置无效：'+k)
+    pool=r.get('boss_pool')
+    require(isinstance(pool,list) and len(pool)==3 and {b.get('type') for b in pool}=={4020,5025,3015}, '蟠桃首领池无效')
+    require(all(b['type'] in journey.NPCS and isinstance(b.get('name'),str) and b['name'] for b in pool), '蟠桃首领配置无效')
     for key in ('daily_rewards', 'weekly_rewards'):
         require([x['end'] for x in r[key]] == [1, 3, 10, 100], '蟠桃奖励名次无效')
         for row in r[key]:
@@ -149,10 +152,13 @@ def prepare(role, now, ar):
 def info(role, ar):
     s=role['activity'];p=s['party'];second=(p['clock']+ar['timezone_offset_hours']*3600)%86400
     rows=daily_board(role,p['day'],second,ar);total=sum(x['damage'] for x in rows);hp=rules()['boss_hp']
+    wave=total//hp+1
+    pool=rules()['boss_pool']
+    boss=pool[stable('party-boss',p['day'],wave)%len(pool)]
     return dict(self_damage=p['damage'],free_count=s['party_count'],pay_count=s['party_paid'],
         damage_list=rows[:10],self_order=placement(role,rows),plus_value=s['party_bonus']*10,plus_count=s['party_bonus'],
-        peach_count=p['peaches'],lucky_point=p['lucky'],fight_prize=[],boss_type=ar['battle_npc'],boss_level=ar['battle_level'],
-        damage=0,total_damage=total,max_hp=hp,cur_hp=hp-total%hp,name='蟠桃守卫',boss_wave=total//hp+1)
+        peach_count=p['peaches'],lucky_point=p['lucky'],fight_prize=[],boss_type=boss['type'],boss_level=ar['battle_level'],
+        damage=0,total_damage=total,max_hp=hp,cur_hp=hp-total%hp,name=boss['name'],boss_wave=wave)
 
 
 def record(role, damage, gain, ar):

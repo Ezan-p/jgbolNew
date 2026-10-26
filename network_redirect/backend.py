@@ -841,6 +841,9 @@ class Backend:
             achievements.record_events(role, events, int(time.time()), login_fields)
             replies = self.item_deltas(before, role) + self.inventory(role) + summon.soul_snapshots(role) + [
                 welfare_attributes(role), vip.attrs(role), summon.event(80,dict(local_vip=vip.client_state(role)))] + events + [welfare.hint(role, now, self.welfare_rules),welfare.mail_snapshot(role,now,self.welfare_rules)]
+            if mid == 1103 and 'pavilion' in role:
+                from . import activity_pavilion
+                replies.append(activity_pavilion.update(role, now, self.duty_peers()))
             self.save(role)
             self.emit('game_welfare_ok', message_id=mid, rules_revision=self.welfare_rules['revision'])
         except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
@@ -874,6 +877,8 @@ class Backend:
             if charged > 0:
                 xianling.record_charge(role, charged, now)
                 welfare.record_charge(role, charged, now, self.welfare_rules)
+                from . import activity_pavilion
+                activity_pavilion.record_charge(role, charged, now)
             journey.prepare(role, now, self.journey_rules)
             activity.prepare(role, now, self.activity_rules, self.duty_peers())
             formation.prepare(role, self.formation_rules)
@@ -883,6 +888,9 @@ class Backend:
                 replies.append(xianling.tip(role,now,self.xianling_rules))
                 if mid == 1111:
                     replies = [welfare.hint(role,now,self.welfare_rules), welfare_attributes(role)] + replies
+            if charged > 0:
+                replies += [activity_pavilion.update(role, now, self.duty_peers()),
+                            welfare.mail_snapshot(role, now, self.welfare_rules)]
             self.save(role)
             self.emit('game_vip_ok', message_id=mid, rules_revision=self.vip_rules['revision'])
         except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:

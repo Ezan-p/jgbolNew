@@ -2,7 +2,7 @@
 import copy
 from pathlib import Path
 from unittest.mock import patch
-from test_activity import ActivityCase, NOW
+from tests.test_activity import ActivityCase, NOW
 from network_redirect import activity, activity_abyss as abyss, activity_drug as drug, npc_players, summon
 from network_redirect.backend import Backend
 
@@ -35,6 +35,7 @@ class AbyssTests(ActivityCase):
             advanced=self.call(7,top_type=1)
         self.assertGreater(advanced['top_data'][1]['layer'],rank['top_data'][1]['layer'])
         self.assertEqual(original,npc_players.catalog())
+        self.assertEqual(self.call(7,top_type=2)['top_type'],2)
 
     def test_all_drop_columns_reachable_and_cap_idempotent(self):
         role=self.b.profile();r=self.b.activity_rules
@@ -98,8 +99,9 @@ class AbyssTests(ActivityCase):
             self.call(7,top_type=1);self.assertEqual(role,self.b.profile())
             self.assertEqual(self.req(1329,id=6,data='{}')[0][0],55)
             self.assertEqual(self.req(1329,id=17,data='{index=1,type_id=1501}')[0][0],55)
-            self.ok(self.req(1102,mail_id=mails[0]['mail_id'],flag=1))
-            before=self.b.profile();self.req(1102,mail_id=mails[0]['mail_id'],flag=1)
+            self.ok(self.req(1103,mail_id=mails[0]['mail_id'],flag=1))
+            self.assertTrue(self.b.profile()['welfare']['mails'][mails[0]['delivery_key']]['claimed'])
+            before=self.b.profile();self.req(1103,mail_id=mails[0]['mail_id'],flag=1)
             self.assertEqual(before,self.b.profile())
 
     def test_news_poll_drain_and_event_badge(self):
@@ -119,3 +121,19 @@ class AbyssTests(ActivityCase):
             for op,data in ((7,dict(top_type=99)),(2,dict(des_area=81)),(14,dict(buy_hour=-1)),(17,dict(index=True,type_id=1501))):
                 self.assertEqual(self.req(1329,id=op,data=summon.lua(data))[0][0],55)
                 self.assertEqual(before,self.b.profile())
+
+    def test_soul_encounter_original_monster_and_persistent_hp(self):
+        from network_redirect import activity_abyss_random as events
+        role=self.b.profile();e=events.create(3,self.b.activity_rules)
+        e.update(npc_type=7223,hp=100000000,max_hp=100000000)
+        role['activity']['abyss']['events']=[e];self.b.save(role)
+        preview=self.call(4,op_type=0)['event_data']['boss_info']
+        self.assertEqual(preview['cortege_type'],7223)
+        self.call(4,op_type=1)
+        lineup=next(d for mid,_,d in self.decoded if mid==1028)
+        self.assertEqual(lineup['lineup'][0]['des_type'],7223)
+        remaining=self.b.profile()['activity']['abyss']['events'][0]['hp']
+        self.assertLess(remaining,100000000)
+        self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        info=self.call(4,op_type=0)['event_data']['boss_info']
+        self.assertEqual((info['hp'],info['max_hp'],info['free_times']),(remaining,100000000,2))

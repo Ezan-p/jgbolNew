@@ -88,18 +88,21 @@ def opponent(r,level=1,ident=1,count=1):
 def travel(s,r,role):
     a.require(s['travel_count']<r['land_daily_travel'],'今日游历次数已用完')
     s['travel_count']+=1
-    n=secrets.choice(list(map(int,MAPS[s['map_level']]['count_list'].split('|'))))
+    # Native showChallengeLayer has exactly four portrait slots (L1751).
+    n=min(4,secrets.choice(list(map(int,MAPS[s['map_level']]['count_list'].split('|')))))
     keys=[]
     for i in range(n):keys.append(npc.choose(role,s,i,excluded=keys))
     s['travel']=[npc.view(key,s['grid_count'],942001+i,r['land_travel_soul']) for i,key in enumerate(keys)]
 
 
-def simulate(role,s,r,jrules,level,count=1,cur_num=None,target=None,team=False):
+def simulate(role,s,r,jrules,level,count=1,cur_num=None,target=None,team=False,encounter=None):
     a.require(any(1<=c.get('order',0)<=8 for c in role['corteges']),'请先上阵神仙')
     ours,enemies=journey.fighters(role,dict(cortege_list='/'.join([f"{r['battle_npc']}|{level}"]*count)))
     ours=ours[:cur_num or s['grid_count']]
     if target:
         enemies=npc.units(target,cur_num or s['grid_count'])
+    if encounter is not None:
+        enemies=copy.deepcopy(encounter['units'])
     if team and s.get('team'):
         members=s['team']['members'];limit=min(s['grid_count'],8//len(members))
         player_units=ours[:limit];ours=[]
@@ -118,7 +121,8 @@ def simulate(role,s,r,jrules,level,count=1,cur_num=None,target=None,team=False):
     result,lineup,actions=journey.battle(role,{},replay_rules,units=(ours,enemies))
     role['activity']['fight_id']+=1;fid=role['activity']['fight_id']
     # [A] landUI consumes nested Lua replay messages, not independent 1027 packets.
-    return result,dict(fight_events=journey.combat_engine.event_data(actions,fid),line_up_msg=decode(encode(1028,dict(fight_id=fid,first_hand=1,des_name=npc.catalog()[target]['role']['name'] if target else '逐鹿守卫',lineup_count=len(lineup),lineup=lineup)))[2],
+    name=encounter['name'] if encounter is not None else npc.catalog()[target]['role']['name'] if target else '逐鹿守卫'
+    return result,dict(fight_events=journey.combat_engine.event_data(actions,fid),line_up_msg=decode(encode(1028,dict(fight_id=fid,first_hand=1,des_name=name,lineup_count=len(lineup),lineup=lineup)))[2],
         fight_result_msg=decode(encode(1027,dict(fight_id=fid,fight_type=21,final_result=result,fight_round=len(actions),fight_result=actions)))[2])
 
 
@@ -164,12 +168,19 @@ def settle(role,req,now,r,jrules,parse):
         a.require(status(now,r)['cur_status']==1,'当前是占塔时段')
         fresh=not s['travel']
         if fresh:travel(s,r,role)
-        return [response(3,s,r,enemy_list=copy.deepcopy(s['travel']),is_new=fresh)]
+        s['travel']=s['travel'][:4]
+        # Native checkLineup reads role_id; keep scene IDs for the activity's
+        # limited formation inspection, including encounters saved by old builds.
+        return [response(3,s,r,enemy_list=[dict(x,role_id=x['id']) for x in s['travel']],is_new=fresh)]
     if op==17:
         a.require(s['travel'] is not None,'没有进行中的游历');s['travel']=None
         return [response(17,s,r)]
     if op==4 and d.get('des_type')==1:
-        ident=d.get('des_id');target=next((x for x in s['travel'] or [] if x['id']==ident),None)
+        ident=d.get('des_id');candidates=(s['travel'] or [])[:4]
+        a.require(type(ident)is int,'游历目标无效')
+        # [A] landUI L1767 tags portraits with their 1-based array position;
+        # sendChallengeRequest forwards that tag as des_id (L1807).
+        target=candidates[ident-1] if 1<=ident<=len(candidates) else next((x for x in candidates if x['id']==ident),None)
         a.require(target is not None and d.get('flag')==1,'游历目标无效')
         a.require(status(now,r)['cur_status']==1,'当前是占塔时段')
         result,replay=simulate(role,s,r,jrules,target['level'],target=target.get('npc_id'));win=1<=result<=3
