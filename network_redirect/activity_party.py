@@ -30,7 +30,9 @@ def stable(*parts):
 
 @lru_cache(maxsize=1)
 def catalog():
+    from . import npc_players
     pool = json.loads((ROOT/'analysis/npc_design/v1/catalog.json').read_text())['npcs']
+    pool = [npc_players.decorate(n) for n in pool]
     pool = sorted((n for n in pool if n['role']['level'] >= 13), key=lambda n: (n['role']['role_combat_power'], n['npc_id']))
     count = rules()['npc_count']
     return {950001+i: pool[i*(len(pool)-1)//max(1,count-1)] for i in range(count)}
@@ -44,7 +46,7 @@ def identity(role, ident):
     if ident == role['role_id']:
         return dict(id=ident, role_id=ident, name=role['role_name'], level=role['level'], head_type=role.get('head_type',1), vip=role.get('vip_level',0), power=role.get('role_combat_power',0))
     n = catalog()[ident]; p = n['role']
-    return dict(id=ident, role_id=ident, name=p['name'], level=p['level'], head_type=1, vip=0, power=p['role_combat_power'])
+    return dict(id=ident, role_id=ident, name=p['role_name'], level=p['level'], head_type=p['head_type'], vip=p['vip_level'], power=p['role_combat_power'])
 
 
 def npc_day(ident, day, second, ar):
@@ -190,16 +192,8 @@ def claim(role):
 
 
 def inspection(role, ident):
-    npc=catalog()[ident]['role'];chars=[]
-    for c in npc['corteges']:
-        if not 1<=c.get('order',0)<=8:continue
-        row=copy.deepcopy(c);row.update(type_id=c['type'],max_hp_show=c['hp'],max_magic_show=c['magic'],wuligongji_show=c['gongji'],wulifangyu_show=c['fangyu'])
-        chars.append(row)
-    from . import cheer
-    data=dict(role_id=ident,role_name=npc['name'],level=npc['level'],vip_level=0,head_type=1,rank=0,
-        owner_cheer_info={},title_info={},animal_info={},hole_train={},cortege_list=chars,cheer_cortege=[],skill_list=[],equip_list=[],ext_skill_list=[],ext_star_list=[])
-    data.update(cheer.inspection(npc,True))
-    return summon.event(11,data)
+    from . import npc_players
+    return summon.event(11, npc_players.inspection_data(catalog()[ident], scene_id=ident))
 
 
 def client_config(role, ar):

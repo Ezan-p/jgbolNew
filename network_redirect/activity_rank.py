@@ -34,7 +34,8 @@ def catalog():
     for npc in data['npcs']:
         if npc['role']['level'] < 5 or npc['battle_validation']['status'] == 'replay_limit_observed':
             continue
-        npc = copy.deepcopy(npc)
+        from . import npc_players
+        npc = npc_players.decorate(npc)
         combat_power.recalculate(npc['role'], formation.load_rules())
         candidates.append(npc)
     require(len(candidates) >= rules()['size'] - 1, '封神榜NPC库数量不足')
@@ -96,7 +97,7 @@ def swap(s, target):
 def opponent(s, order):
     ident = identity(s, order); npc = catalog()[ident]; role = npc['role']
     head = next(c for c in role['corteges'] if c['order'] == 1)
-    return dict(id=ident, type=2, order=order, level=role['level'], name='离线·'+str(ident-930000)+'·'+{'attack':'强袭','magic':'御法','endurance':'固守'}.get(npc['archetype'], '守阵'),
+    return dict(id=ident, type=2, order=order, level=role['level'], name=role['role_name'],
                 cortege=head['type'], cortege_layer=head.get('evolve_level', 0), combat_power=role['role_combat_power'])
 
 
@@ -150,28 +151,8 @@ def inspection(role, ident):
     npc = catalog()[ident]['role']; s = role['activity']
     order = next((o for o in range(1, rules()['size']+1) if identity(s,o) == ident), None)
     require(order is not None, '封神榜对手已变化')
-    chars = []
-    for c in sorted(npc['corteges'],key=lambda c:c.get('order',0)):
-        if not c.get('order'): continue
-        row = {k:v for k,v in c.items() if k!='id'}
-        row.update(type_id=c['type'], max_hp_show=c['hp'], max_magic_show=c['magic'], wuligongji_show=c['gongji'], wulifangyu_show=c['fangyu'])
-        chars.append(row)
-    data = dict(role_id=ident, role_name=opponent(s,order)['name'], level=npc['level'], vip_level=0, head_type=1, rank=0,
-                title_info={}, animal_info={}, hole_train={}, cortege_list=chars, equip_list=[], skill_list=[], ext_skill_list={}, ext_star_list={})
-    data.update(cheer.inspection(npc))
-    for c in data['cheer_cortege'].values(): c.pop('id',None)
-    owners={c['id']:c['order'] for c in npc['corteges'] if c.get('order')}
-    for i in npc['attachments']:
-        if i['attach_type']==5 and i.get('owner_id') in owners and i['type_id'] in combat.ESSENCES:
-            data['ext_skill_list'].setdefault(owners[i['owner_id']],[]).append(dict(type_id=i['type_id'],level=i['level']))
-        if i['attach_type']==5 and i.get('owner_id') in owners and i['type_id'] in reborn_stars.STARS:
-            data['ext_star_list'].setdefault(owners[i['owner_id']],[]).append(dict(type_id=i['type_id'],level=i['level'],order=i['ext_awaken_pos']))
-        if not i.get('equip_order') or not i.get('equip_pos'): continue
-        row = dict(i, order=i['equip_order'], goss_plus=i.get('goss_plus',0))
-        if i['attach_type'] == 6 and i['equip_order'] <= 8: data['skill_list'].append(row)
-        elif i['attach_type'] == 5: data['equip_list'].append(row)
-    # Inspecting never copies the NPC inventory into the player's save.
-    return summon.event(11, data)
+    from . import npc_players
+    return summon.event(11, npc_players.inspection_data(catalog()[ident], scene_id=ident))
 
 
 def simulate(role, order, now, jrules, defence=False):

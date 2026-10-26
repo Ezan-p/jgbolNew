@@ -44,6 +44,11 @@ script = r'''
 local ms=assert(package.loaded.ms);local ui=assert(ms.d_endlessFightUI)
 local act=ms.d_activityUI;local login=ms.d_loginUI
 local saved={};for k,v in pairs(ui) do saved[k]=v end
+local auxiliary={}
+for _,name in ipairs({'d_messageUI','d_commonLayerUI','d_lineupUI','d_mysteryUI'}) do
+ local t=ms[name];local old={};for k,v in pairs(t) do old[k]=v end
+ auxiliary[#auxiliary+1]={target=t,old=old}
+end
 local oldself,oldstatus,oldcurrent,oldrun=act.g_self,act.g_yishiStatus,act.g_currentActivity,act.g_isCurrentSenceRun
 local oldscene=login.g_currentSence
 local gid=act.activityID.tianmingzhizhan;local oldguide=act.g_activityGuide[gid]
@@ -88,6 +93,10 @@ end)
 root:removeFromParentAndCleanup(true)
 for k in pairs(ui) do if saved[k]==nil then ui[k]=nil end end
 for k,v in pairs(saved) do ui[k]=v end
+for _,entry in ipairs(auxiliary) do
+ for k in pairs(entry.target) do if entry.old[k]==nil then entry.target[k]=nil end end
+ for k,v in pairs(entry.old) do entry.target[k]=v end
+end
 act.g_self=oldself;act.g_yishiStatus=oldstatus;act.g_currentActivity=oldcurrent;act.g_isCurrentSenceRun=oldrun
 act.g_activityGuide[gid]=oldguide;login.g_currentSence=oldscene
 ms.d_u.main_server_send_msg=send;ms.MS_report_error=report

@@ -13,7 +13,8 @@ def catalog():
     for n in json.loads(path.read_text())['npcs']:
         if n['battle_validation']['status'] == 'replay_limit_observed':
             continue
-        n = copy.deepcopy(n)
+        from . import npc_players
+        n = npc_players.decorate(n)
         combat_power.recalculate(n['role'], formation.load_rules())
         result[n['npc_id']] = n
     a.require(bool(result), '逐鹿NPC配置为空')
@@ -101,16 +102,5 @@ def inspection(role,ident):
         if t.get('npc_id'):candidates.append(dict(id=940100+t['id'],npc_id=t['npc_id']))
     target=next((m for m in candidates if m['id']==ident and m.get('npc_id')),None)
     if not target:return None
-    n=catalog()[target['npc_id']]['role'];chars=[]
-    for c in n['corteges']:
-        if not 1<=c.get('order',0)<=s['grid_count']:continue
-        row={k:c[k] for k in ('order','level','evolve_level','reborn_layer','combat_power','potential','type','quality') if k in c}
-        row.update(type_id=c['type'],max_hp_show=c['hp'],max_magic_show=c['magic'],wuligongji_show=c['gongji'],wulifangyu_show=c['fangyu'])
-        chars.append(row)
-    d=dict(role_id=ident,role_name=n['name'],level=n['level'],vip_level=0,head_type=1,rank=0,
-           title_info={},animal_info={},hole_train={},cortege_list=chars,equip_list=[],skill_list=[],ext_skill_list={},ext_star_list={})
-    d.update(cheer.inspection(n))
-    for item in n['attachments']:
-        if not 1<=item.get('equip_order',0)<=s['grid_count'] or not item.get('equip_pos'):continue
-        if item['attach_type'] in (5,6):d['equip_list' if item['attach_type']==5 else 'skill_list'].append(dict(item,order=item['equip_order']))
-    return summon.event(11,d)
+    from . import npc_players
+    return summon.event(11, npc_players.inspection_data(catalog()[target['npc_id']], scene_id=ident, count=s['grid_count']))

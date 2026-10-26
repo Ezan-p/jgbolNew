@@ -37,16 +37,15 @@ local function apply(mid,d)
 end
 local function item(tid) for _,i in ipairs(ui.g_packageItemsInfo) do if i.type_id==tid then return i end end end
 local function press(delta)
- local function walk(n)
-  local children=n:getChildren();if not children then return false end
-  for j=0,children:count()-1 do
-   local c=tolua.cast(children:objectAtIndex(j),'CCNode')
-   if c:getTag()==delta then tolua.cast(c,'CCMenuItem'):activate();return true end
-   if walk(c) then return true end
+ local children=assert(calc:getChildren())
+ -- Cocos reorders children by z-order; identify the menu by its +/-10 buttons.
+ for j=0,children:count()-1 do
+  local node=tolua.cast(children:objectAtIndex(j),'CCNode')
+  if node:getChildByTag(-10) and node:getChildByTag(10) then
+   tolua.cast(assert(node:getChildByTag(delta)),'CCMenuItemImage'):activate();return
   end
-  return false
  end
- assert(walk(calc),'missing calculator button '..delta)
+ error('missing calculator menu')
 end
 local function refresh() saleButtons={};ui.showPackage(ui.packageTagDef.props) end
 ''']

@@ -35,7 +35,7 @@ def choose(role, index, excluded=()):
 def opponent(role, index, excluded=()):
     key = choose(role, index, excluded); n = npcs.catalog()[key]['role']
     head = next(c for c in n['corteges'] if c.get('order') == 1)
-    return dict(npc_id=key, show_type=head['type'], level=n['level'], name='离线'+{'attack':'强袭','magic':'御法','endurance':'固守'}[npcs.catalog()[key]['archetype']]+str(n['level'])+'级',
+    return dict(npc_id=key, show_type=head['type'], level=n['level'], name=n['role_name'],
                 has_win=False, top_order=0, cortege_layer=head.get('evolve_level',0), power=n['role_combat_power'])
 
 
@@ -103,24 +103,8 @@ def inspection(role, ident):
     s=role['activity']; target=next((v for b in s.get('rape_boards') or [] for rows in b['form_list'].values() for k,v in rows.items() if int(k)==ident),None)
     if target is None:target=next((v for v in s.get('rape_revenge',{}).values() if v['id']==ident),None)
     if target is None:return None
-    n=npcs.catalog()[target['npc_id']]['role'];chars=[]
-    for c in n['corteges']:
-        if not 1<=c.get('order',0)<=8:continue
-        row={k:v for k,v in c.items() if k!='id'}
-        row.update(type_id=c['type'],max_hp_show=c['hp'],max_magic_show=c['magic'],wuligongji_show=c['gongji'],wulifangyu_show=c['fangyu']);chars.append(row)
-    d=dict(role_id=ident,role_name=target['name'],level=n['level'],vip_level=0,head_type=1,rank=0,title_info={},animal_info={},hole_train={},cortege_list=chars,equip_list=[],skill_list=[],ext_skill_list={},ext_star_list={})
-    d.update(cheer.inspection(n))
-    for c in d['cheer_cortege'].values():c.pop('id',None)
-    owners={c['id']:c['order'] for c in n['corteges'] if 1<=c.get('order',0)<=8}
-    for item in n['attachments']:
-        owner=owners.get(item.get('owner_id'))
-        if owner and item['attach_type']==5 and item['type_id'] in combat.ESSENCES:
-            d['ext_skill_list'].setdefault(owner,[]).append(dict(type_id=item['type_id'],level=item['level']))
-        if owner and item['attach_type']==5 and item['type_id'] in reborn_stars.STARS:
-            d['ext_star_list'].setdefault(owner,[]).append(dict(type_id=item['type_id'],level=item['level'],order=item['ext_awaken_pos']))
-        if 1<=item.get('equip_order',0)<=8 and item.get('equip_pos') and item['attach_type'] in (5,6):
-            d['equip_list' if item['attach_type']==5 else 'skill_list'].append(dict(item,order=item['equip_order']))
-    return summon.event(11,d)
+    from . import npc_players
+    return summon.event(11, npc_players.inspection_data(npcs.catalog()[target['npc_id']], scene_id=ident))
 
 
 def battle(role, req, now, r, jrules):

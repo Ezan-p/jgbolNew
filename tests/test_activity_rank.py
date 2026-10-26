@@ -58,7 +58,7 @@ class RankTests(ActivityCase):
         self.assertEqual(before,self.b.profile());events=self.req(1244,fight_type=2);self.ok(events);self.assertEqual(before,self.b.profile())
         self.assertIn(152,[e for e,d in events]);self.assertNotIn(44,[e for e,d in events])
         meta=next(d['local_rank_records'] for e,d in events if e==80 and 'local_rank_records' in d)
-        self.assertEqual(meta[1]['label'],'攻胜·99·固守')
+        self.assertEqual(meta[1]['label'],'攻胜·'+rank.catalog()[930099]['role']['role_name'])
         self.assertEqual(meta[1]['power'],rank.catalog()[930099]['role']['role_combat_power'])
         self.assertTrue(any(e==80 and d.get('local_rank_show_records') for e,d in events))
 

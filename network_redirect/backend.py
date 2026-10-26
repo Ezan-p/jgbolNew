@@ -11,7 +11,7 @@ import struct
 import time
 
 from .protocol import encode, decode
-from . import role_profile, achievements, spirit_array
+from . import role_profile, achievements, spirit_array, npc_players, gift_codes
 from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily, guild, vip, xianling, welfare, cheer, monument, equipment
 
 
@@ -20,7 +20,7 @@ from . import summon, formation, market, immortal, journey, activity, reborn, re
 CLIENT_CONFIG = '''{
     [4]=__PARTY_CONFIG__,
     [5]={},
-    [7]={achievement=true,collector=true,Bulletin=true,message=true,setting=true,service=true,relogin=true},
+    [7]={achievement=true,collector=true,Bulletin=true,message=true,setting=true,service=true,relogin=true,gift_card=true},
     [10]=__MARKET_CONFIG__,
     [11]=__STONE_CONFIG__,
     [14]=__CHEER_CONFIG__,
@@ -48,6 +48,9 @@ def login_fields(text):
 class Backend:
     def __init__(self, directory, port, emit, account="local-player"):
         self.account = account
+        self.gift_code_rules = gift_codes.load_rules()
+        self.gift_code_replies = {}
+        self.last_gift_code_serial = 0
         self.achievement_rules = achievements.load_rules()
         self.achievement_context = None
         self.achievement_pending = []
@@ -56,6 +59,8 @@ class Backend:
         self.last_array_serial = 0
         self.profile_replies = {}
         self.last_profile_serial = 0
+        self.npc_replies = {}
+        self.last_npc_serial = 0
         self.monument_rules = monument.load_rules()
         self.monument_replies = {}
         self.last_monument_serial = 0
@@ -91,6 +96,7 @@ class Backend:
         os.chmod(directory / 'game.sqlite3', 0o600)
         self.db.execute('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)')
         self.db.execute('CREATE TABLE IF NOT EXISTS roles (account TEXT PRIMARY KEY, data TEXT NOT NULL)')
+        gift_codes.initialize(self.db)
         row = self.db.execute("SELECT value FROM settings WHERE key='sdk_token'").fetchone()
         self.token = row[0] if row else 'local-' + secrets.token_hex(24)
         if not row:
@@ -474,6 +480,8 @@ class Backend:
             self.reply_history.clear()
             self.profile_replies.clear()
             self.last_profile_serial = 0
+            self.npc_replies.clear()
+            self.last_npc_serial = 0
             self.array_replies.clear()
             self.last_array_serial = 0
             self.reborn_replies.clear()
@@ -482,6 +490,8 @@ class Backend:
             self.last_monument_serial = 0
             self.welfare_replies.clear()
             self.last_welfare_serial = 0
+            self.gift_code_replies.clear()
+            self.last_gift_code_serial = 0
             self.vip_replies.clear()
             self.last_vip_serial = 0
             self.guild_replies.clear()
@@ -541,6 +551,9 @@ class Backend:
                 return [packet for serial, packet in self.reply_history if serial > last]
             self.emit('game_replay_unavailable', message_id=mid, message='请求不在当前响应缓存范围内')
             return []
+        npc_target = (data.get('des_id') if mid in (1039,1078) else data.get('des_role_id') if mid == 1067 else None)
+        if mid == 1091 or ((mid in (1039,1067) or mid == 1078 and data.get('flag') == 2) and npc_players.handles(npc_target)):
+            return self.npc_queries(packet, mid, data)
         if mid == 1067:
             try:
                 formation.require(data['flag'] in (0, 1), '成就查询标志无效')
@@ -563,6 +576,8 @@ class Backend:
             return self.monuments(packet, mid, data)
         if welfare.handles(mid, data):
             return self.welfares(packet, mid, data)
+        if mid == 1104:
+            return self.redeem_gift_code(packet, data)
         if vip.handles(mid, data) or mid == 1336 or mid == 1051 and data['item_type'] == 1249:
             return self.vips(packet, mid, data)
         if mid in guild.HANDLED or mid == 1026 and data['fight_type'] in guild.FIGHTS or mid == 1097 and data['channel'] == 6:
@@ -599,6 +614,44 @@ class Backend:
         if data and data.get('serial_num'):
             return self.complete(data['serial_num'], [summon.event(55, {'op_string': '该功能尚未接入本地服务端（%d）' % mid})])
         return []
+
+    def npc_queries(self, packet, mid, data):
+        """NPC lookup is read-only: no player preparation, rewards or inventory writes."""
+        serial = data['serial_num']
+        cached = self.npc_replies.get(serial)
+        if cached and cached[0] == packet:
+            return cached[1]
+        if not serial or serial <= self.last_npc_serial:
+            return self.complete(serial, [summon.event(55, dict(op_string='NPC查询已过期，请刷新后重试'))])
+        try:
+            records = [(a,json.loads(raw)) for a,raw in self.db.execute('SELECT account,data FROM roles')]
+            real_ids = {r['role_id'] for _,r in records}
+            if mid == 1091:
+                level = next((r['level'] for a,r in records if a == self.account),1)
+                replies = [npc_players.search(data,level,real_ids)]
+            else:
+                identity = data['des_role_id'] if mid == 1067 else data['des_id']
+                target = npc_players.get(identity)
+                formation.require(target is not None, 'NPC玩家不存在')
+                formation.require(identity not in real_ids
+                                  and target['role']['role_id'] not in real_ids, 'NPC编号与本地角色冲突')
+                if mid == 1039:
+                    formation.require(data['des_type'] in (1,2), 'NPC阵容目标类型无效')
+                    replies = [summon.event(11,npc_players.inspection_data(target))]
+                elif mid == 1078:
+                    replies = [role_profile.titles_packet(target['role'])]
+                else:
+                    formation.require(data['flag'] in (0,1), '成就查询标志无效')
+                    achievements.refresh(target['role'],int(time.time()))
+                    replies = achievements.packets(target['role'])
+        except (formation.Rejected,ValueError,KeyError,TypeError,OverflowError,struct.error) as error:
+            replies = [summon.event(55,dict(op_string=str(error) if isinstance(error,formation.Rejected) else 'NPC资料无效，请刷新后重试'))]
+        replies = self.complete(serial,replies)
+        self.last_npc_serial = serial
+        self.npc_replies[serial] = (packet,replies)
+        if len(self.npc_replies)>256:
+            del self.npc_replies[next(iter(self.npc_replies))]
+        return replies
 
     def spirit_arrays(self, packet, data):
         serial = data['serial_num']
@@ -728,6 +781,37 @@ class Backend:
         self.guild_replies[serial] = (packet, replies)
         if len(self.guild_replies) > 256:
             del self.guild_replies[next(iter(self.guild_replies))]
+        return replies
+
+    def redeem_gift_code(self, packet, data):
+        serial = data['serial_num']
+        cached = self.gift_code_replies.get(serial)
+        if cached and cached[0] == packet:
+            return cached[1]
+        if not serial or serial <= self.last_gift_code_serial:
+            return self.complete(serial, [gift_codes.response(15, data['flag'])])
+        try:
+            self.profile()  # Finish legacy migrations before acquiring the claim lock.
+            self.db.execute('BEGIN IMMEDIATE')
+            role = json.loads(self.db.execute('SELECT data FROM roles WHERE account=?', (self.account,)).fetchone()[0])
+            before = copy.deepcopy(role)
+            result, event = gift_codes.settle(self.db, role, self.account, data, int(time.time()), self.gift_code_rules)
+            if result == 1:
+                replies = self.item_deltas(before, role) + self.inventory(role) + [welfare_attributes(role), event]
+                self.save(role)  # One SQLite commit for rewards and redemption ledger.
+            else:
+                self.db.rollback()
+                replies = [event]
+            self.emit('game_gift_code_result', result=result, rules_revision=self.gift_code_rules['revision'])
+        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error, sqlite3.Error) as error:
+            self.db.rollback()
+            replies = [gift_codes.response(15, data['flag'])]
+            self.emit('game_gift_code_rejected', message=str(error))
+        replies = self.complete(serial, replies)
+        self.last_gift_code_serial = serial
+        self.gift_code_replies[serial] = (packet, replies)
+        if len(self.gift_code_replies) > 256:
+            del self.gift_code_replies[next(iter(self.gift_code_replies))]
         return replies
 
     def welfares(self, packet, mid, data):
