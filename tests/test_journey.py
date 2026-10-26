@@ -126,6 +126,25 @@ class JourneyTests(unittest.TestCase):
     def test_hp_star_thresholds(self):
         self.assertEqual([journey.stars(n, 100) for n in (1, 39, 40, 69, 70, 100)], [1, 1, 2, 2, 3, 3])
 
+    def test_placeholder_is_not_a_fifty_million_hp_enemy_or_shifted_reserve(self):
+        for kind, gid in ((1, 2008), (1, 6710), (2, 2601), (2, 6701)):
+            cfg = journey.GATES[kind][gid]
+            enemies = journey.fighters(self.b.profile(), cfg)[1]
+            self.assertFalse(any(u['type'] == 8888 for u in enemies))
+            expected = [(i, int(token.split('|')[0])) for i, token in enumerate(cfg['cortege_list'].split('/'), 1)
+                        if int(token.split('|')[0]) != 8888]
+            self.assertEqual([(u['order'], u['type']) for u in enemies], expected)
+        from network_redirect import npc_players
+        key = max(npc_players.catalog(), key=lambda k: npc_players.catalog()[k]['profile']['role_combat_power'])
+        role = npc_players.get(key)['role']
+        for kind, gid in ((1, 6710), (2, 6701)):
+            result, lineup, actions = journey.battle(role, journey.GATES[kind][gid], self.b.journey_rules)
+            self.assertIn(result, (1, 2, 3))
+            self.assertEqual(actions.stop_reason, 'elimination')
+            replay = decode(encode(1028, dict(lineup_count=len(lineup), lineup=lineup)))[2]
+            self.assertEqual(replay['lineup'][4]['des_type'], 0)
+            self.assertNotEqual(replay['lineup'][5]['des_type'], 0)
+
     def test_first_drop_and_first_three_star_once(self):
         r = self.b.profile()
         cfg = journey.GATES[1][105]
@@ -315,6 +334,132 @@ class JourneyTests(unittest.TestCase):
         p.write_text(json.dumps(rules))
         with self.assertRaises(formation.Rejected):
             journey.load_rules(p)
+
+    def test_every_catalog_probability_has_exact_integer_boundary(self):
+        # Exhaust the uniform RNG domain: no flaky approximate statistics.
+        rates = {p[4] for gates in journey.GATES.values() for cfg in gates.values()
+                 for field in ('first_random_prize', 'random_prize', 'com_win_prize')
+                 for p in journey.reward_entries(cfg[field])}
+        for rate in rates:
+            hits = 0
+            with patch('network_redirect.journey.grant', return_value={'hit': True}):
+                for roll in range(100):
+                    with patch('network_redirect.journey.secrets.randbelow', return_value=roll):
+                        hits += len(journey.drops({}, f'5|1022|1|1|{rate}'))
+            self.assertEqual(hits, rate, rate)
+        with patch('network_redirect.journey.grant', side_effect=lambda r, p: p), \
+                patch('network_redirect.journey.secrets.randbelow', side_effect=[9, 10, 99, 0]):
+            rewards = journey.drops({}, '5|1022|1|1|10/5|1023|1|1|10/11|1|30|1|100/12|1|99|1|0')
+        self.assertEqual(rewards, [(5, 1022, 1, 1), (11, 1, 30, 1)])
+
+    def test_bad_rewards_reject_before_any_roll_or_grant(self):
+        for spec in ('5|1022|1|1|-1', '5|1022|1|1|101', '5|1022|0|1|10',
+                     '5|1022|1|0|10', '5|1022|1|1', '5|1022|1|1|10|99'):
+            with self.subTest(spec=spec), patch('network_redirect.journey.secrets.randbelow') as rng, \
+                    patch('network_redirect.journey.grant') as grant:
+                with self.assertRaises(formation.Rejected):
+                    journey.drops({}, '5|1022|1|1|100/' + spec)
+                rng.assert_not_called()
+                grant.assert_not_called()
+
+    def test_catalog_rejects_unreachable_bad_reward_and_enemy(self):
+        cfg = journey.GATES[2][6701]
+        for change in ({'random_prize': '5|999999|1|1|0'}, {'cortege_list': '999999|1'},
+                       {'first_win_prize': '100|101'}, {'pre_tollgate': '999999'}):
+            with self.subTest(change=change), patch.dict(cfg, change):
+                with self.assertRaises(formation.Rejected):
+                    journey.load_rules()
+
+    def test_failed_first_attempt_retains_first_win_and_three_star_rewards(self):
+        role = self.b.profile()
+        cfg = journey.GATES[1][105]
+        for result in (0, 4, 5, 6):
+            outcome, events = journey.attempt(role, 1, 105, cfg, result, NOW, self.b.journey_rules, self.b.formation_rules)
+            self.assertEqual(outcome['send_prize_list'], [])
+            self.assertEqual(events, [])
+            self.assertEqual(journey.progress(role, 1, 105)['pass_star'], 0)
+        with patch('network_redirect.journey.secrets.randbelow', return_value=0):
+            outcome, _ = journey.attempt(role, 1, 105, cfg, 3, NOW, self.b.journey_rules, self.b.formation_rules)
+        self.assertEqual({p['attach_type'] for p in outcome['send_prize_list']}, {2038, 2030})
+
+    def test_elite_reward_preserves_original_item_level(self):
+        role = self.b.profile()
+        with patch('network_redirect.journey.secrets.randbelow', return_value=99):
+            rewards = journey.drops(role, journey.GATES[2][201]['com_win_prize'])
+        self.assertEqual(rewards[0]['attach_level'], 4)
+        self.assertTrue(any(i['type_id'] == 1090 and i['level'] == 4 for i in role['attachments']))
+
+    def test_sweep_rolls_each_attempt_and_late_failure_rolls_back(self):
+        self.fixture(level=30, strength=60)
+        self.clear_map()
+        spec = '5|1022|1|1|50'
+        with patch.dict(journey.GATES[1][101], random_prize=spec), \
+                patch('network_redirect.journey.secrets.randbelow', side_effect=[49, 50, 0]):
+            self.req(1061, tollgate_type=1, tollgate_id=101, sweep_count=3)
+        results = next(data for event, data in self.events if event == 63)
+        self.assertEqual([sum(p['attach_type'] == 1022 for p in r['send_prize_list'].values())
+                          for r in results.values()], [1, 0, 1])
+        self.assertEqual(sum(i['count'] for i in self.b.profile()['attachments'] if i['type_id'] == 1022), 2)
+        self.fixture(last_sweep_time=0)
+        before = self.b.profile()
+        real_attempt = journey.attempt
+        calls = []
+        def fail_second(*args, **kwargs):
+            calls.append(1)
+            if len(calls) == 2:
+                raise ValueError('second settlement failure')
+            return real_attempt(*args, **kwargs)
+        with patch('network_redirect.journey.attempt', side_effect=fail_second):
+            self.req(1061, tollgate_type=1, tollgate_id=101, sweep_count=3)
+        self.assertEqual(self.events[0][0], 55)
+        self.assertEqual(self.b.profile(), before)
+
+    def test_query_validates_flag_and_encodes_before_save(self):
+        before = self.b.profile()
+        self.req(1018, flag=255)
+        self.assertEqual(self.events[0][0], 55)
+        self.assertEqual(self.b.profile(), before)
+        with patch('network_redirect.journey.encode', side_effect=ValueError('snapshot failure')):
+            self.req(1018, flag=1)
+        self.assertEqual(self.events[0][0], 55)
+        self.assertEqual(self.b.profile(), before)
+
+    def test_query_rollover_syncs_elite_limit_and_all_gate_counts(self):
+        self.fixture(level=30, elite_fight_count=30, strength=0)
+        self.clear_map()
+        role = self.b.profile()
+        role['journey']['gates']['1:101']['day_count'] = 99
+        role['journey']['gates']['2:101'] = dict(pass_star=3, day_count=3, flush_count=1)
+        self.b.save(role)
+        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+            self.req(1018, flag=2)
+        attrs = {a['type']: a['value'] for mid, _, data in self.decoded if mid == 1032 for a in data['attr_list']}
+        self.assertEqual((attrs[513], attrs[101]), (0, 30))
+        rows = [g for mid, _, data in self.decoded if mid == 1020 for g in data['tollgate_list']]
+        self.assertTrue(all(g['day_count'] == g['flush_count'] == 0 for g in rows))
+        self.assertFalse(any(mid == 1019 for mid, _, data in self.decoded))
+
+    def test_heartbeat_rollover_refreshes_gate_cache_once(self):
+        self.fight()
+        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+            packets = self.b.respond(encode(2999, {}), self.state)
+            second = self.b.respond(encode(2999, {}), self.state)
+        rows = [g for mid, _, data in map(decode, packets) if mid == 1020 for g in data['tollgate_list']]
+        self.assertTrue(rows)
+        self.assertTrue(all(g['day_count'] == 0 for g in rows))
+        self.assertTrue(all(not data['first_send'] for mid, _, data in map(decode, packets) if mid == 1020))
+        self.assertFalse(any(decode(p)[0] == 1020 for p in second))
+
+    def test_first_operation_after_midnight_syncs_other_gate_counts(self):
+        self.clear_map()
+        role = self.b.profile()
+        role['journey']['gates']['1:102']['day_count'] = 99
+        self.b.save(role)
+        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+            self.fight()
+        rows = [g for mid, _, data in self.decoded if mid == 1020 for g in data['tollgate_list']]
+        self.assertEqual(next(g['day_count'] for g in rows if g['tollgate_type'] == 1 and g['tollgate_id'] == 102), 0)
+        self.assertEqual([d['tollgate_id'] for mid, _, d in self.decoded if mid == 1019], [101])
 
     def test_wire_encode_failure_rolls_back(self):
         before = self.b.profile()

@@ -246,11 +246,15 @@ def track(role, before, mid, req, now):
             c.get('pending_training') and not next((v for v in role['corteges'] if v['id'] == c['id']), {}).get('pending_training')
             for c in before.get('corteges', [])): add(role, 116)
     if mid == 1025 and role.get('corteges') != before.get('corteges'): add(role, 115)
+    if mid == 1059 and req.get('flag') == 1:
+        # All original book tiers share a name, but have distinct type IDs.
+        # Count committed inventory loss only; pills, sales and replay do not count.
+        used = sum(max(0, amount(before, tid) - amount(role, tid)) for tid in f.EXPERIENCE_BOOKS)
+        if used: add(role, 117, used)
     if mid == 1051:
         tid = req.get('item_type'); used = max(0, amount(before, tid) - amount(role, tid))
         if used:
             # Item identities are recovered from item_config; explicit map below.
-            if tid in range(1041, 1049): add(role, 117, used)
             for ident, item in USE_ITEMS.items():
                 if tid == item: add(role, ident, used)
     a, b = role.get('activity', {}), before.get('activity', {})

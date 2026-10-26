@@ -28,6 +28,56 @@ FLUSH = table('tollgate_flush_cost.csv', 'flush_count')
 SWEEP_FLUSH = table('tollgate_sweep_flush.csv', 'count')
 ITEM_PRICE = table('item_buy_price.csv', 'count')
 HANDLED = {1018, 1026, 1050, 1058, 1061, 1062, 1201}
+SKIP_CORTEGE_TYPE = 8888  # [A] common_def.const_def.skip_cortege_type
+
+
+def reward_entries(value, map_prize=False):
+    """Parse the entire list before rolling; bad unhit entries must not hide."""
+    entries = []
+    for token in filter(None, value.split('/')):
+        parts = list(map(int, token.split('|')))
+        require(len(parts) == (4 if map_prize else 5), '奖励配置字段数量无效')
+        typ, tid, count = parts[:3]
+        level, rate = (1, parts[3]) if map_prize else parts[3:]
+        require(count > 0 and level > 0 and 0 <= rate <= 100, '奖励数量、等级或概率无效')
+        entries.append((typ, tid, count, level, rate))
+    return entries
+
+
+def validate_catalog():
+    """Validate original journey tables, including rewards that never roll."""
+    for kind, maps in MAPS.items():
+        gates = GATES[kind]
+        for mid, cfg in maps.items():
+            first = int(cfg['first_tollgate'])
+            require(first in gates and int(gates[first]['map_id']) == mid, '地图首关引用无效')
+            for field in ('pre_map', 'next_map'):
+                require(int(cfg[field]) == 0 or int(cfg[field]) in maps, '地图前后置引用无效')
+        for gid, cfg in gates.items():
+            require(int(cfg['map_id']) in maps, '关卡地图引用无效')
+            for field in ('pre_tollgate', 'next_tollgate'):
+                require(int(cfg[field]) == 0 or int(cfg[field]) in gates, '关卡前后置引用无效')
+            for field in ('strenth_consume', 'day_fight_count', 'day_flush_count', 'exp', 'money'):
+                require(int(cfg[field]) >= (1 if field == 'strenth_consume' else 0), '关卡数值无效')
+            tokens = cfg['cortege_list'].split('/')
+            require(1 <= len(tokens) <= 8, '关卡敌人数量无效')
+            require(any(int(token.split('|')[0]) != SKIP_CORTEGE_TYPE for token in tokens), '关卡缺少实际敌人')
+            for token in tokens:
+                parts = token.split('|')
+                require(len(parts) in (2, 3) and int(parts[0]) in NPCS and int(parts[1]) > 0, '关卡敌人引用无效')
+                skills = parts[2].split('+') if len(parts) == 3 and parts[2] else [NPCS[int(parts[0])]['chushijineng']]
+                require(all(int(skill) in formation.SKILLS for skill in skills), '关卡法术引用无效')
+            if cfg['first_win_prize']:
+                parts = list(map(int, cfg['first_win_prize'].split('|')))
+                require(len(parts) == 2 and parts[0] > 0 and 0 <= parts[1] <= 100, '首胜经验配置无效')
+        specs = [(g[f], False) for g in gates.values()
+                 for f in ('random_prize', 'first_random_prize', 'com_win_prize')]
+        specs += [(m['pass_map_prize'], True) for m in maps.values()]
+        for value, map_prize in specs:
+            for typ, tid, count, level, rate in reward_entries(value, map_prize):
+                valid = (typ in (11, 12) or typ in (4, 7) and tid in summon.BASES
+                         or typ == 5 and tid in formation.ITEMS or typ == 6 and tid in formation.SKILLS)
+                require(valid, '关卡奖励引用无效')
 
 
 def load_rules(path=ROOT / 'server_config/journey_rules.json'):
@@ -47,6 +97,7 @@ def load_rules(path=ROOT / 'server_config/journey_rules.json'):
             and r.get('drop_policy') == 'independent_percent'
             and r.get('sweep_result') == 'historical_best_star'
             and r.get('first_win_extra_exp') == 'all_active_companions', '不支持的旅途结算策略')
+    validate_catalog()
     return r
 
 
@@ -110,9 +161,9 @@ def gate_row(role, kind, gid):
                 **progress(role, kind, gid))
 
 
-def snapshots(role):
+def snapshots(role, reset=True):
     rows = [gate_row(role, kind, gid) for kind in (1, 2) for gid in GATES[kind] if unlocked(role, kind, gid)]
-    replies = [encode(1020, dict(first_send=i == 0, tollgate_count=len(rows[i:i+128]), tollgate_list=rows[i:i+128]))
+    replies = [encode(1020, dict(first_send=reset and i == 0, tollgate_count=len(rows[i:i+128]), tollgate_list=rows[i:i+128]))
                for i in range(0, len(rows), 128)]
     maps = [dict(tollgate_type=1, map_id=mid, pass_map=int(mid in role['journey']['claimed_maps']))
             for mid in MAPS[1]]
@@ -175,6 +226,10 @@ def fighters(role, cfg):
     for order, token in enumerate(cfg['cortege_list'].split('/'), 1):
         parts = token.split('|')
         tid, level = int(parts[0]), int(parts[1])
+        # [A] The original UI hides this reserved slot. [B] Omit it from
+        # simulation, retaining CSV positions for subsequent reserve units.
+        if tid == SKIP_CORTEGE_TYPE:
+            continue
         base = NPCS[tid]
         unit = dict(type=tid, order=order, level=level, evolve=0, reborn=0)
         for stat, col, growth in zip(formation.STATS, formation.BASE_COLUMNS, formation.GROWTH_COLUMNS):
@@ -242,10 +297,7 @@ def grant(role, spec):
 
 def drops(role, value, map_prize=False):
     result = []
-    for token in filter(None, value.split('/')):
-        p = list(map(int, token.split('|')))
-        typ, tid, count = p[:3]
-        level, rate = (1, p[3]) if map_prize else p[3:5]
+    for typ, tid, count, level, rate in reward_entries(value, map_prize):
         if secrets.randbelow(100) < rate:
             result.append(grant(role, (typ, tid, count, level)))
     return result

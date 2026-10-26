@@ -87,7 +87,7 @@ class ProtocolTests(unittest.TestCase):
                 self.assertEqual(decode(replies[2])[2]['cortege_count'], 2)
                 self.assertEqual(decode(replies[3])[2]['cortege_count'], 1)
                 next_server_serial = 200001
-                for mid, values, ids in [(1018, {'serial_num': 123}, [1020, 1023, 1106]),
+                for mid, values, ids in [(1018, {'serial_num': 123}, [1020, 1023, 1032, 1106]),
                                          (1094, {'serial_num': 124, 'flag': 1}, [1095, 1106]),
                                          (1033, {'serial_num': 125, 'flag': 3}, [1034, 1035, 1046, 2998, 1106])]:
                     replies = [decode(r) for r in backend.respond(encode(mid, values), state)]
@@ -163,7 +163,7 @@ class ProtocolTests(unittest.TestCase):
             backend = Backend(Path(directory), 18770, lambda *a, **k: None)
             try:
                 state = {'authenticated': True}
-                for mid, values, ids in [(1018, {}, [1020, 1023]),
+                for mid, values, ids in [(1018, {}, [1020, 1023, 1032]),
                                          (1094, {'flag': 1}, [1095]),
                                          (1033, {'flag': 3}, [1034, 1035, 1046, 2998])]:
                     replies = [decode(r) for r in backend.respond(encode(mid, values), state)]

@@ -15,6 +15,9 @@ ROOT = Path(__file__).resolve().parents[1]
 BASES = summon.BASES
 SKILLS = {int(r['type_id']): r for r in summon.rows('skill_base.csv')}
 ITEMS = {int(r['type_id']): r for r in summon.rows('item_base.csv')}
+EXPERIENCE_BOOKS = frozenset(tid for tid, row in ITEMS.items()
+                           if int(row['main_type']) == 5 and int(row['sub_type']) == 99
+                           and int(row['experience_plus']) > 0)
 LEVELS = {int(r['level']): r for r in summon.rows('role_level_config.csv')}
 EXPERIENCE = {(int(r['quality']), int(r['level'])): int(r['experience'])
               for r in summon.rows('cortege_experience.csv')}
@@ -449,12 +452,19 @@ def feed(role, req, rules):
         top = min(top, role['level'] * 3)
     require(c['level'] < top, '神仙已达当前等级上限')
     gain = 0
+    # [A] expbookUI groups by type_id, never by name, icon or instance level.
+    # [B] Validate the entire batch before consuming even its first stack.
     for r in rolls:
         cfg = ITEMS.get(r['type_id'], {})
-        require(int(cfg.get('experience_plus', 0)) > 0
+        require(int(cfg.get('main_type', 0)) == 5 and int(cfg.get('experience_plus', 0)) > 0
                 and int(cfg.get('sub_type', 0)) == {1: 99, 2: 100}[req['flag']], '经验物品与页面不匹配')
-        debit_item(role, r['type_id'], r['count'])
+        require(type(r['count']) is int and r['count'] > 0, '物品数量无效')
+        available = sum(i['count'] for i in role['attachments']
+                        if i['attach_type'] == 5 and i['type_id'] == r['type_id'] and not i.get('is_lock'))
+        require(available >= r['count'], '材料不足')
         gain += int(cfg['experience_plus']) * r['count']
+    for r in rolls:
+        debit_item(role, r['type_id'], r['count'])
     remaining = Decimal(gain)
     applied = Decimal(0)
     while remaining > 0 and c['level'] < top:
@@ -463,7 +473,8 @@ def feed(role, req, rules):
         cost = needed / rate
         if remaining < cost:
             applied += remaining * rate
-            c['cur_exp'] += float(remaining * rate)
+            # Keep decimal arithmetic through accumulation (e.g. 0.1 + 240).
+            c['cur_exp'] = float(Decimal(str(c['cur_exp'])) + remaining * rate)
             break
         applied += needed
         remaining -= cost

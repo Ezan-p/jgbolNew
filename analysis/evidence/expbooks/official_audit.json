@@ -1,0 +1,822 @@
+{
+  "date": "2026-10-26",
+  "official_server_available": false,
+  "source_classes": {
+    "A": "Original packaged CSV and client bytecode",
+    "B": "Offline settlement, caps/overflow, potential and achievement trigger policy"
+  },
+  "inputs": [
+    {
+      "logical": "csv_config/item_base.csv",
+      "sha256": "2b49aa78b7ea27e7f98c896cc984c2f3a69ac6721c6ef167f20cd4b649aff1c7",
+      "rows": 820,
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/item_name.csv",
+      "sha256": "107da82bd2e8050c6e44dd8da0875f874a56de4cd29db58bc6a4959d3072e685",
+      "rows": 820,
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/cortege_experience.csv",
+      "sha256": "51df43f9d32cc5b04fbb49786424a48c2367b8c5babfc85b87d7ecbd4fa3e44c",
+      "rows": 1500,
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/achievements_config.csv",
+      "sha256": "bbd1388054a77c5b0d33a8778fdbf694f117e985d3f0929dd1c45795097e7f17",
+      "rows": 276,
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/tollgate_config.csv",
+      "sha256": "0f00694c9ea022622c91702d3c9a0fe6f66d50bf8a734e218b4effefabf9b51b",
+      "rows": 597,
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/elite/elite_tollgate_config.csv",
+      "sha256": "1a608ea6e3b22b82f08e2db20e9f6ddbe390a189441e338ac3c147970c8dad76",
+      "rows": 67,
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/hole/main_building_config.csv",
+      "sha256": "01548e03400f73cc11858fff6ba4e5ffe122c9962aba88a87e46bcc2523ebd81",
+      "rows": 21,
+      "csv_values_match": true
+    },
+    {
+      "logical": "lua/ui/expbookUI.lua",
+      "sha256": "d0849fdc6d1974b52c3474ed665b12ff0109d8d32ae9b9f37ed80aaad85dcd2d",
+      "listing": "ui_expbookUI.txt"
+    }
+  ],
+  "books": [
+    {
+      "type_id": 1041,
+      "name": "仙佛密卷",
+      "show_level": 5,
+      "experience": 1200,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 5,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1042,
+      "name": "高级仙佛密卷",
+      "show_level": 5,
+      "experience": 2480,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 5,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1043,
+      "name": "仙佛密卷",
+      "show_level": 10,
+      "experience": 10000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 10,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1044,
+      "name": "高级仙佛密卷",
+      "show_level": 10,
+      "experience": 20000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 10,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1045,
+      "name": "仙佛密卷",
+      "show_level": 15,
+      "experience": 20000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 15,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1046,
+      "name": "高级仙佛密卷",
+      "show_level": 15,
+      "experience": 32000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 15,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1047,
+      "name": "仙佛密卷",
+      "show_level": 20,
+      "experience": 21600,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 20,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1048,
+      "name": "高级仙佛密卷",
+      "show_level": 20,
+      "experience": 44000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 20,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1049,
+      "name": "仙佛密卷",
+      "show_level": 25,
+      "experience": 35200,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 25,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1050,
+      "name": "高级仙佛密卷",
+      "show_level": 25,
+      "experience": 80000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 25,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1051,
+      "name": "仙佛密卷",
+      "show_level": 30,
+      "experience": 50000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 30,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1052,
+      "name": "高级仙佛密卷",
+      "show_level": 30,
+      "experience": 120000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 30,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1053,
+      "name": "仙佛密卷",
+      "show_level": 35,
+      "experience": 80000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 35,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1054,
+      "name": "高级仙佛密卷",
+      "show_level": 35,
+      "experience": 200000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 35,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1055,
+      "name": "仙佛密卷",
+      "show_level": 40,
+      "experience": 100000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 40,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1056,
+      "name": "高级仙佛密卷",
+      "show_level": 40,
+      "experience": 368000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 40,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1057,
+      "name": "仙佛密卷",
+      "show_level": 45,
+      "experience": 132000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 45,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1058,
+      "name": "高级仙佛密卷",
+      "show_level": 45,
+      "experience": 512000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 45,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1059,
+      "name": "仙佛密卷",
+      "show_level": 50,
+      "experience": 208000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 50,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1060,
+      "name": "高级仙佛密卷",
+      "show_level": 50,
+      "experience": 800000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 50,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1061,
+      "name": "仙佛密卷",
+      "show_level": 55,
+      "experience": 360000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 55,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1062,
+      "name": "高级仙佛密卷",
+      "show_level": 55,
+      "experience": 1440000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 55,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1063,
+      "name": "仙佛密卷",
+      "show_level": 60,
+      "experience": 640000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 60,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1064,
+      "name": "高级仙佛密卷",
+      "show_level": 60,
+      "experience": 2560000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 60,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1065,
+      "name": "仙佛密卷",
+      "show_level": 65,
+      "experience": 1016000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 65,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1066,
+      "name": "高级仙佛密卷",
+      "show_level": 65,
+      "experience": 4000000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 65,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1067,
+      "name": "仙佛密卷",
+      "show_level": 70,
+      "experience": 1800000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 70,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1068,
+      "name": "高级仙佛密卷",
+      "show_level": 70,
+      "experience": 7200000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 70,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1069,
+      "name": "仙佛密卷",
+      "show_level": 75,
+      "experience": 6000000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 75,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1070,
+      "name": "高级仙佛密卷",
+      "show_level": 75,
+      "experience": 24000000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 75,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1071,
+      "name": "仙佛密卷",
+      "show_level": 80,
+      "experience": 10800000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 80,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1072,
+      "name": "高级仙佛密卷",
+      "show_level": 80,
+      "experience": 44000000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 80,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1073,
+      "name": "仙佛密卷",
+      "show_level": 85,
+      "experience": 17064000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 85,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1074,
+      "name": "高级仙佛密卷",
+      "show_level": 85,
+      "experience": 70400000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 85,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1075,
+      "name": "仙佛密卷",
+      "show_level": 90,
+      "experience": 24401520,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 90,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1076,
+      "name": "高级仙佛密卷",
+      "show_level": 90,
+      "experience": 100672000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 90,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1077,
+      "name": "仙佛密卷",
+      "show_level": 95,
+      "experience": 30400000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 95,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1078,
+      "name": "高级仙佛密卷",
+      "show_level": 95,
+      "experience": 120000000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 95,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1079,
+      "name": "仙佛密卷",
+      "show_level": 100,
+      "experience": 38400000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 20,
+      "top_level": 100,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    },
+    {
+      "type_id": 1080,
+      "name": "高级仙佛密卷",
+      "show_level": 100,
+      "experience": 156000000,
+      "main_type": 5,
+      "sub_type": 99,
+      "resource": 21,
+      "top_level": 100,
+      "use_limit": 0,
+      "use_target": 0,
+      "product_desc": "天道轮回、大闹蟠桃会、释厄副本"
+    }
+  ],
+  "configured_sources": [
+    {
+      "table": "tollgate_config.csv",
+      "line": 468,
+      "column": "com_win_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1064|8|1|100",
+      "book_ids": [
+        1064
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 11,
+      "column": "random_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1043|1|1|40",
+      "book_ids": [
+        1043
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 11,
+      "column": "com_win_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1043|10|1|100",
+      "book_ids": [
+        1043
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 16,
+      "column": "random_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1045|1|1|40",
+      "book_ids": [
+        1045
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 16,
+      "column": "com_win_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1045|10|1|100",
+      "book_ids": [
+        1045
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 21,
+      "column": "random_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1047|1|1|40",
+      "book_ids": [
+        1047
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 21,
+      "column": "com_win_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1047|10|1|100",
+      "book_ids": [
+        1047
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 26,
+      "column": "random_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1049|1|1|40",
+      "book_ids": [
+        1049
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 26,
+      "column": "com_win_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1049|10|1|100",
+      "book_ids": [
+        1049
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 31,
+      "column": "random_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1051|1|1|40",
+      "book_ids": [
+        1051
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 31,
+      "column": "com_win_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1051|10|1|100",
+      "book_ids": [
+        1051
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 37,
+      "column": "random_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1053|1|1|40",
+      "book_ids": [
+        1053
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 37,
+      "column": "com_win_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1053|10|1|100",
+      "book_ids": [
+        1053
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 41,
+      "column": "random_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1057|1|1|40",
+      "book_ids": [
+        1057
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 41,
+      "column": "com_win_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1058|10|1|100",
+      "book_ids": [
+        1058
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 47,
+      "column": "random_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1061|1|1|40",
+      "book_ids": [
+        1061
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 47,
+      "column": "com_win_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1062|10|1|100",
+      "book_ids": [
+        1062
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 53,
+      "column": "random_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1065|1|1|40",
+      "book_ids": [
+        1065
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 53,
+      "column": "com_win_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1066|10|1|100",
+      "book_ids": [
+        1066
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 58,
+      "column": "random_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1069|1|1|40",
+      "book_ids": [
+        1069
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 58,
+      "column": "com_win_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1070|10|1|100",
+      "book_ids": [
+        1070
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 65,
+      "column": "random_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1069|2|1|30",
+      "book_ids": [
+        1069
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 65,
+      "column": "com_win_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1070|15|1|100",
+      "book_ids": [
+        1070
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 68,
+      "column": "random_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1067|1|1|50",
+      "book_ids": [
+        1067
+      ]
+    },
+    {
+      "table": "elite/elite_tollgate_config.csv",
+      "line": 68,
+      "column": "com_win_prize(object_type|sub_type|count|level|rate/...)",
+      "value": "5|1067|10|1|100",
+      "book_ids": [
+        1067
+      ]
+    }
+  ],
+  "achievement": {
+    "id": "117",
+    "category": "1",
+    "name": "仙佛密卷",
+    "desc": "使用一次仙佛密卷",
+    "plus_point": "5",
+    "plus_type(A/R)": "A",
+    "repeatable(Y/N)": "N",
+    "full_progress": "1",
+    "is_open(Y/N)": "Y",
+    "max_repeatable_times": "0"
+  },
+  "unresolved": [
+    "Original server overflow/refund and decimal rounding policy",
+    "Unpublished activity drop probabilities and level-to-tier mapping"
+  ]
+}

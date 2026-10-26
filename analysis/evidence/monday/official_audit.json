@@ -1,0 +1,201 @@
+{
+  "client": "3.87",
+  "inputs": [
+    {
+      "logical": "v2/funUI/pic32.png",
+      "original": "jgbol3.87/assets/release_/3c9c5577f88f4aa3ee2442f62ba07a4a.data",
+      "sha256": "1660b7ec8d66c17ee41ee909921e8415a7692e7ead44d67b2639cd5bbff6df7b"
+    },
+    {
+      "logical": "v2/funUI/title32.png",
+      "original": "jgbol3.87/assets/release_/8ea84fe87f1b1acf60acbca5bc1be9df.data",
+      "sha256": "e90868cecc7efb03110acc5d6ea9c78800c9ba183c5bc7cd6ba6964ec8c67050"
+    },
+    {
+      "logical": "v2/funUI/pic47.png",
+      "original": "jgbol3.87/assets/release_/786dbd24b4eeef4ed32b4507734b7644.data",
+      "sha256": "1cdab7b511fbc42371aab52f780317a6963266e224bd5a0b2dc81baf88b9f169"
+    },
+    {
+      "logical": "v2/funUI/title47.png",
+      "original": "jgbol3.87/assets/release_/c5e51e1c6c3fd35c067fee0191884897.data",
+      "sha256": "c6243f6ff63c6b8db9984fa50626a965ba6811aa37a209bd78801d021b76e98c"
+    },
+    {
+      "logical": "lua/ui/mondayUI.lua",
+      "original": "jgbol3.87/assets/release_/c1d457c67e9a971b1d545f09cc8f6857.data",
+      "sha256": "4dff205608fa2da7eb480789f518ecbe2f19f9a3a1d5ec30946cdd945b3148a6"
+    },
+    {
+      "logical": "lua/ui/activityUI.lua",
+      "original": "jgbol3.87/assets/release_/f94624a6c6a5f4034d0fdf2e315f0904.data",
+      "sha256": "b62f2dffa9e3707ce73f2b5fedbb147433544d735ec722519d377a31698f134f"
+    },
+    {
+      "logical": "lua/ui/funUI.lua",
+      "original": "jgbol3.87/assets/release_/5dd8b529cd13d0983be4c09ea5cd56db.data",
+      "sha256": "0551c970ff68fdc33625dd35036bcc7b3ecf0e058d6c04ecef4876c42a41214d"
+    },
+    {
+      "logical": "lua/common/common_def.lua",
+      "original": "jgbol3.87/assets/release_/13a640e1f35a7599fe90dd31c8098b15.data",
+      "sha256": "15a4299fc92c50adda7682a4775f2e278e135f49f12d126e105a03d097d9ecf8"
+    },
+    {
+      "logical": "v2/String.plist",
+      "original": "jgbol3.87/assets/release_/08b0428edce64d19f304d30c3829ec87.data",
+      "sha256": "e04af124a848226b08c5a73069666e5eb5fd96294725e380a3e187e7a63b4dc4"
+    },
+    {
+      "logical": "v2/String2.plist",
+      "original": "jgbol3.87/assets/release_/e926a25accffd37afafb015933e815d4.data",
+      "sha256": "1fe10126d1e888551fbe998879cd2d0a1db404e9c6406bccb620f117e31a4943"
+    },
+    {
+      "logical": "csv_config/achievements_config.csv",
+      "original": "jgbol3.87/assets/release_/21e32184cfddbf4046201e0e98e8828e.data",
+      "sha256": "bbd1388054a77c5b0d33a8778fdbf694f117e985d3f0929dd1c45795097e7f17"
+    }
+  ],
+  "identity": {
+    "32": "天工制物阁 / mondayUI / 1219 + 1243 / 112 + 142",
+    "47": "天机阁 / destinyUI / 1227 / 195"
+  },
+  "A": [
+    "Original pic32/title32 match the supplied chest/peaches banner; pic47/title47 depict 天机阁",
+    "mondayUI L53: four slots; L68-93: weekday keyed reward and separate open/closed catalog shapes",
+    "mondayUI L181-188,237-252: 1219 flags1/2/3, op_type0, level1..4; 1243 index1..4",
+    "mondayUI L57: event112 success=1; L128/common_op_result: event142 success=0",
+    "String monday1/4/5/6/7: Monday opening, jade usable on opening day, leftovers recycled",
+    "mondayUI L418-421 VIP icon with monday9: VIP receives double opening jade",
+    "String monday22 and mondayUI L528-545: each preview slot may change once per closed day",
+    "week_task_def: nine tasks, strength/energy/duty/raid/raid refresh/train/three blessings/fated summon/journey",
+    "mondayUI L215-221: pending claim count, finished unclaimed task, Monday daily claim",
+    "achievements_config 125: exchange any item at 天工制物阁, one-time 10 道行"
+  ],
+  "B": [
+    "UTC+8 Tuesday-through-Monday cycle; 10 jade per closed-day task, 20 Monday free (VIP40)",
+    "Nine tasks rotate by local epoch day modulo nine; only committed actual gameplay completes one task",
+    "Four pools and prices are server configuration missing from shipped CSV; uniform draws excluding current item on refresh",
+    "Retain changed preview until Monday, repeated exchange while jade suffices, new pool Tuesday",
+    "Completed unclaimed daily rewards accumulate within cycle; no credit for absent/uncompleted tasks",
+    "1 jade -> 1000 silver via permanent idempotent mail at closure; unclaimed qualification expires",
+    "Persist clock high-water, do not migrate unrelated pavilion bricks or historical 125 achievement"
+  ],
+  "inferred_rules": {
+    "schema_version": 1,
+    "mode": "inferred",
+    "revision": "2026-10-26.1",
+    "enabled": true,
+    "timezone_offset_hours": 8,
+    "daily_jade": 10,
+    "monday_jade": 20,
+    "recycle_silver": 1000,
+    "task_rotation": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "slots": [
+      {
+        "cost": 10,
+        "pool": [
+          [
+            5,
+            1001,
+            10,
+            1
+          ],
+          [
+            5,
+            1421,
+            5,
+            1
+          ],
+          [
+            5,
+            1024,
+            5,
+            1
+          ]
+        ]
+      },
+      {
+        "cost": 20,
+        "pool": [
+          [
+            5,
+            1333,
+            3,
+            1
+          ],
+          [
+            5,
+            1327,
+            5,
+            1
+          ],
+          [
+            5,
+            1323,
+            10,
+            1
+          ]
+        ]
+      },
+      {
+        "cost": 30,
+        "pool": [
+          [
+            5,
+            1032,
+            5,
+            1
+          ],
+          [
+            5,
+            1033,
+            3,
+            1
+          ],
+          [
+            5,
+            10001,
+            5,
+            1
+          ]
+        ]
+      },
+      {
+        "cost": 40,
+        "pool": [
+          [
+            5,
+            6005,
+            5,
+            1
+          ],
+          [
+            5,
+            6002,
+            5,
+            1
+          ],
+          [
+            5,
+            6003,
+            5,
+            1
+          ]
+        ]
+      }
+    ],
+    "notes": "【B】缺少原服务器下发的每日玉圭数、商品池、价格和回收比率，以此表补全。周一兑换、VIP双倍开业赠玉、其余六天每日任务、每格每天换一次与四格布局来自原客户端【A】。"
+  }
+}

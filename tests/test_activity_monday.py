@@ -14,9 +14,6 @@ SUNDAY = MONDAY - 86400
 
 
 class MondayTests(ActivityCase):
-    def at(self, now):
-        self.clock.return_value = now
-
     def setUp(self):
         super().setUp()
         # ActivityCase stores the patcher rather than its mock.
@@ -81,6 +78,16 @@ class MondayTests(ActivityCase):
                 self.assertEqual(untouched['activity']['monday']['task']['finish_time'],0)
                 m.track(after,before,mid,req,SUNDAY)
                 self.assertEqual(after['activity']['monday']['task']['finish_time'],SUNDAY)
+
+    def test_consumption_survives_same_request_recovery(self):
+        for kind, field, ft, area in [(1,'strength',1,'journey'),(2,'energy',3,'activity')]:
+            self.task(kind);before=self.b.profile();after=copy.deepcopy(before)
+            after[field]+=10
+            m.track(after,before,1026,dict(fight_type=ft),SUNDAY)
+            self.assertEqual(after['activity']['monday']['task']['finish_time'],0)
+            after[area]['fight_id']=before[area].get('fight_id',0)+1
+            m.track(after,before,1026,dict(fight_type=ft),SUNDAY)
+            self.assertEqual(after['activity']['monday']['task']['finish_time'],SUNDAY)
 
     def test_randomize_each_slot_daily_and_freeze_monday(self):
         original=self.data(self.call())['activity_data']['show_list']

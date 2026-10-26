@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-24",
+  "date": "2026-10-26",
   "client": "3.87",
   "official_server_available": false,
   "normal_maps": 67,
@@ -10,6 +10,131 @@
     "A": "Packaged original client bytecode, protocol and CSV facts",
     "B": "Explicit inferred server policy, not a recovered official server"
   },
+  "catalog": {
+    "1": {
+      "maps": 67,
+      "gates": 597,
+      "all_reachable": true,
+      "reward_entries": 267,
+      "rates": [
+        0,
+        10,
+        15,
+        20,
+        30,
+        100
+      ],
+      "placeholder_gates": [
+        2008,
+        2108,
+        2208,
+        2308,
+        2408,
+        2508,
+        2608,
+        2708,
+        2808,
+        2908,
+        3008,
+        3109,
+        3209,
+        3309,
+        3409,
+        3509,
+        3609,
+        3709,
+        3809,
+        3909,
+        4009,
+        4110,
+        4210,
+        4310,
+        4410,
+        4510,
+        4610,
+        4710,
+        4810,
+        4910,
+        5010,
+        5110,
+        5210,
+        5310,
+        5410,
+        5510,
+        5610,
+        5710,
+        5810,
+        5910,
+        6010,
+        6110,
+        6210,
+        6310,
+        6410,
+        6510,
+        6610,
+        6710
+      ]
+    },
+    "2": {
+      "maps": 67,
+      "gates": 67,
+      "all_reachable": true,
+      "reward_entries": 134,
+      "rates": [
+        25,
+        30,
+        40,
+        50,
+        60,
+        100
+      ],
+      "placeholder_gates": [
+        2601,
+        2701,
+        2801,
+        2901,
+        3001,
+        3101,
+        3201,
+        3301,
+        3401,
+        3501,
+        3601,
+        3701,
+        3801,
+        3901,
+        4001,
+        4101,
+        4201,
+        4301,
+        4401,
+        4501,
+        4601,
+        4701,
+        4801,
+        4901,
+        5001,
+        5101,
+        5201,
+        5301,
+        5401,
+        5501,
+        5601,
+        5701,
+        5801,
+        5901,
+        6001,
+        6101,
+        6201,
+        6301,
+        6401,
+        6501,
+        6601,
+        6701
+      ]
+    }
+  },
+  "placeholder_type": 8888,
   "inputs": [
     {
       "logical": "lua/ui/mapUI.lua",
@@ -40,6 +165,16 @@
       "logical": "lua/ui/lineupUI.lua",
       "physical": "jgbol3.87/assets/release_/f8e562f5e1c1de4716d573dd13289bcd.data",
       "sha256": "f34a607a17d948c7c1fe2096b32aa4a0578a91f2b9706cc07c56d0426b5bec48"
+    },
+    {
+      "logical": "lua/ui/fightBeginUI.lua",
+      "physical": "jgbol3.87/assets/release_/e9a2cfbd45d40d73f6030fb772cdcff9.data",
+      "sha256": "056cfb8287b3823784b1f98cc33564dfe8972f3e993bb6396b2242d3d1ebfb20"
+    },
+    {
+      "logical": "lua/ui/fightInfoUI.lua",
+      "physical": "jgbol3.87/assets/release_/800bad143827e5057f9254ff2b67fc3e.data",
+      "sha256": "2697405123f029a231cded3886721e1715c1e681399dfd59b6d2fe0adab2e5e9"
     },
     {
       "logical": "lua/event_mgr.lua",
@@ -462,6 +597,18 @@
       "csv_values_match": true
     },
     {
+      "logical": "csv_config/vip_pri_config.csv",
+      "physical": "jgbol3.87/assets/release_/89992cbd4c6e629d6a18ec90dbb33234.data",
+      "sha256": "a15e24d8eb436a37c156ede4d8541e0efe4c32e3afb681a934a27e73a576bae9",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/achievements_config.csv",
+      "physical": "jgbol3.87/assets/release_/21e32184cfddbf4046201e0e98e8828e.data",
+      "sha256": "bbd1388054a77c5b0d33a8778fdbf694f117e985d3f0929dd1c45795097e7f17",
+      "csv_values_match": true
+    },
+    {
       "logical": "csv_config/cortege/cortege_base_0.csv",
       "physical": "jgbol3.87/assets/release_/e8771c6e38d4fa9829474cf0d42c17fa.data",
       "sha256": "55c9d05f8accc205727039a610400209c3a0df3ea6ff7ca395b2c5c7424f7d10",
@@ -871,5 +1018,5 @@
     }
   ],
   "rules": "server_config/journey_rules.json",
-  "rules_sha256": "dba38716c8fa2b57d137c5533e2b8e1639e88fe255f0ac04b1a46753b095fb4a"
+  "rules_sha256": "af182476f0281d713b2f0ed01212688b102895412d122dff62aaaa17b62be974"
 }

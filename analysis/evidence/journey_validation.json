@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-26",
+  "journey_tests": 36,
+  "related_tests": {
+    "run": 121,
+    "passed": 121,
+    "log": ".runtime/journey-final-targeted.log"
+  },
+  "native_client_checks": 11,
+  "full_suite_initial": {
+    "run": 1044,
+    "failures": [
+      "test_auth_reconnect_queries_and_expired_ticket (test_offline_backend.ProtocolTests)",
+      "test_bootstrap_initializes_formation_and_innate_skill (test_offline_backend.ProtocolTests)",
+      "test_serial_zero_queries_do_not_consume_server_sequence_or_send_done (test_offline_backend.ProtocolTests)",
+      "test_rename_failures_atomic (test_role_profile.ProfileTests)"
+    ],
+    "errors": [
+      "test_port_conflict_does_not_disturb_existing_listener (test_game_server.GameServerCLITests)",
+      "test_probe_duration_and_quiet_write_complete_session (test_game_server.GameServerCLITests)",
+      "test_sigterm_closes_active_connection_and_releases_port (test_game_server.GameServerCLITests)",
+      "test_form_csrf_and_registration (test_local_accounts.AuthHTTPTests)",
+      "test_weekly_get_and_head (test_monument.MonumentHTTPTests)",
+      "test_cached_list_bytes_and_query_redaction (test_network_redirect.LandingTests)",
+      "test_concurrent_connections_have_separate_complete_logs (test_network_redirect.LandingTests)",
+      "test_fragmented_health (test_network_redirect.LandingTests)",
+      "test_head_and_traversal (test_network_redirect.LandingTests)",
+      "test_short_binary_and_shutdown (test_network_redirect.LandingTests)",
+      "test_shutdown_closes_waiting_clients_and_records_reason (test_network_redirect.LandingTests)",
+      "test_tls_reaches_local_without_downgrade (test_network_redirect.LandingTests)",
+      "test_truncated_request_does_not_poison_listener (test_network_redirect.LandingTests)",
+      "test_unknown_endpoint_not_fake_success (test_network_redirect.LandingTests)",
+      "test_fragmented_binary_ls_response (test_offline_backend.TLSAndWireTests)",
+      "test_large_tls_response (test_offline_backend.TLSAndWireTests)",
+      "test_unsupported_support_endpoint_is_json_error (test_offline_backend.TLSAndWireTests)",
+      "test_untrusted_certificate_rejected (test_offline_backend.TLSAndWireTests)",
+      "test_verified_tls_with_dynamic_sni (test_offline_backend.TLSAndWireTests)",
+      "test_adb_failures_keep_listener_available_until_recovery (test_startup.ProcessPollingTests)"
+    ],
+    "log": ".runtime/journey-full-regression.log"
+  },
+  "network_and_query_retest": {
+    "run": 25,
+    "passed": 25,
+    "local_loopback_permission": true,
+    "log": ".runtime/journey-network-retest.log"
+  },
+  "remaining_unrelated_failures": [
+    {
+      "test": "test_bootstrap_initializes_formation_and_innate_skill",
+      "reason": "Market rich_item_list now contains 9 entries; existing assertion expects 8."
+    },
+    {
+      "test": "test_rename_failures_atomic",
+      "reason": "Rejected rename saves unrelated Monday activity initialization; journey handlers are not entered."
+    }
+  ],
+  "preserved_existing_uncommitted_changes": true,
+  "playthrough": {
+    "date": "2026-10-26",
+    "passed": true,
+    "temporary_database": true,
+    "live_account_changed": false,
+    "real_combat": true,
+    "army": "npc_v1_l99_t1_attack",
+    "seeded_strength": 10000,
+    "seeded_gold": 100000,
+    "seeded_silver": 1000000,
+    "stat_boosts": false,
+    "seeded_progress": false,
+    "normal_gates": 597,
+    "elite_gates": 67,
+    "sweeps": 664,
+    "chapter_rewards": 67,
+    "restart_at_chapter": 34,
+    "replayed_every_mutation": true,
+    "cooldown_rejections": 664,
+    "requests": 2795,
+    "simulated_seconds": 1195200,
+    "balance_claim": false
+  },
+  "service_reload": "analysis/evidence/journey_service_reload.json"
+}

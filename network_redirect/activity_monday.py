@@ -164,6 +164,20 @@ def track(role, before, mid, req, now):
         if kind in (1, 2):
             key = 'strength' if kind == 1 else 'energy'
             done = role.get(key, 0) < before.get(key, 0)
+            # Recovery or a level-up can offset the same request's expenditure.
+            # Confirm the consuming operation via its committed fight record.
+            if kind == 1:
+                j, oldj = role.get('journey', {}), before.get('journey', {})
+                done |= (mid == 1026 and req.get('fight_type') in (1, 20)
+                         and j.get('fight_id', 0) > oldj.get('fight_id', 0))
+                done |= mid == 1061 and j.get('gates') != oldj.get('gates')
+                u, oldu = a.get('undergo', {}), b.get('undergo', {})
+                done |= (mid == 1349 and req.get('id') == 4 and u.get('count', 0) > 0
+                         and u.get('count') != oldu.get('count')
+                         and a.get('fight_id', 0) > b.get('fight_id', 0))
+            else:
+                done |= ((mid == 1026 and req.get('fight_type') in (2, 3, 12) or mid == 1072)
+                         and a.get('fight_id', 0) > b.get('fight_id', 0))
         elif kind == 3:
             done = mid == 1026 and req.get('fight_type') == 5 and a.get('duty') != b.get('duty')
         elif kind == 4:
@@ -183,5 +197,6 @@ def track(role, before, mid, req, now):
                 mid == 1061 or req.get('fight_type') in (1, 20))
         if done:
             t['finish_time'] = now
-    old = before.get('activity', {}).get('monday')
-    return [summon.event(80, {21: hint(role, now, r)})] if old != s else []
+    # Native event112 refreshes flag21 when opening the activity; bootstrap also
+    # publishes it. Keep unrelated gameplay's response/event ordering intact.
+    return []

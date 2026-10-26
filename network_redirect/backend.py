@@ -145,7 +145,7 @@ class Backend:
             formation.recalculate(role, self.formation_rules)
             achievements.refresh(role, int(time.time()))
             if changed or role != original_role:
-                self.save(role, account)
+                self.save(role, account, gameplay=False)
             return role
         # Explicit local bootstrap defaults; these are not recovered official server values.
         role = dict(area_id=1, role_id=1.0, role_name='本地行者', level=1,
@@ -155,10 +155,10 @@ class Backend:
                     attachments=[])
         formation.prepare(role, self.formation_rules)
         journey.prepare(role, int(time.time()), self.journey_rules)
-        self.save(role, account)
+        self.save(role, account, gameplay=False)
         return role
 
-    def save(self, role, account=None):
+    def save(self, role, account=None, *, gameplay=True):
         account = self.account if account is None else account
         role_profile.prepare(role, self.profile_rules)
         cheer.prepare(role, self.cheer_rules)
@@ -168,17 +168,17 @@ class Backend:
         formation.recalculate(role, self.formation_rules)
         stored = self.db.execute('SELECT data FROM roles WHERE account=?', (account,)).fetchone()
         before_achievements = json.loads(stored[0]) if stored else None
-        context = self.achievement_context if account == self.account else None
+        # Loading/migrating a save is not a committed player operation.
+        context = self.achievement_context if gameplay and account == self.account else None
         mid, req = context or (0, {})
         from . import activity_monday
-        monday_updates = activity_monday.track(role, before_achievements, mid, req, int(time.time()))
+        activity_monday.track(role, before_achievements, mid, req, int(time.time()))
         achievements.track(role, before_achievements, mid, req, int(time.time()))
         updates = achievements.packets(role, new=1, previous=before_achievements) if context and before_achievements else []
         self.db.execute('INSERT OR REPLACE INTO roles VALUES (?,?)',
                         (account, json.dumps(role, ensure_ascii=False)))
         self.db.commit()
         self.achievement_pending.extend(updates)
-        self.achievement_pending.extend(monday_updates)
 
     def duty_peers(self):
         # Only actual registered local saves participate. Exclude the legacy
@@ -537,6 +537,7 @@ class Backend:
             previous_month = role.get('xianling', {}).get('month')
             xianling.prepare(role, now)
             previous_day = role.get('daily', {}).get('day')
+            previous_journey_day = role.get('journey', {}).get('day')
             from . import activity_rulai
             rulai_state = role.get('activity', {}).get('rulai', {})
             rulai_period = activity_rulai.period(now, activity_rulai.load_rules())[0]
@@ -546,6 +547,9 @@ class Backend:
             self.save(role)
             # Refresh expiring permanent effects without replacing UI-held objects.
             updates = self.panel_attributes(role) + self.journey_attributes(role)
+            if previous_journey_day != role['journey']['day']:
+                # Reset all cached gate counts without changing last_fight_npc.
+                updates += journey.snapshots(role, reset=False)
             if rulai_rollover:
                 updates.append(activity_rulai.sync(role, now))
                 self.save(role)
@@ -1112,10 +1116,15 @@ class Backend:
         serial = data['serial_num']
         now = int(time.time())
         if mid == 1018:
-            role = self.profile()
-            journey.prepare(role, now, self.journey_rules)
-            self.save(role)
-            return self.complete(serial, journey.snapshots(role))
+            try:
+                role = self.profile()
+                journey.prepare(role, now, self.journey_rules)
+                replies = journey.settle(role, mid, data, now, self.journey_rules, self.formation_rules)
+                replies += self.journey_attributes(role)
+                self.save(role)
+            except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
+                replies = [summon.event(55, {'op_string': str(error) if isinstance(error, formation.Rejected) else '旅途数据无效，请刷新后重试'})]
+            return self.complete(serial, replies)
         cached = self.journey_replies.get(serial)
         if cached and cached[0] == packet:
             return cached[1]
@@ -1123,6 +1132,7 @@ class Backend:
             return self.complete(serial, [summon.event(55, {'op_string': '旅途请求已过期，请刷新后重试'})])
         try:
             role = self.profile()
+            previous_journey_day = role.get('journey', {}).get('day')
             journey.prepare(role, now, self.journey_rules)
             before = copy.deepcopy(role)
             events = journey.settle(role, mid, data, now, self.journey_rules, self.formation_rules, self.activity_rules)
@@ -1136,8 +1146,10 @@ class Backend:
             # Keep existing companion tables alive for the battle-end experience UI.
             # Refresh inventory before event 44 starts the original replay.
             replies = []
+            if previous_journey_day != role['journey']['day']:
+                replies += journey.snapshots(role, reset=False)
             if mid not in (1018, 2998):
-                replies = (self.companion_deltas(before, role) + self.item_deltas(before, role)
+                replies += (self.companion_deltas(before, role) + self.item_deltas(before, role)
                            + self.inventory(role) + summon.soul_snapshots(role)
                            + journey.updates(role, before))
             replies += self.journey_attributes(role) + events
