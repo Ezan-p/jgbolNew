@@ -111,10 +111,12 @@ def client_source(rules):
     pavilion_source = pavilion_source.replace('__PAVILION_TABLES__', lua(activity_pavilion.client_tables()))
     from . import activity
     feed_source = Path(__file__).with_name('feed_client.lua').read_text(encoding='utf-8')
+    guild_source = Path(__file__).with_name('guild_client.lua').read_text(encoding='utf-8')
+    guild_source += '\n' + Path(__file__).with_name('guild_activity_client.lua').read_text(encoding='utf-8')
     feed_rules = activity.load_rules()
     feed_source = feed_source.replace('__FEED_REWARD_TIERS__', lua(feed_rules['feed_reward_tiers']))
     feed_source = feed_source.replace('__FEED_MAX_COUNT__', str(feed_rules['feed_max_count']))
-    return visit_source + '\n' + feed_source + '\n' + pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
+    return guild_source + '\n' + visit_source + '\n' + feed_source + '\n' + pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
 
 
 def lua(value):

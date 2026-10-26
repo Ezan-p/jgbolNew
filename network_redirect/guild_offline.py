@@ -51,6 +51,10 @@ def prepare(role,s,g,now,r):
                     pending.update(rank=5,jointime=now,online=True);v['members'][key]=pending
                     role.update(union_id=v['id'],union_rank=5,union_name=v['name'],union_contrib=0,cur_union_contrib=0)
                     s['join_count']=s.get('join_count',0)+1
+                    # Old saves could retain multiple pending applications.
+                    # Acceptance closes the others, just like immediate joins.
+                    for other in s['unions'].values():
+                        if other is not v:other['applications'].pop(key,None)
                 del v['applications'][key];s.setdefault('pending_notices',[]).append(dict(event_id=8 if accepted else 9,result=1,role_id=int(key)))
                 break
     for v in s['unions'].values():
@@ -152,6 +156,11 @@ def validate_rules(r):
     require(type(r.get('catch_resident_percent'))is int and 0<=r['catch_resident_percent']<=100,'栖息概率配置无效')
     require(type(r['catch_item_bonus'])is int and 0<=r['catch_item_bonus']<=100,'捕捉道具加成无效')
     daily.validate_prize([5,r['catch_item'],1,1])
+    require(r.get('pet_role_level')==50 and r.get('pet_union_level')==5,'灵宠仙地等级必须符合原版')
+    require(type(r.get('catch_attempts'))is int and 1<=r['catch_attempts']<=20,'捕捉次数配置无效')
+    rates=r.get('catch_prop_rates',{})
+    require(set(rates)=={'1338','1339','1340','1341'} and all(type(v)is int and 0<v<=100 for v in rates.values()) and rates['1338']<rates['1339']<rates['1340']<rates['1341']==100,'镇魂符概率配置无效')
+    require(type(r.get('train_support_percent'))is int and 1<=r['train_support_percent']<=100,'点赞增益配置无效')
     require(r['catch_success_percent']<=100 and r['pet_limit']<=240 and r['search_daily']<=25,'概率、兽栏或棋盘配置越界')
     require(r['train_resident_required']==240,'原版试炼需要240只栖息宠物')
     require(type(r.get('team_min_fighters')) is int and r['team_min_fighters']==3,'秘境至少三人出战')
@@ -163,7 +172,10 @@ def validate_rules(r):
     for k in ('rank_power','match_merit','rank_limits'):
         require(all(type(v)is int and v>0 for v in r[k].values()),'职位数值无效')
     require(r['mission_cost_types'] and all(type(v)is int and v in range(1,5) for v in r['mission_cost_types']),'神树任务池无效')
-    require(len(r['hunt_shop_unlock'])==len(r['hunt_rewards']) and all(type(v)is int and v>=0 for v in r['hunt_shop_unlock']),'声望解锁配置无效')
+    require(isinstance(r.get('pet_shop_items'),list) and r['pet_shop_items'],'宠物商店配置缺失')
+    for item in r['pet_shop_items']:daily.validate_prize(item)
+    require(all(any(p[0]==5 and p[1]==tid for p in r['pet_shop_items']) for tid in (1338,1339,1340,1341)),'宠物商店必须包含四种镇魂符')
+    require(len(r['hunt_shop_unlock'])==len(r['pet_shop_items']) and all(type(v)is int and v>=0 for v in r['hunt_shop_unlock']),'声望解锁配置无效')
     from . import summon
     valid={int(v['type_id']) for v in summon.rows('animal_base.csv')}
     require(r['pet_types'] and all(type(v)is int and v in valid for v in r['pet_types']),'灵兽类型配置无效')

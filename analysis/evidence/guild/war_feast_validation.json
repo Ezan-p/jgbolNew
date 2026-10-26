@@ -1,0 +1,29 @@
+{
+  "revision": "guild-war-feast-2026-10-26",
+  "guild_tests": {
+    "passed": 121,
+    "log": "war_feast_tests.log"
+  },
+  "native_client": {
+    "passed": 141,
+    "restored": true,
+    "log": "war_feast_client_validation.json",
+    "coverage": "Native gift enablement, local/cross targets, all rank tabs, original betting dialog and three stake send callbacks; not exhaustive combat animation testing"
+  },
+  "full_regression_initial": {
+    "run": 957,
+    "failures": 1,
+    "environment_errors": 20,
+    "log": "war_feast_full_tests.log"
+  },
+  "affected_retest": {
+    "passed": 44,
+    "log": "war_feast_network_monument_retest.log"
+  },
+  "checks": [
+    "Python compile passed with writable cache",
+    "git diff --check passed"
+  ],
+  "requires_restart": true,
+  "live_account_resources_changed": false
+}

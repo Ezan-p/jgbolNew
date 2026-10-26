@@ -13,10 +13,10 @@ class GuildTests(unittest.TestCase):
         self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None);self.addCleanup(lambda:self.b.close())
         # This legacy suite exercises settlements independent of weekday; the
         # default original calendar/gates are covered by test_guild_npc_combat.
-        self.b.guild_rules.update(train_weekend_only=False,lucky_weekend_only=False,hunt_weekend_open=True)
+        self.b.guild_rules.update(pet_role_level=0,pet_union_level=0,wander_daily=3,train_weekend_only=False,lucky_weekend_only=False,hunt_weekend_open=True)
         self.clock=patch('network_redirect.backend.time.time',return_value=NOW);self.clock.start();self.addCleanup(self.clock.stop)
         self.serial=1000
-        r=self.b.profile();r.update(level=30,gold_coin=100000,silver_coin=100000);self.b.save(r)
+        r=self.b.profile();r.update(level=30,gold_coin=100000,silver_coin=100000);summon.add_item(r,1338,100);self.b.save(r)
     def req(self,op,**d):
         self.serial+=1;self.packet=encode(1301,dict(serial_num=self.serial,id=op,data=summon.lua(d)))
         self.replies=self.b.respond(self.packet,{'authenticated':True})
@@ -199,11 +199,16 @@ class GuildTests(unittest.TestCase):
         self.create();self.req(19,new_notify='新公告');self.req(71,new_notify='内部公告');self.req(51,new_name='新仙盟')
         info=self.req(18,query_type=1)[-1][2]['union_info'];self.assertEqual(info['notify'],'新公告');self.assertEqual(info['name'],'新仙盟')
         self.req(13);self.assertEqual(self.role()['union_id'],0)
+    def prepare_feast(self):
+        role=self.role();g=role['guild']['unions'][str(role['union_id'])]
+        g.update(popularity=2000,money=10000);role['vip_level']=1;self.b.save(role)
+        ident=int(next(iter(g['applications'])));self.ok(5,role_id=ident)
+
     def test_feast_duplicate(self):
-        self.create();self.req(65,feast_type=1)
+        self.create();self.prepare_feast();self.ok(65,feast_type=1)
         self.assertEqual(self.req(18,query_type=14)[-1][2]['feast_data']['feast_type'],1)
         self.req(68);r=self.role();self.assertEqual(self.req(68)[-1][1],55);self.assertEqual(self.role(),r)
-        self.req(67,gift_type=1,count=1);self.req(66,des_id=1);r=self.role();self.assertEqual(self.req(66,des_id=1)[-1][1],55);self.assertEqual(self.role(),r)
+        self.ok(67,gift_type=1,count=2);self.ok(66,des_id=1);r=self.role();self.assertEqual(self.req(66,des_id=1)[-1][1],55);self.assertEqual(self.role(),r)
     def test_atomic_rollback(self):
         self.create();r=self.role();r['gold_coin']=0;self.b.save(r);self.req(14);before=self.role()
         self.req(15,mission_id=1,mission_type=1,cultivate_type=2,cultivate_record_time=daily.day(NOW,self.b.guild_rules),cultivate_record_count=0)
@@ -282,11 +287,11 @@ class GuildTests(unittest.TestCase):
         self.assertEqual(guild.missions(self.b.guild_rules)[0]['cost_type'],4)
 
     def test_original_luxury_feast_rewards(self):
-        self.create();self.ok(65,feast_type=3);before=self.role();self.ok(68)
+        self.create();self.prepare_feast();self.ok(65,feast_type=3);before=self.role();self.ok(68)
         after=self.role();self.assertEqual(after['strength']-before['strength'],50)
         self.assertEqual(sum(i['count'] for i in after['attachments'] if i['attach_type']==5 and i['type_id']==1029)-sum(i['count'] for i in before['attachments'] if i['attach_type']==5 and i['type_id']==1029),3)
         self.assertEqual(after['train_tree_rate'],3)
-        with patch('network_redirect.backend.time.time',return_value=NOW+3601):self.ok(34)
+        with patch('network_redirect.backend.time.time',return_value=NOW+86401):self.ok(34)
         self.assertEqual(self.role()['train_tree_rate'],0)
     def test_cross_battle_shop_and_prize(self):
         self.create();self.ok(58,query_type=32);self.ok(58,query_type=28,des_id=90001)
@@ -385,13 +390,13 @@ class GuildTests(unittest.TestCase):
         self.assertEqual(log[-1]['balance'],1100)
 
     def test_feast_statistics_and_expiry(self):
-        self.create();self.ok(65,feast_type=1);self.ok(67,gift_type=2,count=2);self.ok(66,des_id=1)
+        self.create();self.prepare_feast();self.ok(65,feast_type=1);self.ok(67,gift_type=2,count=2);self.ok(66,des_id=1)
         row=self.ok(18,query_type=15)[-1][2]['fortune_info'][1]
         self.assertEqual((row['fortune'],row['contribute'],row['advanced_gift']),(105,100,2))
-        with patch('network_redirect.backend.time.time',return_value=NOW+3601):
-            data=self.ok(18,query_type=14)[-1][2]['feast_data']
+        with patch('network_redirect.backend.time.time',return_value=NOW+86401):
+            data=next(d['feast_data'] for m,i,d in self.ok(18,query_type=14) if m==1301 and i==18)
             self.assertFalse(data['can_rece_award']);self.assertFalse(data['gift_data'][1]['can_grab'])
-            self.assertTrue(any('宴席已经结束' in s for s in self.role()['guild']['unions']['2']['events']))
+            self.assertTrue(any('群英会已经结束' in s for s in self.role()['guild']['unions']['2']['events']))
 
     def test_beast_entities_growth_and_atomic_materials(self):
         from network_redirect import guild_offline, guild_instances
@@ -409,10 +414,12 @@ class GuildTests(unittest.TestCase):
 
     def test_capture_failure_escape_and_update_events(self):
         self.create();out=self.ok(86,two_type=2)
-        self.assertTrue(any(i==93 and d['update_list'] for m,i,d in out))
+        # Finding a beast is not a failed capture/escape broadcast.
+        self.assertTrue(any(i==93 and not d['update_list'] for m,i,d in out))
         with patch('network_redirect.guild_offline.roll',return_value=99):
             for _ in range(3):out=self.ok(87,two_type=2)
-        self.assertTrue(any(i==94 for m,i,d in out));self.assertIsNone(self.role()['guild']['instances']['field'])
+        self.assertFalse(any(i==94 for m,i,d in out));self.assertIsNone(self.role()['guild']['instances']['field'])
+        self.assertEqual(self.ok(94)[-1][2]['catch_list'],{})
         self.assertEqual(len(self.role()['guild']['instances']['pets']),0)
         self.ok(86,two_type=2)
         with patch('network_redirect.guild_offline.roll',return_value=0):self.ok(87,two_type=2)
@@ -441,8 +448,8 @@ class GuildTests(unittest.TestCase):
         for won in (True,True,False):
             with patch('network_redirect.guild_combat.simulate',return_value=result(won)):
                 guild_match.fight(role,s,g,dict(fight_type=14,des_id=90001),NOW,r,self.b.journey_rules)
-        m=s['match'];self.assertEqual((m['streak'],m['max_streak'],m['life'],m['merit']),(0,2,75,10))
-        self.assertEqual(m['target_life']['90001'],60)
+        m=s['match'];self.assertEqual((m['streak'],m['max_streak'],m['life'],m['merit']),(0,2,r['match_life']-r['match_loss_life'],10))
+        self.assertEqual(m['target_life']['90001'],r['match_life']-2*r['match_target_loss'])
         m['life']=0
         with self.assertRaises(guild.formation.Rejected):guild_match.fight(role,s,g,dict(fight_type=14,des_id=90002),NOW,r,self.b.journey_rules)
 
@@ -454,10 +461,10 @@ class GuildTests(unittest.TestCase):
             self.ok(80)
             for _ in range(3):self.ok(78)
             before=self.role();self.assertEqual(self.req(78)[-1][1],55);self.assertEqual(before,self.role())
-        a=self.role()['guild']['instances'];self.assertEqual(a['train_hp'],9600)
-        self.assertEqual(a['train_support'],3);self.assertEqual(sum(v['damage'] for v in a['train_damage'].values()),400)
+        a=self.role()['guild']['instances'];self.assertEqual(a['train_hp'],9900)
+        self.assertEqual(a['train_support'],3);self.assertEqual(sum(v['damage'] for v in a['train_damage'].values()),100)
         data=self.ok(79)[-1][2];self.assertEqual(data['rest_time'],NOW+3600)
-        self.assertEqual(data['boss_info']['boss_hp'],9600)
+        self.assertEqual(data['boss_info']['boss_hp'],9900)
 
     def test_escort_protection_raid_and_blacklist(self):
         self.ok(4,union_id=1)
@@ -507,7 +514,8 @@ class GuildTests(unittest.TestCase):
         self.ok(86,two_type=2);before=self.role()['gold_coin']
         with patch('network_redirect.guild_offline.roll',return_value=0):out=self.ok(87,two_type=2)
         self.assertEqual(self.role()['gold_coin'],before)
-        self.assertTrue(any(i==94 and d['catch_list'][1]['type_id'] in self.b.guild_rules['pet_types'] for m,i,d in out))
+        self.assertFalse(any(i==94 for m,i,d in out))
+        self.assertIn(self.ok(94)[-1][2]['catch_list'][1]['type_id'],self.b.guild_rules['pet_types'])
         self.ok(86,two_type=2);self.ok(87,two_type=1)
         self.assertIsNone(self.role()['guild']['instances']['field'])
         self.ok(86,two_type=2)

@@ -10,7 +10,7 @@ from network_redirect.protocol import encode,decode
 ROOT=Path(__file__).resolve().parents[2]
 fixture_now=int(datetime(2026,10,23,12,tzinfo=timezone(timedelta(hours=8))).timestamp())
 with tempfile.TemporaryDirectory() as tmp:
- b=Backend(Path(tmp),18790,lambda *a,**k:None);r=b.profile();r.update(level=40,gold_coin=100000,silver_coin=100000);b.save(r)
+ b=Backend(Path(tmp),18790,lambda *a,**k:None);r=b.profile();r.update(level=50,gold_coin=100000,silver_coin=100000);b.save(r)
  lines=["""local ms=assert(package.loaded.ms)
 local saved={player=ms.d_mainUI.g_playerInfo,config=ms.d_data.g_new_config,send=ms.d_u.main_server_send_msg,report=ms.MS_report_error,guildConfig=ms.d_xianmengUI.guildConfig,time=ms.d_time.getTime}
 ms.d_mainUI.g_playerInfo=ms.d_c.table_copy(saved.player)
@@ -34,14 +34,14 @@ local function selectedButton(line,expectedOp,expectedCount)
  assert(#d.role_list==expectedCount,'native role_list count');return d
 end
 local function withOverride(t,key,fn,run)
- local saved=t[key];t[key]=fn
- local ok,err=xpcall(run,debug.traceback);t[key]=saved
+ local saved=rawget(t,key);rawset(t,key,fn)
+ local ok,err=xpcall(run,debug.traceback);rawset(t,key,saved)
  assert(ok,err)
 end
 local function captureNative(run)
- local register=CCMenuItemImage.registerScriptTapHandler
+ -- Capture callbacks without invoking the inherited tolua registration method.
  withOverride(CCMenuItemImage,'registerScriptTapHandler',function(item,fn)
-  nativeTaps[debug.getinfo(fn,'S').linedefined]=fn;return register(item,fn)
+  nativeTaps[debug.getinfo(fn,'S').linedefined]=fn
  end,run)
 end
 local function findFunction(fn,line,seen)
@@ -75,6 +75,26 @@ local function captureMenu(run,firstLine)
  end,run)
  return assert(found,'button callback not captured: '..firstLine)
 end
+local function verifyBetDialog(open,buttonLine,op)
+ local buttons={};local selectRow;local tableView=ms.d_tableView.tableView
+ local register=CCMenuItemImage.registerScriptTapHandler
+ withOverride(ms.d_tableView,'tableView',function(...)
+  local view=tableView(...);local delegate=view.setDelegate
+  view.setDelegate=function(self,d) selectRow=d.touchCellAtIndex;return delegate(self,d) end
+  return view
+ end,function()
+  withOverride(CCMenuItemImage,'registerScriptTapHandler',function(item,fn)
+   if debug.getinfo(fn,'S').linedefined==buttonLine then buttons[#buttons+1]=fn end
+   if register then return register(item,fn) end
+  end,open)
+ end)
+ assert(#buttons==3,'expected all three original stake buttons');assert(selectRow)(1)
+ for index,fn in ipairs(buttons) do
+  local sent;withOverride(ms.d_u,'main_server_send_msg',function(mid,d) sent=d end,function() fn(index) end)
+  assert(sent and sent.id==op,'native bet request missing')
+  local data=assert(loadstring('return '..sent.data))();assert(data.bet_type==index and type(data.union_id)=='number')
+ end
+end
 local function step(name,fn) cases[#cases+1]={name=name,run=fn,hold=name=='pet_lucky_catch' and 16 or (name=='store' or name=='store_refresh') and 12 or 0} end
 local function apply(mid,d)
  if mid==1032 then ms.d_event_mgr.msg_modify_attr_1032(nil,d,nil)
@@ -87,6 +107,10 @@ end
  lines.append('ms.d_data.g_new_config[8]='+summon.lua(guild.client_config(b.guild_rules)))
  lines.append('ms.d_xianmengUI.getGuildConfig(ms.d_data.g_new_config[8])')
  lines.append("step('entrance',function() ms.d_xianmengUI.showFirstPage() end)")
+ lines.append("local guildPatchPresent={};for _,name in ipairs({'d_guildFightUI','d_crossRealm'}) do guildPatchPresent[name]=ms[name] and ms[name]._localGuildRestore~=nil end")
+ lines.append((ROOT/'network_redirect/guild_client.lua').read_text())
+ lines.append('local guildActivitiesPresent=ms._localGuildActivitiesRestore~=nil')
+ lines.append((ROOT/'network_redirect/guild_activity_client.lua').read_text())
  serial=5000
  def request(name,op,**d):
   global serial
@@ -94,12 +118,14 @@ end
   with patch('network_redirect.backend.time.time',return_value=fixture_now):replies=b.respond(encode(1301,dict(serial_num=serial,id=op,data=summon.lua(d))),dict(authenticated=True))
   lines.append('step('+summon.lua(name)+',function() guild_fixture_now='+str(fixture_now))
   capture=name in ('applications','leader_mute_list')
-  if capture:lines.append("local register=CCMenuItemImage.registerScriptTapHandler;withOverride(CCMenuItemImage,'registerScriptTapHandler',function(item,fn) nativeTaps[debug.getinfo(fn,'S').linedefined]=fn;return register(item,fn) end,function()")
+  if capture:lines.append("withOverride(CCMenuItemImage,'registerScriptTapHandler',function(item,fn) nativeTaps[debug.getinfo(fn,'S').linedefined]=fn end,function()")
+  if name=='pet_train_battle':lines.append("local battles=0;withOverride(ms.d_fightUI,'actFight',function(replay,kind) assert(replay.line_up_msg and replay.fight_result_msg and #replay.fight_result_msg.fight_result>0);battles=battles+1 end,function()")
   for p in replies:
    mid,_,data=decode(p)
    if mid==2998 and data['id']==55:raise AssertionError((name,data['data']))
    if mid in (1032,1301,1098) or mid==2998 and data['id']==82:lines.append('apply('+str(mid)+','+summon.lua(data)+')')
   if capture:lines.append('end)')
+  if name=='pet_train_battle':lines.append("end);assert(battles>0,'trial battle callback missing');ms.d_event_mgr.setSpecialFightType(0)")
   lines.append('end)')
  request('union_list',18,query_type=4,page=1)
  request('create',1,union_name='验证仙盟')
@@ -148,11 +174,27 @@ end
  lines.append("step('store_paid_refresh_no_loop',function() assert(ms.d_mainUI.g_playerInfo.union_store_flush_time>ms.d_time.getTime());assert(guild_fixture_store_queries==1,'paid refresh restarted request loop') end)")
  request('store_buy',40,item_id=1,buy_count=1)
  lines.append("step('store_buy_preserves_deadline',function() assert(ms.d_mainUI.g_playerInfo.union_store_flush_time>ms.d_time.getTime()) end)")
+ r=b.profile();r['guild']['unions'][str(r['union_id'])].update(popularity=2000,money=10000);r['vip_level']=1;b.save(r)
+ lines.append("step('feast_vip',function() ms.d_mainUI.g_playerInfo.vip_level=1 end)")
  request('feast_preview',18,query_type=14)
  request('feast_open',65,feast_type=1)
  request('feast_active',18,query_type=14)
+ lines.append("""step('feast_native_grab_enabled',function()
+ local ui=ms.d_guildPartyUI;local u=ms.d_u;local tracked={};local disabled={};local original=u.createMenu
+ withOverride(u,'createMenu',function(options,items,...)
+  local menu=original(options,items,...)
+  for i,v in ipairs(options) do if v.call_back==ui.getGift then tracked[items[i]]=true end end
+  return menu
+ end,function()
+  withOverride(u,'grayMenuItem',function(item) disabled[item]=true end,function() ui.showGifts() end)
+ end)
+ local count=0;for item in pairs(tracked) do count=count+1;assert(not disabled[item],'available gift grayed out');assert(item:isEnabled(),'available gift disabled') end
+ assert(count==3,'expected three NPC gifts')
+ local sent;withOverride(u,'main_server_send_msg',function(mid,d) sent=d end,function() ui.getGift(1) end)
+ assert(sent and sent.id==66);assert(loadstring('return '..sent.data))()
+end)""")
  request('feast_claim',68)
- request('feast_gift',67,gift_type=1,count=1)
+ request('feast_gift',67,gift_type=1,count=2)
  request('feast_active_gift',18,query_type=14)
  request('feast_grab',66,des_id=1)
  request('feast_fortune',18,query_type=15)
@@ -162,7 +204,30 @@ end
  request('match_lineup',18,query_type=8)
  lines.append("step('match_group_one',function() ms.d_guildFightUI.showGroup(guild_fixture_group_parent,1) end)")
  lines.append("step('match_group_two',function() ms.d_guildFightUI.showGroup(guild_fixture_group_parent,2) end)")
+ lines.append("step('match_native_bet_dialog',function() local ui=ms.d_guildFightUI;local open=captureMenu(function() ui.showGroup(guild_fixture_group_parent,2) end,3740);verifyBetDialog(open,1421,48) end)")
+ request('match_bet_place',48,bet_type=3,union_id=b.profile()['union_id'])
  request('match_targets',18,query_type=13)
+ request('match_schedule',18,query_type=9)
+ request('match_enter_for_score',18,query_type=100)
+ lines.append("step('match_capture_rank',function() local ui=ms.d_guildFightUI;local original=ui.showRankDetail;ui.showRankDetail=function(parent,index) ui.showRankDetail=original;guild_fixture_rank_parent=parent;return original(parent,index) end end)")
+ request('match_score',18,query_type=16)
+ lines.append("step('match_all_rank_tabs',function() for i=1,3 do ms.d_guildFightUI.showRankDetail(guild_fixture_rank_parent,i) end end)")
+ request('match_member_score',18,query_type=17)
+ request('match_top_members',18,query_type=19)
+ request('match_champions',18,query_type=10)
+ request('match_losers',18,query_type=18)
+ request('cross_enter',58,query_type=32)
+ lines.append("step('cross_capture_group',function() local ui=ms.d_crossRealm;local original=ui.showGroup;ui.showGroup=function(parent,index) ui.showGroup=original;guild_fixture_cross_group_parent=parent;return original(parent,index) end end)")
+ request('cross_lineup',58,query_type=20)
+ lines.append("step('cross_native_bet_dialog',function() local ui=ms.d_crossRealm;local open=captureMenu(function() ui.showGroup(guild_fixture_cross_group_parent,3) end,2663);verifyBetDialog(open,2554,63) end)")
+ request('cross_bet_place',63,bet_type=3,union_id=b.profile()['union_id'])
+ request('cross_targets',58,query_type=23)
+ request('cross_enter_for_score',58,query_type=32)
+ lines.append("step('cross_capture_rank',function() local ui=ms.d_crossRealm;local original=ui.showRankDetail;ui.showRankDetail=function(parent,index) ui.showRankDetail=original;guild_fixture_cross_rank_parent=parent;return original(parent,index) end end)")
+ request('cross_score',58,query_type=24)
+ lines.append("step('cross_all_rank_tabs',function() for i=1,4 do ms.d_crossRealm.showRankDetail(guild_fixture_cross_rank_parent,i) end end)")
+ request('cross_members',58,query_type=25)
+ request('cross_shop',58,query_type=33)
  lines.append("step('team_open',function() ms.d_secretAreaUI.show(ms.d_xianmengUI.getXianMengMainLayer()) end)")
  request('team_before_create',44)
  request('team_list',73)
@@ -197,9 +262,14 @@ end)""")
  end
 end)""")
  request('team_full_applications',50)
+ lines.append("step('treasure_capture_count',function() guild_count_labels={};local create=ms.d_u.createByStyles;guild_count_create=create;ms.d_u.createByStyles=function(options,...) local text=options.string;if type(text)=='string' and text:find('今日可免费探宝次数',1,true) then guild_count_labels[#guild_count_labels+1]=text end;return create(options,...) end end)")
  request('treasure_status',43,flag=1)
+ lines.append("step('treasure_native_click',function() local ui=ms.d_secretAreaUI;local press=captureMenu(function() ui.showPrizePage(ui.g_self.main_layer) end,1672);press() end)")
  request('treasure_move',43,flag=2)
+ lines.append("step('treasure_remaining_after_one',function() local ui=ms.d_secretAreaUI;assert(ui.g_self.free_times==4);assert(ui.g_self.prize_data.free_times==4);assert(guild_count_labels[#guild_count_labels]:find('4',1,true),'visible count did not refresh') end,32)")
  request('treasure_sweep',43,flag=6)
+ lines.append("step('treasure_remaining_after_sweep',function() local ui=ms.d_secretAreaUI;assert(ui.g_self.free_times==0);assert(ui.g_self.prize_data.free_times==0);ms.d_u.createByStyles=guild_count_create;guild_count_create=nil end)")
+ r=b.profile();r['guild']['unions'][str(r['union_id'])]['popularity']=4*b.guild_rules['level_popularity'];b.save(r)
  request('pet_task',83)
  lines.append("step('pet_hunt_open',function() ms.d_pethuntUI.showMainLayer(ms.d_xianmengUI.getXianMengMainLayer()) end)")
  request('pet_field',86,two_type=1)
@@ -209,8 +279,11 @@ end)""")
  lines.append("step('pet_shop_entry',function() ms.d_pethuntUI.g_pethuntUI.shop_parent=ms.d_xianmengUI.getXianMengMainLayer() end)")
  request('pet_shop',91,two_type=1)
  request('pet_rank',92,two_type=1,query_type=1)
- fixture_now+=86400
- lines.append("step('pet_home_open',function() ms.d_petHomeUI.show(ms.d_xianmengUI.getXianMengMainLayer()) end)")
+ # Keep Friday to exercise the former weekend-only entry points.
+ lines.append("step('pet_home_open',function() local sent;withOverride(ms.d_u,'main_server_send_msg',function(mid,d) sent=d end,function() ms.d_petHomeUI.show(ms.d_xianmengUI.getXianMengMainLayer()) end);assert(sent and sent.id==88) end)")
+ request('pet_inside_entry',88)
+ lines.append("step('pet_weekday_adoption_button',function() local sent;withOverride(ms.d_u,'main_server_send_msg',function(mid,d) sent=d end,function() ms.d_petHomeUI.GetPetMenu() end);assert(sent and sent.id==89,'weekday adoption still gated') end)")
+ lines.append("step('pet_train_entry_request',function() local sent;withOverride(ms.d_u,'main_server_send_msg',function(mid,d) sent=d end,function() ms.d_petHomeUI.showShilianLayer() end);assert(sent and sent.id==79) end)")
  request('pet_train',79)
  lines.append("step('pet_train_open_button',function() local sent;withOverride(ms.d_u,'main_server_send_msg',function(mid,d) sent=d end,function() ms.d_petHomeUI.sendMsgOpenChanllenge() end);assert(sent and sent.id==80,'240-resident trial button did not open') end)")
  lines.append("step('pet_train_member_request',function() local sent;withOverride(ms.d_u,'main_server_send_msg',function(mid,d) sent=d end,function() ms.d_petHomeUI.sendMsgRequestMemberList() end);assert(sent and sent.id==18);local d=assert(loadstring('return '..sent.data))();assert(d.query_type==2 and d.flag==4) end)")
@@ -232,6 +305,11 @@ end)""")
  request('escort_fetch',69,flag=4,road_type=1)
  request('escort_refresh',69,flag=5,road_type=1)
  request('escort_depart',69,flag=6,road_type=1,book_level=b.profile()['guild']['escort']['level'],des_id=0)
+ fixture_now+=3601
+ request('escort_completed',69,flag=3,road_type=1)
+ lines.append("step('escort_native_claim',function() local ui=ms.d_escortUI;assert(ui.g_escortUI.can_rece_prize);local sent;withOverride(ms.d_u,'main_server_send_msg',function(mid,d) sent=d end,function() ui.pressGetPrize() end);assert(sent and sent.id==69);assert(assert(loadstring('return '..sent.data))().flag==11) end)")
+ request('escort_claim',69,flag=11)
+ lines.append("step('escort_claim_clears_state',function() local ui=ms.d_escortUI;assert(ui.g_escortUI.offline_active==false);assert(ui.g_escortUI.can_rece_prize==false);assert(not ui.getEscortRestTime());assert(ui.g_escortUI.main_layer:getChildByTag(999),'reward popup missing') end)")
  request('cross_schedule',58,query_type=21)
  request('cross_list',58,query_type=30)
  request('cross_enter',58,query_type=32)
@@ -247,8 +325,11 @@ end)""")
  request('former_leader_leave',3)
  lines.append("step('former_leader_unlinked',function() assert(ms.d_mainUI.g_playerInfo.union_id==0) end)")
 
- lines.append("""local i=0;local hold=0
+ lines.append("""local i=0;local hold=0;local pendingCase=false
 local function restore()
+ if guild_count_create then ms.d_u.createByStyles=guild_count_create;guild_count_create=nil end
+ if not guildActivitiesPresent and ms._localGuildActivitiesRestore then ms._localGuildActivitiesRestore() end
+ for _,name in ipairs({'d_guildFightUI','d_crossRealm'}) do if not guildPatchPresent[name] and ms[name] and ms[name]._localGuildRestore then ms[name]._localGuildRestore() end end
  ms.d_u.main_server_send_msg=saved.send;ms.MS_report_error=saved.report;ms.d_time.getTime=saved.time
  ms.d_mainUI.g_playerInfo=saved.player;ms.d_data.g_new_config=saved.config
  ms.d_xianmengUI.getGuildConfig(saved.guildConfig)
@@ -259,12 +340,16 @@ local scheduler=CCDirector:sharedDirector():getScheduler();local handle
 guild_fixture_restore=function() if handle then scheduler:unscheduleScriptEntry(handle) end;restore() end
 handle=scheduler:scheduleScriptFunc(function()
  if hold>0 then hold=hold-1;return end
+ if pendingCase then
+  pendingCase=false;hold=cases[i].hold or 0
+  local ok,err=xpcall(cases[i].run,debug.traceback)
+  if not ok then errors=errors..'\\n'..tostring(err) end
+  return
+ end
  if i>0 then guild_fixture_results[i]={name=cases[i].name,ok=errors=='',error=errors} end
  i=i+1
  if i>#cases then scheduler:unscheduleScriptEntry(handle);restore();return end
- hold=cases[i].hold or 0
- errors='';local ok,err=xpcall(cases[i].run,debug.traceback)
- if not ok then errors=errors..'\\n'..tostring(err) end
+ errors='';guild_fixture_current_name=cases[i].name;pendingCase=true
 end,0.25,false)
 guild_fixture_case_count=#cases
 return 'guild fixture started' 

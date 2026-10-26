@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-26",
+  "basis": [
+    "user supplied in-game acquisition screenshots",
+    "analysis/configs/item_name.csv:1338-1341",
+    "petHomeUI.lua:996-1003",
+    "pethuntUI.lua:1538-1541"
+  ],
+  "A": [
+    "role50 guild5 entry",
+    "successful tasks add residents and one encounter",
+    "failed task does not consume task quota",
+    "weekend adoption for all members",
+    "support updates count without a fight",
+    "capture consumes selected charm",
+    "1341 guarantees capture"
+  ],
+  "B": {
+    "hunt_daily": 3,
+    "hunt_paid_limit": 3,
+    "catch_attempts": 3,
+    "catch_prop_rates": {
+      "1338": 35,
+      "1339": 60,
+      "1340": 85,
+      "1341": 100
+    },
+    "train_support_percent": 5,
+    "lucky_draw_limit": 3,
+    "npc_resident_pets": 60
+  },
+  "targeted_tests": {
+    "count": 79,
+    "passed": true
+  },
+  "native_client": {
+    "count": 116,
+    "passed": true,
+    "restored": true,
+    "report": "analysis/evidence/guild/current_client_validation.json"
+  },
+  "full_regression": {
+    "count": 936,
+    "seconds": 521.671,
+    "passed": true
+  }
+}

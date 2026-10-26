@@ -47,7 +47,7 @@ class GuildSocialNpcTests(unittest.TestCase):
             role = self.b.profile(); role['guild']['fight_id'] = 1
             guild_match.fight(role, role['guild'], role['guild']['unions']['2'],
                               dict(fight_type=16, des_id=leader['id']), NOW, self.b.guild_rules, self.b.journey_rules)
-            self.assertEqual(battle.call_args.kwargs['enemy_npc'], leader['npc_id'])
+            self.assertEqual(battle.call_args_list[0].kwargs['enemy_npc'], leader['npc_id'])
         self.assertEqual(self.req(18, query_type=13)[-1]['des_member_list'], rows)
 
     def test_npc_leader_betting_uses_leader_identity_after_transfer(self):
@@ -77,6 +77,7 @@ class GuildSocialNpcTests(unittest.TestCase):
         role = self.b.profile()
         for ident in list(role['guild']['unions']['2']['applications']):
             self.req(5, role_id=int(ident))
+        role=self.b.profile();role["guild"]["unions"]["2"].update(popularity=2000,money=10000);self.b.save(role)
         self.req(65, feast_type=1)
         before = self.b.profile()
         data = self.req(18, query_type=14)[-1]['feast_data']

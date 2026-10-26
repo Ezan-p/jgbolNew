@@ -16,7 +16,7 @@ def load_rules(path=ROOT/'server_config/guild_rules.json'):
     r=json.loads(Path(path).read_text())
     require(r.get('schema_version')==1 and r.get('mode')=='inferred','仙盟配置来源无效')
     for k in ('join_level','create_level','create_cost_gold','change_name_cost','member_limit','max_level','level_popularity','initial_money','seed_cost_money','tree_grow_seconds','tree_exp_per_level','cultivate_limit','cultivate_gold','cultivate_gold_rate','cultivate_silver','cultivate_contrib','cultivate_exp','cultivate_pop','donate_limit','donate_money_rate','donate_contrib_rate','store_flush_gold','store_flush_limit','battle_npc','battle_level','battle_daily','tree_boss_hp','tree_fight_cooldown','tree_flush_gold','feast_seconds','feast_gift_limit','feast_grab_limit','team_size','team_daily','search_daily','catch_daily','catch_gold','hunt_daily','wander_daily','hunt_silver','hunt_gold','escort_daily','escort_rob_daily','escort_flush_limit','escort_free_flush','escort_flush_gold','search_card_points'):
-        require(type(r.get(k)) is int and 0<r[k]<=1000000,'仙盟配置数值无效: '+k)
+        require(type(r.get(k)) is int and (0 if k=='wander_daily' else 1)<=r[k]<=1000000,'仙盟配置数值无效: '+k)
     require(r['max_level']<=99 and r['member_limit']<=100,'仙盟等级/人数配置越界')
     require(type(r.get('timezone_offset_hours')) is int and -12<=r['timezone_offset_hours']<=14,'仙盟时区无效')
     require(len(r['store'])==6 and len({x['id'] for x in r['store']})==6,'仙盟商店需要六个唯一货位')
@@ -30,6 +30,20 @@ def load_rules(path=ROOT/'server_config/guild_rules.json'):
     for v in r['feast_gifts']:
         daily.validate_prize([5,v['item'],1,1])
         require(all(type(v[k]) is int and v[k]>0 for k in ('gold','contrib')),'宴会礼物消耗无效')
+    for key in ('feast_union_level','feast_npc_grab_seconds','feast_grab_fortune'):
+        require(type(r.get(key)) is int and 0 < r[key] <= 100000, '群英会配置无效: '+key)
+    require(set(r['feast_box_rewards']) == {'1120','1121'}, '群英会礼盒奖励缺失')
+    for prizes in r['feast_box_rewards'].values():
+        require(bool(prizes), '群英会礼盒奖励为空')
+        for prize in prizes: daily.validate_prize(prize)
+    require(bool(r['feast_fortune_rewards']), '群英会福气榜奖励缺失')
+    previous=0
+    for tier in r['feast_fortune_rewards']:
+        require(type(tier['max_rank']) is int and previous<tier['max_rank']<=1000 and bool(tier['prizes']), '福气榜名次无效')
+        previous=tier['max_rank']
+        for prize in tier['prizes']:daily.validate_prize(prize)
+    require(len(r['match_bet_silver']) == 3 and all(type(v) is int and v > 0 for v in r['match_bet_silver']), '盟战押注配置无效')
+    require(len(r['match_power_percent']) == 6 and all(type(v) is int and 1 <= v <= 300 for v in r['match_power_percent']), '盟战战力配置无效')
     offline.validate_rules(r)
     return r
 
@@ -39,7 +53,7 @@ def client_config(r):
     return dict(const_config=dict(create_level=r['create_level'],join_level=r['join_level'],apply_level=r['join_level'],
         create_cost_gold=r['create_cost_gold'],change_name_cost=r['change_name_cost'],union_top_level=r['max_level'],
         open_search_gold=True,open_union_match=1,open_world_match=1,open_feast=1,open_west=True,
-        west_min_role_level=r['join_level'],open_feast_level=1),
+        west_min_role_level=r['join_level'],open_feast_level=r['feast_union_level']),
         right_config={k:dict(right_list={n:True for n in v}) for k,v in rights.items()},
         level_config={i:dict(popularity_limit=i*r['level_popularity'],max_count=min(100,r['member_limit']+(i-1)*r['member_growth'])) for i in range(1,r['max_level']+1)},west_config={**r['west_config'],'book_worth_config':{int(k):v for k,v in r['west_config']['book_worth_config'].items()}})
 
@@ -50,6 +64,9 @@ def new_union(ident,name,r):
 
 
 def prepare(role,now,r):
+    from . import guild_match,guild_feast
+    guild_feast.rollover(role,now,r)
+    guild_match.rollover(role,now,r)
     s=role.setdefault('guild',dict(unions={},next_id=2,applications=[],day=-1))
     if not s['unions']:
         g=new_union(1,'本地仙盟',r)
@@ -68,6 +85,8 @@ def prepare(role,now,r):
     role['union_store_flush_time']=(day+1)*86400-r['timezone_offset_hours']*3600
     if now>=s.get('feast_buff_end',0):
         role.update(train_tree_rate=0,contrib_plus_rate=0);s['feast_fam_rate']=0
+    from . import guild_feast
+    guild_feast.account(role,s,r)
     g=s['unions'].get(str(int(role['union_id'])))
     if g:
         m=g['members'].get(str(int(role['role_id'])))
@@ -103,7 +122,6 @@ def pay(role,key,n):
 
 
 def contribution(role,n):
-    n*=max(1,role.get('contrib_plus_rate',0))
     role['union_contrib']+=n;role['cur_union_contrib']+=n
     return n
 
@@ -118,9 +136,10 @@ def info(g,r):
 
 
 def member(role,g,r):
+    from . import guild_match
     m=copy.deepcopy(g['members'][str(int(role['role_id']))]);m.update(union_contrib=role['union_contrib'],cur_union_contrib=role['cur_union_contrib'],contribute=role['union_contrib'])
     m.update(tree_state=g['tree']['state'],can_plant_tree=role['union_rank']==1,can_cultivate_tree=True,can_kill_tree=True,cultivate_time=10,union_protect_card=3,max_protect_card=3,can_search_gold=True,can_match_fight=True,has_action_point=True,is_match_time=True,is_bet_time=False,has_bet=False,cross_fight_flag=False,can_rece_award=False,west_config=client_config(r)['west_config'])
-    match=role['guild'].get('match',{})
+    match=guild_match.state(role['guild'],False,r)
     rights=client_config(r)['right_config'][role['union_rank']]['right_list']
     m.update(can_plant_tree=bool(rights.get(13)) and g['popularity']>=r['tree_require_pop'],cultivate_time=max(0,r['cultivate_limit']-role['guild']['cultivations']),has_action_point=match.get('fights',0)<r['battle_daily'] and match.get('life',r['match_life'])>0,is_bet_time=not match.get('fights') and not match.get('claimed'),has_bet=bool(match.get('bets')),cross_fight_flag=True,can_rece_award=bool(match.get('fights')) and not match.get('claimed'))
     escort=role['guild'].get('escort',{})
@@ -309,11 +328,16 @@ def settle(role,req,now,r,parse,daily_rules):
                 consume(role,mission['item_id'],mission['item_count'])
             rate=1
             if d['cultivate_type']==2:pay(role,'gold_coin',r['cultivate_gold']);rate=r['cultivate_gold_rate']
-            n=contribution(role,mission['contrib']*rate*(100+(t['level']-1)*r['tree_level_bonus_percent'])//100);s['cultivations']+=1
-            rate*=max(1,role.get('train_tree_rate',0))
-            t['exp']+=mission['exp']*rate;t['level']=min(99,t['level']+t['exp']//r['tree_exp_per_level']);t['exp']%=r['tree_exp_per_level']
+            gain=mission['contrib']*rate*(100+(t['level']-1)*r['tree_level_bonus_percent'])//100
+            exp=mission['exp']*rate
+            if role.get('contrib_plus_rate',0)>0:
+                gain=gain*150//100;role['contrib_plus_rate']-=1
+            if role.get('train_tree_rate',0)>0:
+                exp=exp*150//100;role['train_tree_rate']-=1
+            n=contribution(role,gain);s['cultivations']+=1
+            t['exp']+=exp;t['level']=min(99,t['level']+t['exp']//r['tree_exp_per_level']);t['exp']%=r['tree_exp_per_level']
             g['popularity']+=mission['pop']*rate
-            t['records'].append(dict(name=role['role_name'],id=role['role_id'],cultivate_type=d['cultivate_type'],contrib=n,pop=mission['pop']*rate,exp=mission['exp']*rate))
+            t['records'].append(dict(name=role['role_name'],id=role['role_id'],cultivate_type=d['cultivate_type'],contrib=n,pop=mission['pop']*rate,exp=exp))
             t['records']=t['records'][-30:];daily.record(role,9,1,now,daily_rules)
             return [reply(op,dict(union_contrib=n)),reply(34,tree_data(role,s,g,now,r)),reply(35,missions(r,s))]
         data=tree_data(role,s,g,now,r)

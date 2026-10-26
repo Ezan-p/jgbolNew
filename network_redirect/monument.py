@@ -100,7 +100,8 @@ def champions(role,now,r,grules,arules):
         champion=activity_rank.opponent(role['activity'],1)
         result[1]=dict(name=champion['name'],show_type=champion['cortege'],cortege_layer=champion['cortege_layer'])
     result[2]=copy.deepcopy(standings(role,r)[0])
-    stats=[v for u in s['unions'].values() if u.get('feast',{}).get('day')==s['day'] for v in u['feast'].get('stats',{}).values()]
+    from . import guild_feast
+    stats=guild_feast.ranking(role,s,now,grules)['fortune_info']
     if stats:
         v=min(stats,key=lambda v:(-v['fortune'],-v['contribute'],v['id']))
         result[5]=dict(name=v['name'],show_type=r['battle_npc'],cortege_layer=0)

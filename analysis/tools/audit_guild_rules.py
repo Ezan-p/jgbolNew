@@ -29,8 +29,24 @@ def main():
     for logical in ('v2/String.plist','v2/String2.plist'):
         if logical not in index:continue
         path=ROOT/'jgbol3.87/assets/release_'/index[logical]
-        strings.update({k:v for k,v in plistlib.loads(path.read_bytes()).items() if any(x in str(k).lower() for x in ('union','guild','tree','feast','xianmeng','pethunt','pethome','escort','west_'))})
+        strings.update({k:v for k,v in plistlib.loads(path.read_bytes()).items() if any(x in str(k).lower() for x in ('union','guild','tree','feast','xianmeng','pethunt','pethome','escort','west_','party_'))})
     (OUT/'strings.json').write_text(json.dumps(strings,ensure_ascii=False,indent=2)+'\n')
     (OUT/'audit.json').write_text(json.dumps(dict(client='3.87',official_server_available=False,inputs=inputs,request=1301,notification=82,config_section=8),ensure_ascii=False,indent=2)+'\n')
+    names=('role_ranking','union_consume','union_fight','take_merge_gift','update_union_wander','update_union_catch')
+    references={name:[] for name in names};count=0
+    for logical,physical in index.items():
+        if not logical.startswith('lua/') or not logical.endswith('.lua'):continue
+        raw=(ROOT/'jgbol3.87/assets/release_'/physical).read_bytes();count+=1
+        for name in names:
+            if name.encode() in raw:references[name].append(logical)
+    reserved=dict(scanned_lua_modules=count,string_references=references,
+        conclusions={'10':'Only role_ranking enum found; no confirmed native request.',
+                     '17':'Only union_consume enum found; no confirmed native request.',
+                     '49':'xianmengUI L3324/L3579 handle replies; guildFightUI L632 uses fight_type 14 via 1026, not 1301/id49.',
+                     '77':'Only take_merge_gift enum found; no native merge claim entry confirmed.',
+                     '93':'Wander broadcast handler; no confirmed client request.',
+                     '94':'petHomeUI proto26 L798-803 sends this request; proto2 L244 opens history.'},
+        limitation='String inventory plus manual inspection of guild UI instructions; not proof of unavailable official server behavior.')
+    (OUT/'current_reserved_protocol_audit.json').write_text(json.dumps(reserved,ensure_ascii=False,indent=2)+'\n')
     print('Audited',len(inputs),'original guild modules')
 if __name__=='__main__': main()

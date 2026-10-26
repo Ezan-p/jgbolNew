@@ -16,15 +16,7 @@ from observability.collector import processes
 from network_redirect.backend import login_fields
 
 
-def main():
-    import frida
-    runpy.run_path(str(ROOT/'analysis/tools/build_guild_client_fixture.py'))
-    source=(ROOT/'.runtime/guild-fixture.lua').read_text()
-    config=load_config(ROOT/'game.json')
-    device=frida.get_device(config['serial'],timeout=10)
-    pid=next(p for p,n in processes(config).items() if n==config['package'])
-    session=device.attach(pid)
-    js=r'''
+LUA_EVALUATOR=r'''
 const m=Process.getModuleByName('libxiyoujilua.so');
 const f=(n,r,a)=>new NativeFunction(m.getExportByName(n),r,a);
 const top=f('lua_gettop','int',['pointer']),set=f('lua_settop','void',['pointer','int']);
@@ -41,32 +33,53 @@ Interceptor.attach(m.getExportByName('lua_pcall'),{onEnter(args){
 }});
 rpc.exports.evaluate=function(code){return new Promise(resolve=>{if(pending!==null)throw Error('evaluation already queued');pending={code,resolve};});};
 '''
-    script=session.create_script(js);raw=[];state={};started=False
+
+def main():
+    import frida
+    runpy.run_path(str(ROOT/'analysis/tools/build_guild_client_fixture.py'))
+    source=(ROOT/'.runtime/guild-fixture.lua').read_text()
+    config=load_config(ROOT/'game.json')
+    device=frida.get_device(config['serial'],timeout=10)
+    pid=next(p for p,n in processes(config).items() if n==config['package'])
+    session=device.attach(pid)
+    js=LUA_EVALUATOR
+    script=session.create_script(js);raw=[];state={};started=False;failure=None
+    path=ROOT/'analysis/evidence/guild/current_client_validation.json'
+    progress=ROOT/'analysis/evidence/guild/current_client_progress.json'
     def evaluate(code):
         answer=script.exports_sync.evaluate(code);raw.append(answer)
         if answer.get('status')!=0:raise RuntimeError(answer)
         return answer['result']
     try:
         script.load()
+        login_deadline=time.monotonic()+45
+        while evaluate("local ms=package.loaded.ms;return tostring(ms and ms.d_mainUI and ms.d_mainUI.g_playerInfo and ms.d_mainUI.g_playerInfo.role_id~=nil or false)")!='true':
+            if time.monotonic()>=login_deadline:raise RuntimeError('Enter the game before running the fixture')
+            time.sleep(.5)
         evaluate("assert(not guild_fixture_restore,'a guild fixture is already active');return 'ready'")
         evaluate(source);started=True
-        stop=time.monotonic()+120
+        stop=time.monotonic()+180
         while time.monotonic()<stop:
-            time.sleep(.5)
-            state=login_fields(evaluate("return table.tostring({results=guild_fixture_results or {},restored=guild_fixture_restored or false,expected=guild_fixture_case_count or 0})"))
+            time.sleep(.1)
+            state=login_fields(evaluate("return table.tostring({results=guild_fixture_results or {},restored=guild_fixture_restored or false,expected=guild_fixture_case_count or 0,current=guild_fixture_current_name or ''})"))
+            progress.write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')
             if state.get('restored'):break
+    except Exception as error:
+        failure=str(error)
     finally:
         if started and not state.get('restored'):
             try:evaluate("if guild_fixture_restore then guild_fixture_restore() end;return tostring(guild_fixture_restored)")
             except Exception as error:raw.append(dict(restore_error=str(error)))
-        script.unload();session.detach()
+        try:script.unload()
+        except Exception:pass
+        try:session.detach()
+        except Exception:pass
     checks=list(state.get('results',{}).values())
     passed=bool(state.get('restored') and state.get('expected') and len(checks)==state['expected'] and all(c['ok'] for c in checks))
     report=dict(passed=passed,checks=checks,expected=state.get('expected',0),restored=state.get('restored',False),
                 native_cocos=True,network_sends_captured=True,live_account_resources_changed=False,
                 coverage='Original callbacks, timed store refresh, management responses and NPC team selection; not exhaustive human button/animation testing.')
-    if not passed:report['last_runtime_messages']=raw[-3:]
-    path=ROOT/'analysis/evidence/guild/current_client_validation.json'
+    if not passed:report.update(last_runtime_messages=raw[-3:],current_case=state.get('current'),runtime_error=failure)
     path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print(f'{sum(bool(c["ok"]) for c in checks)}/{len(checks)} original Cocos checks passed; restored={report["restored"]}',flush=True)
     for c in checks:

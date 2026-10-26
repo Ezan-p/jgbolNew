@@ -117,7 +117,9 @@ def simulate(role,s,r,jrules,level,count=1,cur_num=None,target=None,team=False,e
         for i,key in enumerate(('gongji','fangyu','hp','magic'),1):u[key]=u[key]*(100+info(s,r)['charm_plus'][i])//100
         u['max_hp']=u['hp']
     replay_rules=copy.deepcopy(jrules);replay_rules['battle']['max_actions']=min(r['land_max_actions'],jrules['battle']['max_actions'])
-    replay_rules['battle']['mechanics']['event_budget_bytes']=1000
+    # Rulai shields can exceed 1 KB before either army is defeated. Allow
+    # those events while reserving room for 80 actions in the nested Lua replay.
+    replay_rules['battle']['mechanics']['event_budget_bytes']=min(4000,jrules['battle']['mechanics']['event_budget_bytes'])
     result,lineup,actions=journey.battle(role,{},replay_rules,units=(ours,enemies))
     role['activity']['fight_id']+=1;fid=role['activity']['fight_id']
     # [A] landUI consumes nested Lua replay messages, not independent 1027 packets.

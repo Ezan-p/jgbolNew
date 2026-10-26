@@ -1,0 +1,43 @@
+{
+  "scanned_lua_modules": 323,
+  "string_references": {
+    "role_ranking": [
+      "lua/common/common_def.lua"
+    ],
+    "union_consume": [
+      "lua/common/common_def.lua"
+    ],
+    "union_fight": [
+      "lua/background/bkg_mgr.lua",
+      "lua/common/common_def.lua",
+      "lua/event_mgr.lua",
+      "lua/ui/crossRealm.lua",
+      "lua/ui/fightUI.lua",
+      "lua/ui/guildFightUI.lua",
+      "lua/ui/monumentUI.lua",
+      "lua/ui/xianmengUI.lua"
+    ],
+    "take_merge_gift": [
+      "lua/common/common_def.lua"
+    ],
+    "update_union_wander": [
+      "lua/common/common_def.lua",
+      "lua/event_mgr.lua",
+      "lua/ui/pethuntUI.lua"
+    ],
+    "update_union_catch": [
+      "lua/common/common_def.lua",
+      "lua/event_mgr.lua",
+      "lua/ui/petHomeUI.lua"
+    ]
+  },
+  "conclusions": {
+    "10": "Only role_ranking enum found; no confirmed native request.",
+    "17": "Only union_consume enum found; no confirmed native request.",
+    "49": "xianmengUI L3324/L3579 handle replies; guildFightUI L632 uses fight_type 14 via 1026, not 1301/id49.",
+    "77": "Only take_merge_gift enum found; no native merge claim entry confirmed.",
+    "93": "Wander broadcast handler; no confirmed client request.",
+    "94": "petHomeUI proto26 L798-803 sends this request; proto2 L244 opens history."
+  },
+  "limitation": "String inventory plus manual inspection of guild UI instructions; not proof of unavailable official server behavior."
+}

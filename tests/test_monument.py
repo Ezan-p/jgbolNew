@@ -29,7 +29,9 @@ class MonumentTests(unittest.TestCase):
         return self.ok(1026,fight_type=18,des_type=v['rank'],des_id=v['player_id'],des_value=paid)
     def test_champions_empty_and_mapping(self):
         d=self.event(self.ok(1128),130)['champion_list'];self.assertEqual(set(d),{1,2,3,4,5})
-        self.assertTrue(d[1]['name'].startswith('离线·1·'));self.assertEqual(d[2]['name'],'离线论道者1');self.assertEqual(d[5],{'name':'虚位以待'})
+        from network_redirect import activity_rank
+        champion=activity_rank.opponent(self.b.profile()['activity'],1)
+        self.assertEqual(d[1]['name'],champion['name']);self.assertEqual(d[2]['name'],'离线论道者1');self.assertEqual(d[5],{'name':'虚位以待'})
         self.assertEqual(self.b.profile()['union_id'],0)
     def test_original_numeric_switches(self):
         cfg=guild.client_config(self.b.guild_rules)['const_config']
@@ -125,6 +127,9 @@ class MonumentTests(unittest.TestCase):
         d=self.event(self.ok(1128),130);self.assertEqual(d['champion_list'][5]['name'],'离线赠礼者')
         out=self.ok(1301,id=18,data=summon.lua(dict(query_type=15)))
         self.assertTrue(any('离线赠礼者' in d.get('data','') for m,d in out));self.assertEqual(self.b.profile()['union_id'],0)
+        # Fortune now persists for the whole original weekly feast cycle.
+        r=self.b.profile();r['guild']['unions']['80001']['feast']['day']-=1;self.b.save(r)
+        self.assertEqual(self.event(self.ok(1128),130)['champion_list'][5]['name'],'离线赠礼者')
 
 class MonumentHTTPTests(unittest.IsolatedAsyncioTestCase):
     async def test_weekly_get_and_head(self):

@@ -142,6 +142,26 @@ class GuildNpcMemberTests(unittest.TestCase):
         guild_npcs.migrate(role, s, harness.NOW)
         self.assertEqual(role, saved)
 
+    def test_delayed_legacy_acceptance_clears_other_guild_applications(self):
+        self.b.guild_rules['npc_auto_accept']=False
+        self.ok(18,query_type=4,page=1)
+        role=self.role();rid=str(int(role['role_id']))
+        application=dict(guild.offline.npc(int(rid),role['role_name'],harness.NOW),
+                         npc=False,requested_at=harness.NOW-4)
+        for key in ('1','80001'):
+            role['guild']['unions'][key]['applications'][rid]=copy.deepcopy(application)
+        self.b.save(role)
+        self.ok(18,query_type=1)
+        role=self.role()
+        self.assertEqual(role['union_id'],1)
+        self.assertTrue(all(rid not in g['applications'] for g in role['guild']['unions'].values()))
+        self.assertEqual(role['guild']['join_count'],1)
+        self.ok(3)
+        with patch('network_redirect.backend.time.time',return_value=harness.NOW+10):
+            self.ok(18,query_type=4,page=1)
+        self.assertEqual(self.role()['union_id'],0)
+        self.assertEqual(self.role()['guild']['join_count'],1)
+
 
 if __name__ == '__main__':
     unittest.main()

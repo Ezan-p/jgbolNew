@@ -12,7 +12,7 @@ from .protocol import encode
 ROOT = Path(__file__).resolve().parents[1]
 require = formation.require
 ENUMS = json.loads((ROOT/'analysis/evidence/activity_enums.json').read_text())
-HANDLED = {1227, 1060, 1330, 1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1303, 1329, 1333, 1348, 1349, 1350, 1353}
+HANDLED = {1226, 1227, 1060, 1330, 1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1303, 1329, 1333, 1348, 1349, 1350, 1353}
 FIGHTS = {2, 3, 4, 5, 6, 10, 11, 12}
 EXCHANGE = {int(r['index']):r for r in summon.rows('top_score_exchange.csv')}
 RANK_SCORE = summon.rows('top_score.csv')
@@ -41,6 +41,8 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     require(r['rank_initial_order']<=65535 and r['rank_daily_limit']<=255,'活动次数超过协议范围')
     require(r['duty_daily_runs']==3,'原版天命界面固定每日3次')
     from . import duty_balance, activity_convert, activity_practice, activity_pavilion
+    from . import activity_hunt
+    activity_hunt.load_rules()
     activity_pavilion.load_rules()
     duty_balance.rules()
     activity_convert.load_rules()
@@ -108,6 +110,9 @@ def prepare(role,now,r,peers=None):
     for k,v in dict(drug_level=1,drug_exp=0,drug_study_flag=0,drug_study_flag2=0).items():role.setdefault(k,v)
     role.setdefault('rule_index',0)
     for k in ('max_hp_plus','gongji_plus','fangyu_plus','max_magic_plus'):role.setdefault(k,0)
+    if 'hunt' in s:
+        from . import activity_hunt
+        activity_hunt.state(role,now,r)
     if 'babel' in s:
         from . import activity_babel
         activity_babel.state(role,now,r)
@@ -169,10 +174,11 @@ def statuses(role,now,r,flag,peers=None):
     from .activity_land import status as land_status
     s=role['activity']
     if flag==0:
-        from . import activity_pavilion
+        from . import activity_pavilion, activity_hunt
         from .activity_seasonal import status as seasonal_status
         return summon.event(47,dict(visit_list=visit_list(role,r),feed_data=feed_data(role,r),
                                    pavilion_data=activity_pavilion.status(role,now,peers),
+                                   hunt_data=activity_hunt.status(role,now,r),
                                    spring_info=dict(start_time=0,end_time=0),
                                    imperial_exam=dict(start_time=0,end_time=0),**seasonal_status(role,now,r)))
     require(flag==1,'未知活动页')
@@ -362,6 +368,12 @@ def battle(role,req,now,r,jrules,frules):
 
 def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     s=prepare(role,now,r,peers)
+    if mid==1226:
+        from . import activity_hunt
+        return activity_hunt.settle(role,req,now,r)
+    if mid==1051 and req['item_type'] in (1036,1037,1324):
+        from . import activity_hunt
+        return activity_hunt.use_item(role,req,now,r)
     if mid==1227:
         from . import activity_pavilion
         return activity_pavilion.settle(role,req,now,peers)

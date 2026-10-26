@@ -1,0 +1,86 @@
+{
+  "date": "2026-10-26T08:32:56.281608+00:00",
+  "client": "3.87",
+  "guild_rules_revision": "guild-players-2026-10-26",
+  "guild_checks_passed": true,
+  "unit_tests": {
+    "total": 101,
+    "passed": 101,
+    "log": "current_tests.log",
+    "duration_seconds": 39.388
+  },
+  "native_callbacks": {
+    "total": 116,
+    "passed": 116,
+    "restored": true,
+    "evidence": "current_client_validation.json"
+  },
+  "native_secret_battle": {
+    "passed": true,
+    "rounds": 36,
+    "participants": 8,
+    "members": 5,
+    "restored": true,
+    "evidence": "current_client_battle.json"
+  },
+  "combat_matrix": {
+    "levels": [
+      20,
+      40,
+      60,
+      99
+    ],
+    "evidence": "current_combat_matrix.json"
+  },
+  "original_rule_audit": {
+    "modules": 14,
+    "scanned_lua_modules": 323,
+    "evidence": "current_reserved_protocol_audit.json"
+  },
+  "full_suite": {
+    "total": 911,
+    "passed": 910,
+    "failed": 1,
+    "log": "current_full_tests.log",
+    "failure": "test_activity_land.OfflineLandTests.test_complete_64_layers_both_worlds_real_battles: hell 64 not won"
+  },
+  "related_retest": {
+    "total": 23,
+    "passed": 22,
+    "failed": 1,
+    "log": "current_related_retest.log",
+    "failure": "Same unchanged land test: normal 64 not won"
+  },
+  "live_smoke": {
+    "passed": true,
+    "level": 99,
+    "union_id": 3,
+    "resources_unchanged": true,
+    "client_pid": 11899,
+    "screen": "guild",
+    "backend_session": "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/redirect/sessions/20261026T082455Z-84302f51",
+    "actual_guild_query": 18,
+    "rules_revision_confirmed": "guild-players-2026-10-26",
+    "backend_confirmation_time": "2026-10-26T08:29:51.733+00:00"
+  },
+  "limitations": [
+    "Original server hidden rules are not recoverable; offline scheduling, NPC behavior and joint formation are documented as B.",
+    "116 native checks cover callbacks and selected real buttons, not exhaustive click permutations.",
+    "Secret-area full animation was verified separately; trial callbacks/real backend battle were checked, but full trial animation was not independently accepted.",
+    "All-suite results are a recorded snapshot, not a claim that subsequent concurrent work is validated."
+  ],
+  "implementation_sha256": {
+    "network_redirect/guild.py": "76b98ed4970952e402085b43350fa85ff43a8c3739450b15ee5f610bfcc2da9b",
+    "network_redirect/guild_activities.py": "8548eba0753f55161e4d938c473b8e523c518de19f1142aff3c4b2975a2e6e28",
+    "network_redirect/guild_combat.py": "d0f5ee4d481581771b7d5bb68a31319cf2cbd0fdb36a9c7da4b63f7dae80e617",
+    "network_redirect/guild_escort.py": "37ae49b6ef269fbabaa5ac93dce6a13f2a7efbe45b29c6b09d07b21c8c79d7f7",
+    "network_redirect/guild_hunt.py": "3ff8c03e400fb22cb7b0d9f7a1705d18f5466ecd0bcaff3211ace05bf08f098a",
+    "network_redirect/guild_instances.py": "365ecf7c96ec519dcbe37f058b988b829289068ec04cd98e2c02b5fadb647a4b",
+    "network_redirect/guild_match.py": "395be7a09ebd084b63879f106a5ba120c424cf0442f24992bc50b490313b300c",
+    "network_redirect/guild_npcs.py": "5e92828cf4a05ae15927620f7d7a727663143ae6ac6147ae00f879d8e550978a",
+    "network_redirect/guild_offline.py": "127d0ca5cd85bb5837678ecd9a45c5af52cb3fa7858e7d1795276ebb0a75ee98",
+    "server_config/guild_rules.json": "2ab74c48661e6784ba41aecf5a793cf1b4b10c23a18b9a019af52038ca8b85ef"
+  },
+  "syntax_check_passed": true,
+  "diff_whitespace_check_passed": true
+}

@@ -139,7 +139,7 @@ def settle(role,s,g,d,now,r):
         a=e['active'];u.require(a is not None and now>=a['book']['end_time'],'取经尚未完成或奖励已领取')
         level=a['book']['book_level'];loss=20 if a['book']['be_grab_times'] else 0;gain=u.contribution(role,level*10*(100-loss)//100);money=offline.funds(g,level*100*(100-loss)//100,r)
         prizes=[journey.grant(role,[5,1300+a['road'],level,1])];e['active']=None
-        out.update(contribute=gain,union_money=money,item_info=prizes)
+        out.update(contribute=gain,union_money=money,item_info=prizes,can_rece_prize=False,on_road_type=0)
     elif flag==8:
         u.authorize(role,r,26);target=u.positive(d,'des_id');n=u.positive(dict(count=d.get('count',1)),'count',3)
         u.require(str(target) in g['members'] and e['cards']>=n,'护送令不足或成员不存在')
@@ -172,6 +172,10 @@ def settle(role,s,g,d,now,r):
             if row['id']==target:row['is_black']=True
     elif flag==10:
         return rob(role,s,g,e,d,now,r)
+    # Publish the trip itself instead of relying on a stale player timestamp.
+    active=e['active']
+    out.update(escort_active=active is not None,escort_end_time=active['book']['end_time'] if active else 0,
+               on_road_type=active['road'] if active else 0,can_rece_prize=bool(active and now>=active['book']['end_time']))
     return [u.reply(69,out)]
 
 

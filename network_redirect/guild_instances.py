@@ -33,7 +33,7 @@ def team_info(role,a,g,r):
             members.append(dict(g['members'][rid],head_type=first.get('type',5004),
                                 cortege_layer=first.get('reborn_layer',0),finish_fam_data=a.get('layer',0)))
     return dict(teams=members,captain=t.get('captain',role['role_id']) if t else 0,max_count=r['team_size'],free_times=r['team_daily'],fight_count=a['team_fights'],
-        apply_list=team_applications(t,r),last_search_time=0,max_layer=max(1,a.get('layer',0)),fam_id=1,fam_count=max(1,len(members)),can_support_fight=True)
+        apply_list=team_applications(t,r),last_search_time=a.get('team_last_fight_time',0) if a['team_fights'] else 0,max_layer=r['team_daily'],cleared_layer=a.get('layer',0),fam_id=1,fam_count=max(1,len(members)),can_support_fight=True)
 
 
 def team_list(role,a,g,r):
@@ -70,8 +70,8 @@ def resident_info(g,r):
 
 
 def lucky_limit(a,r):
-    earned=max(a.get('previous_week_score',0),a.get('week_score',0))//r['lucky_reputation_per_draw']
-    return min(r['lucky_draw_limit'],earned)+a.get('lucky_bonus',0)
+    # [A] Every member may adopt on weekends; base quota is missing server data [B].
+    return r['lucky_draw_limit']+a.get('lucky_bonus',0)
 
 
 def train_stage(a,r):
@@ -82,11 +82,23 @@ def train_stage(a,r):
 def train_info(role,a,g,now,r):
     # [A] Only has_prize (58) draws the native claim button; had_closed (54)
     # never does. Keep an earned but unclaimed stage available after expiry.
-    result=58 if train_stage(a,r)>a.get('train_claimed_stage',0) else 54 if a['train_done'] else 53 if r['train_weekend_only'] and not weekend(role['guild']) or a['train_open'] and now>=a['train_end'] else 1 if a['train_open'] else 61 if sum(residents(g,r).values())>=r['train_resident_required'] else 41
-    return dict(result=result,last_time=a.get('train_end',0),rest_time=a.get('train_end',0),
+    in_window=not r['train_weekend_only'] or weekend(role['guild'])
+    if train_stage(a,r)>a.get('train_claimed_stage',0):result=58
+    elif a['train_done']:result=54
+    elif not in_window or a['train_open'] and now>=a['train_end']:result=53
+    elif a['train_open']:result=1
+    else:result=61 if sum(residents(g,r).values())>=r['train_resident_required'] else 41
+    # [A] Both native timers treat 0 as an expired timestamp and immediately
+    # remove/requery the dialog. last_time is the next calendar transition;
+    # rest_time exists only while a challenge is actually running.
+    day=role['guild']['day'];weekday=(day+3)%7
+    transition=(day+(5-weekday if weekday<5 else 7-weekday))*86400-r['timezone_offset_hours']*3600
+    if not r['train_weekend_only']:transition=(day+1)*86400-r['timezone_offset_hours']*3600
+    end=a.get('train_end',0)
+    return dict(result=result,last_time=min(end,transition) if end>now else transition,rest_time=end if end>now else False,
         pet_info=resident_info(g,r),train_prize={i:dict(add_union_gold=i*100,add_reputation=i*10,prize_list=[daily.spec(p[:2]+[p[2]*i,p[3]]) for p in r['train_rewards']]) for i in range(1,5)},
         boss_type=r['battle_npc'],boss_layer=1,has_record=bool(a['train_record']),boss_info=dict(type_id=r['battle_npc'],boss_hp=a.get('train_hp') if a.get('train_hp') is not None else r['train_hp'],boss_full_hp=r['train_hp']),
-        name=g['members'].get(str(a.get('appoint',role['role_id'])),{}).get('name',role['role_name']),support=a.get('train_support',0),can_support=a.get('train_support',0)<r['train_support_limit'],damage_rank=sorted(a.get('train_damage',{}).values(),key=lambda v:-v['damage']))
+        name=g['members'].get(str(a.get('appoint',role['role_id'])),{}).get('name',role['role_name']),support=a.get('train_support',0),can_support=in_window and a['train_open'] and not a['train_done'] and now<a['train_end'] and a.get('train_support',0)<r['train_support_limit'],damage_rank=sorted(a.get('train_damage',{}).values(),key=lambda v:-v['damage']))
 
 
 def inside(a,now,r,g):
@@ -171,12 +183,12 @@ def settle(role,s,g,op,d,now,r):
                 u.require(actor is not None,'队员NPC阵容不存在，请重新组队')
                 actors.append(actor)
             result,packets,replay=simulate(role,s,r,journey.load_rules(),15,'仙盟秘境',ally_roles=actors)
-            a['team_fights']+=1;a['team_record']=[replay];a['team']['members']=[str(v) for v in fighters]
+            a['team_fights']+=1;a['team_last_fight_time']=now;a['team_record']=[replay];a['team']['members']=[str(v) for v in fighters]
             if 1<=result<=3:
                 a['layer']=a.get('layer',0)+1
                 a['member_contributions']={key:a['layer'] for key in a['team']['members']}
                 for p in r['team_rewards']:journey.grant(role,p)
-        return record_events(a.get('team_record',[]))+[u.reply(op,dict(result=1,free_times=r['team_daily'],fight_count=a['team_fights'],fight_result_list=client_records(a.get('team_record',[]))))]
+        return record_events(a.get('team_record',[]))+[u.reply(op,dict(result=1,free_times=r['team_daily'],fight_count=a['team_fights'],cleared_layer=a.get('layer',0),max_layer=r['team_daily'],fight_result_list=client_records(a.get('team_record',[]))))]
     if op==43:
         from . import activity
         flag=d.get('flag');u.require(type(flag)is int and flag in range(1,8),'寻宝操作无效')
@@ -208,25 +220,29 @@ def settle(role,s,g,op,d,now,r):
         if flag==7:
             u.require(a['team'] is not None,'请先加入队伍')
             return [u.reply(op,dict(result=1,flag=7,fam_info=team_info(role,a,g,r)))]
-        return [u.reply(op,dict(result=1,flag=flag,index=d.get('index',0),attach_list=prizes,free_times=r['search_daily']-a['search'],fight_count=a['team_fights'],sweep_gold_cost=r['search_sweep_gold'],token_index=min(a['search']+1,25),my_broad_data=a['board'][-1] if flag==2 else new_broadcast,gold_cost=10,all_point=a['points'],get_point=10,prize_list=sweep_prizes if flag==6 else prizes,prize_items=a['search_tiles'],search_order=a['search_order'],max_free_times=r['search_daily'],broad_data=a['board'],store_items=stock(),board_size=25,flush_time=(s['day']+1)*86400-r['timezone_offset_hours']*3600))]
+        return [u.reply(op,dict(result=1,flag=flag,index=d.get('index',0),attach_list=prizes,free_times=r['search_daily']-a['search'],search_count=a['search'],cleared_layer=a.get('layer',0),max_layer=r['team_daily'],fight_count=a['team_fights'],sweep_gold_cost=r['search_sweep_gold'],token_index=min(a['search']+1,25),my_broad_data=a['board'][-1] if flag==2 else new_broadcast,gold_cost=10,all_point=a['points'],get_point=10,prize_list=sweep_prizes if flag==6 else prizes,prize_items=a['search_tiles'],search_order=a['search_order'],max_free_times=r['search_daily'],broad_data=a['board'],store_items=stock(),board_size=25,flush_time=(s['day']+1)*86400-r['timezone_offset_hours']*3600))]
     if op==79:return [u.reply(op,train_info(role,a,g,now,r))]
     if op in (80,78):
         u.require(not r['train_weekend_only'] or weekend(s),'仙盟试炼仅周末开放')
         if op==80:
-            if not a['train_open']:u.require(role['union_rank']==1,'只有盟主可以开启仙盟试炼')
+            if not a['train_open']:
+                u.require(role['union_rank']==1,'只有盟主可以开启仙盟试炼')
             else:u.require(role['union_rank']==1 or a.get('appoint')==role['role_id'],'请由指定成员挑战或参与援助')
-            u.require(sum(residents(g,r).values())>=r['train_resident_required'],'开启试炼需要至少240只仙盟栖息宠物')
+            # [A] Both opening (petHomeUI L817) and continued challenge (L1160)
+            # enforce the resident count in the original executable client.
+            u.require(sum(residents(g,r).values())>=r['train_resident_required'],'试炼挑战需要至少240只仙盟栖息宠物')
         u.require(not a['train_done'],'今日试炼已完成')
         u.require(role['level']>=r['join_level'],'人物等级不足')
         if op==80:
             if not a['train_open']:
                 a.update(train_open=True,train_hp=r['train_hp'],train_end=now+r['train_seconds'],train_damage={},train_support=0,train_attempts=0)
             u.require(now<a['train_end'],'试炼已过期')
-            u.require(a.get('train_attempts',0)<r.get('train_attempt_limit',3),'今日试炼挑战次数已用完')
+            u.require(a.get('train_attempts',0)<r['train_attempt_limit'],'今日试炼挑战次数已用完')
             a['train_attempts']=a.get('train_attempts',0)+1
         else:
             u.require(a['train_open'] and now<a['train_end'],'试炼未开启或已过期')
             u.require(a['train_support']<r['train_support_limit'],'援助次数已用完');a['train_support']+=1
+            return [u.reply(op,dict(result=1,support=a['train_support']))]
         appointed=a.get('appoint',role['role_id']) if op==80 else role['role_id']
         if str(appointed) not in g['members']:appointed=role['role_id']
         actor=role if appointed==role['role_id'] else (npc_players.get(appointed) or {}).get('role')
@@ -238,7 +254,10 @@ def settle(role,s,g,op,d,now,r):
         damage=min(a['train_hp'],replay_damage(replay))
         a['train_hp']-=damage;a['train_done']=a['train_hp']==0;a['train_record'].append(replay)
         row=a['train_damage'].setdefault(str(appointed),dict(id=appointed,name=actor['role_name'],damage=0));row['damage']+=damage
-        return record_events(recent_records(a['train_record']))+[u.reply(op,dict(result=1,support=a['train_support'],free_times=1,fight_count=len(a['train_record']),fight_result_list=recent_records(a['train_record']))),u.reply(79,train_info(role,a,g,now,r))]
+        # The open response starts native battle playback and removes pet-home.
+        # The native return callback requests 79 after rebuilding that page;
+        # pushing 79 here would render into a destroyed Cocos node mid-battle.
+        return record_events(recent_records(a['train_record']))+[u.reply(op,dict(result=1,support=a['train_support'],free_times=1,fight_count=len(a['train_record']),fight_result_list=recent_records(a['train_record'])))]
     if op==95:return record_events(recent_records(a['train_record']))+[u.reply(op,dict(result=1,free_times=1,fight_count=1 if a['train_record'] else 0,fight_result_list=recent_records(a['train_record'])))]
     if op==81:
         u.require(role['union_rank']==1,'只有盟主可以指定挑战成员');target=d.get('appoint_role');u.require(type(target)is int and str(target) in g['members'],'指定成员不存在');a['appoint']=target

@@ -20,8 +20,9 @@ class GuildNpcCombatTests(unittest.TestCase):
         clock=patch('network_redirect.backend.time.time',return_value=NOW)
         clock.start();self.addCleanup(clock.stop)
         self.serial=17000
-        self.backend.guild_rules.update(train_weekend_only=False,lucky_weekend_only=False,hunt_weekend_open=True)
+        self.backend.guild_rules.update(pet_role_level=0,pet_union_level=0,wander_daily=3,train_weekend_only=False,lucky_weekend_only=False,hunt_weekend_open=True)
         role=self.backend.profile();role.update(level=40,gold_coin=100000,silver_coin=100000)
+        summon.add_item(role,1338,100)
         self.backend.save(role)
 
     def request(self,op,**data):
@@ -134,6 +135,21 @@ class GuildNpcCombatTests(unittest.TestCase):
         self.assertEqual(history[1]['name'],self.backend.profile()['role_name'])
         self.assertEqual(self.request(94)[-1][2]['catch_list'],history)
 
+    def test_capture_before_pet_home_does_not_push_pet_home_history(self):
+        self.request(1,union_name='游历首次捕捉')
+        role=self.backend.profile();summon.add_item(role,1338,1);self.backend.save(role)
+        self.request(86,two_type=2)
+        target=self.backend.profile()['guild']['instances']['field']['type_id']
+        with patch('network_redirect.guild_offline.roll',return_value=0):
+            rows=self.request(87,two_type=2,catch_type=1338)
+        self.assertNotIn(94,{op for _,op,_ in rows})
+        self.assertIn(93,{op for _,op,_ in rows})
+        self.assertEqual(next(data for _,op,data in rows if op==87)['flag'],1)
+        history=self.request(94)[-1][2]['catch_list']
+        self.assertEqual(len(history),1)
+        self.assertEqual(history[1]['type_id'],target)
+        self.assertEqual(history[1]['name'],self.backend.profile()['role_name'])
+
     def test_hunt_npc_guard_and_real_player_ranking(self):
         self.request(4,union_id=1)
         main=self.request(83)[-1][2]
@@ -161,6 +177,25 @@ class GuildNpcCombatTests(unittest.TestCase):
         self.assertEqual(self.request(79)[-1][2]['result'],1)
         role=self.backend.profile();role['guild']['instances']['train_end']=NOW-1;self.backend.save(role)
         self.assertEqual(self.request(79)[-1][2]['result'],53)
+
+    def test_trial_inactive_and_expired_timers_do_not_requery_loop(self):
+        self.request(1,union_name='试炼倒计时盟')
+        self.seed_residents()
+        unopened=self.request(79)[-1][2]
+        self.assertGreater(unopened['last_time'],NOW)
+        self.assertIs(unopened['rest_time'],False)
+        fake=(4,[],dict(fight_result_msg=dict(fight_result=[]),damage_total=100))
+        with patch('network_redirect.guild_instances.simulate',return_value=fake):rows=self.request(80)
+        self.assertNotIn(79,{op for _,op,_ in rows})
+        active=self.request(79)[-1][2]
+        self.assertEqual(active['rest_time'],NOW+self.backend.guild_rules['train_seconds'])
+        expired=active['rest_time']+1
+        with patch('network_redirect.backend.time.time',return_value=expired):
+            result=self.request(79)[-1][2]
+            self.assertEqual(result['result'],53)
+            self.assertGreater(result['last_time'],expired)
+            self.assertIs(result['rest_time'],False)
+            self.assertEqual(self.backend.profile()['guild']['instances']['train_end'],active['rest_time'])
 
     def test_joint_slots_keep_original_owned_effects(self):
         ids=self.team();role=self.backend.profile()
@@ -247,6 +282,18 @@ class GuildNpcCombatTests(unittest.TestCase):
             result=self.request(87,two_type=2)
         self.assertEqual(next(row[2] for row in result if row[1]==87)['flag'],4)
         role=self.backend.profile();self.assertEqual(role['guild']['unions'][str(role['union_id'])]['resident_pets'][str(tid)],1)
+
+    def test_continued_training_requires_240_residents_without_side_effects(self):
+        self.request(1,union_name='继续挑战门槛');self.seed_residents()
+        fake=(4,[],dict(fight_result_msg=dict(fight_result=[]),damage_total=100))
+        with patch('network_redirect.guild_instances.simulate',return_value=fake) as battle:
+            self.request(80);self.request(89)
+            role=self.backend.profile();g=role['guild']['unions'][str(role['union_id'])]
+            self.assertEqual(sum(g['resident_pets'].values()),239)
+            self.assertEqual(role['guild']['instances']['train_attempts'],1)
+            self.rejected(80)
+            battle.assert_called_once()
+            self.assertEqual(self.backend.profile()['guild']['instances']['train_attempts'],1)
 
 
 if __name__=='__main__':unittest.main()

@@ -1,15 +1,72 @@
 """Native portrait requests and the 64 distinct tower encounters."""
 import copy
+import random
 from unittest.mock import patch
 from tests.test_activity import ActivityCase
 from network_redirect import activity_land as land, activity_land_encounters as encounters
-from network_redirect import activity_land_boss as boss, formation, summon
+from network_redirect import activity_land_boss as boss, activity_land_npc as npc, formation, summon, journey
 from network_redirect.backend import Backend
+from network_redirect.protocol import MAX_PACKET, decode
 from pathlib import Path
 
 
 class LandTowerTests(ActivityCase):
     def land(self,op,**d):return self.req(1302,id=op,data=summon.lua(d))
+
+    def test_hell_64_shield_events_do_not_truncate_winning_battle(self):
+        self.ok(self.land(1));r=self.b.profile();identity=r['role_id']
+        r.update(copy.deepcopy(npc.catalog()['npc_v1_l99_t2_attack']['role']))
+        r['role_id']=identity
+        r['activity']['land'].update(boss_layer=64,inv_boss_layer=63,grid_count=8,
+                                    soul_count=10000,unlocked=[64])
+        real_battle=journey.battle
+        for seed in (1,3,7):
+            with self.subTest(seed=seed):
+                self.b.save(copy.deepcopy(r));captured=[]
+                def battle(*args,**kwargs):
+                    result=real_battle(*args,**kwargs);captured.append(result[2]);return result
+                # Reproduce the shield proc sequences that exhausted the old
+                # 1000-byte budget. Damage, victory and wire encoding stay real.
+                with patch('network_redirect.combat.secrets.randbelow',side_effect=random.Random(seed).randrange), \
+                     patch.object(journey,'battle',side_effect=battle):
+                    out=self.land(4,flag=1,des_type=4,des_id=64,cur_num=8)
+                self.ok(out);self.assertTrue(out[-1][1]['is_win'])
+                actions=captured[0]
+                self.assertEqual(actions.stop_reason,'elimination')
+                self.assertFalse(any(actions.final_hp[2].values()))
+                replay=out[-1][1]['final_result_list'][1]
+                self.assertGreater(len(summon.lua(replay['fight_events']).encode('utf-8')),1000)
+                self.assertEqual(out[-2][1],replay['fight_events'])
+                self.assertEqual(len(actions),replay['fight_result_msg']['fight_round'])
+                self.ok(self.land(23,index=1));self.ok(self.land(25))
+                self.assertEqual(self.b.profile()['activity']['land']['inv_boss_layer'],64)
+
+    def test_replay_limits_remain_unresolved_and_fit_native_packet(self):
+        self.ok(self.land(1));r=self.b.profile();s=r['activity']['land'];s['grid_count']=8
+        enemy=encounters.encounter(64,True)
+        # Durable armies exercise both cutoffs without ending by elimination.
+        for u in enemy['units']:
+            u.update(hp=1000000,max_hp=1000000,gongji=100,fangyu=10,magic=100,skills=[])
+        r['corteges']=[dict(u,id=u['order']) for u in enemy['units']];r['attachments']=[]
+        real_battle=journey.battle
+        for stop in ('action_limit','event_budget'):
+            with self.subTest(stop=stop):
+                enemy['units'][0]['skills']=[(21,1)] if stop=='event_budget' else []
+                captured=[]
+                def battle(*args,**kwargs):
+                    result=real_battle(*args,**kwargs);captured.append(result[2]);return result
+                with patch('network_redirect.combat.secrets.randbelow',return_value=0), \
+                     patch.object(journey,'battle',side_effect=battle):
+                    result,replay=land.simulate(r,s,self.b.activity_rules,self.b.journey_rules,
+                                              192,8,8,encounter=enemy)
+                self.assertEqual(result,0);self.assertEqual(captured[0].stop_reason,stop)
+                if stop=='action_limit':self.assertEqual(len(captured[0]),80)
+                else:self.assertGreaterEqual(len(summon.lua(replay['fight_events']).encode('utf-8')),4000)
+                packet=land.response(4,s,self.b.activity_rules,fight_type=4,des_level=64,
+                    is_win=False,is_reward=False,return_soul=0,card_list=[],
+                    cost_gold_list=self.b.activity_rules['land_card_gold'],final_result_list=[replay])
+                self.assertLessEqual(len(packet),MAX_PACKET)
+                self.assertEqual(decode(packet)[2]['id'],149)
 
     def test_native_portrait_index_and_inspection_id(self):
         self.ok(self.land(3));s=self.b.profile()['activity']['land']

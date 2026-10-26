@@ -101,6 +101,10 @@ def simulate(role,s,r,jrules,ft,name,hp=None,*,enemy_npc=None,ally_roles=None,ac
     actor=actor_role or role
     u.require(any(1<=c.get('order',0)<=8 for c in actor['corteges']),'请先上阵神仙')
     units=journey.fighters(actor,dict(cortege_list=f"{r['battle_npc']}|{r['battle_level']}"))
+    if ft==27:
+        boost=s.get('instances',{}).get('train_support',0)*r['train_support_percent']
+        for unit in units[0]:
+            for key in ('hp','max_hp','gongji','fangyu','magic'):unit[key]=unit[key]*(100+boost)//100
     sources=[];battle_owner=actor
     if ally_roles:
         allies,sources,power=joint_units(ally_roles)
