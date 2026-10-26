@@ -13,7 +13,7 @@ def state(s):
 def book(role,g,ident,now,level=1):
     own=ident==role['role_id']
     return dict(id=ident,player_name=role['role_name'] if own else '离线取经者',union_name=g['name'] if own else '演武仙盟',
-        book_level=level,role_level=role['level'],tao_point=1000,role_rank=5,head_type=1,be_grab_times=0,
+        book_level=level,role_level=role['level'],tao_point=role.get('tao_point',0) if own else 1000,role_rank=5,head_type=1,be_grab_times=0,
         cloud_time_list=[],end_time=now+3600,had_protector=False)
 
 
@@ -53,7 +53,7 @@ def settle(role,s,g,d,now,r):
         if target:
             u.require(e['credits']>0,'没有可用护送令');e['credits']-=1
         e['sent']+=1;e['road']=road;e['active']=dict(road=road,book=book(role,g,role['role_id'],now,e['level']),raid_checked=False)
-        e['active']['book'].update(had_protector=bool(target),protector_id=target,tao_point=max(1000,role.get('role_combat_power',1000)),cloud_time_list=[now,now+3600] if target else [])
+        e['active']['book'].update(had_protector=bool(target),protector_id=target,tao_point=role.get('tao_point',0),cloud_time_list=[now,now+3600] if target else [])
         role.update(last_west_book_time=now,west_book_count=e['sent'])
         out.update(book_list=books(role,g,e,now,road));e['level']=1;e['flushes']=0
     elif flag==11:

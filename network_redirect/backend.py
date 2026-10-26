@@ -11,7 +11,7 @@ import struct
 import time
 
 from .protocol import encode, decode
-from . import role_profile
+from . import role_profile, achievements
 from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily, guild, vip, xianling, welfare, cheer, monument, equipment
 
 
@@ -20,7 +20,7 @@ from . import summon, formation, market, immortal, journey, activity, reborn, re
 CLIENT_CONFIG = '''{
     [4]=__PARTY_CONFIG__,
     [5]={},
-    [7]={collector=true,Bulletin=true,message=true,setting=true,service=true,relogin=true},
+    [7]={achievement=true,collector=true,Bulletin=true,message=true,setting=true,service=true,relogin=true},
     [10]=__MARKET_CONFIG__,
     [11]=__STONE_CONFIG__,
     [14]=__CHEER_CONFIG__,
@@ -48,6 +48,9 @@ def login_fields(text):
 class Backend:
     def __init__(self, directory, port, emit, account="local-player"):
         self.account = account
+        self.achievement_rules = achievements.load_rules()
+        self.achievement_context = None
+        self.achievement_pending = []
         self.profile_rules = role_profile.load_rules()
         self.profile_replies = {}
         self.last_profile_serial = 0
@@ -132,6 +135,7 @@ class Backend:
             if 'journey' not in role:
                 changed = journey.prepare(role, int(time.time()), self.journey_rules) or changed
             formation.recalculate(role, self.formation_rules)
+            achievements.refresh(role, int(time.time()))
             if changed or role != original_role:
                 self.save(role, account)
             return role
@@ -154,9 +158,16 @@ class Backend:
         reborn.prepare(role, self.reborn_rules)
         immortal.prepare(role, self.immortal_rules)
         formation.recalculate(role, self.formation_rules)
+        stored = self.db.execute('SELECT data FROM roles WHERE account=?', (account,)).fetchone()
+        before_achievements = json.loads(stored[0]) if stored else None
+        context = self.achievement_context if account == self.account else None
+        mid, req = context or (0, {})
+        achievements.track(role, before_achievements, mid, req, int(time.time()))
+        updates = achievements.packets(role, new=1, previous=before_achievements) if context and before_achievements else []
         self.db.execute('INSERT OR REPLACE INTO roles VALUES (?,?)',
                         (account, json.dumps(role, ensure_ascii=False)))
         self.db.commit()
+        self.achievement_pending.extend(updates)
 
     def snapshot(self):
         role = self.profile()
@@ -177,6 +188,7 @@ class Backend:
         # 2998/event 80 feeds data.callback_update_config before mainUI is created.
         # This is a minimal local configuration, not an official configuration dump.
         role = self.profile()
+        achievements.login(role, int(time.time()))
         journey.prepare(role, int(time.time()), self.journey_rules)
         activity.prepare(role, int(time.time()), self.activity_rules)
         goods = market.catalog(role, int(time.time()), self.market_rules)
@@ -223,6 +235,7 @@ class Backend:
             replies.append(summon.news_snapshot(role, self.summon_rules))
         if role.get('summon', {}).get('last_result'):
             replies.append(summon.event(79, role['summon']['last_result']))
+        replies += achievements.packets(role)
         replies.append(daily.hint(role, int(time.time()), self.daily_rules))
         replies.append(welfare.hint(role, int(time.time()), self.welfare_rules))
         replies.append(welfare.mail_snapshot(role, int(time.time()), self.welfare_rules))
@@ -258,9 +271,11 @@ class Backend:
             before = copy.deepcopy(role)
             if mid == 1087:
                 events = cheer.settle(role, data, self.cheer_rules)
+                achievements.record_events(role, events, int(time.time()), login_fields)
                 formation.prepare(role, self.formation_rules)
             else:
                 events = formation.settle(role, mid, data, self.formation_rules, login_fields)
+                achievements.record_events(role, events, int(time.time()), login_fields)
             immortal.prepare(role, self.immortal_rules)
             attrs = [dict(type=t, value=role.get(k, 0)) for t, k in
                      ((7, 'silver_coin'), (8, 'gold_coin'), (30, 'role_combat_power'), (39, 'max_combat_power'), (71, 'cortege_count'))]
@@ -360,6 +375,9 @@ class Backend:
         return packets
 
     def complete(self, request_serial, replies):
+        if self.achievement_pending:
+            replies = self.achievement_pending + replies
+            self.achievement_pending = []
         if not request_serial:
             return replies
         # Responses use an independent, contiguous server sequence. Reusing the
@@ -388,6 +406,7 @@ class Backend:
         try:
             role = self.profile()
             result = summon.settle(role, data, int(time.time()), self.summon_rules)
+            achievements.record_events(role, [summon.event(23, result)], int(time.time()), login_fields)
             welfare.track(role,1045,data,[],int(time.time()),self.welfare_rules)
             formation.prepare(role, self.formation_rules)
             immortal.prepare(role, self.immortal_rules)
@@ -411,6 +430,16 @@ class Backend:
         return replies
 
     def respond(self, packet, state):
+        mid, _, data = decode(packet)
+        self.achievement_context = (mid, data) if state.get('authenticated') else None
+        self.achievement_pending = []
+        try:
+            return self._respond(packet, state)
+        finally:
+            self.achievement_context = None
+            self.achievement_pending = []
+
+    def _respond(self, packet, state):
         mid, connection, data = decode(packet)
         self.emit('game_request', message_id=mid, bytes=len(packet), authenticated=state.get('authenticated', False))
         if mid == 3001:
@@ -489,7 +518,7 @@ class Backend:
                 updates.append(welfare.hint(role, now, self.welfare_rules))
                 updates.append(welfare.mail_snapshot(role, now, self.welfare_rules))
                 self.save(role)
-            return [encode(2999, dict(time=now, random_key=self.random_key, delay_time=0))] + self.number_replies(updates)
+            return [encode(2999, dict(time=now, random_key=self.random_key, delay_time=0))] + self.number_replies(self.achievement_pending + updates)
         if mid == 1105:
             last = data['req_serial_num']
             if last == self.server_serial or (last == 0 and not self.reply_history):
@@ -501,6 +530,20 @@ class Backend:
                 return [packet for serial, packet in self.reply_history if serial > last]
             self.emit('game_replay_unavailable', message_id=mid, message='请求不在当前响应缓存范围内')
             return []
+        if mid == 1067:
+            try:
+                formation.require(data['flag'] in (0, 1), '成就查询标志无效')
+                target_id = data['des_role_id']
+                target = self.profile() if target_id in (0, self.profile()['role_id']) else None
+                if target is None:
+                    matches = [json.loads(raw) for (raw,) in self.db.execute('SELECT data FROM roles')
+                               if json.loads(raw).get('role_id') == target_id]
+                    formation.require(len(matches) == 1, '目标角色不存在或编号不唯一')
+                    target = matches[0]
+                    achievements.refresh(target, int(time.time()))
+                return self.complete(data['serial_num'], achievements.packets(target))
+            except (formation.Rejected, ValueError) as error:
+                return self.complete(data['serial_num'], [summon.event(55, dict(op_string=str(error)))])
         if mid in role_profile.HANDLED:
             return self.role_profiles(packet, mid, data)
         if monument.handles(mid, data):
@@ -564,6 +607,7 @@ class Backend:
                 if target is not None:
                     role_profile.prepare(target, self.profile_rules)
             events = role_profile.settle(role, mid, data, int(time.time()), self.profile_rules, names, target)
+            achievements.record_events(role, events, int(time.time()), login_fields)
             formation.recalculate(role, self.formation_rules)
             replies = self.item_deltas(before, role) + [role_profile.attributes(role)]
             replies += self.panel_attributes(role) + self.power_attributes(role) + events
@@ -592,6 +636,7 @@ class Backend:
             before = copy.deepcopy(role)
             events = monument.settle(role, mid, data, int(time.time()), self.monument_rules,
                                      self.guild_rules, self.activity_rules, self.journey_rules)
+            achievements.record_events(role, events, int(time.time()), login_fields)
             replies = self.item_deltas(before, role) + self.inventory(role) + [monument.attributes(role)] + events
             self.save(role)
             self.emit('game_monument_ok', message_id=mid, rules_revision=self.monument_rules['revision'])
@@ -623,6 +668,7 @@ class Backend:
                 events = guild.chat(role, data['chat_msg'], now, self.guild_rules)
             else:
                 events = guild.settle(role, data, now, self.guild_rules, login_fields, self.daily_rules)
+                achievements.record_events(role, events, int(time.time()), login_fields)
             gs, current_guild = guild.prepare(role, now, self.guild_rules)
             events += [summon.event(82,n) for n in gs.pop('pending_notices',[])]
             if mid == 1301 and current_guild and data['id'] in guild.MANAGEMENT:
@@ -670,6 +716,7 @@ class Backend:
             role = self.profile()
             before = copy.deepcopy(role)
             events = welfare.settle(role, mid, data, now, self.welfare_rules, login_fields)
+            achievements.record_events(role, events, int(time.time()), login_fields)
             replies = self.item_deltas(before, role) + self.inventory(role) + summon.soul_snapshots(role) + [
                 welfare_attributes(role), vip.attrs(role), summon.event(80,dict(local_vip=vip.client_state(role)))] + events + [welfare.hint(role, now, self.welfare_rules),welfare.mail_snapshot(role,now,self.welfare_rules)]
             self.save(role)
@@ -697,8 +744,10 @@ class Backend:
             before = copy.deepcopy(role)
             if mid == 1336 or mid == 1051 and data['item_type'] == 1249:
                 events = xianling.settle(role, mid, data, now, self.xianling_rules)
+                achievements.record_events(role, events, int(time.time()), login_fields)
             else:
                 events = vip.settle(role, mid, data, now, self.vip_rules, login_fields)
+                achievements.record_events(role, events, int(time.time()), login_fields)
             charged = role.get('charge_gold',0)-before.get('charge_gold',0)
             if charged > 0:
                 xianling.record_charge(role, charged, now)
@@ -736,6 +785,7 @@ class Backend:
             role = self.profile()
             before = copy.deepcopy(role)
             events = daily.settle(role, mid, data, now, self.daily_rules, login_fields)
+            achievements.record_events(role, events, int(time.time()), login_fields)
             attrs = [dict(type=t, value=role[k]) for t, k in ((7, 'silver_coin'), (8, 'gold_coin'))]
             replies = self.item_deltas(before, role) + self.inventory(role) + [
                 encode(1032, dict(id=role['role_id'], unit_type=1, attr_count=len(attrs), attr_list=attrs)),
@@ -764,6 +814,7 @@ class Backend:
             before = copy.deepcopy(role)
             events = (reborn.settle(role, data, self.reborn_rules, login_fields) if mid == 1328 else
                       reborn_stars.settle(role, mid, data, self.reborn_rules, login_fields))
+            achievements.record_events(role, events, int(time.time()), login_fields)
             welfare.track(role,mid,data,events,int(time.time()),self.welfare_rules)
             events = daily.track(role, before, mid, data, events, int(time.time()), self.daily_rules, login_fields) + events
             reborn.prepare(role, self.reborn_rules)
@@ -866,6 +917,7 @@ class Backend:
             else:
                 before = copy.deepcopy(role)
                 events = immortal.settle(role, mid, data, self.immortal_rules, login_fields)
+                achievements.record_events(role, events, int(time.time()), login_fields)
                 formation.recalculate(role, self.formation_rules)
                 attrs = [dict(type=t, value=role.get(k, 0)) for t, k in
                          ((7, 'silver_coin'), (8, 'gold_coin'), (30, 'role_combat_power'), (39, 'max_combat_power'))]
@@ -919,6 +971,7 @@ class Backend:
             journey.prepare(role, now, self.journey_rules)
             before = copy.deepcopy(role)
             events = journey.settle(role, mid, data, now, self.journey_rules, self.formation_rules, self.activity_rules)
+            achievements.record_events(role, events, int(time.time()), login_fields)
             welfare.track(role,mid,data,events,now,self.welfare_rules)
             hints = daily.track(role, before, mid, data, events, now, self.daily_rules, login_fields)
             # Keep the sweep result first and the battle-start callback last.
@@ -961,6 +1014,7 @@ class Backend:
             before = copy.deepcopy(role)
             events = activity.settle(role, mid, data, now, self.activity_rules,
                                      self.journey_rules, self.formation_rules, login_fields)
+            achievements.record_events(role, events, int(time.time()), login_fields)
             welfare.track(role,mid,data,events,int(time.time()),self.welfare_rules)
             events = daily.track(role, before, mid, data, events, now, self.daily_rules, login_fields) + events
             formation.prepare(role, self.formation_rules)

@@ -185,7 +185,7 @@ def simulate(role, order, now, jrules, defence=False):
         if s.get('rank_revenge') == target['id']: s.pop('rank_revenge')
     elif defence and result >= 4: s['rank_revenge'] = target['id']
     s['rank_day_best'] = min(s['rank_day_best'], s['rank_order'])
-    replay = dict(fight_id=fid, time=now, name=target['name'], src_name=role['role_name'], vip_level=role.get('vip_level',0), tao_point=0,
+    replay = dict(fight_id=fid, time=now, name=target['name'], src_name=role['role_name'], vip_level=role.get('vip_level',0), tao_point=role.get('tao_point',0),
                   role_combat_power=role.get('role_combat_power',0), target_id=target['id'], target_power=target['combat_power'], defence=defence,
                   old_order=old, new_order=s['rank_order'], stop_reason=getattr(actions,'stop_reason','elimination'),
                   fight_events=journey.combat_engine.event_data(actions,fid),
