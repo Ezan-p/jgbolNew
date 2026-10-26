@@ -39,8 +39,11 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     require(isinstance(r.get('land_card_gold'),list) and len(r['land_card_gold'])==5 and r['land_card_gold'][0]==0 and all(type(v)is int and 0<=v<=100000 for v in r['land_card_gold']),'逐鹿翻牌费用无效')
     require(r['rank_initial_order']<=65535 and r['rank_daily_limit']<=255,'活动次数超过协议范围')
     require(r['duty_daily_runs']==3,'原版天命界面固定每日3次')
-    from . import duty_balance
+    from . import duty_balance, activity_convert, activity_practice
     duty_balance.rules()
+    activity_convert.load_rules()
+    activity_practice.load_rules()
+    require(r.get('convert_item') == 1024, '原版天缘消耗魂缘丹1024')
     require(r['home_missed_event_penalty']<=100,'药田损失不能超过100%')
     require(type(r.get('home_friend_gain_percent'))is int and 0<=r['home_friend_gain_percent']<=100,'施肥增益无效')
     require(type(r.get('home_friend_silver'))is int and 0<r['home_friend_silver']<=1000000,'施肥奖励无效')
@@ -319,6 +322,12 @@ def query_lineup(role,req,r):
 
 def battle(role,req,now,r,jrules,frules):
     ft=req['fight_type'];s=role['activity'];target=None
+    if ft==4:
+        from . import activity_practice
+        return activity_practice.battle(role,req,now,r,jrules)
+    if ft==10:
+        from . import activity_convert
+        return activity_convert.battle(role,req,now,r,jrules)
     if ft==5:
         from . import activity_duty
         return activity_duty.battle(role,req,now,r,jrules)
@@ -329,9 +338,7 @@ def battle(role,req,now,r,jrules,frules):
         from . import activity_rank
         return activity_rank.battle(role,req,now,r,jrules)
     require(role['level']>={2:6,3:8,4:5,5:12,6:13,10:16,11:1}[ft],'等级不足')
-    if ft==4:
-        require(role['rule_index']<role['level']-4,'修炼次数已用完')
-    elif ft==6:
+    if ft==6:
         second=(now+r['timezone_offset_hours']*3600)%86400
         require(r['party_period'][0]<=second<r['party_period'][1],'蟠桃会尚未开放')
         require(day(now,r)==s['party']['day'] and now>=s['party']['clock'],'蟠桃会时钟已回退，请恢复本地时间')
@@ -343,12 +350,6 @@ def battle(role,req,now,r,jrules,frules):
             require(s['party_paid']<r['party_paid_count'],'今日蟠桃会次数已用完')
             spend(role,'gold_coin',r['party_fight_gold']);s['party_paid']+=1
         role['party_fight_count']=s['party_count'];role['party_fight_count_plus']=s['party_paid']
-    elif ft==10:
-        require(role['convert_fight_count']<role['convert_fight_limit']+int(role.get('month_card_time',0)>now),'今日唤神次数已用完')
-        require(req['des_value'] in CONVERT and any(c['type']==req['des_value'] for c in role['corteges']),'唤神来源无效')
-        if role['convert_fight_count']>0:consume(role,r['convert_item'],1)
-        role['convert_fight_count']+=1;role['convert_fight_time']=now
-        s['last_convert_type']=req['des_value']
     elif ft==11:
         trial=trial_state(role,r)
         require(trial is not None and not trial['is_dead'] and req['des_value']==trial['type_id'],'试炼首领不存在或已击败')
@@ -365,30 +366,12 @@ def battle(role,req,now,r,jrules,frules):
     if ft==11:units[1][0].update(hp=trial['hp'],max_hp=trial['max_hp'])
     result,lineup,actions=journey.battle(role,cfg,jrules,units=units);win=1<=result<=3
     events=[];s['fight_id']+=1;fid=s['fight_id']
-    if ft==4 and win:
-        role['rule_index']+=1
-        for key,field,attr in [('hp','max_hp_plus',75),('gongji','gongji_plus',77),('fangyu','fangyu_plus',78),('magic','max_magic_plus',76)]:
-            role[field]+=r['train_increase'][key];events.append(summon.event(5,dict(addition_field=attr,addition_value=r['train_increase'][key])))
-    elif ft==6:
+    if ft==6:
         damage=min(hp,journey.combat_engine.total_damage(actions))
         gain=prizes(role,r['party_rewards'])+activity_party.seasonal_rewards(role,now,r)
         activity_party.record(role,damage,gain,r)
         info=party_info(role,r);info.update(fight_prize=gain,cur_damage=damage)
         events.append(summon.event(29,info))
-    elif ft==10 and win:
-        row=CONVERT[req['des_value']];col=next(k for k in row if k.startswith('output('))
-        entries=[list(map(int,x.split('/'))) for x in row[col].split('|')];roll=secrets.randbelow(sum(x[2] for x in entries))
-        typ,n,_=entries[-1]
-        for t,c,w in entries:
-            if roll<w:typ,n=t,c;break
-            roll-=w
-        tid=int(row['des_cortege_type']) if typ==2 else req['des_value']
-        gain=prizes(role,[[5,r['convert_item'],n,1] if typ==3 else [7,tid,n,1]])
-        # [A] cortCallUI indexes numeric {result_type,count} pairs; the first
-        # pair is the settled reward, remaining pairs are the unchosen cards.
-        cards=[[typ,n]]+[x[:2] for x in entries if x[:2]!=[typ,n]][:2]
-        while len(cards)<3:cards.append([typ,n])
-        events.append(summon.event(70,dict(prize_list=cards,attach_list=gain)))
     elif ft==11:
         damage=journey.combat_engine.total_damage(actions)
         trial['hp']=max(0,trial['hp']-damage);trial['is_dead']=trial['hp']==0

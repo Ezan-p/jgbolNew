@@ -85,4 +85,7 @@ with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.
  b.close()
 lines.append("return 'land fixture ready: '..#cases..' steps'")
 (ROOT/'.runtime/land-fixture.lua').write_text('\n'.join(lines))
+(ROOT/'.runtime/land-players-client-check.lua').write_text(
+ 'local install=function()\n'+'\n'.join(lines)+'\nend\ninstall()\n'+
+ (ROOT/'analysis/tools/land_players_client_harness.lua').read_text())
 print('Wrote isolated land fixture')

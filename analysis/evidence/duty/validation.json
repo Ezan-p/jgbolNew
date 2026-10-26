@@ -1,41 +1,66 @@
 {
   "date": "2026-10-26",
-  "related_regression_tests": 163,
-  "related_passed": 163,
-  "specialized_tests": 29,
-  "specialized_passed": 29,
-  "specialized_overlap_in_related": 23,
-  "total_distinct_tests": 169,
-  "native_ui_checks": 17,
-  "native_ui_passed": 17,
-  "real_engine_battles": 315,
-  "real_engine_claims": 105,
-  "real_engine_exchanges": 105,
-  "balance_verified": false,
-  "enemy_drop_strength_redesign": false,
+  "revision": "2026-10-26-npc-ladder-1",
+  "original_server_balance_reproduced": false,
+  "user_authorized_balance": true,
+  "related_regression_tests": 167,
+  "related_passed": 167,
+  "additional_tier_debit_tests": 1,
+  "additional_tier_debit_passed": 1,
+  "total_distinct_tests": 168,
+  "specialized_tests_in_total": 41,
+  "native_ui_checks": 26,
+  "native_ui_passed": 26,
+  "real_engine_flow_battles": 315,
+  "real_engine_sample_runs": 54,
+  "real_engine_sample_battles": 3174,
+  "real_engine_sample_unresolved": 0,
+  "stage_schedule_rows": 1800,
+  "max_stage_sampled": 120,
+  "stage_limit": null,
   "original_rank_reward_cells_verified": 250,
   "production_save_modified": false,
   "requires_server_restart": true,
+  "test_logs": [
+    "related_tests.log",
+    "bonus_tiers_test.log"
+  ],
   "files": [
     {
       "path": "network_redirect/activity_duty.py",
-      "sha256": "cfbc8fe2206f780c66e6c3bef419b547aeb700c10cc25634d19f6881e1521d7a"
+      "sha256": "40b411c9fb94ae8b3c3e03443532b0d2b21091d4bd563f8b7b9f43823033e1ad"
+    },
+    {
+      "path": "network_redirect/duty_balance.py",
+      "sha256": "d5b9e6e27d7cfbd8a1b1298c88f8f7c592672883b6e27e3aa53182dd96e292fc"
     },
     {
       "path": "network_redirect/activity.py",
-      "sha256": "484a58eabc55f4203b138fb5d627d5976f2b98d21189ce8490b3d3bcc665ade9"
+      "sha256": "e38781580174aaec5cbee181ec96e05fc066397ac46f1f57bb38b066ba6b322e"
     },
     {
-      "path": "network_redirect/backend.py",
-      "sha256": "857018616e83560fb531a108cfea831aeffd6ee2a2a1f597b2629c9de05d91a6"
+      "path": "server_config/duty_rules.json",
+      "sha256": "7abefa1d77f06922cf2ae992967dbaa452bc847927624c0bdd5cad7c0f7da21d"
     },
     {
       "path": "server_config/activity_rules.json",
-      "sha256": "493e3a1c2f7bf35e20a93b2caabaa073e81d9b30370090ba40ca06724980bfae"
+      "sha256": "d07fc275972b8db84e63c3ba827e1cb014e3b7260a2dbe50a904de9c8ef35b37"
+    },
+    {
+      "path": "analysis/npc_design/players/catalog.json",
+      "sha256": "a0febff1a5a68a3d4f053c11c58a4bea24e88912eb9576208759c687030ccba3"
     },
     {
       "path": "tests/test_activity_duty.py",
-      "sha256": "bde7b0e4c799c1f61571efbac22abf5e7961cffbe40736545d3685ac95f9510a"
+      "sha256": "fa846539bf4916af2d45ad8a4944da93f98043a9c2886f07d140fe67a8088521"
+    },
+    {
+      "path": "tests/test_duty_balance.py",
+      "sha256": "b0c16798ac81550a6b4ae1bf640cec904c4d3816f3e32168ac3601162f2baedc"
+    },
+    {
+      "path": "tests/test_daily.py",
+      "sha256": "128c3313e1999b050319c804a6538a42fc2b7f5e2ffcb41c71943f4c0d86978a"
     }
   ]
 }

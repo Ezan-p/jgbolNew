@@ -26,12 +26,16 @@ with tempfile.TemporaryDirectory() as tmp:
     fixtures['win_prize'] = duty.data(role, r, 8)
     duty.update(role, dict(plus_type=3, plus_index=1, flag=0), NOW, r)
     fixtures['exchange'] = duty.data(role, r)
+    fixtures['mixed_exchange'] = copy.deepcopy(fixtures['exchange'])
+    fixtures['mixed_exchange'].update(cur_get_star=108, cur_used_star=0,
+        star_exchange=[dict(field=f, value=5*(i+1), star=9*(i+1)) for i, f in enumerate(duty.FIELDS)])
     index = next(i for i, o in enumerate(d['offers'], 1) if o['star'] <= d['stars']-d['used'])
     duty.update(role, dict(plus_type=2, plus_index=index, flag=0), NOW, r)
     d.update(round=31, stars=270); duty.remember(d); duty.record(role)
     fixtures['stage31'] = duty.data(role, r)
     fixtures['win_next'] = duty.data(role, r, 8)
-    for label, reward in [('bag', [5, 1032, 1, 1]), ('gold', [11, 0, 30, 1])]:
+    for label, reward in [('bag', [5, 1032, 1, 1]), ('silver_bag', [5, 1033, 1, 1]),
+                          ('cloth_bag', [5, 1034, 1, 1]), ('gold', [11, 0, 30, 1])]:
         d.update(phase='prize', pending_rewards=[reward], after_prize='fight')
         fixtures[label+'_prize'] = duty.data(role, r)
         fixtures[label+'_win'] = duty.data(role, r, 8)
@@ -76,7 +80,7 @@ end
 script += '\nlocal fixtures='+summon.lua(fixtures)+'\nlocal rank='+summon.lua(rank)+'\n'
 script += r'''
 for _,name in ipairs({'entry','initial','fight','prize','exchange','stage31','half','exhausted','yesterday',
- 'bag_prize','gold_prize','bag_claimed','gold_claimed'}) do
+ 'bag_prize','gold_prize','bag_claimed','gold_claimed','silver_bag_prize','cloth_bag_prize','mixed_exchange'}) do
  check(name,function() ui.getEndlessFightRes(fixtures[name]) end)
 end
 check('win_prize_return',function() ui.getEndlessFightRes(fixtures.win_prize);ui.showFightRes() end)
@@ -114,4 +118,4 @@ local out={};for _,v in ipairs(results) do out[#out+1]=v.name..':'..tostring(v.o
 return table.concat(out,'\n')
 '''
 (ROOT/'.runtime/duty-fixture.lua').write_text(script)
-print('Built 23 original-client callback checks; no real save or request is changed')
+print('Built 26 original-client callback checks; no real save or request is changed')

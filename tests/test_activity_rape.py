@@ -2,7 +2,7 @@
 import copy
 from unittest.mock import patch
 from tests.test_activity import ActivityCase, NOW
-from network_redirect import activity_rape as rape, activity_land_npc as npcs, activity_rank
+from network_redirect import activity_rape as rape, activity_rape_npc as npcs, activity_rank
 from network_redirect.protocol import decode
 
 

@@ -18,7 +18,13 @@ def create(kind,r):
 def accrue(s,now,r):
     s.setdefault('events',[]);s.setdefault('last_event',now);s.setdefault('events_finished',0)
     elapsed=max(0,now-s['last_event']);ticks=elapsed//r['abyss_event_seconds']
-    for _ in range(min(ticks,5-len(s['events']))):s['events'].append(create(secrets.randbelow(5)+1,r))
+    count=min(ticks,5-len(s['events']))
+    for _ in range(count):s['events'].append(create(secrets.randbelow(5)+1,r))
+    if count:
+        from .activity_abyss import news
+        # The client updates its event badge only for type-4 tips.
+        news(s,'九幽随机事件已积累，请及时查看。',now)
+        s['news'][-1]['tip_type']=s['pending_news'][-1]['tip_type']=4
     if ticks:s['last_event']=now-elapsed%r['abyss_event_seconds']
 
 
@@ -35,7 +41,7 @@ def view(e,r):
 
 
 def settle(role,s,d,now,r,jrules):
-    from .activity_abyss import response
+    from .activity_abyss import response, grant, news
     op=d.get('op_type');a.require(type(op)is int and op in (0,1,2),'随机事件操作无效')
     a.require(s['events'],'暂无随机事件')
     e=s['events'][0];kind=e['kind'];data=view(e,r);packets=[];done=False;won=False
@@ -78,8 +84,11 @@ def settle(role,s,d,now,r,jrules):
             role['activity']['fight_id']+=1;fid=role['activity']['fight_id']
             packets=journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name='魂仙',lineup_count=len(lineup),lineup=lineup)),
                 encode(1027,dict(fight_id=fid,fight_type=25,final_result=result,fight_round=len(actions),fight_result=actions))]
-    if won:data['prize_list']=a.prizes(role,[copy.deepcopy(secrets.choice(r['abyss_event_rewards']))])
-    if done:s['events'].pop(0);s['events_finished']+=1
+    if won:data['prize_list']=grant(role,s,[copy.deepcopy(secrets.choice(r['abyss_event_rewards']))])
+    if done:
+        s['events'].pop(0);s['events_finished']+=1
+        news(s,'随机事件已结束，剩余'+str(len(s['events']))+'个。',now)
+        s['news'][-1]['tip_type']=s['pending_news'][-1]['tip_type']=4
     packets.append(response(4,event_data=data))
     if kind==3 and op==1:packets.append(summon.event(44,dict(fight_id=fid,fight_type=25)))
     return packets

@@ -271,6 +271,7 @@ def track(role, before, mid, req, now):
     if mid == 1029 and a.get('rape_refreshes', 0) > b.get('rape_refreshes', 0):
         if any(int(f.SKILLS.get(board['skill_type'], {}).get('quality', 0)) == 5 for board in a.get('rape_boards', [])):
             add(role, 321)
+    if a.get('convert_total', 0) > b.get('convert_total', 0): add(role, 106)
     if (a.get('pray_total', 0) > b.get('pray_total', 0) or
             role.get('pray_spirit_times', 0) > before.get('pray_spirit_times', 0)): add(role, 109)
     if (a.get('duty') or {}).get('phase') == 'finished' and (b.get('duty') or {}).get('phase') != 'finished': add(role, 104)

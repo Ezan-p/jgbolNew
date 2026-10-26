@@ -68,7 +68,8 @@ class ActivityTests(ActivityCase):
         self.assertEqual(self.req(1085,object_count=2,object_list=[row,row])[0][0],55);self.assertEqual(before,self.b.profile())
         self.assertEqual(self.req(1085,object_count=1,object_list=[dict(object_type=4,object_id=r['corteges'][0]['id'],count=1)])[0][0],55)
         self.assertEqual(before,self.b.profile())
-    def test_training_win_updates_bonus_and_exhaustion(self):
+    @patch('network_redirect.activity_practice.draw', return_value='hp')
+    def test_training_win_updates_bonus_and_exhaustion(self, _draw):
         r=self.b.profile();r['rule_index']=55;self.b.save(r)
         hp=self.b.profile()['corteges'][0]['hp']
         self.ok(self.req(1026,fight_type=4,des_type=1,des_id=0,des_value=0))

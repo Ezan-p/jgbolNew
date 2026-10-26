@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT))
-from network_redirect import activity, activity_rape as rape, activity_land_npc as npcs
+from network_redirect import activity, activity_rape as rape, activity_rape_npc as npcs
 from network_redirect.backend import Backend
 from network_redirect.protocol import decode
 

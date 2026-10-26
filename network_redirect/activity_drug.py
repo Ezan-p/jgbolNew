@@ -75,7 +75,9 @@ def settle(role,s,op,d,r):
             # [B] Deterministic grade bands make the absent quality distribution
             # reproducible; only real item variants are emitted.
             grade=min(3,max(0,role['drug_level']-int(row['min_level']))//r['drug_quality_level_step'])
-            tid=int(row['attach_type'])+grade
+            # [A] Essence drugs are interleaved by family: 1597/1617/1637/1657,
+            # whereas ordinary attribute drugs use four consecutive IDs.
+            tid=int(row['attach_type'])+grade*(20 if int(row['type'])==5 else 1)
             a.require(tid in formation.ITEMS,'药品产出未配置')
             extra['drug_item']=a.prizes(role,[[5,tid,1,1]])
             add_exp(role,r['drug_craft_exp'])

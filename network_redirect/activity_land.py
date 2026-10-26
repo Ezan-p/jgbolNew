@@ -25,7 +25,10 @@ def state(role,now,r):
     s=role['activity'].setdefault('land',dict(map_level=1,soul_count=0,grid_count=2,boss_layer=0,
         inv_boss_layer=0,total_score=0,tower_id=0,charms={},bag={},travel=None,day=-1,boss=None,hell=None,
         history={},inv_history={},auto_tower=0,unlocked=[]))
+    a.require(a.day(now,r)>=s['day'] and now>=s.get('clock',0),'猎魂之地时间已回退，请恢复本地时间')
+    s['clock']=now
     s.setdefault('team', None)
+    npc.migrate(role,s)
     s.setdefault('week',(a.day(now,r)-4)//7)
     if s['tower_id']:
         t=s['towers'][str(s['tower_id'])]
@@ -33,7 +36,7 @@ def state(role,now,r):
         gained=min(t['left_soul'],n*r['land_tower_soul'])
         gain(s,gained);t['left_soul']-=gained;t['last_tick']+=n*r['land_tower_tick']
         if gained:news(s,now,f'占塔获得{gained}魂力。')
-        if now>=t['expire'] or not t['left_soul']:t['owner_type']=2;t['owner_name']='守塔者';s['tower_id']=0
+        if now>=t['expire'] or not t['left_soul']:t['owner_type']=2;t['owner_name']=npc.catalog()[t['npc_id']]['role']['name'];s['tower_id']=0
     weekly(role,s,now,r)
     if s['day']!=a.day(now,r):
         s.update(day=a.day(now,r),travel_count=0,attack_count=0,hell_counts={},swept=False,tower_id=0,towers={},travel=None)
@@ -50,6 +53,10 @@ def state(role,now,r):
         if str(i) in s['charms'] and s['boss_layer']>=int(row['need_boss']):s['charms'][str(i)]['unlock']=True
         if int(row['auto_open']) and s['boss_layer']>=int(row['need_boss']):
             s['charms'].setdefault(str(i),dict(unlock=True,is_open=True,key=0,value=0))
+    from .activity_land_boss import migrate_scores
+    migrate_scores(s)
+    from .activity_land_rewards import titles
+    titles(role,s,now)
     return s
 
 
@@ -68,7 +75,7 @@ def info(s,r):
         inv_boss_layer=s['inv_boss_layer'],total_score=s['total_score'],tower_id=s['tower_id'],had_news=s.get('had_news',False),
         left_travel_count=r['land_daily_travel']-s['travel_count'],max_travel_count=r['land_daily_travel'],
         left_attack_count=r['land_daily_attack']-s['attack_count'],max_attack_count=r['land_daily_attack'],
-        charm_plus=plus,auto_tower=s['auto_tower'],is_clear=s['boss_layer']>=r['land_boss_layers'],is_inv_clear=s['inv_boss_layer']>=r['land_boss_layers'])
+        charm_plus=plus,max_level_score=3000,auto_tower=s['auto_tower'],is_clear=s['boss_layer']>=r['land_boss_layers'],is_inv_clear=s['inv_boss_layer']>=r['land_boss_layers'])
 
 
 def response(op,s,r,**data):return summon.event(149,dict(flag=op,prey_info=info(s,r),**data))
@@ -82,11 +89,13 @@ def travel(s,r,role):
     a.require(s['travel_count']<r['land_daily_travel'],'今日游历次数已用完')
     s['travel_count']+=1
     n=secrets.choice(list(map(int,MAPS[s['map_level']]['count_list'].split('|'))))
-    s['travel']=[npc.view(npc.choose(role,s,i-1),s['grid_count'],942000+i,r['land_travel_soul']) for i in range(1,n+1)]
+    keys=[]
+    for i in range(n):keys.append(npc.choose(role,s,i,excluded=keys))
+    s['travel']=[npc.view(key,s['grid_count'],942001+i,r['land_travel_soul']) for i,key in enumerate(keys)]
 
 
 def simulate(role,s,r,jrules,level,count=1,cur_num=None,target=None,team=False):
-    a.require(any(c.get('order') for c in role['corteges']),'请先上阵神仙')
+    a.require(any(1<=c.get('order',0)<=8 for c in role['corteges']),'请先上阵神仙')
     ours,enemies=journey.fighters(role,dict(cortege_list='/'.join([f"{r['battle_npc']}|{level}"]*count)))
     ours=ours[:cur_num or s['grid_count']]
     if target:
@@ -97,6 +106,9 @@ def simulate(role,s,r,jrules,level,count=1,cur_num=None,target=None,team=False):
         for m in members:
             group=player_units if m['id']==role['role_id'] else npc.units(m['npc_id'],limit)
             for u in group:
+                # Snapshot companion IDs overlap accounts; keep NPC traits from
+                # being overwritten by the player's essence/star attachment pass.
+                if m['id']!=role['role_id']:u['companion_id']=-(len(ours)+1)
                 u['order']=len(ours)+1;ours.append(u)
     for u in ours:
         for i,key in enumerate(('gongji','fangyu','hp','magic'),1):u[key]=u[key]*(100+info(s,r)['charm_plus'][i])//100
@@ -126,11 +138,15 @@ def tower_view(role,s,t,now,r):
     t.setdefault('npc_id',npc.choose(role,s,(t['position']-1)%3,fixed=True))
     defender=npc.view(t['npc_id'],s['grid_count'],940100+t['id'])
     if not owned:t['owner_name']=defender['name']
-    players=([dict(member(role,s),had_soulcount=0)] if owned else [defender])
+    if owned and s.get('team') and t['tower_type']==1:
+        count=min(s['grid_count'],8//len(s['team']['members']))
+        players=[dict(member(role,dict(s,grid_count=count)) if m['id']==role['role_id'] else npc.view(m['npc_id'],count,m['id']),had_soulcount=0) for m in s['team']['members']]
+    else:players=([dict(member(role,s),had_soulcount=0)] if owned else [defender])
+    head=players[0]
     return dict(t,player_list=players,is_owner=owned,end_time=t['expire'],role_list=[],
         owner_id=role['role_id'] if owned else defender['id'],fps_count=r['land_tower_soul'],
-        soul_speed=r['land_tower_soul'],expect_soul=t['left_soul'],fight_power=defender['fight_power'],
-        cortege_count=defender['cortege_count'],type_id=defender['type_id'],cortege_layer=defender['cortege_layer'])
+        soul_speed=r['land_tower_soul'],expect_soul=t['left_soul'],fight_power=sum(m.get('power',0) for m in players),
+        cortege_count=sum(m['cortege_count'] for m in players),type_id=head['type_id'],cortege_layer=head['cortege_layer'])
 
 
 def settle(role,req,now,r,jrules,parse):
@@ -199,7 +215,7 @@ def settle(role,req,now,r,jrules,parse):
         return [response(21,s,r)]
     if op in (18,27):
         flag=d.get('flag',1);a.require(type(flag)is int and flag in (1,2),'榜单参数无效')
-        rows,mine=npc.ranking(role,s,op==27,flag)
+        rows,mine=npc.ranking(role,s,op==27,flag,now,r)
         return [response(op,s,r,top_flag=flag,top_data=rows,my_top_data=mine)]
     if op in (5,11,16) or op==4 and d.get('des_type')==2:
         a.require(status(now,r)['cur_status']==3,'尚未到占塔时段');towers(s,now,r)
@@ -207,7 +223,7 @@ def settle(role,req,now,r,jrules,parse):
         a.require(type(tid)is int and tid in [s['map_level']*10+i for i in range(1,5)],'塔不存在');t=s['towers'][str(tid)]
         if op==11:return [response(11,s,r,tower_info=tower_view(role,s,t,now,r))]
         if op==5:
-            a.require(s['tower_id']==tid,'尚未占领此塔');s['tower_id']=0;t['owner_type']=2;t['owner_name']='守塔者'
+            a.require(s['tower_id']==tid,'尚未占领此塔');s['tower_id']=0;t['owner_type']=2;t['owner_name']=npc.catalog()[t['npc_id']]['role']['name']
             return [response(5,s,r,tower_id=tid)]
         a.require(not s['tower_id'] and t['left_soul']>0,'已占塔或塔内魂力耗尽')
         a.require(s['attack_count']<r['land_daily_attack'],'今日攻塔次数已用完')

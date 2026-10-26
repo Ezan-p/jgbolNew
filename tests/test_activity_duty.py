@@ -426,3 +426,17 @@ class DutyTests(ActivityCase):
         self.assertEqual(d['offers'], saved['offers'])
         self.assertFalse(duty.pending(d))
 
+    def test_each_bonus_tier_debits_its_saved_cost_and_value(self):
+        self.start()
+        for index, tier in enumerate(balance.rules()['bonus_tiers']):
+            r = self.b.profile(); d = r['activity']['duty']
+            d.update(phase='exchange', stars=108, used=0, bonus=[0]*4)
+            with patch.object(balance, 'weighted', return_value=tier):
+                d['offers'] = balance.offers(108)
+            self.b.save(r)
+            self.info(plus_type=2, plus_index=index+1)
+            d = self.b.profile()['activity']['duty']
+            self.assertEqual(d['used'], tier['star'])
+            self.assertEqual(d['bonus'][index], tier['value'])
+            self.assertEqual(sum(d['bonus']), tier['value'])
+

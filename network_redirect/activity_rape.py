@@ -3,7 +3,7 @@ import copy
 import secrets
 import json
 from functools import lru_cache
-from . import activity as a, activity_land_npc as npcs, activity_rank, formation, journey, summon, cheer, combat, reborn_stars
+from . import activity as a, activity_rape_npc as npcs, activity_rank, formation, journey, summon, cheer, combat, reborn_stars
 from .protocol import encode
 
 
@@ -13,6 +13,7 @@ def rules():
     a.require(r['mode']=='inferred' and len(r['power_percent'])==3 and all(type(v)is int and 1<=v<=150 for v in r['power_percent']), '渡劫匹配配置无效')
     a.require(r.get('guards_from_dice') is True and 1<=r['straight_skill_count']<=10 and r['triple_auto_pass'] is False, '渡劫奖盘配置无效')
     a.require(1<=r['revenge_lifetime']<=86400 and set(r['skill_quality_weights'])==set('12345') and all(type(v)is int and 1<=v<=100 for v in r['skill_quality_weights'].values()), '渡劫奖池配置无效')
+    a.require(all(type(r.get(k)) is int and 1<=r[k]<=100 for k in ('match_candidates','match_tolerance_percent','recent_npc_limit')), '渡劫NPC随机池配置无效')
     return r
 
 
@@ -20,22 +21,14 @@ def roll_forms():
     return [secrets.randbelow(6)+1 for _ in range(3)]
 
 
-def choose(role, index, excluded=()):
-    own = max(1, sum(c.get('combat_power', 0) for c in role['corteges'] if 1 <= c.get('order', 0) <= 8))
-    target = own * rules()['power_percent'][index % 3] // 100
-    pool = [n for n in npcs.catalog().values() if n['role']['level'] <= role['level'] and n['npc_id'] not in excluded]
-    a.require(bool(pool), '没有符合等级的渡劫NPC')
-    pool.sort(key=lambda n: (abs(n['role']['role_combat_power']-target), abs(n['role']['level']-role['level']), n['npc_id']))
-    # Small variation within a close-power window; never multiply final stats.
-    best = abs(pool[0]['role']['role_combat_power']-target)
-    candidates = [n for n in pool[:3] if abs(n['role']['role_combat_power']-target) <= best+max(1,target//10)]
-    return secrets.choice(candidates)['npc_id']
+def choose(role, index, excluded=(), used=()):
+    return npcs.choose(role, index, rules(), excluded, used)
 
 
-def opponent(role, index, excluded=()):
-    key = choose(role, index, excluded); n = npcs.catalog()[key]['role']
+def opponent(role, index, excluded=(), used=()):
+    key = choose(role, index, excluded, used); n = npcs.catalog()[key]['role']
     head = next(c for c in n['corteges'] if c.get('order') == 1)
-    return dict(npc_id=key, show_type=head['type'], level=n['level'], name=n['role_name'],
+    return dict(npc_id=key, npc_player_id=n['role_id'], show_type=head['type'], level=n['level'], name=n['role_name'],
                 has_win=False, top_order=0, cortege_layer=head.get('evolve_level',0), power=n['role_combat_power'])
 
 
@@ -59,14 +52,15 @@ def ensure(role, now, r):
         dice = roll_forms()
         straight = dice[1]-dice[0] == dice[2]-dice[1] and abs(dice[1]-dice[0]) == 1
         pool = reward_pool() or r['rape_skills']
-        boards=[]
+        boards=[];used=[]
         for i in range(3):
             rows={}
             for j in range(dice[i]):
-                target=opponent(role,j);target.update(index=j+1,rand=6-j);rows[str(next_id(s))]=target
+                target=opponent(role,j,used=used);used.append(target['npc_id']);target.update(index=j+1,rand=6-j);rows[str(next_id(s))]=target
             boards.append(dict(version=2,form_type=dice[i],skill_type=secrets.choice(pool),skill_count=rules()['straight_skill_count'] if straight else 1,
                                reward_claimed=False,form_list={'1':{},'2':rows}))
         s['rape_boards']=boards
+        npcs.remember(role,used,rules())
     # Upgrade old boards in place without erasing victories or issuing rewards again.
     for i,b in enumerate(boards):
         if b.get('version',1)<2:
@@ -164,12 +158,14 @@ def settle(role,mid,req,now,r,jrules,parse):
     if mid==1041:
         idx=req['form_index'];a.require(1<=idx<=3,'阵位无效');rows=s['rape_boards'][idx-1]['form_list'].get(str(req['object_type']),{})
         key=str(int(req['object_id']));old=rows.get(key);a.require(old is not None and not old['has_win'],'不可刷新该对手')
-        new=opponent(role,list(rows).index(key),[old['npc_id']]);a.spend(role,'gold_coin',r['rape_single_refresh_gold'])
+        used=[t['npc_id'] for b in s['rape_boards'] for group in b['form_list'].values() for t in group.values()]
+        new=opponent(role,list(rows).index(key),[old['npc_id']],used);a.spend(role,'gold_coin',r['rape_single_refresh_gold'])
         new.update(index=old['index'],rand=old['rand'])
         ident=next_id(s)
         # Preserve visual slot ordering across refreshes and subsequent sweeps.
         replaced={str(ident) if k==key else k:new if k==key else v for k,v in rows.items()}
         rows.clear();rows.update(replaced)
+        npcs.remember(role,[new['npc_id']],rules())
         return [summon.event(40,dict(update_type=5,form_index=idx,old_type=req['object_type'],old_id=req['object_id'],new_type=req['object_type'],new_id=ident,new_show_type=new['show_type'],new_top_order=0,new_level=new['level'],new_name=new['name'],cortege_layer=new['cortege_layer']))]
     a.require(mid==1072 and (role['level']>=25 or role.get('vip_level',0)>=5),'渡劫扫荡需25级或VIP5')
     pending=[(i,t,int(k),j) for i,b in enumerate(s['rape_boards'],1) for t,rows in b['form_list'].items() for j,(k,v) in enumerate(rows.items(),1) if not v['has_win']][:role['energy']]

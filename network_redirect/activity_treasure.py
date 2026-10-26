@@ -16,7 +16,8 @@ def view(tid,board,r,op):
 
 
 def grant(role,goods):
-    return a.prizes(role,[[p['object_type'],p['attach_type'],p['attach_count'],p['attach_level']] for p in goods])
+    from .activity_abyss import grant as award
+    return award(role,role['activity']['abyss'],[[p['object_type'],p['attach_type'],p['attach_count'],p['attach_level']] for p in goods])
 
 
 def settle(role,s,op,d,now,r):
@@ -41,6 +42,7 @@ def settle(role,s,op,d,now,r):
         if not board or board['draws']>r['abyss_map_paid_draws']:
             a.require(any(i['attach_type']==5 and i['type_id']==tid and i['count']>0 for i in role['attachments']),'九幽宝图不足')
             board=dict(draws=0,goods=pool(tid,r),quick=marks.get(key,False));maps[key]=board
+        if role.get('month_card_time',0)<=now:board['quick']=False;marks[key]=False
         return [response(3,event_data=view(tid,board,r,1))]
     a.require(board is not None,'请先打开宝图')
     if operation in (5,6):

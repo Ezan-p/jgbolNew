@@ -162,11 +162,13 @@ class DailyTests(unittest.TestCase):
         self.req(1302,id=3,data='{}');self.assertEqual(self.points(7),2)
         self.req(1302,id=3,data='{}');self.assertEqual(self.points(7),2)
         self.req(1043,flag=0);self.req(1043,plus_type=1,plus_index=1)
-        for _ in range(100):
+        for _ in range(400):
             d=self.role()['activity']['duty']
             if d['phase']=='finished':break
-            if d.get('pending_silver',0):self.req(1043,plus_type=3)
-            elif d['phase']=='exchange':self.req(1043,plus_type=2,plus_index=1)
+            if d['phase']=='prize':self.req(1043,plus_type=3)
+            elif d['phase']=='exchange':
+                index=next(i for i,o in enumerate(d['offers'],1) if o['star']<=d['stars']-d['used'])
+                self.req(1043,plus_type=2,plus_index=index)
             else:self.req(1026,fight_type=5,des_type=3,des_value=d['round'])
         self.assertEqual(self.role()['activity']['duty']['phase'],'finished')
         self.assertEqual(self.points(4),10)
