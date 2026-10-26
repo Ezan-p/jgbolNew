@@ -1,0 +1,738 @@
+{
+  "official_server_available": false,
+  "classification": {
+    "A": [
+      "13级入口",
+      "10次免费、5次付费（worldBossUI 62—63行）",
+      "鼓舞价格5×(已购次数+1)",
+      "周一00:00、周榜前100名领奖",
+      "1049/1201/1202原请求及28/29/30/31/32/141事件",
+      "日伤害榜、福星、NPC阵容查看、排行榜点赞"
+    ],
+    "B": [
+      "全天开放",
+      "99名本地NPC及确定性参与模拟",
+      "1000万血首领循环刷新",
+      "伤害、幸运点公式及奖励数量",
+      "每日榜自动入包与未领周奖保留",
+      "节日材料轮换掉落"
+    ]
+  },
+  "files": [
+    {
+      "path": "analysis/evidence/lua_named/lua/ui/worldBossUI.lua.txt",
+      "sha256": "6c51ae4fde1709b9517f6cde16ea592f929b174422c73fce0bec97e48b3d2049"
+    },
+    {
+      "path": "analysis/evidence/lua_named/lua/ui/activityUI.lua.txt",
+      "sha256": "1a4addc2d3ab6595317bd79a9dba1bd946c5422c875e6fd79562625e16d394f3"
+    },
+    {
+      "path": "analysis/npc_design/v1/catalog.json",
+      "sha256": "9dfa5bcde73c25026b57e5674d6b931c2cdd284df79c77c153b65a7829ed4f53"
+    },
+    {
+      "path": "server_config/party_rules.json",
+      "sha256": "795ea5d81024503a5b8a9a99230265d0ae28a5ac79d9bf3e7377f78edfcba658"
+    },
+    {
+      "path": "server_config/activity_rules.json",
+      "sha256": "ef2025a24dcc8c293214fb6bae1a2970876d4ee0703b92f29564d0212f1ea5f6"
+    }
+  ],
+  "npcs": [
+    {
+      "id": 950001,
+      "npc_id": "npc_v1_l18_t5_endurance",
+      "name": "离线·18·T5·固守续航",
+      "level": 18,
+      "power": 11427
+    },
+    {
+      "id": 950002,
+      "npc_id": "npc_v1_l18_t5_magic",
+      "name": "离线·18·T5·法术群攻",
+      "level": 18,
+      "power": 11726
+    },
+    {
+      "id": 950003,
+      "npc_id": "npc_v1_l24_t5_endurance",
+      "name": "离线·24·T5·固守续航",
+      "level": 24,
+      "power": 15740
+    },
+    {
+      "id": 950004,
+      "npc_id": "npc_v1_l24_t5_attack",
+      "name": "离线·24·T5·强袭快攻",
+      "level": 24,
+      "power": 16447
+    },
+    {
+      "id": 950005,
+      "npc_id": "npc_v1_l18_t4_magic",
+      "name": "离线·18·T4·法术群攻",
+      "level": 18,
+      "power": 17988
+    },
+    {
+      "id": 950006,
+      "npc_id": "npc_v1_l18_t4_attack",
+      "name": "离线·18·T4·强袭快攻",
+      "level": 18,
+      "power": 20345
+    },
+    {
+      "id": 950007,
+      "npc_id": "npc_v1_l30_t5_magic",
+      "name": "离线·30·T5·法术群攻",
+      "level": 30,
+      "power": 22013
+    },
+    {
+      "id": 950008,
+      "npc_id": "npc_v1_l30_t5_attack",
+      "name": "离线·30·T5·强袭快攻",
+      "level": 30,
+      "power": 22446
+    },
+    {
+      "id": 950009,
+      "npc_id": "npc_v1_l36_t5_endurance",
+      "name": "离线·36·T5·固守续航",
+      "level": 36,
+      "power": 27387
+    },
+    {
+      "id": 950010,
+      "npc_id": "npc_v1_l36_t5_magic",
+      "name": "离线·36·T5·法术群攻",
+      "level": 36,
+      "power": 27862
+    },
+    {
+      "id": 950011,
+      "npc_id": "npc_v1_l36_t5_attack",
+      "name": "离线·36·T5·强袭快攻",
+      "level": 36,
+      "power": 28604
+    },
+    {
+      "id": 950012,
+      "npc_id": "npc_v1_l18_t3_magic",
+      "name": "离线·18·T3·法术群攻",
+      "level": 18,
+      "power": 31155
+    },
+    {
+      "id": 950013,
+      "npc_id": "npc_v1_l50_t5_endurance",
+      "name": "离线·50·T5·固守续航",
+      "level": 50,
+      "power": 35079
+    },
+    {
+      "id": 950014,
+      "npc_id": "npc_v1_l50_t5_magic",
+      "name": "离线·50·T5·法术群攻",
+      "level": 50,
+      "power": 35727
+    },
+    {
+      "id": 950015,
+      "npc_id": "npc_v1_l30_t4_magic",
+      "name": "离线·30·T4·法术群攻",
+      "level": 30,
+      "power": 36032
+    },
+    {
+      "id": 950016,
+      "npc_id": "npc_v1_l30_t4_endurance",
+      "name": "离线·30·T4·固守续航",
+      "level": 30,
+      "power": 37492
+    },
+    {
+      "id": 950017,
+      "npc_id": "npc_v1_l60_t5_endurance",
+      "name": "离线·60·T5·固守续航",
+      "level": 60,
+      "power": 40360
+    },
+    {
+      "id": 950018,
+      "npc_id": "npc_v1_l60_t5_magic",
+      "name": "离线·60·T5·法术群攻",
+      "level": 60,
+      "power": 41111
+    },
+    {
+      "id": 950019,
+      "npc_id": "npc_v1_l65_t5_endurance",
+      "name": "离线·65·T5·固守续航",
+      "level": 65,
+      "power": 42763
+    },
+    {
+      "id": 950020,
+      "npc_id": "npc_v1_l65_t5_magic",
+      "name": "离线·65·T5·法术群攻",
+      "level": 65,
+      "power": 43586
+    },
+    {
+      "id": 950021,
+      "npc_id": "npc_v1_l65_t5_attack",
+      "name": "离线·65·T5·强袭快攻",
+      "level": 65,
+      "power": 44722
+    },
+    {
+      "id": 950022,
+      "npc_id": "npc_v1_l80_t5_endurance",
+      "name": "离线·80·T5·固守续航",
+      "level": 80,
+      "power": 45335
+    },
+    {
+      "id": 950023,
+      "npc_id": "npc_v1_l80_t5_magic",
+      "name": "离线·80·T5·法术群攻",
+      "level": 80,
+      "power": 46248
+    },
+    {
+      "id": 950024,
+      "npc_id": "npc_v1_l90_t5_endurance",
+      "name": "离线·90·T5·固守续航",
+      "level": 90,
+      "power": 46465
+    },
+    {
+      "id": 950025,
+      "npc_id": "npc_v1_l99_t5_endurance",
+      "name": "离线·99·T5·固守续航",
+      "level": 99,
+      "power": 47308
+    },
+    {
+      "id": 950026,
+      "npc_id": "npc_v1_l80_t5_attack",
+      "name": "离线·80·T5·强袭快攻",
+      "level": 80,
+      "power": 47363
+    },
+    {
+      "id": 950027,
+      "npc_id": "npc_v1_l18_t2_magic",
+      "name": "离线·18·T2·法术群攻",
+      "level": 18,
+      "power": 47484
+    },
+    {
+      "id": 950028,
+      "npc_id": "npc_v1_l90_t5_attack",
+      "name": "离线·90·T5·强袭快攻",
+      "level": 90,
+      "power": 48492
+    },
+    {
+      "id": 950029,
+      "npc_id": "npc_v1_l24_t3_endurance",
+      "name": "离线·24·T3·固守续航",
+      "level": 24,
+      "power": 48911
+    },
+    {
+      "id": 950030,
+      "npc_id": "npc_v1_l18_t2_endurance",
+      "name": "离线·18·T2·固守续航",
+      "level": 18,
+      "power": 49931
+    },
+    {
+      "id": 950031,
+      "npc_id": "npc_v1_l36_t4_endurance",
+      "name": "离线·36·T4·固守续航",
+      "level": 36,
+      "power": 54753
+    },
+    {
+      "id": 950032,
+      "npc_id": "npc_v1_l24_t3_attack",
+      "name": "离线·24·T3·强袭快攻",
+      "level": 24,
+      "power": 55119
+    },
+    {
+      "id": 950033,
+      "npc_id": "npc_v1_l36_t4_attack",
+      "name": "离线·36·T4·强袭快攻",
+      "level": 36,
+      "power": 61237
+    },
+    {
+      "id": 950034,
+      "npc_id": "npc_v1_l30_t3_endurance",
+      "name": "离线·30·T3·固守续航",
+      "level": 30,
+      "power": 68835
+    },
+    {
+      "id": 950035,
+      "npc_id": "npc_v1_l50_t4_magic",
+      "name": "离线·50·T4·法术群攻",
+      "level": 50,
+      "power": 69066
+    },
+    {
+      "id": 950036,
+      "npc_id": "npc_v1_l24_t2_magic",
+      "name": "离线·24·T2·法术群攻",
+      "level": 24,
+      "power": 74500
+    },
+    {
+      "id": 950037,
+      "npc_id": "npc_v1_l24_t2_endurance",
+      "name": "离线·24·T2·固守续航",
+      "level": 24,
+      "power": 77526
+    },
+    {
+      "id": 950038,
+      "npc_id": "npc_v1_l50_t4_attack",
+      "name": "离线·50·T4·强袭快攻",
+      "level": 50,
+      "power": 79374
+    },
+    {
+      "id": 950039,
+      "npc_id": "npc_v1_l60_t4_endurance",
+      "name": "离线·60·T4·固守续航",
+      "level": 60,
+      "power": 82496
+    },
+    {
+      "id": 950040,
+      "npc_id": "npc_v1_l18_t1_magic",
+      "name": "离线·18·T1·法术群攻",
+      "level": 18,
+      "power": 87020
+    },
+    {
+      "id": 950041,
+      "npc_id": "npc_v1_l70_t4_magic",
+      "name": "离线·70·T4·法术群攻",
+      "level": 70,
+      "power": 87344
+    },
+    {
+      "id": 950042,
+      "npc_id": "npc_v1_l80_t4_magic",
+      "name": "离线·80·T4·法术群攻",
+      "level": 80,
+      "power": 90150
+    },
+    {
+      "id": 950043,
+      "npc_id": "npc_v1_l60_t4_attack",
+      "name": "离线·60·T4·强袭快攻",
+      "level": 60,
+      "power": 91247
+    },
+    {
+      "id": 950044,
+      "npc_id": "npc_v1_l90_t4_magic",
+      "name": "离线·90·T4·法术群攻",
+      "level": 90,
+      "power": 92848
+    },
+    {
+      "id": 950045,
+      "npc_id": "npc_v1_l80_t4_endurance",
+      "name": "离线·80·T4·固守续航",
+      "level": 80,
+      "power": 93543
+    },
+    {
+      "id": 950046,
+      "npc_id": "npc_v1_l90_t4_endurance",
+      "name": "离线·90·T4·固守续航",
+      "level": 90,
+      "power": 96423
+    },
+    {
+      "id": 950047,
+      "npc_id": "npc_v1_l65_t4_attack",
+      "name": "离线·65·T4·强袭快攻",
+      "level": 65,
+      "power": 96451
+    },
+    {
+      "id": 950048,
+      "npc_id": "npc_v1_l99_t4_endurance",
+      "name": "离线·99·T4·固守续航",
+      "level": 99,
+      "power": 98935
+    },
+    {
+      "id": 950049,
+      "npc_id": "npc_v1_l70_t4_attack",
+      "name": "离线·70·T4·强袭快攻",
+      "level": 70,
+      "power": 99726
+    },
+    {
+      "id": 950050,
+      "npc_id": "npc_v1_l80_t4_attack",
+      "name": "离线·80·T4·强袭快攻",
+      "level": 80,
+      "power": 103105
+    },
+    {
+      "id": 950051,
+      "npc_id": "npc_v1_l30_t2_magic",
+      "name": "离线·30·T2·法术群攻",
+      "level": 30,
+      "power": 105405
+    },
+    {
+      "id": 950052,
+      "npc_id": "npc_v1_l99_t4_attack",
+      "name": "离线·99·T4·强袭快攻",
+      "level": 99,
+      "power": 108446
+    },
+    {
+      "id": 950053,
+      "npc_id": "npc_v1_l36_t3_attack",
+      "name": "离线·36·T3·强袭快攻",
+      "level": 36,
+      "power": 113978
+    },
+    {
+      "id": 950054,
+      "npc_id": "npc_v1_l18_t1_attack",
+      "name": "离线·18·T1·强袭快攻",
+      "level": 18,
+      "power": 120278
+    },
+    {
+      "id": 950055,
+      "npc_id": "npc_v1_l50_t3_endurance",
+      "name": "离线·50·T3·固守续航",
+      "level": 50,
+      "power": 136271
+    },
+    {
+      "id": 950056,
+      "npc_id": "npc_v1_l30_t2_attack",
+      "name": "离线·30·T2·强袭快攻",
+      "level": 30,
+      "power": 138853
+    },
+    {
+      "id": 950057,
+      "npc_id": "npc_v1_l24_t1_endurance",
+      "name": "离线·24·T1·固守续航",
+      "level": 24,
+      "power": 145374
+    },
+    {
+      "id": 950058,
+      "npc_id": "npc_v1_l36_t2_endurance",
+      "name": "离线·36·T2·固守续航",
+      "level": 36,
+      "power": 159440
+    },
+    {
+      "id": 950059,
+      "npc_id": "npc_v1_l60_t3_magic",
+      "name": "离线·60·T3·法术群攻",
+      "level": 60,
+      "power": 168883
+    },
+    {
+      "id": 950060,
+      "npc_id": "npc_v1_l60_t3_endurance",
+      "name": "离线·60·T3·固守续航",
+      "level": 60,
+      "power": 178758
+    },
+    {
+      "id": 950061,
+      "npc_id": "npc_v1_l70_t3_magic",
+      "name": "离线·70·T3·法术群攻",
+      "level": 70,
+      "power": 189138
+    },
+    {
+      "id": 950062,
+      "npc_id": "npc_v1_l80_t3_magic",
+      "name": "离线·80·T3·法术群攻",
+      "level": 80,
+      "power": 196812
+    },
+    {
+      "id": 950063,
+      "npc_id": "npc_v1_l30_t1_magic",
+      "name": "离线·30·T1·法术群攻",
+      "level": 30,
+      "power": 199502
+    },
+    {
+      "id": 950064,
+      "npc_id": "npc_v1_l70_t3_endurance",
+      "name": "离线·70·T3·固守续航",
+      "level": 70,
+      "power": 200499
+    },
+    {
+      "id": 950065,
+      "npc_id": "npc_v1_l90_t3_magic",
+      "name": "离线·90·T3·法术群攻",
+      "level": 90,
+      "power": 206619
+    },
+    {
+      "id": 950066,
+      "npc_id": "npc_v1_l24_t1_attack",
+      "name": "离线·24·T1·强袭快攻",
+      "level": 24,
+      "power": 209651
+    },
+    {
+      "id": 950067,
+      "npc_id": "npc_v1_l99_t3_magic",
+      "name": "离线·99·T3·法术群攻",
+      "level": 99,
+      "power": 213055
+    },
+    {
+      "id": 950068,
+      "npc_id": "npc_v1_l65_t3_attack",
+      "name": "离线·65·T3·强袭快攻",
+      "level": 65,
+      "power": 214340
+    },
+    {
+      "id": 950069,
+      "npc_id": "npc_v1_l90_t3_endurance",
+      "name": "离线·90·T3·固守续航",
+      "level": 90,
+      "power": 220782
+    },
+    {
+      "id": 950070,
+      "npc_id": "npc_v1_l99_t3_endurance",
+      "name": "离线·99·T3·固守续航",
+      "level": 99,
+      "power": 228255
+    },
+    {
+      "id": 950071,
+      "npc_id": "npc_v1_l90_t3_attack",
+      "name": "离线·90·T3·强袭快攻",
+      "level": 90,
+      "power": 248640
+    },
+    {
+      "id": 950072,
+      "npc_id": "npc_v1_l50_t2_endurance",
+      "name": "离线·50·T2·固守续航",
+      "level": 50,
+      "power": 254426
+    },
+    {
+      "id": 950073,
+      "npc_id": "npc_v1_l99_t3_attack",
+      "name": "离线·99·T3·强袭快攻",
+      "level": 99,
+      "power": 257570
+    },
+    {
+      "id": 950074,
+      "npc_id": "npc_v1_l36_t1_endurance",
+      "name": "离线·36·T1·固守续航",
+      "level": 36,
+      "power": 304842
+    },
+    {
+      "id": 950075,
+      "npc_id": "npc_v1_l30_t1_attack",
+      "name": "离线·30·T1·强袭快攻",
+      "level": 30,
+      "power": 316804
+    },
+    {
+      "id": 950076,
+      "npc_id": "npc_v1_l60_t2_magic",
+      "name": "离线·60·T2·法术群攻",
+      "level": 60,
+      "power": 393277
+    },
+    {
+      "id": 950077,
+      "npc_id": "npc_v1_l65_t2_magic",
+      "name": "离线·65·T2·法术群攻",
+      "level": 65,
+      "power": 416532
+    },
+    {
+      "id": 950078,
+      "npc_id": "npc_v1_l50_t1_magic",
+      "name": "离线·50·T1·法术群攻",
+      "level": 50,
+      "power": 419510
+    },
+    {
+      "id": 950079,
+      "npc_id": "npc_v1_l50_t1_endurance",
+      "name": "离线·50·T1·固守续航",
+      "level": 50,
+      "power": 428657
+    },
+    {
+      "id": 950080,
+      "npc_id": "npc_v1_l70_t2_magic",
+      "name": "离线·70·T2·法术群攻",
+      "level": 70,
+      "power": 464452
+    },
+    {
+      "id": 950081,
+      "npc_id": "npc_v1_l70_t2_endurance",
+      "name": "离线·70·T2·固守续航",
+      "level": 70,
+      "power": 482142
+    },
+    {
+      "id": 950082,
+      "npc_id": "npc_v1_l60_t2_attack",
+      "name": "离线·60·T2·强袭快攻",
+      "level": 60,
+      "power": 564131
+    },
+    {
+      "id": 950083,
+      "npc_id": "npc_v1_l65_t2_attack",
+      "name": "离线·65·T2·强袭快攻",
+      "level": 65,
+      "power": 597748
+    },
+    {
+      "id": 950084,
+      "npc_id": "npc_v1_l90_t2_magic",
+      "name": "离线·90·T2·法术群攻",
+      "level": 90,
+      "power": 628945
+    },
+    {
+      "id": 950085,
+      "npc_id": "npc_v1_l90_t2_endurance",
+      "name": "离线·90·T2·固守续航",
+      "level": 90,
+      "power": 675092
+    },
+    {
+      "id": 950086,
+      "npc_id": "npc_v1_l99_t2_magic",
+      "name": "离线·99·T2·法术群攻",
+      "level": 99,
+      "power": 722390
+    },
+    {
+      "id": 950087,
+      "npc_id": "npc_v1_l60_t1_magic",
+      "name": "离线·60·T1·法术群攻",
+      "level": 60,
+      "power": 776985
+    },
+    {
+      "id": 950088,
+      "npc_id": "npc_v1_l80_t2_attack",
+      "name": "离线·80·T2·强袭快攻",
+      "level": 80,
+      "power": 813769
+    },
+    {
+      "id": 950089,
+      "npc_id": "npc_v1_l65_t1_magic",
+      "name": "离线·65·T1·法术群攻",
+      "level": 65,
+      "power": 830525
+    },
+    {
+      "id": 950090,
+      "npc_id": "npc_v1_l65_t1_endurance",
+      "name": "离线·65·T1·固守续航",
+      "level": 65,
+      "power": 882082
+    },
+    {
+      "id": 950091,
+      "npc_id": "npc_v1_l90_t2_attack",
+      "name": "离线·90·T2·强袭快攻",
+      "level": 90,
+      "power": 1009577
+    },
+    {
+      "id": 950092,
+      "npc_id": "npc_v1_l60_t1_attack",
+      "name": "离线·60·T1·强袭快攻",
+      "level": 60,
+      "power": 1197265
+    },
+    {
+      "id": 950093,
+      "npc_id": "npc_v1_l99_t2_attack",
+      "name": "离线·99·T2·强袭快攻",
+      "level": 99,
+      "power": 1218314
+    },
+    {
+      "id": 950094,
+      "npc_id": "npc_v1_l65_t1_attack",
+      "name": "离线·65·T1·强袭快攻",
+      "level": 65,
+      "power": 1281223
+    },
+    {
+      "id": 950095,
+      "npc_id": "npc_v1_l70_t1_attack",
+      "name": "离线·70·T1·强袭快攻",
+      "level": 70,
+      "power": 1561737
+    },
+    {
+      "id": 950096,
+      "npc_id": "npc_v1_l90_t1_magic",
+      "name": "离线·90·T1·法术群攻",
+      "level": 90,
+      "power": 1726747
+    },
+    {
+      "id": 950097,
+      "npc_id": "npc_v1_l80_t1_attack",
+      "name": "离线·80·T1·强袭快攻",
+      "level": 80,
+      "power": 2005121
+    },
+    {
+      "id": 950098,
+      "npc_id": "npc_v1_l90_t1_attack",
+      "name": "离线·90·T1·强袭快攻",
+      "level": 90,
+      "power": 2929489
+    },
+    {
+      "id": 950099,
+      "npc_id": "npc_v1_l99_t1_attack",
+      "name": "离线·99·T1·强袭快攻",
+      "level": 99,
+      "power": 4446103
+    }
+  ]
+}

@@ -116,6 +116,11 @@ def refresh(role, now):
     """Recover only facts still provable from the saved role; no invented history."""
     from . import formation as f, equipment, journey, reborn_stars
     s = state(role)
+    for index, array in enumerate(role.get('spirit_array', [])):
+        if array['activated']:
+            observe(role, (461,462,463,464,560,561)[index], 1)
+            if index in (3,5) and all(level == 5 for level in array['skill_list']):
+                observe(role, 465 if index == 3 else 562, 1)
     day = (int(now) + 28800) // 86400
     if s['daily'].get('day') != day:
         for ident in (422, 423, 446, 447):

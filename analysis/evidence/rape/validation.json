@@ -1,17 +1,24 @@
 {
-  "date": "2026-10-25",
-  "related_tests": 135,
-  "related_passed": 135,
-  "rape_tests": 9,
-  "full_snapshot_tests": 567,
-  "full_snapshot_passed": 547,
-  "full_snapshot_environment_errors": 20,
-  "local_network_rerun_tests": 23,
-  "local_network_rerun_passed": 23,
+  "date": "2026-10-26",
+  "revision": "offline-rape-2",
+  "related_tests": 134,
+  "related_passed": 134,
+  "rape_tests": 15,
+  "client_lua51_regression": true,
+  "full_client_source_lua51_compile": true,
   "real_battles": 36,
-  "wins": 34,
+  "wins": 32,
   "unresolved": 0,
   "native_ui_verified": false,
-  "native_ui_reason": "emulator-5562 accessible outside sandbox, but com.sygame.jingubang.p360 process not running",
-  "note": "Workspace also contains concurrent unrelated changes; full snapshot and final related regression were run at different points."
+  "native_ui_reason": "No running game process on emulator-5562",
+  "checks": [
+    "dice determines 1..6 guards per column",
+    "no per-guard skill or silver rewards",
+    "column preview amount granted once",
+    "free count decrements in response",
+    "paid refresh keeps free count at zero",
+    "sweep continue refreshes and rejects repeat clicks",
+    "18-guard sweep wire result",
+    "free/paid/continue daily tracking and midnight reset"
+  ]
 }

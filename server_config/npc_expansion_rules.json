@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "revision": "npc-expansion-2026-10-26-v2",
+  "mode": "inferred",
+  "enabled_in_backend": false,
+  "base_seed": 20261026,
+  "levels": [1, 99],
+  "variants": ["attack", "magic", "endurance"],
+  "five_star_min_ratio": {"T5": 0.5, "T4": 0.67, "T3": 0.8, "T2": 1.0, "T1": 1.0},
+  "additional_five_star_probability": 0.35,
+  "dominant_style_probability": 0.6,
+  "fate_candidate_weight": 2,
+  "preferred_candidate_weight": 2,
+  "growth_weight_factor": 3,
+  "equipment_fate_weight": 3,
+  "max_roster_attempts": 80,
+  "target_inner_fraction": [0.2, 0.8],
+  "t1_sample_ceiling_multiplier": 1.2,
+  "battle_levels": [7, 36, 60, 80, 99],
+  "battle_seeds": [17, 83],
+  "tier_ranges": "analysis/npc_design/v1/power_ranges.csv",
+  "notes": [
+    "继承V1逐级分档界限和养成模板；五星最低占比针对首发与战斗替补之和，人数向上取整。",
+    "以固定种子加权无放回抽取真实基础神仙；偏好流派及仙缘但不保证激活。",
+    "先随机阵容及培养方向，再缩减合法养成进度以落入原档；不修改成长表、最终面板或分档界限。",
+    "本批不启用宠物、灵阵、称号、洞府、收集和显式战力加成；属于可重算的战斗快照，不是完整登录账号。"
+  ]
+}

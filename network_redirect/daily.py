@@ -149,7 +149,8 @@ def track(role, before, mid, req, events, now, r, parse):
     gains = {}
     if mid == 1026 and req['fight_type'] in (1, 20): gains[2] = 1
     if mid == 1061: gains[2] = req['sweep_count']
-    if mid == 1029: gains[3] = max(0, a.get('rape_refreshes', 0) - old.get('rape_refreshes', 0))
+    if mid == 1029:
+        gains[3] = max(0, a.get('rape_total_refreshes', a.get('rape_refreshes', 0)) - old.get('rape_total_refreshes', old.get('rape_refreshes', 0)))
     if mid in (1026, 1043):
         d, prev = a.get('duty') or {}, old.get('duty') or {}
         if d.get('phase') == 'finished' and prev.get('phase') != 'finished': gains[4] = 1

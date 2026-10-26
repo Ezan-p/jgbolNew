@@ -202,7 +202,8 @@ def bonuses(role, c, values):
             # Skill-strength modifiers belong to battle, not the four base stats.
             continue
         s = r.STAT[int(stat)]
-        values[s] = values[s] * (1 + rate / 100) + value
+        from . import spirit_array
+        values[s] += spirit_array.star_bonus(role, c, s, values[s] * rate / 100 + value)
 
 
 def combat_traits(role, c):
@@ -223,6 +224,9 @@ def combat_traits(role, c):
         elif kind == 315:
             traits['survival'] += values[0]
             traits['survival_count'] += int(values[1])
+    from . import spirit_array
+    if 1 <= c.get('order', 0) <= 8:
+        traits['spell_rate'] *= 1 + float(spirit_array.effects(role).get(144, 0))/100
     traits['awake_skills'] = {x['type_id']: int(row['plus_rate(整数>0)'])
         for x in role['attachments'] if x.get('innate_owner_id') == c['id'] and x.get('awaken')
         for row in summon.rows('awaken_skill_rate.csv') if int(row['skill_type']) == x['type_id']}

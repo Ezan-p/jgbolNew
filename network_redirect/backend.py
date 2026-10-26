@@ -11,7 +11,7 @@ import struct
 import time
 
 from .protocol import encode, decode
-from . import role_profile, achievements
+from . import role_profile, achievements, spirit_array
 from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily, guild, vip, xianling, welfare, cheer, monument, equipment
 
 
@@ -52,6 +52,8 @@ class Backend:
         self.achievement_context = None
         self.achievement_pending = []
         self.profile_rules = role_profile.load_rules()
+        self.array_replies = {}
+        self.last_array_serial = 0
         self.profile_replies = {}
         self.last_profile_serial = 0
         self.monument_rules = monument.load_rules()
@@ -169,12 +171,18 @@ class Backend:
         self.db.commit()
         self.achievement_pending.extend(updates)
 
+    def duty_peers(self):
+        # Only actual registered local saves participate. Exclude the legacy
+        # template once inherited, rather than counting the same player twice.
+        return [json.loads(raw) for account, raw in self.db.execute('SELECT account,data FROM roles')
+                if account != self.account and account != 'local-player']
+
     def snapshot(self):
         role = self.profile()
         now = int(time.time())
         journey.prepare(role, now, self.journey_rules)
         summon.prepare(role, now, self.summon_rules)
-        activity.prepare(role, now, self.activity_rules)
+        activity.prepare(role, now, self.activity_rules, self.duty_peers())
         daily.prepare(role, now, self.daily_rules)
         guild.prepare(role, now, self.guild_rules)
         xianling.prepare(role, now)
@@ -190,7 +198,7 @@ class Backend:
         role = self.profile()
         achievements.login(role, int(time.time()))
         journey.prepare(role, int(time.time()), self.journey_rules)
-        activity.prepare(role, int(time.time()), self.activity_rules)
+        activity.prepare(role, int(time.time()), self.activity_rules, self.duty_peers())
         goods = market.catalog(role, int(time.time()), self.market_rules)
         self.save(role)
         vip.prepare(role, self.vip_rules)
@@ -202,7 +210,8 @@ class Backend:
         for key, value in daily.client_config(self.daily_rules).items():
             config = config.replace('config_end=true', '[%d]=' % key + summon.lua(value) + ',config_end=true')
         config = config.replace('config_end=true', '[1]=' + summon.lua(vip.client_config(self.vip_rules)) + ',local_vip=' + summon.lua(vip.client_state(role)) + ',config_end=true')
-        config = config.replace('__PARTY_CONFIG__', summon.lua(dict(party_top_list={},pay_consume_gold=self.activity_rules['party_fight_gold'])))
+        from . import activity_party
+        config = config.replace('__PARTY_CONFIG__', summon.lua(activity_party.client_config(role,self.activity_rules)))
         config = config.replace('__IMMORTAL_CONFIG__', summon.lua(immortal.client_config(self.immortal_rules)))
         realm_config = reborn.client_config(self.reborn_rules)
         for realm, values in realm_config.items():
@@ -465,6 +474,8 @@ class Backend:
             self.reply_history.clear()
             self.profile_replies.clear()
             self.last_profile_serial = 0
+            self.array_replies.clear()
+            self.last_array_serial = 0
             self.reborn_replies.clear()
             self.last_reborn_serial = 0
             self.monument_replies.clear()
@@ -544,6 +555,8 @@ class Backend:
                 return self.complete(data['serial_num'], achievements.packets(target))
             except (formation.Rejected, ValueError) as error:
                 return self.complete(data['serial_num'], [summon.event(55, dict(op_string=str(error)))])
+        if mid == 1310:
+            return self.spirit_arrays(packet, data)
         if mid in role_profile.HANDLED:
             return self.role_profiles(packet, mid, data)
         if monument.handles(mid, data):
@@ -558,7 +571,7 @@ class Backend:
             return self.dailies(packet, mid, data)
         if (mid in activity.HANDLED or (mid == 1026 and data['fight_type'] in activity.FIGHTS)
                 or (mid == 1244 and data['fight_type'] == 2)
-                or (mid == 1051 and data['item_type'] in (1021,1130,1131,1132,1133,1213,1214,1215,1216,1217))
+                or (mid == 1051 and data['item_type'] in (1346,1021,1130,1131,1132,1133,1213,1214,1215,1216,1217))
                 or (mid == 1059 and data['flag'] == 3)
                 or (mid == 1201 and data['flag'] in (1, 2))):
             return self.activities(packet, mid, data)
@@ -586,6 +599,31 @@ class Backend:
         if data and data.get('serial_num'):
             return self.complete(data['serial_num'], [summon.event(55, {'op_string': '该功能尚未接入本地服务端（%d）' % mid})])
         return []
+
+    def spirit_arrays(self, packet, data):
+        serial = data['serial_num']
+        cached = self.array_replies.get(serial)
+        if cached and cached[0] == packet:
+            return cached[1]
+        if not serial or serial <= self.last_array_serial:
+            return self.complete(serial, [summon.event(55, {'op_string': '灵阵请求已过期，请重新进入'})])
+        try:
+            role = self.profile()
+            before = copy.deepcopy(role)
+            events = spirit_array.settle(role, data, login_fields, self.profile_rules)
+            formation.recalculate(role, self.formation_rules)
+            replies = self.companion_deltas(before, role) + self.item_deltas(before, role) + self.inventory(role) + self.power_attributes(role) + events
+            self.save(role)
+            self.emit('game_spirit_array_ok', operation=data['id'])
+        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
+            replies = [summon.event(55, {'op_string': str(error) if isinstance(error, formation.Rejected) else '灵阵数据无效'})]
+            self.emit('game_spirit_array_rejected', message=str(error))
+        replies = self.complete(serial, replies)
+        self.last_array_serial = serial
+        self.array_replies[serial] = (packet, replies)
+        if len(self.array_replies) > 256:
+            del self.array_replies[next(iter(self.array_replies))]
+        return replies
 
     def role_profiles(self, packet, mid, data):
         serial = data['serial_num']
@@ -753,7 +791,7 @@ class Backend:
                 xianling.record_charge(role, charged, now)
                 welfare.record_charge(role, charged, now, self.welfare_rules)
             journey.prepare(role, now, self.journey_rules)
-            activity.prepare(role, now, self.activity_rules)
+            activity.prepare(role, now, self.activity_rules, self.duty_peers())
             formation.prepare(role, self.formation_rules)
             replies = self.companion_deltas(before, role) + self.item_deltas(before, role) + self.inventory(role) + self.power_attributes(role) + [vip.attrs(role),
                 summon.event(80, dict(local_vip=vip.client_state(role)))] + events
@@ -1013,7 +1051,7 @@ class Backend:
             role = self.profile()
             before = copy.deepcopy(role)
             events = activity.settle(role, mid, data, now, self.activity_rules,
-                                     self.journey_rules, self.formation_rules, login_fields)
+                                     self.journey_rules, self.formation_rules, login_fields, self.duty_peers())
             achievements.record_events(role, events, int(time.time()), login_fields)
             welfare.track(role,mid,data,events,int(time.time()),self.welfare_rules)
             events = daily.track(role, before, mid, data, events, now, self.daily_rules, login_fields) + events

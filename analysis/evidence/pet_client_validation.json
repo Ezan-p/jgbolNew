@@ -1,6 +1,6 @@
 {
   "client": "3.87 original Lua VM",
-  "date": "2026-10-25",
+  "date": "2026-10-26",
   "transport": "temporary backend packets; actual game Lua thread",
   "real_requests_blocked": true,
   "player_and_inventory_restored": true,
@@ -35,5 +35,15 @@
       "lua_errors": []
     }
   ],
-  "fixture": "analysis/tools/build_pet_client_fixture.py"
+  "fixture": "analysis/tools/build_pet_client_fixture.py",
+  "entry": {
+    "fixture": "analysis/tools/build_pet_entry_fixture.py",
+    "original_button_created": true,
+    "level_49_blocked": true,
+    "level_50_request": {
+      "mid": 1330,
+      "id": 4
+    },
+    "adapter_install_restore_regression": "passed"
+  }
 }

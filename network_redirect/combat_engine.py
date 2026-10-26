@@ -61,6 +61,8 @@ class Battle:
                        if home.get(str(i), {}).get('level', 0) else (0, 0) for i in range(1, 5)]
             for u in self.sides[0]:
                 u['training_bonuses'] = bonuses
+        from . import spirit_array
+        spirit_array.attach_combat(role, self.sides[0])
         self.entry()
         self.initial = copy.deepcopy(self.sides)
 

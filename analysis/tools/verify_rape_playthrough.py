@@ -31,7 +31,7 @@ def main():
                         rows.append(dict(level=level,npc=target['npc_id'],player_power=role['role_combat_power'],npc_power=target['power'],result=fight['final_result'],actions=fight['fight_round']))
                 assert wins>=3,(level,wins)
         finally:backend.close()
-    report=dict(date='2026-10-25',mode='real_engine_fixed_seed',native_ui_verified=False,battles=rows)
+    report=dict(date='2026-10-26',mode='real_engine_fixed_seed',native_ui_verified=False,battles=rows)
     dest=ROOT/'analysis/evidence/rape/playthrough.json';dest.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print('Verified',len(rows),'real battles;',sum(1<=r['result']<=3 for r in rows),'wins;',sum(r['result']==0 for r in rows),'unresolved')
 

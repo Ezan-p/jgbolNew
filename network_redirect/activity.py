@@ -30,7 +30,7 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     for key in ('feed_max_count','feed_base_strength','feed_strength_per_bun','feed_max_strength',
                 'rank_daily_limit','rank_initial_order',
                 'rape_free_refreshes','rape_refresh_gold','rape_single_refresh_gold','duty_daily_runs',
-                'duty_round_limit','duty_silver_per_round','party_free_count','party_paid_count',
+                'duty_initial_bonus','duty_exchange_bonus','duty_exchange_cost','duty_silver_per_round','party_free_count','party_paid_count',
                 'party_fight_gold','party_bonus_gold','party_bonus_limit','convert_daily_limit',
                 'battle_level','battle_silver','trial_daily_limit','trial_bosses_per_day','trial_boss_hp','trial_cooldown_seconds','home_boss_daily_limit','home_assistant_gold','home_missed_event_penalty',
                 'abyss_offline_cap_seconds','abyss_tick_seconds','abyss_power_per_crystal','abyss_double_gold','abyss_grid_gold','babel_cell_coins','drug_craft_exp','drug_quality_level_step',
@@ -40,6 +40,8 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     require(r['land_tower_start_hour']<24 and r['land_boss_layers']<=99 and r['land_daily_travel']<=100 and r['land_max_actions']<=80,'逐鹿时段或关卡上限无效')
     require(isinstance(r.get('land_card_gold'),list) and len(r['land_card_gold'])==5 and r['land_card_gold'][0]==0 and all(type(v)is int and 0<=v<=100000 for v in r['land_card_gold']),'逐鹿翻牌费用无效')
     require(r['rank_initial_order']<=65535 and r['rank_daily_limit']<=255,'活动次数超过协议范围')
+    require(r['duty_daily_runs']==3,'原版天命界面固定每日3次')
+    require(r['duty_exchange_cost']<=3,'祭魂至少应有一项能由三场一星胜利兑换')
     require(r['home_missed_event_penalty']<=100,'药田损失不能超过100%')
     require(type(r.get('home_friend_gain_percent'))is int and 0<=r['home_friend_gain_percent']<=100,'施肥增益无效')
     require(type(r.get('home_friend_silver'))is int and 0<r['home_friend_silver']<=1000000,'施肥奖励无效')
@@ -95,20 +97,26 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
 
 def day(now,r):return (now+r['timezone_offset_hours']*3600)//86400
 
-def prepare(role,now,r):
+def prepare(role,now,r,peers=None):
     s=role.setdefault('activity',{})
     s.setdefault('rank_order',r['rank_initial_order']);s.setdefault('rank_score',0)
     s.setdefault('fight_id',100000);s.setdefault('duty_best',0)
+    s.setdefault('duty_runs',0);s.setdefault('duty',None)
     for k,v in dict(drug_level=1,drug_exp=0,drug_study_flag=0,drug_study_flag2=0).items():role.setdefault(k,v)
     role.setdefault('rule_index',0)
     for k in ('max_hp_plus','gongji_plus','fangyu_plus','max_magic_plus'):role.setdefault(k,0)
-    if s.get('day')!=day(now,r):
+    from . import activity_party
+    activity_party.prepare(role,now,r)
+    from . import activity_duty
+    activity_duty.prepare(role,now,r,peers)
+    if s.get('day') is None or s['day']<day(now,r):
         s.update(day=day(now,r),feed={},visits={},rank_count=0,rank_claimed=False,
-                 rape_refreshes=0,rape_boards=None,duty_runs=0,duty=None,party_count=0,
+                 rape_refreshes=0,rape_total_refreshes=0,rape_boards=None,party_count=0,
                  party_paid=0,party_damage=0,party_bonus=0,party_claimed=False,praised=False,
                  trial=None,trial_count=0,trial_next=0,trial_spawned=0)
         role.update(pray_spirit_times=0,convert_fight_count=0,party_fight_count=0,party_fight_count_plus=0,
-                    gongji_plus_rate=0,party_take_prize=0)
+                    gongji_plus_rate=0)
+    activity_party.sync(role)
     for key,value in dict(trial=None,trial_count=0,trial_next=0,trial_spawned=0).items():s.setdefault(key,value)
     from . import vip
     role.update(top_order=s['rank_order'],top_score=s['rank_score'],top_fight_limit=vip.limit(role,vip.RANK,r['rank_daily_limit']),
@@ -164,8 +172,8 @@ def statuses(role,now,r,flag):
     require(flag==1,'未知活动页')
     return summon.event(48,dict(party_start_period=[dict(begin_seconds=r['party_period'][0],end_seconds=r['party_period'][1])],
         last_convert_type=s.get('last_convert_type',0),cur_fight_count=r['duty_daily_runs']-s['duty_runs'],
-        max_fight_count=r['duty_daily_runs'],party_seld_order=1 if s['party_count'] else 0,
-        party_free_count=r['party_free_count'],party_pay_count=r['party_paid_count'],prey_status_info=land_status(now,r)))
+        max_fight_count=r['duty_daily_runs'],party_seld_order=role.get('party_order',0),
+        party_free_count=s['party_count'],party_pay_count=s['party_paid'],prey_status_info=land_status(now,r)))
 
 
 def feed(role,req,now,r):
@@ -253,28 +261,14 @@ def rape_board(role,now,r,update=1):
     return activity_rape.board(role,now,r,update)
 
 
-def duty_data(role,r,result=2):
-    s=role['activity'];d=s.get('duty') or dict(round=1,stars=0,used=0,bonus=[0]*4)
-    fields=[ENUMS['cortege_property'][k] for k in ('max_hp_rate','max_magic_rate','gongji_rate','fangyu_rate')]
-    data=dict(result=result,cur_round=d['round'],max_fight_round=s['duty_best'],fight_count=r['duty_daily_runs']-s['duty_runs'],
-        max_get_star=s['duty_best']*3,cur_get_star=d['stars'],cur_used_star=d['used'],expect_order=1,
-        last_exchange_rate=10,
-        plus_list=[dict(zip(fields,d['bonus'])),dict.fromkeys(fields,0)],
-        lineup_list=[dict(type=r['battle_npc'],gold=0,stars=i) for i in (1,2,3)])
-    if d.get('phase')=='exchange':
-        data['star_exchange']=[dict(star=3,field=f,value=10) for f in fields]
-    if d.get('pending_silver'):
-        data['silver_prize']=[prize_spec([12,0,d['pending_silver'],1])]
-    return data
+def duty_data(role,r,result=None):
+    from . import activity_duty
+    return activity_duty.data(role,r,result)
 
 
 def party_info(role,r):
-    s=role['activity']
-    return dict(self_damage=s['party_damage'],free_count=s['party_count'],pay_count=s['party_paid'],
-        damage_list=[],self_order=1,plus_value=s['party_bonus']*10,plus_count=s['party_bonus'],
-        peach_count=(s['party_count']+s['party_paid'])*5,lucky_point=0,
-        fight_prize=[],boss_type=r['battle_npc'],boss_level=r['battle_level'],
-        damage=0,total_damage=s['party_damage'],max_hp=10000000,cur_hp=max(0,10000000-s['party_damage']),name='本地蟠桃守卫')
+    from . import activity_party
+    return activity_party.info(role,r)
 
 
 def trial_state(role,r):
@@ -321,6 +315,10 @@ def query_lineup(role,req,r):
     if ident in activity_rank.catalog():
         require(req['des_type'] in (1,2),'阵容目标类型无效')
         return [activity_rank.inspection(role,ident)]
+    from . import activity_party
+    if ident in activity_party.catalog():
+        require(req['des_type'] in (1,2),'蟠桃阵容类型无效')
+        return [activity_party.inspection(role,ident)]
     own=ident==role['role_id']
     gs=role.get('guild',{});g=gs.get('unions',{}).get(str(int(role.get('union_id',0))))
     if g and (str(int(ident)) in g['members'] or ident in range(90001,90007) or ident in range(91001,91004)):
@@ -346,6 +344,9 @@ def query_lineup(role,req,r):
 
 def battle(role,req,now,r,jrules,frules):
     ft=req['fight_type'];s=role['activity'];target=None
+    if ft==5:
+        from . import activity_duty
+        return activity_duty.battle(role,req,now,r,jrules)
     if ft in (3,12):
         from . import activity_rape
         return activity_rape.battle(role,req,now,r,jrules)
@@ -355,13 +356,10 @@ def battle(role,req,now,r,jrules,frules):
     require(role['level']>={2:6,3:8,4:5,5:12,6:13,10:16,11:1}[ft],'等级不足')
     if ft==4:
         require(role['rule_index']<role['level']-4,'修炼次数已用完')
-    elif ft==5:
-        d=s.get('duty');require(d is not None and req['des_value']==d['round'] and req['des_type'] in (1,2,3),'请先开始天命之战')
-        require(d['round']<=r['duty_round_limit'],'已完成本轮天命之战')
-        require(d.get('phase')=='fight','请先完成祝福或领奖')
     elif ft==6:
         second=(now+r['timezone_offset_hours']*3600)%86400
         require(r['party_period'][0]<=second<r['party_period'][1],'蟠桃会尚未开放')
+        require(day(now,r)==s['party']['day'] and now>=s['party']['clock'],'蟠桃会时钟已回退，请恢复本地时间')
         require(req['des_value'] in (0,1),'蟠桃挑战类型无效')
         if req['des_value']==0:
             require(s['party_count']<r['party_free_count'],'免费挑战次数已用完')
@@ -384,17 +382,11 @@ def battle(role,req,now,r,jrules,frules):
     require(any(c.get('order') for c in role['corteges']),'请先上阵神仙')
     cfg=dict(cortege_list=f"{r['battle_npc']}|{r['battle_level']}")
     units=journey.fighters(role,cfg)
-    if ft==5:
-        for u in units[0]:
-            for stat,bonus in zip(('hp','magic','gongji','fangyu'),s['duty']['bonus']):
-                u[stat]=u[stat]*(100+bonus)//100
-            u['max_hp']=u['hp']
-        for u in units[1]:
-            for stat in formation.STATS:u[stat]*=max(1,s['duty']['round']*req['des_type'])
-            u['max_hp']=u['hp']
     if ft==6:
         for u in units[0]:u['gongji']=u['gongji']*(100+s['party_bonus']*10)//100
-        units[1][0].update(hp=10000000,max_hp=10000000)
+        from . import activity_party
+        hp=activity_party.info(role,r)['cur_hp']
+        units[1][0].update(hp=hp,max_hp=activity_party.rules()['boss_hp'])
     if ft==11:units[1][0].update(hp=trial['hp'],max_hp=trial['max_hp'])
     result,lineup,actions=journey.battle(role,cfg,jrules,units=units);win=1<=result<=3
     events=[];s['fight_id']+=1;fid=s['fight_id']
@@ -402,17 +394,11 @@ def battle(role,req,now,r,jrules,frules):
         role['rule_index']+=1
         for key,field,attr in [('hp','max_hp_plus',75),('gongji','gongji_plus',77),('fangyu','fangyu_plus',78),('magic','max_magic_plus',76)]:
             role[field]+=r['train_increase'][key];events.append(summon.event(5,dict(addition_field=attr,addition_value=r['train_increase'][key])))
-    elif ft==5:
-        d=s['duty']
-        if win:
-            d['round']+=1;d['stars']+=req['des_type'];s['duty_best']=max(s['duty_best'],d['round']-1)
-            if d['round']%3==1:
-                d['pending_silver']=3*r['duty_silver_per_round'];d['phase']='prize'
-        else:d['phase']='finished'
-        events.append(summon.event(19,duty_data(role,r,8 if win else 9)))
     elif ft==6:
-        damage=journey.combat_engine.total_damage(actions);s['party_damage']+=damage
-        info=party_info(role,r);info.update(fight_prize=prizes(role,r['party_rewards']),cur_damage=damage)
+        damage=min(hp,journey.combat_engine.total_damage(actions))
+        gain=prizes(role,r['party_rewards'])+activity_party.seasonal_rewards(role,now,r)
+        activity_party.record(role,damage,gain,r)
+        info=party_info(role,r);info.update(fight_prize=gain,cur_damage=damage)
         events.append(summon.event(29,info))
     elif ft==10 and win:
         row=CONVERT[req['des_value']];col=next(k for k in row if k.startswith('output('))
@@ -441,11 +427,24 @@ def battle(role,req,now,r,jrules,frules):
         summon.event(44,dict(fight_id=fid,fight_type=ft))]
 
 
-def settle(role,mid,req,now,r,jrules,frules,parse):
-    s=prepare(role,now,r)
+def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
+    s=prepare(role,now,r,peers)
+    from . import activity_duty
+    if mid==1043:
+        return activity_duty.update(role,req,now,r,peers)
+    if mid==1026 and req['fight_type']==5:
+        return activity_duty.battle(role,req,now,r,jrules,peers)
+    if mid==1049 and req['query_type']==4:
+        activity_duty.guard(role,now,r)
+        return [summon.event(39,activity_duty.rank_data(role,peers))]
+    if mid==1039 and 2**40<=req['des_id']<2**41:
+        return activity_duty.inspection(role,req,peers)
     if mid in (1029,1041,1060,1072) or mid==1026 and req['fight_type'] in (3,12):
         from . import activity_rape
         return activity_rape.settle(role,mid,req,now,r,jrules,parse)
+    if mid == 1051 and req['item_type'] == 1346:
+        from . import pets
+        return pets.use_box(role,req)
     if mid == 1330:
         from . import pets
         return pets.settle(role,req,now,r,parse)
@@ -492,51 +491,24 @@ def settle(role,mid,req,now,r,jrules,frules,parse):
     if mid==1039:return query_lineup(role,req,r)
     if mid==1064:return trial_query(role,req,now,r)
     if mid==1026:return battle(role,req,now,r,jrules,frules)
-    if mid==1043:
-        require(role['level']>=12,'天命之战需12级');op=req['plus_type']
-        if op==0:
-            if s['duty'] is None or s['duty'].get('phase')=='finished':
-                if req['flag']==1:return [summon.event(19,duty_data(role,r,2 if s['duty_runs']<r['duty_daily_runs'] else 7))]
-                require(s['duty_runs']<r['duty_daily_runs'],'今日天命之战次数已用完')
-                s['duty_runs']+=1;s['duty']=dict(round=1,stars=0,used=0,bonus=[0]*4,phase='initial')
-            return [summon.event(19,duty_data(role,r,1 if s['duty']['phase']=='initial' else 5 if s['duty']['phase']=='exchange' else 3))]
-        require(s['duty'] is not None,'请先开始天命之战');d=s['duty']
-        if op in (1,2):
-            idx=req['plus_index'];require(1<=idx<=4,'加成无效')
-            if op==1:require(d.get('phase')=='initial','初始祝福已选择')
-            else:
-                require(d.get('phase')=='exchange' and d['stars']-d['used']>=3,'星数不足或尚未到献祭轮次')
-                d['used']+=3
-            d['bonus'][idx-1]+=10;d['phase']='fight'
-            return [summon.event(19,duty_data(role,r,3))]
-        if op==3:
-            require(d.get('pending_silver',0)>0,'暂无可领取奖励')
-            prizes(role,[[12,0,d.pop('pending_silver'),1]])
-            d['phase']='exchange' if d['round']<=r['duty_round_limit'] else 'finished'
-            return [summon.event(19,duty_data(role,r,5 if d['phase']=='exchange' else 2))]
-        require(op in (4,5),'天命操作无效');require(s['duty_runs']<r['duty_daily_runs'],'今日天命之战次数已用完')
-        require(d.get('phase')=='finished','本轮挑战尚未结束')
-        s['duty_runs']+=1;s['duty']=dict(round=max(1,s['duty_best']//2) if op==5 else 1,stars=0,used=0,bonus=[0]*4,phase='initial')
-        return [summon.event(19,duty_data(role,r,1))]
     if mid==1049:
         typ=req['query_type'];require(1<=typ<=5,'未知排行查询')
-        if typ==1:return [summon.event(29,party_info(role,r))]
-        if typ==2:return [summon.event(30,dict(damage_list=[],top_list=[],self_damage_his=s['party_damage'],self_order=1,
-            fight_count=s['party_count']+s['party_paid'],peach_count=(s['party_count']+s['party_paid'])*5,lucky_point=0,felstar_info={}))]
-        if typ==3:return [summon.event(28,dict(lucky_list=[],self_lucky=0,self_lucky_his=0,self_order=0))]
-        if typ==4:return [summon.event(39,dict(all_top_list={i:[] for i in range(4,9)},duty_group=min(8,max(4,role['cortege_count'])),expect_order=0,max_get_star=s['duty_best']*3,max_fight_round=s['duty_best']))]
-        require(not s.get('praised'),'今日已点赞');s['praised']=True
-        return [summon.event(141,dict(attach_list=prizes(role,[[12,0,1000,1]])))]
+        if typ in (1,2,3,5):
+            from . import activity_party
+            return activity_party.query(role,typ,r,req)
     if mid==1202:
+        require(day(now,r)==s['party']['day'] and now>=s['party']['clock'],'蟠桃会时钟已回退，请恢复本地时间')
+        require(req['flag']==1,'鼓舞操作无效')
+        require(r['party_period'][0]<=(now+r['timezone_offset_hours']*3600)%86400<r['party_period'][1],'蟠桃会尚未开放')
         require(role['level']>=13 and s['party_bonus']<r['party_bonus_limit'],'蟠桃加成已达上限')
         spend(role,'gold_coin',r['party_bonus_gold']*(s['party_bonus']+1));s['party_bonus']+=1
+        s['party']['bonus']=s['party_bonus']
         role['gongji_plus_rate']=s['party_bonus']*10
         return [summon.event(32,{})]
     if mid==1201:
-        require(req['flag']==1 and s['party_count']+s['party_paid']>0 and not s['party_claimed'],'暂无可领取的蟠桃奖励')
-        s['party_claimed']=True
-        role['party_take_prize']=1
-        return [summon.event(31,dict(attach_list=prizes(role,r['party_rewards'])))]
+        from . import activity_party
+        require(req['flag']==1 and role['level']>=13,'蟠桃领奖条件不足')
+        return activity_party.claim(role)
     raise formation.Rejected('活动操作参数无效')
 
 

@@ -39,7 +39,7 @@ with (ROOT / 'analysis/configs/equip_advance_worth.csv').open(encoding='utf-8-si
 STATS = ('hp', 'gongji', 'fangyu', 'magic')
 BASE_COLUMNS = ('base_max_hp', 'base_gongji', 'base_fangyu', 'base_max_magic')
 GROWTH_COLUMNS = ('base_maxhp_plus', 'base_gongji_plus', 'base_fangyu_plus', 'base_maxmagic_plus')
-HANDLED = {1076, 1212, 1053, 1055, 1056, 1074, 1079, 1225, 1054, 1024, 1025, 1037, 1052, 1059, 1071, 1073, 1081, 1082, 1083, 1084, 1089, 1343}
+HANDLED = {1088, 1086, 1076, 1212, 1053, 1055, 1056, 1074, 1079, 1225, 1054, 1024, 1025, 1037, 1052, 1059, 1071, 1073, 1081, 1082, 1083, 1084, 1089, 1343}
 
 
 class Rejected(ValueError):
@@ -86,6 +86,8 @@ def load_rules(path=ROOT / 'server_config/formation_rules.json'):
             and policy.get('advance_extra_tiers') == 'highest_unlocked'
             and policy.get('stages') == ATTRIBUTE_STAGES
             and policy.get('rounding') == 'floor_before_collection_and_final', '属性乘区配置无效')
+    from . import cortege_recycle
+    cortege_recycle.load_rules()
     return rules
 
 
@@ -513,7 +515,13 @@ def impart(role, req, rules):
 
 
 def settle(role, mid, req, rules, parse):
-    if mid == 1024:
+    if mid == 1088:
+        from . import item_sale
+        result = item_sale.settle(role, req, parse)
+    elif mid == 1086:
+        from . import cortege_recycle
+        result = cortege_recycle.settle(role, req)
+    elif mid == 1024:
         result = change_order(role, req)
     elif mid == 1025:
         result = impart(role, req, rules)

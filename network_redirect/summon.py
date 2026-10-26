@@ -97,8 +97,10 @@ def client_source(rules):
     monument_source = Path(__file__).with_name('monument_client.lua').read_text(encoding='utf-8')
     equipment_source = Path(__file__).with_name('equipment_client.lua').read_text(encoding='utf-8')
     reborn_source = Path(__file__).with_name('reborn_client.lua').read_text(encoding='utf-8')
+    rape_source = Path(__file__).with_name('rape_client.lua').read_text(encoding='utf-8')
     rank_source = Path(__file__).with_name('rank_client.lua').read_text(encoding='utf-8')
-    return rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
+    pet_source = Path(__file__).with_name('pet_client.lua').read_text(encoding='utf-8')
+    return pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
 
 
 def lua(value):

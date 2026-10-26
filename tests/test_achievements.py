@@ -190,7 +190,7 @@ class AchievementTests(unittest.TestCase):
         a.simulate_fact(role, 'follow', 1, 'duplicate-target', NOW)
         self.assertEqual(len(a.state(role)['simulation_follow']), 10)
         for result in (323,324,325,326): a.simulate_fact(role, 'fortune', result, str(result), NOW)
-        for stage in (4,6): a.simulate_fact(role, 'spirit_array', dict(stage=stage,level=10), 'array:'+str(stage), NOW)
+        for stage in (4,6): a.simulate_fact(role, 'spirit_array', dict(stage=stage,level=5), 'array:'+str(stage), NOW)
         for ident in (218,219,220,221,236,237,238,302,303,304,305,323,324,325,326,445,461,462,463,464,465,560,561,562):
             self.assertEqual(self.row(role, ident)['times'], 1, ident)
 

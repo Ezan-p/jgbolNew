@@ -11,7 +11,7 @@ from .protocol import encode
 def rules():
     r=json.loads((a.ROOT/'server_config/rape_rules.json').read_text())
     a.require(r['mode']=='inferred' and len(r['power_percent'])==3 and all(type(v)is int and 1<=v<=150 for v in r['power_percent']), '渡劫匹配配置无效')
-    a.require(r['guards_per_form']==3 and 1<=r['straight_skill_count']<=10 and type(r['triple_auto_pass'])is bool, '渡劫奖盘配置无效')
+    a.require(r.get('guards_from_dice') is True and 1<=r['straight_skill_count']<=10 and r['triple_auto_pass'] is False, '渡劫奖盘配置无效')
     a.require(1<=r['revenge_lifetime']<=86400 and set(r['skill_quality_weights'])==set('12345') and all(type(v)is int and 1<=v<=100 for v in r['skill_quality_weights'].values()), '渡劫奖池配置无效')
     return r
 
@@ -53,27 +53,27 @@ def reward_pool():
 
 def ensure(role, now, r):
     s = role['activity']
+    s.setdefault('rape_total_refreshes',s.get('rape_refreshes',0))
     boards = s.get('rape_boards')
     if boards is None:
         dice = roll_forms()
         straight = dice[1]-dice[0] == dice[2]-dice[1] and abs(dice[1]-dice[0]) == 1
-        triple = len(set(dice)) == 1
         pool = reward_pool() or r['rape_skills']
         boards=[]
         for i in range(3):
             rows={}
-            for j in range(3):
-                target=opponent(role,j);target.update(index=j+1,rand=3-j);rows[str(next_id(s))]=target
-            boards.append(dict(form_type=dice[i],skill_type=secrets.choice(pool),skill_count=rules()['straight_skill_count'] if straight else 1,
+            for j in range(dice[i]):
+                target=opponent(role,j);target.update(index=j+1,rand=6-j);rows[str(next_id(s))]=target
+            boards.append(dict(version=2,form_type=dice[i],skill_type=secrets.choice(pool),skill_count=rules()['straight_skill_count'] if straight else 1,
                                reward_claimed=False,form_list={'1':{},'2':rows}))
-        # Three equal dice bypass guards, [B] local special-event reward policy.
-        if triple and rules()['triple_auto_pass']:
-            for b in boards:
-                for t in b['form_list']['2'].values():t['has_win']=True
-                journey.grant(role,(6,b['skill_type'],b['skill_count']+rules()['guards_per_form'],1));b['reward_claimed']=True
         s['rape_boards']=boards
     # Upgrade old boards in place without erasing victories or issuing rewards again.
     for i,b in enumerate(boards):
+        if b.get('version',1)<2:
+            # Keep legacy progress and already-issued rewards; align the die with
+            # its existing guards instead of adding or removing live opponents.
+            b['form_type']=sum(len(rows) for rows in b['form_list'].values())
+            b['version']=2
         b.setdefault('form_type',i+1)
         b['form_list'].setdefault('1',{})
         b.setdefault('reward_claimed', all(t['has_win'] for rows in b['form_list'].values() for t in rows.values()))
@@ -90,9 +90,9 @@ def ensure(role, now, r):
 def board(role, now, r, update=1):
     boards=copy.deepcopy(ensure(role,now,r))
     for b in boards:
-        b.pop('reward_claimed',None)
+        b.pop('reward_claimed',None);b.pop('version',None)
         b['form_list']={int(t):{int(k):{f:v for f,v in row.items() if f not in ('npc_id','power')} for k,row in rows.items()} for t,rows in b['form_list'].items()}
-    return dict(time=now,update_type=update,used_count=role['activity']['rape_refreshes'],free_count=role['rape_flush_limit'],gold_cost=r['rape_refresh_gold'],rape_list=boards)
+    return dict(time=now,update_type=update,used_count=role['activity']['rape_refreshes'],free_count=max(0,role['rape_flush_limit']-role['activity']['rape_refreshes']),gold_cost=r['rape_refresh_gold'],rape_list=boards)
 
 
 def messages(role):
@@ -135,13 +135,14 @@ def battle(role, req, now, r, jrules):
     a.require(any(1<=c.get('order',0)<=8 for c in role['corteges']),'请先上阵神仙');a.spend(role,'energy',1)
     result,lineup,actions=journey.battle(role,{},jrules,units=(activity_rank.units(role),activity_rank.units(npcs.catalog()[target['npc_id']]['role'])))
     win=1<=result<=3;events=[];s['fight_id']+=1;fid=s['fight_id']
-    if win:target['has_win']=True;role['silver_coin']+=r['battle_silver']
+    if win:target['has_win']=True
     if ft==12:
-        if win:journey.grant(role,(6,target['skill_type'],1,1))
+        if win:
+            journey.grant(role,(6,target['skill_type'],1,1))
+            role['silver_coin']+=r['battle_silver']
         events.append(summon.event(77,dict(result=0 if win else 1,request_id=int(req['des_id']))))
     else:
-        passed=all(t['has_win'] for rows in b['form_list'].values() for t in rows.values());count=1 if win else 0
-        if win:journey.grant(role,(6,b['skill_type'],1,1))
+        passed=all(t['has_win'] for rows in b['form_list'].values() for t in rows.values());count=0
         if passed and not b['reward_claimed']:
             count+=b['skill_count'];journey.grant(role,(6,b['skill_type'],b['skill_count'],1));b['reward_claimed']=True
         events.append(summon.event(41,dict(fight_result=result,form_index=idx,pass_one_form=passed,pass_all_form=all(x['reward_claimed'] for x in boards),skill_count=count,skill_type=b['skill_type'])))
@@ -161,12 +162,21 @@ def settle(role,mid,req,now,r,jrules,parse):
         del s['rape_revenge'][key]
         return [summon.event(84,dict(request_id=req['request_id']))]
     if mid==1029:
-        a.require(req['flag'] in (1,2,3),'渡劫请求无效')
-        if req['flag']!=1:
-            if req['flag']==2:a.require(s['rape_refreshes']<role['rape_flush_limit'],'免费刷新次数已用完')
+        flag=req['flag']
+        a.require(flag in (1,2,3,4),'渡劫请求无效')
+        if flag==4:
+            # Explicit Continue, not an ordinary query/reconnect. A second click
+            # cannot spend again once the first request has created a new board.
+            a.require(all(b['reward_claimed'] for b in s['rape_boards']),'请先击败本盘全部守卫')
+            flag=2 if s['rape_refreshes']<role['rape_flush_limit'] else 3
+        if flag!=1:
+            if flag==2:
+                a.require(s['rape_refreshes']<role['rape_flush_limit'],'免费刷新次数已用完')
+                s['rape_refreshes']+=1
             else:a.spend(role,'gold_coin',r['rape_refresh_gold'])
-            s['rape_refreshes']+=1;s['rape_boards']=None
-        return [messages(role),summon.event(40,board(role,now,r,req['flag']))]
+            s['rape_boards']=None
+            s['rape_total_refreshes']=s.get('rape_total_refreshes',0)+1
+        return [messages(role),summon.event(40,board(role,now,r,flag))]
     if mid==1041:
         idx=req['form_index'];a.require(1<=idx<=3,'阵位无效');rows=s['rape_boards'][idx-1]['form_list'].get(str(req['object_type']),{})
         key=str(int(req['object_id']));old=rows.get(key);a.require(old is not None and not old['has_win'],'不可刷新该对手')

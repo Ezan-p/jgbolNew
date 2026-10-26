@@ -27,6 +27,8 @@ def load_rules(path=RULES_PATH):
     a.require(r.get('plus_rate_list') == [0.4, 0.3, 0.7, 0.2], '宠物属性系数须与客户端默认值一致')
     a.require(type(r.get('capacity')) is int and 10 <= r['capacity'] <= 120, '宠物容量无效')
     a.require(r.get('starter_type') in hp.BASE and r.get('starter_quality') in (1, 2, 3, 4), '初始宠物配置无效')
+    a.require(type(r.get('training_box_count')) is int and 1 <= r['training_box_count'] <= 1000, '驯养宝箱奖励数量无效')
+    a.require(type(r.get('task_training_boxes')) is int and 1 <= r['task_training_boxes'] <= 100, '宠物任务宝箱数量无效')
     return r
 
 
@@ -122,6 +124,8 @@ def settle(role, req, now, arules, parse):
         pet = next((p for p in home['pets'] if p['id'] == pid), None)
         a.require(pet is not None, '宠物不存在')
         control = CONTROL[pet['main_type'], pet['quality']]
+        if op in (2,3,5,6):
+            a.require(hp.BASE[pet['type_id']]['is_exp_pet'] != 'Y', '经验宠物仅能用于吞噬升级')
         if op == 3:
             a.require(hp.BASE[pet['type_id']]['is_exp_pet'] != 'Y', '经验宠物不能出战')
             active = not pet['order']
@@ -189,3 +193,19 @@ def settle(role, req, now, arules, parse):
         home['pets'] = [p for p in home['pets'] if p['id'] not in deleted]
     return [summon.event(174, dict(flag=op, update_list={p['id']: hp.wire(p) for p in home['pets']},
         del_list=deleted, const_config={k: r[k] for k in ('min_train_quality', 'upgrade_exp_rate', 'plus_rate_list')}))]
+
+
+def use_box(role, req):
+    """Original item-use request/event; missing reward amount is explicit [B]."""
+    from . import formation
+    n = req.get('item_count')
+    a.require(req.get('item_type') == 1346 and type(n) is int and 1 <= n <= 100, '驯养宝箱数量无效')
+    a.require(req.get('des_type') == 1 and req.get('des_id',0) in (0,role['role_id']), '驯养宝箱目标无效')
+    item = formation.lookup(role,'attachments',req.get('item_id'))
+    a.require(item['attach_type'] == 5 and item['type_id'] == 1346 and item['count'] >= n
+              and not any(item.get(k) for k in ('is_lock','owner_id','equip_pos')), '驯养宝箱不足或不可使用')
+    reward = load_rules()['training_box_count'] * n
+    item['count'] -= n
+    if not item['count']: role['attachments'].remove(item)
+    prizes = a.prizes(role,[[5,1345,reward,1]])
+    return [summon.event(21,dict(result=1,type_id=1346,count=n,attach_list=prizes))]

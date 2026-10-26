@@ -111,7 +111,8 @@ class ActivityTests(ActivityCase):
         self.ok(self.req(1043,plus_type=2,plus_index=1))
     def test_party_open_and_closed_and_bonus(self):
         self.ok(self.req(1049,query_type=1));self.ok(self.req(1202,flag=1));self.ok(self.req(1026,fight_type=6))
-        self.ok(self.req(1201,flag=1));self.assertEqual(self.req(1201,flag=1)[0][0],55)
+        self.assertEqual(self.req(1201,flag=1)[0][0],55)  # weekly prize, not immediate daily participation
+        self.b.activity_rules['party_period']=[39600,46800]
         with patch('network_redirect.backend.time.time',return_value=NOW+7200):self.assertEqual(self.req(1026,fight_type=6)[0][0],55)
     def test_convert_first_free_and_monthcard_extra(self):
         r=self.b.profile();r['vip_level']=3;tid=next(iter(activity.CONVERT))

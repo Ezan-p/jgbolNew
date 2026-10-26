@@ -168,3 +168,30 @@ class PetTests(ActivityCase):
         r=self.b.profile();before=copy.deepcopy(r)
         with self.assertRaises(ValueError):journey.grant(r,[15,201,1,4])
         self.assertEqual(before,r)
+
+    def test_training_box_use_replay_and_locked_rejection(self):
+        r=self.b.profile();summon.add_item(r,1346,3);self.b.save(r)
+        item=next(p for p in r['attachments'] if p['type_id']==1346)
+        self.ok(self.req(1051,item_type=1346,item_id=item['id'],item_count=2,des_type=1,des_id=0))
+        r=self.b.profile()
+        self.assertEqual(sum(p['count'] for p in r['attachments'] if p['type_id']==1345),30)
+        self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
+        self.assertEqual(r,self.b.profile())
+        next(p for p in r['attachments'] if p['type_id']==1346)['is_lock']=True
+        self.b.save(r);before=self.b.profile()
+        self.assertEqual(self.req(1051,item_type=1346,item_id=item['id'],item_count=1,des_type=1,des_id=0)[0][0],55)
+        self.assertEqual(before,self.b.profile())
+
+    def test_experience_pet_cannot_train_or_star(self):
+        target,*sources=self.seed([(101,3)]+[(102,1)]*5)
+        r=self.b.profile();summon.add_item(r,1347,100);summon.add_item(r,1345,100);self.b.save(r)
+        for op in (3,5,6):
+            before=self.b.profile()
+            self.assertEqual(self.req(1330,flag=1,id=op,data=summon.lua(dict(des_id=target,pos=1,src_list=sources)))[0][0],55)
+            self.assertEqual(before,self.b.profile())
+
+    def test_client_entry_adapter_is_packaged(self):
+        source=summon.client_source(summon.load_rules())
+        self.assertIn('profile.showPlayerInfoLayer=function',source)
+        self.assertIn('pet.pet_is_open=true',source)
+        self.assertIn('_localPetRestore',Path('network_redirect/summon_client.js').read_text())

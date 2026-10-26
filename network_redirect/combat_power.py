@@ -200,7 +200,7 @@ def explain(role, rules, now=None):
 
 def recalculate(role, rules, now=None):
     """[B] Server formula using [A] base/growth/equipment/fate coefficients."""
-    from . import formation as f, reborn, reborn_stars, immortal
+    from . import formation as f, reborn, reborn_stars, immortal, spirit_array
     immortal.collection_bonuses(role)
     BASES, SKILLS, ITEMS, FATES = f.BASES, f.SKILLS, f.ITEMS, f.FATES
     BASE_COLUMNS, GROWTH_COLUMNS = f.BASE_COLUMNS, f.GROWTH_COLUMNS
@@ -226,6 +226,8 @@ def recalculate(role, rules, now=None):
         for stat, growth in zip(STATS, GROWTH_COLUMNS):
             values[stat] += floor(Decimal(base[growth]) * 3) * c.get('evolve_level', 0)
         record(trace, 'evolution', values)
+        spirit_array.base_bonuses(role, c, values)
+        ling = spirit_array.effects(role) if 1 <= c.get('order', 0) <= 8 else {}
         equipped = [i for i in role['attachments'] if
                     (i.get('innate_owner_id') == c['id']) or
                     (not i.get('innate_owner_id') and 1 <= c.get('order', 0) <= 8
@@ -235,7 +237,7 @@ def recalculate(role, rules, now=None):
         for item in equipped:
             if item['attach_type'] == 5 and item['type_id'] in ITEMS and int(ITEMS[item['type_id']]['main_type']) in (1, 2, 3):
                 item['effect_value'] = equip_effect(item)
-                values[{1: 'gongji', 2: 'fangyu', 3: 'hp'}[int(ITEMS[item['type_id']]['main_type'])]] += item['effect_value']
+                values[{1: 'gongji', 2: 'fangyu', 3: 'hp'}[int(ITEMS[item['type_id']]['main_type'])]] += Decimal(item['effect_value']) * (1 + ling.get({1:7, 2:8, 3:9}[int(ITEMS[item['type_id']]['main_type'])], Decimal(0))/100)
                 extra_rates[{1: 'gongji', 2: 'fangyu', 3: 'hp'}[int(ITEMS[item['type_id']]['main_type'])]] += advance_worth(item)[2]
             elif item['attach_type'] == 6 and item['type_id'] in SKILLS:
                 item['effect_value'] = skill_effect(item)
@@ -244,7 +246,7 @@ def recalculate(role, rules, now=None):
                     field = int(cfg['effect_field(1-gongji，2-fangyu，3-magic，4-intensity，5-hp)'])
                     if field in (1, 2, 3, 5):
                         s = {1: 'gongji', 2: 'fangyu', 3: 'magic', 5: 'hp'}[field]
-                        passive_rates[s] += Decimal(item['effect_value']) / 100
+                        passive_rates[s] += Decimal(item['effect_value']) / 100 * (1 + ling.get({1:5, 2:6, 3:0, 5:10}[field], Decimal(0))/100)
                     from .skill_insight import hp_percent
                     passive_rates['hp'] += hp_percent(item) / 100
         record(trace, 'equipment', values)
@@ -304,6 +306,8 @@ def recalculate(role, rules, now=None):
         if policy['explicit_channels']:
             add_channels(role, c, values)
         record(trace, 'explicit_channels', values)
+        spirit_array.final_bonuses(role, c, values)
+        record(trace, 'spirit_array', values)
         trace['source_inputs'] = copy.deepcopy({'role': role.get('combat_sources', {}),
                                                  'companion': c.get('combat_sources', {})})
         for s in STATS:

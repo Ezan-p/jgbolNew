@@ -223,6 +223,7 @@ class GuildTests(unittest.TestCase):
     def test_hunt_daily_and_shop(self):
         self.create()
         for i in (1,2,3):self.ok(84,task_index=i,task_type=1,pay_type=1)
+        self.assertEqual(sum(p["count"] for p in self.role()["attachments"] if p["type_id"]==1346),3)
         r=self.role();self.assertEqual(self.req(84,task_index=1,task_type=1)[-1][1],55);self.assertEqual(r,self.role())
         self.ok(91,two_type=2,index=1,buy_count=1)
         self.assertEqual(self.role()['guild']['instances']['reputation'],40)

@@ -50,6 +50,8 @@ def settle(role,s,g,op,d,now,r):
             elif idx not in a['tasks']:a['tasks'].append(idx)
             a['reputation']+=10*idx;a['week_score']=a.get('week_score',0)+10*idx;a['total_reputation']=a.get('total_reputation',0)+10*idx;offline.funds(g,100*idx,r)
             prizes=[journey.grant(role,p[:2]+[p[2]*idx,p[3]]) for p in r['hunt_rewards']]
+            from . import pets
+            prizes.append(journey.grant(role,[5,1346,pets.load_rules()['task_training_boxes'],1]))
         out.append(u.reply(84,dict(result=1,task_type=typ,task_index=idx,fight_result=won,boss_info=task(r,idx)['boss_info'],prize_reputation=10*idx if won else 0,prize_union_gold=100*idx if won else 0,prize_list=prizes,animal_info=[])))
         return out
     if op==86:

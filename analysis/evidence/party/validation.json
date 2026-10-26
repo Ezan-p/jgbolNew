@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-26",
+  "regression": {
+    "tests": 128,
+    "result": "passed",
+    "command": "PYTHONPATH=tests:. .runtime/venv/bin/python -m unittest tests.test_activity_party tests.test_activity tests.test_activity_rank tests.test_daily tests.test_achievements -q"
+  },
+  "final_party_tests": {
+    "tests": 13,
+    "result": "passed"
+  },
+  "original_client": {
+    "version": "3.87",
+    "device": "emulator-5562",
+    "fixture": "analysis/tools/build_party_client_fixture.py",
+    "temporary_backend": true,
+    "server_requests_blocked": true,
+    "cases": [
+      {
+        "name": "entry",
+        "passed": true
+      },
+      {
+        "name": "fight_data_and_rank",
+        "passed": true
+      },
+      {
+        "name": "fight_reward",
+        "passed": true
+      },
+      {
+        "name": "history_and_felstar",
+        "passed": true
+      },
+      {
+        "name": "weekly_rank_and_prize_button",
+        "passed": true
+      },
+      {
+        "name": "champion_notice",
+        "passed": true
+      },
+      {
+        "name": "exhausted",
+        "passed": true
+      }
+    ]
+  },
+  "limitations": [
+    "原服结算配置缺失，推测规则详见文档",
+    "客户端检查覆盖原版界面回调，未逐帧验收全部战斗动画"
+  ]
+}

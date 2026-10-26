@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-26",
+  "official_server_available": false,
+  "evidence": [
+    {
+      "logical": "csv_config/fate_config.csv",
+      "sha256": "5981b005b633dbe4666eac9e19369fb4d52bf45b8ff08636eac91d4519be98cb",
+      "values_match": true
+    },
+    {
+      "logical": "csv_config/item_base.csv",
+      "sha256": "2b49aa78b7ea27e7f98c896cc984c2f3a69ac6721c6ef167f20cd4b649aff1c7",
+      "values_match": true
+    },
+    {
+      "logical": "csv_config/item_name.csv",
+      "sha256": "107da82bd2e8050c6e44dd8da0875f874a56de4cd29db58bc6a4959d3072e685",
+      "values_match": true
+    },
+    {
+      "logical": "csv_config/equip_transfer_config.csv",
+      "sha256": "1b9a12eb151b82433334d532520cac867b0ea5ee84e676d5ecb21c6062024f0e",
+      "values_match": true
+    },
+    {
+      "logical": "csv_config/equip_star_cost.csv",
+      "sha256": "91beab2b4d7612405ac1efd1c8e8ea47a2d4b9d69292aede15c49cb207b64842",
+      "values_match": true
+    },
+    {
+      "logical": "csv_config/equip_advance_cost.csv",
+      "sha256": "1ff63ceafa8d945a7233a79d93612386d616baeeac2680a2a6b63e9e2a944dc8",
+      "values_match": true
+    },
+    {
+      "logical": "csv_config/equip_enhance_cost.csv",
+      "sha256": "18276a5acd46968a47c6adec81cc3ca99a008bc7bd4ca52f2ab8bce5472c1e3e",
+      "values_match": true
+    },
+    {
+      "logical": "lua/ui/cortegeRecycleUI.lua",
+      "sha256": "bcc8c00d8710d13c0f888138ff26b2dbe14be8e2d93ac6dfc10406c03b8f5c07",
+      "preview_increment": 1,
+      "preview_level_modulo": 15
+    }
+  ],
+  "policy": {
+    "schema_version": 1,
+    "mode": "inferred",
+    "revision": "2026-10-26-recycle-1",
+    "fate_advanced_percent": 25,
+    "growth_policy": "consume_without_refund",
+    "bound_items_policy": "return_except_innate"
+  }
+}

@@ -42,7 +42,7 @@ class RapeTests(ActivityCase):
         after=self.b.profile()
         self.assertEqual(after['energy'],before['energy']-9)
         self.assertEqual(after['gold_coin'],before['gold_coin']-9)
-        self.assertEqual(len(after['attachments']),len(before['attachments'])+12)
+        self.assertEqual(len(after['attachments']),len(before['attachments'])+3)
         self.assertTrue(all(b['reward_claimed'] for b in after['activity']['rape_boards']))
         self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
         self.assertEqual(after,self.b.profile())
@@ -72,7 +72,7 @@ class RapeTests(ActivityCase):
         self.assertFalse(self.b.profile()['activity']['rape_revenge'])
 
     def test_special_dice_and_query_idempotence(self):
-        for dice,count,claimed in (([1,2,3],2,False),([2,2,2],1,True)):
+        for dice,count,claimed in (([1,2,3],2,False),([2,2,2],1,False)):
             r=self.b.profile();r['activity']['rape_boards']=None;self.b.save(r)
             with patch('network_redirect.activity_rape.roll_forms',return_value=dice):boards=self.board()
             self.assertTrue(all(b['skill_count']==count and b['reward_claimed']==claimed for b in boards))
@@ -120,3 +120,89 @@ class RapeTests(ActivityCase):
         self.assertEqual(len([k for k in result if isinstance(k,int)]),2)
         after=self.b.profile();self.assertEqual(after['energy'],0);self.assertEqual(after['gold_coin'],before['gold_coin'])
         self.assertFalse(any(t['has_win'] for b in after['activity']['rape_boards'] for t in b['form_list']['2'].values()))
+
+    def test_dice_counts_and_only_column_preview_is_awarded(self):
+        r=self.b.profile();r['activity']['rape_boards']=None;self.b.save(r)
+        with patch.object(rape,'roll_forms',return_value=[4,6,2]):boards=self.board()
+        self.assertEqual([len(b['form_list']['2']) for b in boards],[4,6,2])
+        before=self.b.profile();ids=list(boards[0]['form_list']['2'])
+        with patch.object(rape.journey,'battle',return_value=(1,[],[])):
+            for ident in ids[:-1]:
+                events=self.fight(1,ident);self.ok(events)
+                self.assertEqual(next(d for e,d in events if e==41)['skill_count'],0)
+                self.assertEqual(self.b.profile()['attachments'],before['attachments'])
+                self.assertEqual(self.b.profile()['silver_coin'],before['silver_coin'])
+            events=self.fight(1,ids[-1]);self.ok(events)
+        reward=next(d for e,d in events if e==41)
+        self.assertEqual(reward['skill_count'],boards[0]['skill_count'])
+        added=[v for v in self.b.profile()['attachments'] if v['id'] not in {x['id'] for x in before['attachments']}]
+        self.assertEqual(len(added),boards[0]['skill_count'])
+        self.assertTrue(all(x['type_id']==boards[0]['skill_type'] for x in added))
+        self.assertEqual(self.b.profile()['silver_coin'],before['silver_coin'])
+
+    def test_refresh_remaining_counts_and_paid_refresh_at_zero(self):
+        initial=next(d for e,d in self.req(1029,flag=1) if e==40)
+        limit=initial['free_count'];gold=self.b.profile()['gold_coin']
+        for remaining in range(limit-1,-1,-1):
+            out=self.req(1029,flag=2);self.ok(out)
+            self.assertEqual(next(d for e,d in out if e==40)['free_count'],remaining)
+            self.assertEqual(self.b.profile()['gold_coin'],gold)
+        before=self.b.profile();self.assertIn(55,[e for e,d in self.req(1029,flag=2)])
+        self.assertEqual(before,self.b.profile())
+        out=self.req(1029,flag=3);self.ok(out)
+        self.assertEqual(next(d for e,d in out if e==40)['free_count'],0)
+        self.assertEqual(self.b.profile()['gold_coin'],gold-self.b.activity_rules['rape_refresh_gold'])
+        self.assertEqual(self.b.profile()['activity']['rape_refreshes'],limit)
+
+    def test_sweep_continue_refreshes_and_second_click_does_not_spend(self):
+        old=self.board();before=self.b.profile()
+        with patch.object(rape.journey,'battle',return_value=(1,[],[])):
+            self.ok(self.req(1072))
+        cleared=self.b.profile()
+        self.assertEqual(self.board(),cleared['activity']['rape_boards'])
+        out=self.req(1029,flag=4);self.ok(out);packet=self.packet;replies=self.replies
+        data=next(d for e,d in out if e==40);after=self.b.profile()
+        self.assertEqual(data['free_count'],before['rape_flush_limit']-1)
+        self.assertEqual(data['update_type'],2)
+        self.assertFalse(any(t['has_win'] for b in after['activity']['rape_boards'] for t in b['form_list']['2'].values()))
+        self.assertTrue({k for b in old for k in b['form_list']['2']}.isdisjoint({k for b in after['activity']['rape_boards'] for k in b['form_list']['2']}))
+        self.assertEqual(self.b.respond(packet,self.state),replies);self.assertEqual(after,self.b.profile())
+        self.assertIn(55,[e for e,d in self.req(1029,flag=4)]);self.assertEqual(after,self.b.profile())
+
+    def test_continue_paid_or_insufficient_gold_preserves_cleared_board(self):
+        self.board()
+        with patch.object(rape.journey,'battle',return_value=(1,[],[])):self.ok(self.req(1072))
+        r=self.b.profile();r['activity']['rape_refreshes']=r['rape_flush_limit'];r['gold_coin']=0;self.b.save(r)
+        before=self.b.profile();self.assertIn(55,[e for e,d in self.req(1029,flag=4)])
+        self.assertEqual(before,self.b.profile())
+        r['gold_coin']=100;self.b.save(r);out=self.req(1029,flag=4);self.ok(out)
+        d=next(d for e,d in out if e==40)
+        self.assertEqual((d['free_count'],d['update_type']),(0,3))
+        self.assertEqual(self.b.profile()['gold_coin'],100-self.b.activity_rules['rape_refresh_gold'])
+
+    def test_six_guards_per_column_and_triples_never_auto_award(self):
+        r=self.b.profile();before=len(r['attachments'])
+        with patch.object(rape,'roll_forms',return_value=[6,6,6]):boards=self.board()
+        self.assertEqual([len(b['form_list']['2']) for b in boards],[6,6,6])
+        self.assertEqual(len(self.b.profile()['attachments']),before)
+        with patch.object(rape.journey,'battle',return_value=(1,[],[])):
+            out=self.req(1072);self.ok(out)
+        results=next(d for e,d in out if e==114)
+        self.assertEqual(len([k for k in results if isinstance(k,int)]),18)
+        self.assertTrue(results['pass_all_form'])
+        self.assertEqual(len(self.b.profile()['attachments']),before+3)
+        for b in boards:
+            self.assertEqual([t['index'] for t in b['form_list']['2'].values()],list(range(1,7)))
+
+    def test_paid_and_continue_refresh_count_daily_but_next_day_query_does_not(self):
+        self.board();self.ok(self.req(1029,flag=3))
+        state=self.b.profile()
+        self.assertEqual(state['daily']['points']['3'],5)
+        self.assertEqual(state['activity']['rape_refreshes'],0)
+        with patch.object(rape.journey,'battle',return_value=(1,[],[])):self.ok(self.req(1072))
+        self.ok(self.req(1029,flag=4))
+        self.assertEqual(self.b.profile()['daily']['points']['3'],10)
+        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+            self.board()
+            self.assertEqual(self.b.profile()['daily']['points'].get('3',0),0)
+            self.assertEqual(self.b.profile()['activity']['rape_total_refreshes'],0)
