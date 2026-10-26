@@ -11,6 +11,7 @@ class GuildTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None);self.addCleanup(lambda:self.b.close())
+        self.b.guild_rules['wars_enabled']=True  # Isolated legacy tournament coverage only.
         # This legacy suite exercises settlements independent of weekday; the
         # default original calendar/gates are covered by test_guild_npc_combat.
         self.b.guild_rules.update(pet_role_level=0,pet_union_level=0,wander_daily=3,train_weekend_only=False,lucky_weekend_only=False,hunt_weekend_open=True)
@@ -34,6 +35,7 @@ class GuildTests(unittest.TestCase):
         self.assertEqual(self.role(),r)
         self.assertEqual(self.req(18,query_type=1)[-1][2]['union_info']['name'],'测试仙盟')
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.b.guild_rules['wars_enabled']=True  # Isolated legacy tournament coverage only.
         self.assertEqual(self.role()['union_id'],r['union_id'])
     def test_level_cost_and_name(self):
         r=self.role();r['level']=1;self.b.save(r);before=self.role();self.assertEqual(self.req(1,union_name='测试仙盟')[-1][1],55);self.assertEqual(before,self.role())
@@ -410,6 +412,7 @@ class GuildTests(unittest.TestCase):
         self.assertEqual((p['level'],p['quality'],p['star'],len(a['pets'])),(2,2,2,1))
         before=self.role();self.assertEqual(self.req(23,chat_msg='/合成 1 1')[-1][1],55);self.assertEqual(before,self.role())
         self.ok(23,chat_msg='/灵兽');self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.b.guild_rules['wars_enabled']=True  # Isolated legacy tournament coverage only.
         self.assertEqual(self.role()['guild']['instances']['pet_entities'][0],p)
 
     def test_capture_failure_escape_and_update_events(self):
@@ -501,7 +504,7 @@ class GuildTests(unittest.TestCase):
         self.ok(3);before=self.role();self.assertEqual(self.req(4,union_id=1)[-1][1],55);self.assertEqual(before,self.role())
 
     def test_trial_stage_prizes_cannot_repeat(self):
-        self.create();self.ok(79);r=self.role();a=r['guild']['instances'];a.update(train_open=True,train_hp=7500,train_end=NOW+3600);self.b.save(r)
+        self.create();self.ok(79);r=self.role();a=r['guild']['instances'];a.update(train_open=True,train_cleared=1,train_floor=2,train_hp=20000,train_end=NOW+3600);self.b.save(r)
         self.ok(82);self.assertEqual(self.role()['guild']['instances']['train_claimed_stage'],1)
         before=self.role();self.assertEqual(self.req(82)[-1][1],55);self.assertEqual(before,self.role())
         r=self.role();r['guild']['instances'].update(train_hp=0,train_done=True);self.b.save(r)

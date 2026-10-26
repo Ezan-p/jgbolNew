@@ -1,10 +1,9 @@
-import copy
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from network_redirect import guild_instances, summon
+from network_redirect import summon
 from network_redirect.backend import Backend, login_fields
 from network_redirect.protocol import encode, decode
 
@@ -40,6 +39,10 @@ class GuildActivityFixTests(unittest.TestCase):
             self.assertGreater(info['last_time'],self.now)
             self.assertLessEqual(info['last_time']-self.now,86400)
             self.assertEqual(len(self.req(83)[-1]['union_task']),3)
+            deadline=self.req(88)[-1]['task_last_time']
+            self.assertGreater(deadline,self.now)
+            self.assertLessEqual(deadline-self.now,86400)
+            self.assertEqual((deadline+r['timezone_offset_hours']*3600)%86400,0)
         self.req(89)
         self.assertEqual(self.b.profile()['guild']['instances']['lucky_week_used'],1)
 

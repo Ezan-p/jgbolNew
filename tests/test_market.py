@@ -54,7 +54,8 @@ class MarketTests(unittest.TestCase):
         self.assertEqual(cfg[23], self.backend.formation_rules['equipment_advance'])
         goods = cfg[10]
         self.assertEqual(len(goods['cheap_item_list']), 7)
-        self.assertEqual(len(goods['rich_item_list']), 8)
+        self.assertEqual(len(goods['rich_item_list']), 9)
+        self.assertEqual(goods['rich_item_list'][9137]['type_id'], 1243)
         self.assertEqual(len(goods['limit_item_list']), 0)
         for raw in market.CATALOG:
             if raw['begin_time'] != '0':

@@ -1,0 +1,207 @@
+{
+  "client": "3.87",
+  "official_server_available": false,
+  "sources": [
+    {
+      "logical": "lua/ui/turntableUI.lua",
+      "path": "jgbol3.87/assets/release_/12826e552728da7442927bd96b4c7f04.data",
+      "sha256": "bf1f9063a520b90451855830e5ab3e64c7d66a3da2a8356879d96bc6c312d7ff"
+    },
+    {
+      "logical": "lua/ui/activityUI.lua",
+      "path": "jgbol3.87/assets/release_/f94624a6c6a5f4034d0fdf2e315f0904.data",
+      "sha256": "b62f2dffa9e3707ce73f2b5fedbb147433544d735ec722519d377a31698f134f"
+    },
+    {
+      "logical": "lua/ui/funUI.lua",
+      "path": "jgbol3.87/assets/release_/5dd8b529cd13d0983be4c09ea5cd56db.data",
+      "sha256": "0551c970ff68fdc33625dd35036bcc7b3ecf0e058d6c04ecef4876c42a41214d"
+    },
+    {
+      "logical": "lua/event_mgr.lua",
+      "path": "jgbol3.87/assets/release_/ae0f40d1631f06ad6e89a50dc5ea4c26.data",
+      "sha256": "ad671dc53da75f3f413e6ca0519cbbee0bf114a7b49864bb3c38f723ab4b77ed"
+    },
+    {
+      "logical": "lua/common/common_def.lua",
+      "path": "jgbol3.87/assets/release_/13a640e1f35a7599fe90dd31c8098b15.data",
+      "sha256": "15a4299fc92c50adda7682a4775f2e278e135f49f12d126e105a03d097d9ecf8"
+    },
+    {
+      "logical": "lua/common/msg_def.lua",
+      "path": "jgbol3.87/assets/release_/6dc7effc05688bb493fa72368df65d46.data",
+      "sha256": "12cbfbed63d3696347bf066bd61836b287d129323dd4a147f792814b0493a049"
+    },
+    {
+      "logical": "lua/ui/packageUI.lua",
+      "path": "jgbol3.87/assets/release_/96d7bfc80446c4ad76e979a14eb48185.data",
+      "sha256": "6f5e7e86418fdef9c1ca32aa9cc3c2fc7966d2c8735cae4cbd0982d3ae1f261d"
+    },
+    {
+      "logical": "lua/data.lua",
+      "path": "jgbol3.87/assets/release_/addd745afbcab3049f3e12eed115a370.data",
+      "sha256": "f3d994283064c92bc5ba01ed5bd810785d26cd7509dbac508f96b46b992be5a3"
+    },
+    {
+      "logical": "v2/String.plist",
+      "path": "jgbol3.87/assets/release_/08b0428edce64d19f304d30c3829ec87.data",
+      "sha256": "e04af124a848226b08c5a73069666e5eb5fd96294725e380a3e187e7a63b4dc4"
+    },
+    {
+      "logical": "v2/String2.plist",
+      "path": "jgbol3.87/assets/release_/e926a25accffd37afafb015933e815d4.data",
+      "sha256": "1fe10126d1e888551fbe998879cd2d0a1db404e9c6406bccb620f117e31a4943"
+    },
+    {
+      "logical": "csv_config/happiness_bag_config.csv",
+      "path": "jgbol3.87/assets/release_/ecd1926c22b3ad11fc88546e079b74ed.data",
+      "sha256": "a62d96e7560d9a06acf27be6ba69a7f72133d2f335574df215dad337b721059a",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/item_base.csv",
+      "path": "jgbol3.87/assets/release_/803063b5ac66c77a4fe454fbc3ca9697.data",
+      "sha256": "2b49aa78b7ea27e7f98c896cc984c2f3a69ac6721c6ef167f20cd4b649aff1c7",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/item_name.csv",
+      "path": "jgbol3.87/assets/release_/70cb741174c493cf0a6d5de29ad7894c.data",
+      "sha256": "107da82bd2e8050c6e44dd8da0875f874a56de4cd29db58bc6a4959d3072e685",
+      "csv_values_match": true
+    }
+  ],
+  "strings": {
+    "turntable_1": "活动剩余时间：",
+    "turntable_2": "本期额外豪礼",
+    "turntable_3": "活动期间累计充值         元，可以获得额外豪礼",
+    "turntable_4": "活动期间已充值（%d元）",
+    "turntable_5": "活动期间玩家充值达到指定额度可以获得一次转盘机会，每次将获得随机一个道具。同时充值到指定档次可以获得豪礼，点击图标查看详情。",
+    "turntable_tt_1": "可抽奖次数：%d",
+    "turntable_tips_1": "抽奖次数不足",
+    "turntable_info_1": "如来小福袋数量",
+    "turntable_info_2": "如来大福袋数量",
+    "dream20": "可开出如来魂魄或五法界魂箱"
+  },
+  "request": {
+    "id": 1351,
+    "fields": "serial_num=I,id=B,data=s",
+    "operations": {
+      "enter": 0,
+      "draw": 1,
+      "bonus": 2
+    }
+  },
+  "event": 200,
+  "A": [
+    "activityID49; funUI gated by native start_time<now<end_time; activity_type73/event113 schedule",
+    "eight wheel slots; each request draws one random item; original animation lasts5seconds",
+    "recharge grants draws, cumulative recharge unlocks extra gift; thresholds and prizes supplied by server",
+    "prize_status1=unavailable,2=claimable,3=claimed; callback flag drives hint",
+    "happiness_bag_config:1367 -> 5 souls5053 OR50 boxes1249;1368 ->20 souls OR200 boxes",
+    "native bag picker maximum15 per use; request1051 target object_type10/5 and type ID",
+    "large bag short description mistakenly repeats small bag; full description and CSV agree20/200"
+  ],
+  "B": [
+    "weekly season at Monday00:00UTC+8, no historical schedule available",
+    "cumulative each30RMB earns one draw;300RMB extra big bag once; no daily free/guarantee",
+    "10base gold per simulated RMB, bonus gold excluded, partial amounts carry within season",
+    "eight rewards/weights from local configuration; not certified official probability",
+    "award and debit in same transaction before animation; replay cache and persisted account balances",
+    "new season clears charge/draw/claim counters; inventory/souls remain; bag usage independent of season",
+    "recharge close refreshes native UI; login/status updates schedule and hint"
+  ],
+  "inferred_config": {
+    "schema_version": 1,
+    "mode": "inferred",
+    "revision": "rulai-2026-10-26-v1",
+    "enabled": true,
+    "timezone_offset_hours": 8,
+    "period_days": 7,
+    "gold_per_rmb": 10,
+    "rmb_per_draw": 30,
+    "bonus_rmb": 300,
+    "bonus": [
+      [
+        5,
+        1368,
+        1,
+        1
+      ]
+    ],
+    "pool": [
+      {
+        "reward": [
+          5,
+          1001,
+          30,
+          1
+        ],
+        "weight": 2500
+      },
+      {
+        "reward": [
+          5,
+          1006,
+          3,
+          1
+        ],
+        "weight": 2000
+      },
+      {
+        "reward": [
+          5,
+          1007,
+          1,
+          1
+        ],
+        "weight": 1800
+      },
+      {
+        "reward": [
+          5,
+          1024,
+          5,
+          1
+        ],
+        "weight": 1500
+      },
+      {
+        "reward": [
+          5,
+          1249,
+          10,
+          1
+        ],
+        "weight": 1000
+      },
+      {
+        "reward": [
+          5,
+          1015,
+          5,
+          1
+        ],
+        "weight": 700
+      },
+      {
+        "reward": [
+          5,
+          1367,
+          1,
+          1
+        ],
+        "weight": 400
+      },
+      {
+        "reward": [
+          5,
+          1368,
+          1,
+          1
+        ],
+        "weight": 100
+      }
+    ]
+  }
+}

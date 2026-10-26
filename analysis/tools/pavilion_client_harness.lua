@@ -61,6 +61,26 @@ check('live recharge and mail snapshot refresh',function()
  balance=0;ms.d_data.callback_update_config({local_pavilion={data=FIXTURE.entry,status=FIXTURE.status}})
  assert(ui.g_self.money_info.count==0);assert(ui.g_csv.shop[3].left_buy_count==15)
 end)
+for index,data in ipairs(FIXTURE.ascension) do
+ check('ascension exhausted hint '..index,function()
+  ui.g_self.cur_page=1
+  local labels={};local create=ms.d_u.createByStyle
+  ms.d_u.createByStyle=function(style,...)
+   if style.string then labels[#labels+1]=tostring(style.string) end
+   return create(style,...)
+  end
+  local ok,err=pcall(ms.d_data.callback_update_config,{local_pavilion={data=data,status=FIXTURE.status}})
+  ms.d_u.createByStyle=create
+  assert(ok,err)
+  local text=table.concat(labels,'\n')
+  if index<3 then
+   assert(string.find(text,'可以提升1次购买上限',1,true),text)
+   assert(string.find(text,tostring(data.exchange_info[1].need_charge),1,true),text)
+  else
+   assert(not string.find(text,'可以提升',1,true),text)
+  end
+ end)
+end
 root:removeAllChildrenWithCleanup(true);root:release()
 for i=#saved,1,-1 do local row=saved[i];for k in pairs(row.t) do row.t[k]=nil end;for k,v in pairs(row.old) do row.t[k]=v end end
 ms.MS_report_error=report

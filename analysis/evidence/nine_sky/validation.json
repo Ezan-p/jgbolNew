@@ -1,0 +1,145 @@
+{
+  "date": "2026-10-26",
+  "timezone": "Asia/Shanghai",
+  "full_regression": {
+    "tests": 1013,
+    "passed": 993,
+    "errors": 20,
+    "reason": "sandbox forbids localhost bind; affected classes rerun with loopback allowed",
+    "log": "full_regression.log"
+  },
+  "network_retests": {
+    "tests": 23,
+    "passed": 23,
+    "log": "network_retests.log"
+  },
+  "final_targeted": {
+    "tests": 30,
+    "passed": 30,
+    "nine_sky": 13,
+    "market": 17,
+    "log": "targeted_tests.log"
+  },
+  "native_ui": {
+    "checks": 25,
+    "passed": true,
+    "file": "client_validation.json"
+  },
+  "native_animation": {
+    "passed": true,
+    "all_treasure_types": true,
+    "palace_purchase_during_animation": true,
+    "file": "animation_validation.json"
+  },
+  "playthrough": {
+    "passed": true,
+    "requests": 45,
+    "rolls": 347,
+    "steps": 950,
+    "floor": 9,
+    "stars": 4415,
+    "gold_spent": 34000,
+    "restart_preserved": true,
+    "star_shop_reward_souls": 5,
+    "live_account_modified": false,
+    "temporary_starting_gold": 100000
+  },
+  "runtime": {
+    "restarted": true,
+    "session": ".runtime/redirect/sessions/20261026T124326Z-cf2d9653",
+    "probes": [
+      {
+        "time": "2026-10-26T12:43:39.390+00:00",
+        "level": "I",
+        "kind": "probe_result",
+        "message": "probe_result",
+        "result": {
+          "dns": 0,
+          "resolved": "127.0.0.1",
+          "ipv4": {
+            "connect": 0,
+            "ok": true,
+            "caller_port_unchanged": true
+          },
+          "ipv6": {
+            "connect": 0,
+            "ok": true,
+            "caller_port_unchanged": true
+          }
+        }
+      },
+      {
+        "time": "2026-10-26T12:43:41.470+00:00",
+        "level": "I",
+        "kind": "tls_probe_result",
+        "message": "tls_probe_result",
+        "result": {
+          "status": 200,
+          "cipher": "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+        }
+      },
+      {
+        "time": "2026-10-26T12:43:41.810+00:00",
+        "level": "I",
+        "kind": "native_tls_probe_result",
+        "message": "native_tls_probe_result",
+        "result": {
+          "curl_result": 0,
+          "http_status": 200,
+          "response_bytes": 24
+        }
+      },
+      {
+        "time": "2026-10-26T12:44:15.282+00:00",
+        "level": "I",
+        "kind": "local_summon_ui_ready",
+        "message": "召唤元宝入口已启用，价格与服务端配置同步",
+        "process": "com.sygame.jingubang.p360",
+        "pid": 8691
+      }
+    ]
+  },
+  "files": [
+    {
+      "path": "network_redirect/activity_nine_sky.py",
+      "sha256": "a001cebee9ed8526a466a4ee40e9f0f086af1bc234377542b960ed2d48609a11"
+    },
+    {
+      "path": "network_redirect/nine_sky_client.lua",
+      "sha256": "1c25798e8e65444a0dfe2596bacaca1ae11b6e96163c0a3368c359be858c736e"
+    },
+    {
+      "path": "server_config/nine_sky_rules.json",
+      "sha256": "b9ab8023287cb41ed968f130658007399e81ec4bfa2ac9aaaaa3cf8049abcf6b"
+    },
+    {
+      "path": "tests/test_activity_nine_sky.py",
+      "sha256": "7dd6a788958b4af96c0ddc588dde1a4b4b9ac4e9750326b6ff36c2e5dd409f4b"
+    },
+    {
+      "path": "network_redirect/activity.py",
+      "sha256": "513fb322e60ba1bb994451f07830c1f51d54a3b4c2ed036ce233666f9e451300"
+    },
+    {
+      "path": "network_redirect/backend.py",
+      "sha256": "8191326e8a7b05c4d2fc48e6b03f6c2b57c0442e63b378a8c4d505cd64b968c8"
+    },
+    {
+      "path": "network_redirect/market.py",
+      "sha256": "970c7b72b6479713fa0ca9907b2a977b9dd45a79ee6d6c448682d75ead2cbfd7"
+    },
+    {
+      "path": "network_redirect/summon.py",
+      "sha256": "77d2c2ae7cf1d91d3713008578efc0338524a8854adfd6776223634825a62730"
+    },
+    {
+      "path": "network_redirect/summon_client.js",
+      "sha256": "5afed072472d1b4ec550d4843b17c3590afafa26423e4e44c42c9e6eaa96dc64"
+    }
+  ],
+  "limits": [
+    "Original official service unavailable; missing probabilities, catalogs and seasons explicitly inferred.",
+    "Native tests use isolated/hidden Cocos scenes; real account balances not changed.",
+    "Whole suite ran before final bag/animation hardening; final affected code covered by targeted and native reruns."
+  ]
+}

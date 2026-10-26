@@ -91,6 +91,7 @@ def bet_data(role,s,g,now,r,cross=False):
 
 
 def query(role,s,g,d,now,r,cross=False):
+    u.require(r['wars_enabled'],u.WAR_CLOSED)
     op=58 if cross else 18;q=d['query_type'];m=state(s,cross,r)
     if m.get('union_id',g['id'])!=g['id']:
         g=s['unions'].get(str(m['union_id'])) or m['union_snapshot']
@@ -144,6 +145,7 @@ def rewards(role,s,g,r,cross=False):
 
 def rollover(role,now,r):
     """Mail unclaimed daily rewards before replacing a tournament (also offline)."""
+    if not r['wars_enabled']:return
     from . import system_mail,welfare
     for cross,key in ((False,'match'),(True,'cross_match')):
         s=role.get('guild',{});m=s.get(key,{})
@@ -200,6 +202,7 @@ def npc_round(role,s,g,now,r,jrules,cross):
 
 
 def settle(role,s,g,op,d,now,r):
+    u.require(r['wars_enabled'],u.WAR_CLOSED)
     cross=op in (58,62,63,76);m=state(s,cross,r)
     if op==58:
         if d.get('query_type')==28:
@@ -239,6 +242,7 @@ def settle(role,s,g,op,d,now,r):
 
 
 def fight(role,s,g,req,now,r,jrules):
+    u.require(r['wars_enabled'],u.WAR_CLOSED)
     from .guild_combat import simulate
     cross=req['fight_type'] in (17,23,24,32,33);m=state(s,cross,r)
     u.require(m.get('union_id',g['id'])==g['id'],'本日已代表其他仙盟参战，请次日再战')

@@ -20,6 +20,15 @@ def main():
         def req(flag,index=0,count=0,ten_card=0,five_card=0):
             return login_fields(decode(p.settle(role,dict(flag=flag,index=index,count=count,ten_card=ten_card,five_card=five_card),now)[0])[2]['data'])
         fixtures=dict(entry=req(1),status=p.status(role,now),exchange=req(2,3,2),gift=req(3,1))
+        fixtures['ascension'] = []
+        for gold in (0, 10000, 30000):
+            trial = b.profile()
+            if gold:
+                p.record_charge(trial, gold, now)
+            summon.add_item(trial, 1141, 4000)
+            limit = p.catalog(trial, now, r)['exchange_info'][1]['left_buy_count']
+            p.settle(trial, dict(flag=2, index=1, count=limit, ten_card=0, five_card=0), now)
+            fixtures['ascension'].append(p.catalog(trial, now, r))
         b.close()
     script='local FIXTURE='+summon.lua(fixtures)+'\n'+(ROOT/'analysis/tools/pavilion_client_harness.lua').read_text().replace('-- INSTALL_PATCH', (ROOT/'network_redirect/pavilion_client.lua').read_text().replace('__PAVILION_TABLES__',summon.lua(p.client_tables())))
     path=ROOT/'.runtime/pavilion-native-fixture.lua';path.write_text(script)

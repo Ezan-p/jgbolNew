@@ -1,4 +1,4 @@
-"""天工制物阁: original 1227/event195 and CSV [A], local seasons [B]."""
+"""天机阁: original 1227/event195 and CSV [A], local seasons [B]."""
 import json
 from pathlib import Path
 
@@ -28,19 +28,19 @@ def client_tables():
 def load_rules(path=ROOT / 'server_config/pavilion_rules.json'):
     r = json.loads(Path(path).read_text())
     f.require(r.get('schema_version') == 1 and r.get('mode') == 'inferred'
-              and bool(r.get('revision')), '天工配置来源无效')
-    f.require(type(r.get('enabled')) is bool, '天工开放开关无效')
+              and bool(r.get('revision')), '天机配置来源无效')
+    f.require(type(r.get('enabled')) is bool, '天机开放开关无效')
     f.require(type(r.get('timezone_offset_hours')) is int
-              and -12 <= r['timezone_offset_hours'] <= 14, '天工时区无效')
+              and -12 <= r['timezone_offset_hours'] <= 14, '天机时区无效')
     for key, upper in (('period_days', 365), ('gold_per_rmb', 1000),
                        ('ascension_extra_rmb', 100000), ('ascension_extra_limit', 100),
                        ('batch_limit', 9999)):
-        f.require(type(r.get(key)) is int and 1 <= r[key] <= upper, '天工配置数值无效：' + key)
-    f.require(set(SHOP) == set(range(1, 10)), '天工原版商品缺失')
+        f.require(type(r.get(key)) is int and 1 <= r[key] <= upper, '天机配置数值无效：' + key)
+    f.require(set(SHOP) == set(range(1, 10)), '天机原版商品缺失')
     for row in SHOP.values():
-        f.require(int(row['max_buy_count']) > 0 and int(row['goldon_count']) > 0, '天工原表价格无效')
+        f.require(int(row['max_buy_count']) > 0 and int(row['goldon_count']) > 0, '天机原表价格无效')
         for p in specs(row['attach_list']) + specs(row['gift_prize']):
-            f.require(p[0] == 12 or p[0] == 5 and p[1] in f.ITEMS, '天工奖励物品无效')
+            f.require(p[0] == 12 or p[0] == 5 and p[1] in f.ITEMS, '天机奖励物品无效')
     return r
 
 
@@ -64,8 +64,8 @@ def prepare(role, now, r):
 
 
 def guard(s, now, r):
-    f.require(r['enabled'] and s['start'] <= now < s['end'], '天工制物阁尚未开放')
-    f.require(now >= s['clock'], '天工制物阁时钟已回退，请恢复本地时间')
+    f.require(r['enabled'] and s['start'] <= now < s['end'], '天机阁尚未开放')
+    f.require(now >= s['clock'], '天机阁时钟已回退，请恢复本地时间')
 
 
 def totals(role, peers, s):
@@ -93,7 +93,10 @@ def catalog(role, now, r, peers=None):
                 had_prize=any(g['state'] == 2 for g in gifts.values()), charge_info=gifts,
                 exchange_info={i: dict(state=3 if s['bought'].get(str(i), 0) else 1,
                     left_buy_count=int(row['max_buy_count']) + (ex if i == 1 else 0) - s['bought'].get(str(i), 0),
-                    left_count=0, plus_times=ex if i == 1 else 0,
+                    # Native L509-511: "recharge need_charge more to raise
+                    # the limit by plus_times". This is the next increment,
+                    # not the number of increases already earned.
+                    left_count=0, plus_times=1 if i == 1 and ex < r['ascension_extra_limit'] else 0,
                     need_charge=max(0, (ex + 1) * r['ascension_extra_rmb'] - s['charge_gold'] // r['gold_per_rmb'])
                         if i == 1 and ex < r['ascension_extra_limit'] else 0)
                     for i, row in SHOP.items()})
@@ -116,7 +119,7 @@ def mail(role, key, title, prizes, now):
     from . import system_mail, welfare
     # deliver replaces the detached role, so callers must not keep state aliases.
     return system_mail.deliver(role, key=key, title=title,
-        body='天工制物阁活动奖励，请领取附件。', prizes=prizes,
+        body='天机阁活动奖励，请领取附件。', prizes=prizes,
         now=now, rules=welfare.load_rules())
 
 
@@ -127,7 +130,7 @@ def record_charge(role, gold, now):
         return
     s = prepare(role, now, r)
     guard(s, now, r)
-    f.require(type(gold) is int and gold > 0, '天工充值金额无效')
+    f.require(type(gold) is int and gold > 0, '天机充值金额无效')
     old = s['charge_gold']; s['charge_gold'] += gold
     gain = s['charge_gold'] // r['gold_per_rmb'] - old // r['gold_per_rmb']
     # [B] Each type-1 cumulative milestone pays once per period, in addition to
@@ -139,26 +142,26 @@ def record_charge(role, gold, now):
     s['bricks_earned'] += gain
     if gain:
         mail(role, f"pavilion-charge-{s['start']}-{s['charge_gold']}",
-             '天工制物阁充值金砖', [[5, 1141, gain, 1]], now)
+             '天机阁充值金砖', [[5, 1141, gain, 1]], now)
 
 
 def settle(role, req, now, peers=None):
     from . import activity
     r = load_rules(); s = prepare(role, now, r); guard(s, now, r)
     flag, index, count, ten, five = (req[k] for k in ('flag', 'index', 'count', 'ten_card', 'five_card'))
-    f.require(all(type(x) is int and x >= 0 for x in (flag, index, count, ten, five)), '天工请求参数无效')
+    f.require(all(type(x) is int and x >= 0 for x in (flag, index, count, ten, five)), '天机请求参数无效')
     if flag == 1:
-        f.require(index == count == ten == five == 0, '天工查询参数无效')
+        f.require(index == count == ten == five == 0, '天机查询参数无效')
         return [summon.event(195, catalog(role, now, r, peers))]
     if flag == 3:
-        f.require(index in GIFTS[2] and count == ten == five == 0, '天工领奖参数无效')
+        f.require(index in GIFTS[2] and count == ten == five == 0, '天机领奖参数无效')
         f.require(gift_states(s, totals(role, peers, s))[index]['state'] == 2, '全民好礼未达成或已领取')
         gain = activity.prizes(role, specs(GIFTS[2][index]['gift_list']))
         s['claimed'].append(index)
         return [summon.event(195, dict(flag=3, index=index, prize_list=gain,
                   snapshot=catalog(role, now, r, peers),
                   had_prize=any(v['state'] == 2 for v in gift_states(s, totals(role, peers, s)).values())))]
-    f.require(flag == 2 and index in SHOP and 1 <= count <= r['batch_limit'], '天工兑换参数无效')
+    f.require(flag == 2 and index in SHOP and 1 <= count <= r['batch_limit'], '天机兑换参数无效')
     row = SHOP[index]; bought = s['bought'].get(str(index), 0)
     limit = int(row['max_buy_count']) + (extra(s, r) if index == 1 else 0)
     f.require(bought + count <= limit, '本期礼包兑换次数已用完')
@@ -171,7 +174,7 @@ def settle(role, req, now, peers=None):
     s['bought'][str(index)] = bought + count
     notifications = []
     if bought == 0:
-        mail(role, f"pavilion-first-{s['start']}-{index}", '天工制物阁首次兑换好礼',
+        mail(role, f"pavilion-first-{s['start']}-{index}", '天机阁首次兑换好礼',
              specs(row['gift_prize']), now)
         from . import welfare
         notifications.append(welfare.mail_snapshot(role, now, welfare.load_rules()))

@@ -29,6 +29,14 @@ do
 
   local secret=ms.d_secretAreaUI
   local remainingLabel,remainingParent
+  local function rememberLabel(node,parent)
+   remainingLabel=node;remainingParent=parent;node:setTag(910043)
+   node:registerScriptHandler(function(event)
+    if (event=='exit' or type(event)=='table' and event.name=='exit') and remainingLabel==node then
+     remainingLabel=nil;remainingParent=nil
+    end
+   end)
+  end
   local nativePage=secret.showPrizePage
   replace(secret,'showPrizePage',function(parent,...)
    remainingLabel=nil;remainingParent=nil
@@ -37,16 +45,30 @@ do
    local count=s.fight_count
    if data.cleared_layer~=nil then s.fight_count=data.cleared_layer end
    local create=ms.d_u.createByStyles
+   local costNodes={}
    ms.d_u.createByStyles=function(options,...)
     local node=create(options,...)
     if options.type=='label' and options.string==string.format(ms.d_hz.gethz('secretArea_free_times'),s.free_times) then
-     remainingLabel=node;remainingParent=parent;node:setTag(910043)
+     rememberLabel(node,parent)
+    elseif s.free_times==0 and options.pic=='v2/money_gold.png' then
+     node:setVisible(false)
+    elseif s.free_times==0 and (options.x or 0)>0.5 then
+     costNodes[#costNodes+1]={node=node,y=options.y}
     end
     return node
    end
    local ok,result=pcall(nativePage,parent,...)
    ms.d_u.createByStyles=create;s.fight_count=count
    if not ok then error(result) end
+   if s.free_times==0 then
+    local w,h=ms.d_u.getRealScale(s.prize_bkg)
+    for _,entry in ipairs(costNodes) do
+     if entry.y==0.45-0.14*h then entry.node:setVisible(false) end
+    end
+    local label=create({type='label',fontsize=22,string=string.format(ms.d_hz.gethz('secretArea_free_times'),0),x=0.5+0.32*w,y=0.45-0.14*h,color={211,198,176}})
+    rememberLabel(label,parent);parent:addChild(label)
+    for i=1,2 do if s.prize_btns[i] then ms.d_u.grayMenuItem(s.prize_btns[i]);s.prize_btns[i]:setEnabled(false) end end
+   end
    return result
   end)
   local nativeFree=secret.setFreeTimes

@@ -163,6 +163,13 @@ def validate_rules(r):
     require(type(r.get('train_support_percent'))is int and 1<=r['train_support_percent']<=100,'点赞增益配置无效')
     require(r['catch_success_percent']<=100 and r['pet_limit']<=240 and r['search_daily']<=25,'概率、兽栏或棋盘配置越界')
     require(r['train_resident_required']==240,'原版试炼需要240只栖息宠物')
+    floors=r.get('train_floors')
+    require(isinstance(floors,list) and len(floors)==4,'试炼必须配置四层')
+    for index,floor in enumerate(floors):
+        require(isinstance(floor,dict),'试炼层配置无效')
+        for key in ('level','hp','attack','defense','magic'):
+            require(type(floor.get(key)) is int and 0<floor[key]<=100000000,'试炼属性无效：'+key)
+            if index:require(floor[key]>floors[index-1][key],'试炼难度必须逐层递增：'+key)
     require(type(r.get('team_min_fighters')) is int and r['team_min_fighters']==3,'秘境至少三人出战')
     require(r['train_support_limit']<=20 and r['team_min_fighters']<=r['team_size']<=5,'活动人数配置越界')
     for k in ('hunt_weekend_open','npc_auto_accept','train_weekend_only','lucky_weekend_only'):require(type(r.get(k))is bool,'开关配置无效：'+k)

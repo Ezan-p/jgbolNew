@@ -11,6 +11,7 @@ ROOT=Path(__file__).resolve().parents[2]
 fixture_now=int(datetime(2026,10,23,12,tzinfo=timezone(timedelta(hours=8))).timestamp())
 with tempfile.TemporaryDirectory() as tmp:
  b=Backend(Path(tmp),18790,lambda *a,**k:None);r=b.profile();r.update(level=50,gold_coin=100000,silver_coin=100000);b.save(r)
+ b.guild_rules['wars_enabled']=True  # Replay historical tournament callbacks in isolation.
  lines=["""local ms=assert(package.loaded.ms)
 local saved={player=ms.d_mainUI.g_playerInfo,config=ms.d_data.g_new_config,send=ms.d_u.main_server_send_msg,report=ms.MS_report_error,guildConfig=ms.d_xianmengUI.guildConfig,time=ms.d_time.getTime}
 ms.d_mainUI.g_playerInfo=ms.d_c.table_copy(saved.player)
@@ -109,6 +110,11 @@ end
  lines.append("step('entrance',function() ms.d_xianmengUI.showFirstPage() end)")
  lines.append("local guildPatchPresent={};for _,name in ipairs({'d_guildFightUI','d_crossRealm'}) do guildPatchPresent[name]=ms[name] and ms[name]._localGuildRestore~=nil end")
  lines.append((ROOT/'network_redirect/guild_client.lua').read_text())
+ access_source=(ROOT/'network_redirect/guild_access_client.lua').read_text()
+ lines.append('local guildAccessPresent=ms._localGuildAccessRestore~=nil')
+ lines.append('local guildAccessSource='+summon.lua(access_source.replace('__GUILD_WARS_ENABLED__',summon.lua(guild.load_rules()['wars_enabled']))))
+ lines.append('if guildAccessPresent then ms._localGuildAccessRestore() end')
+ lines.append(access_source.replace('__GUILD_WARS_ENABLED__','true'))
  lines.append('local guildActivitiesPresent=ms._localGuildActivitiesRestore~=nil')
  lines.append((ROOT/'network_redirect/guild_activity_client.lua').read_text())
  serial=5000
@@ -120,12 +126,14 @@ end
   capture=name in ('applications','leader_mute_list')
   if capture:lines.append("withOverride(CCMenuItemImage,'registerScriptTapHandler',function(item,fn) nativeTaps[debug.getinfo(fn,'S').linedefined]=fn end,function()")
   if name=='pet_train_battle':lines.append("local battles=0;withOverride(ms.d_fightUI,'actFight',function(replay,kind) assert(replay.line_up_msg and replay.fight_result_msg and #replay.fight_result_msg.fight_result>0);battles=battles+1 end,function()")
+  if name=='escort_claim':lines.append("local show=ms.d_escortUI.showPrizeLayer;withOverride(ms.d_escortUI,'showPrizeLayer',function(data) assert(#data>=3,'reward summary missing contribution/items/funds');guild_claim_window=show(data);return guild_claim_window end,function()")
   for p in replies:
    mid,_,data=decode(p)
    if mid==2998 and data['id']==55:raise AssertionError((name,data['data']))
    if mid in (1032,1301,1098) or mid==2998 and data['id']==82:lines.append('apply('+str(mid)+','+summon.lua(data)+')')
   if capture:lines.append('end)')
   if name=='pet_train_battle':lines.append("end);assert(battles>0,'trial battle callback missing');ms.d_event_mgr.setSpecialFightType(0)")
+  if name=='escort_claim':lines.append('end)')
   lines.append('end)')
  request('union_list',18,query_type=4,page=1)
  request('create',1,union_name='验证仙盟')
@@ -262,13 +270,16 @@ end)""")
  end
 end)""")
  request('team_full_applications',50)
+ r=b.profile();r['guild']['instances'].update(layer=1,team_fights=2,team_last_fight_time=fixture_now);b.save(r)
+ request('team_floor_progress',44)
+ lines.append("step('team_native_floor_label',function() local ui=ms.d_secretAreaUI;local found;local create=ms.d_u.createByStyle;withOverride(ms.d_u,'createByStyle',function(options,...) if type(options.string)=='string' and options.string:find('今日秘境开启层数',1,true) then found=options.string end;return create(options,...) end,function() ui.showTeamPage() end);assert(found and found:find('1 / 3',1,true),'floor display confused attempts with progress: '..tostring(found));assert(ui.g_self.fight_count==2) end)")
  lines.append("step('treasure_capture_count',function() guild_count_labels={};local create=ms.d_u.createByStyles;guild_count_create=create;ms.d_u.createByStyles=function(options,...) local text=options.string;if type(text)=='string' and text:find('今日可免费探宝次数',1,true) then guild_count_labels[#guild_count_labels+1]=text end;return create(options,...) end end)")
  request('treasure_status',43,flag=1)
- lines.append("step('treasure_native_click',function() local ui=ms.d_secretAreaUI;local press=captureMenu(function() ui.showPrizePage(ui.g_self.main_layer) end,1672);press() end)")
+ lines.append("step('treasure_native_click',function() local ui=ms.d_secretAreaUI;local press=captureMenu(function() ui.showPrizePage(ui.g_self.main_layer) end,1671);press() end)")
  request('treasure_move',43,flag=2)
  lines.append("step('treasure_remaining_after_one',function() local ui=ms.d_secretAreaUI;assert(ui.g_self.free_times==4);assert(ui.g_self.prize_data.free_times==4);assert(guild_count_labels[#guild_count_labels]:find('4',1,true),'visible count did not refresh') end,32)")
  request('treasure_sweep',43,flag=6)
- lines.append("step('treasure_remaining_after_sweep',function() local ui=ms.d_secretAreaUI;assert(ui.g_self.free_times==0);assert(ui.g_self.prize_data.free_times==0);ms.d_u.createByStyles=guild_count_create;guild_count_create=nil end)")
+ lines.append("step('treasure_remaining_after_sweep',function() local ui=ms.d_secretAreaUI;assert(ui.g_self.free_times==0);assert(ui.g_self.prize_data.free_times==0);assert(guild_count_labels[#guild_count_labels]:find('0',1,true),'exhausted counter missing');assert(not ui.g_self.prize_btns[1]:isEnabled() and not ui.g_self.prize_btns[2]:isEnabled());ms.d_u.createByStyles=guild_count_create;guild_count_create=nil end)")
  r=b.profile();r['guild']['unions'][str(r['union_id'])]['popularity']=4*b.guild_rules['level_popularity'];b.save(r)
  request('pet_task',83)
  lines.append("step('pet_hunt_open',function() ms.d_pethuntUI.showMainLayer(ms.d_xianmengUI.getXianMengMainLayer()) end)")
@@ -309,7 +320,7 @@ end)""")
  request('escort_completed',69,flag=3,road_type=1)
  lines.append("step('escort_native_claim',function() local ui=ms.d_escortUI;assert(ui.g_escortUI.can_rece_prize);local sent;withOverride(ms.d_u,'main_server_send_msg',function(mid,d) sent=d end,function() ui.pressGetPrize() end);assert(sent and sent.id==69);assert(assert(loadstring('return '..sent.data))().flag==11) end)")
  request('escort_claim',69,flag=11)
- lines.append("step('escort_claim_clears_state',function() local ui=ms.d_escortUI;assert(ui.g_escortUI.offline_active==false);assert(ui.g_escortUI.can_rece_prize==false);assert(not ui.getEscortRestTime());assert(ui.g_escortUI.main_layer:getChildByTag(999),'reward popup missing') end)")
+ lines.append("step('escort_claim_clears_state',function() local ui=ms.d_escortUI;assert(ui.g_escortUI.offline_active==false);assert(ui.g_escortUI.can_rece_prize==false);assert(not ui.getEscortRestTime());assert(guild_claim_window and guild_claim_window:getParent(),'reward popup missing') end)")
  request('cross_schedule',58,query_type=21)
  request('cross_list',58,query_type=30)
  request('cross_enter',58,query_type=32)
@@ -328,6 +339,8 @@ end)""")
  lines.append("""local i=0;local hold=0;local pendingCase=false
 local function restore()
  if guild_count_create then ms.d_u.createByStyles=guild_count_create;guild_count_create=nil end
+ if ms._localGuildAccessRestore then ms._localGuildAccessRestore() end
+ if guildAccessPresent then assert(loadstring(guildAccessSource))() end
  if not guildActivitiesPresent and ms._localGuildActivitiesRestore then ms._localGuildActivitiesRestore() end
  for _,name in ipairs({'d_guildFightUI','d_crossRealm'}) do if not guildPatchPresent[name] and ms[name] and ms[name]._localGuildRestore then ms[name]._localGuildRestore() end end
  ms.d_u.main_server_send_msg=saved.send;ms.MS_report_error=saved.report;ms.d_time.getTime=saved.time

@@ -57,7 +57,7 @@ def main():
         assert sum(x['count'] for x in stones if x['type_id']==1091 and x['level']==9)==10
         assert any(x['type_id']==1092 and x['level']==8 for x in stones)
         assert all(x['count']==1 for x in stones)
-        assert role['achievements']['totals']['125']==1
+        assert role['achievements']['totals'].get('125',0)==0  # belongs to mondayUI/menu32
         old_currency=records[-1]['bricks'];old_mails=role['welfare']['mails'];clock.return_value=role['pavilion']['end']
         call('下周新一期',1);call('新一期再兑换和首次邮件',2,9,1);mail_claims()
         assert b.profile()['pavilion']['bought']=={'9':1}

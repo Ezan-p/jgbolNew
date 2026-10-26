@@ -1,0 +1,627 @@
+{
+  "client": "3.87",
+  "official_server_available": false,
+  "sources": [
+    {
+      "logical": "lua/ui/towerUI.lua",
+      "path": "jgbol3.87/assets/release_/ca54c49c8a53f04343f4f2774428ba45.data",
+      "sha256": "1b7cc09f055fee860511043d344368aed4eb4b5b0eb063129ededc1561b3e842"
+    },
+    {
+      "logical": "lua/ui/activityUI.lua",
+      "path": "jgbol3.87/assets/release_/f94624a6c6a5f4034d0fdf2e315f0904.data",
+      "sha256": "b62f2dffa9e3707ce73f2b5fedbb147433544d735ec722519d377a31698f134f"
+    },
+    {
+      "logical": "lua/ui/funUI.lua",
+      "path": "jgbol3.87/assets/release_/5dd8b529cd13d0983be4c09ea5cd56db.data",
+      "sha256": "0551c970ff68fdc33625dd35036bcc7b3ecf0e058d6c04ecef4876c42a41214d"
+    },
+    {
+      "logical": "lua/event_mgr.lua",
+      "path": "jgbol3.87/assets/release_/ae0f40d1631f06ad6e89a50dc5ea4c26.data",
+      "sha256": "ad671dc53da75f3f413e6ca0519cbbee0bf114a7b49864bb3c38f723ab4b77ed"
+    },
+    {
+      "logical": "lua/data.lua",
+      "path": "jgbol3.87/assets/release_/addd745afbcab3049f3e12eed115a370.data",
+      "sha256": "f3d994283064c92bc5ba01ed5bd810785d26cd7509dbac508f96b46b992be5a3"
+    },
+    {
+      "logical": "lua/common/common_def.lua",
+      "path": "jgbol3.87/assets/release_/13a640e1f35a7599fe90dd31c8098b15.data",
+      "sha256": "15a4299fc92c50adda7682a4775f2e278e135f49f12d126e105a03d097d9ecf8"
+    },
+    {
+      "logical": "lua/common/msg_def.lua",
+      "path": "jgbol3.87/assets/release_/6dc7effc05688bb493fa72368df65d46.data",
+      "sha256": "12cbfbed63d3696347bf066bd61836b287d129323dd4a147f792814b0493a049"
+    },
+    {
+      "logical": "v2/String.plist",
+      "path": "jgbol3.87/assets/release_/08b0428edce64d19f304d30c3829ec87.data",
+      "sha256": "e04af124a848226b08c5a73069666e5eb5fd96294725e380a3e187e7a63b4dc4"
+    },
+    {
+      "logical": "v2/String2.plist",
+      "path": "jgbol3.87/assets/release_/e926a25accffd37afafb015933e815d4.data",
+      "sha256": "1fe10126d1e888551fbe998879cd2d0a1db404e9c6406bccb620f117e31a4943"
+    },
+    {
+      "logical": "csv_config/tower_road.csv",
+      "path": "jgbol3.87/assets/release_/c3b2db04edf2e2d67a81c2c6b93dc3fa.data",
+      "sha256": "c4eb0b3a16b124925b1eb1a8fd4478123dbc5f3dda9a3c7694dd62e07350d4df",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/tower_compose.csv",
+      "path": "jgbol3.87/assets/release_/1c5c3aaa4da72e5e5d245d75fd20b536.data",
+      "sha256": "2524e713db5a562e1a66181ec64b7c12846c66d7f514564a7c2a9859c4a8fdb9",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/tower_level.csv",
+      "path": "jgbol3.87/assets/release_/d4f3b166887d25f51086d65c0c961103.data",
+      "sha256": "d67b5d87c048c6e490d6af0e9db3b9adab0bb2319b0703f2795198cb22612972",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/item_name.csv",
+      "path": "jgbol3.87/assets/release_/70cb741174c493cf0a6d5de29ad7894c.data",
+      "sha256": "107da82bd2e8050c6e44dd8da0875f874a56de4cd29db58bc6a4959d3072e685",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/item_base.csv",
+      "path": "jgbol3.87/assets/release_/803063b5ac66c77a4fe454fbc3ca9697.data",
+      "sha256": "2b49aa78b7ea27e7f98c896cc984c2f3a69ac6721c6ef167f20cd4b649aff1c7",
+      "csv_values_match": true
+    }
+  ],
+  "strings": {
+    "tower1": "天星",
+    "tower2": "残星",
+    "tower3": "合计",
+    "tower4": "选择兑换数量，可兑换 %d / %d",
+    "tower5": "可使用卡片数量",
+    "tower6": "本次可购买:",
+    "tower7": "下次天宫开启:",
+    "tower8": "免费: %d次",
+    "tower9": "天星不足",
+    "tower10": "残星不足",
+    "tower11": "减%d天星卡",
+    "tower12": "免费骰子",
+    "tower13": "在九重天宫处可购买天星卡",
+    "tower14": "已选择: %d / %d",
+    "tower15": "前进过程一定几率获得天星卡",
+    "tower16": "卡片价值超过商品价值部分将会被回收",
+    "tower17": "卡片价值已经达到商品价格",
+    "tower18": "该卡片数量达到上限",
+    "tower19": "次数",
+    "tower_desc1": "正当你小心探秘时，天边类似流星的物品迅速向你飞来，你费了九牛二虎之力降服了流星，惊喜地发现了宝物。",
+    "tower_desc2": "烈日当空，你寻了一处隐秘的地方进行休息，突然发现你所坐的地方土壤不同其他，你灵机一动，向下挖土，发现了一个宝箱。",
+    "tower_desc3": "你探秘时发现了一处隐秘的洞穴，你小心翼翼地潜入，看着洞中的宝物震惊狂喜。古人诚不欺我。",
+    "tower_desc4": "你被绊倒在地。你捡起害你绊倒的物品破口大骂，却突然发现这竟然是宝贝。",
+    "tower_tip1": "玩家当前坐标",
+    "tower_tip2": "下一重天传送阵坐标",
+    "tower_tip3": "累计前进距离",
+    "tower_tip4": "点击使用进行前进",
+    "tower_tip5": "点击兑换物品"
+  },
+  "constants": {
+    "14": [
+      1,
+      100
+    ],
+    "16": [
+      0.5,
+      1,
+      0,
+      0.36,
+      0.6845,
+      4503599627370499.0,
+      0.21,
+      0.34,
+      0.7,
+      0.3,
+      0.156,
+      0.09
+    ],
+    "21": [
+      1,
+      -1
+    ],
+    "22": [
+      1,
+      -1
+    ]
+  },
+  "request": 1309,
+  "event": 164,
+  "entry": 37,
+  "operations": {
+    "enter": 1,
+    "roll": 2,
+    "shop": 3,
+    "buy": 4,
+    "palace_buy": 5
+  },
+  "level_lengths": [
+    10,
+    20,
+    40,
+    70,
+    100,
+    160,
+    220,
+    320,
+    99999
+  ],
+  "entry_distances": [
+    0,
+    10,
+    30,
+    70,
+    140,
+    240,
+    400,
+    620,
+    940
+  ],
+  "routes": [
+    {
+      "old": 0,
+      "new": 1,
+      "road": "13111",
+      "forward": 4
+    },
+    {
+      "old": 0,
+      "new": 2,
+      "road": "13111",
+      "forward": 4
+    },
+    {
+      "old": 0,
+      "new": 3,
+      "road": "13111",
+      "forward": 4
+    },
+    {
+      "old": 0,
+      "new": 4,
+      "road": "111311",
+      "forward": 5
+    },
+    {
+      "old": 0,
+      "new": 5,
+      "road": "11221",
+      "forward": 3
+    },
+    {
+      "old": 0,
+      "new": 6,
+      "road": "1111",
+      "forward": 4
+    },
+    {
+      "old": 1,
+      "new": 1,
+      "road": "13111",
+      "forward": 4
+    },
+    {
+      "old": 1,
+      "new": 2,
+      "road": "13111",
+      "forward": 4
+    },
+    {
+      "old": 1,
+      "new": 3,
+      "road": "1111",
+      "forward": 4
+    },
+    {
+      "old": 1,
+      "new": 4,
+      "road": "111",
+      "forward": 3
+    },
+    {
+      "old": 1,
+      "new": 5,
+      "road": "11",
+      "forward": 2
+    },
+    {
+      "old": 1,
+      "new": 6,
+      "road": "121",
+      "forward": 2
+    },
+    {
+      "old": 2,
+      "new": 1,
+      "road": "12",
+      "forward": 1
+    },
+    {
+      "old": 2,
+      "new": 2,
+      "road": "1211",
+      "forward": 3
+    },
+    {
+      "old": 2,
+      "new": 3,
+      "road": "1111",
+      "forward": 4
+    },
+    {
+      "old": 2,
+      "new": 4,
+      "road": "111",
+      "forward": 3
+    },
+    {
+      "old": 2,
+      "new": 5,
+      "road": "121",
+      "forward": 2
+    },
+    {
+      "old": 2,
+      "new": 6,
+      "road": "121",
+      "forward": 2
+    },
+    {
+      "old": 3,
+      "new": 1,
+      "road": "12",
+      "forward": 1
+    },
+    {
+      "old": 3,
+      "new": 2,
+      "road": "1211",
+      "forward": 3
+    },
+    {
+      "old": 3,
+      "new": 3,
+      "road": "1111",
+      "forward": 4
+    },
+    {
+      "old": 3,
+      "new": 4,
+      "road": "111",
+      "forward": 3
+    },
+    {
+      "old": 3,
+      "new": 5,
+      "road": "121",
+      "forward": 2
+    },
+    {
+      "old": 3,
+      "new": 6,
+      "road": "121",
+      "forward": 2
+    },
+    {
+      "old": 4,
+      "new": 1,
+      "road": "211",
+      "forward": 2
+    },
+    {
+      "old": 4,
+      "new": 2,
+      "road": "1211",
+      "forward": 3
+    },
+    {
+      "old": 4,
+      "new": 3,
+      "road": "1111",
+      "forward": 4
+    },
+    {
+      "old": 4,
+      "new": 4,
+      "road": "111",
+      "forward": 3
+    },
+    {
+      "old": 4,
+      "new": 5,
+      "road": "121",
+      "forward": 2
+    },
+    {
+      "old": 4,
+      "new": 6,
+      "road": "121",
+      "forward": 2
+    },
+    {
+      "old": 5,
+      "new": 1,
+      "road": "33111",
+      "forward": 3
+    },
+    {
+      "old": 5,
+      "new": 2,
+      "road": "33111",
+      "forward": 3
+    },
+    {
+      "old": 5,
+      "new": 3,
+      "road": "33111",
+      "forward": 3
+    },
+    {
+      "old": 5,
+      "new": 4,
+      "road": "111",
+      "forward": 3
+    },
+    {
+      "old": 5,
+      "new": 5,
+      "road": "31",
+      "forward": 1
+    },
+    {
+      "old": 5,
+      "new": 6,
+      "road": "1311",
+      "forward": 3
+    },
+    {
+      "old": 6,
+      "new": 1,
+      "road": "211",
+      "forward": 2
+    },
+    {
+      "old": 6,
+      "new": 2,
+      "road": "1211",
+      "forward": 3
+    },
+    {
+      "old": 6,
+      "new": 3,
+      "road": "1111",
+      "forward": 4
+    },
+    {
+      "old": 6,
+      "new": 4,
+      "road": "111",
+      "forward": 3
+    },
+    {
+      "old": 6,
+      "new": 5,
+      "road": "121",
+      "forward": 2
+    },
+    {
+      "old": 6,
+      "new": 6,
+      "road": "121",
+      "forward": 2
+    }
+  ],
+  "A": [
+    "6 map shapes, 42 road transitions, directions1=up/2=left/3=right",
+    "100gold per paid roll;10paid rolls1000;free single index0,paid index1",
+    "5stars per upward step;one upward step10stars on double event",
+    "native1..9floor titles;floor lengths accumulated by getTowerFloor",
+    "star/credit shops, card payment, palace special/current/next preview",
+    "special reward object1/type-1 card with level as denomination;other type free dice",
+    "card surplus recycled, ratio unavailable; top name display",
+    "1243 market during event;5souls of5027 and unspecified peaches"
+  ],
+  "B": [
+    "weekly MondayUTC+8 season,daily5free,earned dice survive daily reset",
+    "uniform eligible maps;filter impossible portal overshoots and dead ends",
+    "double10%,treasure20%,treasure weights40/30/20/10",
+    "palace each10rolls,all shops in current batch remain valid until next roll",
+    "1:1 card surplus to credits;prices,stock and catalog in config",
+    "real local account leader by distance/time/id,no fabricated rank prizes",
+    "ninth floor remains playable;99999local-coordinate wrap without tenth floor",
+    "season clears event resources and shops;inventory/souls persist",
+    "bag300gold,100peaches;allow use after event closes"
+  ],
+  "inferred_config": {
+    "schema_version": 1,
+    "mode": "inferred",
+    "revision": "nine-sky-2026-10-26",
+    "enabled": true,
+    "timezone_offset_hours": 8,
+    "period_days": 7,
+    "min_level": 1,
+    "daily_free": 5,
+    "one_rock_money": 100,
+    "double_basis_points": 1000,
+    "treasure_basis_points": 2000,
+    "palace_every": 10,
+    "card_values": [
+      50,
+      100,
+      200,
+      500
+    ],
+    "treasure_pool": [
+      {
+        "weight": 40,
+        "reward": [
+          5,
+          1001,
+          10,
+          1
+        ]
+      },
+      {
+        "weight": 30,
+        "reward": [
+          12,
+          0,
+          10000,
+          1
+        ]
+      },
+      {
+        "weight": 20,
+        "reward": [
+          1,
+          -1,
+          1,
+          50
+        ]
+      },
+      {
+        "weight": 10,
+        "reward": [
+          1,
+          -2,
+          1,
+          1
+        ]
+      }
+    ],
+    "star_shop": [
+      {
+        "reward": [
+          10,
+          5027,
+          5,
+          1
+        ],
+        "cost": 500,
+        "limit": 8
+      },
+      {
+        "reward": [
+          5,
+          1001,
+          100,
+          1
+        ],
+        "cost": 150,
+        "limit": 20
+      },
+      {
+        "reward": [
+          5,
+          1024,
+          5,
+          1
+        ],
+        "cost": 200,
+        "limit": 10
+      },
+      {
+        "reward": [
+          5,
+          1249,
+          10,
+          1
+        ],
+        "cost": 300,
+        "limit": 10
+      }
+    ],
+    "credit_shop": [
+      {
+        "reward": [
+          5,
+          1001,
+          10,
+          1
+        ],
+        "cost": 20,
+        "limit": 50
+      },
+      {
+        "reward": [
+          12,
+          0,
+          10000,
+          1
+        ],
+        "cost": 10,
+        "limit": 100
+      }
+    ],
+    "palace_special": {
+      "reward": [
+        10,
+        5027,
+        5,
+        1
+      ],
+      "money_type": 11,
+      "cost": 300,
+      "limit": 1
+    },
+    "palace_cards": [
+      {
+        "reward": [
+          1,
+          -1,
+          1,
+          50
+        ],
+        "money_type": 11,
+        "cost": 25,
+        "limit": 2
+      },
+      {
+        "reward": [
+          1,
+          -1,
+          1,
+          100
+        ],
+        "money_type": 11,
+        "cost": 50,
+        "limit": 2
+      },
+      {
+        "reward": [
+          1,
+          -1,
+          1,
+          200
+        ],
+        "money_type": 11,
+        "cost": 100,
+        "limit": 2
+      },
+      {
+        "reward": [
+          1,
+          -1,
+          1,
+          500
+        ],
+        "money_type": 11,
+        "cost": 250,
+        "limit": 2
+      }
+    ],
+    "bag_gold": 300,
+    "bag_peaches": 100
+  }
+}

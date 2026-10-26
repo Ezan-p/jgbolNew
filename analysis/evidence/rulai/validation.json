@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-26",
+  "timezone": "Asia/Shanghai",
+  "backend_checks": [
+    {
+      "name": "targeted",
+      "count": 13,
+      "seconds": 5.604,
+      "passed": true,
+      "scope": "13 Rulai backend tests"
+    },
+    {
+      "name": "activities",
+      "count": 346,
+      "seconds": 327.253,
+      "passed": true,
+      "scope": "activity regression before two additional Rulai tests"
+    },
+    {
+      "name": "vip",
+      "count": 15,
+      "seconds": 6.041,
+      "passed": true,
+      "scope": "VIP simulated recharge regression"
+    },
+    {
+      "name": "backend",
+      "count": 18,
+      "seconds": 2.698,
+      "passed": true,
+      "scope": "offline backend, TCP/TLS and login regression"
+    }
+  ],
+  "native_client_checks": 19,
+  "native_client_passed": true,
+  "javascript_syntax_checked": true,
+  "live_account_resources_changed": false,
+  "limitations": [
+    "Original server schedule, thresholds and probabilities unavailable; see A/B documentation",
+    "Native checks use captured network and detached Cocos scenes, not an actual paid account",
+    "Activity regression includes 11 earlier Rulai tests; final 13-test suite also passed separately"
+  ],
+  "source_sha256": {
+    "network_redirect/activity_rulai.py": "51e52b90fb807ba69175974dd6bd3570250f1b23dcf7812bb8485ce6b82286cc",
+    "network_redirect/rulai_client.lua": "35d82421b2c8b8da137fe6d5aca19c046921468e36280f02ef52dfe2bd85c1bd",
+    "server_config/rulai_rules.json": "1b1df7190aa4986a9a76e1791e66b43d5754af8eae28f2b99fa24d15505b312c",
+    "tests/test_activity_rulai.py": "ed7408f8440eaff8d8914705ea46e811ac8ef9eb6724786b11b380a7c510c86a"
+  }
+}

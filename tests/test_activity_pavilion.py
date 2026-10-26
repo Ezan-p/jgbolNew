@@ -88,7 +88,7 @@ class PavilionTests(ActivityCase):
             self.assertEqual(len(mails), 1)
             self.assertEqual(mails[0]['prizes'], p.specs(row['gift_prize']))
         self.claim_mails()
-        self.assertEqual(self.b.profile()['achievements']['totals']['125'], 1)
+        self.assertEqual(self.b.profile()['achievements']['totals'].get('125', 0), 0)
         # Original level-9/8 stones must retain their CSV levels, not become piles of level-1 stones.
         self.assertTrue(any(i['type_id']==1090 and i['level']==9 for i in self.b.profile()['attachments']))
 
@@ -128,7 +128,7 @@ class PavilionTests(ActivityCase):
         d = self.data(self.call())
         self.assertTrue(d['had_prize']); self.assertEqual(d['charge_money'], 1000)
         self.assertEqual(d['exchange_info'][1]['left_buy_count'], 6)
-        self.assertEqual(d['exchange_info'][1]['plus_times'], 3)
+        self.assertEqual(d['exchange_info'][1]['plus_times'], 1)
         for index in range(1, 5): self.data(self.call(3, index=index))
         self.assertFalse(self.data(self.call())['had_prize'])
         self.assertEqual(self.amount(1142), 2); self.assertEqual(self.amount(1143), 2)
@@ -155,6 +155,38 @@ class PavilionTests(ActivityCase):
         self.b.save(r); old=self.b.profile()
         self.assertEqual(self.call(2,index=1,count=1)[0][0],55)
         self.assertEqual(self.b.profile(),old)
+
+    def test_ascension_next_unlock_hint_and_cap(self):
+        # Native destinyUI L509-511 displays the NEXT increase only when
+        # left_buy_count == 0, need_charge > 0 and plus_times > 0.
+        self.stock((1141, 10000))
+        self.data(self.call(2, index=1, count=3))
+        row = self.data(self.call())['exchange_info'][1]
+        self.assertEqual((row['left_buy_count'], row['need_charge'], row['plus_times']), (0, 300, 1))
+        self.charge('unlock-one')  # 1000 RMB, three additional purchases
+        self.data(self.call(2, index=1, count=3))
+        row = self.data(self.call())['exchange_info'][1]
+        self.assertEqual((row['left_buy_count'], row['need_charge'], row['plus_times']), (0, 200, 1))
+        self.charge('unlock-two'); self.charge('unlock-three')
+        self.data(self.call(2, index=1, count=7))
+        row = self.data(self.call())['exchange_info'][1]
+        self.assertEqual((row['left_buy_count'], row['need_charge'], row['plus_times']), (0, 0, 0))
+        self.charge('beyond-cap')
+        self.assertEqual(self.data(self.call())['exchange_info'][1]['left_buy_count'], 0)
+        self.assertEqual(self.call(2, index=1, count=1)[0][0], 55)
+
+    def test_fractional_principal_and_all_six_bonus_tiers(self):
+        role = self.b.profile()
+        p.record_charge(role, 9, NOW)
+        self.assertEqual(role['pavilion']['bricks_earned'], 0)
+        p.record_charge(role, 1, NOW)
+        self.assertEqual(role['pavilion']['bricks_earned'], 1)
+        p.record_charge(role, 49990, NOW)
+        self.assertEqual(role['pavilion']['bricks_earned'], 6150)
+        self.assertEqual(sum(m['prizes'][0][2] for k, m in role['welfare']['mails'].items()
+                             if k.startswith('pavilion-charge-')), 6150)
+        p.record_charge(role, 10, NOW)
+        self.assertEqual(role['pavilion']['bricks_earned'], 6151)
 
     def test_restart_week_rollover_mail_persists_and_clock_rollback(self):
         self.charge(); self.claim_mails(); self.data(self.call(2,index=2,count=1))

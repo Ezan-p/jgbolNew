@@ -15,6 +15,7 @@ class GuildSocialNpcTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(); self.addCleanup(self.tmp.cleanup)
         self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        self.b.guild_rules['wars_enabled']=True  # Isolated legacy tournament coverage only.
         self.addCleanup(lambda: self.b.close())
         self.clock = patch('network_redirect.backend.time.time', return_value=NOW)
         self.clock.start(); self.addCleanup(self.clock.stop)
@@ -95,6 +96,7 @@ class GuildSocialNpcTests(unittest.TestCase):
         first = self.req(18, query_type=13)[-1]['des_member_list']
         saved = copy.deepcopy(self.b.profile()['guild']['match']['npc_roster'])
         self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        self.b.guild_rules['wars_enabled']=True  # Isolated legacy tournament coverage only.
         self.assertEqual(first, self.req(18, query_type=13)[-1]['des_member_list'])
         with patch('network_redirect.backend.time.time', return_value=NOW+86400):
             self.req(18, query_type=13)

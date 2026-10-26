@@ -1,0 +1,244 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\addd745afbcab3049f3e12eed115a370.data'; root=proto222
+
+FUNCTION proto49 offset=0x3d5e source_lines=931-944 params=0
+UPVALUES ['pairs', 'tonumber']
+00001 [L932] GGET     A=0 B=0 C=0 D=0 'g_dreamTable'
+00002 [L932] IST      A=0 B=0 C=0 D=0 
+00003 [L932] JMP      A=0 B=128 C=31 D=32799 target=35
+00004 [L933] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00005 [L933] TGETS    A=0 B=0 C=2 D=2 'd_csv'
+00006 [L933] TGETS    A=0 B=0 C=3 D=3 'open2'
+00007 [L933] KSTR     A=1 B=0 C=4 D=4 'csv_config/dream_prize_config.csv'
+00008 [L933] CALL     A=0 B=2 C=2 D=514 
+00009 [L934] TNEW     A=1 B=0 C=0 D=0 
+00010 [L934] GSET     A=1 B=0 C=0 D=0 'g_dreamTable'
+00011 [L935] UGET     A=1 B=0 C=0 D=0 pairs
+00012 [L935] MOV      A=2 B=0 C=0 D=0 
+00013 [L935] CALL     A=1 B=4 C=2 D=1026 
+00014 [L935] ISNEXT   A=4 B=128 C=18 D=32786 target=33
+00015 [L936] GGET     A=6 B=0 C=0 D=0 'g_dreamTable'
+00016 [L936] UGET     A=7 B=0 C=1 D=1 tonumber
+00017 [L936] TGETS    A=8 B=5 C=5 D=1285 'index'
+00018 [L936] CALL     A=7 B=2 C=2 D=514 
+00019 [L936] TDUP     A=8 B=0 C=8 D=8 {'kind': 'table', 'value': {}}
+00020 [L938] GGET     A=9 B=0 C=6 D=6 'getItemListFromStr'
+00021 [L938] TGETS    A=10 B=5 C=7 D=1287 'dream_prizes'
+00022 [L938] CALL     A=9 B=2 C=2 D=514 
+00023 [L938] TSETS    A=9 B=8 C=7 D=2055 'dream_prizes'
+00024 [L939] GGET     A=9 B=0 C=6 D=6 'getItemListFromStr'
+00025 [L939] TGETS    A=10 B=5 C=9 D=1289 'own_wish_prizes'
+00026 [L939] CALL     A=9 B=2 C=2 D=514 
+00027 [L939] TSETS    A=9 B=8 C=9 D=2057 'own_wish_prizes'
+00028 [L940] GGET     A=9 B=0 C=6 D=6 'getItemListFromStr'
+00029 [L940] TGETS    A=10 B=5 C=10 D=1290 'other_wish_prizes'
+00030 [L940] CALL     A=9 B=2 C=2 D=514 
+00031 [L940] TSETS    A=9 B=8 C=10 D=2058 'other_wish_prizes'
+00032 [L941] TSETV    A=8 B=6 C=7 D=1543 
+00033 [L935] ITERN    A=4 B=3 C=3 D=771 
+00034 [L935] ITERL    A=4 B=127 C=236 D=32748 target=15
+00035 [L944] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto72 offset=0x7cc9 source_lines=1614-1640 params=0
+UPVALUES ['pairs', 'tonumber']
+00001 [L1615] GGET     A=0 B=0 C=0 D=0 'g_omen_rankTable'
+00002 [L1615] IST      A=0 B=0 C=0 D=0 
+00003 [L1615] JMP      A=0 B=128 C=28 D=32796 target=32
+00004 [L1616] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00005 [L1616] TGETS    A=0 B=0 C=2 D=2 'd_csv'
+00006 [L1616] TGETS    A=0 B=0 C=3 D=3 'open2'
+00007 [L1616] KSTR     A=1 B=0 C=4 D=4 'csv_config/monster_top_prize.csv'
+00008 [L1616] CALL     A=0 B=2 C=2 D=514 
+00009 [L1617] TNEW     A=1 B=0 C=0 D=0 
+00010 [L1617] GSET     A=1 B=0 C=0 D=0 'g_omen_rankTable'
+00011 [L1618] GGET     A=1 B=0 C=0 D=0 'g_omen_rankTable'
+00012 [L1619] UGET     A=2 B=0 C=0 D=0 pairs
+00013 [L1619] MOV      A=3 B=0 C=0 D=0 
+00014 [L1619] CALL     A=2 B=4 C=2 D=1026 
+00015 [L1619] ISNEXT   A=5 B=128 C=14 D=32782 target=30
+00016 [L1620] TDUP     A=7 B=0 C=6 D=6 {'kind': 'table', 'value': {}}
+00017 [L1622] UGET     A=8 B=0 C=1 D=1 tonumber
+00018 [L1622] TGETS    A=9 B=6 C=5 D=1541 'min_order'
+00019 [L1622] CALL     A=8 B=2 C=2 D=514 
+00020 [L1622] TSETS    A=8 B=7 C=7 D=1799 'min'
+00021 [L1623] UGET     A=8 B=0 C=1 D=1 tonumber
+00022 [L1623] TGETS    A=9 B=6 C=8 D=1544 'max_order'
+00023 [L1623] CALL     A=8 B=2 C=2 D=514 
+00024 [L1623] TSETS    A=8 B=7 C=9 D=1801 'max'
+00025 [L1624] GGET     A=8 B=0 C=10 D=10 'getItemListFromStr'
+00026 [L1624] TGETS    A=9 B=6 C=11 D=1547 'prize_list'
+00027 [L1624] CALL     A=8 B=2 C=2 D=514 
+00028 [L1624] TSETS    A=8 B=7 C=11 D=1803 'prize_list'
+00029 [L1625] TSETV    A=7 B=1 C=5 D=261 
+00030 [L1619] ITERN    A=5 B=3 C=3 D=771 
+00031 [L1619] ITERL    A=5 B=127 C=240 D=32752 target=16
+00032 [L1628] GGET     A=0 B=0 C=12 D=12 'g_omen_foodTable'
+00033 [L1628] IST      A=0 B=0 C=0 D=0 
+00034 [L1628] JMP      A=0 B=128 C=27 D=32795 target=62
+00035 [L1629] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00036 [L1629] TGETS    A=0 B=0 C=2 D=2 'd_csv'
+00037 [L1629] TGETS    A=0 B=0 C=3 D=3 'open2'
+00038 [L1629] KSTR     A=1 B=0 C=13 D=13 'csv_config/monster_food_prize.csv'
+00039 [L1629] CALL     A=0 B=2 C=2 D=514 
+00040 [L1630] TNEW     A=1 B=0 C=0 D=0 
+00041 [L1630] GSET     A=1 B=0 C=12 D=12 'g_omen_foodTable'
+00042 [L1631] GGET     A=1 B=0 C=12 D=12 'g_omen_foodTable'
+00043 [L1632] UGET     A=2 B=0 C=0 D=0 pairs
+00044 [L1632] MOV      A=3 B=0 C=0 D=0 
+00045 [L1632] CALL     A=2 B=4 C=2 D=1026 
+00046 [L1632] ISNEXT   A=5 B=128 C=13 D=32781 target=60
+00047 [L1633] UGET     A=7 B=0 C=1 D=1 tonumber
+00048 [L1633] TGETS    A=8 B=6 C=14 D=1550 'index'
+00049 [L1633] CALL     A=7 B=2 C=2 D=514 
+00050 [L1633] TDUP     A=8 B=0 C=16 D=16 {'kind': 'table', 'value': {}}
+00051 [L1635] UGET     A=9 B=0 C=1 D=1 tonumber
+00052 [L1635] TGETS    A=10 B=6 C=15 D=1551 'left_food'
+00053 [L1635] CALL     A=9 B=2 C=2 D=514 
+00054 [L1635] TSETS    A=9 B=8 C=17 D=2065 'food_count'
+00055 [L1636] GGET     A=9 B=0 C=10 D=10 'getItemListFromStr'
+00056 [L1636] TGETS    A=10 B=6 C=11 D=1547 'prize_list'
+00057 [L1636] CALL     A=9 B=2 C=2 D=514 
+00058 [L1636] TSETS    A=9 B=8 C=11 D=2059 'prize_list'
+00059 [L1637] TSETV    A=8 B=1 C=7 D=263 
+00060 [L1632] ITERN    A=5 B=3 C=3 D=771 
+00061 [L1632] ITERL    A=5 B=127 C=241 D=32753 target=47
+00062 [L1640] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto76 offset=0x8661 source_lines=1736-1768 params=0
+UPVALUES ['pairs', 'tonumber', 'tostring']
+00001 [L1737] GGET     A=0 B=0 C=0 D=0 'g_friendsLvRewardTable'
+00002 [L1737] ISNEP    A=0 B=0 C=0 D=0 
+00003 [L1737] JMP      A=0 B=128 C=83 D=32851 target=87
+00004 [L1738] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00005 [L1738] TGETS    A=0 B=0 C=2 D=2 'd_csv'
+00006 [L1738] TGETS    A=0 B=0 C=3 D=3 'open2'
+00007 [L1738] KSTR     A=1 B=0 C=4 D=4 'csv_config/friends_lv_reward.csv'
+00008 [L1738] CALL     A=0 B=2 C=2 D=514 
+00009 [L1739] TNEW     A=1 B=0 C=0 D=0 
+00010 [L1739] GSET     A=1 B=0 C=0 D=0 'g_friendsLvRewardTable'
+00011 [L1740] GGET     A=1 B=0 C=0 D=0 'g_friendsLvRewardTable'
+00012 [L1741] UGET     A=2 B=0 C=0 D=0 pairs
+00013 [L1741] MOV      A=3 B=0 C=0 D=0 
+00014 [L1741] CALL     A=2 B=4 C=2 D=1026 
+00015 [L1741] ISNEXT   A=5 B=128 C=69 D=32837 target=85
+00016 [L1743] UGET     A=7 B=0 C=1 D=1 tonumber
+00017 [L1743] TGETS    A=8 B=6 C=5 D=1541 'index'
+00018 [L1743] CALL     A=7 B=2 C=2 D=514 
+00019 [L1745] TGETV    A=8 B=1 C=7 D=263 
+00020 [L1745] IST      A=0 B=0 C=8 D=8 
+00021 [L1745] JMP      A=8 B=128 C=2 D=32770 target=24
+00022 [L1746] TNEW     A=8 B=0 C=0 D=0 
+00023 [L1746] TSETV    A=8 B=1 C=7 D=263 
+00024 [L1749] TGETV    A=8 B=1 C=7 D=263 
+00025 [L1749] UGET     A=9 B=0 C=1 D=1 tonumber
+00026 [L1749] TGETS    A=10 B=6 C=6 D=1542 'level'
+00027 [L1749] CALL     A=9 B=2 C=2 D=514 
+00028 [L1749] TSETS    A=9 B=8 C=6 D=2054 'level'
+00029 [L1750] TGETV    A=8 B=1 C=7 D=263 
+00030 [L1750] UGET     A=9 B=0 C=1 D=1 tonumber
+00031 [L1750] TGETS    A=10 B=6 C=7 D=1543 'max_count'
+00032 [L1750] CALL     A=9 B=2 C=2 D=514 
+00033 [L1750] TSETS    A=9 B=8 C=7 D=2055 'max_count'
+00034 [L1752] UGET     A=8 B=0 C=2 D=2 tostring
+00035 [L1752] TGETS    A=9 B=6 C=8 D=1544 'attach_list'
+00036 [L1752] CALL     A=8 B=2 C=2 D=514 
+00037 [L1753] ISF      A=0 B=0 C=8 D=8 
+00038 [L1753] JMP      A=9 B=128 C=46 D=32814 target=85
+00039 [L1753] LEN      A=9 B=0 C=8 D=8 
+00040 [L1753] KSHORT   A=10 B=0 C=0 D=0 0
+00041 [L1753] ISGE     A=10 B=0 C=9 D=9 
+00042 [L1753] JMP      A=9 B=128 C=42 D=32810 target=85
+00043 [L1754] TNEW     A=9 B=0 C=0 D=0 
+00044 [L1755] GGET     A=10 B=0 C=1 D=1 'd_ms'
+00045 [L1755] TGETS    A=10 B=10 C=9 D=2569 'd_str'
+00046 [L1755] TGETS    A=10 B=10 C=10 D=2570 'split'
+00047 [L1755] MOV      A=11 B=0 C=8 D=8 
+00048 [L1755] KSTR     A=12 B=0 C=11 D=11 '/'
+00049 [L1755] CALL     A=10 B=2 C=3 D=515 
+00050 [L1756] KSHORT   A=11 B=0 C=1 D=1 1
+00051 [L1756] LEN      A=12 B=0 C=10 D=10 
+00052 [L1756] KSHORT   A=13 B=0 C=1 D=1 1
+00053 [L1756] FORI     A=11 B=128 C=29 D=32797 target=83
+00054 [L1757] GGET     A=15 B=0 C=1 D=1 'd_ms'
+00055 [L1757] TGETS    A=15 B=15 C=9 D=3849 'd_str'
+00056 [L1757] TGETS    A=15 B=15 C=10 D=3850 'split'
+00057 [L1757] TGETV    A=16 B=10 C=14 D=2574 
+00058 [L1757] KSTR     A=17 B=0 C=12 D=12 '|'
+00059 [L1757] CALL     A=15 B=2 C=3 D=515 
+00060 [L1758] TNEW     A=16 B=0 C=0 D=0 
+00061 [L1758] TSETV    A=16 B=9 C=14 D=2318 
+00062 [L1759] TGETV    A=16 B=9 C=14 D=2318 
+00063 [L1759] UGET     A=17 B=0 C=1 D=1 tonumber
+00064 [L1759] TGETB    A=18 B=15 C=1 D=3841 
+00065 [L1759] CALL     A=17 B=2 C=2 D=514 
+00066 [L1759] TSETS    A=17 B=16 C=13 D=4109 'object_type'
+00067 [L1760] TGETV    A=16 B=9 C=14 D=2318 
+00068 [L1760] UGET     A=17 B=0 C=1 D=1 tonumber
+00069 [L1760] TGETB    A=18 B=15 C=2 D=3842 
+00070 [L1760] CALL     A=17 B=2 C=2 D=514 
+00071 [L1760] TSETS    A=17 B=16 C=14 D=4110 'attach_type'
+00072 [L1761] TGETV    A=16 B=9 C=14 D=2318 
+00073 [L1761] UGET     A=17 B=0 C=1 D=1 tonumber
+00074 [L1761] TGETB    A=18 B=15 C=3 D=3843 
+00075 [L1761] CALL     A=17 B=2 C=2 D=514 
+00076 [L1761] TSETS    A=17 B=16 C=15 D=4111 'attach_level'
+00077 [L1762] TGETV    A=16 B=9 C=14 D=2318 
+00078 [L1762] UGET     A=17 B=0 C=1 D=1 tonumber
+00079 [L1762] TGETB    A=18 B=15 C=4 D=3844 
+00080 [L1762] CALL     A=17 B=2 C=2 D=514 
+00081 [L1762] TSETS    A=17 B=16 C=16 D=4112 'attach_count'
+00082 [L1756] FORL     A=11 B=127 C=227 D=32739 target=54
+00083 [L1764] TGETV    A=11 B=1 C=7 D=263 
+00084 [L1764] TSETS    A=9 B=11 C=8 D=2824 'attach_list'
+00085 [L1741] ITERN    A=5 B=3 C=3 D=771 
+00086 [L1741] ITERL    A=5 B=127 C=185 D=32697 target=16
+00087 [L1768] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto92 offset=0xac2c source_lines=2162-2170 params=1
+UPVALUES ['tonumber']
+00001 [L2163] TNEW     A=1 B=0 C=0 D=0 
+00002 [L2164] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00003 [L2164] TGETS    A=2 B=2 C=1 D=513 'd_str'
+00004 [L2164] TGETS    A=2 B=2 C=2 D=514 'split'
+00005 [L2164] MOV      A=3 B=0 C=0 D=0 
+00006 [L2164] KSTR     A=4 B=0 C=3 D=3 '|'
+00007 [L2164] CALL     A=2 B=2 C=3 D=515 
+00008 [L2165] UGET     A=3 B=0 C=0 D=0 tonumber
+00009 [L2165] TGETB    A=4 B=2 C=1 D=513 
+00010 [L2165] CALL     A=3 B=2 C=2 D=514 
+00011 [L2165] TSETS    A=3 B=1 C=4 D=260 'object_type'
+00012 [L2166] UGET     A=3 B=0 C=0 D=0 tonumber
+00013 [L2166] TGETB    A=4 B=2 C=2 D=514 
+00014 [L2166] CALL     A=3 B=2 C=2 D=514 
+00015 [L2166] TSETS    A=3 B=1 C=5 D=261 'attach_type'
+00016 [L2167] UGET     A=3 B=0 C=0 D=0 tonumber
+00017 [L2167] TGETB    A=4 B=2 C=3 D=515 
+00018 [L2167] CALL     A=3 B=2 C=2 D=514 
+00019 [L2167] TSETS    A=3 B=1 C=6 D=262 'attach_level'
+00020 [L2168] UGET     A=3 B=0 C=0 D=0 tonumber
+00021 [L2168] TGETB    A=4 B=2 C=4 D=516 
+00022 [L2168] CALL     A=3 B=2 C=2 D=514 
+00023 [L2168] TSETS    A=3 B=1 C=7 D=263 'attach_count'
+00024 [L2169] RET1     A=1 B=0 C=2 D=2 
+
+FUNCTION proto93 offset=0xad16 source_lines=2172-2179 params=1
+UPVALUES ['table']
+00001 [L2173] TNEW     A=1 B=0 C=0 D=0 
+00002 [L2174] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00003 [L2174] TGETS    A=2 B=2 C=1 D=513 'd_str'
+00004 [L2174] TGETS    A=2 B=2 C=2 D=514 'split'
+00005 [L2174] MOV      A=3 B=0 C=0 D=0 
+00006 [L2174] KSTR     A=4 B=0 C=3 D=3 '/'
+00007 [L2174] CALL     A=2 B=2 C=3 D=515 
+00008 [L2175] KSHORT   A=3 B=0 C=1 D=1 1
+00009 [L2175] LEN      A=4 B=0 C=2 D=2 
+00010 [L2175] KSHORT   A=5 B=0 C=1 D=1 1
+00011 [L2175] FORI     A=3 B=128 C=8 D=32776 target=20
+00012 [L2176] UGET     A=7 B=0 C=0 D=0 table
+00013 [L2176] TGETS    A=7 B=7 C=4 D=1796 'insert'
+00014 [L2176] MOV      A=8 B=0 C=1 D=1 
+00015 [L2176] GGET     A=9 B=0 C=5 D=5 'getItemFromStr'
+00016 [L2176] TGETV    A=10 B=2 C=6 D=518 
+00017 [L2176] CALL     A=9 B=0 C=2 D=2 
+00018 [L2176] CALLM    A=7 B=1 C=1 D=257 
+00019 [L2175] FORL     A=3 B=127 C=248 D=32760 target=12
+00020 [L2178] RET1     A=1 B=0 C=2 D=2 

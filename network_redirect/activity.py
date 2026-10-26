@@ -12,7 +12,7 @@ from .protocol import encode
 ROOT = Path(__file__).resolve().parents[1]
 require = formation.require
 ENUMS = json.loads((ROOT/'analysis/evidence/activity_enums.json').read_text())
-HANDLED = {1226, 1227, 1060, 1330, 1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1303, 1329, 1333, 1348, 1349, 1350, 1353}
+HANDLED = {1219, 1243, 1309, 1351, 1226, 1227, 1060, 1330, 1334, 1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1303, 1329, 1333, 1348, 1349, 1350, 1353}
 FIGHTS = {2, 3, 4, 5, 6, 10, 11, 12}
 EXCHANGE = {int(r['index']):r for r in summon.rows('top_score_exchange.csv')}
 RANK_SCORE = summon.rows('top_score.csv')
@@ -44,6 +44,14 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     from . import activity_hunt
     activity_hunt.load_rules()
     activity_pavilion.load_rules()
+    from . import activity_monday
+    activity_monday.load_rules()
+    from . import activity_yuanshi
+    activity_yuanshi.load_rules()
+    from . import activity_rulai
+    activity_rulai.load_rules()
+    from . import activity_nine_sky
+    activity_nine_sky.load_rules()
     duty_balance.rules()
     activity_convert.load_rules()
     activity_practice.load_rules()
@@ -104,6 +112,9 @@ def day(now,r):return (now+r['timezone_offset_hours']*3600)//86400
 
 def prepare(role,now,r,peers=None):
     s=role.setdefault('activity',{})
+    if 'yuanshi' in s:
+        from . import activity_yuanshi
+        activity_yuanshi.state(role,now,activity_yuanshi.load_rules())
     s.setdefault('rank_order',r['rank_initial_order']);s.setdefault('rank_score',0)
     s.setdefault('fight_id',100000);s.setdefault('duty_best',0)
     s.setdefault('duty_runs',0);s.setdefault('duty',None)
@@ -174,11 +185,15 @@ def statuses(role,now,r,flag,peers=None):
     from .activity_land import status as land_status
     s=role['activity']
     if flag==0:
+        from . import activity_nine_sky
         from . import activity_pavilion, activity_hunt
+        from . import activity_yuanshi
         from .activity_seasonal import status as seasonal_status
         return summon.event(47,dict(visit_list=visit_list(role,r),feed_data=feed_data(role,r),
                                    pavilion_data=activity_pavilion.status(role,now,peers),
                                    hunt_data=activity_hunt.status(role,now,r),
+                                   nine_sky_data=activity_nine_sky.status(now),
+                                   yuanshi_info=activity_yuanshi.client_config(now),
                                    spring_info=dict(start_time=0,end_time=0),
                                    imperial_exam=dict(start_time=0,end_time=0),**seasonal_status(role,now,r)))
     require(flag==1,'未知活动页')
@@ -368,6 +383,24 @@ def battle(role,req,now,r,jrules,frules):
 
 def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     s=prepare(role,now,r,peers)
+    if mid==1051 and req['item_type']==1243:
+        from . import activity_nine_sky
+        return activity_nine_sky.use_bag(role,req)
+    if mid==1309:
+        from . import activity_nine_sky
+        return activity_nine_sky.settle(role,req,now,parse,peers)
+    if mid==1351:
+        from . import activity_rulai
+        return activity_rulai.settle(role,req,now)
+    if mid==1051 and req['item_type'] in (1367,1368):
+        from . import activity_rulai
+        return activity_rulai.use_bag(role,req)
+    if mid==1334:
+        from . import activity_yuanshi
+        return activity_yuanshi.settle(role,req,now)
+    if mid==1051 and req['item_type']==1808:
+        from . import activity_yuanshi
+        return activity_yuanshi.use_bag(role,req)
     if mid==1226:
         from . import activity_hunt
         return activity_hunt.settle(role,req,now,r)
@@ -377,6 +410,9 @@ def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     if mid==1227:
         from . import activity_pavilion
         return activity_pavilion.settle(role,req,now,peers)
+    if mid in (1219, 1243):
+        from . import activity_monday
+        return activity_monday.settle(role,mid,req,now)
     if mid == 1350:
         from . import activity_arena
         return activity_arena.settle(role,req,now,r,jrules,parse)
@@ -438,7 +474,9 @@ def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     if mid==1353:
         from . import activity_babel
         return activity_babel.settle(role,req,now,r,jrules,parse)
-    if mid==1205:return [statuses(role,now,r,req['flag'],peers)]
+    if mid==1205:
+        from . import activity_rulai
+        return [activity_rulai.sync(role,now), statuses(role,now,r,req['flag'],peers)]
     if mid==1040:return feed(role,req,now,r,peers)
     if mid==1030:return visit(role,req,r)
     if mid==1085:

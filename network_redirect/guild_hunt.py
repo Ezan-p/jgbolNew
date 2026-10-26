@@ -17,10 +17,15 @@ def task(r,index,day=0):
     return dict(task_info={1:[101+(day+index)%5],2:[201+(day+index)%6],3:[]},prize_info=[reward,reward],boss_info=dict(cur_hp=10000,max_hp=10000,cost_gold=10,fight_count=0),index=index)
 
 
+def wander_capacity(a,r):
+    # One-time operator restoration is a daily quota floor, not repeatable task credit.
+    return max(r['wander_daily']+len(a['tasks'])+a.get('paid_tasks',0),a.get('restored_wander_limit',0))
+
+
 def main(a,now,r,g):
     return dict(result=1,cur_reputation=a['reputation'],free_task_times=max(0,r['hunt_daily']-len(a['tasks'])) if r['hunt_weekend_open'] or not weekend(a) else 0,pay_task_times=max(0,r['hunt_paid_limit']-a.get('paid_tasks',0)) if r['hunt_weekend_open'] or not weekend(a) else 0,pay_task_gold=r['hunt_gold'],
         union_task=[task(r,i,a['day']) for i in range(1,4)] if r['hunt_weekend_open'] or not weekend(a) else [],has_prize=False,pet_info=resident_info(g,r),task_last_time=(a['day']+1)*86400-r['timezone_offset_hours']*3600,
-        drop_baoxiang_item=daily.spec([5,1346,1,1]),week_reputation=a.get('week_score',0),wander_times=max(0,r['wander_daily']+len(a['tasks'])+a.get('paid_tasks',0)-a['wander']))
+        drop_baoxiang_item=daily.spec([5,1346,1,1]),week_reputation=a.get('week_score',0),wander_times=max(0,wander_capacity(a,r)-a['wander']))
 
 
 def shop(a,r):
@@ -50,7 +55,6 @@ def settle(role,s,g,op,d,now,r):
                 opponents[key]=choose_enemy(role,s,layer=idx-1,excluded=[m['id'] for m in g['members'].values()])
             result,packets,replay=simulate(role,s,r,journey.load_rules(),28,'仙盟任务守卫',enemy_npc=opponents[key]);won=1<=result<=3
             out.extend(record_events([replay]))
-            out.append(u.reply(85,dict(result=1,fight_result_list=[replay],free_times=1,fight_count=1,task_index=idx)))
         prizes=[];arrivals=[]
         if won:
             if paid:a['paid_tasks']=a.get('paid_tasks',0)+1
@@ -63,20 +67,26 @@ def settle(role,s,g,op,d,now,r):
             arrivals=[dict(attach_type=tid,attach_count=1)]
             from . import pets
             prizes.append(journey.grant(role,[5,1346,pets.load_rules()['task_training_boxes'],1]))
-        out.append(u.reply(84,dict(result=1,task_type=typ,task_index=idx,fight_result=won,boss_info=task(r,idx)['boss_info'],prize_reputation=10*idx if won else 0,prize_union_gold=100*idx if won else 0,prize_list=prizes,animal_info=arrivals)))
+        # Cache settlement/counts before the battle response destroys the page.
+        out.append(u.reply(84,dict(result=1,task_type=typ,task_index=idx,fight_result=won,boss_info=task(r,idx)['boss_info'],prize_reputation=10*idx if won else 0,prize_union_gold=100*idx if won else 0,prize_list=prizes,animal_info=arrivals,task_state=main(a,now,r,g))))
+        if typ==2:
+            out.append(u.reply(85,dict(result=1,fight_result_list=[replay],free_times=1,fight_count=1,task_index=idx)))
         return out
     if op==86:
         typ=d.get('two_type');u.require(typ in (1,2),'野外操作无效')
         if typ==2:
-            u.require(a['field'] is None,'请先处理当前灵兽');u.require(a['wander']<r['wander_daily']+len(a['tasks'])+a.get('paid_tasks',0),'今日游历次数已用完');a['wander']+=1
+            u.require(a['field'] is None,'请先处理当前灵兽');u.require(a['wander']<wander_capacity(a,r),'今日游历次数已用完');a['wander']+=1
             a['field']=dict(type_id=r['pet_types'][offline.roll(s,len(r['pet_types']))],tries=r['catch_attempts'])
-            return [u.reply(op,dict(result=1,two_type=2,wander_times=r['wander_daily']+len(a['tasks'])+a.get('paid_tasks',0)-a['wander'],boss_info=dict(type_id=a['field']['type_id']),left_times=r['catch_attempts'])),u.reply(93,dict(result=1,update_list=[]))]
-        return [u.reply(op,dict(result=1,two_type=1,wander_times=r['wander_daily']+len(a['tasks'])+a.get('paid_tasks',0)-a['wander'],pet_info=resident_info(g,r),wander_broad=a.get('broadcasts',[])))]
+            return [u.reply(op,dict(result=1,two_type=2,wander_times=wander_capacity(a,r)-a['wander'],boss_info=dict(type_id=a['field']['type_id']),left_times=r['catch_attempts'])),u.reply(93,dict(result=1,update_list=[]))]
+        data=dict(result=1,two_type=1,wander_times=wander_capacity(a,r)-a['wander'],pet_info=resident_info(g,r),wander_broad=a.get('broadcasts',[]))
+        if a['field']:data.update(boss_info=dict(type_id=a['field']['type_id']),left_times=a['field']['tries'])
+        return [u.reply(op,data)]
     if op==87:
-        typ=d.get('two_type');u.require(typ in (1,2),'捕捉操作无效');f=a['field'];u.require(f is not None,'请先游历寻找灵兽')
+        typ=d.get('two_type');u.require(typ in (1,2),'捕捉操作无效');f=a['field']
         if typ==1:
             a['field']=None
-            return [u.reply(op,dict(result=1,two_type=1)),broadcast(a,role,f['type_id'],4)]
+            return [u.reply(op,dict(result=1,two_type=1))]+([broadcast(a,role,f['type_id'],4)] if f else [])
+        u.require(f is not None,'请先游历寻找灵兽')
         u.require(f['tries']>0 and len(a['pets'])<r['pet_limit'],'捕捉次数不足或灵兽已满')
         # [A] The native picker sends the selected catch-prop type, not an
         # arbitrary inventory ID. Never consume a different prop on its behalf.
@@ -88,10 +98,13 @@ def settle(role,s,g,op,d,now,r):
         consume(role,selected,1)
         f['tries']-=1
         tid=f['type_id'];caught=offline.roll(s,100)<r['catch_prop_rates'][str(selected)]
+        acquired=[]
         if caught:
             captured=offline.add_pet(a,tid,s,r)
             from .journey import grant
             grant(role,[15,tid,1,captured['quality']])
+            from .activity_home_pets import wire
+            acquired=[wire(role['activity']['home']['pets'][-1])]
         flag=1 if caught else 2
         if not caught and not f['tries']:
             resting=offline.roll(s,100)<r['catch_resident_percent']
@@ -105,7 +118,7 @@ def settle(role,s,g,op,d,now,r):
         # can capture here before ever opening that panel; save its history for
         # the explicit 94 query instead of pushing into an uninitialized view.
         if caught:catch_update(a,role,tid,now)
-        return [u.reply(op,dict(result=1,two_type=2,flag=flag,left_times=0 if caught else left,animal_list=[dict(type_id=tid,name='灵兽',flag=flag)])),broadcast(a,role,tid,flag)]
+        return [u.reply(op,dict(result=1,two_type=2,flag=flag,left_times=0 if caught else left,animal_list=acquired)),broadcast(a,role,tid,flag)]
     if op==91:
         typ=d.get('two_type');u.require(typ in (1,2),'灵兽商店操作无效')
         if typ==1:return [u.reply(op,shop(a,r))]

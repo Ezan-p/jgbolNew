@@ -14,7 +14,7 @@ TABLES = [
     'material_transform', 'skill_material_transform', 'item_exchange_config',
     'equip_compose_random', 'item_buy_config', 'tollgate_config', 'tollgate_name',
     'map_name', 'undergo_ordeal/elite_tollgate_config',
-    'cortege/cortege_base_0', 'cortege/cortege_name_0',
+    'cortege/cortege_base_0', 'cortege/cortege_name_0', 'happiness_bag_config',
 ]
 
 
@@ -39,7 +39,7 @@ def main():
         assert original == local, logical
         inputs.append(dict(logical=logical, asset=index[logical],
                            sha256=hashlib.sha256(raw).hexdigest(), csv_matches=True))
-    for module in ['smithUI', 'forgeUI', 'equipPieceUI', 'qiankunnizhuan', 'prizeUI']:
+    for module in ['smithUI', 'forgeUI', 'equipPieceUI', 'qiankunnizhuan', 'prizeUI', 'packageUI']:
         logical = 'lua/ui/' + module + '.lua'
         raw = (ROOT / 'jgbol3.87/assets/release_' / index[logical]).read_bytes()
         (OUT / (module + '.txt')).write_text(listing(parse(raw)))
@@ -69,10 +69,38 @@ def main():
                     if len(parts) >= 4 and (int(parts[0]), int(parts[1])) in targets:
                         reward_hits.append(dict(table=table, line=line, column=column,
                                                 tuple=value_tuple, row=row))
+    item_base = {r['type_id']: r for r in rows('item_base')}
+    bag_sources = []
+    for typ, source_rows, bases, id_key in [
+        (5, rows('item_name'), item_base, 'Ftype_id'),
+        (6, rows('skill_name'), {r['type_id']: r for r in rows('skill_base')}, 'type_id'),
+    ]:
+        for row in source_rows:
+            if '乾坤袋' not in (row.get('product_desc') or ''):
+                continue
+            tid = row[id_key]
+            bag_sources.append(dict(object_type=typ, id=int(tid), name=row['name'],
+                                    quality=int(bases[tid]['quality']),
+                                    main_type=int(bases[tid]['main_type']) if typ == 5 else None,
+                                    source_text=row['product_desc'],
+                                    bag_id=None, count=None, official_probability=None))
+    local_rules = json.loads((ROOT / 'server_config/vip_rules.json').read_text())
+    weight_sum = sum(r['weight'] for r in local_rules['bag_pool'])
+    local_pool = [dict(**r, probability=r['weight'] / weight_sum)
+                  for r in local_rules['bag_pool']]
+    local_inputs = []
+    for name in ['server_config/vip_rules.json', 'network_redirect/vip.py',
+                 'network_redirect/backend.py', 'network_redirect/immortal.py']:
+        local_inputs.append(dict(path=name, sha256=hashlib.sha256((ROOT / name).read_bytes()).hexdigest()))
     report = dict(client='3.87', official_server_available=False, inputs=inputs,
                   equipment=equipment, skills=skills, reward_hits=reward_hits,
                   material_recipes=rows('material_transform'),
-                  skill_recipes=rows('skill_material_transform'))
+                  skill_recipes=rows('skill_material_transform'),
+                  bag_source_mentions=bag_sources,
+                  nonzero_item_random_weigth=[r for r in item_base.values()
+                                             if r['random_weigth'] not in ('', '0')],
+                  local_bag_rules=dict(mode=local_rules['mode'], inputs=local_inputs,
+                                      vip_bag_id=1031, pool=local_pool))
     (OUT / 'audit.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     print(f'Verified {len(TABLES)} CSVs; {len(equipment)} five-star equipment, '
           f'{len(skills)} five-star skills, {len(reward_hits)} reward tuples.')

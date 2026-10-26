@@ -16,6 +16,7 @@ class GuildNpcCombatTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         self.backend=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.backend.guild_rules['wars_enabled']=True  # Isolated legacy tournament coverage only.
         self.addCleanup(self.backend.close)
         clock=patch('network_redirect.backend.time.time',return_value=NOW)
         clock.start();self.addCleanup(clock.stop)
@@ -171,7 +172,7 @@ class GuildNpcCombatTests(unittest.TestCase):
         role=self.backend.profile();a=role['guild']['instances']
         self.assertEqual(a['train_hp'],9700)
         self.assertEqual(a['train_end'],NOW+self.backend.guild_rules['train_seconds'])
-        a['train_hp']=7000;self.backend.save(role)
+        a.update(train_cleared=1,train_floor=2,train_hp=20000,train_floor_attempts=0);self.backend.save(role)
         self.assertEqual(self.request(79)[-1][2]['result'],58)
         self.request(82)
         self.assertEqual(self.request(79)[-1][2]['result'],1)

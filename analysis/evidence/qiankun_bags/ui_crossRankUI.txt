@@ -1,0 +1,64 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\704af0e11f2e20c7223c760b34112457.data'; root=proto85
+
+FUNCTION proto63 offset=0xadee source_lines=1455-1477 params=0
+UPVALUES ['tonumber', 'config', 'table']
+00001 [L1456] GGET     A=0 B=0 C=0 D=0 'g_rankPrizeList'
+00002 [L1456] IST      A=0 B=0 C=0 D=0 
+00003 [L1456] JMP      A=0 B=128 C=56 D=32824 target=60
+00004 [L1457] TNEW     A=0 B=8 C=0 D=2048 
+00005 [L1457] TNEW     A=1 B=0 C=0 D=0 
+00006 [L1457] TSETB    A=1 B=0 C=1 D=1 
+00007 [L1457] TNEW     A=1 B=0 C=0 D=0 
+00008 [L1457] TSETB    A=1 B=0 C=2 D=2 
+00009 [L1457] GSET     A=0 B=0 C=0 D=0 'g_rankPrizeList'
+00010 [L1458] GGET     A=0 B=0 C=1 D=1 'd_ms'
+00011 [L1458] TGETS    A=0 B=0 C=2 D=2 'd_csv'
+00012 [L1458] TGETS    A=0 B=0 C=3 D=3 'open2'
+00013 [L1458] KSTR     A=1 B=0 C=4 D=4 'csv_config/rank_prize.csv'
+00014 [L1458] CALL     A=0 B=2 C=2 D=514 
+00015 [L1459] KPRI     A=1 B=0 C=0 D=0 
+00016 [L1460] KSHORT   A=2 B=0 C=1 D=1 1
+00017 [L1460] LEN      A=3 B=0 C=0 D=0 
+00018 [L1460] SUBVN    A=3 B=3 C=0 D=768 
+00019 [L1460] KSHORT   A=4 B=0 C=1 D=1 1
+00020 [L1460] FORI     A=2 B=128 C=39 D=32807 target=60
+00021 [L1461] TGETV    A=6 B=0 C=5 D=5 
+00022 [L1462] TNEW     A=7 B=0 C=0 D=0 
+00023 [L1463] GGET     A=8 B=0 C=1 D=1 'd_ms'
+00024 [L1463] TGETS    A=8 B=8 C=6 D=2054 'd_data'
+00025 [L1463] TGETS    A=8 B=8 C=7 D=2055 'getItemListFromStr'
+00026 [L1463] TGETS    A=9 B=6 C=8 D=1544 'prize'
+00027 [L1463] CALL     A=8 B=2 C=2 D=514 
+00028 [L1463] TSETS    A=8 B=7 C=5 D=1797 'prize_list'
+00029 [L1464] UGET     A=8 B=0 C=0 D=0 tonumber
+00030 [L1464] TGETS    A=9 B=6 C=10 D=1546 'min_order'
+00031 [L1464] CALL     A=8 B=2 C=2 D=514 
+00032 [L1464] TSETS    A=8 B=7 C=9 D=1801 'min'
+00033 [L1465] KSHORT   A=8 B=0 C=0 D=0 0
+00034 [L1465] TSETS    A=8 B=7 C=11 D=1803 'max'
+00035 [L1466] TGETS    A=8 B=7 C=9 D=1801 'min'
+00036 [L1466] UGET     A=9 B=0 C=1 D=1 config
+00037 [L1466] TGETS    A=9 B=9 C=12 D=2316 'king_rank_limit'
+00038 [L1466] ISGT     A=8 B=0 C=9 D=9 
+00039 [L1466] JMP      A=8 B=128 C=7 D=32775 target=47
+00040 [L1467] UGET     A=8 B=0 C=2 D=2 table
+00041 [L1467] TGETS    A=8 B=8 C=13 D=2061 'insert'
+00042 [L1467] GGET     A=9 B=0 C=0 D=0 'g_rankPrizeList'
+00043 [L1467] TGETB    A=9 B=9 C=1 D=2305 
+00044 [L1467] MOV      A=10 B=0 C=7 D=7 
+00045 [L1467] CALL     A=8 B=1 C=3 D=259 
+00046 [L1467] JMP      A=8 B=128 C=6 D=32774 target=53
+00047 [L1469] UGET     A=8 B=0 C=2 D=2 table
+00048 [L1469] TGETS    A=8 B=8 C=13 D=2061 'insert'
+00049 [L1469] GGET     A=9 B=0 C=0 D=0 'g_rankPrizeList'
+00050 [L1469] TGETB    A=9 B=9 C=2 D=2306 
+00051 [L1469] MOV      A=10 B=0 C=7 D=7 
+00052 [L1469] CALL     A=8 B=1 C=3 D=259 
+00053 [L1471] ISF      A=0 B=0 C=1 D=1 
+00054 [L1471] JMP      A=8 B=128 C=3 D=32771 target=58
+00055 [L1472] TGETS    A=8 B=7 C=9 D=1801 'min'
+00056 [L1472] SUBVN    A=8 B=8 C=0 D=2048 
+00057 [L1472] TSETS    A=8 B=1 C=11 D=267 'max'
+00058 [L1474] MOV      A=1 B=0 C=7 D=7 
+00059 [L1460] FORL     A=2 B=127 C=217 D=32729 target=21
+00060 [L1477] RET0     A=0 B=0 C=1 D=1 

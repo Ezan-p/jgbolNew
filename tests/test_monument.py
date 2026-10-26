@@ -37,8 +37,12 @@ class MonumentTests(unittest.TestCase):
         cfg=guild.client_config(self.b.guild_rules)['const_config']
         for k in ('open_union_match','open_world_match','open_feast'):self.assertIs(type(cfg[k]),int);self.assertGreater(cfg[k],0)
     def test_public_queries_never_join(self):
-        for op,q in ((18,9),(18,10),(18,15),(58,21),(58,22),(58,30)):
-            self.ok(1301,id=op,data=summon.lua(dict(query_type=q)))
+        self.ok(1301,id=18,data=summon.lua(dict(query_type=15)))
+        for op,q in ((18,9),(18,10),(58,21),(58,22),(58,30)):
+            before=self.b.profile()
+            error=self.event(self.request(1301,id=op,data=summon.lua(dict(query_type=q))),55)
+            self.assertEqual(error['op_string'],guild.WAR_CLOSED)
+            self.assertEqual(self.b.profile(),before)
         r=self.b.profile();self.assertEqual(r['union_id'],0);self.assertEqual(r['gold_coin'],10000)
         out=self.request(1301,id=45,data='{}');self.event(out,55)
     def test_config_bootstrap_and_day(self):

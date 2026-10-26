@@ -50,7 +50,7 @@ Interceptor.attach(m.getExportByName('lua_pcall'),{onEnter(args){
                 name,sep,rest=line.partition(':')
                 if sep and rest.startswith(('true:','false:')):
                     ok,_,error=rest.partition(':');checks.append(dict(name=name,passed=ok=='true',error=error))
-    passed=len(checks)==19 and all(c['passed'] for c in checks)
+    passed=len(checks)==22 and all(c['passed'] for c in checks)
     report=dict(passed=passed,checks=checks,raw=messages,live_account_resources_changed=False,
                 native_cocos=True,detached_layer=True,network_sends_captured=True)
     path=ROOT/'analysis/evidence/pavilion/client_validation.json'

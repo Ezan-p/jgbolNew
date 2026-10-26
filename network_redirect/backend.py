@@ -25,7 +25,7 @@ CLIENT_CONFIG = '''{
     [11]=__STONE_CONFIG__,
     [14]=__CHEER_CONFIG__,
     [15]=__IMMORTAL_CONFIG__,
-    [24]={vip_shop=__XIANLING_HINT__,buff_data={buff_type=0}},
+    [24]={vip_shop=__XIANLING_HINT__,buff_data={buff_type=0},yuanshi_info=__YUANSHI_CONFIG__},
     config_end=true
 }'''
 with (Path(__file__).resolve().parents[1] / 'analysis/configs/role_level_config.csv').open() as _levels:
@@ -170,12 +170,15 @@ class Backend:
         before_achievements = json.loads(stored[0]) if stored else None
         context = self.achievement_context if account == self.account else None
         mid, req = context or (0, {})
+        from . import activity_monday
+        monday_updates = activity_monday.track(role, before_achievements, mid, req, int(time.time()))
         achievements.track(role, before_achievements, mid, req, int(time.time()))
         updates = achievements.packets(role, new=1, previous=before_achievements) if context and before_achievements else []
         self.db.execute('INSERT OR REPLACE INTO roles VALUES (?,?)',
                         (account, json.dumps(role, ensure_ascii=False)))
         self.db.commit()
         self.achievement_pending.extend(updates)
+        self.achievement_pending.extend(monday_updates)
 
     def duty_peers(self):
         # Only actual registered local saves participate. Exclude the legacy
@@ -209,9 +212,13 @@ class Backend:
         self.save(role)
         vip.prepare(role, self.vip_rules)
         config = CLIENT_CONFIG.replace('__MARKET_CONFIG__', summon.lua(goods))
+        from . import activity_monday
+        config = config.replace('config_end=true', '[21]=' + str(activity_monday.hint(role, int(time.time()))) + ',config_end=true')
         config = config.replace('__STONE_CONFIG__', summon.lua(dict(open_flag=True, min_role_level=equipment.load_rules()['min_role_level'])))
         config = config.replace('__CHEER_CONFIG__', summon.lua(cheer.client_config(self.cheer_rules)))
         config = config.replace('__XIANLING_HINT__', summon.lua(xianling.hint(role,int(time.time()),self.xianling_rules)))
+        from . import activity_yuanshi
+        config = config.replace('__YUANSHI_CONFIG__', summon.lua(activity_yuanshi.client_config(int(time.time()))))
         config = config.replace('config_end=true', '[8]=' + summon.lua(guild.client_config(self.guild_rules)) + ',config_end=true')
         for key, value in daily.client_config(self.daily_rules).items():
             config = config.replace('config_end=true', '[%d]=' % key + summon.lua(value) + ',config_end=true')
@@ -250,6 +257,9 @@ class Backend:
             replies.append(summon.news_snapshot(role, self.summon_rules))
         if role.get('summon', {}).get('last_result'):
             replies.append(summon.event(79, role['summon']['last_result']))
+        from . import activity_rulai
+        replies.append(summon.event(113, {73: activity_rulai.schedule(int(time.time()), activity_rulai.load_rules())}))
+        replies.append(activity_rulai.sync(role, int(time.time())))
         replies += achievements.packets(role)
         replies.append(daily.hint(role, int(time.time()), self.daily_rules))
         replies.append(welfare.hint(role, int(time.time()), self.welfare_rules))
@@ -527,11 +537,18 @@ class Backend:
             previous_month = role.get('xianling', {}).get('month')
             xianling.prepare(role, now)
             previous_day = role.get('daily', {}).get('day')
+            from . import activity_rulai
+            rulai_state = role.get('activity', {}).get('rulai', {})
+            rulai_period = activity_rulai.period(now, activity_rulai.load_rules())[0]
+            rulai_rollover = rulai_state.get('start') != rulai_period
             journey.prepare(role, now, self.journey_rules)
             daily.prepare(role, now, self.daily_rules)
             self.save(role)
             # Refresh expiring permanent effects without replacing UI-held objects.
             updates = self.panel_attributes(role) + self.journey_attributes(role)
+            if rulai_rollover:
+                updates.append(activity_rulai.sync(role, now))
+                self.save(role)
             if previous_month != role['xianling']['month']:
                 updates.append(xianling.tip(role,now,self.xianling_rules))
             if previous_day != role['daily']['day']:
@@ -586,7 +603,7 @@ class Backend:
             return self.dailies(packet, mid, data)
         if (mid in activity.HANDLED or (mid == 1026 and data['fight_type'] in activity.FIGHTS)
                 or (mid == 1244 and data['fight_type'] in (2, 4))
-                or (mid == 1051 and data['item_type'] in (1036,1037,1324,1346,1021,1130,1131,1132,1133,1213,1214,1215,1216,1217))
+                or (mid == 1051 and data['item_type'] in (1243,1367,1368,1808,1036,1037,1324,1346,1021,1130,1131,1132,1133,1213,1214,1215,1216,1217))
                 or (mid == 1059 and data['flag'] == 3)
                 or (mid == 1201 and data['flag'] in (1, 2))):
             return self.activities(packet, mid, data)
@@ -882,6 +899,10 @@ class Backend:
                 welfare.record_charge(role, charged, now, self.welfare_rules)
                 from . import activity_pavilion
                 activity_pavilion.record_charge(role, charged, now)
+                from . import activity_yuanshi
+                activity_yuanshi.record_charge(role, charged, now)
+                from . import activity_rulai
+                activity_rulai.record_charge(role, charged, now)
             journey.prepare(role, now, self.journey_rules)
             activity.prepare(role, now, self.activity_rules, self.duty_peers())
             formation.prepare(role, self.formation_rules)
@@ -892,7 +913,8 @@ class Backend:
                 if mid == 1111:
                     replies = [welfare.hint(role,now,self.welfare_rules), welfare_attributes(role)] + replies
             if charged > 0:
-                replies += [activity_pavilion.update(role, now, self.duty_peers()),
+                replies += [activity_rulai.sync(role, now), activity_yuanshi.update(role, now),
+                            activity_pavilion.update(role, now, self.duty_peers()),
                             welfare.mail_snapshot(role, now, self.welfare_rules)]
             self.save(role)
             self.emit('game_vip_ok', message_id=mid, rules_revision=self.vip_rules['revision'])

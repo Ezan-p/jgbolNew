@@ -8,6 +8,10 @@ ROOT = Path(__file__).resolve().parents[1]
 require = formation.require
 HANDLED = {1301}
 FIGHTS = {13,14,16,17,19}
+WAR_FIGHTS = {14,16,17}
+WAR_OPS = {45,46,47,48,58,62,63,72,76}
+WAR_QUERIES = {8,9,10,11,12,13,16,17,18,19,100}
+WAR_CLOSED = '离线模式，暂未开放'
 OP_LABELS = {1:'创建仙盟',2:'加入仙盟',4:'加入仙盟',5:'批准申请',6:'拒绝申请',11:'任命职位',12:'禅让盟主',19:'修改公告',20:'禁言成员',21:'解除禁言',22:'清空禁言',24:'清空申请',25:'移除成员',51:'更改盟名',71:'修改内部公告'}
 MANAGEMENT = {1,2,3,4,5,6,10,11,12,13,19,20,21,22,23,24,25,51,71}
 
@@ -15,6 +19,7 @@ MANAGEMENT = {1,2,3,4,5,6,10,11,12,13,19,20,21,22,23,24,25,51,71}
 def load_rules(path=ROOT/'server_config/guild_rules.json'):
     r=json.loads(Path(path).read_text())
     require(r.get('schema_version')==1 and r.get('mode')=='inferred','仙盟配置来源无效')
+    require(type(r.get('wars_enabled')) is bool,'仙盟战争开关无效')
     for k in ('join_level','create_level','create_cost_gold','change_name_cost','member_limit','max_level','level_popularity','initial_money','seed_cost_money','tree_grow_seconds','tree_exp_per_level','cultivate_limit','cultivate_gold','cultivate_gold_rate','cultivate_silver','cultivate_contrib','cultivate_exp','cultivate_pop','donate_limit','donate_money_rate','donate_contrib_rate','store_flush_gold','store_flush_limit','battle_npc','battle_level','battle_daily','tree_boss_hp','tree_fight_cooldown','tree_flush_gold','feast_seconds','feast_gift_limit','feast_grab_limit','team_size','team_daily','search_daily','catch_daily','catch_gold','hunt_daily','wander_daily','hunt_silver','hunt_gold','escort_daily','escort_rob_daily','escort_flush_limit','escort_free_flush','escort_flush_gold','search_card_points'):
         require(type(r.get(k)) is int and (0 if k=='wander_daily' else 1)<=r[k]<=1000000,'仙盟配置数值无效: '+k)
     require(r['max_level']<=99 and r['member_limit']<=100,'仙盟等级/人数配置越界')
@@ -52,6 +57,7 @@ def client_config(r):
     rights={int(k):v for k,v in r['rank_rights'].items()}
     return dict(const_config=dict(create_level=r['create_level'],join_level=r['join_level'],apply_level=r['join_level'],
         create_cost_gold=r['create_cost_gold'],change_name_cost=r['change_name_cost'],union_top_level=r['max_level'],
+        # These two flags control visibility; disabled wars keep both icons.
         open_search_gold=True,open_union_match=1,open_world_match=1,open_feast=1,open_west=True,
         west_min_role_level=r['join_level'],open_feast_level=r['feast_union_level']),
         right_config={k:dict(right_list={n:True for n in v}) for k,v in rights.items()},
@@ -139,9 +145,11 @@ def member(role,g,r):
     from . import guild_match
     m=copy.deepcopy(g['members'][str(int(role['role_id']))]);m.update(union_contrib=role['union_contrib'],cur_union_contrib=role['cur_union_contrib'],contribute=role['union_contrib'])
     m.update(tree_state=g['tree']['state'],can_plant_tree=role['union_rank']==1,can_cultivate_tree=True,can_kill_tree=True,cultivate_time=10,union_protect_card=3,max_protect_card=3,can_search_gold=True,can_match_fight=True,has_action_point=True,is_match_time=True,is_bet_time=False,has_bet=False,cross_fight_flag=False,can_rece_award=False,west_config=client_config(r)['west_config'])
-    match=guild_match.state(role['guild'],False,r)
+    match=guild_match.state(role['guild'],False,r) if r['wars_enabled'] else {}
     rights=client_config(r)['right_config'][role['union_rank']]['right_list']
     m.update(can_plant_tree=bool(rights.get(13)) and g['popularity']>=r['tree_require_pop'],cultivate_time=max(0,r['cultivate_limit']-role['guild']['cultivations']),has_action_point=match.get('fights',0)<r['battle_daily'] and match.get('life',r['match_life'])>0,is_bet_time=not match.get('fights') and not match.get('claimed'),has_bet=bool(match.get('bets')),cross_fight_flag=True,can_rece_award=bool(match.get('fights')) and not match.get('claimed'))
+    if not r['wars_enabled']:
+        m.update(can_match_fight=False,has_action_point=False,is_match_time=False,is_bet_time=False,has_bet=False,cross_fight_flag=False,can_rece_award=False)
     escort=role['guild'].get('escort',{})
     m['union_protect_card']=escort.get('cards',3)
     return m
@@ -178,6 +186,8 @@ def store_data(s,r,refreshed=False):
 
 def settle(role,req,now,r,parse,daily_rules):
     op=req['id']; d=parse(req['data']); require(isinstance(d,dict),'仙盟请求格式错误')
+    if op in WAR_OPS or op==18 and d.get('query_type') in WAR_QUERIES:
+        require(r['wars_enabled'],WAR_CLOSED)
     s,g=prepare(role,now,r); rid=str(int(role['role_id']))
     if op==18 and d.get('query_type')==4:
         page=positive(d,'page',10000)

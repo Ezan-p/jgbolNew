@@ -120,6 +120,8 @@ def catalog(role, now, rules):
                             if page == 1 else 0, is_day_limit=1)
     from . import cheer
     result['rich_item_list'].update(cheer.market_goods(role))
+    from . import activity_nine_sky
+    result['rich_item_list'].update(activity_nine_sky.market_goods(now))
     result.update(panic_buy_list=panic_snapshot(role, now, rules),
                   item_begin_time=0, item_end_time=0, server_time=now)
     return result

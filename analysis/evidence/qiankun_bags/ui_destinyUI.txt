@@ -1,0 +1,168 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\d204815c279aad7a9e4572ab8f02af26.data'; root=proto58
+
+FUNCTION proto8 offset=0x6db source_lines=164-211 params=0
+UPVALUES ['pairs', 'tonumber', 'table']
+00001 [L165] GGET     A=0 B=0 C=0 D=0 'g_csv'
+00002 [L165] TGETS    A=0 B=0 C=1 D=1 'shop'
+00003 [L165] IST      A=0 B=0 C=0 D=0 
+00004 [L165] JMP      A=0 B=128 C=82 D=32850 target=87
+00005 [L166] GGET     A=0 B=0 C=0 D=0 'g_csv'
+00006 [L166] TNEW     A=1 B=0 C=0 D=0 
+00007 [L166] TSETS    A=1 B=0 C=1 D=1 'shop'
+00008 [L167] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00009 [L167] TGETS    A=0 B=0 C=3 D=3 'd_csv'
+00010 [L167] TGETS    A=0 B=0 C=4 D=4 'open2'
+00011 [L167] KSTR     A=1 B=0 C=5 D=5 'csv_config/exchange_zone.csv'
+00012 [L167] CALL     A=0 B=2 C=2 D=514 
+00013 [L168] UGET     A=1 B=0 C=0 D=0 pairs
+00014 [L168] MOV      A=2 B=0 C=0 D=0 
+00015 [L168] CALL     A=1 B=4 C=2 D=1026 
+00016 [L168] ISNEXT   A=4 B=128 C=68 D=32836 target=85
+00017 [L169] UGET     A=6 B=0 C=1 D=1 tonumber
+00018 [L169] TGETS    A=7 B=5 C=6 D=1286 'index'
+00019 [L169] CALL     A=6 B=2 C=2 D=514 
+00020 [L170] GGET     A=7 B=0 C=0 D=0 'g_csv'
+00021 [L170] TGETS    A=7 B=7 C=1 D=1793 'shop'
+00022 [L170] TDUP     A=8 B=0 C=7 D=7 {'kind': 'table', 'value': {}}
+00023 [L172] TSETS    A=6 B=8 C=6 D=2054 'index'
+00024 [L173] UGET     A=9 B=0 C=1 D=1 tonumber
+00025 [L173] TGETS    A=10 B=5 C=8 D=1288 'max_buy_count'
+00026 [L173] CALL     A=9 B=2 C=2 D=514 
+00027 [L173] TSETS    A=9 B=8 C=8 D=2056 'max_buy_count'
+00028 [L174] UGET     A=9 B=0 C=1 D=1 tonumber
+00029 [L174] TGETS    A=10 B=5 C=9 D=1289 'goldon_count'
+00030 [L174] CALL     A=9 B=2 C=2 D=514 
+00031 [L174] TSETS    A=9 B=8 C=9 D=2057 'goldon_count'
+00032 [L175] GGET     A=9 B=0 C=2 D=2 'd_ms'
+00033 [L175] TGETS    A=9 B=9 C=10 D=2314 'd_data'
+00034 [L175] TGETS    A=9 B=9 C=11 D=2315 'getItemListFromStr'
+00035 [L175] TGETS    A=10 B=5 C=12 D=1292 'attach_list'
+00036 [L175] CALL     A=9 B=2 C=2 D=514 
+00037 [L175] TSETS    A=9 B=8 C=12 D=2060 'attach_list'
+00038 [L176] UGET     A=9 B=0 C=1 D=1 tonumber
+00039 [L176] TGETS    A=10 B=5 C=13 D=1293 'need_buy_count'
+00040 [L176] CALL     A=9 B=2 C=2 D=514 
+00041 [L176] TSETS    A=9 B=8 C=13 D=2061 'need_buy_count'
+00042 [L177] GGET     A=9 B=0 C=2 D=2 'd_ms'
+00043 [L177] TGETS    A=9 B=9 C=10 D=2314 'd_data'
+00044 [L177] TGETS    A=9 B=9 C=14 D=2318 'getItemFromStr'
+00045 [L177] TGETS    A=10 B=5 C=15 D=1295 'gift_prize'
+00046 [L177] CALL     A=9 B=2 C=2 D=514 
+00047 [L177] TSETS    A=9 B=8 C=15 D=2063 'gift_prize'
+00048 [L178] GGET     A=9 B=0 C=2 D=2 'd_ms'
+00049 [L178] TGETS    A=9 B=9 C=10 D=2314 'd_data'
+00050 [L178] TGETS    A=9 B=9 C=14 D=2318 'getItemFromStr'
+00051 [L178] TGETS    A=10 B=5 C=16 D=1296 'first_prize'
+00052 [L178] CALL     A=9 B=2 C=2 D=514 
+00053 [L178] TSETS    A=9 B=8 C=16 D=2064 'first_prize'
+00054 [L179] TGETS    A=9 B=5 C=17 D=1297 'name'
+00055 [L179] TSETS    A=9 B=8 C=17 D=2065 'name'
+00056 [L180] TSETV    A=8 B=7 C=6 D=1798 
+00057 [L181] GGET     A=7 B=0 C=0 D=0 'g_csv'
+00058 [L181] TGETS    A=7 B=7 C=1 D=1793 'shop'
+00059 [L181] TGETV    A=7 B=7 C=6 D=1798 
+00060 [L182] GGET     A=8 B=0 C=18 D=18 'g_data'
+00061 [L182] TGETS    A=8 B=8 C=19 D=2067 'enter'
+00062 [L182] TGETS    A=8 B=8 C=20 D=2068 'exchange_info'
+00063 [L182] ISF      A=0 B=0 C=8 D=8 
+00064 [L182] JMP      A=9 B=128 C=20 D=32788 target=85
+00065 [L182] GGET     A=8 B=0 C=18 D=18 'g_data'
+00066 [L182] TGETS    A=8 B=8 C=19 D=2067 'enter'
+00067 [L182] TGETS    A=8 B=8 C=20 D=2068 'exchange_info'
+00068 [L182] TGETV    A=8 B=8 C=6 D=2054 
+00069 [L182] ISF      A=0 B=0 C=8 D=8 
+00070 [L182] JMP      A=9 B=128 C=14 D=32782 target=85
+00071 [L183] GGET     A=8 B=0 C=18 D=18 'g_data'
+00072 [L183] TGETS    A=8 B=8 C=19 D=2067 'enter'
+00073 [L183] TGETS    A=8 B=8 C=20 D=2068 'exchange_info'
+00074 [L183] TGETV    A=8 B=8 C=6 D=2054 
+00075 [L184] TGETS    A=9 B=8 C=21 D=2069 'state'
+00076 [L184] TSETS    A=9 B=7 C=21 D=1813 'state'
+00077 [L185] TGETS    A=9 B=8 C=22 D=2070 'left_buy_count'
+00078 [L185] TSETS    A=9 B=7 C=22 D=1814 'left_buy_count'
+00079 [L186] TGETS    A=9 B=8 C=23 D=2071 'left_count'
+00080 [L186] TSETS    A=9 B=7 C=23 D=1815 'left_count'
+00081 [L187] TGETS    A=9 B=8 C=24 D=2072 'need_charge'
+00082 [L187] TSETS    A=9 B=7 C=24 D=1816 'need_charge'
+00083 [L188] TGETS    A=9 B=8 C=25 D=2073 'plus_times'
+00084 [L188] TSETS    A=9 B=7 C=25 D=1817 'plus_times'
+00085 [L168] ITERN    A=4 B=3 C=3 D=771 
+00086 [L168] ITERL    A=4 B=127 C=186 D=32698 target=17
+00087 [L192] GGET     A=0 B=0 C=0 D=0 'g_csv'
+00088 [L192] TGETS    A=0 B=0 C=26 D=26 'gift'
+00089 [L192] IST      A=0 B=0 C=0 D=0 
+00090 [L192] JMP      A=0 B=128 C=73 D=32841 target=164
+00091 [L193] GGET     A=0 B=0 C=0 D=0 'g_csv'
+00092 [L193] TNEW     A=1 B=0 C=0 D=0 
+00093 [L193] TSETS    A=1 B=0 C=26 D=26 'gift'
+00094 [L194] GGET     A=0 B=0 C=2 D=2 'd_ms'
+00095 [L194] TGETS    A=0 B=0 C=3 D=3 'd_csv'
+00096 [L194] TGETS    A=0 B=0 C=4 D=4 'open2'
+00097 [L194] KSTR     A=1 B=0 C=27 D=27 'csv_config/gift_config.csv'
+00098 [L194] CALL     A=0 B=2 C=2 D=514 
+00099 [L195] UGET     A=1 B=0 C=0 D=0 pairs
+00100 [L195] MOV      A=2 B=0 C=0 D=0 
+00101 [L195] CALL     A=1 B=4 C=2 D=1026 
+00102 [L195] ISNEXT   A=4 B=128 C=59 D=32827 target=162
+00103 [L196] UGET     A=6 B=0 C=1 D=1 tonumber
+00104 [L196] TGETS    A=7 B=5 C=28 D=1308 'gift_type'
+00105 [L196] CALL     A=6 B=2 C=2 D=514 
+00106 [L197] GGET     A=7 B=0 C=0 D=0 'g_csv'
+00107 [L197] TGETS    A=7 B=7 C=26 D=1818 'gift'
+00108 [L197] TGETV    A=7 B=7 C=6 D=1798 
+00109 [L197] IST      A=0 B=0 C=7 D=7 
+00110 [L197] JMP      A=7 B=128 C=4 D=32772 target=115
+00111 [L198] GGET     A=7 B=0 C=0 D=0 'g_csv'
+00112 [L198] TGETS    A=7 B=7 C=26 D=1818 'gift'
+00113 [L198] TNEW     A=8 B=0 C=0 D=0 
+00114 [L198] TSETV    A=8 B=7 C=6 D=1798 
+00115 [L200] TNEW     A=7 B=0 C=0 D=0 
+00116 [L201] UGET     A=8 B=0 C=1 D=1 tonumber
+00117 [L201] TGETS    A=9 B=5 C=29 D=1309 'money'
+00118 [L201] CALL     A=8 B=2 C=2 D=514 
+00119 [L201] TSETS    A=8 B=7 C=29 D=1821 'money'
+00120 [L202] GGET     A=8 B=0 C=2 D=2 'd_ms'
+00121 [L202] TGETS    A=8 B=8 C=10 D=2058 'd_data'
+00122 [L202] TGETS    A=8 B=8 C=11 D=2059 'getItemListFromStr'
+00123 [L202] TGETS    A=9 B=5 C=30 D=1310 'gift_list'
+00124 [L202] CALL     A=8 B=2 C=2 D=514 
+00125 [L202] TSETS    A=8 B=7 C=30 D=1822 'gift_list'
+00126 [L203] UGET     A=8 B=0 C=2 D=2 table
+00127 [L203] TGETS    A=8 B=8 C=31 D=2079 'insert'
+00128 [L203] GGET     A=9 B=0 C=0 D=0 'g_csv'
+00129 [L203] TGETS    A=9 B=9 C=26 D=2330 'gift'
+00130 [L203] TGETV    A=9 B=9 C=6 D=2310 
+00131 [L203] MOV      A=10 B=0 C=7 D=7 
+00132 [L203] CALL     A=8 B=1 C=3 D=259 
+00133 [L204] ISNEN    A=6 B=0 C=0 D=0 2
+00134 [L204] JMP      A=8 B=128 C=27 D=32795 target=162
+00135 [L204] GGET     A=8 B=0 C=18 D=18 'g_data'
+00136 [L204] TGETS    A=8 B=8 C=19 D=2067 'enter'
+00137 [L204] TGETS    A=8 B=8 C=32 D=2080 'charge_info'
+00138 [L204] ISF      A=0 B=0 C=8 D=8 
+00139 [L204] JMP      A=9 B=128 C=22 D=32790 target=162
+00140 [L204] GGET     A=8 B=0 C=18 D=18 'g_data'
+00141 [L204] TGETS    A=8 B=8 C=19 D=2067 'enter'
+00142 [L204] TGETS    A=8 B=8 C=32 D=2080 'charge_info'
+00143 [L204] GGET     A=9 B=0 C=0 D=0 'g_csv'
+00144 [L204] TGETS    A=9 B=9 C=26 D=2330 'gift'
+00145 [L204] TGETV    A=9 B=9 C=6 D=2310 
+00146 [L204] LEN      A=9 B=0 C=9 D=9 
+00147 [L204] TGETV    A=8 B=8 C=9 D=2057 
+00148 [L204] ISF      A=0 B=0 C=8 D=8 
+00149 [L204] JMP      A=9 B=128 C=12 D=32780 target=162
+00150 [L205] GGET     A=8 B=0 C=18 D=18 'g_data'
+00151 [L205] TGETS    A=8 B=8 C=19 D=2067 'enter'
+00152 [L205] TGETS    A=8 B=8 C=32 D=2080 'charge_info'
+00153 [L205] GGET     A=9 B=0 C=0 D=0 'g_csv'
+00154 [L205] TGETS    A=9 B=9 C=26 D=2330 'gift'
+00155 [L205] TGETV    A=9 B=9 C=6 D=2310 
+00156 [L205] LEN      A=9 B=0 C=9 D=9 
+00157 [L205] TGETV    A=8 B=8 C=9 D=2057 
+00158 [L206] TGETS    A=9 B=8 C=21 D=2069 'state'
+00159 [L206] TSETS    A=9 B=7 C=21 D=1813 'state'
+00160 [L207] TGETS    A=9 B=8 C=33 D=2081 'count'
+00161 [L207] TSETS    A=9 B=7 C=33 D=1825 'count'
+00162 [L195] ITERN    A=4 B=3 C=3 D=771 
+00163 [L195] ITERL    A=4 B=127 C=195 D=32707 target=103
+00164 [L211] RET0     A=0 B=0 C=1 D=1 

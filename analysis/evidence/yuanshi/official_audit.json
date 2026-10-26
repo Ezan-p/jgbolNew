@@ -1,0 +1,209 @@
+{
+  "client": "3.87",
+  "official_server_available": false,
+  "sources": [
+    {
+      "logical": "lua/ui/twoYearsCelebrateUI.lua",
+      "path": "jgbol3.87/assets/release_/d46fac5d3e86cff98adaf18ae1434625.data",
+      "sha256": "84d3b87d6053b6d4a227031d7d5dfe9691fb016438cc7624a4e51d8fcab7408b"
+    },
+    {
+      "logical": "lua/ui/activityUI.lua",
+      "path": "jgbol3.87/assets/release_/f94624a6c6a5f4034d0fdf2e315f0904.data",
+      "sha256": "b62f2dffa9e3707ce73f2b5fedbb147433544d735ec722519d377a31698f134f"
+    },
+    {
+      "logical": "lua/ui/funUI.lua",
+      "path": "jgbol3.87/assets/release_/5dd8b529cd13d0983be4c09ea5cd56db.data",
+      "sha256": "0551c970ff68fdc33625dd35036bcc7b3ecf0e058d6c04ecef4876c42a41214d"
+    },
+    {
+      "logical": "lua/event_mgr.lua",
+      "path": "jgbol3.87/assets/release_/ae0f40d1631f06ad6e89a50dc5ea4c26.data",
+      "sha256": "ad671dc53da75f3f413e6ca0519cbbee0bf114a7b49864bb3c38f723ab4b77ed"
+    },
+    {
+      "logical": "lua/common/common_def.lua",
+      "path": "jgbol3.87/assets/release_/13a640e1f35a7599fe90dd31c8098b15.data",
+      "sha256": "15a4299fc92c50adda7682a4775f2e278e135f49f12d126e105a03d097d9ecf8"
+    },
+    {
+      "logical": "v2/String2.plist",
+      "path": "jgbol3.87/assets/release_/e926a25accffd37afafb015933e815d4.data",
+      "sha256": "1fe10126d1e888551fbe998879cd2d0a1db404e9c6406bccb620f117e31a4943"
+    },
+    {
+      "logical": "csv_config/item_name.csv",
+      "path": "jgbol3.87/assets/release_/70cb741174c493cf0a6d5de29ad7894c.data",
+      "sha256": "107da82bd2e8050c6e44dd8da0875f874a56de4cd29db58bc6a4959d3072e685",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/item_base.csv",
+      "path": "jgbol3.87/assets/release_/803063b5ac66c77a4fe454fbc3ca9697.data",
+      "sha256": "2b49aa78b7ea27e7f98c896cc984c2f3a69ac6721c6ef167f20cd4b649aff1c7",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/cortege_quality.csv",
+      "path": "jgbol3.87/assets/release_/8e286627626f39ef3c5efd856b6b8098.data",
+      "sha256": "584f3519f065a44760ef1e4c52a85ca7d33d45252dcc0b0e64989eb7f63db987",
+      "csv_values_match": true
+    }
+  ],
+  "strings": {
+    "twoyears_info1": "进度：%d%%",
+    "twoyears_info2": "当前免费祈愿次数：",
+    "twoyears_info3": "当天任意充值可以激活一个新的礼包，并且可以领取所有已激活的礼包，点击礼包可以查看详情",
+    "twoyears_info4": "今日可购买数量：",
+    "twoyears_info5": "已祈愿天数：",
+    "twoyears_info6": "当日若未祈愿，玉清阁将增加一份祈愿供品出售",
+    "twoyears_info7": "价格：",
+    "twoyears_info8": "当天       \t   可以激活一个新的礼包，并且当天可领取所有激活过的礼包，点击礼包可查看详情",
+    "twoyears_info9": "充值",
+    "twoyears_info10": "    每日祈愿可以提高元始天尊等级，进度满后可以获得等级为主角*2的元始天尊 ",
+    "twoyears_info11": "祈愿成功！",
+    "twoyears_info12": "可购买数量不足！",
+    "twoyears_info13": "当前祈愿供品数量：",
+    "twoyears_info14": "礼包还未激活，活动开始的第%d天充值可以激活该礼包！",
+    "twoyears_info15": "礼包是空的！",
+    "twoyears_info16": "任意充值可激活礼包",
+    "twoyears_info17": "充值30元可激活礼包",
+    "twoyears_info18": "充值50元可激活礼包",
+    "twoyears_info19": "祈愿供品数量不足",
+    "twoyears_info20": "可领取已激活礼包",
+    "twoyears_info21": "礼包已全部激活",
+    "twoyears_info22": "可领取",
+    "twoyears_info23": "点击人物图像可以获得元始天尊",
+    "twoyears_info24": "    获得元始天尊后，继续祈愿将可以获得元始天尊魂魄",
+    "twoyears_info25": "需激活上一个礼包后，次日才可激活该礼包",
+    "twoyears_info26": "可领取所有激活过的礼包",
+    "twoyears_info27": "已领取"
+  },
+  "request": {
+    "id": 1334,
+    "fields": "serial_num=I,flag=B,index=B"
+  },
+  "event": 179,
+  "operations": {
+    "enter_activity": 0,
+    "take_prize": 1,
+    "wish_yuanshi": 2,
+    "enter_shop": 3,
+    "buy_shop": 4
+  },
+  "A": [
+    "activityID.twoyears=46; common_config=24; begin_time/end_time gate; funUI L490-491 includes native menu",
+    "gift_config has five positions; gift_list absent=locked, 0=empty, positive=claimable count",
+    "activation labels: any/30/30/50/50 RMB; previous gift must activate on an earlier day",
+    "two shop positions, need_gold and remaining buy_times; wish_times label is days",
+    "1807 grants one extra prayer; 1808 gives level=role*2 Yuanshi; after receiving, prayer yields souls",
+    "getChar and pray both send flag2,index0; native getChar lacks a widget binding"
+  ],
+  "B": [
+    "28-day repeating local season; no official historical schedule",
+    "enroll on first entry/recharge; 1 free prayer/day, +10 percent, 1 soul after claim",
+    "full progress next flag2 claims for free; duplicate grants40 souls; max original experience table level",
+    "missed enrolled days accumulate supply stock; first day0; 100 gold/offering",
+    "second shop slot chosen as1808 at1980 gold, daily1; inferred, not official shop evidence",
+    "recharge uses existing local simulation; 10 gold/RMB, cumulative base gold excludes bonus",
+    "one activation/day; any daily recharge grants each previously activated gift once; claims carry in season",
+    "one click claims all copies of one gift; gift contents in configuration",
+    "season rollover clears event progress/unclaimed gifts/stock, retains inventory and gods",
+    "use native funUI entry; restore missing portrait button, refresh cached shop and recharge status"
+  ],
+  "inferred_config": {
+    "schema_version": 1,
+    "mode": "inferred",
+    "revision": "yuanshi-2026-10-26-v1",
+    "enabled": true,
+    "timezone_offset_hours": 8,
+    "period_days": 28,
+    "daily_free": 1,
+    "progress_per_wish": 10,
+    "souls_per_wish": 1,
+    "offering_gold": 100,
+    "bag_gold": 1980,
+    "bag_daily_limit": 1,
+    "gold_per_rmb": 10,
+    "activation_rmb": [
+      0,
+      30,
+      30,
+      50,
+      50
+    ],
+    "gifts": [
+      [
+        [
+          5,
+          1807,
+          1,
+          1
+        ],
+        [
+          5,
+          1001,
+          5,
+          1
+        ]
+      ],
+      [
+        [
+          10,
+          5046,
+          2,
+          1
+        ],
+        [
+          5,
+          1001,
+          10,
+          1
+        ]
+      ],
+      [
+        [
+          10,
+          5046,
+          3,
+          1
+        ],
+        [
+          5,
+          1007,
+          1,
+          1
+        ]
+      ],
+      [
+        [
+          10,
+          5046,
+          5,
+          1
+        ],
+        [
+          5,
+          1007,
+          2,
+          1
+        ]
+      ],
+      [
+        [
+          10,
+          5046,
+          8,
+          1
+        ],
+        [
+          5,
+          1007,
+          3,
+          1
+        ]
+      ]
+    ]
+  }
+}

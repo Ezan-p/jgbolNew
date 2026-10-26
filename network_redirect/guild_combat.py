@@ -100,7 +100,23 @@ def choose_enemy(role,s,*,power=None,layer=0,excluded=()):
 def simulate(role,s,r,jrules,ft,name,hp=None,*,enemy_npc=None,ally_roles=None,actor_role=None):
     actor=actor_role or role
     u.require(any(1<=c.get('order',0)<=8 for c in actor['corteges']),'请先上阵神仙')
-    units=journey.fighters(actor,dict(cortege_list=f"{r['battle_npc']}|{r['battle_level']}"))
+    npc=r['battle_npc']
+    trial=None
+    if ft==27:
+        from . import guild_trial
+        a=s.setdefault('instances',{})
+        guild_trial.prepare(a,s,r);trial=guild_trial.current(a);npc=trial['type_id']
+        name=f"仙盟试炼第{a['train_floor']}层"
+    if ft==13:
+        # [A] cortege_base/name_0: 9001 is the original 仙盟守护树.
+        # The original server's variant/level table is unavailable; retain
+        # local difficulty and fall back to the requested 乌巢禅师 if missing.
+        npc=9001 if 9001 in journey.NPCS else 4015
+        name='仙盟守护树' if npc==9001 else '乌巢禅师'
+    units=journey.fighters(actor,dict(cortege_list=f"{npc}|{trial['level'] if trial else r['battle_level']}"))
+    if trial:
+        # Normalize random identities so every later floor is strictly harder.
+        units[1][0].update(hp=trial['hp'],max_hp=trial['hp'],gongji=trial['attack'],fangyu=trial['defense'],magic=trial['magic'])
     if ft==27:
         boost=s.get('instances',{}).get('train_support',0)*r['train_support_percent']
         for unit in units[0]:
@@ -129,7 +145,7 @@ def simulate(role,s,r,jrules,ft,name,hp=None,*,enemy_npc=None,ally_roles=None,ac
         bonus=min(100,sum(pet_power(p) for p in pets(a))//100)
         for unit in units[0]:
             for key in ('hp','max_hp','gongji','fangyu','magic'):unit[key]=unit[key]*(100+bonus)//100
-    if hp is not None:units[1][0].update(hp=hp,max_hp=hp)
+    if hp is not None:units[1][0].update(hp=hp,max_hp=trial['hp'] if trial else hp)
     rules=copy.deepcopy(jrules);rules['battle']['max_actions']=min(60,rules['battle']['max_actions'])
     rules['battle']['mechanics']['event_budget_bytes']=1000
     result,lineup,actions=journey.battle(battle_owner,{},rules,units=units,slots=8)
@@ -141,10 +157,14 @@ def simulate(role,s,r,jrules,ft,name,hp=None,*,enemy_npc=None,ally_roles=None,ac
     if sources:replay['participants']=sources
     if enemy_npc is not None:replay['enemy_npc']=enemy['npc_id']
     if actor_role is not None:replay['actor_role_id']=actor['role_id']
+    if trial:
+        replay['trial_boss']=dict(trial,floor=s['instances']['train_floor'])
+        replay['boss_remaining_hp']=actions.final_hp[2][1]
     return result,journey.combat_engine.event_packets(actions,fid)+packets,replay
 
 
 def fight(role,req,now,r,jrules):
+    if req['fight_type'] in u.WAR_FIGHTS:u.require(r['wars_enabled'],u.WAR_CLOSED)
     s,g=u.prepare(role,now,r);u.require(g is not None,'请先加入仙盟');ft=req['fight_type']
     if ft==13:
         u.authorize(role,r,15);t=g['tree'];u.require(t['state']==3,'神树尚未进入守护阶段')

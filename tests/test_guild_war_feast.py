@@ -15,6 +15,7 @@ class GuildWarFeastTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.b.guild_rules['wars_enabled']=True  # Isolated legacy tournament coverage only.
         self.addCleanup(lambda:self.b.close());self.serial=1000
         self.now=NOW
         clock=patch('network_redirect.backend.time.time',side_effect=lambda:self.now)
@@ -64,6 +65,7 @@ class GuildWarFeastTests(unittest.TestCase):
         self.now+=2*3600
         self.assertEqual((self.feast()['feast_stat'],self.feast()['feast_end_time']),(0,end))
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.b.guild_rules['wars_enabled']=True  # Isolated legacy tournament coverage only.
         self.assertEqual(self.feast()['feast_end_time'],end)
         self.now=end;self.assertEqual(self.feast()['feast_stat'],54)
         self.req(65,ok=False,feast_type=1)
@@ -226,6 +228,7 @@ class GuildWarFeastTests(unittest.TestCase):
         claimed=self.role();self.send(1103,dict(mail_id=mail['mail_id']),ok=False)
         self.assertEqual(claimed,self.role())
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.b.guild_rules['wars_enabled']=True  # Isolated legacy tournament coverage only.
         self.feast();self.assertEqual(len([k for k in self.role()['welfare']['mails'] if k.startswith('guild-feast-')]),1)
 
     def test_unused_bet_is_refunded_and_affiliation_cleared_next_day(self):

@@ -1,0 +1,277 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\363655b9e31e27d1b332609eada171d4.data'; root=proto53
+
+FUNCTION proto34 offset=0x53b6 source_lines=744-827 params=1
+UPVALUES ['g_dreamUI', 'Frame', 'pairs', 'table', 'ipairs', 'gethz', 'math', 'CCSizeMake', 'scrSize', 'kCCVerticalTextAlignmentTop', 'g_self', 'getItemString', 'printf', 'sendRequest', 'opTypeDef']
+00001 [L745] GGET     A=1 B=0 C=0 D=0 'clearMain'
+00002 [L745] CALL     A=1 B=2 C=1 D=513 
+00003 [L746] IST      A=0 B=0 C=1 D=1 
+00004 [L746] JMP      A=2 B=128 C=1 D=32769 target=6
+00005 [L747] UCLO     A=0 B=129 C=11 D=33035 target=273
+00006 [L749] UGET     A=2 B=0 C=0 D=0 g_dreamUI
+00007 [L749] KPRI     A=3 B=0 C=0 D=0 
+00008 [L749] TSETS    A=3 B=2 C=1 D=513 'reward'
+00009 [L750] UGET     A=2 B=0 C=0 D=0 g_dreamUI
+00010 [L750] UGET     A=3 B=0 C=1 D=1 Frame
+00011 [L750] TGETS    A=3 B=3 C=3 D=771 'Bless'
+00012 [L750] TSETS    A=3 B=2 C=2 D=514 'frame'
+00013 [L752] UGET     A=2 B=0 C=0 D=0 g_dreamUI
+00014 [L752] TGETS    A=2 B=2 C=4 D=516 'friends'
+00015 [L752] IST      A=0 B=0 C=2 D=2 
+00016 [L752] JMP      A=2 B=128 C=23 D=32791 target=40
+00017 [L753] GGET     A=2 B=0 C=5 D=5 'd_ms'
+00018 [L753] TGETS    A=2 B=2 C=6 D=518 'd_followUI'
+00019 [L753] TGETS    A=2 B=2 C=7 D=519 'g_friendList'
+00020 [L753] IST      A=0 B=0 C=2 D=2 
+00021 [L753] JMP      A=3 B=128 C=1 D=32769 target=23
+00022 [L753] TNEW     A=2 B=0 C=0 D=0 
+00023 [L754] TNEW     A=3 B=0 C=0 D=0 
+00024 [L755] UGET     A=4 B=0 C=2 D=2 pairs
+00025 [L755] MOV      A=5 B=0 C=2 D=2 
+00026 [L755] CALL     A=4 B=4 C=2 D=1026 
+00027 [L755] ISNEXT   A=7 B=128 C=3 D=32771 target=31
+00028 [L756] TDUP     A=9 B=0 C=8 D=8 {'kind': 'table', 'value': {'isChosen': False}}
+00029 [L756] TSETS    A=8 B=9 C=9 D=2313 'player'
+00030 [L756] TSETV    A=9 B=3 C=7 D=775 
+00031 [L755] ITERN    A=7 B=3 C=3 D=771 
+00032 [L755] ITERL    A=7 B=127 C=251 D=32763 target=28
+00033 [L758] UGET     A=4 B=0 C=3 D=3 table
+00034 [L758] TGETS    A=4 B=4 C=10 D=1034 'sort'
+00035 [L758] MOV      A=5 B=0 C=3 D=3 
+00036 [L758] FNEW     A=6 B=0 C=11 D=11 {'kind': 'proto', 'id': 32}
+00037 [L758] CALL     A=4 B=1 C=3 D=259 
+00038 [L759] UGET     A=4 B=0 C=0 D=0 g_dreamUI
+00039 [L759] TSETS    A=3 B=4 C=4 D=1028 'friends'
+00040 [L761] IST      A=0 B=0 C=0 D=0 
+00041 [L761] JMP      A=2 B=128 C=3 D=32771 target=45
+00042 [L762] UGET     A=2 B=0 C=0 D=0 g_dreamUI
+00043 [L762] KPRI     A=3 B=0 C=0 D=0 
+00044 [L762] TSETS    A=3 B=2 C=12 D=524 'BF'
+00045 [L764] UGET     A=2 B=0 C=0 D=0 g_dreamUI
+00046 [L764] TGETS    A=2 B=2 C=13 D=525 'th'
+00047 [L764] SUBNV    A=2 B=2 C=0 D=512 
+00048 [L764] MULNV    A=2 B=2 C=1 D=513 
+00049 [L765] GGET     A=3 B=0 C=5 D=5 'd_ms'
+00050 [L765] TGETS    A=3 B=3 C=14 D=782 'd_u'
+00051 [L765] TGETS    A=3 B=3 C=15 D=783 'createByStyle'
+00052 [L765] TDUP     A=4 B=0 C=16 D=16 {'kind': 'table', 'value': {'pic': 'v2/dreamUI/bless_bkg.png', 'x': 0.5}}
+00053 [L765] TSETS    A=2 B=4 C=17 D=1041 'y'
+00054 [L765] CALL     A=3 B=2 C=2 D=514 
+00055 [L766] MOV      A=5 B=0 C=1 D=1 
+00056 [L766] TGETS    A=4 B=1 C=18 D=274 'addChild'
+00057 [L766] MOV      A=6 B=0 C=3 D=3 
+00058 [L766] CALL     A=4 B=1 C=3 D=259 
+00059 [L767] GGET     A=4 B=0 C=5 D=5 'd_ms'
+00060 [L767] TGETS    A=4 B=4 C=14 D=1038 'd_u'
+00061 [L767] TGETS    A=4 B=4 C=19 D=1043 'getRealScale'
+00062 [L767] MOV      A=5 B=0 C=3 D=3 
+00063 [L767] CALL     A=4 B=3 C=2 D=770 
+00064 [L769] MOV      A=7 B=0 C=1 D=1 
+00065 [L769] TGETS    A=6 B=1 C=18 D=274 'addChild'
+00066 [L769] GGET     A=8 B=0 C=5 D=5 'd_ms'
+00067 [L769] TGETS    A=8 B=8 C=14 D=2062 'd_u'
+00068 [L769] TGETS    A=8 B=8 C=15 D=2063 'createByStyle'
+00069 [L769] TDUP     A=9 B=0 C=20 D=20 {'kind': 'table', 'value': {'pic': 'v2/dreamUI/bkg8.png', 'x': 0.5}}
+00070 [L769] MULNV    A=10 B=5 C=2 D=1282 
+00071 [L769] ADDVV    A=10 B=2 C=10 D=522 
+00072 [L769] TSETS    A=10 B=9 C=17 D=2321 'y'
+00073 [L769] CALL     A=8 B=0 C=2 D=2 
+00074 [L769] CALLM    A=6 B=1 C=1 D=257 
+00075 [L771] KNIL     A=6 B=0 C=7 D=7 
+00076 [L772] GGET     A=8 B=0 C=5 D=5 'd_ms'
+00077 [L772] TGETS    A=8 B=8 C=14 D=2062 'd_u'
+00078 [L772] TGETS    A=8 B=8 C=15 D=2063 'createByStyle'
+00079 [L772] TDUP     A=9 B=0 C=21 D=21 {'kind': 'table', 'value': {'type': 'label', 'string': 'To:', 'fontsize': 38}}
+00080 [L772] MULNV    A=10 B=4 C=3 D=1027 
+00081 [L772] SUBNV    A=10 B=10 C=1 D=2561 
+00082 [L772] TSETS    A=10 B=9 C=22 D=2326 'x'
+00083 [L772] MULNV    A=10 B=5 C=4 D=1284 
+00084 [L772] ADDVV    A=10 B=2 C=10 D=522 
+00085 [L772] TSETS    A=10 B=9 C=17 D=2321 'y'
+00086 [L772] CALL     A=8 B=2 C=2 D=514 
+00087 [L772] MOV      A=7 B=0 C=8 D=8 
+00088 [L773] MOV      A=9 B=0 C=1 D=1 
+00089 [L773] TGETS    A=8 B=1 C=18 D=274 'addChild'
+00090 [L773] MOV      A=10 B=0 C=7 D=7 
+00091 [L773] CALL     A=8 B=1 C=3 D=259 
+00092 [L775] TNEW     A=8 B=0 C=0 D=0 
+00093 [L776] UGET     A=9 B=0 C=0 D=0 g_dreamUI
+00094 [L776] TGETS    A=9 B=9 C=12 D=2316 'BF'
+00095 [L776] ISF      A=0 B=0 C=9 D=9 
+00096 [L776] JMP      A=10 B=128 C=44 D=32812 target=141
+00097 [L777] KPRI     A=9 B=0 C=0 D=0 
+00098 [L778] UGET     A=10 B=0 C=4 D=4 ipairs
+00099 [L778] UGET     A=11 B=0 C=0 D=0 g_dreamUI
+00100 [L778] TGETS    A=11 B=11 C=12 D=2828 'BF'
+00101 [L778] CALL     A=10 B=4 C=2 D=1026 
+00102 [L778] JMP      A=13 B=128 C=15 D=32783 target=118
+00103 [L779] UGET     A=15 B=0 C=3 D=3 table
+00104 [L779] TGETS    A=15 B=15 C=23 D=3863 'insert'
+00105 [L779] MOV      A=16 B=0 C=8 D=8 
+00106 [L779] TGETS    A=17 B=14 C=24 D=3608 'id'
+00107 [L779] CALL     A=15 B=1 C=3 D=259 
+00108 [L780] ISF      A=0 B=0 C=9 D=9 
+00109 [L780] JMP      A=15 B=128 C=7 D=32775 target=117
+00110 [L781] MOV      A=15 B=0 C=9 D=9 
+00111 [L781] UGET     A=16 B=0 C=5 D=5 gethz
+00112 [L781] KSTR     A=17 B=0 C=25 D=25 'andSign'
+00113 [L781] CALL     A=16 B=2 C=2 D=514 
+00114 [L781] TGETS    A=17 B=14 C=26 D=3610 'name'
+00115 [L781] CAT      A=9 B=15 C=17 D=3857 
+00116 [L781] JMP      A=15 B=128 C=1 D=32769 target=118
+00117 [L783] TGETS    A=9 B=14 C=26 D=3610 'name'
+00118 [L778] ITERC    A=13 B=3 C=3 D=771 
+00119 [L778] ITERL    A=13 B=127 C=239 D=32751 target=103
+00120 [L786] ISF      A=0 B=0 C=9 D=9 
+00121 [L786] JMP      A=10 B=128 C=19 D=32787 target=141
+00122 [L787] GGET     A=10 B=0 C=5 D=5 'd_ms'
+00123 [L787] TGETS    A=10 B=10 C=14 D=2574 'd_u'
+00124 [L787] TGETS    A=10 B=10 C=15 D=2575 'createByStyle'
+00125 [L787] TDUP     A=11 B=0 C=27 D=27 {'kind': 'table', 'value': {'type': 'label', 'fontsize': 30}}
+00126 [L787] TSETS    A=9 B=11 C=28 D=2844 'string'
+00127 [L787] MULNV    A=12 B=4 C=5 D=1029 
+00128 [L787] SUBNV    A=12 B=12 C=1 D=3073 
+00129 [L787] TSETS    A=12 B=11 C=22 D=2838 'x'
+00130 [L787] MULNV    A=12 B=5 C=4 D=1284 
+00131 [L787] ADDVV    A=12 B=2 C=12 D=524 
+00132 [L787] TSETS    A=12 B=11 C=17 D=2833 'y'
+00133 [L787] TDUP     A=12 B=0 C=29 D=29 {'kind': 'table', 'value': {1: 0, 2: 0.5}}
+00134 [L787] TSETS    A=12 B=11 C=30 D=2846 'anchor'
+00135 [L787] CALL     A=10 B=2 C=2 D=514 
+00136 [L787] MOV      A=7 B=0 C=10 D=10 
+00137 [L788] MOV      A=11 B=0 C=1 D=1 
+00138 [L788] TGETS    A=10 B=1 C=18 D=274 'addChild'
+00139 [L788] MOV      A=12 B=0 C=7 D=7 
+00140 [L788] CALL     A=10 B=1 C=3 D=259 
+00141 [L792] UGET     A=9 B=0 C=6 D=6 math
+00142 [L792] TGETS    A=9 B=9 C=31 D=2335 'random'
+00143 [L792] KSHORT   A=10 B=0 C=1 D=1 1
+00144 [L792] KSHORT   A=11 B=0 C=4 D=4 4
+00145 [L792] CALL     A=9 B=2 C=3 D=515 
+00146 [L793] UGET     A=10 B=0 C=5 D=5 gethz
+00147 [L793] KSTR     A=11 B=0 C=32 D=32 'dream_wish'
+00148 [L793] MOV      A=12 B=0 C=9 D=9 
+00149 [L793] CAT      A=11 B=11 C=12 D=2828 
+00150 [L793] CALL     A=10 B=2 C=2 D=514 
+00151 [L793] MOV      A=6 B=0 C=10 D=10 
+00152 [L794] GGET     A=10 B=0 C=5 D=5 'd_ms'
+00153 [L794] TGETS    A=10 B=10 C=14 D=2574 'd_u'
+00154 [L794] TGETS    A=10 B=10 C=33 D=2593 'createByStyles'
+00155 [L794] TDUP     A=11 B=0 C=34 D=34 {'kind': 'table', 'value': {'type': 'label', 'fontsize': 26, 'font': 'arial', 'x': 0.5}}
+00156 [L794] TSETS    A=6 B=11 C=28 D=2844 'string'
+00157 [L794] MULNV    A=12 B=5 C=2 D=1282 
+00158 [L794] ADDVV    A=12 B=2 C=12 D=524 
+00159 [L794] TSETS    A=12 B=11 C=17 D=2833 'y'
+00160 [L794] TDUP     A=12 B=0 C=35 D=35 {'kind': 'table', 'value': {1: 255, 2: 191, 3: 90}}
+00161 [L794] TSETS    A=12 B=11 C=36 D=2852 'color'
+00162 [L794] UGET     A=12 B=0 C=7 D=7 CCSizeMake
+00163 [L794] MULNV    A=13 B=4 C=6 D=1030 
+00164 [L794] UGET     A=14 B=0 C=8 D=8 scrSize
+00165 [L794] TGETS    A=14 B=14 C=37 D=3621 'width'
+00166 [L794] MULVV    A=13 B=13 C=14 D=3342 
+00167 [L794] KSHORT   A=14 B=0 C=0 D=0 0
+00168 [L794] CALL     A=12 B=2 C=3 D=515 
+00169 [L794] TSETS    A=12 B=11 C=38 D=2854 'size'
+00170 [L794] UGET     A=12 B=0 C=9 D=9 kCCVerticalTextAlignmentTop
+00171 [L794] TSETS    A=12 B=11 C=39 D=2855 'h_align'
+00172 [L794] CALL     A=10 B=2 C=2 D=514 
+00173 [L794] MOV      A=7 B=0 C=10 D=10 
+00174 [L795] MOV      A=11 B=0 C=1 D=1 
+00175 [L795] TGETS    A=10 B=1 C=18 D=274 'addChild'
+00176 [L795] MOV      A=12 B=0 C=7 D=7 
+00177 [L795] CALL     A=10 B=1 C=3 D=259 
+00178 [L797] UGET     A=10 B=0 C=10 D=10 g_self
+00179 [L797] TGETS    A=10 B=10 C=40 D=2600 'dream_data'
+00180 [L797] TGETS    A=10 B=10 C=41 D=2601 'cur_dream'
+00181 [L798] UGET     A=11 B=0 C=5 D=5 gethz
+00182 [L798] KSTR     A=12 B=0 C=42 D=42 'dream1'
+00183 [L798] CALL     A=11 B=2 C=2 D=514 
+00184 [L798] UGET     A=12 B=0 C=11 D=11 getItemString
+00185 [L798] GGET     A=13 B=0 C=43 D=43 'g_config'
+00186 [L798] TGETV    A=13 B=13 C=10 D=3338 
+00187 [L798] TGETS    A=13 B=13 C=44 D=3372 'own_wish_prizes'
+00188 [L798] CALL     A=12 B=2 C=2 D=514 
+00189 [L798] CAT      A=6 B=11 C=12 D=2828 
+00190 [L799] GGET     A=11 B=0 C=5 D=5 'd_ms'
+00191 [L799] TGETS    A=11 B=11 C=14 D=2830 'd_u'
+00192 [L799] TGETS    A=11 B=11 C=15 D=2831 'createByStyle'
+00193 [L799] TDUP     A=12 B=0 C=45 D=45 {'kind': 'table', 'value': {'type': 'label', 'fontsize': 22}}
+00194 [L799] TSETS    A=6 B=12 C=28 D=3100 'string'
+00195 [L799] MULNV    A=13 B=4 C=7 D=1031 
+00196 [L799] SUBNV    A=13 B=13 C=1 D=3329 
+00197 [L799] TSETS    A=13 B=12 C=22 D=3094 'x'
+00198 [L799] MULNV    A=13 B=5 C=8 D=1288 
+00199 [L799] SUBVV    A=13 B=2 C=13 D=525 
+00200 [L799] TSETS    A=13 B=12 C=17 D=3089 'y'
+00201 [L799] TDUP     A=13 B=0 C=46 D=46 {'kind': 'table', 'value': {1: 0, 2: 0.5}}
+00202 [L799] TSETS    A=13 B=12 C=30 D=3102 'anchor'
+00203 [L799] CALL     A=11 B=2 C=2 D=514 
+00204 [L799] MOV      A=7 B=0 C=11 D=11 
+00205 [L800] MOV      A=12 B=0 C=1 D=1 
+00206 [L800] TGETS    A=11 B=1 C=18 D=274 'addChild'
+00207 [L800] MOV      A=13 B=0 C=7 D=7 
+00208 [L800] CALL     A=11 B=1 C=3 D=259 
+00209 [L802] UGET     A=11 B=0 C=5 D=5 gethz
+00210 [L802] KSTR     A=12 B=0 C=47 D=47 'dream2'
+00211 [L802] CALL     A=11 B=2 C=2 D=514 
+00212 [L802] UGET     A=12 B=0 C=11 D=11 getItemString
+00213 [L802] GGET     A=13 B=0 C=43 D=43 'g_config'
+00214 [L802] TGETV    A=13 B=13 C=10 D=3338 
+00215 [L802] TGETS    A=13 B=13 C=48 D=3376 'other_wish_prizes'
+00216 [L802] CALL     A=12 B=2 C=2 D=514 
+00217 [L802] CAT      A=6 B=11 C=12 D=2828 
+00218 [L803] GGET     A=11 B=0 C=5 D=5 'd_ms'
+00219 [L803] TGETS    A=11 B=11 C=14 D=2830 'd_u'
+00220 [L803] TGETS    A=11 B=11 C=15 D=2831 'createByStyle'
+00221 [L803] TDUP     A=12 B=0 C=49 D=49 {'kind': 'table', 'value': {'type': 'label', 'fontsize': 22}}
+00222 [L803] TSETS    A=6 B=12 C=28 D=3100 'string'
+00223 [L803] MULNV    A=13 B=4 C=7 D=1031 
+00224 [L803] SUBNV    A=13 B=13 C=1 D=3329 
+00225 [L803] TSETS    A=13 B=12 C=22 D=3094 'x'
+00226 [L803] MULNV    A=13 B=5 C=9 D=1289 
+00227 [L803] SUBVV    A=13 B=2 C=13 D=525 
+00228 [L803] TSETS    A=13 B=12 C=17 D=3089 'y'
+00229 [L803] TDUP     A=13 B=0 C=50 D=50 {'kind': 'table', 'value': {1: 0, 2: 0.5}}
+00230 [L803] TSETS    A=13 B=12 C=30 D=3102 'anchor'
+00231 [L803] CALL     A=11 B=2 C=2 D=514 
+00232 [L803] MOV      A=7 B=0 C=11 D=11 
+00233 [L804] MOV      A=12 B=0 C=1 D=1 
+00234 [L804] TGETS    A=11 B=1 C=18 D=274 'addChild'
+00235 [L804] MOV      A=13 B=0 C=7 D=7 
+00236 [L804] CALL     A=11 B=1 C=3 D=259 
+00237 [L814] FNEW     A=11 B=0 C=51 D=51 {'kind': 'proto', 'id': 33}
+00238 [L816] TDUP     A=12 B=0 C=52 D=52 {'kind': 'table', 'value': {'x': 0, 'y': 0}}
+00239 [L819] TDUP     A=13 B=0 C=53 D=53 {'kind': 'table', 'value': {'npic': 'v2/dreamUI/btn11.png', 'spic': 'v2/dreamUI/btn12.png'}}
+00240 [L820] MULNV    A=14 B=4 C=9 D=1033 
+00241 [L820] SUBNV    A=14 B=14 C=1 D=3585 
+00242 [L820] TSETS    A=14 B=13 C=22 D=3350 'x'
+00243 [L820] MULNV    A=14 B=5 C=4 D=1284 
+00244 [L820] SUBVV    A=14 B=2 C=14 D=526 
+00245 [L820] TSETS    A=14 B=13 C=17 D=3345 'y'
+00246 [L820] GGET     A=14 B=0 C=54 D=54 'showFriendChooseLayer'
+00247 [L820] TSETS    A=14 B=13 C=55 D=3383 'call_back'
+00248 [L820] TSETB    A=13 B=12 C=1 D=3073 
+00249 [L820] TDUP     A=13 B=0 C=56 D=56 {'kind': 'table', 'value': {'npic': 'v2/dreamUI/btn21.png', 'spic': 'v2/dreamUI/btn22.png'}}
+00250 [L821] MULNV    A=14 B=4 C=9 D=1033 
+00251 [L821] ADDNV    A=14 B=14 C=1 D=3585 
+00252 [L821] TSETS    A=14 B=13 C=22 D=3350 'x'
+00253 [L821] MULNV    A=14 B=5 C=4 D=1284 
+00254 [L821] SUBVV    A=14 B=2 C=14 D=526 
+00255 [L821] TSETS    A=14 B=13 C=17 D=3345 'y'
+00256 [L821] TSETS    A=11 B=13 C=55 D=3383 'call_back'
+00257 [L821] TSETB    A=13 B=12 C=2 D=3074 
+00258 [L823] MOV      A=14 B=0 C=1 D=1 
+00259 [L823] TGETS    A=13 B=1 C=18 D=274 'addChild'
+00260 [L823] GGET     A=15 B=0 C=5 D=5 'd_ms'
+00261 [L823] TGETS    A=15 B=15 C=14 D=3854 'd_u'
+00262 [L823] TGETS    A=15 B=15 C=57 D=3897 'createMenu'
+00263 [L823] MOV      A=16 B=0 C=12 D=12 
+00264 [L823] CALL     A=15 B=2 C=2 D=514 
+00265 [L823] KSHORT   A=16 B=0 C=5 D=5 5
+00266 [L823] CALL     A=13 B=1 C=4 D=260 
+00267 [L825] GGET     A=13 B=0 C=58 D=58 'showTitle'
+00268 [L825] CALL     A=13 B=1 C=1 D=257 
+00269 [L826] GGET     A=13 B=0 C=59 D=59 'showCharm'
+00270 [L826] CALL     A=13 B=1 C=1 D=257 
+00271 [L827] UCLO     A=0 B=128 C=0 D=32768 target=272
+00272 [L827] RET0     A=0 B=0 C=1 D=1 
+00273 [L827] RET0     A=0 B=0 C=1 D=1 
