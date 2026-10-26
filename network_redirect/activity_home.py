@@ -1,4 +1,4 @@
-"""洞府 1348 [A]; persistent local economy, missing schedules/shop/boss [B]."""
+"""洞府 1348 [A]; persistent local economy and NPC cooperation [B]."""
 import copy
 import secrets
 from . import activity as a, formation, journey, summon
@@ -36,7 +36,7 @@ def specs(value):return [list(map(int,t.split('|'))) for t in value.split('/') i
 def state(role,now,r):
     s=role['activity'].setdefault('home',dict(level=1,build={str(i):0 for i in KEYS},plants={},
         train={str(i):dict(level=0,cur_exp=0) for i in range(1,5)},pray_time=0,pray_count=0,passed=False,day=-1))
-    if s['day']!=a.day(now,r):s.update(day=a.day(now,r),train_count={},purchases={},fight_count=r['home_boss_daily_limit'])
+    if s['day']<a.day(now,r):s.update(day=a.day(now,r),train_count={},purchases={},fight_count=r['home_boss_daily_limit'])
     s.setdefault('assistant_until',0);s.setdefault('assistant_from',0)
     from .activity_home_pets import initialize
     initialize(s,r)
@@ -52,7 +52,20 @@ def state(role,now,r):
                 event['end_time']=0
             elif now>=event['end_time']:
                 p['missed_events']+=1;event['end_time']=0
-    return s
+    # Old versions allowed banking experience beyond a room's cap. Apply only
+    # previously paid experience when room capacity becomes available, without
+    # counting it again in the new weekly competition.
+    maximum=int(BUILD[4][s['build']['4']]['train_level'])
+    for typ in range(1,5):
+        tr=s['train'][str(typ)]
+        while tr['level']<maximum:
+            need=int(TRAIN[typ,tr['level']+1]['need_experience'])
+            if tr['cur_exp']<need:break
+            tr['cur_exp']-=need;tr['level']+=1
+    role['hole_hp_plus']=point(s)
+    role['cortege_limit_plus']=int(BUILD[1][s['build']['1']]['coretege_limit_plus'])
+    from .activity_home_welfare import prepare
+    return prepare(role,s,now,r)
 
 
 def point(s):
@@ -61,8 +74,11 @@ def point(s):
 
 
 def upgrade_info(s,r):
+    from .combat_power import score_panel
+    _,enemies=journey.fighters({'corteges':[]},dict(cortege_list=f"{r['battle_npc']}|{s['level']*r['battle_level']}"))
+    power=score_panel(enemies[0],formation.load_rules()['combat_weights'])
     return dict(has_passed=s['passed'],fight_count=s['fight_count'],boss_info=dict(cortege_type=r['battle_npc'],
-        cortege_layer=0,combat_power=100*s['level'],cortege_count=1,train_level=s['level']))
+        cortege_layer=0,combat_power=power,cortege_count=1,train_level=s['level']))
 
 
 def info(s,r):
@@ -78,15 +94,29 @@ def info(s,r):
     return data
 
 
+def shop_rows(r,page):
+    return [(i,row) for i,row in enumerate(r['home_shop'],1) if row.get('page',1)==page]
+
+
 def shop(s,r):
     return [[dict(item=a.prize_spec(row['reward']),consume=a.prize_spec(row['consume']),
-                  limit=row['limit']-s['purchases'].get(str(i),0)) for i,row in enumerate(r['home_shop'],1)]]
+                  limit=row['limit']-s['purchases'].get(str(i),0)) for i,row in shop_rows(r,page)] for page in (1,2)]
 
 
 def settle(role,req,now,r,jrules,parse):
     a.require(role['level']>=50,'洞府需50级');s=state(role,now,r)
     d=parse(req['data']) if req['data'] else {};a.require(isinstance(d,dict),'洞府参数无效');op=req['id']
-    if op==1:return [response(1,info(s,r))]
+    a.require(a.day(now,r)>=s['day'],'洞府时钟已回退，请恢复本地时间')
+    if op==1:
+        from .activity_home_friends import listing
+        data=info(s,r);data['friend_list']=list(listing(role,s,now,r).values())
+        from .activity_home_welfare import view as welfare_view
+        welfare=welfare_view(role,s,now,r)
+        data['config_data'].update(offline_home=True,activity_flag={
+            68:False,69:welfare[69]['can_take']==2,
+            70:any(row['status']==2 for row in welfare[70]['act_data'].values()),
+            72:any(row['status']==2 for group in welfare[72].values() for row in group['target_list'].values())})
+        return [response(1,data)]
     if op==8:
         hours=d.get('hour')
         a.require(s['build']['2']>0,'请先建造药园')
@@ -107,19 +137,21 @@ def settle(role,req,now,r,jrules,parse):
         from .activity_home_pets import settle as pets
         return pets(role,s,op,d,r)
     if op==24:
-        a.require(d.get('flag',1)==1,'没有进行中的洞府限时福利')
-        return [response(24,dict(flag=1,all_activity=[]))]
+        from .activity_home_welfare import settle as welfare
+        return welfare(role,s,d,now,r)
     if op in (14,15):
         if op==15:
-            i,n=d.get('item_index'),d.get('buy_count',1)
-            a.require(d.get('shop_page')==1 and type(i)is int and 1<=i<=len(r['home_shop']) and type(n)is int and n>0,'洞府兑换参数无效')
-            row=r['home_shop'][i-1];used=s['purchases'].get(str(i),0)
+            i,n,page=d.get('item_index'),d.get('buy_count',1),d.get('shop_page')
+            a.require(type(page)is int and page in (1,2),'洞府商店分页无效')
+            rows=shop_rows(r,page)
+            a.require(type(i)is int and 1<=i<=len(rows) and type(n)is int and n>0,'洞府兑换参数无效')
+            key,row=rows[i-1];used=s['purchases'].get(str(key),0)
             a.require(n+used<=row['limit'],'兑换次数不足')
             cost(role,'|'.join(map(str,row['consume'])),n);p=row['reward'];a.prizes(role,[[p[0],p[1],p[2]*n,p[3]]])
-            s['purchases'][str(i)]=used+n
-            return [response(15,dict(shop_page=1,item_index=i,limit=row['limit']-used-n))]
-        a.require(not d.get('flush_flag'),'商店在每日零点自动刷新')
-        return [response(14,dict(shop_data=shop(s,r),diff_time=86400-(now+8*3600)%86400,flush_flag=False))]
+            s['purchases'][str(key)]=used+n
+            return [response(15,dict(shop_page=page,item_index=i,limit=row['limit']-used-n))]
+        a.require(type(d.get('flush_flag',False))is bool,'商店刷新参数无效')
+        return [response(14,dict(shop_data=shop(s,r),diff_time=86400-(now+r['timezone_offset_hours']*3600)%86400,flush_flag=False))]
     if op==2:
         typ=d.get('building_type');a.require(type(typ)is int and typ in KEYS,'洞府建筑无效')
         level=s['build'][str(typ)]+1;row=UPGRADE.get((typ,level))
@@ -128,6 +160,10 @@ def settle(role,req,now,r,jrules,parse):
             pre,lv=map(int,token.split('|'))
             a.require((s['level'] if pre==0 else s['build'][str(pre)])>=lv,'前置建筑等级不足')
         cost(role,row['cost']);s['build'][str(typ)]=level;role['hole_hp_plus']=point(s);new={}
+        role['cortege_limit_plus']=int(BUILD[1][s['build']['1']]['coretege_limit_plus'])
+        if typ==5:
+            from .activity_home_pets import initialize
+            initialize(s,r)
         if typ==2:
             for i in range(1,int(BUILD[2][level]['grid_count'])+1):
                 if str(i) not in s['plants']:s['plants'][str(i)]=dict(level=0);new[i]=s['plants'][str(i)]
@@ -165,6 +201,7 @@ def settle(role,req,now,r,jrules,parse):
         gain=a.prizes(role,rewards);level=p['level'];p.clear();p['level']=level
         return [response(10,dict(plant_grid=idx,prize_list=gain,**detail))]
     if op==11:
+        a.require(s['build']['3']>0,'请先建造佛堂')
         a.require(not s['pray_time'] or a.day(s['pray_time'],r)!=a.day(now,r),'今日已祈愿')
         n=s['pray_count']%7+1;rate=TEMPLE.get((s['build']['3'],n),100)
         rewards=copy.deepcopy(r['home_pray_rewards'])
@@ -184,11 +221,16 @@ def settle(role,req,now,r,jrules,parse):
         tr=s['train'][str(typ)];row=EXP[way];used=s['train_count'].get(str(way),0)
         a.require(not int(row['limit']) or used+n<=int(row['limit']),'今日修炼次数已满')
         maximum=int(BUILD[4][s['build']['4']]['train_level']);a.require(tr['level']<maximum,'请先升级修炼房')
+        remaining=sum(int(TRAIN[typ,lv]['need_experience']) for lv in range(tr['level']+1,maximum+1))-tr['cur_exp']
+        amount=int(row['add_experience'])
+        a.require(remaining>0 and n<=(remaining+amount-1)//amount,'本次修炼超过修炼房等级上限')
+        s['welfare']['race_exp']+=min(remaining,amount*n)
         cost(role,row['consume'],n);s['train_count'][str(way)]=used+n;tr['cur_exp']+=int(row['add_experience'])*n
         while tr['level']<maximum:
             need=int(TRAIN[typ,tr['level']+1]['need_experience'])
             if tr['cur_exp']<need:break
             tr['cur_exp']-=need;tr['level']+=1
+        if tr['level']==maximum:tr['cur_exp']=0
         return [response(20,dict(train_type=typ,consume_type=way,train_count=used+n,**tr))]
     if op in (25,26):
         a.require(s['level']<max(OWNER),'洞府规模已满')
@@ -205,4 +247,4 @@ def settle(role,req,now,r,jrules,parse):
         return journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name='红尘劫',lineup_count=len(lineup),lineup=lineup)),
             encode(1027,dict(fight_id=fid,fight_type=34,final_result=result,fight_round=len(actions),fight_result=actions)),
             response(25,dict(has_passed=s['passed'],fight_count=s['fight_count'])),summon.event(44,dict(fight_id=fid,fight_type=34))]
-    a.require(False,'洞府操作无效或该限时福利尚未配置')
+    a.require(False,'洞府操作无效')

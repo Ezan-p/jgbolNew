@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-26",
+  "server_regression": {
+    "passed": 135,
+    "seconds": 37.55,
+    "log": ".runtime/home-regression.log",
+    "modules": [
+      "test_activity_home",
+      "test_activity.HomeAbyssTests",
+      "test_pets",
+      "test_npc_players",
+      "test_summon",
+      "test_formation",
+      "test_combat_power",
+      "test_system_mail"
+    ]
+  },
+  "playthrough": {
+    "file": "playthrough.json",
+    "requests": 519,
+    "temporary_funded_account": true,
+    "full_building_and_training_progression": true,
+    "real_boss_battles": 2,
+    "save_restart": true
+  },
+  "lua51_patch": {
+    "passed": true,
+    "full_injection_compiled": true,
+    "checks": [
+      "offline entrance with no online schedule",
+      "permanent activity dates and immediate reward text",
+      "authoritative invitation counters",
+      "do not overwrite visited NPC garden",
+      "authoritative rewards refresh",
+      "idempotent install and restore"
+    ]
+  },
+  "native_cocos": {
+    "passed": 6,
+    "original_cocos": true,
+    "detached_layer": true,
+    "state_restored": true,
+    "checks": [
+      "native welfare container and training targets",
+      "native building targets",
+      "native growth plan",
+      "native community construction (zero-based rewards)",
+      "native weekly rank (11 participants)",
+      "native two-section shop"
+    ],
+    "full_manual_clickthrough": false
+  },
+  "subsequent_native_attempt": {
+    "result": "no Lua frame observed; test did not execute",
+    "note": "The six earlier detached native renders passed; final entrance/text patch is covered by Lua51 regression."
+  },
+  "inferred_rules": "NPC home layout and activity, reward thresholds, weekly scoring and local economy are explicit offline inferences."
+}

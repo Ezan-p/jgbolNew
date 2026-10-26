@@ -23,6 +23,12 @@ class EngineTests(unittest.TestCase):
     def battle(self, left=None, right=None, **kw):
         return e.Battle({}, (left or [unit()], right or [unit()]), self.rules, **kw)
 
+    def test_nine_grid_sparse_positions_alternate_occupied_units(self):
+        b = self.battle([unit(9)], [unit(1), unit(2)], slots=9)
+        self.assertEqual(b.schedule(), ((2, 1), (1, 9), (2, 2)))
+        b = self.battle([unit(1), unit(9)], [unit(1), unit(2)], slots=9)
+        self.assertEqual(b.schedule(), ((1, 1), (2, 1), (1, 9), (2, 2)))
+
     def test_counter_never_recurses_and_parry_blocks(self):
         b = self.battle([unit(essences={3: (100, 50)})], [unit(essences={3: (100, 50)})])
         b.round = 1

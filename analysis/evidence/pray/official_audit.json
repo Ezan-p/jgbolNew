@@ -1,0 +1,38 @@
+{
+  "client": "3.87",
+  "official_server_available": false,
+  "inputs": [
+    {
+      "logical": "lua/ui/qiFuUI.lua",
+      "sha256": "5affa0a05a558bbf6f9ce2190eefcb690231cddec2dfe9fcdd58f8a3ccb17d80"
+    },
+    {
+      "logical": "v2/qiFuUI/intro.png",
+      "sha256": "71809b65a0c9426ede6274d19da655921fda3661c3968f6e6333e8d8fdeca27b"
+    },
+    {
+      "logical": "csv_config/pray_spirit_config.csv",
+      "sha256": "b08230e3c9c90e03b40b9d833f63e003a2bd84ce30e8513392dbdd42d51d0d45"
+    },
+    {
+      "logical": "csv_config/cortege_quality.csv",
+      "sha256": "584f3519f065a44760ef1e4c52a85ca7d33d45252dcc0b0e64989eb7f63db987"
+    }
+  ],
+  "verified": [
+    "intro.png explicitly promises gold currency, not ordinary items",
+    "CSV costs: 200 / 500 / 1000; qiFuUI L183-189 falls back to final CSV row",
+    "qiFuUI L563-584 excludes active/cheering companions and quality above 3",
+    "qiFuUI L586-611 permits manual selection of higher-quality souls",
+    "qiFuUI L202-270 bulk selection only includes low-quality souls",
+    "qiFuUI L848-900 warns for level >=2 then allows confirmation",
+    "1085 carries type/id/count; spirit=10 (7 is calc), cortege=4; event 52 pray_item_list drives native reward UI"
+  ],
+  "inferred": [
+    "equal chance of 10 / 20 / 30 gold per successful prayer",
+    "completed-count storage, UTC+8 daily cost reset, persistent remaining soul value",
+    "no daily hard cap: follows native last-cost fallback; official server cap unknown",
+    "zero-worth offerings rejected; lock/training/attached essence protections",
+    "innate spell consumed with owner; no growth material refund"
+  ]
+}

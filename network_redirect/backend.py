@@ -585,7 +585,7 @@ class Backend:
         if mid in daily.HANDLED:
             return self.dailies(packet, mid, data)
         if (mid in activity.HANDLED or (mid == 1026 and data['fight_type'] in activity.FIGHTS)
-                or (mid == 1244 and data['fight_type'] == 2)
+                or (mid == 1244 and data['fight_type'] in (2, 4))
                 or (mid == 1051 and data['item_type'] in (1346,1021,1130,1131,1132,1133,1213,1214,1215,1216,1217))
                 or (mid == 1059 and data['flag'] == 3)
                 or (mid == 1201 and data['flag'] in (1, 2))):

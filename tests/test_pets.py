@@ -155,8 +155,9 @@ class PetTests(ActivityCase):
     def test_star_stones_have_purchasable_source(self):
         r=self.b.profile();summon.add_item(r,1361,10000);self.b.save(r)
         for tid in (1347,1348,1349):
-            index=next(i for i,row in enumerate(self.b.activity_rules['home_shop'],1) if row['reward'][1]==tid)
-            self.ok(self.req(1348,id=15,data=summon.lua(dict(shop_page=1,item_index=index,buy_count=1))))
+            rows=[row for row in self.b.activity_rules['home_shop'] if row.get('page',1)==2]
+            index=next(i for i,row in enumerate(rows,1) if row['reward'][1]==tid)
+            self.ok(self.req(1348,id=15,data=summon.lua(dict(shop_page=2,item_index=index,buy_count=1))))
             self.assertEqual(sum(p['count'] for p in self.b.profile()['attachments'] if p['type_id']==tid),5)
 
     def test_full_capacity_query_fits_native_packet(self):

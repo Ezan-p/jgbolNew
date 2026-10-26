@@ -26,10 +26,17 @@ with tempfile.TemporaryDirectory() as tmp:
     fixtures['win_prize'] = duty.data(role, r, 8)
     duty.update(role, dict(plus_type=3, plus_index=1, flag=0), NOW, r)
     fixtures['exchange'] = duty.data(role, r)
-    duty.update(role, dict(plus_type=2, plus_index=3, flag=0), NOW, r)
+    index = next(i for i, o in enumerate(d['offers'], 1) if o['star'] <= d['stars']-d['used'])
+    duty.update(role, dict(plus_type=2, plus_index=index, flag=0), NOW, r)
     d.update(round=31, stars=270); duty.remember(d); duty.record(role)
     fixtures['stage31'] = duty.data(role, r)
     fixtures['win_next'] = duty.data(role, r, 8)
+    for label, reward in [('bag', [5, 1032, 1, 1]), ('gold', [11, 0, 30, 1])]:
+        d.update(phase='prize', pending_rewards=[reward], after_prize='fight')
+        fixtures[label+'_prize'] = duty.data(role, r)
+        fixtures[label+'_win'] = duty.data(role, r, 8)
+        duty.update(role, dict(plus_type=3, plus_index=1, flag=0), NOW, r)
+        fixtures[label+'_claimed'] = duty.data(role, r)
     d['phase'] = 'finished'
     fixtures['half'] = duty.data(role, r)
     fixtures['lose'] = duty.data(role, r, 9)
@@ -68,11 +75,14 @@ end
 '''
 script += '\nlocal fixtures='+summon.lua(fixtures)+'\nlocal rank='+summon.lua(rank)+'\n'
 script += r'''
-for _,name in ipairs({'entry','initial','fight','prize','exchange','stage31','half','exhausted','yesterday'}) do
+for _,name in ipairs({'entry','initial','fight','prize','exchange','stage31','half','exhausted','yesterday',
+ 'bag_prize','gold_prize','bag_claimed','gold_claimed'}) do
  check(name,function() ui.getEndlessFightRes(fixtures[name]) end)
 end
 check('win_prize_return',function() ui.getEndlessFightRes(fixtures.win_prize);ui.showFightRes() end)
 check('win_next_return',function() ui.getEndlessFightRes(fixtures.win_next);ui.showFightRes() end)
+check('bag_win_return',function() ui.getEndlessFightRes(fixtures.bag_win);ui.showFightRes() end)
+check('gold_win_return',function() ui.getEndlessFightRes(fixtures.gold_win);ui.showFightRes() end)
 check('loss_return',function() ui.getEndlessFightRes(fixtures.lose);ui.showFightLosePage() end)
 check('rank_all_groups',function() ui.getRankInfo(rank);for i=1,5 do ui.createRankCells(i) end end)
 check('native_next_stage_request',function()
@@ -104,4 +114,4 @@ local out={};for _,v in ipairs(results) do out[#out+1]=v.name..':'..tostring(v.o
 return table.concat(out,'\n')
 '''
 (ROOT/'.runtime/duty-fixture.lua').write_text(script)
-print('Built 17 original-client callback checks; no real save or request is changed')
+print('Built 23 original-client callback checks; no real save or request is changed')

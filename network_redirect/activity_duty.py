@@ -1,12 +1,10 @@
-"""天命之战: 3.87 client contracts, with explicitly retained offline balance.
-
-Enemy generation, stage drops and difficulty are deliberately unchanged. Round
+"""天命之战: 3.87 client contracts with user-authorized offline balance. Round
 in the save is the NEXT stage; cur_round on the original wire is stages CLEARED.
 Ranking contains actual local-account results, never fabricated NPC scores.
 """
 import copy
 import hashlib
-from . import formation, journey, summon, achievements, role_profile, cheer
+from . import formation, journey, summon, achievements, role_profile, cheer, duty_balance
 from .protocol import encode
 
 require = formation.require
@@ -40,7 +38,11 @@ def meta(role):
 
 
 def checkpoint(d):
-    return {k: copy.deepcopy(d[k]) for k in ('round', 'stars', 'used', 'bonus', 'initial_bonus', 'phase')}
+    out = {k: copy.deepcopy(d[k]) for k in ('round', 'stars', 'used', 'bonus', 'initial_bonus', 'phase', 'group', 'offers') if k in d}
+    # A half-run skips already earned rewards, but keeps its saved offers.
+    if out['phase'] == 'prize':
+        out['phase'] = d.get('after_prize', 'exchange')
+    return out
 
 
 def remember(d):
@@ -66,8 +68,8 @@ def prepare(role, now, r, peers=None):
         d.setdefault('initial_bonus', [0]*4)
         d.setdefault('checkpoints', {})
         d.setdefault('group', group(role))
-        if d['phase'] == 'exchange':
-            d.setdefault('offers', offers(r))
+        if d['phase'] == 'exchange' and 'offers' not in d:
+            exchange_or_fight(d)
         # Old saves contain no trustworthy earlier snapshots or victory grades.
         # Preserve their actual totals and pending reward; don't invent history.
         if not d['checkpoints'] and d['phase'] in ('initial', 'fight', 'exchange'):
@@ -76,9 +78,9 @@ def prepare(role, now, r, peers=None):
     if today > m['day']:
         previous = m['records'].get(str(today-1))
         m['yesterday'] = copy.deepcopy(previous) if previous else None
-        # Earned, unclaimed stage silver survives the day boundary exactly once.
-        if d and d.get('pending_silver'):
-            journey.grant(role, [12, 0, d.pop('pending_silver'), 1])
+        # Earned, unclaimed silver and random drops survive exactly once.
+        if d:
+            grant_pending(role, d)
         s.update(duty=None, duty_runs=0)
         m['day'] = today
     m['clock'] = now
@@ -169,9 +171,27 @@ def rank_data(role, peers=None):
                 max_get_star=rec.get('stars', 0), max_fight_round=rec.get('rounds', 0))
 
 
-def offers(r):
-    # Former balance deliberately retained pending original server tables.
-    return [dict(star=r['duty_exchange_cost'], field=f, value=r['duty_exchange_bonus']) for f in FIELDS]
+def exchange_or_fight(d):
+    available = d['stars']-d['used']
+    if available < duty_balance.rules()['bonus_tiers'][0]['star']:
+        d.pop('offers', None)
+        d['phase'] = 'fight'
+    else:
+        if 'offers' not in d:
+            d['offers'] = duty_balance.offers(available)
+        d['phase'] = 'exchange'
+
+
+def pending(d):
+    # Legacy unclaimed silver is not discarded when upgrading a save.
+    return ([[12, 0, d['pending_silver'], 1]] if d.get('pending_silver') else []) + d.get('pending_rewards', [])
+
+
+def grant_pending(role, d):
+    for reward in pending(d):
+        journey.grant(role, reward)
+    d.pop('pending_silver', None)
+    d.pop('pending_rewards', None)
 
 
 def data(role, r, result=None, peers=None):
@@ -187,17 +207,18 @@ def data(role, r, result=None, peers=None):
     score = m['records'].get(str(m['day']), {})
     _, pos = rank(role, peers, m['day'])
     ours = sum(1 <= c.get('order', 0) <= 8 for c in role['corteges'])
+    plan = duty_balance.stage(current.get('group', group(role)), current['round'])
     out = dict(result=result, cur_round=current['round']-1,
         max_fight_round=score.get('rounds', 0), max_get_star=score.get('stars', 0),
         fight_count=max(0, r['duty_daily_runs']-s['duty_runs']),
         cur_get_star=current['stars'], cur_used_star=current['used'], expect_order=pos,
         last_exchange_rate=r['duty_initial_bonus'],
         plus_list=[dict(zip(FIELDS, current['initial_bonus'])), dict(zip(FIELDS, current['bonus']))],
-        lineup_list=[dict(type=r['battle_npc'], gold=0, stars=i, vs=[ours, 1]) for i in (1, 2, 3)])
+        lineup_list=[dict(type=plan['type'], gold=0, stars=i, vs=[ours, plan['group']]) for i in (1, 2, 3)])
     if d and d['phase'] == 'exchange':
         out['star_exchange'] = copy.deepcopy(d['offers'])
-    if d and d.get('pending_silver'):
-        out['silver_prize'] = [dict(object_type=12, attach_type=0, attach_count=d['pending_silver'], attach_level=1)]
+    if d and pending(d):
+        out['silver_prize'] = [dict(object_type=p[0], attach_type=p[1], attach_count=p[2], attach_level=p[3]) for p in pending(d)]
     restored = half(d) if d else None
     out.update(revert_begin_round=restored['round'] if restored else 1,
         revert_plus_list=dict(zip(FIELDS, [a+b for a,b in zip(restored['bonus'], restored['initial_bonus'])])) if restored else dict.fromkeys(FIELDS, 0))
@@ -224,7 +245,7 @@ def start(role, r, restored=None):
         if d['phase'] == 'prize':
             d['phase'] = 'exchange'
         if d['phase'] == 'exchange':
-            d['offers'] = offers(r)
+            exchange_or_fight(d)
     s['duty'] = d
     remember(d)
 
@@ -265,9 +286,12 @@ def update(role, req, now, r, peers=None):
         d['used'] += offer['star']; d['bonus'][FIELDS.index(offer['field'])] += offer['value']
         d.pop('offers'); d['phase'] = 'fight'; remember(d); record(role)
     elif op == 3:
-        require(d['phase'] == 'prize' and d.get('pending_silver', 0) > 0, '暂无可领取奖励')
-        journey.grant(role, [12, 0, d.pop('pending_silver'), 1])
-        d['phase'] = 'exchange'; d['offers'] = offers(r); remember(d); record(role)
+        require(d['phase'] == 'prize' and bool(pending(d)), '暂无可领取奖励')
+        grant_pending(role, d)
+        d['phase'] = d.pop('after_prize', 'exchange')
+        if d['phase'] == 'exchange':
+            exchange_or_fight(d)
+        remember(d); record(role)
     return [event(role, r, peers=peers)]
 
 
@@ -277,16 +301,12 @@ def battle(role, req, now, r, jrules, peers=None):
     require(d is not None and d['phase'] == 'fight', '请先完成祝福、领奖或重开')
     require(req['des_type'] in (1, 2, 3) and req['des_id'] == 0 and req['des_value'] == d['round'], '天命关卡已变化，请刷新后重试')
     cfg = dict(cortege_list=f"{r['battle_npc']}|{r['battle_level']}")
-    units = journey.fighters(role, cfg)
+    plan = duty_balance.stage(d['group'], d['round'])
+    units = (journey.fighters(role, cfg)[0], duty_balance.enemies(d['group'], d['round'], req['des_type']))
     require(bool(units[0]), '请先上阵神仙')
     for u in units[0]:
         for stat, bonus, initial in zip(STATS, d['bonus'], d['initial_bonus']):
             u[stat] = u[stat]*(100+bonus+initial)//100
-        u['max_hp'] = u['hp']
-    # User explicitly deferred redesign of enemies, difficulty and drops.
-    for u in units[1]:
-        for stat in formation.STATS:
-            u[stat] *= max(1, d['round']*req['des_type'])
         u['max_hp'] = u['hp']
     result, lineup, actions = journey.battle(role, cfg, jrules, units=units)
     win = 1 <= result <= 3
@@ -294,14 +314,22 @@ def battle(role, req, now, r, jrules, peers=None):
     if win:
         d['stars'] += req['des_type']*result
         d['round'] += 1
+        rewards = []
         if (d['round']-1) % 3 == 0:
-            d['pending_silver'] = 3*r['duty_silver_per_round']; d['phase'] = 'prize'
+            rewards.append([12, 0, 3*r['duty_silver_per_round'], 1])
+            exchange_or_fight(d)
+        reward = duty_balance.drop()
+        if reward:
+            rewards.append(reward)
+        if rewards:
+            d['pending_rewards'] = rewards
+            d['after_prize'] = d['phase']; d['phase'] = 'prize'
         remember(d); record(role)
     else:
         d['phase'] = 'finished'; record(role)
     outcome = 8 if win else 11 if half(d) and s['duty_runs'] < r['duty_daily_runs'] else 9
     return journey.combat_engine.event_packets(actions, fid) + [
-        encode(1028, dict(fight_id=fid, first_hand=1, des_name='本地活动对手', lineup_count=len(lineup), lineup=lineup)),
+        encode(1028, dict(fight_id=fid, first_hand=1, des_name=plan['name'], lineup_count=len(lineup), lineup=lineup)),
         encode(1027, dict(fight_id=fid, fight_type=5, final_result=result, fight_round=len(actions), fight_result=actions)),
         event(role, r, outcome, peers), summon.event(44, dict(fight_id=fid, fight_type=5))]
 

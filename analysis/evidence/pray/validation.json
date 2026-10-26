@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-26",
+  "server_regression": {
+    "tests": 171,
+    "passed": true,
+    "modules": [
+      "test_activity_pray",
+      "test_activity",
+      "test_achievements",
+      "test_daily",
+      "test_summon",
+      "test_cortege_recycle",
+      "test_formation"
+    ]
+  },
+  "client": {
+    "runtime": "original Android 3.87 Cocos client",
+    "checks": 11,
+    "passed": true,
+    "outgoing_prayers_intercepted": true,
+    "reward_delays_accelerated": true
+  },
+  "lua51": {
+    "adapter_regression": true,
+    "combined_source_compiles": true
+  },
+  "playthrough": "playthrough.json",
+  "runtime_reload": "local service and client restarted; original login succeeded",
+  "limitations": [
+    "reward amount/probability inferred",
+    "official server daily cap unknown; follows client final-cost fallback",
+    "request replay cache is session-local",
+    "no real-account sacrificial inventory mutations during verification"
+  ]
+}

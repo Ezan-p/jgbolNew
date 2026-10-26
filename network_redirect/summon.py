@@ -97,10 +97,14 @@ def client_source(rules):
     monument_source = Path(__file__).with_name('monument_client.lua').read_text(encoding='utf-8')
     equipment_source = Path(__file__).with_name('equipment_client.lua').read_text(encoding='utf-8')
     reborn_source = Path(__file__).with_name('reborn_client.lua').read_text(encoding='utf-8')
+    pray_source = Path(__file__).with_name('pray_client.lua').read_text(encoding='utf-8')
+    pray_source = pray_source.replace('__PRAY_COSTS__', lua([int(r['spirit_coins']) for r in rows('pray_spirit_config.csv')]))
     rape_source = Path(__file__).with_name('rape_client.lua').read_text(encoding='utf-8')
     rank_source = Path(__file__).with_name('rank_client.lua').read_text(encoding='utf-8')
     pet_source = Path(__file__).with_name('pet_client.lua').read_text(encoding='utf-8')
-    return pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
+    taixu_source = Path(__file__).with_name('taixu_client.lua').read_text(encoding='utf-8')
+    home_source = Path(__file__).with_name('home_client.lua').read_text(encoding='utf-8')
+    return pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
 
 
 def lua(value):

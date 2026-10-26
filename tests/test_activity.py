@@ -60,11 +60,11 @@ class ActivityTests(ActivityCase):
         self.assertEqual(before,self.b.profile());self.ok(self.req(1030,visit_index=1,op_type=2))
     def test_pray_original_value_and_carryover(self):
         r=self.b.profile();r['souls']={'5004':100};self.b.save(r)
-        self.ok(self.req(1085,object_count=1,object_list=[dict(object_type=7,object_id=5004,count=26)]))
+        self.ok(self.req(1085,object_count=1,object_list=[dict(object_type=10,object_id=5004,count=26)]))
         r=self.b.profile();self.assertEqual(r['spirit_retain'],8);self.assertEqual(r['souls']['5004'],74)
     def test_pray_duplicate_selection_and_active_companion_atomic(self):
         r=self.b.profile();r['souls']={'5004':100};self.b.save(r);before=self.b.profile()
-        row=dict(object_type=7,object_id=5004,count=26)
+        row=dict(object_type=10,object_id=5004,count=26)
         self.assertEqual(self.req(1085,object_count=2,object_list=[row,row])[0][0],55);self.assertEqual(before,self.b.profile())
         self.assertEqual(self.req(1085,object_count=1,object_list=[dict(object_type=4,object_id=r['corteges'][0]['id'],count=1)])[0][0],55)
         self.assertEqual(before,self.b.profile())
@@ -101,7 +101,8 @@ class ActivityTests(ActivityCase):
         self.ok(self.req(1072));self.assertEqual(self.decoded[-2][2]['id'],114)
         for _ in range(self.b.activity_rules['rape_free_refreshes']):self.ok(self.req(1029,flag=2))
         self.assertEqual(self.req(1029,flag=2)[0][0],55)
-    def test_duty_query_start_fight_claim(self):
+    @patch('network_redirect.duty_balance.weighted', side_effect=lambda rows: rows[0])
+    def test_duty_query_start_fight_claim(self, _picker):
         self.ok(self.req(1043,flag=1));self.assertIsNone(self.b.profile()['activity']['duty'])
         self.ok(self.req(1043,flag=0))
         self.assertEqual(self.req(1026,fight_type=5,des_type=3,des_value=1)[0][0],55)
@@ -196,8 +197,8 @@ class UndergoTests(ActivityCase):
         out=self.req(1349,id=1,data='{}');self.ok(out)
         self.assertIn(1349,[m for m,_,d in self.decoded])
         role=self.b.profile();cid=role['corteges'][0]['id'];before=role['strength']
-        self.ok(self.req(1349,id=4,data=summon.lua(dict(mode=1,map_id=101,cortege_list={9:cid}))))
-        self.assertEqual(self.b.profile()['strength'],before-1)
+        self.ok(self.req(1349,id=4,data=summon.lua(dict(mode=1,map_id=101,cortege_list={cid:9}))))
+        self.assertEqual(self.b.profile()['strength'],before-2)
         replay=next(d for m,_,d in self.decoded if m==1140)
         self.assertTrue(all(len(a['damage_list'])==9 for a in replay['fight_result']))
         self.assertEqual(self.b.profile()['activity']['undergo']['count'],1)
@@ -205,7 +206,7 @@ class UndergoTests(ActivityCase):
     def test_undergo_forged_lineup_and_progress_rollback(self):
         self.ok(self.req(1349,id=1,data='{}'));before=self.b.profile()
         for d in (dict(mode=1,map_id=201,cortege_list={1:1}),dict(mode=1,map_id=101,cortege_list={1:999999}),
-                  dict(mode=2,map_id=101,cortege_list={1:before['corteges'][0]['id']})):
+                  dict(mode=2,map_id=101,cortege_list={before['corteges'][0]['id']:1})):
             self.assertEqual(self.req(1349,id=4,data=summon.lua(d))[0][0],55)
             self.assertEqual(before,self.b.profile())
     def test_undergo_shop_and_day_prize(self):
@@ -213,7 +214,7 @@ class UndergoTests(ActivityCase):
         r=self.b.profile();summon.add_item(r,1366,1000);self.b.save(r)
         self.ok(self.req(1349,id=5,data='{index=1,count=1}'))
         self.assertEqual(self.req(1349,id=7,data='{index=1}')[0][0],55)
-        r=self.b.profile();r['activity']['undergo']['passed']=list(range(101,110));self.b.save(r)
+        r=self.b.profile();r['activity']['undergo']['challenge_passed']=list(range(101,110));self.b.save(r)
         self.ok(self.req(1349,id=7,data='{index=1}'));before=self.b.profile()
         self.assertEqual(self.req(1349,id=7,data='{index=1}')[0][0],55);self.assertEqual(before,self.b.profile())
 
@@ -239,7 +240,8 @@ class HomeAbyssTests(ActivityCase):
     def test_home_friends_protocol_fertilize_restart_and_daily_reset(self):
         self.ok(self.req(1348,id=13,data='{}'))
         data=next(login_fields(d['data']) for m,_,d in self.decoded if m==1348)
-        self.assertIn(900001,data['friend_data'])
+        self.assertEqual(len(data['friend_data']),10)
+        self.assertTrue(all(v['is_npc'] for v in data['friend_data'].values()))
         self.ok(self.req(1348,id=6,data='{friend_id=900001}'))
         silver=self.b.profile()['silver_coin']
         self.ok(self.req(1348,id=7,data='{friend_id=900001,plant_grid=1}'))
@@ -249,12 +251,12 @@ class HomeAbyssTests(ActivityCase):
         self.assertEqual(self.req(1348,id=23,data='{friend_id=900001}')[0][0],55)
         r=self.b.profile();r['month_card_time']=NOW+86400;self.b.save(r)
         self.ok(self.req(1348,id=23,data='{friend_id=900001}'))
-        self.assertEqual(self.b.profile()['silver_coin'],silver+30000)
+        self.assertEqual(self.b.profile()['silver_coin'],silver+20000)
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
-        self.ok(self.req(1348,id=23,data='{friend_id=900001}'));self.assertEqual(self.b.profile()['silver_coin'],silver+30000)
+        self.ok(self.req(1348,id=23,data='{friend_id=900001}'));self.assertEqual(self.b.profile()['silver_coin'],silver+20000)
         with patch('network_redirect.backend.time.time',return_value=NOW+86400):
             self.ok(self.req(1348,id=7,data='{friend_id=900001,plant_grid=1}'))
-        self.assertEqual(self.b.profile()['silver_coin'],silver+40000)
+        self.assertEqual(self.b.profile()['silver_coin'],silver+30000)
 
     def test_home_invitation_messages_and_harvest_details(self):
         r=self.b.profile();r['silver_coin']=1000000000;self.b.save(r)
@@ -391,6 +393,8 @@ class HomeAbyssTests(ActivityCase):
             self.ok(self.req(1348,id=10,data='{plant_grid=1}'))
             before=self.b.profile();self.assertEqual(self.req(1348,id=10,data='{plant_grid=1}')[0][0],55);self.assertEqual(before,self.b.profile())
     def test_home_pray_and_forged_build_atomic(self):
+        self.ok(self.req(1348,id=1,data='{}'))
+        r=self.b.profile();r['activity']['home']['build']['3']=1;self.b.save(r)
         self.ok(self.req(1348,id=11,data='{}'));before=self.b.profile()
         self.assertEqual(self.req(1348,id=11,data='{}')[0][0],55);self.assertEqual(before,self.b.profile())
         self.assertEqual(self.req(1348,id=2,data='{building_type=99}')[0][0],55);self.assertEqual(before,self.b.profile())

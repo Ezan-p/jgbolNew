@@ -1,11 +1,7 @@
 {
   "client": "3.87",
   "official_server_available": false,
-  "deferred_by_user": [
-    "各关敌阵",
-    "掉落",
-    "强度"
-  ],
+  "user_authorized_balance": "server_config/duty_rules.json",
   "inputs": [
     {
       "logical": "lua/ui/endlessFightUI.lua",
@@ -497,17 +493,22 @@
       "难度×胜利评级战魂：2013年攻略，与原版三档倍率UI相符；不能视为3.87原服源码"
     ],
     "B_retained": [
-      "1001等级1、轮次×难度缩放",
       "每3胜3000银币",
-      "初始10%、祭魂3星换10%",
+      "免费初始祝福10%",
       "半程起点floor(已通关数/2)，至少1"
+    ],
+    "B_user_authorized": [
+      "players库完整NPC阵容，4—8人固定强度曲线、三档80%/100%/125%",
+      "每胜一次随机无掉落/10或30元宝/棉布银绸金丝乾坤袋",
+      "祭魂5%/10%/15%/20%，费用9/18/27/36，权重50/30/15/5",
+      "不足9魂自动继续，有9魂时至少一个可购买选项"
     ],
     "B_local_policy": [
       "真实本地账号排行，星数/关数/账号键排序",
       "最高单次成绩及固定开局分组",
       "跨日自动入包榜奖、按结榜日期授24h称号",
-      "跨日保留未领银币",
-      "半程仅还原实际快照，不复制跳关奖励"
+      "跨日保留所有未领奖励",
+      "半程仅还原实际快照与已抽选项，不复制跳关奖励"
     ]
   },
   "historical_reference": "https://jingyan.baidu.com/article/d2b1d10268bad25c7f37d464.html"

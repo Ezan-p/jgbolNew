@@ -135,7 +135,12 @@ class Battle:
     def schedule(self):
         if self.slots == 8:
             return ((1, 1), (2, 2), (1, 2), (2, 1), (1, 3), (2, 4), (1, 4), (2, 3))
-        return tuple((side, order) for order in range(1, self.slots + 1) for side in (1, 2))
+        # Nine-grid manual: nearest occupied position starts (attacker on ties),
+        # then sides alternate their occupied positions, skipping empty cells.
+        orders = {side: sorted(u['order'] for u in self.fielded(side)) for side in (1, 2)}
+        first = 1 if min(orders[1], default=10) <= min(orders[2], default=10) else 2
+        return tuple((side, orders[side][i]) for i in range(max(map(len, orders.values())))
+                     for side in (first, 3-first) if i < len(orders[side]))
 
     def alive(self, side):
         return [u for u in self.sides[side - 1] if u['hp'] > 0]

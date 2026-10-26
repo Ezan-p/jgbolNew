@@ -1,4 +1,4 @@
-"""Real combat, 3 x 105 stages; disposable strong test role, unchanged enemies."""
+"""Real combat through the configured NPC ladder using disposable test roles."""
 import json
 import random
 import sys
@@ -42,7 +42,9 @@ def main():
                     if d['phase'] == 'prize':
                         assert duty.data(role, b.activity_rules)['result'] == 6
                         duty.update(role, dict(plus_type=3, plus_index=1, flag=0), now, b.activity_rules)
-                        duty.update(role, dict(plus_type=2, plus_index=3, flag=0), now, b.activity_rules)
+                    if d['phase'] == 'exchange':
+                        index = next(i for i, offer in enumerate(d['offers'], 1) if offer['star'] <= d['stars']-d['used'])
+                        duty.update(role, dict(plus_type=2, plus_index=index, flag=0), now, b.activity_rules)
                 assert role['silver_coin']-initial_silver == 35*3000
                 runs.append(dict(difficulty=difficulty, stages=rows, stars=d['stars'], used=d['used'], silver=role['silver_coin']-initial_silver))
         finally:
@@ -50,8 +52,8 @@ def main():
     out = ROOT/'analysis/evidence/duty'
     out.mkdir(parents=True, exist_ok=True)
     (out/'playthrough.json').write_text(json.dumps(dict(date='2026-10-26', mode='real_engine_disposable_strong_role',
-        unchanged_enemy_and_drop_config=True, balance_validation=False, runs=runs), ensure_ascii=False, indent=2)+'\n')
-    print('Verified 315 real battles, 105 claims and exchanges, 3 difficulties; this is flow validation, not balance validation')
+        enemy_config='server_config/duty_rules.json', balance_validation=False, runs=runs), ensure_ascii=False, indent=2)+'\n')
+    print('Verified 315 real battles, 3 difficulties through stage 105; flow validation, not balance validation')
 
 
 if __name__ == '__main__':

@@ -2,13 +2,20 @@
 import copy
 from unittest.mock import patch
 from test_activity import ActivityCase, NOW
-from network_redirect import activity, activity_duty as duty, achievements
+from network_redirect import activity, activity_duty as duty, achievements, duty_balance as balance
 from network_redirect.backend import Backend
 from network_redirect.protocol import decode, encode
 from pathlib import Path
 
 
 class DutyTests(ActivityCase):
+    def setUp(self):
+        super().setUp()
+        # Stable baseline: no random drop, 5% / 9-soul offers. Separate tests
+        # below exercise every weighted outcome and saved random state.
+        picker = patch('network_redirect.duty_balance.weighted', side_effect=lambda rows: rows[0])
+        picker.start(); self.addCleanup(picker.stop)
+
     def info(self, **req):
         out = self.req(1043, **req); self.ok(out)
         return next(data for ident, data in out if ident == 19)
@@ -29,6 +36,7 @@ class DutyTests(ActivityCase):
             self.fight()
             if self.b.profile()['activity']['duty']['phase'] == 'prize':
                 self.info(plus_type=3, plus_index=1)
+            if self.b.profile()['activity']['duty']['phase'] == 'exchange':
                 self.info(plus_type=2, plus_index=3)
 
     def test_original_client_round_plus_one_and_vs(self):
@@ -36,7 +44,7 @@ class DutyTests(ActivityCase):
         self.assertIsNone(self.b.profile()['activity']['duty'])
         self.start(); d = self.info(flag=1)
         self.assertEqual(d['cur_round'], 0)
-        self.assertEqual([x['vs'][2] for x in d['lineup_list'].values()], [1]*3)
+        self.assertEqual([x['vs'][2] for x in d['lineup_list'].values()], [self.b.profile()['activity']['duty']['group']]*3)
         self.assertEqual(self.fight()['cur_round'], 1)
 
     def test_all_nine_grade_and_difficulty_combinations(self):
@@ -58,7 +66,7 @@ class DutyTests(ActivityCase):
         self.assertEqual(self.req(1043, plus_type=3)[0][0], 55)
         self.assertEqual(self.info(flag=1)['star_exchange'], d['star_exchange'])
         self.info(plus_type=2, plus_index=3)
-        self.assertEqual(self.info(flag=1)['cur_used_star'], 3)
+        self.assertEqual(self.info(flag=1)['cur_used_star'], 9)
         self.assertEqual(self.req(1043, plus_type=2, plus_index=3)[0][0], 55)
 
     def test_invalid_stage_target_phase_and_flags_are_atomic(self):
@@ -317,4 +325,104 @@ class DutyTests(ActivityCase):
         before = self.b.profile()['activity']
         self.assertEqual(self.req(1043, plus_type=2, plus_index=1)[0][0], 55)
         self.assertEqual(self.b.profile()['activity'], before)
+
+    def test_low_grade_souls_accumulate_without_exchange_softlock(self):
+        self.start()
+        for stage in range(1, 10):
+            self.fight(1, 1)
+            if stage % 3 == 0:
+                info = self.info(plus_type=3)
+                self.assertEqual(info['result'], 5 if stage == 9 else 3)
+        self.assertEqual(info['cur_get_star'], 9)
+        self.info(plus_type=2, plus_index=1)
+        self.assertEqual(self.info(flag=1)['cur_used_star'], 9)
+
+    def test_random_prize_ack_resumes_fight_and_preserves_reconnect(self):
+        self.start()
+        with patch.object(balance, 'drop', return_value=[5, 1032, 1, 1]):
+            self.fight()
+        before = self.info(flag=1)
+        self.assertEqual(before['silver_prize'][1]['attach_type'], 1032)
+        self.assertEqual(before['result'], 6)
+        self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        self.assertEqual(self.info(flag=1), before)
+        before_count = sum(i['count'] for i in self.b.profile()['attachments'] if i['type_id'] == 1032)
+        self.assertEqual(self.info(plus_type=3)['result'], 3)
+        after_count = sum(i['count'] for i in self.b.profile()['attachments'] if i['type_id'] == 1032)
+        self.assertEqual(after_count, before_count+1)
+        saved = self.b.profile()
+        self.assertEqual(self.req(1043, plus_type=3)[0][0], 55)
+        self.assertEqual(self.b.profile(), saved)
+
+    def test_all_random_prizes_settle_once_and_loss_has_no_roll(self):
+        self.start()
+        for row in balance.rules()['drops'][1:]:
+            prize = row['reward']
+            with patch.object(balance, 'drop', return_value=prize) as roll:
+                result = self.fight()
+                roll.assert_called_once_with()
+            self.assertIn(prize, duty.pending(self.b.profile()['activity']['duty']))
+            before = self.b.profile()
+            self.info(plus_type=3)
+            after = self.b.profile()
+            if prize[0] == 11:
+                self.assertEqual(after['gold_coin']-before['gold_coin'], prize[2])
+            else:
+                count = lambda r: sum(i['count'] for i in r['attachments'] if i['type_id'] == prize[1])
+                self.assertEqual(count(after)-count(before), prize[2])
+            if after['activity']['duty']['phase'] == 'exchange':
+                self.info(plus_type=2, plus_index=1)
+        with patch.object(balance, 'drop') as roll:
+            self.fight(4)
+            roll.assert_not_called()
+
+    def test_random_drop_encoder_failure_rolls_back_entire_win(self):
+        self.start(); before = self.b.profile()
+        with patch.object(balance, 'drop', return_value=[11, 0, 30, 1]), \
+             patch.object(duty.journey, 'battle', return_value=(3, [], [])), \
+             patch('network_redirect.backend.activity.attributes', side_effect=ValueError('encode')):
+            self.assertEqual(self.req(1026, fight_type=5, des_type=3, des_value=1)[0][0], 55)
+        self.assertEqual(before, self.b.profile())
+
+    def test_pending_random_prizes_cross_day_and_half_never_duplicates(self):
+        self.start(); self.pass_stages(6)
+        with patch.object(balance, 'drop', return_value=[11, 0, 30, 1]):
+            self.fight()
+        before = self.b.profile()['gold_coin']
+        g = self.b.profile()['activity']['duty']['group']
+        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+            self.info(flag=1); self.info(flag=1)
+            self.assertEqual(self.b.profile()['gold_coin'], before+30+duty.rank_reward(g, 1))
+            self.info(plus_type=5, plus_index=1)
+            self.assertFalse(duty.pending(self.b.profile()['activity']['duty']))
+
+    def test_affordable_fallback_and_saved_random_offers(self):
+        self.start(); self.fight(); self.fight()
+        with patch.object(balance, 'weighted', side_effect=lambda rows: rows[-1]), \
+             patch.object(balance.secrets, 'randbelow', return_value=2):
+            self.fight()
+        d = self.b.profile()['activity']['duty']
+        self.assertEqual([o['value'] for o in d['offers']], [20, 20, 5, 20])
+        self.assertEqual(d['offers'][2]['star'], 9)
+        offers = copy.deepcopy(d['offers'])
+        self.info(flag=1); self.info(plus_type=3); self.info(flag=1)
+        self.assertEqual(self.b.profile()['activity']['duty']['offers'], offers)
+        before = self.b.profile()
+        self.assertEqual(self.req(1043, plus_type=2, plus_index=1)[0][0], 55)
+        self.assertEqual(self.b.profile(), before)
+        self.info(plus_type=2, plus_index=3)
+        self.assertEqual(self.b.profile()['activity']['duty']['bonus'][2], 5)
+
+    def test_half_keeps_group_and_saved_offers(self):
+        self.start(); self.pass_stages(12)
+        r = self.b.profile(); d = r['activity']['duty']
+        saved = d['checkpoints']['6']
+        saved.update(phase='exchange', offers=[dict(field=177, value=15, star=27)], stars=54, used=9)
+        original_group = d['group']
+        d['phase'] = 'finished'; r['cortege_count'] = 4; self.b.save(r)
+        self.info(plus_type=4, plus_index=1)
+        d = self.b.profile()['activity']['duty']
+        self.assertEqual(d['group'], original_group)
+        self.assertEqual(d['offers'], saved['offers'])
+        self.assertFalse(duty.pending(d))
 

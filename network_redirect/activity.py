@@ -12,10 +12,8 @@ from .protocol import encode
 ROOT = Path(__file__).resolve().parents[1]
 require = formation.require
 ENUMS = json.loads((ROOT/'analysis/evidence/activity_enums.json').read_text())
-HANDLED = {1060, 1330, 1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1303, 1329, 1333, 1348, 1349, 1353}
+HANDLED = {1060, 1330, 1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1303, 1329, 1333, 1348, 1349, 1350, 1353}
 FIGHTS = {2, 3, 4, 5, 6, 10, 11, 12}
-PRAY = {int(r['pray_times']): int(r['spirit_coins']) for r in summon.rows('pray_spirit_config.csv')}
-QUALITY = {int(r['cortege_quality']): r for r in summon.rows('cortege_quality.csv')}
 EXCHANGE = {int(r['index']):r for r in summon.rows('top_score_exchange.csv')}
 RANK_SCORE = summon.rows('top_score.csv')
 DICE_RATE = {tuple(map(int,x['form_type'].split('|'))):int(x['rate']) for x in summon.rows('luhsing_form_rate.csv')}
@@ -30,7 +28,7 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     for key in ('feed_max_count','feed_base_strength','feed_strength_per_bun','feed_max_strength',
                 'rank_daily_limit','rank_initial_order',
                 'rape_free_refreshes','rape_refresh_gold','rape_single_refresh_gold','duty_daily_runs',
-                'duty_initial_bonus','duty_exchange_bonus','duty_exchange_cost','duty_silver_per_round','party_free_count','party_paid_count',
+                'duty_initial_bonus','duty_silver_per_round','party_free_count','party_paid_count',
                 'party_fight_gold','party_bonus_gold','party_bonus_limit','convert_daily_limit',
                 'battle_level','battle_silver','trial_daily_limit','trial_bosses_per_day','trial_boss_hp','trial_cooldown_seconds','home_boss_daily_limit','home_assistant_gold','home_missed_event_penalty',
                 'abyss_offline_cap_seconds','abyss_tick_seconds','abyss_power_per_crystal','abyss_double_gold','abyss_grid_gold','babel_cell_coins','drug_craft_exp','drug_quality_level_step',
@@ -41,14 +39,11 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     require(isinstance(r.get('land_card_gold'),list) and len(r['land_card_gold'])==5 and r['land_card_gold'][0]==0 and all(type(v)is int and 0<=v<=100000 for v in r['land_card_gold']),'逐鹿翻牌费用无效')
     require(r['rank_initial_order']<=65535 and r['rank_daily_limit']<=255,'活动次数超过协议范围')
     require(r['duty_daily_runs']==3,'原版天命界面固定每日3次')
-    require(r['duty_exchange_cost']<=3,'祭魂至少应有一项能由三场一星胜利兑换')
+    from . import duty_balance
+    duty_balance.rules()
     require(r['home_missed_event_penalty']<=100,'药田损失不能超过100%')
     require(type(r.get('home_friend_gain_percent'))is int and 0<=r['home_friend_gain_percent']<=100,'施肥增益无效')
     require(type(r.get('home_friend_silver'))is int and 0<r['home_friend_silver']<=1000000,'施肥奖励无效')
-    friends=r.get('home_offline_friends')
-    require(isinstance(friends,list) and 1<=len(friends)<=20,'离线洞府好友配置无效')
-    require(all(isinstance(f,dict) and type(f.get('id'))is int and 900000<=f['id']<1000000 and isinstance(f.get('name'),str) and 1<=len(f['name'])<=20 for f in friends),'离线洞府好友字段无效')
-    require(len({f['id'] for f in friends})==len(friends),'离线洞府好友编号重复')
     require(type(r.get('home_starter_pet'))is int and r['home_starter_pet'] in range(201,207),'洞府初始灵兽配置无效')
     for periods in (r.get('feed_periods'), [r.get('party_period')]):
         require(isinstance(periods,list) and bool(periods),'活动时段缺失')
@@ -75,6 +70,7 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
             require(isinstance(p,list) and len(p)==4 and all(type(v)is int for v in p),'活动奖励格式错误')
             typ,tid,n,lv=p
             require(0<n<=1000000 and 1<=lv<=200 and ((typ in (11,12)) or (typ==5 and tid in formation.ITEMS)),'活动奖励无效')
+    require(all(p[0]==11 and p[1]==0 and p[3]==1 for p in r['pray_rewards']),'神石祈福奖励必须为元宝')
     require(len(r['visit_rewards'])==3,'福禄寿奖励必须三组')
     require(len(r['abyss_map_rewards'])==12 and r['abyss_map_remove_count']+r['abyss_map_paid_draws']<12,'宝图奖盘或次数无效')
     require(set(r.get('train_increase',{}))==set(formation.STATS) and all(type(v)is int and 0<v<=10000 for v in r['train_increase'].values()),'修炼属性配置无效')
@@ -85,6 +81,7 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
             require(isinstance(p,list) and len(p)==4 and all(type(v)is int for v in p) and p[0]==5 and p[1] in formation.ITEMS and 1<=p[2]<=100000 and p[3]==1,'活动商品无效')
             require(type(goods.get('limit'))is int and 1<=goods['limit']<=1000,'活动限购无效')
             if name=='home_shop':
+                require(type(goods.get('page',1))is int and goods.get('page',1) in (1,2),'洞府商店分页无效')
                 q=goods.get('consume')
                 require(isinstance(q,list) and len(q)==4 and all(type(v)is int for v in q) and q[0]==5 and q[1] in formation.ITEMS and 0<q[2]<=1000000 and q[3]==1,'洞府商品消耗无效')
             else:require(type(goods.get('cost'))is int and 0<goods['cost']<=1000000,'活动商品价格无效')
@@ -105,6 +102,9 @@ def prepare(role,now,r,peers=None):
     for k,v in dict(drug_level=1,drug_exp=0,drug_study_flag=0,drug_study_flag2=0).items():role.setdefault(k,v)
     role.setdefault('rule_index',0)
     for k in ('max_hp_plus','gongji_plus','fangyu_plus','max_magic_plus'):role.setdefault(k,0)
+    if 'home' in s:
+        from . import activity_home
+        activity_home.state(role,now,r)
     from . import activity_party
     activity_party.prepare(role,now,r)
     from . import activity_duty
@@ -218,33 +218,8 @@ def visit(role,req,r):
 
 
 def pray(role,req,r):
-    require(role['level']>=15,'祈福需15级')
-    index=role.get('pray_spirit_times',0)+1
-    require(index in PRAY,'今日祈福次数已用完')
-    rows=req['object_list'];require(len(rows)<=255,'祭品数量过多')
-    seen=set();value=0;remove=[]
-    for row in rows:
-        typ,ident,n=row['object_type'],row['object_id'],row['count']
-        require((typ,ident) not in seen and type(n)is int and n>0,'祭品重复或数量无效');seen.add((typ,ident))
-        if typ==7:
-            tid=int(ident);require(tid==ident and tid in formation.BASES,'未知魂魄')
-            require(role.get('souls',{}).get(str(tid),0)>=n,'魂魄不足')
-            role['souls'][str(tid)]-=n
-            value += n*int(QUALITY[int(formation.BASES[tid]['quality'])]['spirit_worth'])
-        else:
-            require(typ==4 and n==1,'祭品类型无效')
-            c=next((c for c in role['corteges'] if c['id']==ident),None)
-            require(c is not None and not c.get('order') and not c.get('cheer_order') and not c.get('is_lock'),'该神仙不能献祭')
-            require(not any(i.get('owner_id')==ident for i in role['attachments']),'请先卸下精魄')
-            tid=c['type'];q=int(formation.BASES[tid]['quality'])
-            require(q<=3,'只能献祭三星及以下神仙')
-            remove.append(c);value += int(QUALITY[q]['cortage_worth'])
-    value += role.get('spirit_retain',0)
-    require(value>=PRAY[index],'祭品魂值不足')
-    role['spirit_retain']=value-PRAY[index]
-    role['corteges']=[c for c in role['corteges'] if c not in remove]
-    role['pray_spirit_times']=index
-    return [summon.event(52,dict(pray_item_list=prizes(role,[secrets.choice(r['pray_rewards'])])))]
+    from . import activity_pray
+    return activity_pray.settle(role,req,r)
 
 
 def rank(role,r):
@@ -429,6 +404,12 @@ def battle(role,req,now,r,jrules,frules):
 
 def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     s=prepare(role,now,r,peers)
+    if mid == 1350:
+        from . import activity_arena
+        return activity_arena.settle(role,req,now,r,jrules,parse)
+    if mid == 1244 and req['fight_type'] == 4:
+        from . import activity_arena
+        return activity_arena.replay(role,req)
     from . import activity_duty
     if mid==1043:
         return activity_duty.update(role,req,now,r,peers)
@@ -487,7 +468,9 @@ def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     if mid==1205:return [statuses(role,now,r,req['flag'])]
     if mid==1040:return feed(role,req,now,r)
     if mid==1030:return visit(role,req,r)
-    if mid==1085:return pray(role,req,r)
+    if mid==1085:
+        require(s['day']==day(now,r),'祈福日期已回退，请恢复本地时间')
+        return pray(role,req,r)
     if mid==1039:return query_lineup(role,req,r)
     if mid==1064:return trial_query(role,req,now,r)
     if mid==1026:return battle(role,req,now,r,jrules,frules)
