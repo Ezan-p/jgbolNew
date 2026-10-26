@@ -1,0 +1,50 @@
+{
+  "client": "3.87",
+  "official_server_available": false,
+  "inputs": [
+    {
+      "logical": "lua/ui/eatBunUI.lua",
+      "resource": "d0925f461a667039d29095989dc9ea45.data",
+      "sha256": "5d0f96ffbb5e93c320776fd08cb25886f420806ce31175f422f1c67091d97895"
+    },
+    {
+      "logical": "lua/ui/activityUI.lua",
+      "resource": "f94624a6c6a5f4034d0fdf2e315f0904.data",
+      "sha256": "b62f2dffa9e3707ce73f2b5fedbb147433544d735ec722519d377a31698f134f"
+    },
+    {
+      "logical": "v2/eatBunUI/info1.png",
+      "resource": "36ff0bf0552eb1dc0c7ebb65f7ae7b9d.data",
+      "sha256": "319c6a184de51c2a794582264e753bc0f969af0a3c1fb72365713b372ed67cbd"
+    },
+    {
+      "logical": "v2/eatBunUI/info2.png",
+      "resource": "a59be74444f63d90f83fe8d54c5ead04.data",
+      "sha256": "07a585d30fdb811166e343a8b6b2970e45aa99bc451287aae2edf30e4429a362"
+    },
+    {
+      "logical": "csv_config/achievements_config.csv",
+      "resource": "21e32184cfddbf4046201e0e98e8828e.data",
+      "sha256": "bbd1388054a77c5b0d33a8778fdbf694f117e985d3f0929dd1c45795097e7f17"
+    }
+  ],
+  "verified": [
+    "eatBunUI L135-139: enter only sends query feed_count=0",
+    "eatBunUI L268-293 and L339-355: Begin opens barrel with zero clicks and 10 seconds",
+    "eatBunUI L423-431: first barrel click starts timer; each valid click increments score",
+    "eatBunUI L468-489: ten-second timer, two-second result delay, positive score submitted via 1040",
+    "info2.png: 点击木桶开始倒计时，点击速度越快，吃的越多。",
+    "info1.png: more buns earn more strength; no numeric reward table in image",
+    "activityUI uses 12:00-14:00 and 18:00-20:00; feed result 2/3/4 = success/closed/already claimed",
+    "eatBunUI L278 and L596 use truthiness/nil, while L494-511 require numeric 1 / claimed timestamp",
+    "achievement 108 = feed once; 445 = enter 快快侠 board"
+  ],
+  "inferred": [
+    "six reward tiers: 1/10/20/30/40/50 clicks -> 10/20/30/40/50/60 strength, per user fallback",
+    "retain offline maximum 200; client shares cap and tier config with server",
+    "per-slot daily claims and best score storage; query returns historical earned best strength",
+    "today champion among actual local saves; ties by completion time then role id",
+    "achievement 445 on successful settlement into local first place; official award timing unavailable",
+    "original 1040 sends only final count; server bounds score and prevents double rewards but cannot prove individual clicks"
+  ]
+}

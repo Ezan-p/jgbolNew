@@ -28,6 +28,7 @@ def npc(ident,name,now,rank=5):
 
 def prepare(role,s,g,now,r):
     from .guild import new_union
+    from . import guild_npcs
     # IDs above the player-created range; migrate once without overwriting saves.
     if not s.get('offline_world_v1'):
         for ident,name,pop in ((80001,'花果山演武盟',1200),(80002,'蓬莱修行盟',600),(80003,'昆仑问道盟',300)):
@@ -39,6 +40,7 @@ def prepare(role,s,g,now,r):
             for i in range(2,5):home['members'].setdefault(str(10000+i),npc(10000+i,'离线道友'+str(i),now))
             if '10001' in home['members']:home['members']['10001']['npc']=True
         s['offline_world_v1']=True
+    guild_npcs.migrate(role,s,now)
     if not role['union_id']:
         key=str(int(role['role_id']))
         for v in s['unions'].values():
@@ -67,11 +69,8 @@ def prepare(role,s,g,now,r):
             team['members']=[key for key in team['members'] if key in g['members']]
             team['applications']={key:v for key,v in team.get('applications',{}).items() if key in g['members'] and key not in team['members']}
             if str(team['captain']) not in team['members']:a['team']=None
-    if g and role['union_rank']==1 and g.get('recruit_day')!=s['day']:
-        g['recruit_day']=s['day']
-        ident=700000+s['day']*10+g['id']%10
-        if len(g['members'])<capacity(g,r):
-            g['applications'][str(ident)]=npc(ident,'离线求道者',now)
+    if g:
+        guild_npcs.recruit(role,s,g,now,r)
 
 
 def store(s,r):
@@ -147,14 +146,17 @@ def audit(before,role,now,operation,r):
 
 def validate_rules(r):
     from . import daily
-    keys=('tree_require_pop','member_growth','apply_daily','join_daily','mute_seconds','money_cap','search_sweep_gold','tree_challenge_contrib','tree_challenge_limit','tree_paid_peaches','tree_level_bonus_percent','match_life','match_loss_life','match_target_loss','match_max_streak','train_hp','train_seconds','train_support_limit','pet_limit','pet_feed_silver','pet_feed_exp','pet_exp_level','pet_max_level','pet_max_star','pet_star_reputation','catch_success_percent','hunt_paid_limit')
+    require(type(r.get('npc_recruit_daily',4)) is int and 1<=r.get('npc_recruit_daily',4)<=20,'每日NPC招募人数无效')
+    keys=('tree_require_pop','member_growth','apply_daily','join_daily','mute_seconds','money_cap','search_sweep_gold','tree_challenge_contrib','tree_challenge_limit','tree_paid_peaches','tree_level_bonus_percent','match_life','match_loss_life','match_target_loss','match_max_streak','train_hp','train_seconds','train_support_limit','train_attempt_limit','train_resident_required','npc_resident_pets','lucky_reputation_per_draw','lucky_draw_limit','hunt_rank_limit','pet_limit','pet_feed_silver','pet_feed_exp','pet_exp_level','pet_max_level','pet_max_star','pet_star_reputation','catch_success_percent','hunt_paid_limit')
     for k in keys:require(type(r.get(k)) is int and 0<r[k]<=100000000,'离线仙盟配置无效：'+k)
+    require(type(r.get('catch_resident_percent'))is int and 0<=r['catch_resident_percent']<=100,'栖息概率配置无效')
     require(type(r['catch_item_bonus'])is int and 0<=r['catch_item_bonus']<=100,'捕捉道具加成无效')
     daily.validate_prize([5,r['catch_item'],1,1])
     require(r['catch_success_percent']<=100 and r['pet_limit']<=240 and r['search_daily']<=25,'概率、兽栏或棋盘配置越界')
+    require(r['train_resident_required']==240,'原版试炼需要240只栖息宠物')
     require(type(r.get('team_min_fighters')) is int and r['team_min_fighters']==3,'秘境至少三人出战')
     require(r['train_support_limit']<=20 and r['team_min_fighters']<=r['team_size']<=5,'活动人数配置越界')
-    for k in ('hunt_weekend_open','npc_auto_accept'):require(type(r.get(k))is bool,'开关配置无效：'+k)
+    for k in ('hunt_weekend_open','npc_auto_accept','train_weekend_only','lucky_weekend_only'):require(type(r.get(k))is bool,'开关配置无效：'+k)
     for key in ('rank_power','rank_rights','match_merit'):
         require(set(r.get(key,{}))==set(map(str,range(1,8))),'职位配置缺失：'+key)
     for rights in r['rank_rights'].values():require(isinstance(rights,list) and all(type(v)is int and 1<=v<=28 for v in rights),'权限配置无效')

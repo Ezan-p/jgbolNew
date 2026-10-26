@@ -10,6 +10,9 @@ do
   local oldMapShow=map.show
   local oldMapFight=map.canFightNextChallenge
   local oldEnter=ms.d_undergoOrdealUI.pressEnterUndergoLayer
+  local oldRootEnter=ms.d_undergoOrdealUI.enter
+  local oldArenaEnter=ui.enter
+  local prizeView=false
   local wrappers={}
   local state={}
   local autoGroup=nil
@@ -43,14 +46,43 @@ do
   for _,name in ipairs({'showQualifyFight','showExerFight','showBloodFight','showCommonRank','showDoubleRank'}) do
    local native=ui[name];wrappers[name]=native
    ui[name]=function(...)
-    local result=native(...)
+    local result
+    if name=='showExerFight' then
+     -- The original practice view polls when formal_race.start_time has passed.
+     -- Preserve every original node/position, but render its timer slot once as
+     -- an offline instruction, without installing the one-second poll callback.
+     local oldRest,oldDelay=ms.d_time.getRestTime,ms.d_u.delay
+     local schedule=ui.g_data.enter.schedule_list.match_time_list
+     local formalStart=schedule[3].start_time
+     ms.d_time.getRestTime=function(time,...)
+      if time==formalStart then return '可直接推进' end
+      return oldRest(time,...)
+     end
+     ms.d_u.delay=function(parent,seconds,callback,...)
+      if seconds==1 then return end
+      return oldDelay(parent,seconds,callback,...)
+     end
+     local ok,value=pcall(native,...)
+     ms.d_time.getRestTime=oldRest;ms.d_u.delay=oldDelay
+     if not ok then error(value) end
+     result=value
+    else result=native(...) end
     local parent=ui.g_arenaUI[name=='showQualifyFight' and 'qualify_layer' or name=='showBloodFight' and 'blood_layer' or 'rank_parent']
     controls(parent)
     return result
    end
   end
+  wrappers.showPrize=ui.showPrize
+  ui.showPrize=function(...)
+   prizeView=true
+   local ok,value=pcall(wrappers.showPrize,...)
+   prizeView=false
+   if not ok then error(value) end
+   return value
+  end
   ui.onGetResult=function(data)
    if data.local_arena then state=data.local_arena end
+   if data.local_entry then ui.g_data.enter=data.local_entry end
    -- Exercise responses have no original update branch. Keep every native view
    -- on the same authoritative snapshot, including records and score changes.
    if data.id==5 and ui.g_data.rank then
@@ -70,13 +102,22 @@ do
    ui.enter(ms.d_undergoOrdealUI.getMainLayer())
   end
   ms.d_hz.gethz=function(key,...)
-   if key=='undergo_info22' then return '玩家等级达到12级开放' end
+   if key=='kfight6' and prizeView then return '结算本届后奖励直接到账' end
+   if key=='undergo_info22' then return '玩家等级达到50级开放' end
    if key=='undergo_info16' then return '每日0点恢复神仙次数，当前大关小关进度重置' end
    return oldHz(key,...)
   end
   ms.d_undergoOrdealUI.pressEnterUndergoLayer=function()
-   if ms.d_mainUI.g_playerInfo.level<12 then ms.d_info.show('玩家等级达到12级开放');return end
+   if ms.d_mainUI.g_playerInfo.level<50 then ms.d_info.show('玩家等级达到50级开放');return end
    ms.d_undergoOrdealUI.sendMsg(1,{})
+  end
+  ms.d_undergoOrdealUI.enter=function(...)
+   if ms.d_mainUI.g_playerInfo.level<50 then ms.d_info.show('玩家等级达到50级开放');return end
+   return oldRootEnter(...)
+  end
+  ui.enter=function(...)
+   if ms.d_mainUI.g_playerInfo.level<50 then ms.d_info.show('玩家等级达到50级开放');return end
+   return oldArenaEnter(...)
   end
   map.canFightNextChallenge=function(mid,sid)
    if mid>9 then return false end
@@ -100,6 +141,7 @@ do
    ui.onGetResult=oldResult;ui.onFightReturn=oldReturn
    ms.d_hz.gethz=oldHz;map.show=oldMapShow;map.canFightNextChallenge=oldMapFight
    ms.d_undergoOrdealUI.pressEnterUndergoLayer=oldEnter
+   ms.d_undergoOrdealUI.enter=oldRootEnter;ui.enter=oldArenaEnter
    for name,native in pairs(wrappers) do ui[name]=native end
    ui._localAdvance=nil;ui._localStage=nil;ui._localTaixuRestore=nil
   end

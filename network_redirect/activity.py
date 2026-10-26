@@ -16,7 +16,6 @@ HANDLED = {1227, 1060, 1330, 1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 106
 FIGHTS = {2, 3, 4, 5, 6, 10, 11, 12}
 EXCHANGE = {int(r['index']):r for r in summon.rows('top_score_exchange.csv')}
 RANK_SCORE = summon.rows('top_score.csv')
-DICE_RATE = {tuple(map(int,x['form_type'].split('|'))):int(x['rate']) for x in summon.rows('luhsing_form_rate.csv')}
 CONVERT = {int(r['src_cortege_type']): r for r in summon.rows('convert_output.csv')}
 
 
@@ -25,7 +24,7 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     require(r.get('schema_version')==1 and r.get('mode')=='inferred','活动配置必须标注 inferred')
     require(isinstance(r.get('revision'),str) and bool(r['revision']),'活动配置版本缺失')
     require(type(r.get('timezone_offset_hours')) is int and -12<=r['timezone_offset_hours']<=14,'活动时区无效')
-    for key in ('feed_max_count','feed_base_strength','feed_strength_per_bun','feed_max_strength',
+    for key in ('feed_max_count',
                 'rank_daily_limit','rank_initial_order',
                 'rape_free_refreshes','rape_refresh_gold','rape_single_refresh_gold','duty_daily_runs',
                 'duty_initial_bonus','duty_silver_per_round','party_free_count','party_paid_count',
@@ -34,6 +33,8 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
                 'abyss_offline_cap_seconds','abyss_tick_seconds','abyss_power_per_crystal','abyss_double_gold','abyss_grid_gold','babel_cell_coins','drug_craft_exp','drug_quality_level_step',
                 'abyss_event_seconds','abyss_event_boss_hp','abyss_event_fight_gold','abyss_steal_max','abyss_map_paid_draws','abyss_map_gold','abyss_map_remove_count','land_tower_start_hour','land_daily_travel','land_daily_attack','land_travel_soul','land_charm_exchange','land_tower_tick','land_tower_soul','land_tower_total','land_tower_duration','land_boss_layers','land_boss_soul','land_hell_unlock_soul','land_hell_daily','land_max_actions','abyss_boss_max_actions'):
         require(type(r.get(key)) is int and 0<r[key]<=1000000,'活动数值无效：'+key)
+    from . import activity_feed
+    activity_feed.validate(r)
     require(r['abyss_boss_max_actions']<=80,'冥仙精魄战报超过协议上限')
     require(r['land_tower_start_hour']<24 and r['land_boss_layers']<=99 and r['land_daily_travel']<=100 and r['land_max_actions']<=80,'逐鹿时段或关卡上限无效')
     require(isinstance(r.get('land_card_gold'),list) and len(r['land_card_gold'])==5 and r['land_card_gold'][0]==0 and all(type(v)is int and 0<=v<=100000 for v in r['land_card_gold']),'逐鹿翻牌费用无效')
@@ -68,14 +69,15 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
         for p in rewards:
             require(isinstance(p,list) and len(p)==4 and all(type(v)is int for v in p) and 0<p[2]<=1000 and p[3]==1 and (p[0] in (11,12) or p[0]==5 and p[1] in formation.ITEMS or p[0]==6 and p[1] in formation.SKILLS),'节日礼包奖励无效')
     require(isinstance(r.get('abyss_eye_choices'),list) and len(r['abyss_eye_choices'])==4 and len(set(r['abyss_eye_choices']))==4 and all(t in formation.BASES for t in r['abyss_eye_choices']),'火眼金睛选项无效')
-    for key in ('visit_rewards','visit_fu_pool','pray_rewards','party_rewards','trial_rewards','home_pray_rewards','abyss_event_rewards','abyss_pray_consumes','abyss_map_rewards','land_card_rewards','land_full_card_rewards','seasonal_moon_bonus','fish_pool'):
+    from . import activity_visit
+    r['visit_rules'] = activity_visit.load_rules()
+    for key in ('pray_rewards','party_rewards','trial_rewards','home_pray_rewards','abyss_event_rewards','abyss_pray_consumes','abyss_map_rewards','land_card_rewards','land_full_card_rewards','seasonal_moon_bonus','fish_pool'):
         require(isinstance(r.get(key),list) and len(r[key])>0,'活动奖励缺失')
         for p in r[key]:
             require(isinstance(p,list) and len(p)==4 and all(type(v)is int for v in p),'活动奖励格式错误')
             typ,tid,n,lv=p
             require(0<n<=1000000 and 1<=lv<=200 and ((typ in (11,12)) or (typ==5 and tid in formation.ITEMS)),'活动奖励无效')
     require(all(p[0]==11 and p[1]==0 and p[3]==1 for p in r['pray_rewards']),'神石祈福奖励必须为元宝')
-    require(len(r['visit_rewards'])==3,'福禄寿奖励必须三组')
     require(len(r['abyss_map_rewards'])==12 and r['abyss_map_remove_count']+r['abyss_map_paid_draws']<12,'宝图奖盘或次数无效')
     require(set(r.get('train_increase',{}))==set(formation.STATS) and all(type(v)is int and 0<v<=10000 for v in r['train_increase'].values()),'修炼属性配置无效')
     for name in ('undergo_shop','home_shop','abyss_shop','spring_shop','fish_shop'):
@@ -153,13 +155,8 @@ def prize_spec(spec):
     return dict(object_type=spec[0],attach_type=spec[1],attach_count=spec[2],attach_level=spec[3])
 
 def visit_list(role,r):
-    visits=role['activity']['visits']
-    out=[]
-    for i,p in enumerate(r['visit_rewards'],1):
-        state=visits.get(str(i),{})
-        info=copy.deepcopy(state.get('prize_info',prize_spec(p)))
-        out.append(dict(can_visit=True,has_visit=bool(state.get('claimed')),prize_info=info))
-    return out
+    from . import activity_visit
+    return activity_visit.visit_list(role)
 
 
 def feed_data(role,r):
@@ -185,45 +182,14 @@ def statuses(role,now,r,flag,peers=None):
         party_free_count=s['party_count'],party_pay_count=s['party_paid'],prey_status_info=land_status(now,r)))
 
 
-def feed(role,req,now,r):
-    s=role['activity'];n=req['feed_count'];result=1;strength=0
-    if n:
-        require(1<=n<=r['feed_max_count'],'包子数量超出有效范围')
-        second=(now+r['timezone_offset_hours']*3600)%86400
-        slot=next((str(i) for i,(a,b) in enumerate(r['feed_periods'],1) if a<=second<b),None)
-        if slot is None:result=3
-        elif slot in s['feed']:result=4
-        else:
-            strength=min(r['feed_max_strength'],r['feed_base_strength']+n*r['feed_strength_per_bun'])
-            role['strength']+=strength;s['feed'][slot]=dict(count=n,strength=strength)
-            role['feed_time'+slot]=now;result=2
-    data=feed_data(role,r)
-    return [summon.event(43,dict(feed_result=result,server_time=now,strength=strength,
-        feed_data=data,feed_time=[dict(begin_seconds=a,end_seconds=b) for a,b in r['feed_periods']],
-        feed_champion=dict(name=role['role_name'] if data['feed_count'] else '',count=data['feed_count'])))]
+def feed(role,req,now,r,peers=None):
+    from . import activity_feed
+    return activity_feed.settle(role,req,now,r,peers)
 
 
 def visit(role,req,r):
-    i,op=req['visit_index'],req['op_type'];s=role['activity']['visits']
-    if i:
-        require(i in (1,2,3) and op in (1,2),'拜访参数无效')
-        state=s.setdefault(str(i),{})
-        require(not state.get('claimed'),'今日已拜访该仙人')
-        if op==1 and not state:
-            p=prize_spec(r['visit_rewards'][i-1])
-            if i==1:
-                cards=[secrets.choice(r['visit_fu_pool']) for _ in range(8)]
-                state['reward']=cards[0]
-                state['prize_info']=[dict(prize_spec(card),get_flag=j==0) for j,card in enumerate(cards)]
-            elif i==2:
-                dice=[secrets.randbelow(6)+1 for _ in range(3)]
-                reward=copy.deepcopy(r['visit_rewards'][1]);reward[2]*=DICE_RATE.get(tuple(sorted(dice)),1)
-                state['reward']=reward;state['prize_info']=dict(prize_spec(reward),form_type=dice,total_money=reward[2])
-            else:state['prize_info']=p
-        elif op==2:
-            require('prize_info' in state,'请先开始拜访')
-            prizes(role,[state.get('reward',r['visit_rewards'][i-1])]);state['claimed']=True
-    return [summon.event(42,dict(visit_index=i,op_type=op,result=1,visit_list=visit_list(role,r)))]
+    from . import activity_visit
+    return activity_visit.settle(role,req,r['visit_rules'])
 
 
 def pray(role,req,r):
@@ -461,7 +427,7 @@ def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
         from . import activity_babel
         return activity_babel.settle(role,req,now,r,jrules,parse)
     if mid==1205:return [statuses(role,now,r,req['flag'],peers)]
-    if mid==1040:return feed(role,req,now,r)
+    if mid==1040:return feed(role,req,now,r,peers)
     if mid==1030:return visit(role,req,r)
     if mid==1085:
         require(s['day']==day(now,r),'祈福日期已回退，请恢复本地时间')

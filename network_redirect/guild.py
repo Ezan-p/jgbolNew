@@ -58,7 +58,14 @@ def prepare(role,now,r):
     for k in ('union_id','union_rank','union_contrib','cur_union_contrib','union_store_flush_time'):role.setdefault(k,0)
     role.setdefault('union_name','')
     day=daily.day(now,r)
-    if s['day']!=day:s.update(day=day,cultivations=0,donations=0,purchases={},flushes=0,create_count=0,apply_count=0,join_count=0,tree_reward_count=0,store_stock=[])
+    if s['day']!=day:
+        previous_day=s['day']
+        s.update(day=day,cultivations=0,donations=0,purchases={},flushes=0,create_count=0,apply_count=0,join_count=0,tree_reward_count=0,store_stock=[])
+        if previous_day>=0:offline.refresh_store(s,r)
+    # [A] guildStoreUI L370-378 requests the store again when this deadline
+    # expires. It is the NEXT refresh time, never the last refresh timestamp.
+    # [B] Automatic free restocking shares the local daily reset at UTC+8.
+    role['union_store_flush_time']=(day+1)*86400-r['timezone_offset_hours']*3600
     if now>=s.get('feast_buff_end',0):
         role.update(train_tree_rate=0,contrib_plus_rate=0);s['feast_fam_rate']=0
     g=s['unions'].get(str(int(role['union_id'])))
@@ -74,8 +81,21 @@ def prepare(role,now,r):
     return s,s['unions'].get(str(int(role['union_id'])))
 
 
-def positive(data,key,maximum=1000000):
+def positive(data,key,maximum=2147483647):
     n=data.get(key); require(type(n) is int and 0<n<=maximum,'仙盟参数无效: '+key); return n
+
+
+def selected_members(data):
+    """[A] Native accept/reject/unmute buttons submit a selected role_list."""
+    values=data.get('role_list')
+    if values is None:return [str(positive(data,'role_id'))]
+    if isinstance(values,dict):
+        require(all(type(key)is int for key in values) and set(values)==set(range(1,len(values)+1)),'成员选择列表无效')
+        values=[values[i] for i in range(1,len(values)+1)]
+    require(isinstance(values,list) and 0<len(values)<=100 and
+            all(type(v)is int and 0<v<=2147483647 for v in values) and
+            len(set(values))==len(values),'成员选择列表无效')
+    return list(map(str,values))
 
 
 def pay(role,key,n):
@@ -132,8 +152,9 @@ def missions(r,s=None):
     return rows
 
 
-def store_data(s,r):
-    return dict(flush_flag=True,flush_cost=r['store_flush_gold'],item_list=[dict(id=x['id'],item=daily.spec(x['prize']),cost_contrib=x['cost'],buy_times=max(0,x['limit']-s['purchases'].get(str(x['id']),0))) for x in offline.store(s,r)])
+def store_data(s,r,refreshed=False):
+    # [A] The original UI compares this field to numeric 1, not Lua true.
+    return dict(flush_flag=int(refreshed),flush_cost=r['store_flush_gold'],item_list=[dict(id=x['id'],item=daily.spec(x['prize']),cost_contrib=x['cost'],buy_times=max(0,x['limit']-s['purchases'].get(str(x['id']),0))) for x in offline.store(s,r)])
 
 
 def settle(role,req,now,r,parse,daily_rules):
@@ -157,11 +178,13 @@ def settle(role,req,now,r,parse,daily_rules):
             require(s.get('join_count',0)<r['join_daily'],'今日加入次数已用完')
             if op==4:
                 require(s.get('apply_count',0)<r['apply_daily'],'今日申请次数已用完');s['apply_count']=s.get('apply_count',0)+1
-                g['applications'][rid]=dict(offline.npc(int(rid),role['role_name'],now),npc=False,requested_at=now,level=role['level'])
+                for other in s['unions'].values():other['applications'].pop(rid,None)
+                g['applications'][rid]=dict(offline.npc(int(rid),role['role_name'],now),npc=False,requested_at=now,level=role['level'],head_type=role.get('head_type',1),combat_power=role.get('role_combat_power',0),vip_level=role.get('vip_level',0))
                 if not r['npc_auto_accept']:return [notice(7,role_id=int(rid))]
             g['applications'].pop(rid,None);s['join_count']=s.get('join_count',0)+1
             # [B] Offline public guild accepts applications immediately.
         g['members'][rid]=dict(id=role['role_id'],name=role['role_name'],rank=rank,level=role['level'],contrib=0,head_type=role.get('head_type',1),totalcontrib=0,jointime=now,lastlogin=now,online=True,toporder=0,logout_time=0,combat_power=role.get('role_combat_power',0))
+        for other in s['unions'].values():other['applications'].pop(rid,None)
         role.update(union_id=g['id'],union_rank=rank,union_name=g['name'],union_contrib=0,cur_union_contrib=0)
         return ([notice(7,role_id=int(rid))] if op==4 else [])+[notice(1 if op==1 else 8),reply(18,dict(query_type=1,union_info=info(g,r),role_info=member(role,g,r)))]
     if op == 18 and d.get('query_type') == 15:
@@ -212,26 +235,46 @@ def settle(role,req,now,r,parse,daily_rules):
         return [notice(op,name=value)]
     if op in (5,6,24):
         authorize(role,r,1)
-        if op==24:g['applications']={}
-        else:
-            target=str(positive(d,'role_id'));m=g['applications'].get(target);require(m is not None,'申请不存在')
-            if op==5:require(len(g['members'])<offline.capacity(g,r),'成员已满');g['members'][target]=dict(m,rank=5,jointime=now)
-            del g['applications'][target]
-        return [notice(op)]+([notice(9,role_id=int(target))] if op==6 else [])
+        if op==24:g['applications']={};return [notice(op)]
+        targets=selected_members(d)
+        require(all(key in g['applications'] and key not in g['members'] for key in targets),'申请不存在')
+        if op==5:
+            room=offline.capacity(g,r)-len(g['members']);require(room>0,'成员已满')
+            targets=targets[:room]
+        for target in targets:
+            m=g['applications'].pop(target)
+            if op==5:g['members'][target]=dict(m,rank=5,jointime=now)
+        return [notice(op)]+([notice(9,role_id=int(key)) for key in targets] if op==6 else [])
     if op in (11,12,20,21,22,25):
         if op==22:authorize(role,r,17);g['forbidden']=[];return [notice(op)]
+        if op==21:
+            authorize(role,r,17);targets=selected_members(d)
+            require(all(key!=rid and key in g['members'] and r['rank_power'][str(role['union_rank'])]>r['rank_power'][str(g['members'][key]['rank'])] for key in targets),'目标成员无效或权限不足')
+            g['forbidden']=[v for v in g['forbidden'] if str(v['id']) not in targets]
+            return [notice(op)]
         target=str(positive(d,'role_id'));m=g['members'].get(target);require(m is not None and target!=rid,'目标成员无效')
         require(r['rank_power'][str(role['union_rank'])]>r['rank_power'][str(m['rank'])],'不能操作同级或上级成员')
         if op in (11,12):
             rank=1 if op==12 else positive(d,'new_rank',7)
-            if op==12:require(role['union_rank']==1,'只有盟主可以禅让')
+            # [A] Native "禅让" sends rank_appoint(11), new_rank=leader(1).
+            # Keep the older explicit transfer event(12) as an alias.
+            if rank==1:require(role['union_rank']==1,'只有盟主可以禅让')
             else:
-                require(rank!=1,'请使用禅让移交盟主');authorize(role,r,{7:6,2:7,3:8,4:9,5:10,6:10}[rank])
+                authorize(role,r,{7:6,2:7,3:8,4:9,5:10,6:10}[rank])
                 require(r['rank_power'][str(role['union_rank'])]>r['rank_power'][str(rank)],'不能任命同级或上级')
                 require(sum(v['rank']==rank for v in g['members'].values() if v['id']!=m['id'])<r['rank_limits'].get(str(rank),100),'该职位人数已满')
             m['rank']=rank
             if rank==1:g['members'][rid]['rank']=5;role['union_rank']=5
-        elif op==25:authorize(role,r,2);del g['members'][target]
+        elif op==25:
+            authorize(role,r,2);del g['members'][target]
+            g['forbidden']=[v for v in g['forbidden'] if v['id']!=m['id']]
+            # Removed members cannot remain eligible for an escort or a team.
+            escort=s.get('escort',{})
+            escort['requests']=[ident for ident in escort.get('requests',[]) if ident!=m['id']]
+            escort.get('issued',{}).pop(target,None)
+            active=escort.get('active')
+            if active and active['book'].get('protector_id')==m['id']:
+                active['book'].update(had_protector=False,protector_id=0,cloud_time_list=[])
         else:
             authorize(role,r,17)
             g['forbidden']=[v for v in g['forbidden'] if v['id']!=m['id']]
@@ -277,14 +320,14 @@ def settle(role,req,now,r,parse,daily_rules):
         return [reply(op,data)]
     if op in (38,39,40):
         if op==39:
-            require(s['flushes']<r['store_flush_limit'],'今日刷新次数已用完');pay(role,'gold_coin',r['store_flush_gold']);s['flushes']+=1;s['purchases']={};offline.refresh_store(s,r);role['union_store_flush_time']=now
+            require(s['flushes']<r['store_flush_limit'],'今日刷新次数已用完');pay(role,'gold_coin',r['store_flush_gold']);s['flushes']+=1;s['purchases']={};offline.refresh_store(s,r)
         if op==40:
             ident=positive(d,'item_id');count=positive(d,'buy_count',100)
             row=next((x for x in offline.store(s,r) if x['id']==ident),None);require(row is not None,'商品不存在')
             require(s['purchases'].get(str(ident),0)+count<=row['limit'],'商品购买次数不足');pay(role,'cur_union_contrib',row['cost']*count)
             prize=list(row['prize']);prize[2]*=count;journey.grant(role,prize);s['purchases'][str(ident)]=s['purchases'].get(str(ident),0)+count
             return [reply(op,dict(item_info=next(x for x in store_data(s,r)['item_list'] if x['id']==ident)))]
-        return [reply(op,store_data(s,r))]
+        return [reply(op,store_data(s,r,refreshed=op==39))]
     from . import guild_activities
     return guild_activities.settle(role,s,g,op,d,now,r)
 

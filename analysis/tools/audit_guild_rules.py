@@ -29,7 +29,7 @@ def main():
     for logical in ('v2/String.plist','v2/String2.plist'):
         if logical not in index:continue
         path=ROOT/'jgbol3.87/assets/release_'/index[logical]
-        strings.update({k:v for k,v in plistlib.loads(path.read_bytes()).items() if any(x in str(k).lower() for x in ('union','guild','tree','feast','xianmeng','pethunt'))})
+        strings.update({k:v for k,v in plistlib.loads(path.read_bytes()).items() if any(x in str(k).lower() for x in ('union','guild','tree','feast','xianmeng','pethunt','pethome','escort','west_'))})
     (OUT/'strings.json').write_text(json.dumps(strings,ensure_ascii=False,indent=2)+'\n')
     (OUT/'audit.json').write_text(json.dumps(dict(client='3.87',official_server_available=False,inputs=inputs,request=1301,notification=82,config_section=8),ensure_ascii=False,indent=2)+'\n')
     print('Audited',len(inputs),'original guild modules')

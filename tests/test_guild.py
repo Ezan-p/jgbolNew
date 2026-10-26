@@ -11,6 +11,9 @@ class GuildTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None);self.addCleanup(lambda:self.b.close())
+        # This legacy suite exercises settlements independent of weekday; the
+        # default original calendar/gates are covered by test_guild_npc_combat.
+        self.b.guild_rules.update(train_weekend_only=False,lucky_weekend_only=False,hunt_weekend_open=True)
         self.clock=patch('network_redirect.backend.time.time',return_value=NOW);self.clock.start();self.addCleanup(self.clock.stop)
         self.serial=1000
         r=self.b.profile();r.update(level=30,gold_coin=100000,silver_coin=100000);self.b.save(r)
@@ -65,7 +68,7 @@ class GuildTests(unittest.TestCase):
     def test_team_application_keys_are_client_role_ids(self):
         self.ok(4,union_id=80001);self.ok(26)
         applicants=self.ok(50)[-1][2]
-        self.assertEqual(set(applicants),{800011,800012,800013})
+        self.assertEqual(set(applicants),{m['id'] for m in self.role()['guild']['unions']['80001']['members'].values() if m.get('npc')})
         self.assertEqual(self.ok(44)[-1][2]['team']['apply_list'],applicants)
         # Original showJoinTeamPage copies the table key into row.id.
         selected=next(iter(applicants))
@@ -108,12 +111,14 @@ class GuildTests(unittest.TestCase):
         self.assertEqual(set(self.role()['guild']['instances']['team']['members']),{'1'}|set(map(str,ids)))
 
     def test_team_fight_minimum_and_maximum_boundaries(self):
+        from network_redirect import guild_npcs
         self.ok(4,union_id=1);self.ok(26)
         for size in (1,2,3,4,5,6):
             with self.subTest(size=size):
                 r=self.role();g=r['guild']['unions']['1'];a=r['guild']['instances']
-                ids=[1]+list(range(820001,820000+size))
-                for ident in ids[1:]:g['members'][str(ident)]=guild.offline.npc(ident,'试战道友',NOW)
+                rows=[guild_npcs.member(e,NOW) for e in guild_npcs.choose(r['guild'],r['level'],size-1,guild_npcs.occupied(r['guild']))]
+                ids=[1]+[m['id'] for m in rows]
+                for m in rows:g['members'][str(m['id'])]=m
                 a['team']['members']=list(map(str,ids));a['team']['applications']={};a['team_fights']=0;self.b.save(r)
                 before=self.role()
                 with patch('network_redirect.guild_instances.simulate',return_value=(4,[],{})) as battle:
@@ -127,10 +132,12 @@ class GuildTests(unittest.TestCase):
                         battle.assert_not_called();self.assertEqual(self.role(),before)
 
     def test_team_fight_rejects_forged_or_incomplete_roster(self):
-        self.ok(4,union_id=1);self.ok(26);self.ok(28,role_list=[10001,10002])
-        for data in ({},{'fight_list':[1,10001]},{'fight_list':[1,10001,10001]},
-                     {'fight_list':[1,10001,99999]},{'fight_list':[True,10001,10002]},
-                     {'fight_list':{2:1,3:10001,4:10002}}):
+        self.ok(4,union_id=1);self.ok(26)
+        first,second=list(self.ok(50)[-1][2])[:2]
+        self.ok(28,role_list=[first,second])
+        for data in ({},{'fight_list':[1,first]},{'fight_list':[1,first,first]},
+                     {'fight_list':[1,first,99999]},{'fight_list':[True,first,second]},
+                     {'fight_list':{2:1,3:first,4:second}}):
             before=self.role()
             with patch('network_redirect.guild_instances.simulate') as battle:
                 self.assertEqual(self.req(41,**data)[-1][1],55)
@@ -237,13 +244,16 @@ class GuildTests(unittest.TestCase):
             if self.role()['guild']['instances']['field'] is None:break
             self.ok(87,two_type=2)
         self.assertEqual(self.req(87,two_type=2)[-1][1],55)
+        applicant=int(next(iter(self.role()['guild']['unions']['2']['applications'])))
+        self.ok(5,role_id=applicant)
+        r=self.role();r['guild']['instances']['week_score']=30;self.b.save(r)
         for _ in range(3):self.ok(89)
         self.assertEqual(self.req(89)[-1][1],55)
     def test_escort_timer_and_replay(self):
         self.create();self.ok(69,flag=3,road_type=1);self.ok(69,flag=4,road_type=1);self.ok(69,flag=5,road_type=1)
         self.ok(69,flag=6,road_type=1,book_level=2,des_id=0)
         r=self.role();self.assertEqual(self.req(69,flag=11)[-1][1],55);self.assertEqual(r,self.role())
-        with patch('network_redirect.backend.time.time',return_value=NOW+3601):self.ok(69,flag=11)
+        with patch('network_redirect.backend.time.time',return_value=NOW+3601),patch('network_redirect.guild_offline.roll',return_value=99):self.ok(69,flag=11)
         r=self.role();self.assertEqual(r['cur_union_contrib'],20)
         self.assertEqual(self.req(69,flag=11)[-1][1],55);self.assertEqual(r,self.role())
     def battle(self,ft,**d):
@@ -260,9 +270,9 @@ class GuildTests(unittest.TestCase):
         self.assertEqual(r['guild']['unions']['2']['popularity'],expected)
         r=self.role();self.assertEqual(self.req(72)[-1][1],55);self.assertEqual(r,self.role())
     def test_nested_battles(self):
-        self.create();r=self.role()
-        for ident in (830001,830002,830003,830004):r['guild']['unions']['2']['members'][str(ident)]=guild.offline.npc(ident,'试战道友',NOW)
-        self.b.save(r);self.ok(26);self.ok(28,role_list=[830001,830002,830003,830004]);self.ok(41,fight_list=[1,830001,830002,830003,830004]);self.ok(42)
+        self.create();ids=list(map(int,self.role()['guild']['unions']['2']['applications']))
+        for ident in ids:self.ok(5,role_id=ident)
+        self.ok(26);self.ok(28,role_list=ids);self.ok(41,fight_list=[1]+ids);self.ok(42)
         self.ok(80);self.ok(95)
         self.ok(84,task_index=1,task_type=2,pay_type=1)
     def test_tree_guard(self):
@@ -286,8 +296,10 @@ class GuildTests(unittest.TestCase):
         r=self.role();self.assertEqual(self.req(58,query_type=34,index=1,count=1)[-1][1],55);self.assertEqual(r,self.role())
         self.ok(76);r=self.role();self.assertEqual(self.req(76)[-1][1],55);self.assertEqual(r,self.role())
     def test_offline_team_join_permissions(self):
-        self.ok(4,union_id=1);self.ok(73);self.ok(27,leader_id=10001)
-        self.assertEqual(self.role()['guild']['instances']['team']['captain'],10001)
+        self.ok(4,union_id=1);self.ok(73)
+        captain=next(m['id'] for m in self.role()['guild']['unions']['1']['members'].values() if m['rank']==1)
+        self.ok(27,leader_id=captain)
+        self.assertEqual(self.role()['guild']['instances']['team']['captain'],captain)
         r=self.role();self.assertEqual(self.req(32)[-1][1],55);self.assertEqual(r,self.role())
         self.ok(31);self.ok(3);self.assertIsNone(self.role()['guild']['instances']['team'])
     def test_escort_compose_consumes_fragments(self):
@@ -437,6 +449,7 @@ class GuildTests(unittest.TestCase):
     def test_train_persistent_damage_and_support_limit(self):
         def replay():return (4,[],dict(fight_result_msg=dict(fight_result=[dict(is_src=True,damage_list=[100])])) )
         self.create()
+        for ident in list(self.role()['guild']['unions']['2']['applications']):self.ok(5,role_id=int(ident))
         with patch('network_redirect.guild_instances.simulate',side_effect=lambda *a:replay()):
             self.ok(80)
             for _ in range(3):self.ok(78)
@@ -447,14 +460,17 @@ class GuildTests(unittest.TestCase):
         self.assertEqual(data['boss_info']['boss_hp'],9600)
 
     def test_escort_protection_raid_and_blacklist(self):
-        self.ok(4,union_id=1);self.ok(69,flag=15,des_id=10001)
+        self.ok(4,union_id=1)
+        leader=next(m['id'] for m in self.role()['guild']['unions']['1']['members'].values() if m['rank']==1)
+        self.ok(69,flag=15,des_id=leader)
         self.assertEqual(self.role()['guild']['escort']['credits'],1)
-        self.ok(69,flag=6,road_type=1,book_level=1,des_id=10001)
+        self.ok(69,flag=6,road_type=1,book_level=1,des_id=leader)
         self.assertTrue(self.role()['guild']['escort']['active']['book']['had_protector'])
         with patch('network_redirect.backend.time.time',return_value=NOW+1801),patch('network_redirect.guild_offline.roll',return_value=0):
             out=self.ok(69,flag=12)[-1][2];row=out['berob_info'][1]
-            self.assertEqual(row['rob_id'],91001);self.assertEqual(row['rob_contrib'],2)
-            self.ok(69,flag=14,des_id=91001)
+            from network_redirect import npc_players
+            self.assertIsNotNone(npc_players.resolve(row['rob_id']));self.assertEqual(row['rob_contrib'],2)
+            self.ok(69,flag=14,des_id=row['rob_id'])
             self.assertTrue(self.ok(69,flag=12)[-1][2]['berob_info'][1]['is_black'])
             self.assertEqual(len(self.role()['guild']['escort']['raid_log']),1)
 

@@ -265,9 +265,15 @@ def track(role, before, mid, req, now):
     match, oldmatch = role.get('guild', {}).get('match', {}), before.get('guild', {}).get('match', {})
     if match.get('fights', 0) > oldmatch.get('fights', 0): add(role, 126)
     for key, visit in a.get('visits', {}).items():
-        if key == '1' and visit.get('claimed') and not b.get('visits', {}).get(key, {}).get('claimed'):
-            reward = visit.get('reward', [])
-            if len(reward) >= 2 and reward[0] == 5 and int(f.ITEMS.get(reward[1], {}).get('main_type', 0)) in (1, 2, 3): add(role, 322)
+        previous = b.get('visits', {}).get(key, {}) if a.get('day') == b.get('day') else {}
+        if visit.get('claimed') and not previous.get('claimed'):
+            if key == '1':
+                reward = visit.get('reward', [])
+                if len(reward) >= 2 and reward[0] == 5 and int(f.ITEMS.get(reward[1], {}).get('main_type', 0)) in (1, 2, 3): add(role, 322)
+            elif key == '2':
+                from . import activity_visit
+                _, ident = activity_visit.dice_result(visit.get('prize_info', {}).get('form_type', []))
+                if ident: add(role, ident)
     if mid == 1029 and a.get('rape_refreshes', 0) > b.get('rape_refreshes', 0):
         if any(int(f.SKILLS.get(board['skill_type'], {}).get('quality', 0)) == 5 for board in a.get('rape_boards', [])):
             add(role, 321)

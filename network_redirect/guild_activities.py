@@ -6,7 +6,18 @@ FEAST={int(v['award_type']):v for v in summon.rows('union_feast_award.csv')}
 
 def feast(s,g,now,r):
     f=g.setdefault('feast',dict(day=-1,type=0,end=0,gifts=[],claimed=[],grabbed={},sent=0))
-    if f['day']!=s['day']:f.update(stats={},log=[],ended=False,day=s['day'],type=0,end=0,gifts=[],claimed=[],grabbed={},sent=0)
+    if f['day']!=s['day']:f.update(npc_seeded=False,stats={},log=[],ended=False,day=s['day'],type=0,end=0,gifts=[],claimed=[],grabbed={},sent=0)
+    if f['type'] and now<f['end'] and not f.get('npc_seeded'):
+        # [B] Catalog members contribute a limited welcome gift once per feast.
+        # Their simulated budget never debits the human player's wallet/quotas.
+        from .guild_offline import roll
+        donors=[m for m in g['members'].values() if m.get('npc_id')]
+        for _ in range(min(3,len(donors))):
+            m=donors.pop(roll(s,len(donors)));cfg=r['feast_gifts'][0];ident=len(f['gifts'])+1
+            f['gifts'].append(dict(des_id=ident,id=ident,name=m['name'],sender_id=m['id'],gift_type=cfg['item'],count=1,begin_time=now,end_time=f['end'],grabbed=[],npc=True))
+            f.setdefault('stats',{})[str(m['id'])]=dict(id=m['id'],name=m['name'],rank=0,fortune=cfg['contrib'],contribute=cfg['contrib'],normal_gift=1,advanced_gift=0)
+            f.setdefault('log',[]).append(dict(role_id=m['id'],gift_id=ident,time=now,gift_type=cfg['item'],action='send'))
+        f['npc_seeded']=True
     if f['type'] and now>=f['end'] and not f.get('ended'):
         f['ended']=True;g['events'].append('宴席已经结束（'+str(f['end'])+'）');g['events']=g['events'][-100:]
     return f
@@ -39,7 +50,7 @@ def settle(role,s,g,op,d,now,r):
     if op in (83,84,85,86,87,91,92):
         from . import guild_hunt
         return guild_hunt.settle(role,s,g,op,d,now,r)
-    if op in (26,27,28,29,30,31,32,33,41,42,43,44,50,73,74,75,78,79,80,81,82,88,89,95):
+    if op in (26,27,28,29,30,31,32,33,41,42,43,44,50,73,74,75,78,79,80,81,82,88,89,94,95):
         from . import guild_instances
         return guild_instances.settle(role,s,g,op,d,now,r)
     if op in (45,46,47,48,58,62,63,72,76):

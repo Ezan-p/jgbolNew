@@ -1,5 +1,5 @@
 """Local and cross-area guild tournament state [B], original UI envelopes [A]."""
-from . import guild as u,daily,journey,summon
+from . import guild as u,daily,journey,summon,npc_players,guild_npcs
 from .protocol import encode
 
 
@@ -14,7 +14,7 @@ def state(s,cross=False,r=None):
     m=s.setdefault(key,{})
     if m.get('day')!=s['day'] and m.get('settlement'):
         m['history']=(m.get('history',[])+[dict(m['settlement'],day=m['day'])])[-14:]
-    if m.get('day')!=s['day']:m.update(settlement=None,total_score=0,life=life,streak=0,max_streak=0,loss_streak=0,target_life={},merit=0,day=s['day'],signed=cross,fights=0,wins=0,score=0,claimed=False,bets={},records=[],purchases={})
+    if m.get('day')!=s['day']:m.update(npc_roster=[],tournament_leaders=[],settlement=None,total_score=0,life=life,streak=0,max_streak=0,loss_streak=0,target_life={},merit=0,day=s['day'],signed=cross,fights=0,wins=0,score=0,claimed=False,bets={},records=[],purchases={})
     for k,v in dict(life=life,streak=0,max_streak=0,loss_streak=0,target_life={},merit=0).items():m.setdefault(k,v)
     m.setdefault('total_score',m['score'])
     return m
@@ -29,10 +29,22 @@ def enter(role,s,g,now,r,cross=False):
 
 def targets(role,s,g,r,cross=False):
     m=state(s,cross,r)
-    rows=[dict(index=i,id=90000+i,role_id=90000+i,name='演武守卫'+str(i),level=r['battle_level'],rank=[1,7,2,3,4,5][i-1],head_type=5004,cortege_layer=0,life_point=m['target_life'].get(str(90000+i),r['match_life']),action_point=10,win_count=0,total_count=0,score_point=0,combat_power=1000,order=i) for i in range(1,7)]
+    rows=[]
+    for i,entry in enumerate(opponents(role,s,g,r,cross),1):
+        p=entry['profile'];ident=p['role_id']
+        rows.append(dict(index=i,id=ident,role_id=ident,npc_id=entry['npc_id'],name=p['role_name'],level=p['level'],rank=[1,7,2,3,4,5][i-1],head_type=p['head_type'],cortege_layer=p['reborn_layer'],life_point=m['target_life'].get(str(90000+i),r['match_life']),action_point=10,win_count=0,total_count=0,score_point=0,combat_power=p['role_combat_power'],order=i))
     return dict(result=1,des_member_list=rows,top_member_list=rows,src_union_name=g['name'],des_union_name='离线演武盟',
         src_union_life=m['life'],des_union_life=sum(v['life_point'] for v in rows),my_action_point=max(0,r['battle_daily']-m['fights']),my_life_point=m['life'],
         my_win_count=m['wins'],my_keep_win_count=m['streak'],max_win_streak_count=m['max_streak'],merit_point=m['merit'],score_point=m['score'],get_contrib=0,rank_name='盟员',fight_result=1)
+
+
+def opponents(role,s,g,r,cross=False):
+    """[B] Stable daily catalog armies; old scene IDs remain request aliases."""
+    m=state(s,cross,r)
+    if not m.get('npc_roster'):
+        m['npc_roster']=[e['npc_id'] for e in guild_npcs.choose(s,role['level'],6,
+                            excluded_ids=guild_npcs.occupied(s))]
+    return [npc_players.catalog()[key] for key in m['npc_roster']]
 
 
 def query(role,s,g,d,now,r,cross=False):
@@ -47,14 +59,16 @@ def query(role,s,g,d,now,r,cross=False):
     elif typ==9:out.update(schedule_list=dict(champion_list=champions(role,s,g,r,cross),match_member=tournament(role,s,g,r,cross),begin_time=s['day']*86400-r['timezone_offset_hours']*3600,end_time=(s['day']+1)*86400-r['timezone_offset_hours']*3600),had_signup=m['signed'],match_list=tournament(role,s,g,r,cross))
     elif typ==8:
         pair=enter(role,s,g,now,r,cross)['against_data']
-        for side,ident in (('src',g['id']),('des',90001)):pair[side].update(union_id=ident,id=ident,leader_id=int(role['role_id']) if side=='src' else 90001,match_type=CLIENT_MATCH_STAGE,level=g['level'] if side=='src' else 1,order=1,score=0)
+        own_leader=next(v['id'] for v in g['members'].values() if v['rank']==1)
+        enemy_leader=opponents(role,s,g,r,cross)[0]['profile']['role_id']
+        for side,ident in (('src',g['id']),('des',90001)):pair[side].update(union_id=ident,id=ident,leader_id=own_leader if side=='src' else enemy_leader,match_type=CLIENT_MATCH_STAGE,level=g['level'] if side=='src' else 1,order=1,score=0)
         start=s['day']*86400-r['timezone_offset_hours']*3600
-        out.update(bet_time_info=dict(begin_time=start,end_time=0 if m['fights'] or m['claimed'] else start+86400),bet_list={int(role['role_id']) if ident==g['id'] else ident:True for ident in m['bets'].values()},lineup_list={i:[pair] for i in range(1,8)},bet_info_list={i:{1:dict(silver_count=0,pantao_count=0)} for i in range(1,8)},match_type=CLIENT_MATCH_STAGE)
+        out.update(bet_time_info=dict(begin_time=start,end_time=0 if m['fights'] or m['claimed'] else start+86400),bet_list={own_leader if ident==g['id'] else enemy_leader:True for ident in m['bets'].values()},lineup_list={i:[pair] for i in range(1,8)},bet_info_list={i:{1:dict(silver_count=0,pantao_count=0)} for i in range(1,8)},match_type=CLIENT_MATCH_STAGE)
     elif typ in (10,18):out.update(teams=tournament(role,s,g,r,cross),champion_list=champions(role,s,g,r,cross),lineup_list=tournament(role,s,g,r,cross))
     elif typ==17:out.update(member_score={1:[dict(name=role['role_name'],score_point=m['merit'],win_count=m['wins'],total_count=m['fights'])],2:targets(role,s,g,r,cross)['des_member_list']},src_direction=1,des_direction=2)
     elif typ==19:out.update(member_list=[dict(name=role['role_name'],score_point=m['score'],win_count=m['wins'],total_count=m['fights'],prize_count=1)])
     elif typ==16:out.update(union_score=dict(my_order=next(v['order'] for v in tournament(role,s,g,r,cross) if v['id']==g['id']),top_list=tournament(role,s,g,r,cross)))
-    elif cross and q in (29,31):out['lineup_info']=lineup(role,d.get('des_id',role['role_id']),r)
+    elif cross and q in (29,31):out['lineup_info']=lineup(role,d.get('des_id',role['role_id']),r,cross=True)
     elif typ==33:out.update(score=m['score'],shop_list=shop(m,r))
     else:u.require(False,'仙盟赛程查询参数无效')
     return [u.reply(op,out)]
@@ -84,7 +98,8 @@ def settle(role,s,g,op,d,now,r):
     if op in (48,63):
         u.authorize(role,r,22 if cross else 19);u.require(m['fights']==0 and not m['claimed'],'开战后不能押注');typ=u.positive(d,'bet_type',2);ident=u.positive(d,'union_id')
         # The current detail panel submits the leader ID as union_id.
-        if ident==int(role['role_id']):ident=g['id']
+        if ident==next(v['id'] for v in g['members'].values() if v['rank']==1):ident=g['id']
+        if ident==opponents(role,s,g,r,cross)[0]['profile']['role_id']:ident=90001
         u.require(ident in (g['id'],90001) and str(typ) not in m['bets'],'押注目标无效或已押注')
         u.pay(role,'silver_coin',1000 if typ==1 else 5000);m['bets'][str(typ)]=ident
         return [u.notice(op),u.reply(47 if op==48 else 62,dict(result=1,bet_list=m['bets']))]
@@ -108,10 +123,14 @@ def fight(role,s,g,req,now,r,jrules):
     from .guild_combat import simulate
     cross=req['fight_type'] in (17,23,24,32,33);m=state(s,cross,r)
     u.authorize(role,r,3);u.require(m['signed'],'请先报名仙盟战');u.require(not m['claimed'],'本轮已结算，请次日再战');u.require(m['fights']<r['battle_daily'],'行动力不足');u.require(m['life']>0,'生命点不足')
-    target=int(req['des_id']);u.require(target in range(90001,90007),'对手不存在')
+    target=int(req['des_id']);roster=opponents(role,s,g,r,cross)
+    selected=next((i for i,e in enumerate(roster) if e['profile']['role_id']==target),None)
+    if selected is not None:target=90001+selected
+    u.require(target in range(90001,90007),'对手不存在')
     u.require(m['target_life'].get(str(target),r['match_life'])>0,'目标已经退场')
     if req['fight_type']==16:u.require(target==90001,'盟主战请选择盟主')
-    result,packets,replay=simulate(role,s,r,jrules,req['fight_type'],'离线演武盟')
+    enemy=roster[target-90001]
+    result,packets,replay=simulate(role,s,r,jrules,req['fight_type'],enemy['profile']['role_name'],enemy_npc=enemy['npc_id'])
     m['fights']+=1;win=1<=result<=3;m['wins']+=int(win)
     rank=[1,7,2,3,4,5][target-90001];merit=r['match_merit'][str(rank)]
     if win:
@@ -125,8 +144,17 @@ def fight(role,s,g,req,now,r,jrules):
     return packets+[u.reply(58 if cross else 18,out),summon.event(44,dict(fight_id=s['fight_id'],fight_type=req['fight_type']))]
 
 
-def lineup(role,ident,r):
+def lineup(role,ident,r,cross=False):
     import copy
+    npc=npc_players.get(ident)
+    s=role.get('guild',{});g=s.get('unions',{}).get(str(int(role.get('union_id',0))))
+    if npc is None and g and ident in range(90001,90007):
+        npc=npc_players.get(opponents(role,s,g,r,cross)[int(ident)-90001]['npc_id'])
+    if npc is not None:
+        data=npc_players.inspection_data(npc)
+        data['role_id']=ident
+        if g and str(ident) in g['members']:data['union_name']=g['name']
+        return data
     own=ident==role['role_id']
     chars=copy.deepcopy([c for c in role['corteges'] if c.get('order')]) if own else [dict(c,id=ident,evolve_level=0,reborn_layer=0) for c in journey.fighters(role,dict(cortege_list=f"{r['battle_npc']}|{r['battle_level']}"))[1]]
     for c in chars:
@@ -141,10 +169,16 @@ def lineup(role,ident,r):
 def tournament(role,s,g,r,cross=False):
     """Daily four-guild offline points cup; no fake online matchmaking."""
     m=state(s,cross,r)
-    rows=[dict(id=g['id'],union_id=g['id'],name=g['name'],union_name=g['name'],score=m['total_score'],life_point=m['life'],group_type=7)]
+    leader=next(v for v in g['members'].values() if v['rank']==1)
+    rows=[dict(id=g['id'],union_id=g['id'],name=g['name'],union_name=g['name'],leader_id=leader['id'],leader_name=leader['name'],score=m['total_score'],life_point=m['life'],group_type=7)]
+    roster=opponents(role,s,g,r,cross)
+    if not m.get('tournament_leaders'):
+        excluded=guild_npcs.occupied(s)|{e['profile']['role_id'] for e in roster}
+        m['tournament_leaders']=[roster[0]['npc_id']]+[e['npc_id'] for e in guild_npcs.choose(s,role['level'],2,excluded_ids=excluded)]
     for i,name in enumerate(('离线演武盟','离线蓬莱盟','离线昆仑盟'),1):
         score=10+((s['day']+i+(3 if cross else 0))%4)*10
-        rows.append(dict(id=90000+i,union_id=90000+i,name=name,union_name=name,score=score,life_point=100,group_type=7))
+        p=npc_players.catalog()[m['tournament_leaders'][i-1]]['profile']
+        rows.append(dict(id=90000+i,union_id=90000+i,name=name,union_name=name,leader_id=p['role_id'],leader_name=p['role_name'],score=score,life_point=100,group_type=7))
     rows.sort(key=lambda row:(-row['score'],row['id']))
     for i,row in enumerate(rows,1):row['order']=i
     return rows
@@ -154,7 +188,6 @@ def champions(role,s,g,r,cross=False):
     """[B] Current offline champion card, [A] original detail-page field names."""
     winner=tournament(role,s,g,r,cross)[0]
     own=winner['id']==g['id']
-    leader=next((m for m in g['members'].values() if m['rank']==1),None) if own else None
     return [dict(winner,week=s['day'],area='本地区' if own else '本地模拟区',
                  level=g['level'] if own else 1,popularity=g['popularity'] if own else 0,
-                 leader_name=leader['name'] if leader else '离线盟主',top_member=[])]
+                 top_member=[])]

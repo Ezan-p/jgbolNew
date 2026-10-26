@@ -74,10 +74,15 @@ for name,data in pairs(fixtures) do
  end
 end
 check('taixu_entry',function() ms.d_undergoOrdealUI.enter() end)
-check('level12_entry_request',function()
- ms.d_mainUI.g_playerInfo.level=12;ms.d_undergoOrdealUI.pressEnterUndergoLayer()
+check('level50_entry_request',function()
+ ms.d_mainUI.g_playerInfo.level=50;ms.d_undergoOrdealUI.pressEnterUndergoLayer()
  assert(sent[#sent].mid==1349 and sent[#sent].data.id==1)
  ms.d_mainUI.g_playerInfo.level=60
+end)
+check('level49_entry_blocked',function()
+ local count=#sent;ms.d_mainUI.g_playerInfo.level=49
+ ms.d_undergoOrdealUI.enter();ms.d_undergoOrdealUI.pressEnterUndergoLayer();ui.enter(root)
+ assert(#sent==count);ms.d_mainUI.g_playerInfo.level=60
 end)
 check('arena_entry',function() ui.onGetResult(clone(fixtures.entry)) end)
 for stage=1,6 do
@@ -85,11 +90,27 @@ for stage=1,6 do
   ui.onGetResult(clone(fixtures['entry_'..stage]))
   ui.onGetResult(clone(fixtures[tostring(stage)]))
   assert(ui._localStage().stage==stage)
+  local count=#sent
+  ui.showExerFight(ui.g_arenaUI.main_layer)
+  assert(#sent==count,'Rendering must never poll the server')
   if stage<6 then ui._localAdvance();assert(sent[#sent].mid==1350 and sent[#sent].data.id==7) end
  end)
 end
 check('arena_fight_update',function() ui.onGetResult(clone(fixtures.update)) end)
-check('arena_prize',function() ui.showPrize(root);ui.showPrizeDetail(root,1) end)
+check('arena_prize',function()
+ local p=ui.g_data.rank.rank_prize_info[1][1].prize_list
+ assert(p[1].object_type==11 and p[1].attach_count==500)
+ assert(p[2].attach_type==1343 and p[2].attach_count==10)
+ ui.showPrize(root);ui.showPrizeDetail(root,1)
+end)
+check('practice_expired_clock_does_not_poll',function()
+ ui.onGetResult(clone(fixtures.entry_2))
+ ui.g_data.enter.schedule_list.match_time_list[3].start_time=now-1
+ local count=#sent;local oldRest=ms.d_time.getRestTime;local oldDelay=ms.d_u.delay
+ ui.onGetResult(clone(fixtures['2']))
+ assert(#sent==count,'Expired practice clock must not request another board')
+ assert(ms.d_time.getRestTime==oldRest and ms.d_u.delay==oldDelay)
+end)
 check('arena_records',function() ui.showBloodHis(root) end)
 check('arena_rank',function() ui.onGetResult(clone(fixtures.rank)) end)
 check('arena_return',function() ui.onFightReturn();assert(sent[#sent].data.id==1);ui.onGetResult(clone(fixtures.entry));assert(sent[#sent].data.id==2) end)

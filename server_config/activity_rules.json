@@ -14,28 +14,13 @@
     ]
   ],
   "feed_max_count": 200,
-  "feed_base_strength": 10,
-  "feed_strength_per_bun": 1,
-  "feed_max_strength": 60,
-  "visit_rewards": [
-    [
-      5,
-      1001,
-      5,
-      1
-    ],
-    [
-      12,
-      0,
-      10000,
-      1
-    ],
-    [
-      5,
-      1022,
-      1,
-      1
-    ]
+  "feed_reward_tiers": [
+    {"min_count": 1, "strength": 10},
+    {"min_count": 10, "strength": 20},
+    {"min_count": 20, "strength": 30},
+    {"min_count": 30, "strength": 40},
+    {"min_count": 40, "strength": 50},
+    {"min_count": 50, "strength": 60}
   ],
   "pray_rewards": [
     [
@@ -362,32 +347,6 @@
       "cost": 500,
       "limit": 5
     }
-  ],
-  "visit_fu_pool": [
-    [
-      5,
-      1001,
-      5,
-      1
-    ],
-    [
-      12,
-      0,
-      10000,
-      1
-    ],
-    [
-      5,
-      1022,
-      1,
-      1
-    ],
-    [
-      5,
-      1023,
-      1,
-      1
-    ]
   ],
   "home_missed_event_penalty": 10,
   "drug_craft_exp": 10,

@@ -13,6 +13,7 @@ AUTO = {101,102,103,104,105,107,108,109,111,112,113,114,115,116,117,118,121,122,
 247,248,249,250,251,252,253,254,317,318,319,321,322,401,414,415,416,422,423,424,425,
 440,441,443,444,446,447,450,451,452,453,454,455,456,459,460,466,467,468,469,470,471,
 472,473,474,475,476,479,481,482,483,484,485,563,564,565}
+AUTO.update(range(323,327))  # Native Lu claim with original dice result.
 AUTO.add(125)  # Native pavilion event195/flag2, after successful exchange.
 AUTO.update(range(201,216));AUTO.update(range(402,414));AUTO.update(range(417,422))
 AUTO.update(range(426,431));AUTO.update(range(490,559))

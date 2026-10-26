@@ -147,6 +147,64 @@ class UndergoCompleteTests(TaixuCase):
 
 
 class ArenaTests(TaixuCase):
+    def test_original_level_50_gate_and_existing_low_level_save(self):
+        # Previously created low-level seasons survive the restored entry gate.
+        role=self.b.profile();role['level']=12
+        role['activity']['arena']=arena.new_season(role,self.b.activity_rules.get('day',0),NOW)
+        self.b.save(role)
+        for level in (12,49):
+            role=self.b.profile();role['level']=level;self.b.save(role);before=self.b.profile()
+            for mid in (1349,1350):
+                self.assertEqual(self.call(1,mid=mid)[0][0],55)
+                self.assertEqual(before,self.b.profile())
+        role=self.b.profile();role['level']=50;self.b.save(role)
+        self.ok(self.call(1));self.ok(self.call(1,mid=1350))
+        self.assertEqual(self.b.profile()['activity']['arena']['group'],1)
+
+    def test_rank_preview_matches_gold_and_holy_peaches_for_every_tier(self):
+        self.arena_enter()
+        for expected in arena.rules()['arena_rank_prizes']:
+            role=self.b.profile();s=role['activity']['arena'];s['stage']=5
+            keys=[k for k in s['competitors'] if k!='self']
+            keys.insert(expected['front']-1,'self')
+            for i,key in enumerate(keys):s['competitors'][key].update(hp=1000-i,score=0)
+            before=copy.deepcopy(role)
+            gain=arena.settle_prizes(role,s)
+            preview=next(p for p in arena.prize_info() if p['front']==expected['front'])
+            self.assertEqual(gain,preview['prize_list'])
+            self.assertEqual(role['gold_coin']-before['gold_coin'],expected['gold'])
+            def count(r,tid):return sum(x['count'] for x in r['attachments'] if x['type_id']==tid and x['attach_type']==5)
+            self.assertEqual(count(role,1343)-count(before,1343),expected['holy_peach'])
+            for tid in (1001,1029,1366):self.assertEqual(count(role,tid),count(before,tid))
+
+    @patch('network_redirect.activity_arena.journey.battle',return_value=(1,[],[]))
+    def test_first_defeat_still_grants_only_twenty_crystals_once(self,_):
+        self.arena_enter();role=self.b.profile();s=role['activity']['arena']
+        key=arena.ranking(s)[-2];target=npc_players.catalog()[key]['profile']['role_id']
+        def count(r):return sum(x['count'] for x in r['attachments'] if x['type_id']==1366 and x['attach_type']==5)
+        before=self.b.profile();self.ok(self.arena_fight(des_id=target))
+        after=self.b.profile();self.assertEqual(count(after)-count(before),20)
+        self.assertEqual(after['gold_coin'],before['gold_coin'])
+        s=after['activity']['arena'];order=arena.ranking(s).index(key)+1
+        self.ok(self.arena_fight(des_id=target,des_order=order))
+        self.assertEqual(count(self.b.profile()),count(after))
+
+    @patch('network_redirect.activity_arena.journey.battle',return_value=(4,[],[]))
+    def test_practice_transition_is_one_board_with_future_formal_start(self,_):
+        self.arena_enter();self.ok(self.arena_fight())
+        events=self.call(7,dict(stage=1),mid=1350);self.ok(events)
+        boards=[d for e,d in events if e==199]
+        self.assertEqual(len(boards),1);data=boards[0]
+        self.assertEqual(data['id'],2);self.assertEqual(data['rank_type'],2)
+        schedule=data['local_entry']['schedule_list']['match_time_list']
+        self.assertLess(schedule[2]['start_time'],NOW)
+        self.assertGreater(schedule[2]['end_time'],NOW)
+        self.assertGreater(schedule[3]['start_time'],NOW)
+        self.assertEqual(data['event_info']['cur_fight_count'],5)
+        for _ in range(5):self.ok(self.arena_fight())
+        role=self.b.profile();self.assertEqual(arena.board(role,role['activity']['arena'])['event_info']['cur_fight_count'],0)
+        self.assertEqual(self.arena_fight()[0][0],55)
+
     def test_all_groups_npc_identity_inspection_and_no_cross_group_attack(self):
         s=self.arena_enter();self.assertEqual(len(s['competitors']),20)
         for group in range(1,8):

@@ -8,7 +8,6 @@ import hashlib
 from . import activity as a, activity_undergo as undergo, activity_rank, npc_players, journey, summon
 from .protocol import encode, decode
 
-PRIZES = summon.rows('all_rank_prize.csv')
 STAGES = {1: '冲榜赛', 2: '练习赛', 3: '血战第一阶段', 4: '血战第二阶段', 5: '血战第三阶段', 6: '本届已结算'}
 
 
@@ -46,7 +45,7 @@ def new_season(role, day, now):
 
 
 def state(role, now, arules):
-    a.require(role['level'] >= rules()['arena_level'], '血战需12级')
+    a.require(role['level'] >= rules()['arena_level'], f"血战需{rules()['arena_level']}级")
     s = role['activity'].get('arena')
     day = a.day(now, arules)
     if s:
@@ -84,20 +83,28 @@ def row(role, key, progress, order):
                 area_name='本地离线', order=order, hp_point=progress['hp'], score=progress['score'], is_me=key == 'self')
 
 
+def prize_specs(prize):
+    # User-requested ranking rewards; leave the original CSV and first-win crystals intact.
+    return [[11, 0, prize['gold'], 1], [5, 1343, prize['holy_peach'], 1]]
+
+
 def prize_info():
-    return [dict(front=int(r['up_order']), back=int(r['low_order']), min=int(r['up_order']), max=int(r['low_order']),
-                 prize_list=[a.prize_spec(list(map(int, t.split('|')))) for t in r['prize_list(object_type|attach_type|attach_count|attach_level/)'].split('/')]) for r in PRIZES]
+    return [dict(front=p['front'], back=p['back'], min=p['front'], max=p['back'],
+                 prize_list=[a.prize_spec(spec) for spec in prize_specs(p)])
+            for p in rules()['arena_rank_prizes']]
 
 
 def schedule(now, stage):
     # Native views need timestamps. This is a local, explicitly advanced schedule;
     # never advertise fictitious remote players or depend on weekly wall time.
-    period = dict(start_time=now-1, end_time=now+86400)
+    current = min(stage, 3)
+    periods = [dict(start_time=now+(i-current)*86400-1,
+                    end_time=now+(i-current+1)*86400-1) for i in range(1, 4)]
     grade = max(1, min(3, stage-2))
     blood = [dict(start_time=now+(i-grade)*86400-1, end_time=now+(i-grade+1)*86400-1)
              for i in range(1, 4)]
-    return dict(match_time_list=[dict(period) for _ in range(3)],
-                grade_time_list={1: [dict(period)], 2: [dict(period)], 3: blood})
+    return dict(match_time_list=periods,
+                grade_time_list={1: [dict(periods[0])], 2: [dict(periods[1])], 3: blood})
 
 
 def entry(role, s, now):
@@ -113,7 +120,8 @@ def board(role, s, op=2):
     else:
         rows = [row(role, k, dict(hp=rules()['arena_hp_base'], score=(rules()['arena_size']-i)*100), i)
                 for i, k in enumerate(reversed(select_roster(s['viewing'], s['day'])), 1)]
-    remaining = max(0, rules()['arena_qualify_fights']-s['stage_fights'])
+    limit = rules()['arena_practice_fights' if s['stage'] == 2 else 'arena_qualify_fights']
+    remaining = max(0, limit-s['stage_fights'])
     return dict(id=op, enter_group=s['viewing'], rank_type=rank_type(s), rank_data=rows,
                 rank_prize_info={i: prize_info() for i in range(1, 4)},
                 event_info=dict(in_rank=own and not s['settled'], cur_fight_count=remaining,
@@ -121,7 +129,7 @@ def board(role, s, op=2):
                     solo_rank_last_half=0, action_point=s['actions'], buy_action_point=rules()['arena_paid_gold'],
                     fight_records=copy.deepcopy(list(reversed(s['records'])))),
                 local_arena=dict(stage=s['stage'], title=STAGES[s['stage']], own=own,
-                    stage_fights=s['stage_fights'], paid_left=max(0, rules()['arena_paid_limit']-s['paid']),
+                    stage_fights=s['stage_fights'], action_cost=rules()['arena_action_cost'], paid_left=max(0, rules()['arena_paid_limit']-s['paid']),
                     settled=s['settled'], settlement=s.get('settlement', {})), reward_score=0)
 
 
@@ -140,12 +148,12 @@ def resolve_target(role, s, data):
 def settle_prizes(role, s):
     a.require(not s['settled'], '本届血战已经结算')
     order = ranking(s).index('self')+1
-    prize = next((p for p in PRIZES if int(p['up_order']) <= order <= int(p['low_order'])), None)
+    prize = next((p for p in rules()['arena_rank_prizes'] if p['front'] <= order <= p['back']), None)
     gain = []
-    reputation = int(prize['add_reputation']) if prize else 0
+    reputation = prize['reputation'] if prize else 0
     if prize:
-        for token in prize['prize_list(object_type|attach_type|attach_count|attach_level/)'].split('/'):
-            gain.append(journey.grant(role, list(map(int, token.split('|')))))
+        for spec in prize_specs(prize):
+            gain.append(journey.grant(role, spec))
     # No unverified role property is written: local blood-reputation is persisted
     # as an activity statistic and shown on the settlement screen.
     s['reputation'] = s.get('reputation', 0)+reputation
@@ -269,5 +277,7 @@ def settle(role, req, now, arules, jrules, parse):
     if op == 7:
         a.require(type(data.get('stage')) is int and data['stage'] == s['stage'], '赛程已变化，请刷新')
         gain = advance(role, s)
-        return [response(entry(role, s, now)), response(board(role, s))]+([summon.event(33, gain)] if gain else [])
+        out = board(role, s)
+        out['local_entry'] = entry(role, s, now)
+        return [response(out)]+([summon.event(33, gain)] if gain else [])
     a.require(False, '血战操作无效')

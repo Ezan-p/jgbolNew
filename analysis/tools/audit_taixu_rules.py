@@ -31,8 +31,8 @@ for relative in ['undergo_ordeal/map_config.csv','undergo_ordeal/tollgate_config
 report=dict(client='3.87',official_server_available=False,inputs=inputs,contracts=contracts,local_rules=u.rules(),
     classification={'A':['mode1=挑战,mode2=历劫','cortege_list=神仙ID→阵位','原版81关及守卫与修炼',
        '挑战每日10次/2体力，历劫0体力/每神仙4次','72小时退关/每日当前小关重置',
-       '血战七组、冲榜、练习、三段血战、血量优先排名','all_rank_prize.csv物品奖励'],
-      'B':['保留现有12级入口','历劫首战开始计时、历史通关日奖保留','按本地NPC库补足血战分组、数值与赛程推进',
+       '血战七组、冲榜、练习、三段血战、血量优先排名','原包50级入口与all_rank_prize.csv原始档位'],
+      'B':['按用户要求将血战榜奖改为元宝和圣母蟠桃，首次击败20仙晶不变','历劫首战开始计时、历史通关日奖保留','按本地NPC库补足血战分组、数值与赛程推进',
            '离线声望单独记录，不写未经确认的角色字段']})
 out=ROOT/'analysis/evidence/taixu';out.mkdir(parents=True,exist_ok=True)
 (out/'official_audit.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
