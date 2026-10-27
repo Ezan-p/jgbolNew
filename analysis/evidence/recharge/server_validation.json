@@ -1,0 +1,55 @@
+{
+  "task_date": "2026-10-27",
+  "timezone": "Asia/Shanghai",
+  "tests_run": 24,
+  "passed": true,
+  "wall_seconds": 17.805,
+  "test_storage": "Each test uses tempfile.TemporaryDirectory and a separate Backend SQLite database.",
+  "real_role_save_modified": false,
+  "coverage": [
+    "50/5 RMB mixed cards and exact payment validation",
+    "locked, equipped and owned inventory exclusion",
+    "legacy free recharge and unfunded prebuy rejection",
+    "VIP and all implemented recharge hooks use principal only",
+    "order and packet replay, restart, conflict and account isolation",
+    "two database connections cannot spend the same final card",
+    "encoding and downstream-hook failure rollback",
+    "definite failure receipt uses pre-submit inventory and does not persist",
+    "operator mail to inventory to card payment to first reward loop",
+    "month card purchase, renewal, 30 daily rewards, expiry and clock rollback",
+    "growth fund one-time paid purchase and all activity counters",
+    "backpack 1051 compatibility and 253 unique order across reset serial",
+    "bootstrap catalog and inventory state",
+    "exact event period boundary accounting",
+    "state-render and fallback-render failures preserve rollback and 1106 acknowledgement",
+    "post-commit telemetry failure cannot report a successful payment as failed",
+    "Legacy active month-card saves expose the same remaining daily quota to client and server"
+  ],
+  "runs": [
+    {
+      "command": ".runtime/venv/bin/python -m unittest discover -s tests -p test_recharge.py -v",
+      "exit_code": 0,
+      "tests_run": 20,
+      "passed": true,
+      "wall_seconds": 14.712,
+      "test_log": "analysis/evidence/recharge/server_validation.log"
+    },
+    {
+      "command": "PYTHONPATH=tests .runtime/venv/bin/python -m unittest test_recharge.GoldCardRechargeTests.test_broken_state_renderer_still_acks_failure_and_rolls_back_payment test_recharge.GoldCardRechargeTests.test_success_log_failure_keeps_committed_payment_successful_and_idempotent -v",
+      "exit_code": 0,
+      "tests_run": 2,
+      "passed": true,
+      "wall_seconds": 1.436,
+      "test_log": "analysis/evidence/recharge/server_failure_path_validation.log"
+    },
+    {
+      "command": "PYTHONPATH=tests .runtime/venv/bin/python -m unittest test_recharge.GoldCardRechargeTests.test_legacy_active_month_card_has_matching_client_and_server_quota test_recharge.GoldCardRechargeTests.test_month_card_daily_claim_expiry_renewal_and_no_recharge_for_daily_gold -v",
+      "exit_code": 0,
+      "tests_run": 2,
+      "passed": true,
+      "wall_seconds": 1.657
+    }
+  ],
+  "validation_scope": "20-test baseline plus 2 fault-injection tests and 2 legacy/month-card checks after targeted fixes; 23 unique recharge tests passed across these runs, with one month-card test repeated. Full repository suite was not completed.",
+  "unique_tests_passed": 23
+}

@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-27",
+  "focused_regression": {
+    "count": 129,
+    "passed": true,
+    "output": "----------------------------------------------------------------------\nRan 129 tests in 99.013s\n\nOK\n"
+  },
+  "activity_broad_first_run": {
+    "count": 329,
+    "passed": false,
+    "output": "======================================================================\nFAIL: test_replay_limits_remain_unresolved_and_fit_native_packet (test_activity_land_tower.LandTowerTests) (stop='action_limit')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_activity_land_tower.py\", line 63, in test_replay_limits_remain_unresolved_and_fit_native_packet\n    self.assertEqual(result,0);self.assertEqual(captured[0].stop_reason,'action_limit')\nAssertionError: 240 != 80\n\n======================================================================\nFAIL: test_replay_limits_remain_unresolved_and_fit_native_packet (test_activity_land_tower.LandTowerTests) (stop='event_budget')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_activity_land_tower.py\", line 62, in test_replay_limits_remain_unresolved_and_fit_native_packet\n    192,8,8,encounter=enemy)\nAssertionError: 'action_limit' != 'event_budget'\n- action_limit\n+ event_budget\n\n\n----------------------------------------------------------------------\nRan 329 tests in 393.678s\n\nFAILED (failures=2)\n"
+  },
+  "changed_worktree_targeted_rerun": {
+    "test": "test_activity_land_tower.LandTowerTests.test_replay_limits_remain_unresolved_and_fit_native_packet",
+    "count": 1,
+    "passed": true,
+    "seconds": 20.028,
+    "note": "Other ongoing workspace battle changes updated this test; progression task did not edit it."
+  },
+  "native_client": {
+    "count": 7,
+    "passed": true,
+    "evidence": "analysis/evidence/progression_client_validation.json"
+  }
+}

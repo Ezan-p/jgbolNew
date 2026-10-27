@@ -5,7 +5,7 @@ from unittest.mock import patch
 from tests.test_activity import ActivityCase
 from network_redirect import activity_land as land, activity_land_encounters as encounters
 from network_redirect import activity_land_boss as boss, activity_land_npc as npc, formation, summon, journey
-from network_redirect.backend import Backend
+from network_redirect.backend import Backend, login_fields
 from network_redirect.protocol import MAX_PACKET, decode
 from pathlib import Path
 
@@ -41,17 +41,18 @@ class LandTowerTests(ActivityCase):
                 self.ok(self.land(23,index=1));self.ok(self.land(25))
                 self.assertEqual(self.b.profile()['activity']['land']['inv_boss_layer'],64)
 
-    def test_replay_limits_remain_unresolved_and_fit_native_packet(self):
+    def test_thirty_round_hp_results_preserve_complete_replay(self):
         self.ok(self.land(1));r=self.b.profile();s=r['activity']['land'];s['grid_count']=8
         enemy=encounters.encounter(64,True)
-        # Durable armies exercise both cutoffs without ending by elimination.
+        # Durable armies reach the shared thirty-round limit. Effect volume must
+        # never impose a shorter battle or lose the tail of the replay.
         for u in enemy['units']:
             u.update(hp=1000000,max_hp=1000000,gongji=100,fangyu=10,magic=100,skills=[])
         r['corteges']=[dict(u,id=u['order']) for u in enemy['units']];r['attachments']=[]
         real_battle=journey.battle
-        for stop in ('action_limit','event_budget'):
-            with self.subTest(stop=stop):
-                enemy['units'][0]['skills']=[(21,1)] if stop=='event_budget' else []
+        for effects in (False,True):
+            with self.subTest(effects=effects):
+                enemy['units'][0]['skills']=[(21,1)] if effects else []
                 captured=[]
                 def battle(*args,**kwargs):
                     result=real_battle(*args,**kwargs);captured.append(result[2]);return result
@@ -59,14 +60,22 @@ class LandTowerTests(ActivityCase):
                      patch.object(journey,'battle',side_effect=battle):
                     result,replay=land.simulate(r,s,self.b.activity_rules,self.b.journey_rules,
                                               192,8,8,encounter=enemy)
-                self.assertEqual(result,0);self.assertEqual(captured[0].stop_reason,stop)
-                if stop=='action_limit':self.assertEqual(len(captured[0]),80)
-                else:self.assertGreaterEqual(len(summon.lua(replay['fight_events']).encode('utf-8')),4000)
-                packet=land.response(4,s,self.b.activity_rules,fight_type=4,des_level=64,
+                actions=captured[0]
+                self.assertEqual(actions.stop_reason,'round_limit')
+                self.assertEqual(actions.rounds,30)
+                hp=[sum(actions.final_hp[side].values()) for side in (1,2)]
+                self.assertEqual(result==0,hp[0]==hp[1])
+                self.assertEqual(1<=result<=3,hp[0]>hp[1])
+                if effects:self.assertGreaterEqual(len(summon.lua(replay['fight_events']).encode('utf-8')),4000)
+                packets=land.replay_response(4,s,self.b.activity_rules,replay,fight_type=4,des_level=64,
                     is_win=False,is_reward=False,return_soul=0,card_list=[],
-                    cost_gold_list=self.b.activity_rules['land_card_gold'],final_result_list=[replay])
-                self.assertLessEqual(len(packet),MAX_PACKET)
-                self.assertEqual(decode(packet)[2]['id'],149)
+                    cost_gold_list=self.b.activity_rules['land_card_gold'])
+                from tests.test_battle_replay import decoded_packets
+                self.assertTrue(all(len(packet)<=MAX_PACKET for packet in packets))
+                restored=decoded_packets(packets)
+                self.assertEqual(restored[-1][2]['id'],149)
+                self.assertEqual(login_fields(restored[-1][2]['data'])['final_result_list'][1],
+                                 login_fields(summon.lua(replay)))
 
     def test_native_portrait_index_and_inspection_id(self):
         self.ok(self.land(3));s=self.b.profile()['activity']['land']

@@ -30,10 +30,8 @@ def choose(floor, kind):
 @lru_cache(maxsize=128)
 def template(key):
     role = npc_players.get(key)['role']
-    units = journey.fighters(role, dict(cortege_list='1001|1'))[0]
-    combat.attach_essences(role, units)
-    reborn_stars.attach_combat_traits(role, units)
-    return units
+    from .combat_loadout import player_units
+    return player_units(role)
 
 
 def enemies(s, kind, row, column):

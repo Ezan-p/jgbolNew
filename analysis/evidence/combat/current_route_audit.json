@@ -1,0 +1,342 @@
+{
+  "updated_at": "2026-10-27T03:26:48.504978+00:00",
+  "scope": "全游戏已接入战斗入口静态路由与服务端回归；不等同所有原版特效逐一实机验收",
+  "engine": "全部实时战斗共用 combat_engine.Battle；journey.battle 为通用入口，activity_abyss_combat 为同引擎精魄适配器",
+  "routes": [
+    {
+      "name": "旅途普通/精英",
+      "fight_types": [
+        1,
+        20
+      ],
+      "request": "1026",
+      "implementation": "journey.py:settle",
+      "transport": "1028/1027 + events 45/44",
+      "settlement": "服务端扣体力并按真实星级发经验、掉落、首胜；扫荡使用历史星级"
+    },
+    {
+      "name": "封神榜",
+      "fight_types": [
+        2
+      ],
+      "request": "1026",
+      "implementation": "activity_rank.py:battle",
+      "transport": "1028/1027 + 33/44",
+      "settlement": "排名、积分、翻牌；1244 type2 → 152历史"
+    },
+    {
+      "name": "渡劫/反击",
+      "fight_types": [
+        3,
+        12
+      ],
+      "request": "1026/1072",
+      "implementation": "activity_rape.py:battle",
+      "transport": "1028/1027 + 44",
+      "settlement": "NPC对手、资源与护法结算"
+    },
+    {
+      "name": "修炼",
+      "fight_types": [
+        4
+      ],
+      "request": "1026",
+      "implementation": "activity_practice.py:battle",
+      "transport": "1028/1027 + 44",
+      "settlement": "修炼收益"
+    },
+    {
+      "name": "天命",
+      "fight_types": [
+        5
+      ],
+      "request": "1026",
+      "implementation": "activity_duty.py:battle",
+      "transport": "1028/1027 + 19/44",
+      "settlement": "关卡、目标与积分"
+    },
+    {
+      "name": "蟠桃会",
+      "fight_types": [
+        6
+      ],
+      "request": "1026",
+      "implementation": "activity.py:battle",
+      "transport": "1028/1027 + 29/44",
+      "settlement": "累计伤害及每次奖励，NPC模拟共享Boss"
+    },
+    {
+      "name": "天缘",
+      "fight_types": [
+        10
+      ],
+      "request": "1026",
+      "implementation": "activity_convert.py:battle",
+      "transport": "1028/1027 + 70/44",
+      "settlement": "卡牌转化奖励"
+    },
+    {
+      "name": "随机试炼",
+      "fight_types": [
+        11
+      ],
+      "request": "1026",
+      "implementation": "activity_trial.py:battle",
+      "transport": "1028/1027 + 75/44",
+      "settlement": "真实最终HP保留、次数/冷却、后续领取"
+    },
+    {
+      "name": "神树守护",
+      "fight_types": [
+        13
+      ],
+      "request": "1026",
+      "implementation": "guild_combat.py:fight",
+      "transport": "1028/1027 + 1301/16 + 44",
+      "settlement": "累计伤害与贡献"
+    },
+    {
+      "name": "仙盟战/盟主/跨服",
+      "fight_types": [
+        14,
+        16,
+        17
+      ],
+      "request": "1026/1301",
+      "implementation": "guild_match.py:fight",
+      "transport": "1028/1027 + 1301 + 44",
+      "settlement": "默认wars_enabled=false；隔离legacy测试覆盖"
+    },
+    {
+      "name": "仙盟秘境",
+      "fight_types": [
+        15
+      ],
+      "request": "1301/41,42",
+      "implementation": "guild_instances.py:settle",
+      "transport": "1301嵌套fight_result_list",
+      "settlement": "五人NPC组队八阵位，真实战报与奖励"
+    },
+    {
+      "name": "名人山",
+      "fight_types": [
+        18
+      ],
+      "request": "1026",
+      "implementation": "monument.py:settle",
+      "transport": "1028/1027 + 105/44",
+      "settlement": "本地榜单积分；1244 type3 → 152历史"
+    },
+    {
+      "name": "劫镖",
+      "fight_types": [
+        19
+      ],
+      "request": "1026/1301/69",
+      "implementation": "guild_escort.py:rob",
+      "transport": "1028/1027 + 1301/69 + 44",
+      "settlement": "NPC镖队与贡献"
+    },
+    {
+      "name": "逐鹿游历/攻塔/首领/冥界",
+      "fight_types": [
+        21
+      ],
+      "request": "1302",
+      "implementation": "activity_land.py / activity_land_boss.py",
+      "transport": "149嵌套final_result_list",
+      "settlement": "魂力、占领、通关、翻牌；NPC世界"
+    },
+    {
+      "name": "九幽魂仙",
+      "fight_types": [
+        25
+      ],
+      "request": "1329随机事件",
+      "implementation": "activity_abyss_random.py",
+      "transport": "1028/1027 + 44",
+      "settlement": "随机事件奖励"
+    },
+    {
+      "name": "九幽冥仙",
+      "fight_types": [
+        26
+      ],
+      "request": "1329/6",
+      "implementation": "activity_abyss.py",
+      "transport": "1028/1027 + 44",
+      "settlement": "精魄/丹药适配，仍调用共享Battle"
+    },
+    {
+      "name": "仙盟灵兽试炼",
+      "fight_types": [
+        27
+      ],
+      "request": "1301/80,95",
+      "implementation": "guild_instances.py:settle",
+      "transport": "1301嵌套fight_result_list",
+      "settlement": "四层随机Boss、最终HP与每层奖励"
+    },
+    {
+      "name": "灵宠挑战任务",
+      "fight_types": [
+        28
+      ],
+      "request": "1301/84,85",
+      "implementation": "guild_hunt.py:settle",
+      "transport": "1301/84结算 + 85嵌套",
+      "settlement": "NPC玩家对手，成功任务与奖励先结算后播放"
+    },
+    {
+      "name": "太虚挑战/历劫",
+      "fight_types": [
+        30,
+        31
+      ],
+      "request": "1349/4",
+      "implementation": "activity_undergo.py:settle",
+      "transport": "1141/1140 + 44",
+      "settlement": "九阵位、次数与独立阵容及掉落"
+    },
+    {
+      "name": "血战",
+      "fight_types": [
+        32
+      ],
+      "request": "1350",
+      "implementation": "activity_arena.py:fight",
+      "transport": "1028/1027 + 44",
+      "settlement": "赛程积分、生命与奖励；1244 type4重播"
+    },
+    {
+      "name": "洞府红尘劫",
+      "fight_types": [
+        34
+      ],
+      "request": "1348/25",
+      "implementation": "activity_home.py:settle",
+      "transport": "1028/1027 + 44",
+      "settlement": "幻化前置通关"
+    },
+    {
+      "name": "通天塔",
+      "fight_types": [
+        200
+      ],
+      "request": "1353/2",
+      "implementation": "activity_babel.py:fight",
+      "transport": "1028/1027 + 44",
+      "settlement": "地图生命、行动力、守卫与周奖励"
+    }
+  ],
+  "non_server_modes": [
+    {
+      "fight_types": [
+        7,
+        8,
+        9,
+        100
+      ],
+      "status": "原客户端新手/示范战斗，不由正式后端生成"
+    },
+    {
+      "fight_types": [
+        22,
+        23,
+        24,
+        33,
+        118
+      ],
+      "status": "历史记录/展示别名；不能按实时挑战路由计数"
+    },
+    {
+      "fight_types": [
+        29
+      ],
+      "status": "特殊战斗基类，不单独生成"
+    },
+    {
+      "fight_types": [
+        201
+      ],
+      "status": "原客户端通天塔秘境类型，当前后端无对应生成"
+    }
+  ],
+  "changes": {
+    "event_limit": "事件预算不再截断战斗，121超24KiB可靠分块",
+    "nested_payload": "1301/149/152整个大响应预载后引用，客户端完整还原；超2MiB大历史逐条预载，单次拼合<=2MiB、块数<=256，兼容客户端4MiB保护",
+    "history": "已持久化记录不再按28KiB大小静默省略",
+    "action_limit": "撤销仙盟60、逐鹿80、冥仙80局部上限；统一使用全局240动作保护上限",
+    "optional_field": "逐鹿游历失败不再向Lua序列化器传charm_data=None"
+  },
+  "tests": {
+    "baseline": {
+      "modules": 32,
+      "total": 550,
+      "passed": 549,
+      "errors": 1,
+      "seconds": 530.086,
+      "log": "/tmp/battle_route_tests.log",
+      "snapshot": "本代理变更之前启动的测试进程，不能作为变更后回归",
+      "error": "test_monument.MonumentHTTPTests.test_weekly_get_and_head 沙箱禁止绑定127.0.0.1",
+      "permission_retry": {
+        "test": "test_monument.MonumentHTTPTests.test_weekly_get_and_head",
+        "passed": true,
+        "total": 1,
+        "seconds": 0.028
+      },
+      "combined_all_550_passed": true
+    },
+    "transport": {
+      "total": 7,
+      "passed": true,
+      "seconds": 41.874,
+      "log": "/tmp/battle_replay_tests_final.log",
+      "cases": [
+        "small_empty_native_contract",
+        "large_effects_utf8_lossless",
+        "whole_nested_response_all_history",
+        "same_fight_id_distinct_content_keys",
+        "persisted_numeric_effect_keys",
+        "large_monument_history_not_discarded",
+        "twenty_314KiB_history_records_use_under_2MiB_child_preloads"
+      ],
+      "verified_at": "2026-10-27T03:26:48.504978+00:00"
+    },
+    "changed_routes": {
+      "status": "passed_after_obsolete_expectation_update",
+      "modules": [
+        "test_guild_npc_combat",
+        "test_guild_pet_fixes",
+        "test_activity_land",
+        "test_activity_land_players",
+        "test_activity_land_tower",
+        "test_activity_abyss",
+        "test_activity_rank",
+        "test_activity_taixu",
+        "test_monument"
+      ],
+      "log": "/tmp/battle_route_after.log",
+      "total": 127,
+      "initial_passed": 126,
+      "initial_failed_tests": 1,
+      "initial_failed_subtests": 2,
+      "seconds": 210.732,
+      "combined_all_127_passed": true,
+      "verified_at": "2026-10-27T03:26:48.504978+00:00",
+      "expectation_update": "旧逐鹿测试期待80动作及event_budget中断，已改为共享240动作与完整分块还原断言",
+      "targeted_retry": {
+        "test": "test_activity_land_tower.LandTowerTests.test_replay_limits_remain_unresolved_and_fit_native_packet",
+        "total": 1,
+        "passed": true,
+        "seconds": 20.987,
+        "log": "/tmp/battle_route_limit_retry.log"
+      }
+    }
+  },
+  "validation_limits": [
+    "550项基线与127项变更回归有交集，不能相加当独立测试总数",
+    "原版所有精魄/技能动画未由本代理逐项实机验证；原生测试由主代理执行",
+    "当前全局240动作是原始单战报255动作协议范围内的保护上限；耗尽时保留未决，不伪造胜利"
+  ]
+}

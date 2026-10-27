@@ -5,6 +5,7 @@ Ranking contains actual local-account results, never fabricated NPC scores.
 import copy
 import hashlib
 from . import formation, journey, summon, achievements, role_profile, cheer, duty_balance
+from . import battle_replay
 from .protocol import encode
 
 require = formation.require
@@ -330,7 +331,7 @@ def battle(role, req, now, r, jrules, peers=None):
     outcome = 8 if win else 11 if half(d) and s['duty_runs'] < r['duty_daily_runs'] else 9
     return journey.combat_engine.event_packets(actions, fid) + [
         encode(1028, dict(fight_id=fid, first_hand=1, des_name=plan['name'], lineup_count=len(lineup), lineup=lineup)),
-        encode(1027, dict(fight_id=fid, fight_type=5, final_result=result, fight_round=len(actions), fight_result=actions)),
+        *battle_replay.result_packets(1027, dict(fight_id=fid, fight_type=5, final_result=result, fight_round=len(actions), fight_result=actions)),
         event(role, r, outcome, peers), summon.event(44, dict(fight_id=fid, fight_type=5))]
 
 

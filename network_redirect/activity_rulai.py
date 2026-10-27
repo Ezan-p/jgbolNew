@@ -54,7 +54,7 @@ def state(role, now, r):
 
 
 def guard(s, now, r):
-    f.require(r['enabled'] and s['start'] < now < s['end'], '如来转盘尚未开放或已经结束')
+    f.require(r['enabled'] and s['start'] <= now < s['end'], '如来转盘尚未开放或已经结束')
     f.require(now >= s['clock'], '如来转盘时钟已回退，请恢复本地时间')
 
 

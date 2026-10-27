@@ -91,10 +91,10 @@ def client_source(rules):
     """Use the same validated prices for the UI, affordability check and debit."""
     prices = [rules['grades'][str(grade)]['gold_cost'] for grade in (1, 2, 3)]
     template = Path(__file__).with_name('summon_client.lua').read_text(encoding='utf-8')
+    template = Path(__file__).with_name('progression_client.lua').read_text(encoding='utf-8') + '\n' + template
     template = Path(__file__).with_name('activity_entry_client.lua').read_text(encoding='utf-8') + '\n' + template
     from . import vip
     vip_source = Path(__file__).with_name('vip_client.lua').read_text(encoding='utf-8')
-    vip_source = vip_source.replace('__VIP_PRODUCTS__', lua(vip.load_rules()['products']))
     welfare_source = Path(__file__).with_name('welfare_client.lua').read_text(encoding='utf-8')
     monument_source = Path(__file__).with_name('monument_client.lua').read_text(encoding='utf-8')
     equipment_source = Path(__file__).with_name('equipment_client.lua').read_text(encoding='utf-8')
@@ -124,9 +124,10 @@ def client_source(rules):
     rulai_source = Path(__file__).with_name('rulai_client.lua').read_text(encoding='utf-8')
     nine_source = Path(__file__).with_name('nine_sky_client.lua').read_text(encoding='utf-8')
     trial_source = Path(__file__).with_name('trial_client.lua').read_text(encoding='utf-8')
+    battle_source = Path(__file__).with_name('battle_replay_client.lua').read_text(encoding='utf-8')
     feed_source = feed_source.replace('__FEED_REWARD_TIERS__', lua(feed_rules['feed_reward_tiers']))
     feed_source = feed_source.replace('__FEED_MAX_COUNT__', str(feed_rules['feed_max_count']))
-    return trial_source + '\n' + nine_source + '\n' + guild_source + '\n' + visit_source + '\n' + feed_source + '\n' + pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + yuanshi_source + '\n' + rulai_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
+    return battle_source + '\n' + trial_source + '\n' + nine_source + '\n' + guild_source + '\n' + visit_source + '\n' + feed_source + '\n' + pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + yuanshi_source + '\n' + rulai_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
 
 
 def lua(value):

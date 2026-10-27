@@ -57,8 +57,8 @@ class DamageTests(unittest.TestCase):
 
     def test_engraved_essence_parameters(self):
         unit = dict(type=5004, order=1)
-        role = dict(corteges=[dict(id=7, type=5004, order=1)], attachments=[
-            dict(type_id=10211, attach_type=5, owner_id=7, level=5)])
+        role = dict(corteges=[dict(id=7, type=5004, order=1, equiped_ext_skill_limit=1)], attachments=[
+            dict(id=8, type_id=10211, attach_type=5, owner_id=7, level=5, count=1, ext_skill_pos=1)])
         combat.attach_essences(role, [unit])
         self.assertEqual(combat.effect(unit, 11), (60, 27.5))
 

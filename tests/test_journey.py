@@ -302,7 +302,7 @@ class JourneyTests(unittest.TestCase):
         self.assertEqual(sum(c['tollgate_count'] for c in chunks), 598)
 
     def test_all_catalog_enemies_and_rewards_resolve(self):
-        r = self.fixture(level=200)
+        r = self.fixture(level=99)
         for kind, gates in journey.GATES.items():
             for gid, cfg in gates.items():
                 with self.subTest(kind=kind, gid=gid):

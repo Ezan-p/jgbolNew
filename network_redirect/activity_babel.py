@@ -2,6 +2,7 @@
 import copy
 import secrets
 from . import activity as a, journey, summon, activity_babel_npc as npc
+from . import battle_replay
 from .protocol import encode
 
 FLOORS = summon.rows('babel_tower_floor_prize.csv')
@@ -114,7 +115,7 @@ def fight(role, s, typ, row, col, jrules):
     name = npc.npc_players.catalog()[key]['profile']['role_name']
     events = journey.combat_engine.event_packets(actions,fid) + [
         encode(1028,dict(fight_id=fid,first_hand=1,des_name='守塔·'+name,lineup_count=len(lineup),lineup=lineup)),
-        encode(1027,dict(fight_id=fid,fight_type=200,final_result=result,fight_round=len(actions),fight_result=actions))]
+        *battle_replay.result_packets(1027, dict(fight_id=fid,fight_type=200,final_result=result,fight_round=len(actions),fight_result=actions))]
     maximum = sum(u['max_hp'] for u in ours)
     remaining = getattr(actions, 'final_hp', {}).get(1)
     lost = max(0, maximum-sum(remaining.values())) if remaining is not None else journey.combat_engine.total_damage(actions,2)

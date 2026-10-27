@@ -5,7 +5,7 @@ stages. NPC identities and combat builds come from players/catalog.json.
 """
 import copy
 import hashlib
-from . import activity as a, activity_undergo as undergo, activity_rank, npc_players, journey, summon
+from . import activity as a, activity_undergo as undergo, activity_rank, npc_players, journey, summon, battle_replay
 from .protocol import encode, decode
 
 STAGES = {1: '冲榜赛', 2: '练习赛', 3: '血战第一阶段', 4: '血战第二阶段', 5: '血战第三阶段', 6: '本届已结算'}
@@ -234,13 +234,13 @@ def fight(role, s, data, now, jrules):
         if win:
             reward_score = rules()['arena_win_score']; mine['score'] += reward_score
             enemy['hp'] = max(0, enemy['hp']-rules()['arena_hp_damage'])
-        elif s['stage'] == 5:
+        elif s['stage'] == 5 and 4 <= result <= 6:
             mine['hp'] = max(0, mine['hp']-rules()['arena_hp_damage'])
     s['fights'] += 1; s['stage_fights'] += 1
     role['activity']['fight_id'] += 1; fid = role['activity']['fight_id']
-    packets = journey.combat_engine.event_packets(actions, fid)+[
-        encode(1028, dict(fight_id=fid, first_hand=1, des_name=npc['role']['role_name'], lineup_count=len(lineup), lineup=lineup)),
-        encode(1027, dict(fight_id=fid, fight_type=32, final_result=result, fight_round=len(actions), fight_result=actions))]
+    lineup_packet = encode(1028, dict(fight_id=fid, first_hand=1, des_name=npc['role']['role_name'], lineup_count=len(lineup), lineup=lineup))
+    result_fields = dict(fight_id=fid, fight_type=32, final_result=result, fight_round=len(actions), fight_result=actions)
+    packets = journey.combat_engine.event_packets(actions, fid)+[lineup_packet, *battle_replay.result_packets(1027, result_fields)]
     log_time = max(now, s['records'][-1]['log_time']+1 if s['records'] else now)
     record = dict(src_name=role['role_name'], des_name=npc['role']['role_name'], src_id=role['role_id'],
                   des_id=npc['role']['role_id'], final_result=result, log_time=log_time, match_type=rank_type(s), fight_id=fid)
@@ -250,7 +250,7 @@ def fight(role, s, data, now, jrules):
     # comparison can handle battles with effects before the first DB write.
     # replay_packets restores numeric indices for the native Lua client.
     saved_effects = {str(k): v for k, v in journey.combat_engine.event_data(actions, fid).items()}
-    s['replays'][str(fid)] = dict(line_up_msg=decode(packets[-2])[2], fight_result_msg=decode(packets[-1])[2],
+    s['replays'][str(fid)] = dict(line_up_msg=decode(lineup_packet)[2], fight_result_msg=battle_replay.result_message(result_fields),
                                   fight_events=saved_effects)
     keep = {str(r['fight_id']) for r in s['records']}
     s['replays'] = {k: v for k, v in s['replays'].items() if k in keep}

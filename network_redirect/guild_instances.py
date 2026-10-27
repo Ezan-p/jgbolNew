@@ -1,6 +1,6 @@
 """Offline guild team dungeon and spirit-beast training, original callback shapes."""
 from . import guild as u,journey,daily,summon,npc_players
-from .guild_combat import simulate, replay_damage, record_events, recent_records, client_records
+from .guild_combat import simulate, replay_damage, record_events, recent_records, client_records, replay_reply
 from . import guild_offline as offline, guild_trial
 
 
@@ -192,7 +192,7 @@ def settle(role,s,g,op,d,now,r):
                 a['layer']=a.get('layer',0)+1
                 a['member_contributions']={key:a['layer'] for key in a['team']['members']}
                 for p in r['team_rewards']:journey.grant(role,p)
-        return record_events(a.get('team_record',[]))+[u.reply(op,dict(result=1,free_times=r['team_daily'],fight_count=a['team_fights'],cleared_layer=a.get('layer',0),max_layer=r['team_daily'],fight_result_list=client_records(a.get('team_record',[]))))]
+        return record_events(a.get('team_record',[]))+replay_reply(op,dict(result=1,free_times=r['team_daily'],fight_count=a['team_fights'],cleared_layer=a.get('layer',0),max_layer=r['team_daily'],fight_result_list=client_records(a.get('team_record',[]))))
     if op==43:
         from . import activity
         flag=d.get('flag');u.require(type(flag)is int and flag in range(1,8),'寻宝操作无效')
@@ -267,8 +267,8 @@ def settle(role,s,g,op,d,now,r):
         # The open response starts native battle playback and removes pet-home.
         # The native return callback requests 79 after rebuilding that page;
         # pushing 79 here would render into a destroyed Cocos node mid-battle.
-        return record_events([replay])+[u.reply(op,dict(result=1,support=a['train_support'],free_times=r['train_attempt_limit'],fight_count=a['train_floor_attempts'],fight_result_list=client_records([replay])))]
-    if op==95:return record_events(recent_records(a['train_record']))+[u.reply(op,dict(result=1,free_times=1,fight_count=1 if a['train_record'] else 0,fight_result_list=recent_records(a['train_record'])))]
+        return record_events([replay])+replay_reply(op,dict(result=1,support=a['train_support'],free_times=r['train_attempt_limit'],fight_count=a['train_floor_attempts'],fight_result_list=client_records([replay])))
+    if op==95:return record_events(recent_records(a['train_record']))+replay_reply(op,dict(result=1,free_times=1,fight_count=1 if a['train_record'] else 0,fight_result_list=recent_records(a['train_record'])))
     if op==81:
         u.require(role['union_rank']==1,'只有盟主可以指定挑战成员');target=d.get('appoint_role');u.require(type(target)is int and str(target) in g['members'],'指定成员不存在');a['appoint']=target
         return [u.reply(op,dict(result=1,name=g['members'][str(target)]['name']))]

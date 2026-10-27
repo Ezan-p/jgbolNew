@@ -122,7 +122,7 @@ class RankTests(ActivityCase):
             record=state['rank_records'][-1]
             self.assertTrue(record['defence']);self.assertGreaterEqual(record['fight_result_msg']['final_result'],4)
 
-    def test_unresolved_battle_keeps_rank_and_no_win_reward(self):
+    def test_draw_keeps_rank_and_no_win_reward(self):
         self.board();r=self.b.profile();r['activity'].update(rank_order=1,rank_origin_order=1,rank_slots={},rank_reached_order=1);self.b.save(r)
         with patch('network_redirect.activity_rank.journey.battle',return_value=(0,[],[])):
             fight,events=self.fight(2)

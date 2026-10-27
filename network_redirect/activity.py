@@ -8,11 +8,12 @@ import json
 import secrets
 from pathlib import Path
 from . import formation, journey, summon
+from . import battle_replay
 from .protocol import encode
 ROOT = Path(__file__).resolve().parents[1]
 require = formation.require
 ENUMS = json.loads((ROOT/'analysis/evidence/activity_enums.json').read_text())
-HANDLED = {1219, 1243, 1309, 1351, 1226, 1227, 1060, 1330, 1334, 1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1303, 1329, 1333, 1348, 1349, 1350, 1353}
+HANDLED = {1131, 1219, 1243, 1309, 1351, 1226, 1227, 1060, 1330, 1334, 1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1303, 1329, 1333, 1348, 1349, 1350, 1353}
 FIGHTS = {2, 3, 4, 5, 6, 10, 11, 12}
 EXCHANGE = {int(r['index']):r for r in summon.rows('top_score_exchange.csv')}
 RANK_SCORE = summon.rows('top_score.csv')
@@ -36,8 +37,8 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     from . import activity_feed, activity_trial
     activity_trial.load_rules()
     activity_feed.validate(r)
-    require(r['abyss_boss_max_actions']<=80,'冥仙精魄战报超过协议上限')
-    require(r['land_tower_start_hour']<24 and r['land_boss_layers']<=99 and r['land_daily_travel']<=100 and r['land_max_actions']<=80,'逐鹿时段或关卡上限无效')
+    # Legacy action-budget keys are accepted but no longer truncate battles.
+    require(r['land_tower_start_hour']<24 and r['land_boss_layers']<=99 and r['land_daily_travel']<=100,'逐鹿时段或关卡上限无效')
     require(isinstance(r.get('land_card_gold'),list) and len(r['land_card_gold'])==5 and r['land_card_gold'][0]==0 and all(type(v)is int and 0<=v<=100000 for v in r['land_card_gold']),'逐鹿翻牌费用无效')
     require(r['rank_initial_order']<=65535 and r['rank_daily_limit']<=255,'活动次数超过协议范围')
     require(r['duty_daily_runs']==3,'原版天命界面固定每日3次')
@@ -114,7 +115,7 @@ def day(now,r):return (now+r['timezone_offset_hours']*3600)//86400
 def prepare(role,now,r,peers=None):
     s=role.setdefault('activity',{})
     if 'yuanshi' in s:
-        from . import activity_yuanshi
+        from . import activity_yuanshi, welfare
         activity_yuanshi.state(role,now,activity_yuanshi.load_rules())
     s.setdefault('rank_order',r['rank_initial_order']);s.setdefault('rank_score',0)
     s.setdefault('fight_id',100000);s.setdefault('duty_best',0)
@@ -188,14 +189,14 @@ def statuses(role,now,r,flag,peers=None):
     if flag==0:
         from . import activity_nine_sky
         from . import activity_pavilion, activity_hunt
-        from . import activity_yuanshi
+        from . import activity_yuanshi, welfare
         from .activity_seasonal import status as seasonal_status
         return summon.event(47,dict(visit_list=visit_list(role,r),feed_data=feed_data(role,r),
                                    pavilion_data=activity_pavilion.status(role,now,peers),
                                    hunt_data=activity_hunt.status(role,now,r),
                                    nine_sky_data=activity_nine_sky.status(now),
                                    yuanshi_info=activity_yuanshi.client_config(now),
-                                   spring_info=dict(start_time=0,end_time=0),
+                                   spring_info=welfare.spring_info(role,now,welfare.load_rules()),
                                    imperial_exam=dict(start_time=0,end_time=0),**seasonal_status(role,now,r)))
     require(flag==1,'未知活动页')
     return summon.event(48,dict(party_start_period=[dict(begin_seconds=r['party_period'][0],end_seconds=r['party_period'][1])],
@@ -340,12 +341,15 @@ def battle(role,req,now,r,jrules,frules):
         events.append(summon.event(29,info))
     if win and ft in (2,3):role['silver_coin']+=r['battle_silver']
     return journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name=boss['name'] if ft==6 else '本地活动对手',lineup_count=len(lineup),lineup=lineup)),
-        encode(1027,dict(fight_id=fid,fight_type=ft,final_result=result,fight_round=len(actions),fight_result=actions))]+events+[
+        *battle_replay.result_packets(1027, dict(fight_id=fid,fight_type=ft,final_result=result,fight_round=len(actions),fight_result=actions))]+events+[
         summon.event(44,dict(fight_id=fid,fight_type=ft))]
 
 
 def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     s=prepare(role,now,r,peers)
+    if mid==1131:
+        from . import progression
+        return progression.settle(role,req,now)
     if mid==1051 and req['item_type']==1243:
         from . import activity_nine_sky
         return activity_nine_sky.use_bag(role,req)
@@ -359,10 +363,10 @@ def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
         from . import activity_rulai
         return activity_rulai.use_bag(role,req)
     if mid==1334:
-        from . import activity_yuanshi
+        from . import activity_yuanshi, welfare
         return activity_yuanshi.settle(role,req,now)
     if mid==1051 and req['item_type']==1808:
-        from . import activity_yuanshi
+        from . import activity_yuanshi, welfare
         return activity_yuanshi.use_bag(role,req)
     if mid==1226:
         from . import activity_hunt

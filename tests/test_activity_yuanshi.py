@@ -1,4 +1,5 @@
 """Original wire packets, economy, daily transitions and durable receipts."""
+from recharge_helpers import funded_order
 import json
 from pathlib import Path
 from unittest.mock import patch
@@ -32,7 +33,7 @@ class YuanshiTests(ActivityCase):
         return sum(i['count'] for i in self.b.profile()['attachments'] if i['attach_type'] == 5 and i['type_id'] == tid)
 
     def charge(self, product=1, order=None):
-        self.req(1111, event_id=250, data=summon.lua(dict(item_id=product, order_id=order or f'yuanshi-{self.serial}')))
+        self.req(1111, event_id=251, data=funded_order(self.b, product, order or f'yuanshi-{self.serial}'))
 
     def test_bootstrap_and_original_contract(self):
         d = self.data(self.call())
@@ -94,7 +95,7 @@ class YuanshiTests(ActivityCase):
         start, _ = y.period(NOW, y.load_rules())
         for day in range(5):
             with patch('network_redirect.backend.time.time', return_value=start + 3600 + day * 86400):
-                # 50 simulated RMB unlocks any next tier; never two on one day.
+                # 50 RMB in gold cards unlocks any next tier; never two on one day.
                 self.charge(2); self.charge(2)
                 d = self.data(self.call()); self.assertEqual(len(d['gift_list']), day + 1)
                 self.assertEqual(list(d['gift_list'].values()), list(range(day + 1, 0, -1)))

@@ -187,6 +187,7 @@ def settle(role,mid,d,now,r,grules,arules,jrules):
 def record_packets(s):
     # [A] event 152 accumulates records; event 44/118 opens the record page.
     from .guild_combat import recent_records
+    from .battle_replay import event_packets
     rows=[]
     for v in recent_records(s['records']):
         info=dict(name=v['src_name'],vip_level=v['vip_level'],tao_point=v['tao_point'],role_combat_power=v['role_combat_power'])
@@ -195,7 +196,7 @@ def record_packets(s):
             lineup_list=v['line_up_msg']['lineup'],result_list=v['fight_result_msg']['fight_result'],
             elite_logic={int(k) if str(k).isdigit() else k:value for k,value in v['fight_events'].items()})))
     records={i:v for i,v in enumerate(rows,1)}
-    return [summon.event(152,dict(fight_type=118,records=records)),summon.event(44,dict(fight_type=118))]
+    return event_packets(152,dict(fight_type=118,records=records))+[summon.event(44,dict(fight_type=118))]
 
 
 def weekly_html():

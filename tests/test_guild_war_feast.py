@@ -210,6 +210,22 @@ class GuildWarFeastTests(unittest.TestCase):
         self.assertEqual(guild_match.reward_row(1,True)['prize_list'],'5|1029|1|20/5|1001|1|500')
         self.assertEqual(guild_match.reward_row(1,True)['popularity'],'250')
 
+    def test_draw_has_no_winner_merit_or_life_loss_for_either_side(self):
+        self.req(45)
+        role=self.role();s=role['guild'];g=s['unions'][str(role['union_id'])]
+        r=self.b.guild_rules;m=guild_match.state(s,False,r);m.update(streak=2,loss_streak=2);s['fight_id']=1
+        before=copy.deepcopy(m)
+        replay=dict(line_up_msg=dict(fight_id=1),fight_result_msg=dict(fight_round=0,final_result=0,fight_result=[]))
+        with patch('network_redirect.guild_combat.simulate',return_value=(0,[],replay)):
+            guild_match.fight(role,s,g,dict(fight_type=14,des_id=90006),NOW,r,self.b.journey_rules)
+        self.assertEqual((m['wins'],m['draws'],m['merit'],m['life']), (0,1,before['merit'],before['life']))
+        self.assertEqual((m['streak'],m['loss_streak']), (0,0))
+        self.assertEqual(m['target_life'],before['target_life'])
+        self.assertEqual(m['target_stats']['90006'],dict(fights=1,wins=0,merit=0))
+        self.assertEqual(m['npc_rounds'][0]['winner'],0)
+        self.assertEqual((m['npc_scores']['90002'],m['npc_scores']['90003']), (1,1))
+        self.assertEqual(guild_match.enter(role,s,g,NOW,r)['union_data']['lose_count'],0)
+
     def test_cross_native_query_fight_settles_and_wraps_result(self):
         target=self.req(58,query_type=23)[-1]['des_member_list'][6]['id']
         out=self.req(58,query_type=28,des_id=target)[-1]

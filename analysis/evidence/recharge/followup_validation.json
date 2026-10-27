@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-27",
+  "passed": true,
+  "backend_tests": 64,
+  "native_client_checks": 18,
+  "backend_runs": [
+    {
+      "pattern": "test_recharge.py",
+      "tests": 26,
+      "passed": true
+    },
+    {
+      "pattern": "test_welfare*.py",
+      "tests": 23,
+      "passed": true
+    },
+    {
+      "pattern": "test_vip.py",
+      "tests": 15,
+      "passed": true
+    }
+  ],
+  "native_runs": [
+    {
+      "file": "client_validation.json",
+      "checks": 12,
+      "passed": true
+    },
+    {
+      "file": "spring_charge_client_validation.json",
+      "checks": 6,
+      "passed": true
+    }
+  ],
+  "changes": [
+    "Passive activity synchronization without event 47/93/127 navigation pushes",
+    "Remove added month-card footer and quota; preserve native daily 100-gold claim",
+    "Native fund purchase bypasses disabled real-payment channel; retains parent and updates claim state"
+  ],
+  "real_role_resources_changed": false,
+  "full_repository_suite_run": false
+}

@@ -134,7 +134,9 @@ def attach_combat(role, units):
     from fractions import Fraction as F
     e = effects(role)
     for unit in units:
-        if not 1 <= unit.get('order', 0) <= 8:
+        # Battle rosters also include the ninth cell of the original 历劫 grid.
+        # Ownership is resolved before re-slotting by combat_loadout.
+        if not 1 <= unit.get('order', 0) <= 9:
             continue
         for key, (kind, index) in ESSENCE_MAP.items():
             values = unit.get('essences', {}).get(kind)

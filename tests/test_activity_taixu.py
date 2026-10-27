@@ -38,6 +38,25 @@ class TaixuCase(ActivityCase):
 
 
 class UndergoCompleteTests(TaixuCase):
+    def test_long_nine_grid_result_uses_preload_without_losing_actions(self):
+        from network_redirect import combat_engine, battle_replay
+        actions = combat_engine.Actions()
+        actions.extend(dict(self_use=False,skill_type=1,is_src=True,result=0,src_order=9,
+                            des_order=1,cur_round=i//10+1,damage_count=9,damage_list=[0]*9)
+                       for i in range(300))
+        with patch('network_redirect.activity_undergo.journey.battle',return_value=(0,[],actions)):
+            self.ok(self.fight())
+        notice = next(data for mid,_,data in self.decoded if mid==1140)
+        self.assertEqual(notice['guide_stage'],battle_replay.RESULT_MARKER)
+        self.assertEqual(notice['final_result'],0)
+        from tests.test_battle_replay import decoded_packets
+        from network_redirect.backend import login_fields
+        restored = decoded_packets(self.replies)
+        payloads = [login_fields(data['data']) for mid,_,data in restored if mid==2998 and data['id']==121]
+        result = next(data['offline_battle_result'] for data in payloads if 'offline_battle_result' in data)
+        self.assertEqual(result['fight_round'],300)
+        self.assertEqual(len(result['fight_result']),300)
+
     @patch('network_redirect.activity_undergo.journey.battle', return_value=(1, [], []))
     def test_mode_rewards_costs_first_and_daily_prize(self, _):
         self.ok(self.call(1)); role = self.b.profile(); before = role['strength']; silver = role['silver_coin']
@@ -147,6 +166,16 @@ class UndergoCompleteTests(TaixuCase):
 
 
 class ArenaTests(TaixuCase):
+    @patch('network_redirect.activity_arena.journey.battle',return_value=(0,[],[]))
+    def test_draw_in_final_stage_awards_no_score_or_life_damage(self,_):
+        self.arena_enter();role=self.b.profile();s=role['activity']['arena']
+        s.update(stage=5,stage_fights=0);self.b.save(role)
+        before=copy.deepcopy(s['competitors']);self.ok(self.arena_fight())
+        after=self.b.profile()['activity']['arena']
+        self.assertEqual(after['competitors'],before)
+        self.assertEqual(after['records'][-1]['final_result'],0)
+        self.assertEqual(after['stage_fights'],1)
+
     def test_original_level_50_gate_and_existing_low_level_save(self):
         # Previously created low-level seasons survive the restored entry gate.
         role=self.b.profile();role['level']=50

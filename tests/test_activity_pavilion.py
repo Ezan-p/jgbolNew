@@ -1,4 +1,5 @@
 """Real 1227 packets, original catalog, local recharge/mail, limits and rollback."""
+from recharge_helpers import funded_order
 import copy
 import json
 from pathlib import Path
@@ -57,7 +58,7 @@ class PavilionTests(ActivityCase):
         self.b.save(r)
 
     def charge(self, order='pavilion-order', product=106):
-        return self.req(1111, event_id=250, data=summon.lua(dict(item_id=product, order_id=order)))
+        return self.req(1111, event_id=251, data=funded_order(self.b, product, order))
 
     def claim_mails(self):
         mails = self.b.profile()['welfare'].get('mails', {})

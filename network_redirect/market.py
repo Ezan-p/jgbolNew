@@ -108,6 +108,11 @@ def catalog(role, now, rules):
         object_type, type_id, count = map(int, raw['type_id'].split('|'))
         index, page = int(raw['index']), int(raw['page_id'])
         price = int(raw['buy_price'])
+        # [A] Native monthCardUI promises one extra discounted Soul Fate Pill
+        # per day. The same remaining quantity is enforced by buy(), so expiry
+        # or renewal changes eligibility without resetting today's purchases.
+        daily_limit = rules['cheap_daily_limit'] + int(
+            page == 1 and type_id == 1024 and role.get('month_card_time', 0) > now)
         result[LISTS[page]][index] = dict(
             index=index, object_type=object_type, type_id=type_id, count=count,
             name=NAMES[type_id], buy_price=price, money_type=rules['money_type'],
@@ -116,7 +121,7 @@ def catalog(role, now, rules):
             # or the actual price when no normal listing survives.
             origin_price=normal_prices[type_id] * count if type_id in normal_prices else price,
             begin_time=state['day'], end_time=state['day'] + 86400 - 1,
-            buy_limit_times=max(0, rules['cheap_daily_limit'] - state['purchases'].get(str(index), 0))
+            buy_limit_times=max(0, daily_limit - state['purchases'].get(str(index), 0))
                             if page == 1 else 0, is_day_limit=1)
     from . import cheer
     result['rich_item_list'].update(cheer.market_goods(role))

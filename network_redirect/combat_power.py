@@ -290,12 +290,9 @@ def recalculate(role, rules, now=None):
         if policy['title']:
             add_title(role, values, now)
         record(trace, 'title', values)
-        training = role.get('activity', {}).get('home', {}).get('train', {})
-        for kind, stat in ((1, 'gongji'), (2, 'fangyu')):
-            row = HOME_TRAIN.get((kind, training.get(str(kind), {}).get('level', 0)))
-            if row:
-                rate, flat = map(Decimal, row['worth(rate|value)'].split('|'))
-                values[stat] = values[stat] * (1 + rate / 100) + flat
+        # [A] newbie_content17 rows 11–14 describe damage modifiers, not panel
+        # attack/defence. All four cultivation effects are applied in combat;
+        # applying the first two here would count them twice and alter spells.
         record(trace, 'home_training', values)
         if policy['pet']:
             add_pet(role, c, values)

@@ -2,6 +2,7 @@
 import copy
 import secrets
 from . import activity as a, journey, summon
+from . import battle_replay
 from .protocol import encode
 SOUL_NPCS=(7221,7222,7223)  # [A] cortege_base_0: name=jiuyousuiji
 
@@ -94,7 +95,7 @@ def settle(role,s,d,now,r,jrules):
             e['hp']=max(0,e['hp']-damage);e['attempts']+=1;won=e['hp']==0;done=won;data=view(e,r)
             role['activity']['fight_id']+=1;fid=role['activity']['fight_id']
             packets=journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name='魂仙',lineup_count=len(lineup),lineup=lineup)),
-                encode(1027,dict(fight_id=fid,fight_type=25,final_result=result,fight_round=len(actions),fight_result=actions))]
+                *battle_replay.result_packets(1027, dict(fight_id=fid,fight_type=25,final_result=result,fight_round=len(actions),fight_result=actions))]
     if won:data['prize_list']=grant(role,s,[copy.deepcopy(secrets.choice(r['abyss_event_rewards']))])
     if done:
         s['events'].pop(0);s['events_finished']+=1

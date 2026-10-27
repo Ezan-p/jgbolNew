@@ -4,6 +4,7 @@ from fractions import Fraction as F
 from . import combat as c, formation, summon, reborn_stars
 
 RULAI = {int(r['level']): r for r in summon.rows('rulai_skill_base.csv')}
+MAX_ROUNDS = 30
 
 
 class Actions(list):
@@ -13,15 +14,26 @@ class Actions(list):
         self.damage_totals = {1: 0, 2: 0}
         self.final_hp = {}
         self.stop_reason = 'elimination'
+        self.rounds = 0
+        self.opening_passives = []
 
 
 def event_data(actions, fight_id):
-    return dict({i: e for i, e in enumerate(getattr(actions, 'events', []), 1)}, fight_id=fight_id)
+    data = dict({i: e for i, e in enumerate(getattr(actions, 'events', []), 1)}, fight_id=fight_id)
+    if getattr(actions, 'opening_passives', None):
+        data['opening_passives'] = copy.deepcopy(actions.opening_passives)
+    return data
 
 
 def event_packets(actions, fight_id):
     # Also clear the client's previous event cache when this fight has no effects.
-    return [summon.event(121, event_data(actions, fight_id))]
+    from .battle_replay import effect_packets
+    return effect_packets(event_data(actions, fight_id))
+
+
+def result_packets(message_id, fields):
+    from .battle_replay import result_packets as packets
+    return packets(message_id, fields)
 
 
 def total_damage(actions, side=1):
@@ -38,8 +50,9 @@ class Battle:
         self.rules['multi_target_limit'] = self.rules['formation_target_limits'].get(str(slots), self.rules['multi_target_limit'])
         self.policy = self.rules['mechanics']
         self.slots = slots
-        self.limit = min(self.rules['max_actions'] if max_actions is None else max_actions,
-                         self.rules['max_actions'])
+        # Explicit limits are only a mechanism-test/debug hook. Production
+        # battles finish a whole round, independent of the wire array size.
+        self.limit = max_actions
         self.actions = Actions()
         self.round = 0
         self.event_bytes = 0
@@ -53,19 +66,20 @@ class Battle:
                     u['base_' + stat] = u[stat]
                 if extras is not None and side_no == 2:
                     u['extras'] = extras.copy()
-        reborn_stars.attach_combat_traits(role, self.sides[0])
-        c.attach_essences(role, self.sides[0])
-        home = role.get('activity', {}).get('home', {}).get('train', {})
-        if home:
-            from .activity_home import TRAIN
-            bonuses = [tuple(map(F, TRAIN[i, home.get(str(i), {}).get('level', 0)]['worth'].split('|')))
-                       if home.get(str(i), {}).get('level', 0) else (0, 0) for i in range(1, 5)]
-            for u in self.sides[0]:
-                u['training_bonuses'] = bonuses
-        from . import spirit_array
-        spirit_array.attach_combat(role, self.sides[0])
+        from .combat_loadout import attach_owned_bonuses
+        attach_owned_bonuses(role, self.sides[0])
         self.entry()
         self.initial = copy.deepcopy(self.sides)
+        for side, units in enumerate(self.initial, 1):
+            for unit in units:
+                if unit['hp'] <= 0:
+                    continue
+                for skill, level in unit.get('skills', []):
+                    if int(formation.SKILLS[skill]['use_mode(1-active，2-passive)']) == 2:
+                        self.actions.opening_passives.append(dict(
+                            self_use=True, skill_type=skill, is_src=side == 1, result=0,
+                            src_order=unit['order'], des_order=unit['order'], cur_round=0,
+                            damage_count=slots, damage_list=[0] * slots))
 
     def position(self, unit):
         return (unit['order'] - 1) % 4 + 1 if self.slots == 8 else unit['order']
@@ -147,8 +161,8 @@ class Battle:
         return [u for u in self.sides[side - 1] if u['hp'] > 0]
 
     def can_act(self):
-        if len(self.actions) >= self.limit:
-            self.actions.stop_reason = 'action_limit'
+        if self.limit is not None and len(self.actions) >= self.limit:
+            self.actions.stop_reason = 'debug_action_limit'
             return False
         # Event bytes bound transmission chunks, never the simulated fight.
         # A few heals can fill one chunk while both armies are still alive.
@@ -224,11 +238,12 @@ class Battle:
             shared = int(F(amount) * int(self.rulai(protector)['absorb_rate']) / 100)
             amount -= shared
             loss = self.lose_hp(protector, self.shield_absorb(protector, shared, index), actor['side'], index)
-            # Sharing is represented in the same target-side damage array: no double HP event.
-            row['damage_list'][protector['order'] - 1] += loss
+            # Native single-target attacks only consume des_order's damage
+            # slot. Publish sharing as an HP event so off-target protectors
+            # lose HP too; never also include it in the AOE damage array.
             total += loss
             if loss:
-                self.event(protector, 101201, loss, index, field=0)
+                self.event(protector, 101201, -loss, index)
             if not protector['hp']:
                 fallen.append(protector)
         hit = self.lose_hp(target, amount, actor['side'], index)
@@ -319,24 +334,24 @@ class Battle:
         for target in targets:
             gain = min(amount, target['max_hp'] - target['hp'])
             target['hp'] += gain
-            self.event(target, 0, gain, index)
+            # The native skill-6 zero-damage action does not heal by itself.
+            # Use the existing heal attribute effect; logic 0 means addAllHp
+            # in the client and would also increase maximum HP.
+            self.event(target, 101101, gain, index)
 
     def upkeep(self):
         # Snapshot prevents a revived unit from receiving a second upkeep this round.
         for unit in [u for side in (1, 2) for u in self.fielded(side)]:
-            if not self.can_act() or not all(self.alive(s) for s in (1, 2)):
+            if not self.can_act():
                 return
             poison = unit.get('poison')
             if poison and c.roll(c.effect(unit, 17)[0]):
                 unit.pop('poison')
                 poison = None
-            chance, rate = c.effect(unit, 10)
-            healing = self.round >= 2 and unit['hp'] < unit['max_hp'] and rate and c.roll(chance)
-            if not poison and not healing:
-                continue
-            # Dedicated zero-damage action anchors pre-turn HP events, including lethal poison.
-            _, index = self.row(unit, [unit], self_use=True)
+            index = None
             if poison:
+                # Dedicated zero-damage action anchors pre-turn HP events, including lethal poison.
+                _, index = self.row(unit, [unit], self_use=True)
                 amount = min(self.policy['poison_max_damage'], int(F(unit['base_hp']) * poison['rate'] / 100))
                 loss = self.lose_hp(unit, amount, poison['source_side'], index)
                 self.event(unit, poison['logic'], -loss, index)
@@ -345,12 +360,17 @@ class Battle:
                 self.deploy(index)
                 if died:
                     continue
-            if healing:
+            chance, rate = c.effect(unit, 10)
+            # Check missing HP after poison: a unit that entered upkeep at
+            # full health can heal damage received during this same upkeep.
+            if self.round >= 2 and unit['hp'] < unit['max_hp'] and rate and c.roll(chance):
+                if index is None:
+                    _, index = self.row(unit, [unit], self_use=True)
                 amount = F(unit['base_hp']) * rate / 100 * (1 + c.effect(unit, 14)[0] / 100)
                 self.heal(unit, amount, 10, index)
 
     def run(self):
-        while all(self.alive(s) for s in (1, 2)) and self.can_act():
+        while self.round < MAX_ROUNDS and all(self.alive(s) for s in (1, 2)) and self.can_act():
             self.round += 1
             self.upkeep()
             # A position has one turn per round; a newly deployed reserve inherits
@@ -366,18 +386,21 @@ class Battle:
                     else:
                         self.attack(actor, self.targets(actor, sk), sk, lv)
         self.actions.final_hp = {s: {u['order']: u['hp'] for u in self.sides[s - 1]} for s in (1, 2)}
+        self.actions.rounds = self.round
         hp = [sum(u['hp'] for u in side) for side in self.sides]
         maximum = [sum(u['max_hp'] for u in side) for side in self.sides]
+        if not all(hp):
+            self.actions.stop_reason = 'elimination'
+        elif self.round == MAX_ROUNDS:
+            self.actions.stop_reason = 'round_limit'
         def stars(h, m):
             return 3 if h * 10 >= m * 7 else 2 if h * 10 >= m * 4 else 1
-        if not hp[0] and not hp[1]:
+        if hp[0] == hp[1]:
             result = 0
-        elif not hp[1]:
+        elif hp[0] > hp[1]:
             result = stars(hp[0], maximum[0])
-        elif not hp[0]:
-            result = 7 - stars(hp[1], maximum[1])
         else:
-            result = 0  # Incomplete at the protocol safety boundary; never award an HP-ratio victory.
+            result = 7 - stars(hp[1], maximum[1])
         lineup = []
         for order in range(1, max((u['order'] for side in self.initial for u in side), default=0) + 1):
             row = {}

@@ -1,3 +1,4 @@
+from recharge_helpers import funded_order
 import copy
 import tempfile
 import unittest
@@ -23,7 +24,7 @@ class XianlingTests(unittest.TestCase):
         self.assertEqual(decode(self.replies[-1])[0],1106)
         return [(d['id'],login_fields(d['data'])) for m,_,d in map(decode,self.replies) if m==2998]
     def charge(self,order='order-0001',product=1):
-        return self.req(mid=1111,event_id=250,data=summon.lua(dict(item_id=product,order_id=order)))
+        return self.req(mid=1111,event_id=251,data=funded_order(self.b,product,order))
     def item(self,tid):return sum(a['count'] for a in self.b.profile()['attachments'] if a['type_id']==tid)
     def fixture(self,tid=1140,n=1000):
         r=self.b.profile();r['gold_coin']=10000;summon.add_item(r,tid,n);self.b.save(r);return self.b.profile()

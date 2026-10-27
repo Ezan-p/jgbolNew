@@ -1,4 +1,5 @@
 """Rulai native wire contracts, recharge accounting, wheel and selectable bags."""
+from recharge_helpers import funded_order
 import json
 from pathlib import Path
 from unittest.mock import patch
@@ -18,7 +19,7 @@ class RulaiTests(ActivityCase):
         return next(d for e, d in events if e == 200)
 
     def charge(self, product=1, order=None):
-        events = self.req(1111, event_id=250, data=summon.lua(dict(item_id=product, order_id=order or f'rulai-{self.serial}')))
+        events = self.req(1111, event_id=251, data=funded_order(self.b, product, order or f'rulai-{self.serial}'))
         self.assertTrue(any(e == 80 and 'local_vip' in d for e,d in events))
 
     def amount(self, tid):
@@ -67,6 +68,16 @@ class RulaiTests(ActivityCase):
                     self.assertEqual(r.draw(cfg), i)
             offset += row['weight']
         self.assertEqual(offset, 10000)
+
+    def test_recharge_at_exact_period_boundary_counts_in_new_period(self):
+        cfg = r.load_rules()
+        start, end = r.period(NOW, cfg)
+        role = self.b.profile()
+        r.record_charge(role, 500, start)
+        self.assertEqual(role['activity']['rulai']['charge_gold'], 500)
+        r.record_charge(role, 100, end)
+        self.assertEqual(role['activity']['rulai']['start'], end)
+        self.assertEqual(role['activity']['rulai']['charge_gold'], 100)
 
     def test_bonus_claim_once_independent_of_draws(self):
         self.charge(4)

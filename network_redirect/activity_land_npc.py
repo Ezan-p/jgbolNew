@@ -18,20 +18,8 @@ def catalog():
 
 def units(key, count):
     role = catalog()[key]['role']
-    result = []
-    # Preserve original formation positions, equipment, skills and combat traits.
-    for c in sorted(role['corteges'], key=lambda c: c.get('order', 0)):
-        if not 1 <= c.get('order', 0) <= count:
-            continue
-        u = dict(companion_id=c['id'], type=c['type'], order=c['order'], level=c['level'],
-                 evolve=c.get('evolve_level', 0), reborn=c.get('reborn_layer', 0),
-                 max_hp=c['hp'], **{k:c[k] for k in formation.STATS})
-        u['skills'] = [(i['type_id'], i['level']) for i in role['attachments']
-                      if i['attach_type'] == 6 and i.get('equip_order') == c['order'] and i.get('equip_pos', 0)>0]
-        result.append(u)
-    combat.attach_essences(role, result)
-    reborn_stars.attach_combat_traits(role, result)
-    return result
+    from .combat_loadout import player_units
+    return [unit for unit in player_units(role) if unit['order'] <= count]
 
 
 def power(n, count):

@@ -1,7 +1,7 @@
 """Guild beast quests and wilderness: persistent inferred local progression."""
 from . import guild as u,daily,journey
 from .guild_instances import state, weekend, resident_info, residents
-from .guild_combat import simulate, record_events, choose_enemy
+from .guild_combat import simulate, record_events, choose_enemy, replay_reply, client_records
 from . import guild_offline as offline
 
 
@@ -70,7 +70,7 @@ def settle(role,s,g,op,d,now,r):
         # Cache settlement/counts before the battle response destroys the page.
         out.append(u.reply(84,dict(result=1,task_type=typ,task_index=idx,fight_result=won,boss_info=task(r,idx)['boss_info'],prize_reputation=10*idx if won else 0,prize_union_gold=100*idx if won else 0,prize_list=prizes,animal_info=arrivals,task_state=main(a,now,r,g))))
         if typ==2:
-            out.append(u.reply(85,dict(result=1,fight_result_list=[replay],free_times=1,fight_count=1,task_index=idx)))
+            out.extend(replay_reply(85,dict(result=1,fight_result_list=client_records([replay]),free_times=1,fight_count=1,task_index=idx)))
         return out
     if op==86:
         typ=d.get('two_type');u.require(typ in (1,2),'野外操作无效')

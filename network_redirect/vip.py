@@ -1,6 +1,5 @@
 """VIP wire/UI rules [A]; missing economy is explicit inferred configuration [B]."""
 import json
-import re
 from pathlib import Path
 from . import formation as f, summon, journey
 from .protocol import encode
@@ -26,8 +25,6 @@ def load_rules(path=ROOT / 'server_config/vip_rules.json'):
     f.require(r['daily_gold'][:4] == [0]*4 and r['daily_jade'][0] == 0 and all(r['daily_jade'][1:]), 'VIP福利与原版不符')
     from . import qiankun_bags
     qiankun_bags.load_rules()
-    f.require(len({p['id'] for p in r['products']}) == len(r['products']) and all(type(p['gold']) is int and 0 < p['gold'] <= 1000000 for p in r['products']), '模拟充值商品无效')
-    f.require(all(type(p.get('bonus', 0)) is int and 0 <= p.get('bonus', 0) <= 1000000 for p in r['products']), '模拟充值赠送数量无效')
     return r
 
 
@@ -56,8 +53,7 @@ def client_config(r):
 
 def handles(mid, req):
     return (mid == 1201 and req['flag'] in (5,7) or
-            mid == 1051 and (1031 <= req['item_type'] <= 1034 or 1101 <= req['item_type'] <= 1110) or
-            mid == 1111 and req['event_id'] == 250)
+            mid == 1051 and (1031 <= req['item_type'] <= 1034 or 1101 <= req['item_type'] <= 1110))
 
 
 def attrs(role):
@@ -70,21 +66,6 @@ def settle(role, mid, req, now, r, parse):
         from . import qiankun_bags
         return qiankun_bags.use(role, req)
     prepare(role,r); v = level(role)
-    if mid == 1111:
-        data = parse(req['data'])
-        product = next((p for p in r['products'] if p['id'] == data.get('item_id')), None)
-        f.require(product is not None, '模拟充值商品不存在')
-        order = data.get('order_id')
-        f.require(isinstance(order,str) and re.fullmatch(r'[A-Za-z0-9-]{8,80}',order), '模拟充值订单编号无效')
-        orders = role.setdefault('vip_orders', {})
-        if order in orders:
-            f.require(orders[order] == product['id'], '模拟充值订单内容冲突')
-            return [summon.event(55,dict(op_string='该模拟充值订单已到账'))]
-        orders[order] = product['id']
-        role['charge_gold'] += product['gold']; role['gold_coin'] += product['gold'] + product.get('bonus', 0)
-        role['vip_level'] = max(v, max(i for i,n in enumerate(r['thresholds']) if role['charge_gold'] >= n))
-        prepare(role,r)
-        return [summon.event(55,dict(op_string='本地模拟充值成功，不发生真实扣款'))]
     if mid == 1201 and req['flag'] == 5:
         day = lambda t: (t+r['timezone_offset_hours']*3600)//86400
         f.require(v > 0, 'VIP1开放每日福利')
@@ -118,5 +99,5 @@ def settle(role, mid, req, now, r, parse):
 
 def client_state(role):
     keys = ('charge_gold','vip_level','vip_gift','next_charge_gold','day_take_gold_limit','enhance_inbatch_limit',
-            'strength_item_limit','energy_item_limit','top_fight_limit','rape_flush_limit','convert_fight_limit','tollgate_flush_limit')
+            'strength_item_limit','energy_item_limit','top_fight_limit','rape_flush_limit','convert_fight_limit','tollgate_flush_limit','month_card_time','month_card_record','buy_growup','first_charge','first_charge_gift')
     return {k:role[k] for k in keys if k in role}

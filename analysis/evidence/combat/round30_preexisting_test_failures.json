@@ -1,0 +1,87 @@
+{
+  "date": "2026-10-27",
+  "purpose": "记录全量回归中两项非战斗失败的只读隔离归因；未扩大范围修复无关模块",
+  "production_code_modified_for_this_audit": false,
+  "test_code_modified_for_this_audit": false,
+  "player_save_modified": false,
+  "isolation": "测试使用临时SQLite存档；HEAD backend.py通过git show读取并在内存模块执行，未覆盖工作区文件；其辅助模块使用当前版本，market/monday/nine_sky及九重天规则经逐字节核对均等于HEAD。",
+  "runs": [
+    {
+      "variant": "current_backend",
+      "test": "test_offline_backend.ProtocolTests.test_bootstrap_initializes_formation_and_innate_skill",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "battle_run_calls": 0,
+      "observed": "rich_item_list长度为9，旧断言为8"
+    },
+    {
+      "variant": "current_backend",
+      "test": "test_role_profile.ProfileTests.test_rename_failures_atomic",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "battle_run_calls": 0,
+      "observed": "失败改名后保存新增activity.monday初始化状态，导致全角色快照不相等"
+    },
+    {
+      "variant": "HEAD_backend_with_current_unchanged_market_monday",
+      "test": "test_offline_backend.ProtocolTests.test_bootstrap_initializes_formation_and_innate_skill",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "battle_run_calls": 0,
+      "observed": "rich_item_list长度为9，旧断言为8"
+    },
+    {
+      "variant": "HEAD_backend_with_current_unchanged_market_monday",
+      "test": "test_role_profile.ProfileTests.test_rename_failures_atomic",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "battle_run_calls": 0,
+      "observed": "失败改名后保存新增activity.monday初始化状态，导致全角色快照不相等"
+    }
+  ],
+  "unchanged_from_HEAD": {
+    "network_redirect/market.py": true,
+    "network_redirect/activity_monday.py": true,
+    "network_redirect/activity_nine_sky.py": true,
+    "server_config/nine_sky_rules.json": true
+  },
+  "causes": [
+    {
+      "test": "test_offline_backend.ProtocolTests.test_bootstrap_initializes_formation_and_innate_skill",
+      "source": [
+        "network_redirect/market.py:124",
+        "network_redirect/activity_nine_sky.py:281"
+      ],
+      "detail": "market.catalog合并当前活动商品：index=9137、type_id=1243、名称九重天礼包。不是金卡，也不经过战斗。",
+      "preexisting_commit": "0abbe62",
+      "diagnostic_control": {
+        "patch": "仅测试进程mock activity_nine_sky.market_goods返回空字典",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0
+      }
+    },
+    {
+      "test": "test_role_profile.ProfileTests.test_rename_failures_atomic",
+      "source": [
+        "network_redirect/backend.py:178",
+        "network_redirect/backend.py:728",
+        "network_redirect/activity_monday.py:148"
+      ],
+      "detail": "失败改名以event12结果返回，role_profiles仍走save；既有save调用activity_monday.track，非零mid触发state初始化。HEAD backend已有同一调用。",
+      "preexisting_commit": "38461ee",
+      "diagnostic_control": {
+        "patch": "仅测试进程mock activity_monday.track返回空列表",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0
+      }
+    }
+  ],
+  "conclusion": "两项均为任务前已有活动路径与测试断言不一致，不是本轮战斗机制回归引入。该审计仅记录证据，未修改相关生产逻辑或测试。",
+  "full_regression_log": ".runtime/combat-full-regression.log"
+}

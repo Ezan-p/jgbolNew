@@ -19,17 +19,18 @@ def state(s,cross=False,r=None):
     if m.get('day')!=s['day']:
         m['previous_roster']=m.get('npc_roster',[])[:]
         m.pop('union_id',None);m.pop('union_snapshot',None)
-    if m.get('day')!=s['day']:m.update(npc_roster=[],tournament_leaders=[],settlement=None,total_score=0,life=life,streak=0,max_streak=0,loss_streak=0,target_life={},merit=0,day=s['day'],signed=cross,fights=0,wins=0,score=0,claimed=False,bets={},records=[],purchases={},npc_scores={},target_stats={},npc_rounds=[])
+    if m.get('day')!=s['day']:m.update(npc_roster=[],tournament_leaders=[],settlement=None,total_score=0,life=life,streak=0,max_streak=0,loss_streak=0,target_life={},merit=0,day=s['day'],signed=cross,fights=0,wins=0,draws=0,score=0,claimed=False,bets={},records=[],purchases={},npc_scores={},target_stats={},npc_rounds=[])
     for k,v in dict(life=life,streak=0,max_streak=0,loss_streak=0,target_life={},merit=0).items():m.setdefault(k,v)
     m.setdefault('total_score',m['score'])
     for k,v in dict(npc_scores={},target_stats={},npc_rounds=[]).items():m.setdefault(k,v)
+    m.setdefault('draws',0)
     return m
 
 
 def enter(role,s,g,now,r,cross=False):
     m=state(s,cross,r);start=s['day']*86400-r['timezone_offset_hours']*3600
     group=3 if cross else 7
-    stats=dict(match_type=CLIENT_MATCH_STAGE,group_type=group,win_count=m['wins'],lose_count=m['fights']-m['wins'],score=m['score'],life_point=m['life'])
+    stats=dict(match_type=CLIENT_MATCH_STAGE,group_type=group,win_count=m['wins'],lose_count=m['fights']-m['wins']-m['draws'],score=m['score'],life_point=m['life'])
     pending=m['fights']>0 and not m['claimed']
     return dict(area=2,area_name='本地区',union_data=stats,owner_data=stats,time_info=dict(begin_time=start,end_time=start+86400),has_match_flag=m['signed'],
         can_rece_award=pending,prize_list=[dict(match_type=CLIENT_MATCH_STAGE,from_group=group,to_group=group)] if pending else [],
@@ -195,7 +196,7 @@ def npc_round(role,s,g,now,r,jrules,cross):
     sandbox=dict(day=s['day'],fight_id=0)
     result,_,replay=simulate(actor,sandbox,r,jrules,17 if cross else 14,
                              enemy['profile']['role_name'],enemy_npc=second)
-    winner=90002 if 1<=result<=3 else 90003
+    winner=90002 if 1<=result<=3 else 90003 if 4<=result<=6 else 0
     for ident in (90002,90003):m['npc_scores'][str(ident)]=m['npc_scores'].get(str(ident),0)+(50 if ident==winner else 1)
     m['npc_rounds'].append(dict(round=m['fights'],src=first,des=second,winner=winner,result=result,
                                 time=now,round_count=replay.get('fight_result_msg',{}).get('fight_round',0)))
@@ -258,17 +259,22 @@ def fight(role,s,g,req,now,r,jrules):
     m['union_id']=g['id']
     m['union_snapshot']={k:copy.deepcopy(g[k]) for k in ('id','name','level','popularity','members')}
     result,packets,replay=simulate(role,s,r,jrules,req['fight_type'],enemy['profile']['role_name'],enemy_npc=enemy['npc_id'])
-    m['fights']+=1;win=1<=result<=3;m['wins']+=int(win)
-    ts=m['target_stats'].setdefault(str(target),dict(fights=0,wins=0,merit=0));ts['fights']+=1;ts['wins']+=int(not win)
-    ts['merit']+=0 if win else r['match_merit'].get(str(role['union_rank']),1)
+    m['fights']+=1;win=1<=result<=3;lost=4<=result<=6;m['wins']+=int(win)
+    m['draws']+=int(result==0)
+    ts=m['target_stats'].setdefault(str(target),dict(fights=0,wins=0,merit=0));ts['fights']+=1;ts['wins']+=int(lost)
+    ts['merit']+=r['match_merit'].get(str(role['union_rank']),1) if lost else 0
     rank=[1,7,2,3,4,5][target-90001];merit=r['match_merit'][str(rank)]
     if win:
         m['streak']=min(r['match_max_streak'],m['streak']+1);m['max_streak']=max(m['max_streak'],m['streak']);m['loss_streak']=0
         m['merit']+=merit;m['score']+=merit*10
         m['target_life'][str(target)]=max(0,m['target_life'].get(str(target),r['match_life'])-r['match_target_loss'])
-    else:m['life']=max(0,m['life']-r['match_loss_life']);m['streak']=0;m['loss_streak']+=1;m['score']+=1
+    else:
+        m['streak']=0;m['score']+=1
+        if lost:
+            m['life']=max(0,m['life']-r['match_loss_life']);m['loss_streak']+=1
+        else:m['loss_streak']=0
     m['total_score']+=merit*10 if win else 1
-    m['npc_scores']['90001']=m['npc_scores'].get('90001',0)+(1 if win else r['match_merit'].get(str(role['union_rank']),1)*10)
+    m['npc_scores']['90001']=m['npc_scores'].get('90001',0)+(r['match_merit'].get(str(role['union_rank']),1)*10 if lost else 1)
     npc_round(role,s,g,now,r,jrules,cross)
     gain=u.contribution(role,merit*2 if win else 2);m['records'].append(replay);m['records']=m['records'][-10:]
     out=targets(role,s,g,r,cross);out.update(query_type=28 if cross else 12,fight_result=result,get_contrib=gain)
@@ -303,7 +309,7 @@ def tournament(role,s,g,r,cross=False):
     m=state(s,cross,r)
     if m.get('settlement'):return copy.deepcopy(m['settlement']['ranking'])
     leader=next(v for v in g['members'].values() if v['rank']==1)
-    rows=[dict(id=g['id'],union_id=g['id'],name=g['name'],union_name=g['name'],leader_id=int(leader['id']),leader_name=leader['name'],score=m['total_score'],life_point=m['life'],group_type=7,level=g['level'],area='本地区',win_count=m['wins'],lose_count=m['fights']-m['wins'])]
+    rows=[dict(id=g['id'],union_id=g['id'],name=g['name'],union_name=g['name'],leader_id=int(leader['id']),leader_name=leader['name'],score=m['total_score'],life_point=m['life'],group_type=7,level=g['level'],area='本地区',win_count=m['wins'],lose_count=m['fights']-m['wins']-m['draws'])]
     roster=opponents(role,s,g,r,cross)
     if not m.get('tournament_leaders'):
         from .guild_offline import roll
@@ -316,7 +322,7 @@ def tournament(role,s,g,r,cross=False):
     for i,name in enumerate(('离线演武盟','离线蓬莱盟','离线昆仑盟'),1):
         score=m['npc_scores'].get(str(90000+i),0)
         p=npc_players.catalog()[m['tournament_leaders'][i-1]]['profile']
-        rows.append(dict(id=90000+i,union_id=90000+i,name=name,union_name=name,leader_id=p['role_id'],leader_name=p['role_name'],score=score,life_point=sum(m['target_life'].get(str(90001+j),r['match_life']) for j in range(6)) if i==1 else r['match_life'],group_type=7,level=1,area='离线跨服区' if cross else '本地模拟区',win_count=sum(v['winner']==90000+i for v in m['npc_rounds']) if i>1 else m['fights']-m['wins'],lose_count=sum(v['winner']!=90000+i for v in m['npc_rounds']) if i>1 else m['wins']))
+        rows.append(dict(id=90000+i,union_id=90000+i,name=name,union_name=name,leader_id=p['role_id'],leader_name=p['role_name'],score=score,life_point=sum(m['target_life'].get(str(90001+j),r['match_life']) for j in range(6)) if i==1 else r['match_life'],group_type=7,level=1,area='离线跨服区' if cross else '本地模拟区',win_count=sum(v['winner']==90000+i for v in m['npc_rounds']) if i>1 else m['fights']-m['wins']-m['draws'],lose_count=sum(v['winner']!=0 and v['winner']!=90000+i for v in m['npc_rounds']) if i>1 else m['wins']))
     rows.sort(key=lambda row:(-row['score'],row['id']))
     for i,row in enumerate(rows,1):row.update(order=i,server_name=row['area'],group_type=3 if cross else 7)
     return rows

@@ -95,11 +95,11 @@ class CombatPowerTests(unittest.TestCase):
         self.role['activity'] = {'home': {'pets': [dict(type_id=101,order=1,grow_values=[100,200,300,400])],
                                         'train': {'1': {'level':1}}}}
         c = self.calculate()
-        self.assertEqual(c['gongji'], cp.floor(Decimal(base['gongji']) * Decimal('1.01') + 500 + 40))
+        self.assertEqual(c['gongji'], base['gongji'] + 40)
         self.assertEqual(c['hp'], base['hp'])
         self.role['activity']['home']['pets'][0]['order'] = 0
         self.calculate()
-        self.assertEqual(c['gongji'], cp.floor(Decimal(base['gongji']) * Decimal('1.01') + 500))
+        self.assertEqual(c['gongji'], base['gongji'])
 
     def test_cached_fields_and_temporary_effects_not_scored(self):
         base = self.calculate()['combat_power']

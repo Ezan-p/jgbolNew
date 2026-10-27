@@ -110,8 +110,8 @@ def settle(role,s,op,d,now,r,jrules):
         land.news(s,now,f"{'冥界' if hell else '普通'}首领第{layer}层：{'胜利' if win else '未获胜'}。")
         if reward:
             s[key]=dict(layer=layer,cards=[],rewards=[copy.deepcopy(secrets.choice(r['land_card_rewards'])) for _ in range(3 if hell else 5)])
-        return [summon.event(121,replay['fight_events']),response(4,fight_type=4 if hell else 3,des_level=layer,is_win=win,is_reward=reward,
-            return_soul=0,card_list=[],cost_gold_list=r['land_card_gold'],final_result_list=[replay])]
+        return land.replay_response(4,s,r,replay,fight_type=4 if hell else 3,des_level=layer,is_win=win,is_reward=reward,
+            return_soul=0,card_list=[],cost_gold_list=r['land_card_gold'])
     if op in (14,23):
         key='hell' if op==23 else 'boss';pending=s[key];idx=d.get('index')
         a.require(pending is not None and type(idx)is int and 1<=idx<=(3 if op==23 else 5) and all(x['position']!=idx for x in pending['cards']),'翻牌位置无效或已翻开')

@@ -88,6 +88,62 @@ class MarketTests(unittest.TestCase):
         self.now += 86400
         self.assertEqual(self.buy(page_id=1, index=10)['result'], 1)
 
+    def test_month_card_adds_only_one_discounted_soul_fate_pill(self):
+        role = self.backend.profile()
+        role['month_card_time'] = self.now + 86400 * 30
+        self.backend.save(role)
+        catalog = self.request(first_send=1, page_id=1)[0][1]
+        self.assertEqual(catalog['cheap_item_list'][15]['buy_limit_times'], 2)
+        self.assertEqual(catalog['cheap_item_list'][15]['buy_price'], 100)
+        for index, row in catalog['cheap_item_list'].items():
+            if index != 15:
+                self.assertEqual(row['buy_limit_times'], 1)
+        before = self.count(1024)
+        for remaining in (1, 0):
+            self.assertEqual(self.buy(page_id=1, index=15, type_id=1024)['result'], 1)
+            catalog = self.request(first_send=1, page_id=1)[0][1]
+            self.assertEqual(catalog['cheap_item_list'][15]['buy_limit_times'], remaining)
+        self.assertEqual(self.count(1024), before + 2)
+        self.assertEqual(self.backend.profile()['gold_coin'], 9800)
+        saved = self.backend.profile()
+        self.assertEqual(self.buy(page_id=1, index=15, type_id=1024)['result'], 7)
+        self.assertEqual(self.backend.profile(), saved)
+        self.assertEqual(self.buy(page_id=1, index=10)['result'], 1)
+        self.assertEqual(self.buy(page_id=1, index=10)['result'], 7)
+        # The regular-price listing keeps its existing unrestricted batch policy.
+        self.assertEqual(self.buy(page_id=2, index=16, type_id=1024, count=2)['result'], 1)
+
+    def test_month_card_expiry_and_renewal_preserve_used_market_quota(self):
+        role = self.backend.profile()
+        role['month_card_time'] = self.now + 1
+        self.backend.save(role)
+        self.assertEqual(self.buy(page_id=1, index=15, type_id=1024)['result'], 1)
+        self.now += 1
+        catalog = self.request(first_send=1, page_id=1)[0][1]
+        self.assertEqual(catalog['cheap_item_list'][15]['buy_limit_times'], 0)
+        saved = self.backend.profile()
+        self.assertEqual(self.buy(page_id=1, index=15, type_id=1024)['result'], 7)
+        self.assertEqual(self.backend.profile(), saved)
+        role = self.backend.profile()
+        role['month_card_time'] = self.now + 86400 * 30
+        self.backend.save(role)
+        catalog = self.request(first_send=1, page_id=1)[0][1]
+        self.assertEqual(catalog['cheap_item_list'][15]['buy_limit_times'], 1)
+        self.assertEqual(self.buy(page_id=1, index=15, type_id=1024)['result'], 1)
+        role = self.backend.profile()
+        role['month_card_time'] += 86400 * 30
+        self.backend.save(role)
+        self.backend.close()
+        self.backend = Backend(Path(self.tmp.name), 18770, lambda *a, **kw: None)
+        catalog = self.request(first_send=1, page_id=1)[0][1]
+        self.assertEqual(catalog['cheap_item_list'][15]['buy_limit_times'], 0)
+        saved = self.backend.profile()
+        self.assertEqual(self.buy(page_id=1, index=15, type_id=1024)['result'], 7)
+        self.assertEqual(self.backend.profile(), saved)
+        self.now += 86400
+        catalog = self.request(first_send=1, page_id=1)[0][1]
+        self.assertEqual(catalog['cheap_item_list'][15]['buy_limit_times'], 2)
+
     def test_bundle_grants_ten_and_preserves_vip_gate(self):
         self.assertEqual(self.buy(page_id=1, index=8, type_id=1001)['result'], 5)
         role = self.backend.profile()

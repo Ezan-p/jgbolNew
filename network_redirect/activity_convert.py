@@ -4,6 +4,7 @@ import secrets
 from pathlib import Path
 
 from . import formation as f, journey, summon
+from . import battle_replay
 from .protocol import encode
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -86,6 +87,6 @@ def battle(role, req, now, rules, jrules):
     return journey.combat_engine.event_packets(actions, fid) + [
         encode(1028, dict(fight_id=fid, first_hand=1, des_name=NAMES.get(target, '缘神仙'),
                          lineup_count=len(lineup), lineup=lineup)),
-        encode(1027, dict(fight_id=fid, fight_type=10, final_result=result,
+        *battle_replay.result_packets(1027, dict(fight_id=fid, fight_type=10, final_result=result,
                          fight_round=len(actions), fight_result=actions)),
         summon.event(70, cards), summon.event(44, dict(fight_id=fid, fight_type=10))]

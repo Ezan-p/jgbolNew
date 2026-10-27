@@ -3,6 +3,7 @@ import copy
 import csv
 import secrets
 from . import activity as a, formation, journey, summon
+from . import battle_replay
 from .protocol import encode
 from . import activity_abyss_combat as combat
 HANG={int(x['layer']):x for x in summon.rows('specter_hang_ouput.csv')}
@@ -220,7 +221,7 @@ def settle(role,req,now,r,jrules,parse):
         a.require(any(c.get('order') for c in role['corteges']),'请先上阵神仙')
         ours,_=journey.fighters(role,dict(cortege_list=f"{r['battle_npc']}|1"));extras=combat.effects(BOSSES[s['boss']],s['pills']);fight_events=[]
         if extras:
-            result,lineup,actions,fight_events=combat.battle(role,(ours,enemies(s)),jrules,extras,r['abyss_boss_max_actions'])
+            result,lineup,actions,fight_events=combat.battle(role,(ours,enemies(s)),jrules,extras)
         else:result,lineup,actions=journey.battle(role,{},jrules,units=(ours,enemies(s)))
         s['boss_count']+=1;win=1<=result<=3;gain=[]
         if win:
@@ -234,8 +235,7 @@ def settle(role,req,now,r,jrules,parse):
             s['complete']=s['boss']==max(BOSSES);s['boss']=min(max(BOSSES),s['boss']+1);s['pills']={};s['reductions']=[0]*4
             if s['complete']:news(s,'九幽八十一层全部通关！仍可选择已开放层数挂机、处理随机事件和兑换奖励。',now)
         role['activity']['fight_id']+=1;fid=role['activity']['fight_id']
-        extra_packet=journey.combat_engine.event_packets(actions,fid)[0]
-        return [extra_packet,encode(1028,dict(fight_id=fid,first_hand=1,des_name='冥仙',lineup_count=len(lineup),lineup=lineup)),
-            encode(1027,dict(fight_id=fid,fight_type=26,final_result=result,fight_round=len(actions),fight_result=actions)),
+        return journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name='冥仙',lineup_count=len(lineup),lineup=lineup)),
+            *battle_replay.result_packets(1027, dict(fight_id=fid,fight_type=26,final_result=result,fight_round=len(actions),fight_result=actions)),
             response(6,is_win=win,prize_list=gain,**boss(role,s,now)),summon.event(44,dict(fight_id=fid,fight_type=26))]
     a.require(False,'该九幽操作尚缺可验证的服务端配置')

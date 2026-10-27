@@ -2,13 +2,13 @@
 import sys,tempfile
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
-from network_redirect import vip,summon
+from network_redirect import recharge,vip,summon
 from network_redirect.backend import Backend,login_fields
 from network_redirect.protocol import encode,decode
 root=Path(__file__).resolve().parents[2]
 with tempfile.TemporaryDirectory() as tmp:
  b=Backend(Path(tmp),18790,lambda *a,**k:None)
- r=b.profile();r.update(vip_level=10,charge_gold=200000);b.save(r)
+ r=b.profile();r.update(vip_level=10,charge_gold=200000);summon.add_item(r,1156,100);b.save(r)
  lines=["""local ms=assert(package.loaded.ms)
 local v=ms.d_vipUI
 local hadAdapter=v._localVipRestore
@@ -22,7 +22,8 @@ local function check(name,fn)
  results[#results+1]={name=name,ok=ok,error=not ok and tostring(err) or nil}
 end
 """]
- lines.append(Path('network_redirect/vip_client.lua').read_text().replace('__VIP_PRODUCTS__',summon.lua(b.vip_rules['products'])))
+ lines.append(Path('network_redirect/vip_client.lua').read_text())
+ lines.append('ms.d_data.g_new_config.local_recharge='+summon.lua(recharge.client_state(b.profile(),int(__import__('time').time()),recharge.load_rules(),b.welfare_rules)))
  lines.append('ms.d_data.g_new_config[1]='+summon.lua(vip.client_config(b.vip_rules)))
  lines.append('ms.d_data.g_new_config.local_vip='+summon.lua(vip.client_state(r)))
  lines.append("check('open',function() v.show() end)")
@@ -52,9 +53,9 @@ check('recharge_send',function()
  local r=ms.d_rechargeUI
  local button=tolua.cast(r.g_self.menu:getChildByTag(r.g_self.button_tag+1),'CCMenuItem')
  button:activate()
- assert(captured and captured.mid==1111 and captured.data.event_id==250)
- local data=assert(loadstring('return '..captured.data.data))()
- assert(data.item_id==101 and type(data.order_id)=='string')
+ assert(r._localCardSelection and r._localCardSelection.product.id==101)
+ assert(r._localCardSelection.small_count==2)
+ r._localCardCancel()
 end)
 check('close',function() ms.d_rechargeUI.pressClose() end)
 if not hadAdapter and v._localVipRestore then v._localVipRestore() end

@@ -2,7 +2,7 @@
 import json
 import secrets
 from pathlib import Path
-from . import daily, formation as f, journey, summon, xianling, vip
+from . import daily, formation as f, journey, summon, xianling
 from .protocol import encode, decode
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,6 +14,13 @@ def load_rules(path=ROOT/'server_config/welfare_rules.json'):
     f.require(r['mode']=='inferred' and r['schema_version']==1, '福利配置来源无效')
     f.require(set(r['order'])==TYPES and len(r['order'])==len(TYPES), '福利分支配置不完整')
     f.require(1<=r['season_days']<=365 and r['gold_per_rmb']>0 and r['fund_price']>0, '福利周期或价格无效')
+    for key in ('charge', 'single_charge', 'spring_charge', 'daily_total'):
+        rows = r[key]
+        f.require(isinstance(rows,list) and 0<len(rows)<100 and
+                  all(type(x['rmb']) is int and x['rmb']>0 for x in rows) and
+                  all(a['rmb']<b['rmb'] for a,b in zip(rows,rows[1:])), '充值奖励档位无效')
+    f.require(bool(r['fund']) and all(type(x['level']) is int and 1<=x['level']<=99 for x in r['fund'])
+              and all(a['level']<b['level'] for a,b in zip(r['fund'],r['fund'][1:])), '成长基金等级档位无效')
     def validate(obj):
         if isinstance(obj,dict):
             for k,v in obj.items():
@@ -35,19 +42,34 @@ def prepare(role, now, r):
     if now>=s['start']+r['season_days']*86400:s.setdefault('end_level',s.get('last_level',role['level']))
     else:s['last_level']=role['level']
     for k in ('first_charge','first_charge_gift','take_charge_gift_time','buy_growup'):role.setdefault(k,0)
+    s.setdefault('single_max_gold',0)
+    # Prior saves used lifetime claims for the native weekly reward. Preserve
+    # those claims for the upgrade week, then let the next Monday reset them.
+    if not s.get('weekly_claims_migrated'):
+        period=week_period(d)
+        for key in tuple(s['claims']):
+            parts=key.split(':')
+            if len(parts)==2 and parts[0]=='74' and parts[1].isdigit() and int(parts[1])>=100:
+                migrated=key+':'+period
+                if migrated not in s['claims']:s['claims'].append(migrated)
+        s['weekly_claims_migrated']=True
     settle_anniversary_mail(role,now,r,s)
     return s
 
 
 def record_charge(role, gold, now, r, fund=False):
+    f.require(type(gold) is int and gold>0,'充值统计金额无效')
     s=prepare(role,now,r);key=str(daily.day(now,r))
     role['first_charge_gift']=1
     if not fund and not role['first_charge']:
         role['first_charge']=1
         # [A] first-charge-double; [B] eligible local gold products, bonus excluded.
         role['gold_coin']+=gold
-    if now>=s['start']+r['season_days']*86400:return
+    if not s['start']<=now<s['start']+r['season_days']*86400:return
     s['charge_days'][key]=s['charge_days'].get(key,0)+gold
+    # A transaction is one charge even when it spends multiple card stacks.
+    # Never reconstruct single-charge progress from historical daily totals.
+    s['single_max_gold']=max(s['single_max_gold'],gold)
     for typ in (48,67):
         if s['charge_days'][key] > 0:
             count=sum(v>0 for v in s['charge_days'].values())
@@ -67,6 +89,65 @@ def claimed(s,a,i,day=None):return f'{a}:{i}'+(f':{day}' if day is not None else
 def mark(s,a,i,day=None):s['claims'].append(f'{a}:{i}'+(f':{day}' if day is not None else ''))
 def specs(ps):return [daily.spec(p) for p in ps]
 def status(s,a,i,ready,day=None):return 3 if claimed(s,a,i,day) else 2 if ready else 1
+
+
+def week_start(day):
+    # Unix day zero was a Thursday. The input already includes UTC+8 offset.
+    return day-(day+3)%7
+
+
+def week_period(day):return 'week:'+str(week_start(day))
+
+
+def weekly_gold(s,day):
+    start=week_start(day)
+    return sum(value for key,value in s['charge_days'].items() if start<=int(key)<=day)
+
+
+def single_catalog(role,now,r):
+    """Offline extension: each tier is earned by one qualifying transaction."""
+    s=prepare(role,now,r);end=s['start']+r['season_days']*86400
+    money=s['single_max_gold']/r['gold_per_rmb'];active=s['start']<=now<end
+    return dict(start_time=s['start'],end_time=end,max_rmb=money,
+                rows=[dict(index=i,rmb=x['rmb'],status=status(s,'single',i,active and money>=x['rmb']),
+                           prize_list=specs(x['prizes'])) for i,x in enumerate(r['single_charge'],1)])
+
+
+def claim_single(role,index,now,r):
+    f.require(type(index) is int and 1<=index<=len(r['single_charge']),'单充奖励编号无效')
+    data=single_catalog(role,now,r)
+    f.require(data['start_time']<=now<data['end_time'],'单充活动已结束')
+    f.require(data['rows'][index-1]['status']==2,'单笔充值不足或奖励已领取')
+    prizes=[journey.grant(role,p) for p in r['single_charge'][index-1]['prizes']]
+    mark(role['welfare'],'single',index)
+    return [summon.event(80,dict(local_single_charge=single_catalog(role,now,r),local_single_charge_reward=prizes)),
+            summon.event(55,dict(op_string='单充奖励已领取'))]
+
+
+def spring_info(role,now,r):
+    """Native chargePresentUI array plus named fields used by event 47/93."""
+    s=prepare(role,now,r);end=s['start']+r['season_days']*86400
+    money=sum(s['charge_days'].values())/r['gold_per_rmb'];active=s['start']<=now<end
+    rows={i:dict(prize_info=dict(min_money_range=x['rmb'],prize_list=specs(x['prizes'])),
+                 status=status(s,'spring',i,active and money>=x['rmb']))
+          for i,x in enumerate(r['spring_charge'],1)}
+    rows.update(start_time=s['start'],end_time=end,total_charge_count=money)
+    return rows
+
+
+def spring_settle(role,mid,req,now,r):
+    info=spring_info(role,now,r)
+    if mid==1216:
+        f.require(req['flag']==1,'充值礼包查询参数无效')
+        return [summon.event(93,info)]
+    index=req['prize_id']
+    f.require(type(index) is int and 1<=index<=len(r['spring_charge']),'充值礼包编号无效')
+    f.require(info['start_time']<=now<info['end_time'],'充值礼包活动已结束')
+    f.require(info[index]['status']==2,'累计充值不足或礼包已领取')
+    prizes=[journey.grant(role,p) for p in r['spring_charge'][index-1]['prizes']]
+    mark(role['welfare'],'spring',index)
+    return [summon.event(92,dict(prize_id=index,status=3,
+                              prize_info=dict(min_money_range=r['spring_charge'][index-1]['rmb'],prize_list=prizes)))]
 
 def first_prizes():
     # [A] CSV field order is object|type|level|count.
@@ -123,13 +204,14 @@ def catalog(role,now,r):
     out[71]=dict(end_time=end,day=days,charge_rmb=today,
         charge_data=[dict(rmb=x['rmb'],status=status(s,71,i,today>=x['rmb'],d),prize_list=specs(x['prizes'])) for i,x in enumerate(r['charge'],1)],
         ext_charge_data=[dict(day=x['days'],linear_day=days,status=status(s,71,100*i,days>=x['days']),prize_list=specs(x['prizes'])) for i,x in enumerate(r['hole_extra'],1)])
-    out[74]=dict(id=1,data=dict(isopen=active,rmb=today,total_charge=money,charge_rmb=today,
+    week_money=weekly_gold(s,d)/r['gold_per_rmb']
+    out[74]=dict(id=1,data=dict(isopen=active,rmb=today,total_charge=week_money,charge_rmb=today,
         charge_data=[dict(rmb=x['rmb'],status=status(s,74,i,today>=x['rmb'],d),prize_list=specs(x['prizes'])) for i,x in enumerate(r['charge'],1)],
-        total_charge_data=[dict(rmb=x['rmb'],status=status(s,74,100*i,money>=x['rmb']),prize_list=specs(x['prizes'])) for i,x in enumerate(r['daily_total'],1)]))
+        total_charge_data=[dict(rmb=x['rmb'],status=status(s,74,100*i,week_money>=x['rmb'],week_period(d)),prize_list=specs(x['prizes'])) for i,x in enumerate(r['daily_total'],1)]))
     return out
 
 
-def handles(mid,req):return mid in (1127,1239,1352,1102,1103) or mid==1201 and req['flag']==6 or mid==1112 and req['event_id']==3
+def handles(mid,req):return mid in (1127,1239,1352,1102,1103,1215,1216) or mid==1201 and req['flag']==6 or mid==1112 and req['event_id']==3
 
 
 def hint(role,now,r):
@@ -142,7 +224,10 @@ def hint(role,now,r):
     for a in (23,60,71,74):
         rows= list(c[a]['prize_list'].values()) if a==23 else c[a]['gift_list'] if a==60 else c[a]['charge_data'] if a==71 else c[a]['data']['charge_data']
         flags[a]=any(isinstance(x,dict) and x.get('status')==2 for x in rows)
-    return summon.event(80,{24:dict(activity_info=dict(had_prize_flag=flags,show_icon=False),vip_shop=xianling.hint(role,now,xianling.load_rules()),buff_data=dict(buff_type=0))})
+    flags[71]=flags[71] or any(x['status']==2 for x in c[71]['ext_charge_data'])
+    flags[74]=flags[74] or any(x['status']==2 for x in c[74]['data']['total_charge_data'])
+    from . import progression
+    return summon.event(80,{24:dict(activity_info=dict(had_prize_flag=flags,show_icon=False),vip_shop=xianling.hint(role,now,xianling.load_rules()),buff_data=progression.info(role, now))})
 
 
 def query(role,now,r):
@@ -150,23 +235,21 @@ def query(role,now,r):
     return summon.event(127,dict(flag=1,animal_open=True,order_list=r['order'],all_activity=c))
 
 
+def client_state(role,now,r):
+    """Passive state only: native events 47/93/127 are navigation replies."""
+    return dict(all_activity=catalog(role,now,r),spring_info=spring_info(role,now,r))
+
+
 def settle(role,mid,req,now,r,parse):
+    if mid==1112:
+        f.require(False,'请在金卡充值面板使用传世金卡购买成长基金')
+    if mid in (1215,1216):return spring_settle(role,mid,req,now,r)
     s=prepare(role,now,r);c=catalog(role,now,r);d=daily.day(now,r)
     if mid in (1102,1103):return mail_request(role,mid,req,now,r,s)
     if mid==1127 and req['flag']==1:
         a=req['act_type'];f.require(a==0 or a in TYPES,'福利类型无效')
         return [query(role,now,r)] if a==0 else [summon.event(127,dict(flag=1,act_type=a,activity_data=c[a]))]
     if mid==1352 and req['id']==1:return [summon.event(202,c[74])]
-    if mid==1112:
-        data=parse(req['data']);f.require(data.get('item_id')==r['fund_product_id'],'本地预购商品无效')
-        f.require(not role['buy_growup'],'成长基金已购买')
-        # Offline purchase adapter uses the original prebuy protocol; no SDK/payment.
-        role['buy_growup']=1
-        role['charge_gold']=role.get('charge_gold',0)+r['fund_price']
-        vr=vip.load_rules();role['vip_level']=max(role.get('vip_level',0),max(j for j,n in enumerate(vr['thresholds']) if role['charge_gold']>=n))
-        vip.prepare(role,vr);record_charge(role,r['fund_price'],now,r,fund=True)
-        xianling.record_charge(role,r['fund_price'],now)
-        return [summon.event(55,dict(op_string='本地成长基金购买成功'))]
     if mid==1201:
         f.require(role['first_charge_gift'] and not role['take_charge_gift_time'],'尚未首充或礼包已领取')
         ps=[journey.grant(role,p) for p in first_prizes()];role['take_charge_gift_time']=now;role['first_charge_gift']=1
@@ -249,8 +332,9 @@ def settle(role,mid,req,now,r,parse):
         rows=r['hole_extra'] if a==71 and i>=100 else r['daily_total'] if i>=100 else r['charge']
         f.require(1<=k<=len(rows) and (i<100 or i%100==0),'充值奖励编号无效')
         data=c[a] if a==71 else c[a]['data'];field=('ext_charge_data' if a==71 else 'total_charge_data') if i>=100 else 'charge_data'
-        take(i,rows[k-1]['prizes'],data[field][k-1]['status']==2,None if i>=100 else d)
-    else:f.require(False,'该福利通过模拟充值自动发放')
+        period=week_period(d) if a==74 and i>=100 else None if i>=100 else d
+        take(i,rows[k-1]['prizes'],data[field][k-1]['status']==2,period)
+    else:f.require(False,'该福利通过金卡充值自动发放')
     f.require(bool(keys),'没有可领取的福利')
     prizes=[journey.grant(role,p) for p in reward]
     for k,period in keys:mark(s,a,k,period)

@@ -348,7 +348,11 @@ def record_events(role, events, now, parse):
             else:
                 totals = state(role)['totals']; totals['456'] = totals.get('456', 0) // 5 * 5
         if mid not in (2998, 1301): continue
-        event = data['id']; d = parse(data['data'])
+        event = data['id']
+        # Battle effects and long-replay preloads have no achievement facts.
+        # Their authoritative outcome still arrives in the 1027 notification.
+        if mid == 2998 and event == 121: continue
+        d = parse(data['data'])
         if not isinstance(d, dict): continue
         if mid == 1301:
             if d.get('result', 1) != 1: continue

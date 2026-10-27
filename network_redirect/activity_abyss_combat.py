@@ -23,7 +23,9 @@ def effects(row,pills):
     return out
 
 
-def battle(role,units,rules,effect_values,max_actions=80):
+def battle(role,units,rules,effect_values,max_actions=None):
     from .combat_engine import Battle
+    # The historical 80-action override was a serialization workaround. Use
+    # the common combat limit now that extra events are transported in chunks.
     result, lineup, actions = Battle(role, units, rules, extras=effect_values, max_actions=max_actions).run()
     return result, lineup, actions, actions.events

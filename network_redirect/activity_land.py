@@ -1,7 +1,7 @@
 """逐鹿 1302/event149 [A]; local opponents, schedules and soul economy [B]."""
 import copy
 import secrets
-from . import activity as a, journey, summon
+from . import activity as a, journey, summon, battle_replay
 from . import activity_land_npc as npc
 from .activity_land_rewards import gain, news, weekly
 from .protocol import encode, decode
@@ -80,6 +80,11 @@ def info(s,r):
 
 def response(op,s,r,**data):return summon.event(149,dict(flag=op,prey_info=info(s,r),**data))
 
+
+def replay_response(op,s,r,replay,**data):
+    payload=dict(flag=op,prey_info=info(s,r),final_result_list=[replay],**data)
+    return battle_replay.effect_packets(replay['fight_events'])+battle_replay.event_packets(149,payload)
+
 def opponent(r,level=1,ident=1,count=1):
     return dict(id=ident,object_type=2,type_id=r['battle_npc'],name='逐鹿守卫',union_name='',cortege_layer=0,
         cortege_count=count,fight_power=level*100,expect_soul=r['land_travel_soul'],level=level)
@@ -104,6 +109,8 @@ def simulate(role,s,r,jrules,level,count=1,cur_num=None,target=None,team=False,e
     if encounter is not None:
         enemies=copy.deepcopy(encounter['units'])
     if team and s.get('team'):
+        from .combat_loadout import attach_owned_bonuses
+        attach_owned_bonuses(role, ours)
         members=s['team']['members'];limit=min(s['grid_count'],8//len(members))
         player_units=ours[:limit];ours=[]
         for m in members:
@@ -116,16 +123,12 @@ def simulate(role,s,r,jrules,level,count=1,cur_num=None,target=None,team=False,e
     for u in ours:
         for i,key in enumerate(('gongji','fangyu','hp','magic'),1):u[key]=u[key]*(100+info(s,r)['charm_plus'][i])//100
         u['max_hp']=u['hp']
-    replay_rules=copy.deepcopy(jrules);replay_rules['battle']['max_actions']=min(r['land_max_actions'],jrules['battle']['max_actions'])
-    # Rulai shields can exceed 1 KB before either army is defeated. Allow
-    # those events while reserving room for 80 actions in the nested Lua replay.
-    replay_rules['battle']['mechanics']['event_budget_bytes']=min(4000,jrules['battle']['mechanics']['event_budget_bytes'])
-    result,lineup,actions=journey.battle(role,{},replay_rules,units=(ours,enemies))
+    result,lineup,actions=journey.battle(role,{},jrules,units=(ours,enemies))
     role['activity']['fight_id']+=1;fid=role['activity']['fight_id']
     # [A] landUI consumes nested Lua replay messages, not independent 1027 packets.
     name=encounter['name'] if encounter is not None else npc.catalog()[target]['role']['name'] if target else '逐鹿守卫'
     return result,dict(fight_events=journey.combat_engine.event_data(actions,fid),line_up_msg=decode(encode(1028,dict(fight_id=fid,first_hand=1,des_name=name,lineup_count=len(lineup),lineup=lineup)))[2],
-        fight_result_msg=decode(encode(1027,dict(fight_id=fid,fight_type=21,final_result=result,fight_round=len(actions),fight_result=actions)))[2])
+        fight_result_msg=battle_replay.result_message(dict(fight_id=fid,fight_type=21,final_result=result,fight_round=len(actions),fight_result=actions)))
 
 
 def towers(s,now,r):
@@ -191,7 +194,7 @@ def settle(role,req,now,r,jrules,parse):
             gain(s,reward);kind=secrets.randbelow(4)+1;charm(s,kind,5,1);drop=dict(key=kind,value=5)
         news(s,now,f"游历挑战{target['name']}：{'胜利' if win else '未获胜'}，获得{reward}魂力。")
         s['travel']=None
-        return [summon.event(121,replay['fight_events']),response(4,s,r,fight_type=1,is_win=win,soul_count=reward,charm_data=drop,final_result_list=[replay])]
+        return replay_response(4,s,r,replay,fight_type=1,is_win=win,soul_count=reward,**(dict(charm_data=drop) if drop else {}))
     if op==6:return [response(6,s,r,charm_get=bag(s),exchange_consume=r['land_charm_exchange'])]
     if op==7:
         idx=d.get('index');a.require(type(idx)is int and idx in CHARMS,'符咒位置无效');row=CHARMS[idx]
@@ -250,6 +253,6 @@ def settle(role,req,now,r,jrules,parse):
         result,replay=simulate(role,s,r,jrules,s['map_level']*5,count=s['map_level'],target=t['npc_id'],team=t['tower_type']==1);s['attack_count']+=1;win=1<=result<=3
         news(s,now,f"攻打{tid}号塔：{'胜利' if win else '未获胜'}。")
         if win:s['tower_id']=tid;t.update(owner_type=1,owner_name=role['role_name'],last_tick=now,expire=now+r['land_tower_duration'])
-        return [summon.event(121,replay['fight_events']),response(4,s,r,fight_type=2,des_id=tid,is_win=win,final_result_list=[replay])]
+        return replay_response(4,s,r,replay,fight_type=2,des_id=tid,is_win=win)
     from .activity_land_boss import settle as boss_settle
     return boss_settle(role,s,op,d,now,r,jrules)

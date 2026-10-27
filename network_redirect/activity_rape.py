@@ -4,6 +4,7 @@ import secrets
 import json
 from functools import lru_cache
 from . import activity as a, activity_rape_npc as npcs, activity_rank, formation, journey, summon, cheer, combat, reborn_stars
+from . import battle_replay
 from .protocol import encode
 
 
@@ -129,6 +130,10 @@ def battle(role, req, now, r, jrules):
     a.require(any(1<=c.get('order',0)<=8 for c in role['corteges']),'请先上阵神仙');a.spend(role,'energy',1)
     result,lineup,actions=journey.battle(role,{},jrules,units=(activity_rank.units(role),activity_rank.units(npcs.catalog()[target['npc_id']]['role'])))
     win=1<=result<=3;events=[];s['fight_id']+=1;fid=s['fight_id']
+    from . import progression, formation
+    xp=int(formation.LEVELS[role['level']]['energy_win_exp' if win else 'energy_lose_exp'])
+    progression.add_exp(role,xp,now)
+    events.append(summon.event(45,dict(fight_id=fid,obj_type=1,exp_plus=xp)))
     if win:target['has_win']=True
     if ft==12:
         if win:
@@ -145,7 +150,7 @@ def battle(role, req, now, r, jrules):
             ident=next_id(s);s['rape_revenge_day']=s['day']
             s['rape_revenge'][str(ident)]=dict(id=int(req['des_id']),npc_id=target['npc_id'],name=target['name'],level=target['level'],time=now,skill_type=b['skill_type'],has_win=False)
             events.append(messages(role))
-    return journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name=target['name'],lineup_count=len(lineup),lineup=lineup)),encode(1027,dict(fight_id=fid,fight_type=ft,final_result=result,fight_round=len(actions),fight_result=actions))]+events+[summon.event(44,dict(fight_id=fid,fight_type=ft))]
+    return journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name=target['name'],lineup_count=len(lineup),lineup=lineup)),*battle_replay.result_packets(1027, dict(fight_id=fid,fight_type=ft,final_result=result,fight_round=len(actions),fight_result=actions))]+events+[summon.event(44,dict(fight_id=fid,fight_type=ft))]
 
 
 def settle(role,mid,req,now,r,jrules,parse):

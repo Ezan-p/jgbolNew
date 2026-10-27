@@ -2,6 +2,7 @@
 import copy
 import secrets
 from . import activity as a, formation, journey, summon
+from . import battle_replay
 from .protocol import encode
 
 
@@ -245,6 +246,6 @@ def settle(role,req,now,r,jrules,parse):
         result,lineup,actions=journey.battle(role,cfg,jrules);s['passed']=1<=result<=3
         role['activity']['fight_id']+=1;fid=role['activity']['fight_id']
         return journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name='红尘劫',lineup_count=len(lineup),lineup=lineup)),
-            encode(1027,dict(fight_id=fid,fight_type=34,final_result=result,fight_round=len(actions),fight_result=actions)),
+            *battle_replay.result_packets(1027, dict(fight_id=fid,fight_type=34,final_result=result,fight_round=len(actions),fight_result=actions)),
             response(25,dict(has_passed=s['passed'],fight_count=s['fight_count'])),summon.event(44,dict(fight_id=fid,fight_type=34))]
     a.require(False,'洞府操作无效')

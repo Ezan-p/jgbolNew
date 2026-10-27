@@ -544,7 +544,9 @@ class LandTests(ActivityCase):
         unit=dict(type=1001,order=1,level=1,evolve=0,reborn=0,hp=100000000,max_hp=100000000,magic=1,gongji=1,fangyu=1,skills=[])
         with patch.object(journey,'fighters',return_value=([unit],[copy.deepcopy(unit)])):
             result,replay=land.simulate(r,s,self.b.activity_rules,self.b.journey_rules,1)
-        self.assertEqual(len(replay['fight_result_msg']['fight_result']),80)
+        # Two main actions per complete round; no legacy 80-action cutoff.
+        self.assertEqual(len(replay['fight_result_msg']['fight_result']),60)
+        self.assertEqual(replay['fight_result_msg']['fight_result'][-1]['cur_round'],30)
         packet=land.response(4,s,self.b.activity_rules,final_result_list=[replay])
         self.assertLess(len(packet),32768)
 

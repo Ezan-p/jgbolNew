@@ -2,7 +2,7 @@
 import copy
 import unittest
 from unittest.mock import patch
-from network_redirect import combat, combat_engine as e, journey
+from network_redirect import combat, combat_engine as e, journey, summon
 from network_redirect.protocol import encode, decode
 from network_redirect.backend import login_fields
 
@@ -133,7 +133,9 @@ class EngineTests(unittest.TestCase):
     def test_rulai_shares_raw_damage_before_hp_cap_without_recursion(self):
         b = self.battle([unit(gongji=1000)], [unit(hp=500, skills=[(21, 10)]), unit(2, skills=[(21, 10)])])
         b.attack(b.sides[0][0], [b.sides[1][0]])
-        self.assertEqual(b.actions[0]['damage_list'][:2], [500, 120])
+        self.assertEqual(b.actions[0]['damage_list'][:2], [500, 0])
+        self.assertEqual(b.actions.events[0]['logic_type'], 101201)
+        self.assertEqual(b.actions.events[0]['skill_result_list'], [dict(field=65, field_plus=-120, des_order=2)])
         self.assertEqual(e.total_damage(b.actions), 620)
 
     def test_shield_absorbs_before_hp_and_lifesteal(self):
@@ -167,8 +169,8 @@ class EngineTests(unittest.TestCase):
             self.assertEqual(combat.select_skill(actor), (1, 1))
 
     def test_reordered_identity_preserves_engraved_effects(self):
-        role = dict(corteges=[dict(id=7, type=1001, order=1)], attachments=[
-            dict(type_id=10219, level=5, attach_type=5, owner_id=7)])
+        role = dict(corteges=[dict(id=7, type=1001, order=1, equiped_ext_skill_limit=1)], attachments=[
+            dict(id=1, type_id=10219, level=5, attach_type=5, count=1, owner_id=7, ext_skill_pos=1)])
         fighter = unit(9, companion_id=7)
         b = e.Battle(role, ([fighter], [unit()]), self.rules, slots=9)
         self.assertEqual(combat.effect(b.sides[0][0], 19), (12, 14))
@@ -188,7 +190,7 @@ class EngineTests(unittest.TestCase):
                     hp[side, order] -= hit
                     self.assertGreaterEqual(hp[side, order], 0)
             for event in payload.values():
-                if isinstance(event, dict) and event['cur_action'] == index:
+                if isinstance(event, dict) and event.get('cur_action') == index:
                     for v in event['skill_result_list'].values():
                         if v['field'] == 65:
                             hp[event['who_use'], v['des_order']] += v['field_plus']
@@ -216,7 +218,9 @@ class EngineTests(unittest.TestCase):
         b = self.battle([unit(gongji=10000, magic=10000)],
             [unit(), unit(2, hp=10, max_hp=1000, skills=[(21, 10)], essences={19: (100, 50)})])
         b.attack(b.sides[0][0], b.sides[1], skill=101)
-        self.assertEqual(b.actions[0]['damage_list'][1], 10)
+        self.assertEqual(b.actions[0]['damage_list'][1], 0)
+        self.assertEqual([(event['logic_type'], event['skill_result_list'][0]['field_plus'])
+                          for event in b.actions.events], [(101201, -10), (101191, 500)])
         self.assertEqual(b.sides[1][1]['hp'], 500)
         self.assertEqual(b.sides[1][1]['revive_count'], 1)
 
@@ -268,6 +272,11 @@ class EngineTests(unittest.TestCase):
         self.assertGreater(b.sides[0][2]['hp'], 200)
         self.assertEqual(b.sides[1][0]['hp'], 1000)
         self.assertEqual(e.total_damage(b.actions), 0)
+        self.assertTrue(b.actions.events)
+        self.assertTrue(all(event['logic_type'] == 101101 for event in b.actions.events))
+        self.assertTrue(all(change['field'] == 65 and change['field_plus'] > 0
+                            for event in b.actions.events for change in event['skill_result_list']))
+        self.assertEqual([u['max_hp'] for u in b.sides[0]], [1000, 1000, 1000])
 
     def test_placeholder_projectile_uses_physical_formula(self):
         actor, target = unit(magic=100000), unit()
@@ -291,17 +300,21 @@ class EngineTests(unittest.TestCase):
                   for i in range(1, 10)] for _ in range(2)]
         b = e.Battle({}, sides, self.rules, slots=9)
         result, lineup, actions = b.run()
-        for packet in (e.event_packets(actions, 123)[0], encode(1140, dict(fight_id=123,
-                fight_type=30, final_result=result, fight_round=len(actions), fight_result=actions))):
+        event_packets = e.event_packets(actions, 123)
+        for packet in event_packets + e.result_packets(1140, dict(fight_id=123,
+                fight_type=30, final_result=result, fight_round=len(actions), fight_result=actions)):
             self.assertLessEqual(len(packet), 32768)
+        # Full transport reassembly is covered by test_battle_replay. Here
+        # verify every authoritative HP event for the actual heavy battle.
+        payload = e.event_data(actions, 123)
         hp = {(side, u['order']): u['hp'] for side, team in enumerate(b.initial, 1) for u in team}
         for index, row in enumerate(actions, 1):
             side = 2 if row['is_src'] else 1
             for order, hit in enumerate(row['damage_list'], 1):
                 hp[side, order] -= hit
                 self.assertGreaterEqual(hp[side, order], 0)
-            for event in actions.events:
-                if event['cur_action'] == index:
+            for event in payload.values():
+                if isinstance(event, dict) and event.get('cur_action') == index:
                     for v in event['skill_result_list']:
                         if v['field'] == 65:
                             hp[event['who_use'], v['des_order']] += v['field_plus']

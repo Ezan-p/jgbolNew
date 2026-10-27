@@ -93,7 +93,8 @@ def load_rules(path=ROOT / 'server_config/journey_rules.json'):
                         ('multi_target_limit', 1, 8)]:
         require(type(b.get(key)) is int and lo <= b[key] <= hi, '战斗配置无效：' + key)
     combat.validate_rules(b)
-    require(b.get('first_hand') == 'challenger' and b.get('timeout') == 'unresolved'
+    require(b.get('max_rounds') == combat_engine.MAX_ROUNDS, '所有战斗必须使用30回合上限')
+    require(b.get('first_hand') == 'challenger' and b.get('timeout') == 'total_remaining_hp'
             and r.get('drop_policy') == 'independent_percent'
             and r.get('sweep_result') == 'historical_best_star'
             and r.get('first_win_extra_exp') == 'all_active_companions', '不支持的旅途结算策略')
@@ -213,14 +214,14 @@ def stars(hp, maximum):
 
 
 def fighters(role, cfg):
+    from .combat_loadout import equipped_skills
     ours = []
     for c in sorted(role['corteges'], key=lambda c: c.get('order', 0)):
         if not 1 <= c.get('order', 0) <= 8:
             continue
         unit = dict(companion_id=c['id'], type=c['type'], order=c['order'], level=c['level'], evolve=c.get('evolve_level', 0),
                     reborn=c.get('reborn_layer', 0), **{s: max(1, int(c[s])) for s in formation.STATS})
-        unit['skills'] = [(i['type_id'], i['level']) for i in role['attachments'] if i['attach_type'] == 6
-                          and i.get('equip_order') == c['order'] and i.get('equip_pos', 0) > 0]
+        unit['skills'] = equipped_skills(role, c['order'])
         ours.append(unit)
     enemies = []
     for order, token in enumerate(cfg['cortege_list'].split('/'), 1):
@@ -236,6 +237,7 @@ def fighters(role, cfg):
             unit[stat] = max(1, int(float(base[col]) + float(base[growth]) * (level - 1)))
         sk = [int(s) for s in parts[2].split('+')] if len(parts) > 2 and parts[2] else [int(base['chushijineng'])]
         unit['skills'] = [(s, int(cfg.get('skill_level', 1))) for s in sk if s in formation.SKILLS]
+        combat.apply_npc_passives(unit)
         enemies.append(unit)
     for u in ours + enemies:
         u['max_hp'] = u['hp']
@@ -303,17 +305,15 @@ def drops(role, value, map_prize=False):
     return result
 
 
-def experience(role, cfg, win, rules, formation_rules, bonus_exp=0):
+def experience(role, cfg, win, rules, formation_rules, bonus_exp=0, now=None):
     level = role['level']
     gain = int(formation.LEVELS[level]['win_exp' if win else 'lose_exp']) * int(cfg['strenth_consume'])
-    role['cur_exp'] += gain
-    while role['level'] < max(formation.LEVELS) and role['cur_exp'] >= int(formation.LEVELS[role['level']]['upgrade_exp']):
-        role['cur_exp'] -= int(formation.LEVELS[role['level']]['upgrade_exp'])
-        role['level'] += 1
-    role['next_exp'] = int(formation.LEVELS[role['level']]['upgrade_exp'])
-    if role['level'] == max(formation.LEVELS):
-        role['cur_exp'] = min(role['cur_exp'], role['next_exp'])
+    from . import progression
+    eligible, percent = progression.strength_bonus(role, int(cfg['strenth_consume']), now)
+    gain += int(formation.LEVELS[level]['win_exp' if win else 'lose_exp']) * eligible * percent // 100
+    progression.add_exp(role, gain, now)
     exp = int(cfg['exp']) * (100 if win else rules['defeat_companion_exp_percent']) // 100 + bonus_exp
+    exp += exp * eligible * percent // (100 * max(1, int(cfg['strenth_consume'])))
     exp_list = {}
     for c in role['corteges']:
         if not c.get('order'):
@@ -331,6 +331,7 @@ def experience(role, cfg, win, rules, formation_rules, bonus_exp=0):
         c['next_exp'] = formation.EXPERIENCE.get((quality, c['level']), 0)
         exp_list[c['order']] = applied
     money = int(cfg['money']) * (100 if win else rules['defeat_silver_percent']) // 100
+    money += money * eligible * percent // (100 * max(1, int(cfg['strenth_consume'])))
     role['silver_coin'] += money
     return gain, exp_list, money
 
@@ -363,7 +364,7 @@ def attempt(role, kind, gid, cfg, result, now, rules, formation_rules, activity_
                 prize_events.append(summon.event(22, dict(prize_type=2, prize_list=bonus)))
                 prize_list.extend(bonus)
         state['pass_star'] = max(state['pass_star'], result)
-    gain, exp_list, money = experience(role, cfg, win, rules, formation_rules, bonus_exp)
+    gain, exp_list, money = experience(role, cfg, win, rules, formation_rules, bonus_exp, now)
     return dict(role_add_exp=gain, exp_list=exp_list, silver_coin=money, send_prize_list=prize_list), prize_events
 
 
@@ -472,7 +473,7 @@ def settle(role, mid, req, now, rules, formation_rules, activity_rules=None):
         from . import activity_trial
         prizes += activity_trial.encounter(role, now, activity_rules)
     return combat_engine.event_packets(actions, fid) + [encode(1028, dict(fight_id=fid, first_hand=1, des_name='旅途', lineup_count=len(lineup), lineup=lineup)),
-            encode(1027, dict(fight_id=fid, fight_type=ft, final_result=result, fight_round=len(actions), fight_result=actions)),
+            *combat_engine.result_packets(1027, dict(fight_id=fid, fight_type=ft, final_result=result, fight_round=len(actions), fight_result=actions)),
             summon.event(45, dict(fight_id=fid, obj_type=1, exp_plus=outcome['role_add_exp'])),
             summon.event(45, dict(fight_id=fid, obj_type=4, exp_list=outcome['exp_list']))] + prizes + [
             summon.event(44, dict(fight_id=fid, fight_type=ft, **getattr(actions, 'talent', {})))]

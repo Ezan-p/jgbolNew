@@ -1,6 +1,6 @@
 """Server-authoritative guild battles, original fixed-width replay format."""
 import copy
-from . import guild as u, journey, summon, npc_players, combat, reborn_stars, spirit_array
+from . import guild as u, journey, summon, npc_players, combat, reborn_stars, spirit_array, battle_replay
 from .protocol import encode,decode
 
 
@@ -14,7 +14,7 @@ def record_events(records):
     for replay in records:
         data = replay.get('fight_events')
         if data:
-            packets.append(summon.event(121, {int(k) if str(k).isdigit() else k: v for k, v in data.items()}))
+            packets.extend(battle_replay.effect_packets(data))
     return packets
 
 
@@ -28,31 +28,18 @@ def client_records(records):
 
 
 def recent_records(records):
-    """Keep complete newest replays within the native Lua event packet budget."""
-    selected = []
-    for replay in reversed(records):
-        if len(summon.lua([replay] + selected).encode('utf-8')) > 28000:
-            break
-        selected.insert(0, replay)
-    return client_records(selected)
+    """Retain every stored replay; transport chunking handles packet limits."""
+    return client_records(records)
+
+
+def replay_reply(op, data):
+    return battle_replay.lua_packets(1301, dict(id=op), data)
 
 
 def player_units(role):
     """Take an immutable player's actual formation, including attached effects."""
-    units=journey.fighters(role,dict(cortege_list='1001|1'))[0]
-    combat.attach_essences(role,units)
-    reborn_stars.attach_combat_traits(role,units)
-    # Joint formation has no shared owner. Attach each owner's bonuses before
-    # moving slots, then use a neutral combat owner to avoid double attachment.
-    home=role.get('activity',{}).get('home',{}).get('train',{})
-    if home:
-        from fractions import Fraction
-        from .activity_home import TRAIN
-        bonuses=[tuple(map(Fraction,TRAIN[i,home.get(str(i),{}).get('level',0)]['worth'].split('|')))
-                 if home.get(str(i),{}).get('level',0) else (0,0) for i in range(1,5)]
-        for unit in units:unit['training_bonuses']=bonuses
-    spirit_array.attach_combat(role,units)
-    return units
+    from .combat_loadout import player_units as snapshot
+    return snapshot(role)
 
 
 def joint_units(roles):
@@ -146,13 +133,12 @@ def simulate(role,s,r,jrules,ft,name,hp=None,*,enemy_npc=None,ally_roles=None,ac
         for unit in units[0]:
             for key in ('hp','max_hp','gongji','fangyu','magic'):unit[key]=unit[key]*(100+bonus)//100
     if hp is not None:units[1][0].update(hp=hp,max_hp=trial['hp'] if trial else hp)
-    rules=copy.deepcopy(jrules);rules['battle']['max_actions']=min(60,rules['battle']['max_actions'])
-    rules['battle']['mechanics']['event_budget_bytes']=1000
-    result,lineup,actions=journey.battle(battle_owner,{},rules,units=units,slots=8)
+    result,lineup,actions=journey.battle(battle_owner,{},jrules,units=units,slots=8)
     s['fight_id']=s.get('fight_id',0)+1;fid=s['fight_id']
-    packets=[encode(1028,dict(fight_id=fid,first_hand=1,des_name=name,lineup_count=len(lineup),lineup=lineup)),
-             encode(1027,dict(fight_id=fid,fight_type=ft,final_result=result,fight_round=len(actions),fight_result=actions))]
-    replay=dict(line_up_msg=decode(packets[0])[2],fight_result_msg=decode(packets[1])[2],
+    lineup_packet=encode(1028,dict(fight_id=fid,first_hand=1,des_name=name,lineup_count=len(lineup),lineup=lineup))
+    result_fields=dict(fight_id=fid,fight_type=ft,final_result=result,fight_round=len(actions),fight_result=actions)
+    packets=[lineup_packet,*battle_replay.result_packets(1027,result_fields)]
+    replay=dict(line_up_msg=decode(lineup_packet)[2],fight_result_msg=battle_replay.result_message(result_fields),
         fight_events=journey.combat_engine.event_data(actions,fid),damage_total=journey.combat_engine.total_damage(actions))
     if sources:replay['participants']=sources
     if enemy_npc is not None:replay['enemy_npc']=enemy['npc_id']

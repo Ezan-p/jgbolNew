@@ -15,20 +15,24 @@ def roll(percent):
 
 
 def attach_essences(role, units):
+    from .combat_power import essence_score
     for unit in units:
         c = next((c for c in role.get('corteges', [])
                   if (c['id'] == unit['companion_id'] if unit.get('companion_id') else
                       c.get('order') == unit['order'] and c['type'] == unit['type'])), None)
         if not c:
             continue
-        effects = unit.setdefault('essences', {})
-        for item in role.get('attachments', []):
-            row = ESSENCES.get(item['type_id'])
-            if row and item.get('attach_type') == 5 and item.get('owner_id') == c['id']:
-                unit.setdefault('essence_ids', {})[item['type_id'] % 100] = item['type_id']
-                effects[item['type_id'] % 100] = tuple(
-                    F(part.split('|')[item['level'] - 1].rstrip('%'))
-                    for part in row['parameter'].split('/'))
+        # Share the panel's equipped-instance validation and duplicate resolution.
+        # Ownership alone is insufficient: a stale inventory instance, a locked
+        # slot, level zero or an empty stack must not grant a battle effect.
+        effects = unit['essences'] = {}
+        identities = unit['essence_ids'] = {}
+        for item in essence_score(role, c)['selected']:
+            kind = item['family']
+            identities[kind] = item['type_id']
+            effects[kind] = tuple(
+                F(part.split('|')[item['level'] - 1].rstrip('%'))
+                for part in ESSENCES[item['type_id']]['parameter'].split('/'))
 
 
 def effect(unit, kind):
@@ -43,6 +47,27 @@ def effect(unit, kind):
     if kind in (1, 4, 14, 16, 18):
         return F(0), F(0), F(0)
     return (F(100), F(value)) if kind in (2, 3, 6, 7, 10, 11) else (F(value),)
+
+
+def apply_npc_passives(unit):
+    """[B] Settle a fresh CSV NPC's base stats before its initial HP snapshot.
+
+    Treat the journey table's base_* fields as pre-passive attributes. The
+    original server's inclusion policy is unavailable; percentage values and
+    rounding follow the existing player passive calculation. Call only while
+    constructing a CSV enemy, never on an already settled player/NPC snapshot.
+    """
+    rates = {stat: F(0) for stat in formation.STATS}
+    for skill_id, level in unit.get('skills', []):
+        skill = formation.SKILLS[skill_id]
+        if int(skill['use_mode(1-active，2-passive)']) != 2:
+            continue
+        field = int(skill['effect_field(1-gongji，2-fangyu，3-magic，4-intensity，5-hp)'])
+        stat = {1: 'gongji', 2: 'fangyu', 3: 'magic', 5: 'hp'}.get(field)
+        if stat:
+            rates[stat] += F(formation.skill_effect(dict(type_id=skill_id, level=level)), 100)
+    for stat, rate in rates.items():
+        unit[stat] = int(F(unit[stat]) * (1 + rate))
 
 
 def target_count(skill_id, rules):

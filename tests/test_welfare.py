@@ -46,25 +46,29 @@ class WelfareTests(unittest.TestCase):
   self.assertTrue(self.error(self.req(1239,buy_count=6)))
   self.assertFalse(self.error(self.req(1239,buy_count=5)))
   self.assertEqual(start-self.b.profile()['gold_coin'],800)
- def test_daily_pay_resets_only_daily(self):
+ def test_daily_pay_and_monday_weekly_reset(self):
   self.ready()
   for op in (2,3):
    self.assertFalse(self.error(self.req(1352,id=op,data='{index=1}')))
    self.assertTrue(self.error(self.req(1352,id=op,data='{index=1}')))
   role=self.b.profile();nextday=NOW+86400;welfare.record_charge(role,1000,nextday,self.b.welfare_rules)
   cat=welfare.catalog(role,nextday,self.b.welfare_rules)[74]['data']
-  self.assertEqual(cat['charge_data'][0]['status'],2);self.assertEqual(cat['total_charge_data'][0]['status'],3)
- def test_fund_simulation_first_gift_not_double(self):
-  self.assertFalse(self.error(self.req(1112,event_id=3,data='{item_id=8}')) and not self.b.profile().get('buy_growup'))
+  self.assertEqual(cat['charge_data'][0]['status'],2);self.assertEqual(cat['total_charge_data'][0]['status'],2)
+  self.assertEqual(cat['total_charge'],100)
+ def test_fund_cards_first_gift_not_double(self):
+  before=self.b.profile();self.assertTrue(self.error(self.req(1112,event_id=3,data='{item_id=8}')));self.assertEqual(before,self.b.profile())
+  role=self.b.profile();summon.add_item(role,1156,9);self.b.save(role)
+  self.req(1111,event_id=251,data='{item_id=202,order_id="welfare-fund-001",large_count=0,small_count=9}')
   r=self.b.profile();self.assertEqual(r['buy_growup'],1);self.assertEqual(r['gold_coin'],60);self.assertEqual(r['first_charge'],0);self.assertEqual(r['first_charge_gift'],1)
   self.assertFalse(self.error(self.req(1201,flag=6,id=0)));self.assertTrue(self.error(self.req(1201,flag=6,id=0)))
   self.assertTrue(self.error(self.req(1112,event_id=3,data='{item_id=8}')))
  def test_first_charge_double_only_once(self):
-  self.req(1111,event_id=250,data='{item_id=101,order_id="welfare-order-001"}')
+  role=self.b.profile();summon.add_item(role,1156,4);self.b.save(role)
+  self.req(1111,event_id=251,data='{item_id=101,order_id="welfare-order-001",large_count=0,small_count=2}')
   r=self.b.profile();self.assertEqual(r['gold_coin'],260);self.assertEqual(r['charge_gold'],100)
-  self.req(1111,event_id=250,data='{item_id=101,order_id="welfare-order-001"}')
+  self.req(1111,event_id=251,data='{item_id=101,order_id="welfare-order-001",large_count=0,small_count=2}')
   self.assertEqual(r,self.b.profile())
-  self.req(1111,event_id=250,data='{item_id=101,order_id="welfare-order-002"}')
+  self.req(1111,event_id=251,data='{item_id=101,order_id="welfare-order-002",large_count=0,small_count=2}')
   self.assertEqual(self.b.profile()['gold_coin'],360)
  def test_upgrade_after_deadline_uses_frozen_level(self):
   self.ready();self.assertTrue(self.error(self.claim(7)))

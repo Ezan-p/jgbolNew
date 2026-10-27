@@ -6,6 +6,7 @@ from unittest.mock import patch
 from network_redirect.backend import Backend, login_fields
 from network_redirect import vip, summon, journey, activity, reborn_stars
 from network_redirect.protocol import encode, decode
+from recharge_helpers import funded_order
 
 NOW=1792814400
 class VipTests(unittest.TestCase):
@@ -14,6 +15,7 @@ class VipTests(unittest.TestCase):
         self.b=Backend(Path(self.tmp.name),18790,lambda *a,**k:None)
         self.addCleanup(lambda:self.b.close());self.serial=200
         clock=patch('network_redirect.backend.time.time',return_value=NOW);clock.start();self.addCleanup(clock.stop)
+        funded_order(self.b,101,'seed-test-cards')
     def req(self,mid=1201,**data):
         self.serial+=1;self.packet=encode(mid,dict(serial_num=self.serial,**data))
         self.reply=self.b.respond(self.packet,dict(authenticated=True))
@@ -70,14 +72,14 @@ class VipTests(unittest.TestCase):
         self.assertEqual(out[-1][0],21);self.assertEqual(len(out[-1][1]['attach_list']),15)
         self.assertEqual(self.req(1051,**args)[-1][0],55)
     def test_recharge_replay_and_restart(self):
-        self.req(1111,event_id=250,data='{item_id=3,order_id="test-order-0003"}')
-        r=self.b.profile();self.assertEqual((r['charge_gold'],r['vip_level'],r['gold_coin']),(1000,3,2120))
+        self.req(1111,event_id=251,data='{item_id=103,large_count=2,small_count=0,order_id="test-order-0003"}')
+        r=self.b.profile();self.assertEqual((r['charge_gold'],r['vip_level'],r['gold_coin']),(1000,3,2230))
         self.assertEqual(self.b.respond(self.packet,dict(authenticated=True)),self.reply)
         self.assertEqual(self.b.profile(),r)
-        self.assertEqual(self.req(1111,event_id=250,data='{item_id=999,gold=999999}')[-1][0],55)
+        self.assertEqual(self.req(1111,event_id=251,data='{item_id=999,gold=999999}')[-1][0],55)
         self.b.close();self.b=Backend(Path(self.tmp.name),18790,lambda *a,**k:None)
         self.assertEqual(self.b.profile(),r)
-        self.req(1111,event_id=250,data='{item_id=3,order_id="test-order-0003"}')
+        self.req(1111,event_id=251,data='{item_id=103,large_count=2,small_count=0,order_id="test-order-0003"}')
         self.assertEqual(self.b.profile(),r)
 
     def test_limits_all_levels(self):
@@ -97,7 +99,7 @@ class VipTests(unittest.TestCase):
         self.assertEqual(r['divination']['divi_count'],20)
     def test_unauthenticated(self):
         with self.assertRaises(ValueError):
-            self.b.respond(encode(1111,dict(serial_num=1,event_id=250,data='{item_id=1}')),{})
+            self.b.respond(encode(1111,dict(serial_num=1,event_id=251,data='{item_id=1}')),{})
 
     def test_buy_resource_limit_and_upgrade_preserves_used(self):
         self.fixture(1)
@@ -114,34 +116,34 @@ class VipTests(unittest.TestCase):
         before=self.b.profile()
         self.assertEqual(self.req(flag=5,id=0)[-1][0],55)
         self.assertEqual(self.b.profile(),before)
-        self.req(1111,event_id=250,data='{item_id=1,order_id="overflow-order"}')
+        self.req(1111,event_id=251,data='{item_id=101,large_count=0,small_count=2,order_id="overflow-order"}')
         self.assertEqual(self.b.profile(),before)
 
     def test_invalid_orders_and_duplicate_conflicts(self):
-        for data in ('{}','{item_id=1}','{item_id=1,order_id="bad"}','os.execute("no")'):
-            before=self.b.profile();self.assertEqual(self.req(1111,event_id=250,data=data)[-1][0],55);self.assertEqual(before,self.b.profile())
-        self.req(1111,event_id=250,data='{item_id=1,order_id="duplicate-order"}')
+        for data in ('{}','{item_id=1}','{item_id=101,large_count=0,small_count=2,order_id="bad"}','os.execute("no")'):
+            before=self.b.profile();self.assertEqual(self.req(1111,event_id=251,data=data)[-1][0],55);self.assertEqual(before,self.b.profile())
+        self.req(1111,event_id=251,data='{item_id=101,large_count=0,small_count=2,order_id="duplicate-order"}')
         before=self.b.profile()
-        self.req(1111,event_id=250,data='{item_id=2,order_id="duplicate-order"}')
+        self.req(1111,event_id=251,data='{item_id=102,large_count=1,small_count=0,order_id="duplicate-order"}')
         self.assertEqual(before,self.b.profile())
 
     def test_original_layout_products_bonus_and_monthly_base(self):
         expected = [(100,0),(500,50),(1000,110),(2000,240),(5000,650),(10000,1500)]
         for index,(base,bonus) in enumerate(expected,1):
-            product=next(p for p in self.b.vip_rules['products'] if p.get('ui_index')==index)
+            product=next(p for p in self.b.recharge_rules['products'] if p.get('ui_index')==index)
             self.assertEqual((product['gold'],product['bonus']),(base,bonus))
             before=self.b.profile()
-            self.req(1111,event_id=250,data=summon.lua(dict(item_id=product['id'],order_id=f'original-ui-{index}')))
+            self.req(1111,event_id=251,data=funded_order(self.b,product['id'],f'original-ui-{index}'))
             after=self.b.profile()
             self.assertEqual(after['gold_coin']-before['gold_coin'],base+bonus+(base if index==1 else 0)+(60 if index==1 else 0)+(30*(base//500) if index>1 else 0))
             self.assertEqual(after['charge_gold']-before['charge_gold'],base)
             self.assertEqual(after['xianling']['charge'],sum(x[0] for x in expected[:index]))
-            self.req(1111,event_id=250,data=summon.lua(dict(item_id=product['id'],order_id=f'original-ui-{index}')))
+            self.req(1111,event_id=251,data=funded_order(self.b,product['id'],f'original-ui-{index}'))
             self.assertEqual(self.b.profile(),after)
 
     def test_original_products_replay_after_restart(self):
-        self.req(1111,event_id=250,data='{item_id=104,order_id="original-ui-restart"}')
+        self.req(1111,event_id=251,data='{item_id=104,large_count=4,small_count=0,order_id="original-ui-restart"}')
         before=self.b.profile()
         self.b.close();self.b=Backend(Path(self.tmp.name),18790,lambda *a,**k:None)
-        self.req(1111,event_id=250,data='{item_id=104,order_id="original-ui-restart"}')
+        self.req(1111,event_id=251,data='{item_id=104,large_count=4,small_count=0,order_id="original-ui-restart"}')
         self.assertEqual(self.b.profile(),before)

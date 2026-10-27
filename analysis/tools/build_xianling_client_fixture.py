@@ -2,12 +2,12 @@
 import sys,tempfile
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
-from network_redirect import vip,xianling,summon
+from network_redirect import recharge,vip,xianling,summon
 from network_redirect.backend import Backend,login_fields
 from network_redirect.protocol import encode,decode
 root=Path(__file__).resolve().parents[2]
 with tempfile.TemporaryDirectory() as tmp:
- b=Backend(Path(tmp),18790,lambda *a,**k:None);r=b.profile();r['gold_coin']=10000;summon.add_item(r,1140,1000);summon.add_item(r,1249,90);b.save(r)
+ b=Backend(Path(tmp),18790,lambda *a,**k:None);r=b.profile();r['gold_coin']=10000;summon.add_item(r,1140,1000);summon.add_item(r,1249,90);summon.add_item(r,1152,20);summon.add_item(r,1156,100);b.save(r)
  lines=["""local ms=assert(package.loaded.ms)
 local x=ms.d_xianlingShopUI
 local v=ms.d_vipUI
@@ -29,7 +29,8 @@ ms.d_data.getItemCountByType=function(kind,tid) if kind==5 and tid==1249 then re
 local results={}
 local function check(name,fn) local ok,err=xpcall(fn,debug.traceback);results[#results+1]={name=name,ok=ok,error=not ok and tostring(err) or nil} end
 """]
- lines.append(Path('network_redirect/vip_client.lua').read_text().replace('__VIP_PRODUCTS__',summon.lua(b.vip_rules['products'])))
+ lines.append(Path('network_redirect/vip_client.lua').read_text())
+ lines.append('ms.d_data.g_new_config.local_recharge='+summon.lua(recharge.client_state(b.profile(),int(__import__('time').time()),recharge.load_rules(),b.welfare_rules)))
  lines.append("check('open_shop',function() x.create(host);assert(captured.mid==1336 and captured.data.flag==4) end)")
  serial=4000
  def req(name,mid=1336,**kw):
@@ -48,7 +49,7 @@ local function check(name,fn) local ok,err=xpcall(fn,debug.traceback);results[#r
  lines.append("check('batch_dialog',function() x.createBatchBuy(x.g_self.config[1]) end)")
  req('exchange',flag=1,index=1,count=2)
  req('daily_buy',flag=3,index=1,count=1)
- req('charge_tracking',1111,event_id=250,data='{item_id=4,order_id="fixture-charge-01"}')
+ req('charge_tracking',1111,event_id=251,data='{item_id=105,large_count=10,small_count=0,order_id="fixture-charge-01"}')
  req('eligible_monthly',flag=4,index=0,count=0)
  for i in range(1,5):
   lines.append("check('preview_%d',function() x.showGiftDetail(%d);x.g_self.main_layer:removeChildByTag(x.g_self.giftDetailTag,true) end)"%(i,i))
@@ -62,8 +63,9 @@ check('market_recharge',function()
  local r=ms.d_rechargeUI
  assert(r.g_self.main_layer)
  tolua.cast(r.g_self.menu:getChildByTag(r.g_self.button_tag+1),'CCMenuItem'):activate()
+ r._localCardConfirm()
  r.pressClose()
- assert(captured.mid==1111 and captured.data.event_id==250)
+ assert(captured.mid==1111 and captured.data.event_id==251)
  local d=assert(loadstring('return '..captured.data.data))();assert(d.item_id==101 and d.order_id)
 end)
 check('xianling_recharge',function()

@@ -5,6 +5,7 @@ import secrets
 from functools import lru_cache
 from pathlib import Path
 from . import formation, summon, journey, combat, combat_power, reborn_stars, cheer
+from . import battle_replay
 from .protocol import encode, decode
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -136,14 +137,8 @@ def client_state(role):
 
 
 def units(role):
-    ours = []
-    for c in role['corteges']:
-        if not 1 <= c.get('order',0) <= 8: continue
-        u = dict(companion_id=c['id'], type=c['type'], order=c['order'], level=c['level'], evolve=c.get('evolve_level',0), reborn=c.get('reborn_layer',0), max_hp=c['hp'], **{k:c[k] for k in formation.STATS})
-        u['skills'] = [(i['type_id'], i['level']) for i in role['attachments'] if i['attach_type'] == 6 and i.get('equip_order') == c['order'] and i.get('equip_pos',0)>0]
-        ours.append(u)
-    combat.attach_essences(role, ours); reborn_stars.attach_combat_traits(role, ours)
-    return ours
+    from .combat_loadout import player_units
+    return player_units(role)
 
 
 def inspection(role, ident):
@@ -171,16 +166,18 @@ def simulate(role, order, now, jrules, defence=False):
                   old_order=old, new_order=s['rank_order'], stop_reason=getattr(actions,'stop_reason','elimination'),
                   fight_events=journey.combat_engine.event_data(actions,fid),
                   line_up_msg=decode(encode(1028,dict(fight_id=fid,first_hand=1,des_name=target['name'],lineup_count=len(lineup),lineup=lineup)))[2],
-                  fight_result_msg=decode(encode(1027,dict(fight_id=fid,fight_type=2,final_result=result,fight_round=len(actions),fight_result=actions)))[2])
+                  fight_result_msg=battle_replay.result_message(dict(fight_id=fid,fight_type=2,final_result=result,fight_round=len(actions),fight_result=actions)))
     # Check the complete effect packet before committing any cost or rank swap.
-    summon.event(121, replay['fight_events'])
+    from .battle_replay import effect_packets
+    effect_packets(replay['fight_events'])
     s['rank_records'] = (s['rank_records']+[replay])[-rules()['records']:]
     return win, replay
 
 
 def replay_packets(record):
+    from .battle_replay import effect_packets
     effects = {int(k) if str(k).isdigit() else k:v for k,v in record['fight_events'].items()}
-    return [summon.event(121, effects), encode(1028, record['line_up_msg']), encode(1027, record['fight_result_msg'])]
+    return effect_packets(effects)+[encode(1028, record['line_up_msg']), *battle_replay.result_packets(1027, record['fight_result_msg'])]
 
 
 def battle(role, req, now, arules, jrules):
@@ -192,6 +189,9 @@ def battle(role, req, now, arules, jrules):
     require(any(c.get('order') for c in role['corteges']), '请先上阵神仙')
     a.spend(role,'energy',1); s['rank_count'] += 1; role['top_fight_time'] = now
     win, replay = simulate(role, target, now, jrules)
+    from . import progression, formation
+    xp = int(formation.LEVELS[role['level']]['energy_win_exp' if win else 'energy_lose_exp'])
+    progression.add_exp(role, xp, now)
     rewards = []
     if win:
         gain = score(s['rank_order']); s['rank_score'] = min(16777215, s['rank_score']+gain)
@@ -203,7 +203,7 @@ def battle(role, req, now, arules, jrules):
         # Original rankUI flips exactly five cards; flag marks the ONE award.
         rewards = [dict(a.prize_spec(v[:4]),flag=i==0) for i,v in enumerate([chosen]+[cards[(cards.index(chosen)+i)%len(cards)] for i in range(1,5)])]
     prepare(role,now,arules)
-    return replay_packets(replay)+[client_state(role),board(role)]+([summon.event(33,rewards)] if win else [])+[summon.event(44,dict(fight_id=replay['fight_id'],fight_type=2))]
+    return replay_packets(replay)+[summon.event(45,dict(fight_id=replay['fight_id'],obj_type=1,exp_plus=xp)),client_state(role),board(role)]+([summon.event(33,rewards)] if win else [])+[summon.event(44,dict(fight_id=replay['fight_id'],fight_type=2))]
 
 
 def settle(role, mid, req, now, arules, jrules):
@@ -228,7 +228,7 @@ def settle(role, mid, req, now, arules, jrules):
             result=v['fight_result_msg']['final_result']
             label=('守' if v['defence'] else '攻')+('胜' if 1<=result<=3 else '败' if result>=4 else '平')+'·'+v['name'].removeprefix('离线·')
             meta.append(dict(label=label,power=v.get('target_power',0)))
-        return [summon.event(80,dict(local_rank_records=meta)),record_packets(dict(records=s['rank_records']))[0],
+        return [summon.event(80,dict(local_rank_records=meta))]+record_packets(dict(records=s['rank_records']))[:-1]+[
                 summon.event(80,dict(local_rank_show_records=True))]
     if mid == 1051:
         n = req['item_count'] or 1

@@ -4,12 +4,45 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 from network_redirect import achievements as a, formation as f, summon
 from network_redirect.backend import Backend, login_fields
 from network_redirect.protocol import encode, decode
 
 NOW = 1792900800
+
+
+class BattleAchievementTransportTests(unittest.TestCase):
+    def result_packets(self, outcome):
+        from network_redirect import battle_replay
+        actions = [dict(skill_type=1, is_src=True, src_order=1, des_order=1,
+                        cur_round=i//10+1, damage_list=[0]*8) for i in range(300)]
+        return battle_replay.result_packets(1027, dict(fight_id=31, fight_type=20,
+                                                      final_result=outcome, fight_result=actions))
+
+    def test_long_battle_preloads_are_not_parsed_and_true_win_counts(self):
+        role = dict(role_id=1)
+        parse = Mock(side_effect=AssertionError('visual/preload payload must not be parsed'))
+        packets = [summon.event(121, dict(fight_id=31))] + self.result_packets(3)
+        self.assertGreater(len(packets), 2)
+        a.record_events(role, packets, NOW, parse)
+        parse.assert_not_called()
+        self.assertEqual(a.state(role)['totals']['456'], 1)
+
+    def test_long_battle_draw_does_not_add_a_win(self):
+        role = dict(role_id=1)
+        a.add(role, 456, 4)
+        parse = Mock(side_effect=AssertionError('visual/preload payload must not be parsed'))
+        a.record_events(role, self.result_packets(0), NOW, parse)
+        parse.assert_not_called()
+        self.assertEqual(a.state(role)['totals']['456'], 0)
+
+    def test_other_event_payloads_keep_existing_parse_path(self):
+        role = dict(role_id=1)
+        parse = Mock(return_value={})
+        packets = [summon.event(21, {}), encode(1301, dict(id=121, data='{}'))]
+        a.record_events(role, packets, NOW, parse)
+        self.assertEqual(parse.call_count, 2)
 
 
 class AchievementTests(unittest.TestCase):

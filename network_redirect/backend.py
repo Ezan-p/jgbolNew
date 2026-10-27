@@ -11,8 +11,8 @@ import struct
 import time
 
 from .protocol import encode, decode
-from . import role_profile, achievements, spirit_array, npc_players, gift_codes, xianyuan_fruit
-from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily, guild, vip, xianling, welfare, cheer, monument, equipment
+from . import progression, role_profile, achievements, spirit_array, npc_players, gift_codes, xianyuan_fruit
+from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily, guild, vip, xianling, welfare, recharge, cheer, monument, equipment
 
 
 # The client initializes these sections together in data.set_g_new_config.
@@ -25,7 +25,7 @@ CLIENT_CONFIG = '''{
     [11]=__STONE_CONFIG__,
     [14]=__CHEER_CONFIG__,
     [15]=__IMMORTAL_CONFIG__,
-    [24]={vip_shop=__XIANLING_HINT__,buff_data={buff_type=0},yuanshi_info=__YUANSHI_CONFIG__},
+    [24]={vip_shop=__XIANLING_HINT__,buff_data=__PROGRESSION_HINT__,yuanshi_info=__YUANSHI_CONFIG__},
     config_end=true
 }'''
 with (Path(__file__).resolve().parents[1] / 'analysis/configs/role_level_config.csv').open() as _levels:
@@ -69,6 +69,7 @@ class Backend:
         self.last_welfare_serial = 0
         self.xianling_rules = xianling.load_rules()
         self.vip_rules = vip.load_rules()
+        self.recharge_rules = recharge.load_rules()
         self.vip_replies = {}
         self.last_vip_serial = 0
         self.guild_rules = guild.load_rules()
@@ -80,6 +81,7 @@ class Backend:
         self.reborn_rules = reborn.load_rules()
         self.reborn_replies = {}
         self.last_reborn_serial = 0
+        progression.load_rules()
         self.summon_rules = summon.load_rules()
         self.formation_rules = formation.load_rules()
         self.cheer_rules = cheer.load_rules()
@@ -135,6 +137,7 @@ class Backend:
             if 'attachments' not in role:
                 role['attachments'] = []
                 changed = True
+            progression.prepare(role)
             role_profile.prepare(role, self.profile_rules)
             cheer.prepare(role, self.cheer_rules)
             changed = formation.prepare(role, self.formation_rules) or changed
@@ -160,6 +163,7 @@ class Backend:
 
     def save(self, role, account=None, *, gameplay=True):
         account = self.account if account is None else account
+        progression.prepare(role)
         role_profile.prepare(role, self.profile_rules)
         cheer.prepare(role, self.cheer_rules)
         vip.prepare(role, self.vip_rules)
@@ -212,6 +216,7 @@ class Backend:
         self.save(role)
         vip.prepare(role, self.vip_rules)
         config = CLIENT_CONFIG.replace('__MARKET_CONFIG__', summon.lua(goods))
+        config = config.replace('__PROGRESSION_HINT__', summon.lua(progression.info(role, int(time.time()))))
         from . import activity_monday
         config = config.replace('config_end=true', '[21]=' + str(activity_monday.hint(role, int(time.time()))) + ',config_end=true')
         config = config.replace('__STONE_CONFIG__', summon.lua(dict(open_flag=True, min_role_level=equipment.load_rules()['min_role_level'])))
@@ -223,6 +228,7 @@ class Backend:
         for key, value in daily.client_config(self.daily_rules).items():
             config = config.replace('config_end=true', '[%d]=' % key + summon.lua(value) + ',config_end=true')
         config = config.replace('config_end=true', '[1]=' + summon.lua(vip.client_config(self.vip_rules)) + ',local_vip=' + summon.lua(vip.client_state(role)) + ',config_end=true')
+        config = config.replace('config_end=true', 'local_recharge=' + summon.lua(recharge.client_state(role, int(time.time()), self.recharge_rules, self.welfare_rules)) + ',config_end=true')
         from . import activity_party
         config = config.replace('__PARTY_CONFIG__', summon.lua(activity_party.client_config(role,self.activity_rules)))
         config = config.replace('__IMMORTAL_CONFIG__', summon.lua(immortal.client_config(self.immortal_rules)))
@@ -597,6 +603,8 @@ class Backend:
             return self.role_profiles(packet, mid, data)
         if monument.handles(mid, data):
             return self.monuments(packet, mid, data)
+        if recharge.handles(mid, data):
+            return self.vips(packet, mid, data)
         if welfare.handles(mid, data):
             return self.welfares(packet, mid, data)
         if mid == 1104:
@@ -863,18 +871,21 @@ class Backend:
             return self.complete(serial, [summon.event(55, {'op_string': '福利请求已过期，请刷新后重试'})])
         try:
             now = int(time.time())
-            role = self.profile()
+            self.profile()
+            self.db.execute('BEGIN IMMEDIATE')
+            role = json.loads(self.db.execute('SELECT data FROM roles WHERE account=?', (self.account,)).fetchone()[0])
             before = copy.deepcopy(role)
             events = welfare.settle(role, mid, data, now, self.welfare_rules, login_fields)
             achievements.record_events(role, events, int(time.time()), login_fields)
             replies = self.item_deltas(before, role) + self.inventory(role) + summon.soul_snapshots(role) + [
-                welfare_attributes(role), vip.attrs(role), summon.event(80,dict(local_vip=vip.client_state(role)))] + events + [welfare.hint(role, now, self.welfare_rules),welfare.mail_snapshot(role,now,self.welfare_rules)]
+                welfare_attributes(role), vip.attrs(role), summon.event(80,dict(local_vip=vip.client_state(role), local_recharge=recharge.client_state(role, now, self.recharge_rules, self.welfare_rules), local_welfare=welfare.client_state(role, now, self.welfare_rules)))] + events + [welfare.hint(role, now, self.welfare_rules),welfare.mail_snapshot(role,now,self.welfare_rules)]
             if mid == 1103 and 'pavilion' in role:
                 from . import activity_pavilion
                 replies.append(activity_pavilion.update(role, now, self.duty_peers()))
             self.save(role)
             self.emit('game_welfare_ok', message_id=mid, rules_revision=self.welfare_rules['revision'])
-        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
+        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error, sqlite3.Error) as error:
+            self.db.rollback()
             replies = [summon.event(55, {'op_string': str(error) if isinstance(error, formation.Rejected) else '福利数据无效，请刷新后重试'})]
             self.emit('game_welfare_rejected', message_id=mid, message=str(error))
         replies = self.complete(serial, replies)
@@ -893,29 +904,26 @@ class Backend:
             return self.complete(serial, [summon.event(55, {'op_string': 'VIP请求已过期，请刷新后重试'})])
         try:
             now = int(time.time())
-            role = self.profile()
+            self.profile()  # Complete legacy migrations before taking the payment lock.
+            self.db.execute('BEGIN IMMEDIATE')
+            role = json.loads(self.db.execute('SELECT data FROM roles WHERE account=?', (self.account,)).fetchone()[0])
             before = copy.deepcopy(role)
-            if mid == 1336 or mid == 1051 and data['item_type'] == 1249:
+            if recharge.handles(mid, data):
+                events = recharge.settle(role, mid, data, now, self.recharge_rules, self.vip_rules, self.welfare_rules, login_fields)
+                achievements.record_events(role, events, now, login_fields)
+            elif mid == 1336 or mid == 1051 and data['item_type'] == 1249:
                 events = xianling.settle(role, mid, data, now, self.xianling_rules)
                 achievements.record_events(role, events, int(time.time()), login_fields)
             else:
                 events = vip.settle(role, mid, data, now, self.vip_rules, login_fields)
                 achievements.record_events(role, events, int(time.time()), login_fields)
             charged = role.get('charge_gold',0)-before.get('charge_gold',0)
-            if charged > 0:
-                xianling.record_charge(role, charged, now)
-                welfare.record_charge(role, charged, now, self.welfare_rules)
-                from . import activity_pavilion
-                activity_pavilion.record_charge(role, charged, now)
-                from . import activity_yuanshi
-                activity_yuanshi.record_charge(role, charged, now)
-                from . import activity_rulai
-                activity_rulai.record_charge(role, charged, now)
             journey.prepare(role, now, self.journey_rules)
             activity.prepare(role, now, self.activity_rules, self.duty_peers())
             formation.prepare(role, self.formation_rules)
-            replies = self.companion_deltas(before, role) + self.item_deltas(before, role) + self.inventory(role) + self.power_attributes(role) + [vip.attrs(role),
-                summon.event(80, dict(local_vip=vip.client_state(role)))] + events
+            from . import activity_rulai, activity_yuanshi, activity_pavilion
+            replies = self.companion_deltas(before, role) + self.item_deltas(before, role) + self.inventory(role) + self.power_attributes(role) + [vip.attrs(role), recharge.attrs(role), welfare_attributes(role),
+                summon.event(80, dict(local_vip=vip.client_state(role), local_recharge=recharge.client_state(role, now, self.recharge_rules, self.welfare_rules), **(dict(local_welfare=welfare.client_state(role, now, self.welfare_rules)) if mid in (1111,1051) else {})))] + events
             if mid in (1336,1111):
                 replies.append(xianling.tip(role,now,self.xianling_rules))
                 if mid == 1111:
@@ -925,9 +933,27 @@ class Backend:
                             activity_pavilion.update(role, now, self.duty_peers()),
                             welfare.mail_snapshot(role, now, self.welfare_rules)]
             self.save(role)
-            self.emit('game_vip_ok', message_id=mid, rules_revision=self.vip_rules['revision'])
-        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
+            # Telemetry failure cannot turn a committed payment into a failed
+            # payment receipt; the client must still receive its success data.
+            try:
+                self.emit('game_vip_ok', message_id=mid, rules_revision=self.vip_rules['revision'])
+            except Exception:
+                pass
+        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error, sqlite3.Error) as error:
+            self.db.rollback()
             replies = [summon.event(55, {'op_string': str(error) if isinstance(error, formation.Rejected) else 'VIP数据无效，请刷新后重试'})]
+            # A definite rollback is different from a lost acknowledgement.
+            # Let the UI unlock this rejected order, while retaining uncertain
+            # orders for same-ID retry. Never persist this transient receipt.
+            if mid == 1111 and data.get('event_id') in (251, 253) and 'before' in locals():
+                try:
+                    order = login_fields(data['data']).get('order_id')
+                    if isinstance(order, str) and recharge.ORDER.fullmatch(order):
+                        receipt = recharge.client_state(before, now, self.recharge_rules, self.welfare_rules)
+                        receipt['failed_order_id'] = order
+                        replies.insert(0, summon.event(80, dict(local_recharge=receipt)))
+                except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error):
+                    pass  # Keep the error + 1106 ack even if state is malformed.
             self.emit('game_vip_rejected', message_id=mid, message=str(error))
         replies = self.complete(serial, replies)
         self.last_vip_serial = serial
@@ -1143,7 +1169,10 @@ class Backend:
             achievements.record_events(role, events, int(time.time()), login_fields)
             welfare.track(role,mid,data,events,now,self.welfare_rules)
             hints = daily.track(role, before, mid, data, events, now, self.daily_rules, login_fields)
-            # Keep the sweep result first and the battle-start callback last.
+            upgrades = progression.upgrade_events(before, role)
+            if upgrades:
+                events = upgrades + [welfare.hint(role, now, self.welfare_rules)] + events
+            # Keep the battle-start callback last.
             events = events + hints if mid == 1061 else hints + events
             formation.prepare(role, self.formation_rules)
             immortal.prepare(role, self.immortal_rules)
@@ -1185,12 +1214,15 @@ class Backend:
             before = copy.deepcopy(role)
             events = activity.settle(role, mid, data, now, self.activity_rules,
                                      self.journey_rules, self.formation_rules, login_fields, self.duty_peers())
+            upgrades = progression.upgrade_events(before, role)
+            if upgrades or mid == 1131:
+                events = upgrades + [welfare.hint(role, now, self.welfare_rules)] + events
             achievements.record_events(role, events, int(time.time()), login_fields)
             welfare.track(role,mid,data,events,int(time.time()),self.welfare_rules)
             events = daily.track(role, before, mid, data, events, now, self.daily_rules, login_fields) + events
             formation.prepare(role, self.formation_rules)
             immortal.prepare(role, self.immortal_rules)
-            attrs = activity.attributes(role) + self.power_attributes(role)
+            attrs = activity.attributes(role) + self.power_attributes(role) + self.journey_attributes(role)
             replies = (self.companion_deltas(before, role) + self.item_deltas(before, role)
                        + self.inventory(role) + summon.soul_snapshots(role)
                        + immortal.handbook(role, self.immortal_rules) + attrs + events)
