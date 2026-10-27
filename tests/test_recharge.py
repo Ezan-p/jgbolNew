@@ -421,7 +421,7 @@ class GoldCardRechargeTests(unittest.TestCase):
         for output in outputs:
             self.assertFalse({47,48,93,127} & {e for e,_ in output})
             passive = next(d['local_welfare'] for e,d in output if e == 80 and 'local_welfare' in d)
-            self.assertGreater(passive['spring_info']['total_charge_count'],0)
+            self.assertEqual(passive['spring_info'],dict(start_time=0,end_time=0,total_charge_count=0))
             self.assertIn(22,passive['all_activity'])
 
     def test_growth_fund_purchase_cancel_equivalent_and_every_level_reward_once(self):

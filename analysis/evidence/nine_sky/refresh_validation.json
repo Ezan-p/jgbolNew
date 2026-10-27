@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-27",
+  "revision": "nine-sky-2026-10-27-v2",
+  "passed": true,
+  "live_account_modified": false,
+  "focused_tests": {
+    "activity_nine_sky": 24,
+    "nine_sky_battle": 8,
+    "market": 19,
+    "system_mail": 8,
+    "offline_backend": 18
+  },
+  "tls_note": "Five loopback TLS tests initially blocked by sandbox; all passed after temporary loopback permission.",
+  "regression_note": "Updated bootstrap catalog assertion to include permanent Nine Sky gift 9137/1243.",
+  "client": {
+    "lua51": 10,
+    "native_cocos": 30,
+    "timed_ten_roll_animation": true
+  },
+  "original_asset_audit": {
+    "files": 14,
+    "route_tables": 3,
+    "routes": 42
+  },
+  "playthrough": {
+    "passed": true,
+    "requests": 49,
+    "rolls": 351,
+    "steps": 962,
+    "floor": 9,
+    "stars": 4975,
+    "gold_spent": 34000,
+    "restart_preserved": true,
+    "star_shop_reward": [
+      5,
+      1023,
+      1,
+      1
+    ],
+    "battle_count": 33,
+    "battle_wins": 0,
+    "live_account_modified": false,
+    "temporary_starting_gold": 100000
+  },
+  "source_sha256": {
+    "network_redirect/activity_nine_sky.py": "57df055937b2004b2231f1ad769dc74ffc4ea2c0ada3ca6e5933537687290dcb",
+    "network_redirect/nine_sky_battle.py": "9760816ae0cf5a53798173142a164c384632da5114cc58eaafc2f1cb0f3899fd",
+    "network_redirect/nine_sky_client.lua": "cb1ec1e5114f3e455cd79564021031612f8031400769e9b9a101e3df18c53718",
+    "server_config/nine_sky_rules.json": "f317948bffc8fa52c297eac3c879292efe8b0577427d1bae9e5e713083203560",
+    "tests/test_activity_nine_sky.py": "3ecd670b74e14bbe5399316f41c679013a4b5365c3f9e87c93523159d385a39d",
+    "tests/test_nine_sky_battle.py": "20a795db0ed169d13c21d6c3c8a6899bc0e9cc9810091cc101daf2040ff9954c",
+    "tests/nine_sky_client_regression.lua": "771f029bb8d7a98a295e76b339c6eaec12be0b6fb1bc7ea091fe594b3e0c933c"
+  },
+  "activity_regression": {
+    "tests": 458,
+    "passed": true,
+    "seconds": 453.634,
+    "note": "Two additional Nine Sky integration/config tests were added during this run and passed in the separate final 24-test Nine Sky run."
+  }
+}

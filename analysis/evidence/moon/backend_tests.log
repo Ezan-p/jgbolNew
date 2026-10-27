@@ -1,0 +1,23 @@
+缘聚中秋本次验证记录（2026-10-27，北京时间）
+以下为本次终端实际执行结果的汇总；均使用隔离临时数据库。
+
+python -m unittest discover -s tests -p test_activity_moon.py
+Ran 11 tests in 15.264s — OK
+后续新增两项按名称执行：
+PYTHONPATH=tests python -m unittest test_activity_moon.MoonTests.test_legacy_starter_migration_and_recipe_failure_rollback test_activity_moon.MoonTests.test_hundred_foods_aggregate_and_crafting_daily_limit
+Ran 2 tests in 1.051s — OK
+
+python -m unittest discover -s tests -p test_activity.py
+Ran 61 tests in 45.171s — OK
+python -m unittest discover -s tests -p test_activity_duty.py
+Ran 37 tests in 64.979s — OK
+python -m unittest discover -s tests -p test_activity_party.py
+Ran 15 tests in 9.984s — OK
+python -m unittest discover -s tests -p test_journey.py
+Ran 36 tests in 10.386s — OK
+python -m unittest discover -s tests -p test_summon.py
+Ran 26 tests in 30.128s — OK
+
+后端合计188项通过，其中中秋专项13项。
+中秋专项覆盖四池40000个组选择票号、108个具体候选真实协议到账、材料分布、各来源、100个独立开箱、迁移、存档、回滚和防重。
+原生客户端14项通过及恢复现场记录另见client_validation.json。

@@ -3,11 +3,32 @@ from . import guild as u,journey,daily,summon,npc_players
 from .guild_combat import simulate, replay_damage, record_events, recent_records, client_records, replay_reply
 from . import guild_offline as offline, guild_trial
 
+SEARCH_BOARD_SIZE = 18  # Native secretAreaUI draws 6 + 3 + 6 + 3 slots.
+
+
+def search_board(a,s,r):
+    """Keep server reward indices stable when repairing legacy 25-slot saves."""
+    if not a.get('search_tiles'):
+        a['search_tiles']=[dict(item=daily.spec(r['search_rewards'][offline.roll(s,len(r['search_rewards']))]),had_token=i<a['search']) for i in range(SEARCH_BOARD_SIZE)]
+        positions=list(range(1,SEARCH_BOARD_SIZE+1));a['search_order']=[]
+        while positions:a['search_order'].append(positions.pop(offline.roll(s,len(positions))))
+    elif len(a['search_tiles'])>SEARCH_BOARD_SIZE:
+        # Daily searches consume the first five server indices. Remove only
+        # surplus display candidates; never reroll prizes or refund searches.
+        a['search_tiles']=a['search_tiles'][:SEARCH_BOARD_SIZE]
+        order=a['search_order'][:SEARCH_BOARD_SIZE]
+        ranks={value:index for index,value in enumerate(sorted(order),1)}
+        a['search_order']=[ranks[value] for value in order]
+        for row in a['board']:
+            index=row.get('server_index',0)
+            if 1<=index<=SEARCH_BOARD_SIZE:
+                row['index']=row['random_sort']=a['search_order'][index-1]
+
 
 def state(s):
     a=s.setdefault('instances',{})
     if a.get('day')!=s['day']:
-        a.update(train_bosses=[],train_floor=1,train_cleared=0,train_floor_attempts=0)
+        a.update(train_bosses=[],train_floor=1,train_cleared=0,train_floor_attempts=0,completed_tasks=[])
         a.update(train_claimed_stage=0,train_attempts=0,paid_tasks=0,train_hp=None,train_end=0,train_damage={},train_support=0,layer=0,team_opponents={},task_opponents={},search_tiles=[],search_order=[],search_bought={},tasks=[],wander=0,restored_wander_limit=0,field=None,shop_bought={},rank_claimed=False,day=s['day'],team=None,team_fights=0,search=0,points=0,board=[],train_open=False,train_done=False,train_claimed=False,train_record=[],catch=0,reputation=a.get('reputation',0),pets=a.get('pets',[]))
     week=(s['day']+3)//7
     if a.get('week')!=week:
@@ -198,10 +219,7 @@ def settle(role,s,g,op,d,now,r):
         flag=d.get('flag');u.require(type(flag)is int and flag in range(1,8),'寻宝操作无效')
         bought=a.setdefault('search_bought',{})
         def stock():return [dict(daily.spec(p),cost_score=20,buy_times=max(0,5-bought.get(str(i),0))) for i,p in enumerate(r['train_rewards'],1)]
-        if not a.get('search_tiles'):
-            a['search_tiles']=[dict(item=daily.spec(r['search_rewards'][offline.roll(s,len(r['search_rewards']))]),had_token=i<a['search']) for i in range(25)]
-            positions=list(range(1,26));a['search_order']=[]
-            while positions:a['search_order'].append(positions.pop(offline.roll(s,len(positions))))
+        search_board(a,s,r)
         prizes=[];sweep_prizes={};new_broadcast=[]
         if flag in (2,6):
             n=1 if flag==2 else r['search_daily']-a['search']
@@ -224,7 +242,7 @@ def settle(role,s,g,op,d,now,r):
         if flag==7:
             u.require(a['team'] is not None,'请先加入队伍')
             return [u.reply(op,dict(result=1,flag=7,fam_info=team_info(role,a,g,r)))]
-        return [u.reply(op,dict(result=1,flag=flag,index=d.get('index',0),attach_list=prizes,free_times=r['search_daily']-a['search'],search_count=a['search'],cleared_layer=a.get('layer',0),max_layer=r['team_daily'],fight_count=a['team_fights'],sweep_gold_cost=r['search_sweep_gold'],token_index=min(a['search']+1,25),my_broad_data=a['board'][-1] if flag==2 else new_broadcast,gold_cost=10,all_point=a['points'],get_point=10,prize_list=sweep_prizes if flag==6 else prizes,prize_items=a['search_tiles'],search_order=a['search_order'],max_free_times=r['search_daily'],broad_data=a['board'],store_items=stock(),board_size=25,flush_time=(s['day']+1)*86400-r['timezone_offset_hours']*3600))]
+        return [u.reply(op,dict(result=1,flag=flag,index=d.get('index',0),attach_list=prizes,free_times=r['search_daily']-a['search'],search_count=a['search'],cleared_layer=a.get('layer',0),max_layer=r['team_daily'],fight_count=a['team_fights'],sweep_gold_cost=r['search_sweep_gold'],token_index=min(a['search']+1,SEARCH_BOARD_SIZE+1),my_broad_data=a['board'][-1] if flag==2 else new_broadcast,gold_cost=10,all_point=a['points'],get_point=10,prize_list=sweep_prizes if flag==6 else prizes,prize_items=a['search_tiles'],search_order=a['search_order'],max_free_times=r['search_daily'],broad_data=a['board'],store_items=stock(),board_size=SEARCH_BOARD_SIZE,flush_time=(s['day']+1)*86400-r['timezone_offset_hours']*3600))]
     if op==79:return [u.reply(op,train_info(role,a,g,now,r))]
     if op in (80,78):
         guild_trial.prepare(a,s,r)

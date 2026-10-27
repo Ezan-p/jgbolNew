@@ -180,7 +180,9 @@ do
    ms.d_undergoOrdealUI.sendMsg(1,{})
   end
   ms.d_undergoOrdealUI.enter=function(...)
-   if ms.d_mainUI.g_playerInfo.level<50 then ms.d_info.show('玩家等级达到50级开放');return end
+   -- activityUI.getRequireLevel: the outer menu/shop unlocks at 12.
+   -- pressEnterUndergoLayer separately enforces the original 50-level gate.
+   if ms.d_mainUI.g_playerInfo.level<12 then ms.d_info.show('玩家等级达到12级开放');return end
    return oldRootEnter(...)
   end
   ui.enter=function(...)

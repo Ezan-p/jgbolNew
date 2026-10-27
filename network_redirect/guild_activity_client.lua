@@ -41,6 +41,13 @@ do
   replace(secret,'showPrizePage',function(parent,...)
    remainingLabel=nil;remainingParent=nil
    local s=secret.g_self;local data=s.prize_data or {}
+   -- Older running servers/cached pages contain 25 rewards, but the native
+   -- carousel creates only 18 buttons. Its selected slot can otherwise be
+   -- 19..25 and abort rendering before the controls/close button are created.
+   if data.prize_items and #data.prize_items>18 then
+    for i=#data.prize_items,19,-1 do data.prize_items[i]=nil end
+    data.sort_list={} -- Rebuild from the retained server indices and order.
+   end
    if data.free_times~=nil then s.free_times=data.free_times end
    local count=s.fight_count
    if data.cleared_layer~=nil then s.fight_count=data.cleared_layer end

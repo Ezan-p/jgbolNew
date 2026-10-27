@@ -111,10 +111,17 @@
     "new season clears charge/draw/claim counters; inventory/souls remain; bag usage independent of season",
     "recharge close refreshes native UI; login/status updates schedule and hint"
   ],
+  "user_overrides": [
+    "slot1: peach1001x30 -> fruit1246x3",
+    "slot2: advanced summon1006x3 -> VIP bag1031x3",
+    "slot3: super summon1007x1 -> five-star passive fragments6005x5",
+    "slot4: soul pill1024x5 -> five-star treasure fragments6004x5",
+    "retain slot order; slot1 weight1000 (10%), slot6 weight2200 (22%); other weights unchanged; fragment count is5 per win"
+  ],
   "inferred_config": {
     "schema_version": 1,
     "mode": "inferred",
-    "revision": "rulai-2026-10-26-v1",
+    "revision": "rulai-2026-10-27-v3",
     "enabled": true,
     "timezone_offset_hours": 8,
     "period_days": 7,
@@ -133,16 +140,16 @@
       {
         "reward": [
           5,
-          1001,
-          30,
+          1246,
+          3,
           1
         ],
-        "weight": 2500
+        "weight": 1000
       },
       {
         "reward": [
           5,
-          1006,
+          1031,
           3,
           1
         ],
@@ -151,8 +158,8 @@
       {
         "reward": [
           5,
-          1007,
-          1,
+          6005,
+          5,
           1
         ],
         "weight": 1800
@@ -160,7 +167,7 @@
       {
         "reward": [
           5,
-          1024,
+          6004,
           5,
           1
         ],
@@ -182,7 +189,7 @@
           5,
           1
         ],
-        "weight": 700
+        "weight": 2200
       },
       {
         "reward": [

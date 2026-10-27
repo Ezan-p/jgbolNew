@@ -9,9 +9,20 @@ class BalanceTests(unittest.TestCase):
     def test_exact_weighted_distribution_and_boundaries(self):
         for key in ('bonus_tiers', 'drops'):
             rows = b.rules()[key]
-            with patch.object(b.secrets, 'randbelow', side_effect=range(100)):
-                actual = Counter(rows.index(b.weighted(rows)) for _ in range(100))
+            total = sum(row['weight'] for row in rows)
+            with patch.object(b.secrets, 'randbelow', side_effect=range(total)):
+                actual = Counter(rows.index(b.weighted(rows)) for _ in range(total))
             self.assertEqual(actual, {i: row['weight'] for i, row in enumerate(rows)})
+
+    def test_guard_positions_and_reward_pool(self):
+        with patch.object(b.secrets, 'randbelow', side_effect=[0, 0, 1, 600, 2, 999]):
+            results = [b.guard_reward(7) for _ in range(3)]
+        self.assertEqual([r['difficulty'] for r in results], [1, 2, 3])
+        self.assertEqual([r['round'] for r in results], [7]*3)
+        self.assertEqual([r['reward'] for r in results], [[12, 0, 3000, 1], [11, 0, 20, 1], [5, 1031, 1, 1]])
+        self.assertEqual([r['reward'] for r in b.rules()['drops']], [
+            [12, 0, 3000, 1], [11, 0, 20, 1], [5, 1034, 1, 1],
+            [5, 1033, 1, 1], [5, 1032, 1, 1], [5, 1031, 1, 1]])
 
     def test_every_group_and_stage_difficulty_and_stable_schedule(self):
         for group in range(4, 9):
@@ -25,6 +36,16 @@ class BalanceTests(unittest.TestCase):
                 previous = p['targets']
                 self.assertIn(p['npc_id'], npc_players.catalog())
                 self.assertEqual(b.stage(group, stage), p)
+                self.assertEqual(len(set(p['guard_types'])), 3)
+                resources = [int(formation.BASES[t]['resource']) for t in p['guard_types']]
+                self.assertEqual(len(set(resources)), 3)
+                armies = [b.enemies(group, stage, d) for d in (1, 2, 3)]
+                self.assertTrue(set(p['guard_types']).issubset({u['type'] for u in armies[0]}))
+                for easy, normal, hard in zip(*armies):
+                    self.assertEqual(easy['type'], normal['type'])
+                    self.assertEqual(normal['type'], hard['type'])
+                    self.assertTrue(all(easy[s] < normal[s] < hard[s] for s in formation.STATS),
+                                    (group, stage, easy['type']))
             self.assertGreater(len(selected), 20)
 
     def test_complete_lineups_scaling_traits_and_no_source_mutation(self):

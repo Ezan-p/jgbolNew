@@ -1,4 +1,5 @@
 """天机阁: original 1227/event195 and CSV [A], local seasons [B]."""
+import copy
 import json
 from pathlib import Path
 
@@ -57,10 +58,48 @@ def prepare(role, now, r):
     s = role.setdefault('pavilion', dict(start=start, end=end, clock=now,
                                         charge_gold=0, bricks_earned=0, bought={}, claimed=[]))
     # Keep the high-water clock: rewinding cannot resurrect an earlier season.
-    if now >= s['clock'] and start > s['start']:
-        s.update(start=start, end=end, charge_gold=0, bricks_earned=0, bought={}, claimed=[])
+    # A legacy seven-day save migrates once, even when its start is identical
+    # to (or later than) the new globally aligned fortnight's start.
+    if now >= s['clock'] and (start > s['start'] or s['end'] - s['start'] != end - start):
+        trial = copy.deepcopy(role)
+        recycle(trial, now, s)
+        trial['pavilion'].update(start=start, end=end, charge_gold=0, bricks_earned=0,
+                                 bought={}, claimed=[])
+        role.clear(); role.update(trial)
+        s = role['pavilion']
     s['clock'] = max(now, s['clock'])
     return s
+
+
+def recycle(role, now, old):
+    """Retire every old brick, including locked stacks and unclaimed mail."""
+    def brick(p):
+        return p[0] == 5 and p[1] == 1141
+
+    items = role.get('attachments', [])
+    retired = [i for i in items if i['attach_type'] == 5 and i['type_id'] == 1141]
+    bag_count = sum(i['count'] for i in retired)
+    role['attachments'] = [i for i in items if not (i['attach_type'] == 5 and i['type_id'] == 1141)]
+    pending_count = 0
+    for m in role.get('welfare', {}).get('mails', {}).values():
+        if m['claimed']:
+            continue
+        count = sum(p[2] for p in m['prizes'] if brick(p))
+        if not count:
+            continue
+        pending_count += count
+        m['prizes'] = [p for p in m['prizes'] if not brick(p)]
+        m['claimed'] = not m['prizes']
+        m['mail_body'] += f'\n本期刷新，未领取的{count}金砖已按1:1兑换蟠桃，转入“天机阁金砖返还”邮件。'
+    count = bag_count + pending_count
+    if count:
+        mail(role, f"pavilion-recycle-{old['start']}-{old['end']}", '天机阁金砖返还',
+             [[5, 1001, count, 1]], now,
+             body=f'天机阁常驻活动每14天刷新一次，本期进度已重置。剩余金砖共{count}个'
+                  f'（背包{bag_count}个、未领取邮件{pending_count}个），已按1:1兑换为蟠桃{count}个，'
+                  '请领取附件。旧金砖不再保留；累充、全民充值送豪礼、兑换次数和首次兑换资格重新计算。')
+    role['pavilion']['last_recycle'] = dict(start=old['start'], end=old['end'],
+                                           bag_count=bag_count, pending_count=pending_count, count=count)
 
 
 def guard(s, now, r):
@@ -71,7 +110,8 @@ def guard(s, now, r):
 def totals(role, peers, s):
     # Actual local saves only; no invented purchases or recharge NPCs.
     states = [s] + [p['pavilion'] for p in peers or []
-                    if p.get('pavilion', {}).get('start') == s['start']]
+                    if p.get('pavilion', {}).get('start') == s['start']
+                    and p['pavilion'].get('end') == s['end']]
     return sum(p['bricks_earned'] for p in states)
 
 
@@ -115,11 +155,11 @@ def update(role, now, peers=None):
         status=status(role, now, peers), data=catalog(role, now, load_rules(), peers))))
 
 
-def mail(role, key, title, prizes, now):
+def mail(role, key, title, prizes, now, body='天机阁活动奖励，请领取附件。'):
     from . import system_mail, welfare
     # deliver replaces the detached role, so callers must not keep state aliases.
     return system_mail.deliver(role, key=key, title=title,
-        body='天机阁活动奖励，请领取附件。', prizes=prizes,
+        body=body, prizes=prizes,
         now=now, rules=welfare.load_rules())
 
 
@@ -141,7 +181,7 @@ def record_charge(role, gold, now):
             gain += specs(row['gift_list'])[0][2]
     s['bricks_earned'] += gain
     if gain:
-        mail(role, f"pavilion-charge-{s['start']}-{s['charge_gold']}",
+        mail(role, f"pavilion-charge-{s['start']}-{s['end']}-{s['charge_gold']}",
              '天机阁充值金砖', [[5, 1141, gain, 1]], now)
 
 
@@ -174,7 +214,7 @@ def settle(role, req, now, peers=None):
     s['bought'][str(index)] = bought + count
     notifications = []
     if bought == 0:
-        mail(role, f"pavilion-first-{s['start']}-{index}", '天机阁首次兑换好礼',
+        mail(role, f"pavilion-first-{s['start']}-{s['end']}-{index}", '天机阁首次兑换好礼',
              specs(row['gift_prize']), now)
         from . import welfare
         notifications.append(welfare.mail_snapshot(role, now, welfare.load_rules()))

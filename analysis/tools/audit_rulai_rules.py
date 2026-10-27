@@ -48,6 +48,11 @@ def main():
            'award and debit in same transaction before animation; replay cache and persisted account balances',
            'new season clears charge/draw/claim counters; inventory/souls remain; bag usage independent of season',
            'recharge close refreshes native UI; login/status updates schedule and hint'],
+        user_overrides=['slot1: peach1001x30 -> fruit1246x3',
+                        'slot2: advanced summon1006x3 -> VIP bag1031x3',
+                        'slot3: super summon1007x1 -> five-star passive fragments6005x5',
+                        'slot4: soul pill1024x5 -> five-star treasure fragments6004x5',
+                        'retain slot order; slot1 weight1000 (10%), slot6 weight2200 (22%); other weights unchanged; fragment count is5 per win'],
         inferred_config=r.load_rules())
     (out/'official_audit.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print(f'Verified {len(sources)} original assets and {len(strings)} strings')

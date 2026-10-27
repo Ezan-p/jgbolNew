@@ -8,12 +8,18 @@ from . import guild_offline as offline
 def prepare(s):
     a=state(s)
     for k,v in dict(tasks=[],wander=0,field=None,shop_bought={},rank_claimed=False).items():a.setdefault(k,v)
+    # Older saves only recorded free completions. Keep those targets retired.
+    a.setdefault('completed_tasks',list(a['tasks']))
     return a
 
 
-def task(r,index,day=0):
+def task_prizes(r,index):
     from . import pets
-    reward=dict(add_reputation=10*index,prize_list=[daily.spec(p[:2]+[p[2]*index,p[3]]) for p in r['hunt_rewards']]+[daily.spec([5,1346,pets.load_rules()['task_training_boxes'],1])])
+    return [p[:2]+[p[2]*index,p[3]] for p in r['hunt_rewards']]+[[5,1346,pets.load_rules()['task_training_boxes'],1]]
+
+
+def task(r,index,day=0):
+    reward=dict(add_reputation=10*index,prize_list=[daily.spec(p) for p in task_prizes(r,index)])
     return dict(task_info={1:[101+(day+index)%5],2:[201+(day+index)%6],3:[]},prize_info=[reward,reward],boss_info=dict(cur_hp=10000,max_hp=10000,cost_gold=10,fight_count=0),index=index)
 
 
@@ -23,14 +29,23 @@ def wander_capacity(a,r):
 
 
 def main(a,now,r,g):
-    return dict(result=1,cur_reputation=a['reputation'],free_task_times=max(0,r['hunt_daily']-len(a['tasks'])) if r['hunt_weekend_open'] or not weekend(a) else 0,pay_task_times=max(0,r['hunt_paid_limit']-a.get('paid_tasks',0)) if r['hunt_weekend_open'] or not weekend(a) else 0,pay_task_gold=r['hunt_gold'],
-        union_task=[task(r,i,a['day']) for i in range(1,4)] if r['hunt_weekend_open'] or not weekend(a) else [],has_prize=False,pet_info=resident_info(g,r),task_last_time=(a['day']+1)*86400-r['timezone_offset_hours']*3600,
+    completed=set(a.get('completed_tasks',[]))|set(a['tasks'])
+    remaining=[task(r,i,a['day']) for i in range(1,4) if i not in completed] if r['hunt_weekend_open'] or not weekend(a) else []
+    return dict(result=1,cur_reputation=a['reputation'],free_task_times=min(len(remaining),max(0,r['hunt_daily']-len(a['tasks']))),pay_task_times=min(len(remaining),max(0,r['hunt_paid_limit']-a.get('paid_tasks',0))),pay_task_gold=r['hunt_gold'],
+        union_task=remaining,task_day=a['day'],has_prize=False,pet_info=resident_info(g,r),task_last_time=(a['day']+1)*86400-r['timezone_offset_hours']*3600,
         drop_baoxiang_item=daily.spec([5,1346,1,1]),week_reputation=a.get('week_score',0),wander_times=max(0,wander_capacity(a,r)-a['wander']))
 
 
 def shop(a,r):
     return dict(result=1,two_type=1,cur_reputation=a['reputation'],total_reputation=a.get('total_reputation',a['reputation']),
-        item_list=[dict(item=daily.spec(p),consume_gold=0,buy_reputation=20,total_reputation=r['hunt_shop_unlock'][i-1],left_times=max(0,3+a.get('total_reputation',0)//100-a['shop_bought'].get(str(i),0))) for i,p in enumerate(r['pet_shop_items'],1)])
+        item_list=[dict(item=daily.spec(p),consume_gold=0,buy_reputation=r['pet_shop_reputation'][i-1],total_reputation=r['hunt_shop_unlock'][i-1],left_times=max(0,3+a.get('total_reputation',0)//100-a['shop_bought'].get(str(i),0))) for i,p in enumerate(r['pet_shop_items'],1)])
+
+
+def shop_positive(data,key,maximum=2147483647):
+    # Lua numbers can arrive as 4.0 after the native batch picker's arithmetic.
+    value=data.get(key)
+    u.require(type(value) in (int,float) and 0<value<=maximum and value==int(value),'宠物商店参数无效: '+key)
+    return int(value)
 
 
 def settle(role,s,g,op,d,now,r):
@@ -38,6 +53,8 @@ def settle(role,s,g,op,d,now,r):
     if op==83:return [u.reply(op,main(a,now,r,g))]
     if op in (84,85):
         u.authorize(role,r,28);idx=u.positive(d,'task_index',3)
+        if 'task_day' in d:u.require(type(d['task_day']) is int and d['task_day']==a['day'],'灵兽任务已刷新，请重新进入灵宠仙地')
+        u.require(idx not in a['completed_tasks'] and idx not in a['tasks'],'该灵兽任务今日已完成，请等待每日刷新')
         paid=d.get('pay_type')==2
         u.require((a.get('paid_tasks',0)<r['hunt_paid_limit'] if paid else idx not in a['tasks'] and len(a['tasks'])<r['hunt_daily']),'任务已完成或今日次数不足')
         u.require(r['hunt_weekend_open'] or (s['day']+3)%7<5,'周末任务休息，可领取排行奖励')
@@ -57,16 +74,15 @@ def settle(role,s,g,op,d,now,r):
             out.extend(record_events([replay]))
         prizes=[];arrivals=[]
         if won:
+            a['completed_tasks'].append(idx)
             if paid:a['paid_tasks']=a.get('paid_tasks',0)+1
             elif idx not in a['tasks']:a['tasks'].append(idx)
             a['reputation']+=10*idx;a['week_score']=a.get('week_score',0)+10*idx;a['total_reputation']=a.get('total_reputation',0)+10*idx;offline.funds(g,100*idx,r)
-            prizes=[journey.grant(role,p[:2]+[p[2]*idx,p[3]]) for p in r['hunt_rewards']]
+            prizes=[journey.grant(role,p) for p in task_prizes(r,idx)]
             population=residents(g,r)
             tid=r['pet_types'][offline.roll(s,len(r['pet_types']))]
             population[str(tid)]=population.get(str(tid),0)+1
             arrivals=[dict(attach_type=tid,attach_count=1)]
-            from . import pets
-            prizes.append(journey.grant(role,[5,1346,pets.load_rules()['task_training_boxes'],1]))
         # Cache settlement/counts before the battle response destroys the page.
         out.append(u.reply(84,dict(result=1,task_type=typ,task_index=idx,fight_result=won,boss_info=task(r,idx)['boss_info'],prize_reputation=10*idx if won else 0,prize_union_gold=100*idx if won else 0,prize_list=prizes,animal_info=arrivals,task_state=main(a,now,r,g))))
         if typ==2:
@@ -101,10 +117,11 @@ def settle(role,s,g,op,d,now,r):
         acquired=[]
         if caught:
             captured=offline.add_pet(a,tid,s,r)
-            from .journey import grant
-            grant(role,[15,tid,1,captured['quality']])
+            from . import activity_home, pets
             from .activity_home_pets import wire
-            acquired=[wire(role['activity']['home']['pets'][-1])]
+            # Capturing a pet must not reload every seasonal activity rule or
+            # settle the home calendar just to append an inventory entity.
+            acquired=[wire(pets.add(activity_home.storage(role),tid,captured['quality']))]
         flag=1 if caught else 2
         if not caught and not f['tries']:
             resting=offline.roll(s,100)<r['catch_resident_percent']
@@ -122,10 +139,14 @@ def settle(role,s,g,op,d,now,r):
     if op==91:
         typ=d.get('two_type');u.require(typ in (1,2),'灵兽商店操作无效')
         if typ==1:return [u.reply(op,shop(a,r))]
-        idx=u.positive(d,'index',len(r['pet_shop_items']));n=u.positive(d,'buy_count',3)
-        u.require(a.get('total_reputation',0)>=r['hunt_shop_unlock'][idx-1],'累计声望尚未解锁商品')
-        u.require(a['shop_bought'].get(str(idx),0)+n<=3+a.get('total_reputation',0)//100,'购买次数不足');u.require(a['reputation']>=20*n,'声望不足')
-        a['reputation']-=20*n;a['shop_bought'][str(idx)]=a['shop_bought'].get(str(idx),0)+n
+        idx=shop_positive(d,'index',len(r['pet_shop_items']));n=shop_positive(d,'buy_count')
+        offer=shop(a,r)['item_list'][idx-1]
+        u.require(a.get('total_reputation',0)>=offer['total_reputation'],'累计声望尚未解锁商品')
+        # The native UI allows the full advertised stock, which grows with
+        # lifetime reputation. The former fixed cap of 3 rejected valid buys.
+        u.require(n<=offer['left_times'],'购买次数不足')
+        cost=offer['buy_reputation']*n;u.require(a['reputation']>=cost,'声望不足')
+        a['reputation']-=cost;a['shop_bought'][str(idx)]=a['shop_bought'].get(str(idx),0)+n
         p=list(r['pet_shop_items'][idx-1]);p[2]*=n;journey.grant(role,p)
         return [u.reply(op,dict(result=1,two_type=2,index=idx,cur_reputation=a['reputation'],total_reputation=a.get('total_reputation',0),buy_item=shop(a,r)['item_list'][idx-1]))]
     if op==92:

@@ -51,7 +51,7 @@ Interceptor.attach(m.getExportByName('lua_pcall'),{onEnter(args){
                 if sep and rest.startswith(('true:', 'false:')):
                     ok, _, error = rest.partition(':')
                     checks.append(dict(name=name, passed=ok == 'true', error=error))
-    passed = len(checks) == 12 and all(c['passed'] for c in checks)
+    passed = len(checks) == 20 and all(c['passed'] for c in checks)
     report = dict(passed=passed, checks=checks, raw=messages, native_cocos=True,
                   live_account_resources_changed=False, network_sends_captured=True)
     path = ROOT / 'analysis/evidence/recharge/client_validation.json'

@@ -9,6 +9,8 @@ sys.path.insert(0,str(ROOT))
 from network_redirect import activity_pavilion as p,summon
 from network_redirect.backend import Backend,login_fields
 from network_redirect.protocol import encode,decode
+sys.path.insert(0,str(ROOT/'tests'))
+from recharge_helpers import funded_order
 NOW=1792987200
 
 
@@ -22,7 +24,7 @@ def main():
             packet=encode(mid,dict(serial_num=serial,**data));reply=b.respond(packet,{'authenticated':True})
             decoded=[decode(x) for x in reply]
             errors=[login_fields(d['data'])['op_string'] for m,_,d in decoded if m==2998 and d['id']==55]
-            if mid==1111:assert errors==['本地模拟充值成功，不发生真实扣款'],errors
+            if mid==1111:assert errors==['金卡充值成功，计入充值1000元'],errors
             else:assert bool(errors)!=expected,(name,errors)
             after=b.profile()
             if not expected:assert before==after
@@ -38,7 +40,7 @@ def main():
                 if key.startswith('pavilion-') and not m['claimed']:
                     request('领取活动邮件:'+key,1103,mail_id=m['mail_id'])
         request('原版活动入口',1205,flag=0);call('首次进入',1)
-        for i in range(20):request('本地模拟充值'+str(i+1),1111,event_id=250,data=summon.lua(dict(item_id=106,order_id='pavilion-run-'+str(i))))
+        for i in range(20):request('金卡充值'+str(i+1),1111,event_id=251,data=funded_order(b,106,'pavilion-run-'+str(i)))
         mail_claims();call('查看全民奖励',1)
         for i in range(1,5):call('领取全民档位'+str(i),3,index=i)
         call('拒绝重复领奖',3,index=1,expected=False)
@@ -59,11 +61,16 @@ def main():
         assert all(x['count']==1 for x in stones)
         assert role['achievements']['totals'].get('125',0)==0  # belongs to mondayUI/menu32
         old_currency=records[-1]['bricks'];old_mails=role['welfare']['mails'];clock.return_value=role['pavilion']['end']
-        call('下周新一期',1);call('新一期再兑换和首次邮件',2,9,1);mail_claims()
+        call('双周新一期',1)
+        assert records[-1]['bricks']==0
+        refund=next(m for k,m in b.profile()['welfare']['mails'].items() if k.startswith('pavilion-recycle-'))
+        assert refund['prizes']==[[5,1001,old_currency,1]]
+        request('新一期重新充值',1111,event_id=251,data=funded_order(b,106,'pavilion-next-period'))
+        mail_claims();call('新一期再兑换和首次邮件',2,9,1);mail_claims()
         assert b.profile()['pavilion']['bought']=={'9':1}
         assert all(b.profile()['welfare']['mails'][k]==v for k,v in old_mails.items())
         b.close()
-    report=dict(passed=True,date='2026-10-26',temporary_database=True,seeded_resources=False,
+    report=dict(passed=True,date='2026-10-27',temporary_database=True,seeded_gold_cards=True,seeded_bricks=False,
         requests=len(records),replayed_every_packet=True,all_nine_limits_exhausted=True,
         stones=stones,steps=records,boundary='原版协议端到端流程；充值通过已有本地不扣款模拟；界面验证另见client_validation.log')
     out=ROOT/'analysis/evidence/pavilion/playthrough.json';out.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')

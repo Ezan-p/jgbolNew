@@ -1,0 +1,50 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\0aaf9138ef79f4065afb567aa3dec130.data'; root=proto0
+
+FUNCTION proto0 offset=0x4b source_lines=834-851 params=0
+UPVALUES ['pairs']
+00001 [L835] GGET     A=0 B=0 C=0 D=0 'g_cardUI'
+00002 [L835] TGETS    A=0 B=0 C=1 D=1 'main_layer'
+00003 [L835] ISF      A=0 B=0 C=0 D=0 
+00004 [L835] JMP      A=0 B=128 C=8 D=32776 target=13
+00005 [L835] GGET     A=0 B=0 C=0 D=0 'g_cardUI'
+00006 [L835] TGETS    A=0 B=0 C=2 D=2 'tipLabel'
+00007 [L835] ISF      A=0 B=0 C=0 D=0 
+00008 [L835] JMP      A=0 B=128 C=4 D=32772 target=13
+00009 [L835] GGET     A=0 B=0 C=0 D=0 'g_cardUI'
+00010 [L835] TGETS    A=0 B=0 C=3 D=3 'UsedCards'
+00011 [L835] IST      A=0 B=0 C=0 D=0 
+00012 [L835] JMP      A=0 B=128 C=1 D=32769 target=14
+00013 [L836] RET0     A=0 B=0 C=1 D=1 
+00014 [L838] UGET     A=0 B=0 C=0 D=0 pairs
+00015 [L838] GGET     A=1 B=0 C=4 D=4 'g_self'
+00016 [L838] TGETS    A=1 B=1 C=5 D=261 'card_combination'
+00017 [L838] CALL     A=0 B=4 C=2 D=1026 
+00018 [L838] ISNEXT   A=3 B=128 C=24 D=32792 target=43
+00019 [L839] KPRI     A=5 B=0 C=2 D=2 
+00020 [L840] UGET     A=6 B=0 C=0 D=0 pairs
+00021 [L840] MOV      A=7 B=0 C=4 D=4 
+00022 [L840] CALL     A=6 B=4 C=2 D=1026 
+00023 [L840] ISNEXT   A=9 B=128 C=13 D=32781 target=37
+00024 [L841] GGET     A=11 B=0 C=0 D=0 'g_cardUI'
+00025 [L841] TGETS    A=11 B=11 C=3 D=2819 'UsedCards'
+00026 [L841] TGETV    A=11 B=11 C=9 D=2825 
+00027 [L841] ISF      A=0 B=0 C=11 D=11 
+00028 [L841] JMP      A=11 B=128 C=6 D=32774 target=35
+00029 [L841] GGET     A=11 B=0 C=0 D=0 'g_cardUI'
+00030 [L841] TGETS    A=11 B=11 C=3 D=2819 'UsedCards'
+00031 [L841] TGETV    A=11 B=11 C=9 D=2825 
+00032 [L841] TGETS    A=11 B=11 C=6 D=2822 'level'
+00033 [L841] ISEQV    A=11 B=0 C=10 D=10 
+00034 [L841] JMP      A=11 B=128 C=2 D=32770 target=37
+00035 [L842] KPRI     A=5 B=0 C=1 D=1 
+00036 [L843] JMP      A=6 B=128 C=2 D=32770 target=39
+00037 [L840] ITERN    A=9 B=3 C=3 D=771 
+00038 [L840] ITERL    A=9 B=127 C=241 D=32753 target=24
+00039 [L846] ISF      A=0 B=0 C=5 D=5 
+00040 [L846] JMP      A=6 B=128 C=2 D=32770 target=43
+00041 [L847] KPRI     A=6 B=0 C=2 D=2 
+00042 [L847] RET1     A=6 B=0 C=2 D=2 
+00043 [L838] ITERN    A=3 B=3 C=3 D=771 
+00044 [L838] ITERL    A=3 B=127 C=230 D=32742 target=19
+00045 [L850] KPRI     A=0 B=0 C=1 D=1 
+00046 [L850] RET1     A=0 B=0 C=2 D=2 

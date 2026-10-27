@@ -31,6 +31,7 @@ EQUIP_WEIGHTS = {int(next(iter(r.values()))): int(r['random_weight'])
                  for r in summon.rows('equip_enhance_weight.csv')}
 SKILL_COST = {int(r['skill_level']): r for r in summon.rows('skill_enhance_cost.csv')}
 SKILL_WORTH = {int(r['skill_level']): r for r in summon.rows('skill_enhance_worth.csv')}
+RULAI_SKILL = {int(r['level']): r for r in summon.rows('rulai_skill_base.csv')}
 FATES = summon.rows('fate_config.csv')
 ADVANCE_COST = {(int(r['equip_quality']), int(r['advance_level'])): r
                 for r in summon.rows('equip_advance_cost.csv')}
@@ -118,6 +119,14 @@ def skill_effect(item):
     return floor(Decimal(cfg[column]) + Decimal(cfg['upgrade_plus']) * (item.get('level', 1) - 1))
 
 
+def refresh_skill(item):
+    """Populate wire/display values for both idle and equipped spell instances."""
+    item['effect_value'] = skill_effect(item)
+    row = RULAI_SKILL.get(item.get('level', 1), {}) if item['type_id'] == 21 else {}
+    item['absorb_rate'] = int(row.get('absorb_rate', 0))
+    item['shield_rate'] = int(row.get('shield_rate', 0))
+
+
 def equip_effect(item):
     from . import equipment
     return equipment.effect(item)
@@ -179,6 +188,8 @@ def prepare(role, rules):
         item.update(innate_owner_id=c['id'], owner_id=c['id'], equip_order=c.get('order', 0) or (c.get('cheer_order', 0) + 8 if c.get('cheer_order') else 0), equip_pos=1)
         item['effect_value'] = skill_effect(item)
     for item in role['attachments']:
+        if item.get('attach_type') == 6 and item.get('type_id') in SKILLS:
+            refresh_skill(item)
         if item.get('attach_type') == 5 and int(ITEMS.get(item.get('type_id'), {}).get('main_type', 0)) in (1, 2, 3):
             item['effect_value'] = equip_effect(item)
     from . import cheer
@@ -303,7 +314,9 @@ def enhance_skill(role, req, rules, parse):
     if isinstance(ids, dict):
         require(set(ids) == set(range(1, len(ids) + 1)), '材料列表无效')
         ids = list(ids.values())
-    require(isinstance(ids, list) and 1 <= len(ids) <= 500 and len(set(ids)) == len(ids), '材料列表无效或重复')
+    require(isinstance(ids, list) and 1 <= len(ids) <= 500
+            and all(type(i) in (int, float) and i > 0 and i == int(i) for i in ids)
+            and len(set(ids)) == len(ids), '材料列表无效或重复')
     cfg, old = SKILLS[item['type_id']], item['level']
     require(old < int(cfg['top_level']) and old in SKILL_COST, '法术已达等级上限')
     worth = Decimal(0)
@@ -312,6 +325,7 @@ def enhance_skill(role, req, rules, parse):
         require(material['id'] != item['id'] and material['attach_type'] == 6 and not material.get('protogenic')
                 and not material.get('equip_order') and not material.get('owner_id') and not material.get('is_lock')
                 and not material.get('upgrade_level') and not material.get('awaken'), '已装备、自带或锁定法术不能作为材料')
+        require(material['type_id'] in SKILLS, '材料法术类型无效')
         quality = int(SKILLS[material['type_id']]['quality'])
         require(material['level'] in SKILL_WORTH, '材料法术等级无效')
         worth += Decimal(SKILL_WORTH[material['level']]['quality_worth%d' % quality].strip())
@@ -526,6 +540,8 @@ def impart(role, req, rules):
 
 
 def settle(role, mid, req, rules, parse):
+    from . import feature_levels
+    feature_levels.check(role, mid, req)
     if mid == 1088:
         from . import item_sale
         result = item_sale.settle(role, req, parse)

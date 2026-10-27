@@ -435,18 +435,22 @@
   "B": [
     "weekly MondayUTC+8 season,daily5free,earned dice survive daily reset",
     "uniform eligible maps;filter impossible portal overshoots and dead ends",
-    "double10%,treasure20%,treasure weights40/30/20/10",
+    "double10%,treasure20%,treasure weights35/25/15/5/15/5",
+    "independent battle10%,local NPC loadouts and real combat;weekly opponent rotation",
+    "battle victory weights25/20/20/15/15/5;floor power in config",
+    "permanent entry,UTC+8 midnight shop5low+1high without replacement;persisted daily quotas",
     "palace each10rolls,all shops in current batch remain valid until next roll",
     "1:1 card surplus to credits;prices,stock and catalog in config",
     "real local account leader by distance/time/id,no fabricated rank prizes",
     "ninth floor remains playable;99999local-coordinate wrap without tenth floor",
-    "season clears event resources and shops;inventory/souls persist",
+    "Monday reset clears progress/cards/credits/dice;stars2:1peach permanent mail,odd remainder rounded up",
+    "shop day/revision rejects stale purchases;offline catch-up and rollback protection",
     "bag300gold,100peaches;allow use after event closes"
   ],
   "inferred_config": {
     "schema_version": 1,
     "mode": "inferred",
-    "revision": "nine-sky-2026-10-26",
+    "revision": "nine-sky-2026-10-27-v2",
     "enabled": true,
     "timezone_offset_hours": 8,
     "period_days": 7,
@@ -464,16 +468,7 @@
     ],
     "treasure_pool": [
       {
-        "weight": 40,
-        "reward": [
-          5,
-          1001,
-          10,
-          1
-        ]
-      },
-      {
-        "weight": 30,
+        "weight": 35,
         "reward": [
           12,
           0,
@@ -482,7 +477,34 @@
         ]
       },
       {
-        "weight": 20,
+        "weight": 25,
+        "reward": [
+          5,
+          1033,
+          1,
+          1
+        ]
+      },
+      {
+        "weight": 15,
+        "reward": [
+          5,
+          1032,
+          1,
+          1
+        ]
+      },
+      {
+        "weight": 5,
+        "reward": [
+          5,
+          1031,
+          1,
+          1
+        ]
+      },
+      {
+        "weight": 15,
         "reward": [
           1,
           -1,
@@ -491,7 +513,7 @@
         ]
       },
       {
-        "weight": 10,
+        "weight": 5,
         "reward": [
           1,
           -2,
@@ -502,6 +524,106 @@
     ],
     "star_shop": [
       {
+        "tier": "low",
+        "reward": [
+          5,
+          1022,
+          1,
+          1
+        ],
+        "cost": 50,
+        "limit": 1
+      },
+      {
+        "tier": "low",
+        "reward": [
+          5,
+          1023,
+          1,
+          1
+        ],
+        "cost": 60,
+        "limit": 1
+      },
+      {
+        "tier": "low",
+        "reward": [
+          5,
+          1041,
+          1,
+          1
+        ],
+        "cost": 80,
+        "limit": 1
+      },
+      {
+        "tier": "low",
+        "reward": [
+          5,
+          1033,
+          1,
+          1
+        ],
+        "cost": 100,
+        "limit": 1
+      },
+      {
+        "tier": "low",
+        "reward": [
+          5,
+          1006,
+          1,
+          1
+        ],
+        "cost": 150,
+        "limit": 1
+      },
+      {
+        "tier": "low",
+        "reward": [
+          5,
+          1032,
+          1,
+          1
+        ],
+        "cost": 180,
+        "limit": 1
+      },
+      {
+        "tier": "low",
+        "reward": [
+          5,
+          1024,
+          1,
+          1
+        ],
+        "cost": 220,
+        "limit": 1
+      },
+      {
+        "tier": "low",
+        "reward": [
+          5,
+          1042,
+          1,
+          1
+        ],
+        "cost": 260,
+        "limit": 1
+      },
+      {
+        "tier": "low",
+        "reward": [
+          5,
+          1007,
+          1,
+          1
+        ],
+        "cost": 300,
+        "limit": 1
+      },
+      {
+        "tier": "high",
         "reward": [
           10,
           5027,
@@ -509,37 +631,40 @@
           1
         ],
         "cost": 500,
-        "limit": 8
+        "limit": 1
       },
       {
+        "tier": "high",
         "reward": [
-          5,
-          1001,
-          100,
-          1
-        ],
-        "cost": 150,
-        "limit": 20
-      },
-      {
-        "reward": [
-          5,
-          1024,
+          10,
+          5036,
           5,
           1
         ],
-        "cost": 200,
-        "limit": 10
+        "cost": 600,
+        "limit": 1
       },
       {
+        "tier": "high",
+        "reward": [
+          5,
+          1031,
+          5,
+          1
+        ],
+        "cost": 450,
+        "limit": 1
+      },
+      {
+        "tier": "high",
         "reward": [
           5,
           1249,
-          10,
+          30,
           1
         ],
-        "cost": 300,
-        "limit": 10
+        "cost": 900,
+        "limit": 1
       }
     ],
     "credit_shop": [
@@ -622,6 +747,75 @@
       }
     ],
     "bag_gold": 300,
-    "bag_peaches": 100
+    "bag_peaches": 100,
+    "battle_basis_points": 1000,
+    "recycle_stars_per_peach": 2,
+    "battle_floor_power": [
+      3000,
+      6000,
+      12000,
+      22000,
+      38000,
+      65000,
+      105000,
+      160000,
+      240000
+    ],
+    "battle_pool": [
+      {
+        "weight": 25,
+        "reward": [
+          5,
+          1031,
+          5,
+          1
+        ]
+      },
+      {
+        "weight": 20,
+        "reward": [
+          5,
+          6002,
+          5,
+          1
+        ]
+      },
+      {
+        "weight": 20,
+        "reward": [
+          5,
+          6003,
+          5,
+          1
+        ]
+      },
+      {
+        "weight": 15,
+        "reward": [
+          5,
+          6004,
+          5,
+          1
+        ]
+      },
+      {
+        "weight": 15,
+        "reward": [
+          1,
+          -1,
+          1,
+          100
+        ]
+      },
+      {
+        "weight": 5,
+        "reward": [
+          5,
+          1246,
+          1,
+          1
+        ]
+      }
+    ]
   }
 }

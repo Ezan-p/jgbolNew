@@ -17,7 +17,7 @@ class GuildTests(unittest.TestCase):
         self.b.guild_rules.update(pet_role_level=0,pet_union_level=0,wander_daily=3,train_weekend_only=False,lucky_weekend_only=False,hunt_weekend_open=True)
         self.clock=patch('network_redirect.backend.time.time',return_value=NOW);self.clock.start();self.addCleanup(self.clock.stop)
         self.serial=1000
-        r=self.b.profile();r.update(level=30,gold_coin=100000,silver_coin=100000);summon.add_item(r,1338,100);self.b.save(r)
+        r=self.b.profile();r.update(level=36,gold_coin=100000,silver_coin=100000);summon.add_item(r,1338,100);self.b.save(r)
     def req(self,op,**d):
         self.serial+=1;self.packet=encode(1301,dict(serial_num=self.serial,id=op,data=summon.lua(d)))
         self.replies=self.b.respond(self.packet,{'authenticated':True})
@@ -440,9 +440,10 @@ class GuildTests(unittest.TestCase):
 
     def test_paid_task_limit_even_with_unused_free_tasks(self):
         self.create()
-        for _ in range(3):self.ok(84,task_index=1,task_type=1,pay_type=2)
-        before=self.role();self.assertEqual(self.req(84,task_index=2,task_type=1,pay_type=2)[-1][1],55);self.assertEqual(before,self.role())
-        self.ok(84,task_index=2,task_type=1,pay_type=1)
+        self.b.guild_rules['hunt_paid_limit']=2
+        for index in (1,2):self.ok(84,task_index=index,task_type=1,pay_type=2)
+        before=self.role();self.assertEqual(self.req(84,task_index=3,task_type=1,pay_type=2)[-1][1],55);self.assertEqual(before,self.role())
+        self.ok(84,task_index=3,task_type=1,pay_type=1)
 
     def test_match_life_merit_and_streak(self):
         from network_redirect import guild_match
@@ -525,7 +526,7 @@ class GuildTests(unittest.TestCase):
 
     def test_search_board_persists_and_matches_granted_prize(self):
         self.create();first=self.ok(43,flag=1)[-1][2]
-        self.assertEqual(len(first['prize_items']),25);self.assertEqual(len(set(first['search_order'].values())),25)
+        self.assertEqual(len(first['prize_items']),18);self.assertEqual(set(first['search_order'].values()),set(range(1,19)))
         second=self.ok(43,flag=1)[-1][2];self.assertEqual(first['prize_items'],second['prize_items'])
         self.ok(43,flag=2);a=self.role()['guild']['instances']
         self.assertTrue(a['search_tiles'][0]['had_token'])

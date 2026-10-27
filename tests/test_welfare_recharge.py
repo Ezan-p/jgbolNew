@@ -17,6 +17,9 @@ class WelfareRechargeTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.backend = Backend(Path(self.temp.name), 1, lambda *a, **k: None)
         self.rules = self.backend.welfare_rules
+        # Explicit opt-in for legacy reward mechanics, disabled in production.
+        self.rules['order'] = sorted(welfare.TYPES)
+        self.rules['spring_charge_enabled'] = True
         self.serial = 0
 
     def tearDown(self):

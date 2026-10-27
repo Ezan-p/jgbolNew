@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-27",
+  "timezone": "Asia/Shanghai",
+  "revision": "yuanshi-2026-10-27-v2",
+  "official_audit": {"passed": true, "assets": 9, "strings": 27},
+  "backend_tests": [
+    {"command": ".runtime/venv/bin/python -m unittest discover -s tests -p 'test_activity_yuanshi.py'", "passed": true, "tests": 18},
+    {"command": ".runtime/venv/bin/python -m unittest discover -s tests -p 'test_activity.py'", "passed": true, "tests": 64}
+  ],
+  "native_client": {
+    "command": ".runtime/venv/bin/python analysis/tools/verify_yuanshi_client.py",
+    "status": "not_completed",
+    "reason": "frida.InvalidArgumentError: device not found",
+    "fixture_built": true,
+    "historical_client_validation_is_current": false
+  },
+  "probability_verification": "All 100 integer tickets enumerated: 40 silver, 25 baozi, 20 pills, 10 gold bags, 5 VIP bags. Quantities and probabilities are inferred, not official.",
+  "post_claim_reward": "Original twoyears_info24 specifies Yuanshi souls (object_type 10, type 5046), not equipable spirits."
+}

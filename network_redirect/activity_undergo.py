@@ -148,7 +148,8 @@ def enemy_units(gid):
 
 
 def settle(role, req, now, r, jrules, frules, parse):
-    a.require(role['level'] >= rules()['undergo_level'], f"历劫需{rules()['undergo_level']}级")
+    from . import feature_levels
+    feature_levels.check(role, 1349, req)
     data = parse(req['data']) if req['data'] else {}
     a.require(isinstance(data, dict), '历劫参数无效')
     op = req['id']; s = state(role, now, r)

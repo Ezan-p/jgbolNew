@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-27",
+  "original_audit": {
+    "activity_ids": 42,
+    "level_reference_modules": 147,
+    "csv_tables_matched": 14
+  },
+  "tests": [
+    {
+      "log": "regression.log",
+      "count": 217,
+      "result": "OK",
+      "modules": [
+        "tests.test_feature_levels",
+        "tests.test_activity",
+        "tests.test_reborn",
+        "tests.test_equipment_crafting",
+        "tests.test_guild",
+        "tests.test_activity_taixu",
+        "tests.test_formation"
+      ]
+    },
+    {
+      "log": "related_regression.log",
+      "count": 79,
+      "result": "OK",
+      "modules": [
+        "tests.test_feature_levels",
+        "tests.test_guild_store",
+        "tests.test_guild_war_feast",
+        "tests.test_pets",
+        "tests.test_activity_party",
+        "tests.test_activity_hunt"
+      ],
+      "note": "Includes the final added level-12 shop purchase/replay test and final feature names; suites overlap, counts are not unique-test totals."
+    }
+  ],
+  "lua_check": "luaparser syntax passed; no emulator UI validation in this change",
+  "document_check": "all 42 activity IDs and local links verified",
+  "real_save_modified": false,
+  "service_restarted": false,
+  "sha256": {
+    "network_redirect/feature_levels.py": "fe5e92b60765396016b99a79c9e7d864f850eac07459b91ab1d8fd77818a5534",
+    "network_redirect/activity.py": "af4acafd4c42db9320dfbd2ba5f7cc04d90c9f29c6870b4bce070a0ddec134de",
+    "network_redirect/activity_undergo.py": "d79cd92d3bbbe636325b7b850a0c326e17a22ba7116dd545cedd85be56e3ea98",
+    "network_redirect/formation.py": "62d36f663b1d59a30c13fad2be65303eb654b950cc7a77cf50d2cee0eafd4159",
+    "network_redirect/guild.py": "738b3999d70694e1524b328e4278a1e7260c54cb85e7b2725ac8549d88a9f44e",
+    "network_redirect/reborn.py": "ad6ccc8fc8a071151b3730f3f5803b100d19836b3f03a5f494e6f95f5e4dc0a1",
+    "network_redirect/taixu_client.lua": "24ee4ccd09fad650c994c899013e079d0fd2a8966f2d070e2f51b26b5299d925",
+    "tests/test_feature_levels.py": "1bcebab3f25043dfdced5c8cee1d6e40d673b044aef59a95984686ab478ae4e0"
+  }
+}

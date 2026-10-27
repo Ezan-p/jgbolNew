@@ -1,5 +1,6 @@
 """Rulai native wire contracts, recharge accounting, wheel and selectable bags."""
 from recharge_helpers import funded_order
+from collections import Counter
 import json
 from pathlib import Path
 from unittest.mock import patch
@@ -30,6 +31,10 @@ class RulaiTests(ActivityCase):
         self.assertEqual(d['cur_count'], 0)
         self.assertEqual(d['order_pay'], 0)
         self.assertEqual(len(d['random_table']), 8)
+        expected = [(1246, 3), (1031, 3), (6005, 5), (6004, 5),
+                    (1249, 10), (1015, 5), (1367, 1), (1368, 1)]
+        self.assertEqual([(p['attach_type'], p['attach_count'])
+                          for p in d['random_table'].values()], expected)
         self.assertEqual(d['ext_info']['prize_flag'], 1)
         packets = [v for m, _, v in map(decode, self.b.bootstrap()) if m == 2998]
         schedule = next(login_fields(v['data'])[73][1] for v in packets if v['id'] == 113)
@@ -57,6 +62,8 @@ class RulaiTests(ActivityCase):
                 d = self.result(self.call(1))
             self.assertEqual(d['prize_index'], index)
             self.assertEqual(self.amount(tid) - before, n)
+            self.assertEqual(d['prize_list'][1], dict(object_type=5, attach_type=tid,
+                                                    attach_count=n, attach_level=1))
         self.assertEqual(self.b.profile()['activity']['rulai']['draws'], 8)
         self.assertEqual(self.b.profile()['gold_coin'], gold)
 
@@ -68,6 +75,56 @@ class RulaiTests(ActivityCase):
                     self.assertEqual(r.draw(cfg), i)
             offset += row['weight']
         self.assertEqual(offset, 10000)
+        # Exhaust the random integer domain: verify exact probabilities, not a
+        # flaky random sample or just the configured weight values.
+        with patch.object(r.secrets, 'randbelow', side_effect=range(offset)):
+            counts = Counter(r.draw(cfg) for _ in range(offset))
+        self.assertEqual(counts, dict(enumerate([1000, 2000, 1800, 1500, 1000, 2200, 400, 100], 1)))
+
+    def test_replacement_rewards_can_be_used_and_fragments_composed(self):
+        self.charge(4)
+        self.charge(4)
+        def win(index, times=1):
+            with patch.object(r, 'draw', return_value=index):
+                for _ in range(times):
+                    self.result(self.call(1))
+        def item(tid):
+            return next(i for i in self.b.profile()['attachments']
+                        if i['attach_type'] == 5 and i['type_id'] == tid)
+
+        win(1)
+        before = self.amount(1246)
+        self.ok(self.req(1051, item_type=1246, item_id=item(1246)['id'], item_count=1,
+                         des_type=5, des_id=5001))
+        self.assertEqual(self.amount(1246), before - 1)
+        win(2)
+        before = self.amount(1031)
+        self.ok(self.req(1051, item_type=1031, item_id=item(1031)['id'], item_count=1,
+                         des_type=1, des_id=0))
+        self.assertEqual(self.amount(1031), before - 1)
+
+        role = self.b.profile()
+        role.update(level=60, silver_coin=2000000)
+        self.b.save(role)
+        for index, tid, kind in ((3, 6005, 6), (4, 6004, 5)):
+            before = self.amount(tid)
+            win(index, 8)
+            self.assertEqual(self.amount(tid) - before, 40)
+            shard = item(tid)
+            cfg = formation.ITEMS[tid]
+            events = self.req(1053, compose_type=1, equip_type=int(cfg['sub_type']),
+                              equip_quality=5, material_quality=5, material_count=1,
+                              material_list=[dict(id=shard['id'])])
+            self.ok(events)
+            prize = next(d for e, d in events if e == 6)
+            self.assertEqual(self.amount(tid), before)
+            catalog = formation.SKILLS if kind == 6 else formation.ITEMS
+            result = catalog[prize['equip_type']]
+            self.assertEqual(result['quality'], '5')
+            if kind == 6:
+                self.assertEqual(result['use_mode(1-active，2-passive)'], '2')
+            else:
+                self.assertEqual(result['main_type'], '3')
 
     def test_recharge_at_exact_period_boundary_counts_in_new_period(self):
         cfg = r.load_rules()

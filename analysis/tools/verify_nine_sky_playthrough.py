@@ -19,6 +19,9 @@ def main():
         wire={'authenticated':True}
         def request(op=1,**args):
             nonlocal serial
+            if op==4:
+                saved=b.profile()['activity']['nine_sky']
+                args.update(shop_day=saved['shop_day'],shop_revision=saved['shop_revision'])
             serial+=1;packet=encode(1309,dict(serial_num=serial,id=op,data=summon.lua(args)))
             result=b.respond(packet,wire);events=[(d['id'],login_fields(d['data'])) for mid,_,d in map(decode,result) if mid==2998]
             assert not any(e==55 for e,_ in events),events
@@ -39,7 +42,8 @@ def main():
         state=b.profile()['activity']['nine_sky']
         report=dict(passed=True,requests=len(history),rolls=state['rolls'],steps=state['steps'],floor=state['floor'],
                     stars=state['stars'],gold_spent=100000-b.profile()['gold_coin'],
-                    restart_preserved=True,star_shop_reward_souls=b.profile()['souls'].get('5027',0),
+                    restart_preserved=True,star_shop_reward=state['shop'][0]['reward'],
+                    battle_count=state.get('battle_count',0),battle_wins=state.get('battle_wins',0),
                     live_account_modified=False,temporary_starting_gold=100000,history=history)
         b.close()
     out=ROOT/'analysis/evidence/nine_sky/playthrough.json';out.parent.mkdir(parents=True,exist_ok=True)

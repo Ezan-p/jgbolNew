@@ -34,9 +34,14 @@ def cost(role,value,n=1):
 def specs(value):return [list(map(int,t.split('|'))) for t in value.split('/') if t]
 
 
-def state(role,now,r):
-    s=role['activity'].setdefault('home',dict(level=1,build={str(i):0 for i in KEYS},plants={},
+def storage(role):
+    """Create the shared home container without settling unrelated activities."""
+    return role.setdefault('activity',{}).setdefault('home',dict(level=1,build={str(i):0 for i in KEYS},plants={},
         train={str(i):dict(level=0,cur_exp=0) for i in range(1,5)},pray_time=0,pray_count=0,passed=False,day=-1))
+
+
+def state(role,now,r):
+    s=storage(role)
     if s['day']<a.day(now,r):s.update(day=a.day(now,r),train_count={},purchases={},fight_count=r['home_boss_daily_limit'])
     s.setdefault('assistant_until',0);s.setdefault('assistant_from',0)
     from .activity_home_pets import initialize

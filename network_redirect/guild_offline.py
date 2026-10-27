@@ -161,7 +161,7 @@ def validate_rules(r):
     rates=r.get('catch_prop_rates',{})
     require(set(rates)=={'1338','1339','1340','1341'} and all(type(v)is int and 0<v<=100 for v in rates.values()) and rates['1338']<rates['1339']<rates['1340']<rates['1341']==100,'镇魂符概率配置无效')
     require(type(r.get('train_support_percent'))is int and 1<=r['train_support_percent']<=100,'点赞增益配置无效')
-    require(r['catch_success_percent']<=100 and r['pet_limit']<=240 and r['search_daily']<=25,'概率、兽栏或棋盘配置越界')
+    require(r['catch_success_percent']<=100 and r['pet_limit']<=240 and r['search_daily']<=18,'概率、兽栏或棋盘配置越界')
     require(r['train_resident_required']==240,'原版试炼需要240只栖息宠物')
     floors=r.get('train_floors')
     require(isinstance(floors,list) and len(floors)==4,'试炼必须配置四层')
@@ -183,6 +183,10 @@ def validate_rules(r):
     for item in r['pet_shop_items']:daily.validate_prize(item)
     require(all(any(p[0]==5 and p[1]==tid for p in r['pet_shop_items']) for tid in (1338,1339,1340,1341)),'宠物商店必须包含四种镇魂符')
     require(len(r['hunt_shop_unlock'])==len(r['pet_shop_items']) and all(type(v)is int and v>=0 for v in r['hunt_shop_unlock']),'声望解锁配置无效')
+    prices=r.get('pet_shop_reputation')
+    require(isinstance(prices,list) and len(prices)==len(r['pet_shop_items']) and all(type(v)is int and 0<v<=100000000 for v in prices),'宠物商店声望价格配置无效')
+    charm_prices={p[1]:cost for p,cost in zip(r['pet_shop_items'],prices) if p[0]==5 and p[1] in (1338,1339,1340,1341)}
+    require(charm_prices[1338]<charm_prices[1339]<charm_prices[1340]<charm_prices[1341],'镇魂符价格必须随品质递增')
     from . import summon
     valid={int(v['type_id']) for v in summon.rows('animal_base.csv')}
     require(r['pet_types'] and all(type(v)is int and v in valid for v in r['pet_types']),'灵兽类型配置无效')

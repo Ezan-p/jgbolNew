@@ -47,6 +47,11 @@ end)
 check('native initial screen eight rewards',function()
  response(FIXTURE.entry);assert(ui.g_self.main_layer);assert(#ui.g_self.data.reward_list==8)
  assert(#ui.g_self.tt_reward_splash==8);assert(ui.g_self.data.total_time==0)
+ local expected={{1246,3},{1031,3},{6005,5},{6004,5},{1249,10},{1015,5},{1367,1},{1368,1}}
+ for i,p in ipairs(ui.g_self.data.reward_list) do
+  assert(p.object_type==5 and p.attach_type==expected[i][1] and p.attach_count==expected[i][2],
+   'wrong replacement reward in native slot '..i)
+ end
  local n=#sent;buttons['v2/newTurnTableUI/luckdraw1.png']();assert(#sent==n)
 end)
 check('native live charge refresh and hint',function()
@@ -64,6 +69,9 @@ end)
 for i=1,8 do check('native wheel request animation reward '..i,function()
  buttons['v2/newTurnTableUI/luckdraw1.png']();last(1)
  response(FIXTURE.draws[i]);assert(ui.g_self.data.result_index==i)
+ local shown=ui.g_self.data.reward_list[i];local awarded=FIXTURE.draws[i].prize_list[1]
+ assert(shown.attach_type==awarded.attach_type and shown.attach_count==awarded.attach_count,
+  'native wheel prize differs from actual server award')
  assert(ui.g_progressSchedule and ui.g_progressSchedule~=0)
  ui.close_schedulescriptfunc();ui.g_bagua:stopAllActions()
  ui.g_self.index=i;ui.showreward();assert(ui.g_self.data.total_time==10-i)

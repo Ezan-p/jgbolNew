@@ -103,7 +103,9 @@ class ActivityTests(ActivityCase):
         for _ in range(self.b.activity_rules['rape_free_refreshes']):self.ok(self.req(1029,flag=2))
         self.assertEqual(self.req(1029,flag=2)[0][0],55)
     @patch('network_redirect.duty_balance.weighted', side_effect=lambda rows: rows[0])
-    def test_duty_query_start_fight_claim(self, _picker):
+    @patch('network_redirect.duty_balance.guard_reward', side_effect=lambda number:
+           dict(round=number, difficulty=1, reward=[12, 0, 3000, 1]))
+    def test_duty_query_start_fight_claim(self, *_pickers):
         self.ok(self.req(1043,flag=1));self.assertIsNone(self.b.profile()['activity']['duty'])
         self.ok(self.req(1043,flag=0))
         self.assertEqual(self.req(1026,fight_type=5,des_type=3,des_value=1)[0][0],55)
@@ -608,9 +610,10 @@ class SeasonalTests(ActivityCase):
         events=self.req(1126,compose_type=1,material_count=2,material_list=ids);self.ok(events)
         self.assertEqual(events[-1][1]['result'],0);self.assertEqual(self.count(1208),45);self.assertEqual(self.count(1213),1)
         before=self.b.profile();self.assertEqual(self.req(1126,compose_type=1,material_count=2,material_list=ids)[0][0],55);self.assertEqual(before,self.b.profile())
-        item=self.item(1213);old=self.count(1001)
-        self.ok(self.req(1051,item_type=1213,item_id=item['id'],item_count=1,des_type=1,des_id=0))
-        self.assertEqual(self.count(1001),old+10);self.assertEqual(self.count(1213),0)
+        item=self.item(1213);old=self.count(1022)
+        with patch('network_redirect.activity_rice.randbelow',return_value=0):
+            self.ok(self.req(1051,item_type=1213,item_id=item['id'],item_count=1,des_type=1,des_id=0))
+        self.assertEqual(self.count(1022),old+2);self.assertEqual(self.count(1213),0)
         self.assertEqual(self.req(1051,item_type=1213,item_id=item['id'],item_count=1,des_type=1,des_id=0)[0][0],55)
     def test_moon_news_bonus_and_source_validation(self):
         self.ok(self.req(1205,flag=0));self.ok(self.req(1333,flag=0,src_type=0))
@@ -620,10 +623,11 @@ class SeasonalTests(ActivityCase):
         self.assertEqual(self.b.profile()['activity']['seasonal']['moon_count'],10)
         news=self.req(1333,flag=0,src_type=0)[-1][1];self.assertEqual(news['left_process'],10);self.assertIsInstance(news['broad_list'][1],str)
         before=self.b.profile();self.assertEqual(self.req(1333,flag=1,src_type=9999)[0][0],55);self.assertEqual(before,self.b.profile())
-    def test_closed_season_and_journey_material_cycle(self):
+    def test_closed_season_and_independent_random_materials(self):
         from network_redirect.activity_seasonal import travel_drop
         r=self.b.profile();a=self.b.activity_rules
-        for _ in range(4):self.assertEqual(len(travel_drop(r,NOW,a)),5)
+        with patch('network_redirect.activity_tangwang.randbelow',return_value=99), patch('network_redirect.activity_moon.randbelow',side_effect=[0,10,0,0,0]*4), patch('network_redirect.activity_rice.randbelow',side_effect=[0,0,0,10,0]*4):
+            for _ in range(4):self.assertEqual(len(travel_drop(r,NOW,a)),4)
         self.assertEqual(r['activity']['seasonal']['travel_wins'],4)
         self.assertEqual(sum(i['count'] for i in r['attachments'] if i['type_id']==1208),4)
 
@@ -632,62 +636,28 @@ class SeasonalTests(ActivityCase):
         self.assertEqual(self.req(1333,flag=0,src_type=0)[0][0],55)
         self.ok(self.req(1205,flag=0));self.assertEqual(self.count(1208),0)
 
-class FishTests(ActivityCase):
-    def count(self,tid):return sum(i['count'] for i in self.b.profile()['attachments'] if i['attach_type']==5 and i['type_id']==tid)
-    def test_preview_contract_and_incomplete_row_rejected(self):
-        data=self.req(1205,flag=0)[-1][1]['search_gold_data']
-        self.assertEqual(len(data['random_get_item']),5)
-        self.assertEqual(len(data['exchange_data']),5)
-        r=copy.deepcopy(self.b.activity_rules);r['fish_pool']=r['fish_pool'][:3]
-        p=Path(self.tmp.name)/'incomplete-fish.json';p.write_text(json.dumps(r))
-        with self.assertRaises(formation.Rejected):activity.load_rules(p)
-    def test_daily_gift_free_paid_ten_and_restart(self):
-        self.ok(self.req(1205,flag=0));self.assertEqual(self.count(1026),3)
-        self.ok(self.req(1205,flag=0));self.assertEqual(self.count(1026),3)
-        gold=self.b.profile()['gold_coin']
-        self.ok(self.req(1208,count=1,type_id=0));self.assertEqual(self.count(1026),2)
-        self.assertEqual(self.b.profile()['gold_coin'],gold);self.assertEqual(self.count(1027),2)
-        self.ok(self.req(1208,count=10,type_id=0));self.assertEqual(self.count(1026),2)
-        self.assertEqual(self.b.profile()['gold_coin'],gold-200);self.assertEqual(self.count(1027),22)
-        for _ in range(3):self.ok(self.req(1208,count=1,type_id=0))
-        self.assertEqual(self.b.profile()['gold_coin'],gold-220)
-        self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
-        self.ok(self.req(1205,flag=0));self.assertEqual(self.count(1026),0)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
-            self.ok(self.req(1205,flag=0));self.assertEqual(self.count(1026),3)
-    def test_exchange_remaining_news_and_atomic_rejections(self):
-        self.ok(self.req(1205,flag=0));r=self.b.profile();summon.add_item(r,1027,100);self.b.save(r)
-        old=self.count(1001);out=self.req(1208,count=2,type_id=1001);self.ok(out)
-        self.assertEqual(self.count(1001),old+20);self.assertEqual(self.count(1027),96)
-        self.assertEqual(out[-2][1]['count'],2);self.assertEqual(out[-1][1][1]['type_id'],1001)
-        data=self.req(1205,flag=0)[-1][1]['search_gold_data'];self.assertEqual(data['exchange_data'][1]['count'],18)
-        for n,tid in ((19,1001),(1,999999),(2,0),(0,0)):
-            before=self.b.profile();self.assertEqual(self.req(1208,count=n,type_id=tid)[0][0],55);self.assertEqual(before,self.b.profile())
-        r=self.b.profile();r['gold_coin']=0;self.b.save(r);before=self.b.profile()
-        self.assertEqual(self.req(1208,count=10,type_id=0)[0][0],55);self.assertEqual(before,self.b.profile())
-        self.b.activity_rules['seasonal_games']['fish']['enabled']=False
-        self.assertEqual(self.req(1208,count=1,type_id=0)[0][0],55)
-
 class SpringTests(ActivityCase):
     def test_daily_worship_exchange_and_rollover(self):
         self.ok(self.req(1205,flag=0));self.ok(self.req(1210,flag=1));before=self.b.profile()
         self.assertEqual(self.req(1210,flag=1)[0][0],55);self.assertEqual(before,self.b.profile())
-        gain=self.req(1211,prize_id=1,count=2);self.ok(gain);self.assertEqual(gain[-1][1]['attach_count'],20)
-        before=self.b.profile();self.assertEqual(self.req(1211,prize_id=1,count=10)[0][0],55);self.assertEqual(before,self.b.profile())
+        row=self.b.profile()['activity']['seasonal']['spring']['shop'][0]
+        from network_redirect.activity_caishen import offer_id
+        ident=offer_id(self.b.profile()['activity']['seasonal']['spring'],row,self.b.activity_rules)
+        gain=self.req(1211,prize_id=ident,count=1);self.ok(gain)
+        self.assertEqual(next(d for e,d in gain if e==87)['attach_count'],row['reward'][2])
+        before=self.b.profile();self.assertEqual(self.req(1211,prize_id=ident,count=1)[0][0],55);self.assertEqual(before,self.b.profile())
         with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.ok(self.req(1210,flag=1))
         self.assertEqual(self.b.profile()['activity']['seasonal']['spring']['purchases'],{})
-    def test_original_card_combinations_duplicate_and_inventory(self):
-        from network_redirect.activity_spring import COMBINATIONS
+    def test_card_combinations_duplicate_and_inventory(self):
+        from network_redirect.activity_tangwang import COMBINATIONS, card
         self.ok(self.req(1205,flag=0))
         count=lambda:sum(c['count'] for c in self.b.profile()['attachments'] if c['type_id']==1094)
-        self.assertEqual(count(),16);self.ok(self.req(1205,flag=0));self.assertEqual(count(),16)
+        self.assertEqual(count(),4);self.ok(self.req(1205,flag=0));self.assertEqual(count(),4)
         for recipe in COMBINATIONS:
-            chosen=[]
-            for level in recipe:
-                chosen.append(next(c['id'] for c in self.b.profile()['attachments'] if c['type_id']==1094 and c['level']==level and c['id'] not in chosen))
+            role=self.b.profile();chosen=[card(role,level)['id'] for level in recipe];self.b.save(role)
             before=self.b.profile();self.assertEqual(self.req(1213,count=4,card_list=[dict(id=chosen[0])]*4)[0][0],55);self.assertEqual(before,self.b.profile())
             self.ok(self.req(1213,count=4,card_list=[dict(id=i) for i in chosen]))
             self.assertEqual(self.req(1213,count=4,card_list=[dict(id=i) for i in chosen])[0][0],55)
-        self.assertEqual(count(),0)
+        self.assertEqual(count(),4)
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
-        self.ok(self.req(1205,flag=0));self.assertEqual(count(),0)
+        self.ok(self.req(1205,flag=0));self.assertEqual(count(),4)

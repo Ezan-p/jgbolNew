@@ -207,6 +207,14 @@ def settle(role,req,now,r,parse,daily_rules):
     op=req['id']; d=parse(req['data']); require(isinstance(d,dict),'仙盟请求格式错误')
     if op in WAR_OPS or op==18 and d.get('query_type') in WAR_QUERIES:
         require(r['wars_enabled'],WAR_CLOSED)
+    # mainUI.menuXianmengCallback uses the same advertised join_level for
+    # entry, including list queries. Creating uses its separate threshold.
+    minimum = r['create_level'] if op == 1 else r['join_level']
+    require(role['level'] >= minimum, f'仙盟需角色{minimum}级开放')
+    # worldTreeUI.gotoDonate L871–875: level >= 36 OR VIP > 0.
+    if op == 36:
+        require(role['level'] >= 36 or role.get('vip_level', 0) > 0,
+                '仙盟元宝捐献需角色36级或VIP1')
     s,g=prepare(role,now,r); rid=str(int(role['role_id']))
     if op==18 and d.get('query_type')==4:
         page=positive(d,'page',10000)

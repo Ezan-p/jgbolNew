@@ -93,11 +93,15 @@ def client_source(rules):
     template = Path(__file__).with_name('summon_client.lua').read_text(encoding='utf-8')
     template = Path(__file__).with_name('progression_client.lua').read_text(encoding='utf-8') + '\n' + template
     template = Path(__file__).with_name('activity_entry_client.lua').read_text(encoding='utf-8') + '\n' + template
+    template = Path(__file__).with_name('activity_level_client.lua').read_text(encoding='utf-8') + '\n' + template
     from . import vip
     vip_source = Path(__file__).with_name('vip_client.lua').read_text(encoding='utf-8')
     welfare_source = Path(__file__).with_name('welfare_client.lua').read_text(encoding='utf-8')
     monument_source = Path(__file__).with_name('monument_client.lua').read_text(encoding='utf-8')
     equipment_source = Path(__file__).with_name('equipment_client.lua').read_text(encoding='utf-8')
+    equipment_source += '\n' + Path(__file__).with_name('state_refresh_client.lua').read_text(encoding='utf-8')
+    equipment_source += '\n' + Path(__file__).with_name('skill_client.lua').read_text(encoding='utf-8')
+    equipment_source += '\n' + Path(__file__).with_name('soul_refresh_client.lua').read_text(encoding='utf-8')
     reborn_source = Path(__file__).with_name('reborn_client.lua').read_text(encoding='utf-8')
     pray_source = Path(__file__).with_name('pray_client.lua').read_text(encoding='utf-8')
     pray_source = pray_source.replace('__PRAY_COSTS__', lua([int(r['spirit_coins']) for r in rows('pray_spirit_config.csv')]))
@@ -123,11 +127,18 @@ def client_source(rules):
     yuanshi_source = Path(__file__).with_name('yuanshi_client.lua').read_text(encoding='utf-8')
     rulai_source = Path(__file__).with_name('rulai_client.lua').read_text(encoding='utf-8')
     nine_source = Path(__file__).with_name('nine_sky_client.lua').read_text(encoding='utf-8')
+    caishen_source = Path(__file__).with_name('caishen_client.lua').read_text(encoding='utf-8')
+    fish_source = Path(__file__).with_name('fish_client.lua').read_text(encoding='utf-8')
+    template = Path(__file__).with_name('duty_client.lua').read_text(encoding='utf-8') + '\n' + template
+    tangwang_source = Path(__file__).with_name('tangwang_client.lua').read_text(encoding='utf-8')
+    from . import activity_moon, activity_rice
+    moon_source = activity_moon.client_source(feed_rules)
+    template = moon_source + '\n' + activity_rice.client_source(feed_rules) + '\n' + template
     trial_source = Path(__file__).with_name('trial_client.lua').read_text(encoding='utf-8')
     battle_source = Path(__file__).with_name('battle_replay_client.lua').read_text(encoding='utf-8')
     feed_source = feed_source.replace('__FEED_REWARD_TIERS__', lua(feed_rules['feed_reward_tiers']))
     feed_source = feed_source.replace('__FEED_MAX_COUNT__', str(feed_rules['feed_max_count']))
-    return battle_source + '\n' + trial_source + '\n' + nine_source + '\n' + guild_source + '\n' + visit_source + '\n' + feed_source + '\n' + pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + yuanshi_source + '\n' + rulai_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
+    return tangwang_source + '\n' + fish_source + '\n' + caishen_source + '\n' + battle_source + '\n' + trial_source + '\n' + nine_source + '\n' + guild_source + '\n' + visit_source + '\n' + feed_source + '\n' + pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + yuanshi_source + '\n' + rulai_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
 
 
 def lua(value):

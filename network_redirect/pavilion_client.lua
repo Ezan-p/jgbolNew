@@ -2,13 +2,67 @@
 do
  local ms=package.loaded.ms
  local ui=ms and ms.d_destinyUI
- if not ui or not ms.d_data then return 'pending' end
+ if not ui or not ms.d_data or not ms.d_time then return 'pending' end
+ if ui._localPavilionRestore and ui._localPavilionVersion~=2 then ui._localPavilionRestore() end
  if not ui._localPavilionRestore then
+  ui._localPavilionVersion=2
   local tables=__PAVILION_TABLES__
   local originalResult=ui.onGetResult
   local originalConfig=ms.d_data.callback_update_config
+  local originalShow,originalGift,originalSend=ui.show,ui.showGift,ui.sendRequest
+  local originalJoin=ui.canJoin
+  local lastQuery=-100
+  local function query()
+   local now=ms.d_time.getTime()
+   if now-lastQuery>=3 or now<lastQuery then lastQuery=now;originalSend(1) end
+  end
+  -- Native timers capture the old end_time and close the entire activity at
+  -- zero. Keep their layout/scheduling, but read the latest server deadline.
+  local function withCountdown(fn,...)
+   local rest,delay,create=ms.d_time.getRestTime,ms.d_u.delay,ms.d_u.createByStyles
+   local text
+   ms.d_time.getRestTime=function()
+    local config=ui.g_self.config or {}
+    local left=math.max(0,math.floor((config.end_time or 0)-ms.d_time.getTime()))
+    text=string.format('%d天%02d:%02d:%02d',math.floor(left/86400),math.floor(left/3600)%24,math.floor(left/60)%60,left%60)
+    if left==0 then query() end
+    return text
+   end
+   ms.d_u.createByStyles=function(style,...)
+    if text and type(style.string)=='string' and style.string:sub(-#text)==text then
+     style.string='刷新剩余：'..text;style.fontsize=22
+    end
+    return create(style,...)
+   end
+   ms.d_u.delay=function(layer,seconds,callback,...)
+    return delay(layer,seconds,function(...) return withCountdown(callback,...) end,...)
+   end
+   local ok,result=pcall(fn,...)
+   ms.d_time.getRestTime=rest;ms.d_u.delay=delay;ms.d_u.createByStyles=create
+   if not ok then error(result) end
+   return result
+  end
+  ui.show=function(...) return withCountdown(originalShow,...) end
+  ui.showGift=function(...) return withCountdown(originalGift,...) end
+  ui.canJoin=function(...)
+   local c=ui.g_self.config
+   if c and c.end_time and c.end_time>0 then
+    -- The entry remains available while waiting for the next-period snapshot.
+    return ms.d_time.getTime()>=c.begin_time
+   end
+   return originalJoin(...)
+  end
+  ui.sendRequest=function(flag,...)
+   if flag~=1 and ui.g_self.config and ms.d_time.getTime()>=ui.g_self.config.end_time then
+    query();return
+   end
+   return originalSend(flag,...)
+  end
   local function refresh(data)
    if not data then return end
+   local previous=ui.g_self.config
+   if previous and (previous.begin_time~=data.begin_time or previous.end_time~=data.end_time)
+      and ui.g_destinyUI.buy_layer then ui.closeBuyItemLayer() end
    ui.g_data.enter=data
    ui.g_self.config={begin_time=data.begin_time,end_time=data.end_time,had_prize=data.had_prize}
    for index,info in pairs(data.exchange_info or {}) do
@@ -73,7 +127,10 @@ do
   end
   ui._localPavilionRestore=function()
    ui.onGetResult=originalResult;ms.d_data.callback_update_config=originalConfig
+   ui.show=originalShow;ui.showGift=originalGift;ui.sendRequest=originalSend
+   ui.canJoin=originalJoin
    ui._localPavilionRestore=nil
+   ui._localPavilionVersion=nil
   end
  end
 end

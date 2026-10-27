@@ -43,6 +43,7 @@ def main():
            '1807 grants one extra prayer; 1808 gives level=role*2 Yuanshi; after receiving, prayer yields souls',
            'getChar and pray both send flag2,index0; native getChar lacks a widget binding'],
         B=['28-day repeating local season; no official historical schedule',
+           'unfinished wishes grant one reward including the wish reaching100: silver100000/baozi1/pill1/gold_bag1/VIP_bag1 at40/25/20/10/5%; user pool, inferred quantities and weights',
            'enroll on first entry/recharge; 1 free prayer/day, +10 percent, 1 soul after claim',
            'full progress next flag2 claims for free; duplicate grants40 souls; max original experience table level',
            'missed enrolled days accumulate supply stock; first day0; 100 gold/offering',

@@ -6,13 +6,32 @@ do
  if not v._localWelfareRestore then
   local callback,meiri,showItem,fund=v.callbackGetActNoticeData,v.setMeiridata,v.showgetItem,v.createGrowthFund
   local configCallback=ms.d_data.callback_update_config
+  local anniversary=v.createAnniversaryRecharge
+  v.createAnniversaryRecharge=function(...)
+   -- This page binds an anonymous callback that removes the activity layer
+   -- before opening recharge; replace only its recharge button at creation.
+   local createMenu=ms.d_u.createMenu
+   ms.d_u.createMenu=function(styles,...)
+    for _,style in ipairs(styles) do
+     if style.npic=='v2/rechargeUI/recharge1.png' then
+      style.call_back=function() ms.d_rechargeUI.show() end
+      style.tag=19890
+     end
+    end
+    return createMenu(styles,...)
+   end
+   local ok,result=pcall(anniversary,...)
+   ms.d_u.createMenu=createMenu
+   if not ok then error(result) end
+   return result
+  end
   v._localRefreshContent=function()
    local view=v.g_self
    local recharge=ms.d_rechargeUI
    -- Refresh an already open tab in place; never call show/navigation here.
    if not view or not view.data or not view.main_layer or not view.main_layer:getParent()
       or not view.last_press_btn_tag then return end
-   if recharge and recharge.g_self and recharge.g_self.main_layer then return end
+   if recharge and recharge._localIsOpen and recharge._localIsOpen() then return end
    if recharge and recharge._localCardSelection then return end
    v.showContent(view.main_layer,view.last_press_btn_tag)
   end
@@ -23,7 +42,7 @@ do
     local view=v.g_self
     if view and view.data then
      view.data.all_activity=current.all_activity
-     view.meiri=current.all_activity[74]
+     view.meiri=current.all_activity[74] or {data={isopen=false}}
     end
     if current.spring_info and ms.d_chargePresentUI then
      ms.d_chargePresentUI.updateActivityStatus({spring_info=current.spring_info})
@@ -55,7 +74,7 @@ do
     local exists=false
     for i=#current.order_list,1,-1 do
      if current.order_list[i]==74 then
-      if exists then table.remove(current.order_list,i) else exists=true end
+      if exists or not (data.data and data.data.isopen) then table.remove(current.order_list,i) else exists=true end
      end
     end
     if not exists and data.data and data.data.isopen then table.insert(current.order_list,74) end
@@ -76,6 +95,7 @@ do
    ms.d_data.callback_update_config=configCallback
    v._localRefreshContent=nil
    v.callbackGetActNoticeData=callback;v.setMeiridata=meiri;v.showgetItem=showItem;v.createGrowthFund=fund
+   v.createAnniversaryRecharge=anniversary
    v._localWelfareRestore=nil
   end
  end

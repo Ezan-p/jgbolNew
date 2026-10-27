@@ -45,7 +45,9 @@ def consume(role, tid, n, selected=None):
     f.require(sum(i['count'] for i in items) >= n, '可用金卡不足，请检查背包数量或锁定状态')
     for i in items:
         take = min(n, i['count']); i['count'] -= take; n -= take
-    role['attachments'] = [i for i in role['attachments'] if i['count'] > 0]
+    # Skill count is failure compensation, not an inventory stack size.
+    consumed = {i['id'] for i in items if i['count'] == 0}
+    role['attachments'] = [i for i in role['attachments'] if i['id'] not in consumed]
 
 
 def handles(mid, req):

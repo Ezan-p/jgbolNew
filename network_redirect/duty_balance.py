@@ -27,12 +27,13 @@ def rules():
     require([t['value'] for t in tiers] == [5, 10, 15, 20] and tiers[0]['star'] >= 9, '天命祭魂档位无效')
     require(all(a['star'] < b['star'] and a['weight'] > b['weight'] > 0 for a, b in zip(tiers, tiers[1:])), '天命祭魂费用或概率无效')
     require(sum(t['weight'] for t in tiers) == 100, '天命祭魂概率和须为100')
-    require(sum(t['weight'] for t in r['drops']) == 100, '天命掉落概率和须为100')
+    require(sum(t['weight'] for t in r['drops']) == 1000, '天命守卫奖励权重和须为1000')
     for row in r['drops']:
         p = row['reward']
         require(type(row['weight']) is int and row['weight'] > 0, '天命掉落权重无效')
-        require(p is None or (len(p) == 4 and all(type(v) is int for v in p) and p[2] > 0 and p[3] == 1
-                and (p[0] == 11 or p[0] == 5 and p[1] in formation.ITEMS)), '天命掉落物品无效')
+        require(isinstance(p, list) and len(p) == 4 and all(type(v) is int for v in p) and p[2] > 0 and p[3] == 1
+                and (p[0] in (11, 12) and p[1] == 0 or p[0] == 5 and p[1] in (1031, 1032, 1033, 1034)
+                     and p[1] in formation.ITEMS and p[2] == 1), '天命掉落物品无效')
     return r
 
 
@@ -58,6 +59,10 @@ def drop():
     return copy.deepcopy(weighted(rules()['drops'])['reward'])
 
 
+def guard_reward(number):
+    return dict(round=number, difficulty=secrets.randbelow(3)+1, reward=drop())
+
+
 @lru_cache(maxsize=1)
 def pool():
     groups = {g: [] for g in range(4, 9)}
@@ -71,9 +76,21 @@ def pool():
             g = len(active)
             if g not in groups:
                 continue
+            # Use three members of this exact formation as its difficulty
+            # portraits. Different type IDs/qualities can depict the same
+            # immortal, so deduplicate by character artwork resource.
+            guard_types = []
+            resources = set()
+            for c in active:
+                resource = int(formation.BASES[c['type']]['resource'])
+                if resource not in resources:
+                    guard_types.append(c['type'])
+                    resources.add(resource)
+            formation.require(len(guard_types) >= 3, '天命NPC阵容缺少三种守卫立绘')
             p = entries[key]['profile']
             groups[g].append(dict(npc_id=key, power=p['role_combat_power'], name=p['role_name'],
-                                  type=active[0]['type'], archetype=p['preferred_archetype'], level=p['level']))
+                                  type=active[0]['type'], guard_types=tuple(guard_types[:3]),
+                                  archetype=p['preferred_archetype'], level=p['level']))
     for rows in groups.values():
         rows.sort(key=lambda row: (row['power'], row['npc_id']))
         formation.require(bool(rows), '天命NPC分组为空')

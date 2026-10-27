@@ -1,5 +1,6 @@
 """两周年 / 元始祈愿: 3.87 contracts [A], missing server economy [B]."""
 import json
+import secrets
 from pathlib import Path
 
 from . import activity as a, formation as f, summon
@@ -20,6 +21,19 @@ def load_rules(path=ROOT / 'server_config/yuanshi_rules.json'):
                        ('bag_daily_limit', 100), ('gold_per_rmb', 1000)]:
         f.require(type(r.get(key)) is int and 1 <= r[key] <= upper, '两周年数值无效：' + key)
     f.require(r.get('activation_rmb') == [0, 30, 30, 50, 50], '原版五礼包门槛须为任意/30/30/50/50元')
+    pool = r.get('wish_pool')
+    f.require(isinstance(pool, list) and len(pool) == 5, '祈愿需要五类奖励')
+    identities = set()
+    for row in pool:
+        f.require(isinstance(row, dict) and type(row.get('weight')) is int
+                  and 1 <= row['weight'] <= 1000000, '祈愿奖励权重无效')
+        p = row.get('reward')
+        f.require(isinstance(p, list) and len(p) == 4 and all(type(v) is int for v in p), '祈愿奖励格式无效')
+        typ, tid, n, lv = p
+        f.require((typ, tid) in {(12, 0), (5, 1022), (5, 1023), (5, 1032), (5, 1031)}
+                  and 1 <= n <= 100000 and lv == 1, '祈愿奖励无效')
+        identities.add((typ, tid))
+    f.require(len(identities) == 5, '祈愿奖励种类重复或缺失')
     gifts = r.get('gifts')
     f.require(isinstance(gifts, list) and len(gifts) == 5, '原版需要五个礼包')
     for rows in gifts:
@@ -137,6 +151,16 @@ def use_bag(role, req):
     return [summon.event(21, dict(result=1, type_id=1808, count=n, attach_list=grant_yuanshi(role, n)))]
 
 
+def draw_wish(r):
+    """One server-side reward per unfinished wish; weights are inferred [B]."""
+    pick = secrets.randbelow(sum(row['weight'] for row in r['wish_pool']))
+    for row in r['wish_pool']:
+        if pick < row['weight']:
+            return row['reward']
+        pick -= row['weight']
+    raise AssertionError('unreachable weighted wish')
+
+
 def settle(role, req, now):
     r = load_rules()
     s = state(role, now, r)
@@ -162,6 +186,8 @@ def settle(role, req, now):
             if s['claimed']:
                 gain = a.prizes(role, [[10, 5046, r['souls_per_wish'], 1]])
             else:
+                # Includes the wish that reaches 100%; claiming is a separate free action.
+                gain = a.prizes(role, [draw_wish(r)])
                 s['progress'] = min(100, s['progress'] + r['progress_per_wish'])
     elif flag == 1:
         f.require(index <= len(s['gift_counts']) and s['gift_counts'][index - 1] > 0, '礼包未激活或已领取')

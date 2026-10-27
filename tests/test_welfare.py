@@ -11,6 +11,9 @@ NOW=1792857600
 class WelfareTests(unittest.TestCase):
  def setUp(self):
   self.tmp=tempfile.TemporaryDirectory();self.b=Backend(Path(self.tmp.name),1,lambda *a,**k:None);self.serial=0
+  # Retain coverage of the optional legacy branches; shipping defaults are
+  # covered separately by test_welfare_disabled.py.
+  self.b.welfare_rules['order']=sorted(welfare.TYPES)
  def tearDown(self):self.b.close();self.tmp.cleanup()
  def req(self,mid=1127,**kw):
   self.serial+=1

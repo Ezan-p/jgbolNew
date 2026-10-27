@@ -101,7 +101,8 @@ def settle(role, req, parse, profile_rules):
                 array['skill_list'][pos-1] += 1
     for item in selected:
         item['count'] -= 1
-    role['attachments'] = [x for x in role['attachments'] if x.get('count', 1) > 0]
+    consumed = {x['id'] for x in selected if x['count'] == 0}
+    role['attachments'] = [x for x in role['attachments'] if x['id'] not in consumed]
     result['ret_items'] = []
     if refund:
         summon.add_item(role, 1315, refund)

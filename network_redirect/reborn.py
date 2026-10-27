@@ -91,6 +91,8 @@ def consume(role, text):
 
 
 def settle(role, req, rules, parse):
+    from . import feature_levels
+    feature_levels.check(role, 1328, req)
     op, kind = req['id'], req['reborn_type']
     f.require((kind, op) in {(1, 4), (2, 1), (2, 2), (2, 3), (3, 5), (3, 6)}, '转生操作无效')
     d = parse(req['data'])

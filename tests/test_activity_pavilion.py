@@ -189,7 +189,7 @@ class PavilionTests(ActivityCase):
         p.record_charge(role, 10, NOW)
         self.assertEqual(role['pavilion']['bricks_earned'], 6151)
 
-    def test_restart_week_rollover_mail_persists_and_clock_rollback(self):
+    def test_restart_fortnight_rollover_mail_persists_and_clock_rollback(self):
         self.charge(); self.claim_mails(); self.data(self.call(2,index=2,count=1))
         self.data(self.call(3,index=1)); before=self.b.profile()
         self.b.close(); self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
@@ -199,7 +199,12 @@ class PavilionTests(ActivityCase):
             d=self.data(self.call())
             self.assertEqual(d['exchange_info'][2]['left_buy_count'],1)
             self.assertFalse(d['had_prize']); self.assertEqual(d['charge_money'],0)
-            self.assertEqual(self.b.profile()['welfare']['mails'],before['welfare']['mails'])
+            mails = self.b.profile()['welfare']['mails']
+            self.assertTrue(all(mails[k] == v for k, v in before['welfare']['mails'].items()))
+            refunds = [m for k, m in mails.items() if k.startswith('pavilion-recycle-')]
+            self.assertEqual(len(refunds), 1)
+            self.assertEqual(refunds[0]['prizes'], [[5, 1001, 1200, 1]])
+            self.assertEqual(self.amount(1141), 0)
         before=self.b.profile(); self.assertEqual(self.call()[0][0],55)
         self.assertEqual(self.b.profile(),before)
 
@@ -214,6 +219,140 @@ class PavilionTests(ActivityCase):
         end=self.b.profile()['pavilion']['end']
         with patch('network_redirect.backend.time.time',return_value=end):
             self.assertFalse(self.data(self.call())['had_prize'])
+
+    def refunds(self):
+        return [m for k, m in self.b.profile()['welfare'].get('mails', {}).items()
+                if k.startswith('pavilion-recycle-')]
+
+    def test_exact_fortnight_boundary_resets_all_progress_and_reearns_bonuses(self):
+        self.charge('first-period'); self.claim_mails()
+        self.data(self.call(2, index=1, count=1))
+        for i in range(1, 5): self.data(self.call(3, index=i))
+        old = self.b.profile(); end = old['pavilion']['end']
+        self.assertEqual(end - old['pavilion']['start'], 14 * 86400)
+        with patch('network_redirect.backend.time.time', return_value=end - 1):
+            self.assertEqual(self.data(self.call())['charge_money'], 1000)
+        with patch('network_redirect.backend.time.time', return_value=end):
+            d = self.data(self.call())
+            self.assertEqual((d['begin_time'], d['end_time']), (end, end + 14 * 86400))
+            self.assertEqual(d['charge_money'], 0)
+            self.assertTrue(all(g['count'] == 0 and g['state'] == 1 for g in d['charge_info'].values()))
+            self.assertEqual(d['exchange_info'][1]['left_buy_count'], 3)
+            self.assertEqual(d['exchange_info'][1]['state'], 1)
+            self.assertEqual(self.amount(1141), 0)
+            self.assertEqual((self.amount(1142), self.amount(1143)), (2, 2))
+            self.charge('first-period')  # A previous order must never count again.
+            self.assertEqual(self.b.profile()['pavilion']['charge_gold'], 0)
+            self.charge('second-period')
+            self.assertEqual(self.b.profile()['pavilion']['bricks_earned'], 1350)
+            self.data(self.call(3, index=4))
+            self.claim_mails(); self.data(self.call(2, index=1, count=1))
+            firsts = [k for k in self.b.profile()['welfare']['mails'] if k.startswith('pavilion-first-')]
+            self.assertEqual(len(firsts), 2)
+            self.assertEqual(len(self.refunds()), 1)
+            self.assertEqual(self.refunds()[0]['prizes'], [[5, 1001, 1050, 1]])
+
+    def test_unclaimed_mixed_mail_and_locked_bricks_recycled_once_after_offline_gap(self):
+        from network_redirect import system_mail
+        self.charge(); self.stock((1141, 7), (1142, 2))
+        role = self.b.profile()
+        for item in role['attachments']:
+            if item['type_id'] == 1141: item['is_lock'] = True
+        system_mail.deliver(role, key='mixed-bricks', title='混合附件', body='测试',
+                            prizes=[[5, 1141, 3, 1], [5, 1001, 4, 1]], now=NOW, rules=self.b.welfare_rules)
+        self.b.save(role)
+        with patch('network_redirect.backend.time.time', return_value=role['pavilion']['end'] + 42 * 86400):
+            self.data(self.call())
+            refund = self.refunds()[0]
+            self.assertEqual(refund['prizes'], [[5, 1001, 1360, 1]])
+            self.assertIn('背包7个、未领取邮件1353个', refund['mail_body'])
+            self.assertEqual(self.amount(1141), 0)
+            mixed = self.b.profile()['welfare']['mails']['mixed-bricks']
+            self.assertEqual(mixed['prizes'], [[5, 1001, 4, 1]])
+            self.assertFalse(mixed['claimed'])
+            self.ok(self.req(1103, mail_id=mixed['mail_id']))
+            before_peaches = self.amount(1001)
+            self.ok(self.req(1103, mail_id=refund['mail_id']))
+            self.assertEqual(self.amount(1001), before_peaches + 1360)
+            self.assertEqual(self.req(1103, mail_id=refund['mail_id'])[0][0], 55)
+            self.data(self.call()); self.assertEqual(len(self.refunds()), 1)
+            self.assertEqual(self.amount(1142), 2)
+
+    def test_direct_old_mail_claim_at_boundary_cannot_restore_bricks(self):
+        self.charge()
+        role = self.b.profile()
+        m = next(m for k, m in role['welfare']['mails'].items() if k.startswith('pavilion-charge-'))
+        with patch('network_redirect.backend.time.time', return_value=role['pavilion']['end']):
+            self.ok(self.req(1103, mail_id=m['mail_id']))
+            self.assertEqual(self.amount(1141), 0)
+            self.assertEqual(self.b.profile()['pavilion']['charge_gold'], 0)
+            self.assertEqual(self.refunds()[0]['prizes'], [[5, 1001, 1350, 1]])
+
+    def test_mail_read_and_heartbeat_refresh_without_opening_pavilion(self):
+        self.charge()
+        role = self.b.profile(); end = role['pavilion']['end']
+        m = next(m for k, m in role['welfare']['mails'].items() if k.startswith('pavilion-charge-'))
+        with patch('network_redirect.backend.time.time', return_value=end):
+            events = self.req(1102, mail_id=m['mail_id'], flag=0)
+            self.ok(events)
+            self.assertEqual(next(d for e, d in events if e == 14)['attach_count'], 0)
+            self.assertEqual(len(self.refunds()), 1)
+            self.stock((1141, 9))
+        with patch('network_redirect.backend.time.time', return_value=end + 14 * 86400):
+            replies = self.b.respond(encode(2999, {}), self.state)
+            self.assertEqual(decode(replies[0])[0], 2999)
+            self.assertEqual(self.amount(1141), 0)
+            self.assertEqual(len(self.refunds()), 2)
+            self.assertEqual(self.b.profile()['pavilion']['start'], end + 14 * 86400)
+
+    def test_recharge_at_boundary_settles_old_mail_before_new_principal(self):
+        self.charge('period-old')
+        end = self.b.profile()['pavilion']['end']
+        with patch('network_redirect.backend.time.time', return_value=end):
+            self.charge('period-new')
+            self.assertEqual(self.b.profile()['pavilion']['charge_gold'], 10000)
+            self.assertEqual(self.b.profile()['pavilion']['bricks_earned'], 1350)
+            self.assertEqual(self.refunds()[0]['prizes'], [[5, 1001, 1350, 1]])
+            self.claim_mails(); self.assertEqual(self.amount(1141), 1350)
+
+    def test_legacy_week_migration_same_start_or_second_week_and_peer_isolation(self):
+        r = p.load_rules(); start, end = p.period(NOW, r)
+        for offset in (0, 7 * 86400):
+            with self.subTest(offset=offset):
+                role = self.b.profile()
+                role['pavilion'] = dict(start=start+offset, end=start+offset+7*86400,
+                    clock=start+offset, charge_gold=100, bricks_earned=20, bought={'9': 1}, claimed=[1])
+                p.mail(role, f'pavilion-charge-{start+offset}-100', '天机阁充值金砖', [[5, 1141, 20, 1]], start+offset)
+                peer = copy.deepcopy(role)
+                data = p.catalog(role, NOW, r, [peer])
+                self.assertFalse(data['had_prize'])
+                self.assertEqual(data['charge_money'], 0)
+                self.assertEqual((data['begin_time'], data['end_time']), (start, end))
+                p.record_charge(role, 100, NOW)
+                self.assertEqual(role['pavilion']['bricks_earned'], 20)
+                mails = role['welfare']['mails']
+                self.assertTrue(mails[f'pavilion-charge-{start+offset}-100']['claimed'])
+                self.assertFalse(mails[f'pavilion-charge-{start}-{end}-100']['claimed'])
+
+    def test_rollover_mail_and_encoding_failure_leave_no_partial_conversion(self):
+        self.charge(); self.stock((1141, 10))
+        old = self.b.profile()
+        with patch('network_redirect.backend.time.time', return_value=old['pavilion']['end']):
+            old = self.b.profile()  # Unrelated achievement daily migration precedes the transaction.
+            with patch.object(p, 'mail', side_effect=formation.Rejected('mail failed')):
+                self.assertEqual(self.call()[0][0], 55)
+            self.assertEqual(self.b.profile(), old)
+            with patch('network_redirect.backend.activity.attributes', side_effect=ValueError('encode failed')):
+                self.assertEqual(self.call()[0][0], 55)
+            self.assertEqual(self.b.profile(), old)
+            self.data(self.call())
+            self.assertEqual(self.refunds()[0]['prizes'], [[5, 1001, 1360, 1]])
+
+    def test_empty_rollover_does_not_send_empty_refund(self):
+        role = self.b.profile()
+        with patch('network_redirect.backend.time.time', return_value=role['pavilion']['end']):
+            self.data(self.call())
+            self.assertFalse(self.refunds())
 
     def test_encoding_and_mail_failure_roll_back_resources(self):
         self.stock((1141,500))

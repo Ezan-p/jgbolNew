@@ -7,6 +7,7 @@ from unittest.mock import patch
 from test_activity import ActivityCase, NOW
 from network_redirect import activity_visit as v, achievements, formation, summon
 from network_redirect.backend import Backend
+from network_redirect.protocol import decode
 
 
 class VisitTests(ActivityCase):
@@ -39,12 +40,42 @@ class VisitTests(ActivityCase):
                 info = data['visit_list'][3]['prize_info']
                 self.assertEqual(info, dict(object_type=6, attach_type=tid, attach_count=1, attach_level=1))
                 self.assertEqual(before['attachments'], self.b.profile()['attachments'])
-                self.call(3, 2)
+                claim = self.call(3, 2)
                 added = [i for i in self.b.profile()['attachments'] if i['id'] not in {x['id'] for x in before['attachments']}]
                 self.assertEqual(len(added), 1)
                 self.assertEqual((added[0]['attach_type'], added[0]['type_id'], added[0]['level']), (6, tid, 1))
                 self.assertEqual(added[0]['effect_value'], formation.skill_effect(dict(type_id=tid, level=1)))
+                self.assertEqual(self.visit_state(3)['reward_ids'], [added[0]['id']])
+                self.assertEqual(claim['local_prizes'][1], info)
+                packets = list(map(decode, self.replies))
+                received = [item for mid, _, data in packets if mid == 1035 for item in data['attach_list']]
+                book = next(item for item in received if item['id'] == added[0]['id'])
+                self.assertEqual((book['count'], book['protogenic'], book['equip_pos']), (0, 0, 0))
                 self.assertEqual(before['gold_coin'], self.b.profile()['gold_coin'])
+
+    def test_missing_grant_cannot_mark_claimed(self):
+        self.call(3)
+        before = self.b.profile()
+        with patch.object(v.journey, 'grant'):
+            self.assertEqual(self.req(1030, visit_index=3, op_type=2)[0][0], 55)
+        self.assertEqual(before, self.b.profile())
+
+    def test_claimed_book_survives_material_cleanup_and_restart(self):
+        from network_redirect import recharge
+        self.call(3); self.call(3, 2)
+        role = self.b.profile()
+        ident = role['activity']['visits']['3']['reward_ids'][0]
+        summon.add_item(role, 1150, 1)
+        recharge.consume(role, 1150, 1)
+        self.b.save(role)
+        self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        self.call()
+        self.assertTrue(any(i['id'] == ident for i in self.b.profile()['attachments']))
+        # Deliberate use as a material must not be undone by later visit queries.
+        role = self.b.profile()
+        role['attachments'] = [i for i in role['attachments'] if i['id'] != ident]
+        self.b.save(role); self.call()
+        self.assertFalse(any(i['id'] == ident for i in self.b.profile()['attachments']))
 
     def test_quality_probability_is_per_tier_not_pool_size(self):
         counts = {q: 0 for q in range(2, 6)}

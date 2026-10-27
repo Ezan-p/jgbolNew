@@ -8,11 +8,100 @@ do
   local function replace(t,key,fn)
    local old=t[key];t[key]=fn;undo[#undo+1]=function() t[key]=old end
   end
+  local restore
+  local refreshLayer,refreshTime
+  local function refreshTasks()
+   local layer=ui.g_pethuntUI.main_layer
+   local now=ms.d_time.getTime()
+   if refreshLayer==layer and refreshTime and now-refreshTime<5 then return end
+   if layer and layer:getParent() then refreshLayer=layer end
+   refreshTime=now
+   ui.sendRequest(83,{})
+  end
+  local send=ui.sendRequest
+  replace(ui,'sendRequest',function(op,data,...)
+   if op==84 or op==85 then
+    local main=ui.g_data.main or {}
+    if main.task_last_time and ms.d_time.getTime()>=main.task_last_time then
+     refreshTasks();return
+    end
+    data=data or {};data.task_day=ui.g_self.cur_task_day or main.task_day
+   end
+   return send(op,data,...)
+  end)
+  local taskLayer=ui.showTaskLayer
+  replace(ui,'showTaskLayer',function(parent,task,...)
+   if task then ui.g_self.cur_task_index=task.index or ui.g_self.cur_task_index end
+   ui.g_self.cur_task_day=ui.g_data.main and ui.g_data.main.task_day
+   return taskLayer(parent,task,...)
+  end)
+  local showMain=ui.showMainLayer
+  replace(ui,'showMainLayer',function(...)
+   refreshLayer=nil;refreshTime=nil
+   local result=showMain(...)
+   local layer=ui.g_pethuntUI.main_layer
+   local main=ui.g_data.main
+   local function tick()
+    if ms._localGuildPetRestore~=restore or ui.g_pethuntUI.main_layer~=layer or not layer:getParent() then return end
+    if main and main.task_last_time and ms.d_time.getTime()>=main.task_last_time then
+     refreshTasks();ms.d_u.delay(layer,5,tick);return
+    end
+    ms.d_u.delay(layer,1,tick)
+   end
+   if layer and main and main.task_last_time then ms.d_u.delay(layer,1,tick) end
+   return result
+  end)
+  local finish=ui.showTaskFinish
+  replace(ui,'showTaskFinish',function(...)
+   -- The native delayed reward renderer treats currency IDs as item IDs.
+   -- Give its nested closure a private environment, so other screens and
+   -- callbacks keep their own rendering helpers while this animation runs.
+   local rewards=ui.g_data.task_finish and ui.g_data.task_finish.prize_list or {}
+   local current,index=nil,0
+   local dataProxy=setmetatable({
+    getCertainSmallSprite=function(typ,tid,...)
+     index=index+1;current=rewards[index]
+     return ms.d_data.getCertainSmallSprite(typ,tid,...)
+    end,
+    getItemName=function(tid,...)
+     if current and current.object_type==12 then return '银两' end
+     if current and current.object_type==11 then return '元宝' end
+     return ms.d_data.getItemName(tid,...)
+    end
+   },{__index=ms.d_data})
+   local utilities=setmetatable({createByStyle=function(options,...)
+    if current and options.type=='label' and options.y==0.3 then
+     options.string=dataProxy.getItemName(current.attach_type)..'×'..tostring(current.attach_count)
+     options.fontsize=22
+    end
+    return ms.d_u.createByStyle(options,...)
+   end},{__index=ms.d_u})
+   local env=getfenv(finish)
+   local proxy=setmetatable({d_data=dataProxy,d_u=utilities},{__index=ms})
+   setfenv(finish,setmetatable({d_ms=proxy},{__index=env,__newindex=env}))
+   local ok,result=pcall(finish,...);setfenv(finish,env)
+   if not ok then error(result) end
+   return result
+  end)
   local native=ui.onGetResult
   replace(ui,'onGetResult',function(op,data,...)
+   if op==83 and data.result~=1 then refreshLayer=nil;refreshTime=nil end
+   if data.result==1 and op==83 and refreshLayer then
+    local layer=refreshLayer;refreshLayer=nil;refreshTime=nil
+    ui.g_data.main=data
+    if layer==ui.g_pethuntUI.main_layer and layer:getParent() then
+     return ui.showMainLayer(layer:getParent())
+    end
+   end
    if data.result==1 and op==84 and data.task_state then
     ui.g_data.main=data.task_state
-    if ui.g_pethuntUI.main_layer then ui.addMainBottomLayer(ui.g_pethuntUI.main_layer) end
+    ui.g_data.task_finish=data
+    local layer=ui.g_pethuntUI.main_layer
+    if layer and layer:getParent() then ui.showMainLayer(layer:getParent()) end
+    -- Native settlement writes union_task[task_index], but the visible list
+    -- is now compact after a target has been completed.
+    if data.task_type==1 then return ui.showTaskFinish() end
+    return
    end
    if data.result==1 and op==85 then
     local replay=data.fight_result_list and data.fight_result_list[1]
@@ -103,9 +192,11 @@ do
    if reward and pet.g_self.g_Shilian_layer then popup(pet.g_self.g_Shilian_layer,reward.items,reward.z) end
    return result
   end)
-  ms._localGuildPetRestore=function()
+  restore=function()
+   refreshLayer=nil;refreshTime=nil
    for i=#undo,1,-1 do undo[i]() end
    ms._localGuildPetRestore=nil
   end
+  ms._localGuildPetRestore=restore
  end
 end

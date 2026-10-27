@@ -1,0 +1,107 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\0aaf9138ef79f4065afb567aa3dec130.data'; root=proto0
+
+FUNCTION proto0 offset=0x4b source_lines=897-933 params=0
+UPVALUES ['pairs', 'table']
+00001 [L899] GGET     A=0 B=0 C=0 D=0 'd_ms'
+00002 [L899] TGETS    A=0 B=0 C=1 D=1 'd_common_def'
+00003 [L899] TGETS    A=0 B=0 C=2 D=2 'object_type'
+00004 [L901] GGET     A=1 B=0 C=0 D=0 'd_ms'
+00005 [L901] TGETS    A=1 B=1 C=1 D=257 'd_common_def'
+00006 [L901] TGETS    A=1 B=1 C=3 D=259 'item_main_type'
+00007 [L902] GGET     A=2 B=0 C=0 D=0 'd_ms'
+00008 [L902] TGETS    A=2 B=2 C=4 D=516 'd_packageUI'
+00009 [L902] TGETS    A=2 B=2 C=5 D=517 'g_reorgItemsInfo'
+00010 [L902] TGETS    A=3 B=0 C=6 D=6 'item'
+00011 [L902] TGETV    A=2 B=2 C=3 D=515 
+00012 [L902] TGETS    A=3 B=1 C=7 D=263 'invisible_card'
+00013 [L902] TGETV    A=2 B=2 C=3 D=515 
+00014 [L902] IST      A=0 B=0 C=2 D=2 
+00015 [L902] JMP      A=3 B=128 C=1 D=32769 target=17
+00016 [L902] TNEW     A=2 B=0 C=0 D=0 
+00017 [L905] GGET     A=3 B=0 C=8 D=8 'g_cardUI'
+00018 [L905] TGETS    A=3 B=3 C=9 D=777 'UsedCards'
+00019 [L905] ISF      A=0 B=0 C=3 D=3 
+00020 [L905] JMP      A=4 B=128 C=12 D=32780 target=33
+00021 [L906] UGET     A=3 B=0 C=0 D=0 pairs
+00022 [L906] GGET     A=4 B=0 C=8 D=8 'g_cardUI'
+00023 [L906] TGETS    A=4 B=4 C=9 D=1033 'UsedCards'
+00024 [L906] CALL     A=3 B=4 C=2 D=1026 
+00025 [L906] ISNEXT   A=6 B=128 C=5 D=32773 target=31
+00026 [L907] GGET     A=8 B=0 C=0 D=0 'd_ms'
+00027 [L907] TGETS    A=8 B=8 C=10 D=2058 'd_u'
+00028 [L907] TGETS    A=8 B=8 C=11 D=2059 'remove'
+00029 [L907] TGETS    A=9 B=7 C=12 D=1804 'sprite'
+00030 [L907] CALL     A=8 B=1 C=2 D=258 
+00031 [L906] ITERN    A=6 B=3 C=3 D=771 
+00032 [L906] ITERL    A=6 B=127 C=249 D=32761 target=26
+00033 [L910] GGET     A=3 B=0 C=8 D=8 'g_cardUI'
+00034 [L910] TNEW     A=4 B=0 C=0 D=0 
+00035 [L910] TSETS    A=4 B=3 C=9 D=777 'UsedCards'
+00036 [L911] GGET     A=3 B=0 C=8 D=8 'g_cardUI'
+00037 [L911] TGETS    A=3 B=3 C=13 D=781 'tipLabel'
+00038 [L911] MOV      A=4 B=0 C=3 D=3 
+00039 [L911] TGETS    A=3 B=3 C=14 D=782 'setVisible'
+00040 [L911] KPRI     A=5 B=0 C=1 D=1 
+00041 [L911] CALL     A=3 B=1 C=3 D=259 
+00042 [L913] GGET     A=3 B=0 C=8 D=8 'g_cardUI'
+00043 [L913] TNEW     A=4 B=0 C=0 D=0 
+00044 [L913] TSETS    A=4 B=3 C=15 D=783 'countList'
+00045 [L914] GGET     A=3 B=0 C=8 D=8 'g_cardUI'
+00046 [L914] TGETS    A=3 B=3 C=15 D=783 'countList'
+00047 [L915] KSHORT   A=4 B=0 C=0 D=0 0
+00048 [L916] UGET     A=5 B=0 C=0 D=0 pairs
+00049 [L916] MOV      A=6 B=0 C=2 D=2 
+00050 [L916] CALL     A=5 B=4 C=2 D=1026 
+00051 [L916] ISNEXT   A=8 B=128 C=26 D=32794 target=78
+00052 [L917] TGETS    A=10 B=9 C=16 D=2320 'level'
+00053 [L918] TGETV    A=11 B=3 C=10 D=778 
+00054 [L918] ISF      A=0 B=0 C=11 D=11 
+00055 [L918] JMP      A=12 B=128 C=12 D=32780 target=68
+00056 [L919] TGETV    A=11 B=3 C=10 D=778 
+00057 [L919] TGETV    A=12 B=3 C=10 D=778 
+00058 [L919] TGETS    A=12 B=12 C=17 D=3089 'count'
+00059 [L919] ADDVN    A=12 B=12 C=0 D=3072 
+00060 [L919] TSETS    A=12 B=11 C=17 D=2833 'count'
+00061 [L920] UGET     A=11 B=0 C=1 D=1 table
+00062 [L920] TGETS    A=11 B=11 C=18 D=2834 'insert'
+00063 [L920] TGETV    A=12 B=3 C=10 D=778 
+00064 [L920] TGETS    A=12 B=12 C=19 D=3091 'ids'
+00065 [L920] TGETS    A=13 B=9 C=20 D=2324 'id'
+00066 [L920] CALL     A=11 B=1 C=3 D=259 
+00067 [L920] JMP      A=11 B=128 C=6 D=32774 target=74
+00068 [L922] TDUP     A=11 B=0 C=21 D=21 {'kind': 'table', 'value': {'count': 1}}
+00069 [L922] TNEW     A=12 B=0 C=3 D=3 
+00070 [L922] TGETS    A=13 B=9 C=20 D=2324 'id'
+00071 [L922] TSETB    A=13 B=12 C=1 D=3073 
+00072 [L922] TSETS    A=12 B=11 C=19 D=2835 'ids'
+00073 [L922] TSETV    A=11 B=3 C=10 D=778 
+00074 [L924] ISGE     A=4 B=0 C=10 D=10 
+00075 [L924] JMP      A=11 B=128 C=2 D=32770 target=78
+00076 [L924] ISTC     A=4 B=0 C=10 D=10 
+00077 [L924] JMP      A=11 B=128 C=0 D=32768 target=78
+00078 [L916] ITERN    A=8 B=3 C=3 D=771 
+00079 [L916] ITERL    A=8 B=127 C=228 D=32740 target=52
+00080 [L926] GGET     A=5 B=0 C=8 D=8 'g_cardUI'
+00081 [L926] TNEW     A=6 B=0 C=0 D=0 
+00082 [L926] TSETS    A=6 B=5 C=22 D=1302 'UnusedCards'
+00083 [L927] KSHORT   A=5 B=0 C=1 D=1 1
+00084 [L927] MOV      A=6 B=0 C=4 D=4 
+00085 [L927] KSHORT   A=7 B=0 C=1 D=1 1
+00086 [L927] FORI     A=5 B=128 C=14 D=32782 target=101
+00087 [L928] TGETV    A=9 B=3 C=8 D=776 
+00088 [L928] ISF      A=0 B=0 C=9 D=9 
+00089 [L928] JMP      A=10 B=128 C=10 D=32778 target=100
+00090 [L929] UGET     A=9 B=0 C=1 D=1 table
+00091 [L929] TGETS    A=9 B=9 C=18 D=2322 'insert'
+00092 [L929] GGET     A=10 B=0 C=8 D=8 'g_cardUI'
+00093 [L929] TGETS    A=10 B=10 C=22 D=2582 'UnusedCards'
+00094 [L929] TDUP     A=11 B=0 C=23 D=23 {'kind': 'table', 'value': {}}
+00095 [L929] TSETS    A=8 B=11 C=16 D=2832 'level'
+00096 [L929] TGETV    A=12 B=3 C=8 D=776 
+00097 [L929] TGETS    A=12 B=12 C=17 D=3089 'count'
+00098 [L929] TSETS    A=12 B=11 C=17 D=2833 'count'
+00099 [L929] CALL     A=9 B=1 C=3 D=259 
+00100 [L927] FORL     A=5 B=127 C=242 D=32754 target=87
+00101 [L932] GGET     A=5 B=0 C=24 D=24 'createCardsScrollLayer'
+00102 [L932] CALL     A=5 B=1 C=1 D=257 
+00103 [L933] RET0     A=0 B=0 C=1 D=1 

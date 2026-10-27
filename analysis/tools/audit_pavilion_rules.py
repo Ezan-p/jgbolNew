@@ -29,11 +29,12 @@ def main():
            'gift_config type1 six recharge bonus rows; type2 four thresholds based on server-wide bricks (destinyUI L441)',
            'destinyUI L902-907 clamps discounted total to zero; L955 decrements count after reward dismissal',
            'destinyUI L509-511 shows need_charge and plus_times only after quota exhaustion; destiny14 means next purchase-limit increase, not increases already earned'],
-        B=['7-day recurring local period starting Monday UTC+8; principal/10 RMB; no history retroactivity',
+        B=['permanent 14-day recurring local period anchored at 1970-01-05 Monday UTC+8; principal/10 RMB; no history retroactivity',
            'type1 milestones paid once each per period; base and bonus delivered together by permanent mail',
            'server total uses actual current-period local-account bricks earned (including unclaimed mail), no simulated strangers',
            'each account may claim four public gifts once, including non-paying accounts',
-           'index1 gains one extra purchase per 300 RMB, max10; all counters reset each period; currency/cards persist',
+           'index1 gains one extra purchase per 300 RMB, max10; all counters reset each period; coupons persist',
+           'all remaining bricks, including unclaimed mail, convert 1:1 to item1001 peaches in permanent refund mail; legacy seven-day saves migrate once',
            'no global gift escalation invented because original shipped table has no threshold or alternative reward'],
         shop=p.SHOP,gifts=p.GIFTS)
     (out/'official_audit.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')

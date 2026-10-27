@@ -1,4 +1,5 @@
 import tempfile
+import copy
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -90,3 +91,51 @@ class GuildActivityFixTests(unittest.TestCase):
         treasure=self.req(43,flag=1)[-1];self.assertEqual((treasure['max_layer'],treasure['cleared_layer'],treasure['free_times']),(3,1,5))
         self.now+=86400;self.req(26)
         info=self.req(44)[-1]['team'];self.assertEqual((info['max_layer'],info['cleared_layer'],info['last_search_time']),(3,0,0))
+
+
+    def test_legacy_search_board_migrates_without_reroll_or_duplicate_rewards(self):
+        for used in (0,2,5):
+            with self.subTest(used=used):
+                self.now+=86400
+                self.req(43,flag=1)
+                for _ in range(used):self.req(43,flag=2)
+                role=self.b.profile();a=role['guild']['instances']
+                original=copy.deepcopy(a['search_tiles'])
+                a['search_tiles']+=copy.deepcopy(a['search_tiles'][:7])
+                # The reported freeze: reward 5 is at display slot 20 of 25.
+                a['search_order']=[15,9,7,3,20,11,17,22,1,6,13,19,8,23,21,5,18,14,10,12,25,24,4,16,2]
+                self.b.save(role)
+                result=self.req(43,flag=1)[-1];after=self.b.profile()
+                self.assertEqual((result['board_size'],len(result['prize_items'])),(18,18))
+                self.assertEqual(set(result['search_order'].values()),set(range(1,19)))
+                self.assertEqual(after['guild']['instances']['search_tiles'],original)
+                self.assertEqual((result['search_count'],result['free_times'],result['all_point']),(used,5-used,used*10))
+                for key in ('gold_coin','silver_coin','attachments'):
+                    self.assertEqual(role.get(key),after.get(key))
+                self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+                again=self.req(43,flag=1)[-1]
+                self.assertEqual(result['prize_items'],again['prize_items'])
+                self.assertEqual(result['search_order'],again['search_order'])
+                if used<5:
+                    gold=self.b.profile()['gold_coin']
+                    swept=self.req(43,flag=6)[-1]
+                    self.assertEqual(set(swept['prize_list']),set(range(used+1,6)))
+                    for index,prize in swept['prize_list'].items():
+                        item=result['prize_items'][index]['item']
+                        for key in ('object_type','attach_type','attach_count','attach_level'):
+                            self.assertEqual(prize[key],item[key])
+                    self.assertEqual(self.b.profile()['gold_coin'],gold-self.b.guild_rules['search_sweep_gold'])
+                before=self.b.profile();self.req(43,ok=False,flag=6)
+                self.assertEqual(before,self.b.profile())
+
+
+    def test_search_board_capacity_and_last_reward_cursor(self):
+        from network_redirect import guild_offline, formation
+        rules=dict(self.b.guild_rules,search_daily=19)
+        with self.assertRaises(formation.Rejected):guild_offline.validate_rules(rules)
+        self.b.guild_rules['search_daily']=18
+        initial=self.req(43,flag=1)[-1]
+        result=self.req(43,flag=6)[-1]
+        self.assertEqual((result['free_times'],result['search_count'],result['token_index']),(0,18,19))
+        self.assertEqual(set(result['prize_list']),set(range(1,19)))
+        self.assertEqual(result['prize_list'][18]['attach_count'],initial['prize_items'][18]['item']['attach_count'])

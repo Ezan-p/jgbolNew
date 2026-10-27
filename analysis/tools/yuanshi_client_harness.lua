@@ -1,6 +1,7 @@
 -- Real original widgets, detached root, network captured, state restored.
 local ms=assert(package.loaded.ms);local ui=assert(ms.d_twoYearsCelebrateUI)
 local saved,checks,sent,errors={},{},{},{}
+local lastPrize
 local function preserve(t)
  local old={};for k,v in pairs(t) do old[k]=v end;saved[#saved+1]={t=t,old=old}
 end
@@ -22,7 +23,7 @@ ms.d_smithUI.getMaterialCount=function() return 10 end
 ms.d_activityUI.g_self={main_layer=root}
 ms.d_activityUI.show=function(id) assert(id==46);ms.d_activityUI.g_currentActivity=46;ui.show(root) end
 ms.d_commonLayerUI.showPrizeResLayer=function(parent,list,callback)
- assert(type(list)=='table');if callback then callback() end
+ assert(type(list)=='table');lastPrize=list;if callback then callback() end
 end
 -- INSTALL_PATCH
 local function check(name,fn)
@@ -40,7 +41,12 @@ check('original funUI anniversary entry',function()
  ms.d_activityUI.show(46);last(0,0)
 end)
 check('entry native rendering',function() response(FIXTURE.entry);assert(ui.g_self.main_layer);assert(#ui.g_self[0].gift_config==5) end)
-check('free prayer native request and callback',function() ui.pray();last(2,0);response(FIXTURE.wish);assert(ui.g_self[0].cur_progress==10) end)
+check('free prayer native request and reward callback',function()
+ ui.pray();last(2,0);lastPrize=nil;response(FIXTURE.wish)
+ assert(ui.g_self[0].cur_progress==10)
+ assert(lastPrize and #lastPrize==1,'wish reward missing from native popup')
+ for k,v in pairs(FIXTURE.wish.prize_list[1]) do assert(lastPrize[1][k]==v,'wish reward mismatch') end
+end)
 check('shop original two items',function() ui.createShop();last(3,0);response(FIXTURE.shop);assert(ui.g_self.shoplayer) end)
 check('buy offering and update cached stock',function()
  ui.buy(1);last(4,1);response(FIXTURE.buy);assert(ui.g_self[3].shop_config[1].buy_times==0)

@@ -45,12 +45,16 @@ def main():
                    '1243 market during event;5souls of5027 and unspecified peaches'],
                 B=['weekly MondayUTC+8 season,daily5free,earned dice survive daily reset',
                    'uniform eligible maps;filter impossible portal overshoots and dead ends',
-                   'double10%,treasure20%,treasure weights40/30/20/10',
+                   'double10%,treasure20%,treasure weights35/25/15/5/15/5',
+                   'independent battle10%,local NPC loadouts and real combat;weekly opponent rotation',
+                   'battle victory weights25/20/20/15/15/5;floor power in config',
+                   'permanent entry,UTC+8 midnight shop5low+1high without replacement;persisted daily quotas',
                    'palace each10rolls,all shops in current batch remain valid until next roll',
                    '1:1 card surplus to credits;prices,stock and catalog in config',
                    'real local account leader by distance/time/id,no fabricated rank prizes',
                    'ninth floor remains playable;99999local-coordinate wrap without tenth floor',
-                   'season clears event resources and shops;inventory/souls persist',
+                   'Monday reset clears progress/cards/credits/dice;stars2:1peach permanent mail,odd remainder rounded up',
+                   'shop day/revision rejects stale purchases;offline catch-up and rollback protection',
                    'bag300gold,100peaches;allow use after event closes'],inferred_config=n.load_rules())
     out=ROOT/'analysis/evidence/nine_sky';out.mkdir(parents=True,exist_ok=True)
     (out/'official_audit.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')

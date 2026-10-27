@@ -12,7 +12,8 @@ TYPES = {20,22,7,16,23,21,24,32,33,34,35,36,48,60,67,71,74}
 def load_rules(path=ROOT/'server_config/welfare_rules.json'):
     r=json.loads(Path(path).read_text())
     f.require(r['mode']=='inferred' and r['schema_version']==1, '福利配置来源无效')
-    f.require(set(r['order'])==TYPES and len(r['order'])==len(TYPES), '福利分支配置不完整')
+    f.require(bool(r['order']) and set(r['order'])<=TYPES and len(r['order'])==len(set(r['order'])), '福利分支配置无效')
+    f.require(type(r['spring_charge_enabled']) is bool, '充值礼包开关无效')
     f.require(1<=r['season_days']<=365 and r['gold_per_rmb']>0 and r['fund_price']>0, '福利周期或价格无效')
     for key in ('charge', 'single_charge', 'spring_charge', 'daily_total'):
         rows = r[key]
@@ -71,6 +72,7 @@ def record_charge(role, gold, now, r, fund=False):
     # Never reconstruct single-charge progress from historical daily totals.
     s['single_max_gold']=max(s['single_max_gold'],gold)
     for typ in (48,67):
+        if typ not in r['order']:continue
         if s['charge_days'][key] > 0:
             count=sum(v>0 for v in s['charge_days'].values())
             for i,row in enumerate(r['nian'],1):
@@ -78,7 +80,7 @@ def record_charge(role, gold, now, r, fund=False):
                 if row['day']<=count and claim not in s['claims']:
                     for p in row['prizes']:journey.grant(role,p)
                     s['claims'].append(claim)
-    extra_count=s['charge_days'][key]//(r['any_charge_rmb']*r['gold_per_rmb'])
+    extra_count=s['charge_days'][key]//(r['any_charge_rmb']*r['gold_per_rmb']) if 67 in r['order'] else 0
     for i in range(1,extra_count+1):
         if not claimed(s,67,1000+i,daily.day(now,r)):
             for p in r['nian'][0]['prizes']:journey.grant(role,p)
@@ -126,6 +128,8 @@ def claim_single(role,index,now,r):
 
 def spring_info(role,now,r):
     """Native chargePresentUI array plus named fields used by event 47/93."""
+    if not r['spring_charge_enabled']:
+        return dict(start_time=0,end_time=0,total_charge_count=0)
     s=prepare(role,now,r);end=s['start']+r['season_days']*86400
     money=sum(s['charge_days'].values())/r['gold_per_rmb'];active=s['start']<=now<end
     rows={i:dict(prize_info=dict(min_money_range=x['rmb'],prize_list=specs(x['prizes'])),
@@ -140,6 +144,7 @@ def spring_settle(role,mid,req,now,r):
     if mid==1216:
         f.require(req['flag']==1,'充值礼包查询参数无效')
         return [summon.event(93,info)]
+    f.require(r['spring_charge_enabled'],'充值送豪礼已下线')
     index=req['prize_id']
     f.require(type(index) is int and 1<=index<=len(r['spring_charge']),'充值礼包编号无效')
     f.require(info['start_time']<=now<info['end_time'],'充值礼包活动已结束')
@@ -185,7 +190,7 @@ def catalog(role,now,r):
     steps=[]
     for i,x in enumerate(r['turn'],1):
         key=str(i)
-        if active and money>=x['rmb'] and key not in s['turn_results']:s['turn_results'][key]=secrets.randbelow(8)+1
+        if 33 in r['order'] and active and money>=x['rmb'] and key not in s['turn_results']:s['turn_results'][key]=secrets.randbelow(8)+1
         steps.append(0 if claimed(s,33,10*i+s['turn_results'].get(key,0)) else s['turn_results'].get(key,0))
     out[33]=dict(end_time=end,money=money,step_list=steps,prize_data=[dict(money=x['rmb'],prize_list=specs(x['prizes'])) for x in r['turn']],
         pay_flag=[2 if claimed(s,33,i) else 1 if money>=x['rmb'] else 0 for i,x in enumerate(r['turn'],1)],
@@ -200,7 +205,7 @@ def catalog(role,now,r):
     for a in (48,67):out[a]=dict(end_time=end,days=sum(v>0 for v in s['charge_days'].values()),had_took=today>0,charge_prize=[dict(attach_list=specs(x['prizes'])) for x in r['nian']],other_prize=dict(must_list=specs(r['nian'][-1]['prizes']),rand_list=specs(r['nian'][0]['prizes'])))
     out[60]=dict(end_time=end,base_pay=r['high'][0]['rmb'],up_pay=r['high'][1]['rmb']-r['high'][0]['rmb'],total_charge_money=money,
         gift_list=[dict(status=status(s,60,i,money>=x['rmb']),prize_info=dict(consume_gold=x['price'],worth_gold=x['worth'],prize_list=specs(x['prizes']))) for i,x in enumerate(r['high'],1)])
-    days=charge_streak(s,d)
+    days=charge_streak(s,d) if 71 in r['order'] else 0
     out[71]=dict(end_time=end,day=days,charge_rmb=today,
         charge_data=[dict(rmb=x['rmb'],status=status(s,71,i,today>=x['rmb'],d),prize_list=specs(x['prizes'])) for i,x in enumerate(r['charge'],1)],
         ext_charge_data=[dict(day=x['days'],linear_day=days,status=status(s,71,100*i,days>=x['days']),prize_list=specs(x['prizes'])) for i,x in enumerate(r['hole_extra'],1)])
@@ -208,7 +213,7 @@ def catalog(role,now,r):
     out[74]=dict(id=1,data=dict(isopen=active,rmb=today,total_charge=week_money,charge_rmb=today,
         charge_data=[dict(rmb=x['rmb'],status=status(s,74,i,today>=x['rmb'],d),prize_list=specs(x['prizes'])) for i,x in enumerate(r['charge'],1)],
         total_charge_data=[dict(rmb=x['rmb'],status=status(s,74,100*i,week_money>=x['rmb'],week_period(d)),prize_list=specs(x['prizes'])) for i,x in enumerate(r['daily_total'],1)]))
-    return out
+    return {a:out[a] for a in r['order']}
 
 
 def handles(mid,req):return mid in (1127,1239,1352,1102,1103,1215,1216) or mid==1201 and req['flag']==6 or mid==1112 and req['event_id']==3
@@ -216,16 +221,18 @@ def handles(mid,req):return mid in (1127,1239,1352,1102,1103,1215,1216) or mid==
 
 def hint(role,now,r):
     s=prepare(role,now,r);c=catalog(role,now,r)
-    flags={a:False for a in r['order']}
-    flags[20]=bool(role['first_charge_gift'] and not role['take_charge_gift_time'])
-    flags[22]=any(x['can_take'] for x in c[22]['role_info'].values())
-    flags[16]=any(not x['take_prize'] for x in c[16]['role_info'])
-    flags[35]=not c[35]['had_took']
+    # Explicit false values also clear hints cached by an older client session.
+    flags={a:False for a in TYPES}
+    if 20 in c:flags[20]=bool(role['first_charge_gift'] and not role['take_charge_gift_time'])
+    if 22 in c:flags[22]=any(x['can_take'] for x in c[22]['role_info'].values())
+    if 16 in c:flags[16]=any(not x['take_prize'] for x in c[16]['role_info'])
+    if 35 in c:flags[35]=not c[35]['had_took']
     for a in (23,60,71,74):
+        if a not in c:continue
         rows= list(c[a]['prize_list'].values()) if a==23 else c[a]['gift_list'] if a==60 else c[a]['charge_data'] if a==71 else c[a]['data']['charge_data']
         flags[a]=any(isinstance(x,dict) and x.get('status')==2 for x in rows)
-    flags[71]=flags[71] or any(x['status']==2 for x in c[71]['ext_charge_data'])
-    flags[74]=flags[74] or any(x['status']==2 for x in c[74]['data']['total_charge_data'])
+    if 71 in c:flags[71]=flags[71] or any(x['status']==2 for x in c[71]['ext_charge_data'])
+    if 74 in c:flags[74]=flags[74] or any(x['status']==2 for x in c[74]['data']['total_charge_data'])
     from . import progression
     return summon.event(80,{24:dict(activity_info=dict(had_prize_flag=flags,show_icon=False),vip_shop=xianling.hint(role,now,xianling.load_rules()),buff_data=progression.info(role, now))})
 
@@ -244,6 +251,12 @@ def settle(role,mid,req,now,r,parse):
     if mid==1112:
         f.require(False,'请在金卡充值面板使用传世金卡购买成长基金')
     if mid in (1215,1216):return spring_settle(role,mid,req,now,r)
+    if mid==1352 and 74 not in r['order']:
+        if req['id']==1:return [summon.event(202,dict(id=1,data=dict(isopen=False)))]
+        f.require(False,'天天有礼已下线')
+    if mid==1239:f.require(24 in r['order'],'团购礼包已下线')
+    if mid==1127 and req['act_type']!=0:
+        f.require(req['act_type'] in r['order'],'福利活动未开放')
     s=prepare(role,now,r);c=catalog(role,now,r);d=daily.day(now,r)
     if mid in (1102,1103):return mail_request(role,mid,req,now,r,s)
     if mid==1127 and req['flag']==1:
@@ -301,11 +314,12 @@ def settle(role,mid,req,now,r,parse):
             if p[0] in (11,12):
                 k='gold_coin' if p[0]==11 else 'silver_coin';f.require(role[k]>=p[2],'兑换货币不足');role[k]-=p[2]
             else:
-                items=[x for x in role['attachments'] if x['type_id']==p[1] and not x.get('is_lock')]
+                items=[x for x in role['attachments'] if x['attach_type']==5 and x['type_id']==p[1] and not x.get('is_lock')]
                 f.require(sum(x['count'] for x in items)>=p[2],'兑换物品不足');left=p[2]
                 for item in items:
                     n=min(left,item['count']);item['count']-=n;left-=n
-                role['attachments']=[x for x in role['attachments'] if x['count']>0]
+                consumed={x['id'] for x in items if x['count']==0}
+                role['attachments']=[x for x in role['attachments'] if x['id'] not in consumed]
     elif a==33:
         k=i if i<10 else i//10;f.require(1<=k<=len(r['turn']),'转盘档位无效');x=r['turn'][k-1]
         if i<10:take(i,x['extra'],c[33]['pay_flag'][k-1]==1)
@@ -382,6 +396,7 @@ def charge_streak(s,day):
 
 
 def settle_anniversary_mail(role,now,r,s):
+    if 34 not in r['order']:return
     end=s['start']+r['season_days']*86400
     if now<end-86400-5:return
     mails=s.setdefault('mails',{})

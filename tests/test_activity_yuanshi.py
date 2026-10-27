@@ -1,6 +1,8 @@
 """Original wire packets, economy, daily transitions and durable receipts."""
 from recharge_helpers import funded_order
 import json
+import copy
+from collections import Counter
 from pathlib import Path
 from unittest.mock import patch
 
@@ -52,6 +54,7 @@ class YuanshiTests(ActivityCase):
         r = self.b.profile(); summon.add_item(r, 1807, 10); self.b.save(r)
         for i in range(10):
             d = self.data(self.call(2)); self.assertEqual(d['cur_progress'], (i + 1) * 10)
+            self.assertEqual(len(d['prize_list']), 1)  # Including the wish reaching 100%.
         self.assertEqual(self.amount(1807), 1)
         self.assertFalse(self.ys()['claimed'])
         self.assertEqual(self.ys()['wish_days'], 1)
@@ -65,6 +68,73 @@ class YuanshiTests(ActivityCase):
         self.assertEqual(self.b.profile()['souls']['5046'], 1)
         before = self.b.profile(); self.assertEqual(self.call(2)[0][0], 55)
         self.assertEqual(before, self.b.profile())
+
+    def test_wish_pool_probabilities_exact_ticket_coverage(self):
+        rules = y.load_rules()
+        counts = Counter()
+        for ticket in range(100):
+            with patch.object(y.secrets, 'randbelow', return_value=ticket) as rng:
+                counts[tuple(y.draw_wish(rules))] += 1
+                rng.assert_called_once_with(100)
+        self.assertEqual(counts, {(12, 0, 100000, 1): 40, (5, 1022, 1, 1): 25,
+                                  (5, 1023, 1, 1): 20, (5, 1032, 1, 1): 10,
+                                  (5, 1031, 1, 1): 5})
+
+    def test_each_wish_reward_is_granted_and_returned_once(self):
+        r = self.b.profile(); summon.add_item(r, 1807, 4); self.b.save(r)
+        for ticket, spec in zip((0, 40, 65, 85, 95), (row['reward'] for row in y.load_rules()['wish_pool'])):
+            typ, tid, n, lv = spec
+            before = self.b.profile()['silver_coin'] if typ == 12 else self.amount(tid)
+            with patch.object(y.secrets, 'randbelow', return_value=ticket):
+                d = self.data(self.call(2))
+            self.assertEqual(len(d['prize_list']), 1)
+            self.assertEqual(d['prize_list'][1], y.a.prize_spec(spec))
+            after = self.b.profile()['silver_coin'] if typ == 12 else self.amount(tid)
+            self.assertEqual(after - before, n)
+            saved = self.b.profile()
+            self.assertEqual(self.b.respond(self.packet, self.state_for_wire()), self.replies)
+            self.assertEqual(self.b.profile(), saved)
+        self.assertEqual(self.amount(1807), 0)
+        self.assertEqual(self.ys()['progress'], 50)
+
+    def test_full_progress_claim_and_souls_never_draw_pool(self):
+        self.data(self.call())
+        r = self.b.profile(); r['activity']['yuanshi']['progress'] = 100; self.b.save(r)
+        with patch.object(y, 'draw_wish', side_effect=AssertionError('unexpected random reward')):
+            d = self.data(self.call(2))
+            self.assertEqual(d['prize_list'][1]['object_type'], 4)
+            self.assertEqual(self.ys()['free'], 1)
+            self.assertEqual(self.ys()['wishes'], 0)
+            d = self.data(self.call(2))
+            self.assertEqual(d['prize_list'], {1: y.a.prize_spec([10, 5046, 1, 1])})
+            self.assertEqual(self.ys()['progress'], 100)
+            self.assertEqual(self.ys()['free'], 0)
+
+    def test_wish_failure_rolls_back_reward_progress_and_cost(self):
+        self.data(self.call())
+        before = self.b.profile()
+        with patch.object(y.secrets, 'randbelow', return_value=0), \
+                patch('network_redirect.backend.activity.attributes', side_effect=ValueError('encoding failure')):
+            self.assertEqual(self.call(2)[0][0], 55)
+        self.assertEqual(before, self.b.profile())
+        self.data(self.call(2)); before = self.b.profile()
+        with patch.object(y, 'draw_wish') as draw:
+            self.assertEqual(self.call(2)[0][0], 55)
+            draw.assert_not_called()
+        self.assertEqual(before, self.b.profile())
+
+    def test_bad_wish_pool_configuration(self):
+        pool = y.load_rules()['wish_pool']
+        invalid = [None, [], pool[:-1], [pool[0]] * 5]
+        for field, value in [('weight', 0), ('weight', -1), ('weight', True), ('weight', 0.5),
+                             ('reward', [11, 0, 1, 1]), ('reward', [5, 1022, 0, 1]),
+                             ('reward', [5, 1022, 1, 2]), ('reward', [5, 1022, True, 1])]:
+            rows = copy.deepcopy(pool); rows[0][field] = value; invalid.append(rows)
+        for rows in invalid:
+            with self.subTest(pool=rows):
+                cfg = y.load_rules(); cfg['wish_pool'] = rows
+                p = Path(self.tmp.name) / 'bad-pool.json'; p.write_text(json.dumps(cfg))
+                with self.assertRaises(formation.Rejected): y.load_rules(p)
 
     def test_daily_misses_carry_stock_and_purchase(self):
         self.data(self.call())

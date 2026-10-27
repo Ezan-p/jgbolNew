@@ -91,7 +91,10 @@ def grant(role, entries):
         else:
             f.require(tid in (f.ITEMS if kind == 5 else f.SKILLS), '奖励物品不存在')
             for _ in range(count):
-                role['attachments'].append(dict(id=f.new_id(role), attach_type=kind, type_id=tid, level=level, count=0 if kind == 6 else 1))
+                item = dict(id=f.new_id(role), attach_type=kind, type_id=tid, level=level, count=0 if kind == 6 else 1)
+                if kind == 6:
+                    f.refresh_skill(item)
+                role['attachments'].append(item)
         result.append(dict(object_type=kind, attach_type=tid, attach_level=level, attach_count=count))
     return result
 

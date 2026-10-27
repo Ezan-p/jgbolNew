@@ -1,0 +1,105 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\0aaf9138ef79f4065afb567aa3dec130.data'; root=proto0
+
+FUNCTION proto0 offset=0x4b source_lines=719-748 params=0
+UPVALUES ['tonumber', 'xs']
+00001 [L720] GGET     A=0 B=0 C=0 D=0 'PrintTable'
+00002 [L720] GGET     A=1 B=0 C=1 D=1 'g_self'
+00003 [L720] TGETS    A=1 B=1 C=2 D=258 'tmp_manual_table'
+00004 [L720] CALL     A=0 B=1 C=2 D=258 
+00005 [L721] TNEW     A=0 B=16 C=0 D=4096 
+00006 [L722] GGET     A=1 B=0 C=1 D=1 'g_self'
+00007 [L722] TGETS    A=1 B=1 C=2 D=258 'tmp_manual_table'
+00008 [L722] TGETB    A=1 B=1 C=3 D=259 
+00009 [L722] TGETS    A=1 B=1 C=3 D=259 'first'
+00010 [L722] TSETB    A=1 B=0 C=1 D=1 
+00011 [L723] GGET     A=1 B=0 C=1 D=1 'g_self'
+00012 [L723] TGETS    A=1 B=1 C=2 D=258 'tmp_manual_table'
+00013 [L723] TGETB    A=1 B=1 C=3 D=259 
+00014 [L723] TGETS    A=1 B=1 C=4 D=260 'second'
+00015 [L723] TSETB    A=1 B=0 C=2 D=2 
+00016 [L724] GGET     A=1 B=0 C=1 D=1 'g_self'
+00017 [L724] TGETS    A=1 B=1 C=2 D=258 'tmp_manual_table'
+00018 [L724] TGETB    A=1 B=1 C=3 D=259 
+00019 [L724] TGETS    A=1 B=1 C=5 D=261 'third'
+00020 [L724] TSETB    A=1 B=0 C=3 D=3 
+00021 [L725] GGET     A=1 B=0 C=1 D=1 'g_self'
+00022 [L725] TGETS    A=1 B=1 C=2 D=258 'tmp_manual_table'
+00023 [L725] TGETB    A=1 B=1 C=3 D=259 
+00024 [L725] TGETS    A=1 B=1 C=6 D=262 'fouth'
+00025 [L725] TSETB    A=1 B=0 C=4 D=4 
+00026 [L728] GGET     A=1 B=0 C=1 D=1 'g_self'
+00027 [L728] TSETS    A=0 B=1 C=7 D=263 'tmpContainer'
+00028 [L730] KPRI     A=1 B=0 C=2 D=2 
+00029 [L731] KSHORT   A=2 B=0 C=1 D=1 1
+00030 [L731] KSHORT   A=3 B=0 C=4 D=4 4
+00031 [L731] KSHORT   A=4 B=0 C=1 D=1 1
+00032 [L731] FORI     A=2 B=128 C=20 D=32788 target=53
+00033 [L732] GGET     A=6 B=0 C=8 D=8 'g_cardUI'
+00034 [L732] TGETS    A=6 B=6 C=9 D=1545 'countList'
+00035 [L732] UGET     A=7 B=0 C=0 D=0 tonumber
+00036 [L732] TGETV    A=8 B=0 C=5 D=5 
+00037 [L732] CALL     A=7 B=2 C=2 D=514 
+00038 [L732] TGETV    A=6 B=6 C=7 D=1543 
+00039 [L732] ISEQP    A=6 B=0 C=0 D=0 
+00040 [L732] JMP      A=6 B=128 C=10 D=32778 target=51
+00041 [L732] GGET     A=6 B=0 C=8 D=8 'g_cardUI'
+00042 [L732] TGETS    A=6 B=6 C=9 D=1545 'countList'
+00043 [L732] UGET     A=7 B=0 C=0 D=0 tonumber
+00044 [L732] TGETV    A=8 B=0 C=5 D=5 
+00045 [L732] CALL     A=7 B=2 C=2 D=514 
+00046 [L732] TGETV    A=6 B=6 C=7 D=1543 
+00047 [L732] TGETS    A=6 B=6 C=10 D=1546 'count'
+00048 [L732] KSHORT   A=7 B=0 C=1 D=1 1
+00049 [L732] ISGE     A=6 B=0 C=7 D=7 
+00050 [L732] JMP      A=6 B=128 C=1 D=32769 target=52
+00051 [L733] KPRI     A=1 B=0 C=1 D=1 
+00052 [L731] FORL     A=2 B=127 C=236 D=32748 target=33
+00053 [L736] ISNEP    A=1 B=0 C=1 D=1 
+00054 [L736] JMP      A=2 B=128 C=10 D=32778 target=65
+00055 [L737] GGET     A=2 B=0 C=11 D=11 'd_ms'
+00056 [L737] TGETS    A=2 B=2 C=12 D=524 'd_info'
+00057 [L737] TGETS    A=2 B=2 C=13 D=525 'show'
+00058 [L737] GGET     A=3 B=0 C=11 D=11 'd_ms'
+00059 [L737] TGETS    A=3 B=3 C=14 D=782 'd_hz'
+00060 [L737] TGETS    A=3 B=3 C=15 D=783 'gethz'
+00061 [L737] KSTR     A=4 B=0 C=16 D=16 'cardcollect'
+00062 [L737] CALL     A=3 B=0 C=2 D=2 
+00063 [L737] CALLM    A=2 B=1 C=0 D=256 
+00064 [L738] RET0     A=0 B=0 C=1 D=1 
+00065 [L740] GGET     A=2 B=0 C=17 D=17 'resetCards'
+00066 [L740] CALL     A=2 B=1 C=1 D=257 
+00067 [L741] KSHORT   A=2 B=0 C=1 D=1 1
+00068 [L741] KSHORT   A=3 B=0 C=4 D=4 4
+00069 [L741] KSHORT   A=4 B=0 C=1 D=1 1
+00070 [L741] FORI     A=2 B=128 C=28 D=32796 target=99
+00071 [L742] GGET     A=6 B=0 C=11 D=11 'd_ms'
+00072 [L742] TGETS    A=6 B=6 C=18 D=1554 'd_data'
+00073 [L742] TGETS    A=6 B=6 C=19 D=1555 'getCardSprite'
+00074 [L742] UGET     A=7 B=0 C=0 D=0 tonumber
+00075 [L742] TGETV    A=8 B=0 C=5 D=5 
+00076 [L742] CALL     A=7 B=0 C=2 D=2 
+00077 [L742] CALLM    A=6 B=2 C=0 D=512 
+00078 [L743] MOV      A=8 B=0 C=6 D=6 
+00079 [L743] TGETS    A=7 B=6 C=20 D=1556 'setPosition'
+00080 [L743] GGET     A=9 B=0 C=11 D=11 'd_ms'
+00081 [L743] TGETS    A=9 B=9 C=21 D=2325 'd_u'
+00082 [L743] TGETS    A=9 B=9 C=22 D=2326 'makePoint'
+00083 [L743] UGET     A=10 B=0 C=1 D=1 xs
+00084 [L743] TGETV    A=10 B=10 C=5 D=2565 
+00085 [L743] KNUM     A=11 B=0 C=0 D=0 0.55
+00086 [L743] CALL     A=9 B=0 C=3 D=3 
+00087 [L743] CALLM    A=7 B=1 C=1 D=257 
+00088 [L744] GGET     A=7 B=0 C=23 D=23 'g_tmpcard'
+00089 [L744] TSETV    A=6 B=7 C=5 D=1797 
+00090 [L745] GGET     A=7 B=0 C=8 D=8 'g_cardUI'
+00091 [L745] TGETS    A=7 B=7 C=24 D=1816 'main_layer'
+00092 [L745] MOV      A=8 B=0 C=7 D=7 
+00093 [L745] TGETS    A=7 B=7 C=25 D=1817 'addChild'
+00094 [L745] MOV      A=9 B=0 C=6 D=6 
+00095 [L745] KSHORT   A=10 B=0 C=11 D=11 11
+00096 [L745] KSHORT   A=11 B=0 C=11 D=11 11
+00097 [L745] CALL     A=7 B=1 C=5 D=261 
+00098 [L741] FORL     A=2 B=127 C=228 D=32740 target=71
+00099 [L747] KSHORT   A=2 B=0 C=4 D=4 4
+00100 [L747] GSET     A=2 B=0 C=26 D=26 'g_flag'
+00101 [L748] RET0     A=0 B=0 C=1 D=1 

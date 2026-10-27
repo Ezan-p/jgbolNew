@@ -1,0 +1,94 @@
+LuaJIT dump version=1; source='@D:\\mg_update_\\lua_cache\\lua1\\0aaf9138ef79f4065afb567aa3dec130.data'; root=proto0
+
+FUNCTION proto0 offset=0x4b source_lines=942-969 params=3
+UPVALUES ['print', 'pairs', 'string', 'tostring', 'type']
+00001 [L943] KSTR     A=3 B=0 C=0 D=0 ''
+00002 [L944] IST      A=0 B=0 C=2 D=2 
+00003 [L944] JMP      A=4 B=128 C=1 D=32769 target=5
+00004 [L944] KPRI     A=2 B=0 C=2 D=2 
+00005 [L945] IST      A=0 B=0 C=1 D=1 
+00006 [L945] JMP      A=4 B=128 C=1 D=32769 target=8
+00007 [L945] KSHORT   A=1 B=0 C=1 D=1 1
+00008 [L946] KSTR     A=4 B=0 C=0 D=0 ''
+00009 [L947] KSHORT   A=5 B=0 C=1 D=1 1
+00010 [L947] MOV      A=6 B=0 C=1 D=1 
+00011 [L947] KSHORT   A=7 B=0 C=1 D=1 1
+00012 [L947] FORI     A=5 B=128 C=4 D=32772 target=17
+00013 [L948] MOV      A=9 B=0 C=4 D=4 
+00014 [L948] KSTR     A=10 B=0 C=1 D=1 '  '
+00015 [L948] CAT      A=4 B=9 C=10 D=2314 
+00016 [L947] FORL     A=5 B=127 C=252 D=32764 target=13
+00017 [L950] UGET     A=5 B=0 C=0 D=0 print
+00018 [L950] MOV      A=6 B=0 C=4 D=4 
+00019 [L950] KSTR     A=7 B=0 C=2 D=2 '{'
+00020 [L950] CAT      A=6 B=6 C=7 D=1543 
+00021 [L950] CALL     A=5 B=1 C=2 D=258 
+00022 [L951] UGET     A=5 B=0 C=1 D=1 pairs
+00023 [L951] MOV      A=6 B=0 C=0 D=0 
+00024 [L951] CALL     A=5 B=4 C=2 D=1026 
+00025 [L951] ISNEXT   A=8 B=128 C=57 D=32825 target=83
+00026 [L952] ISF      A=0 B=0 C=2 D=2 
+00027 [L952] JMP      A=10 B=128 C=30 D=32798 target=58
+00028 [L953] ISEQS    A=8 B=0 C=3 D=3 '_class_type'
+00029 [L953] JMP      A=10 B=128 C=53 D=32821 target=83
+00030 [L953] ISEQS    A=8 B=0 C=4 D=4 'DeleteMe'
+00031 [L953] JMP      A=10 B=128 C=51 D=32819 target=83
+00032 [L954] UGET     A=10 B=0 C=2 D=2 string
+00033 [L954] TGETS    A=10 B=10 C=5 D=2565 'format'
+00034 [L954] KSTR     A=11 B=0 C=6 D=6 '%s%s = %s'
+00035 [L954] MOV      A=12 B=0 C=4 D=4 
+00036 [L954] KSTR     A=13 B=0 C=7 D=7 ' '
+00037 [L954] CAT      A=12 B=12 C=13 D=3085 
+00038 [L954] UGET     A=13 B=0 C=3 D=3 tostring
+00039 [L954] MOV      A=14 B=0 C=8 D=8 
+00040 [L954] CALL     A=13 B=2 C=2 D=514 
+00041 [L954] UGET     A=14 B=0 C=3 D=3 tostring
+00042 [L954] MOV      A=15 B=0 C=9 D=9 
+00043 [L954] CALL     A=14 B=0 C=2 D=2 
+00044 [L954] CALLM    A=10 B=2 C=3 D=515 
+00045 [L955] UGET     A=11 B=0 C=0 D=0 print
+00046 [L955] MOV      A=12 B=0 C=10 D=10 
+00047 [L955] CALL     A=11 B=1 C=2 D=258 
+00048 [L956] UGET     A=11 B=0 C=4 D=4 type
+00049 [L956] MOV      A=12 B=0 C=9 D=9 
+00050 [L956] CALL     A=11 B=2 C=2 D=514 
+00051 [L956] ISNES    A=11 B=0 C=8 D=8 'table'
+00052 [L956] JMP      A=11 B=128 C=30 D=32798 target=83
+00053 [L957] GGET     A=11 B=0 C=9 D=9 'PrintTable'
+00054 [L957] MOV      A=12 B=0 C=9 D=9 
+00055 [L957] ADDVN    A=13 B=1 C=0 D=256 
+00056 [L957] CALL     A=11 B=1 C=3 D=259 
+00057 [L959] JMP      A=10 B=128 C=25 D=32793 target=83
+00058 [L961] UGET     A=10 B=0 C=2 D=2 string
+00059 [L961] TGETS    A=10 B=10 C=5 D=2565 'format'
+00060 [L961] KSTR     A=11 B=0 C=6 D=6 '%s%s = %s'
+00061 [L961] MOV      A=12 B=0 C=4 D=4 
+00062 [L961] KSTR     A=13 B=0 C=7 D=7 ' '
+00063 [L961] CAT      A=12 B=12 C=13 D=3085 
+00064 [L961] UGET     A=13 B=0 C=3 D=3 tostring
+00065 [L961] MOV      A=14 B=0 C=8 D=8 
+00066 [L961] CALL     A=13 B=2 C=2 D=514 
+00067 [L961] UGET     A=14 B=0 C=3 D=3 tostring
+00068 [L961] MOV      A=15 B=0 C=9 D=9 
+00069 [L961] CALL     A=14 B=0 C=2 D=2 
+00070 [L961] CALLM    A=10 B=2 C=3 D=515 
+00071 [L962] UGET     A=11 B=0 C=0 D=0 print
+00072 [L962] MOV      A=12 B=0 C=10 D=10 
+00073 [L962] CALL     A=11 B=1 C=2 D=258 
+00074 [L963] UGET     A=11 B=0 C=4 D=4 type
+00075 [L963] MOV      A=12 B=0 C=9 D=9 
+00076 [L963] CALL     A=11 B=2 C=2 D=514 
+00077 [L963] ISNES    A=11 B=0 C=8 D=8 'table'
+00078 [L963] JMP      A=11 B=128 C=4 D=32772 target=83
+00079 [L964] GGET     A=11 B=0 C=9 D=9 'PrintTable'
+00080 [L964] MOV      A=12 B=0 C=9 D=9 
+00081 [L964] ADDVN    A=13 B=1 C=0 D=256 
+00082 [L964] CALL     A=11 B=1 C=3 D=259 
+00083 [L951] ITERN    A=8 B=3 C=3 D=771 
+00084 [L951] ITERL    A=8 B=127 C=197 D=32709 target=26
+00085 [L968] UGET     A=5 B=0 C=0 D=0 print
+00086 [L968] MOV      A=6 B=0 C=4 D=4 
+00087 [L968] KSTR     A=7 B=0 C=10 D=10 '}'
+00088 [L968] CAT      A=6 B=6 C=7 D=1543 
+00089 [L968] CALL     A=5 B=1 C=2 D=258 
+00090 [L969] RET0     A=0 B=0 C=1 D=1 

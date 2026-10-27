@@ -16,21 +16,21 @@ FOODS={1130,1131,1132,1133,1213,1214,1215,1216,1217}
 
 def travel_drop(role,now,r):
     if not any(is_open(r,n,now) for n in r['seasonal_games']):return []
-    role.setdefault('activity',{});s=state(role);idx=s.get('travel_wins',0);s['travel_wins']=idx+1;rewards=[]
-    for name,table in (('rice',RICE),('moon',MOON)):
-        if is_open(r,name,now):
-            for typ,tid,n,lv in list(table.values())[idx%4]['source']:
-                rewards.append([typ,tid,r['seasonal_travel_material_count'],lv])
-    if is_open(r,'spring_money',now):rewards.append([5,1028,1,1])
-    if is_open(r,'spring_cards',now) and (idx+1)%5==0:
-        from .activity_spring import card
-        card(role,(idx//5)%10+1)
-        rewards_shown=a.prizes(role,rewards)
-        return rewards_shown+[a.prize_spec([5,1094,1,(idx//5)%10+1])]
-    return a.prizes(role,rewards)
+    role.setdefault('activity',{});s=state(role);s['travel_wins']=s.get('travel_wins',0)+1
+    from . import activity_tangwang
+    return a.prizes(role,material_specs(r))+activity_tangwang.travel_drop(role,now,r)
+
+
+def material_specs(r):
+    from . import activity_moon, activity_rice
+    # Share probability tables only. Each event executes five fresh random draws.
+    return activity_rice.material_specs(r)+activity_moon.material_specs(r)
 
 
 def use_food(role,req,r):
+    from . import activity_moon, activity_rice
+    if req['item_type'] in activity_moon.FOODS:return activity_moon.use(role,req,r)
+    if req['item_type'] in activity_rice.FOOD_POOLS:return activity_rice.use(role,req,r)
     tid,n=req['item_type'],req['item_count']
     a.require(tid in FOODS and type(n)is int and 1<=n<=100,'节日礼包使用数量无效')
     a.require(req['des_type']==1 and req['des_id'] in (0,role['role_id']),'节日礼包使用目标无效')
@@ -42,17 +42,25 @@ def use_food(role,req,r):
     return [summon.event(21,dict(result=1,type_id=tid,count=n,attach_list=a.prizes(role,rewards)))]
 
 
-def state(role):return role['activity'].setdefault('seasonal',dict(supplies={},counts={},rice_news=[],moon_news=[],moon_count=0))
+def state(role):
+    from . import activity_rice
+    return activity_rice.state(role['activity'].setdefault('seasonal',dict(supplies={},counts={},rice_news=[],moon_news=[],moon_count=0)))
 
 
 def is_open(r,name,now):
     cfg=r['seasonal_games'][name]
+    if name in ('spring_money','spring_cards','moon','rice'):return cfg['enabled']
     return cfg['enabled'] and cfg['start_time']<=now<cfg['end_time']
 
 
 def supply(role,s,r,name,now):
-    # One starter set per configured season, never one per query or per restart.
+    # Permanent events keep old season-claim markers as one lifetime starter set.
     cfg=r['seasonal_games'][name];key=f"{name}:{cfg['start_time']}"
+    if name in ('moon','rice'):
+        key=f'{name}:permanent'
+        # Preserve already claimed starter sets when migrating the seasonal event.
+        if any(k.startswith(f'{name}:') for k in s['supplies']):
+            s['supplies'][key]=True
     if not is_open(r,name,now) or key in s['supplies']:return
     s['supplies'][key]=True
     for row in (RICE if name=='rice' else MOON).values():a.prizes(role,row['source'])
@@ -65,6 +73,10 @@ def status(role,now,r):
         supply(role,s,r,name,now)
         out[field]={start:cfg['start_time'] if cfg['enabled'] else 0,'end_time':cfg['end_time'] if cfg['enabled'] else 0}
     out['dragon_boat_info']['luck_list']=copy.deepcopy(s['rice_news'])
+    from . import activity_rice
+    out['dragon_boat_info'].update(local_permanent=True,local_enabled=r['seasonal_games']['rice']['enabled'],
+                                   **activity_rice.progress(s,r))
+    out['midautumn_data'].update(local_permanent=True,local_enabled=r['seasonal_games']['moon']['enabled'])
     from .activity_spring import status as spring_status
     out.update(spring_status(role,now,r))
     from .activity_fish import status as fish_status
@@ -89,16 +101,24 @@ def settle(role,mid,req,now,r):
         a.require(req['material_count']==len(row['source'])==len(ids) and len(set(ids))==len(ids),'合成材料数量无效')
         items=[next((i for i in role['attachments'] if i['id']==v and i['attach_type']==5),None) for v in ids]
         a.require(all(items) and sorted(i['type_id'] for i in items)==sorted(p[1] for p in row['source']),'合成材料不属于该配方')
-        a.require(all(not i.get('is_lock') and not i.get('owner_id') and not i.get('equip_pos') and i['count']>=next(p[2] for p in row['source'] if p[1]==i['type_id']) for i in items),'所选合成材料不足或不可使用')
+        a.require(all(not i.get('is_lock') and not i.get('owner_id') and not i.get('equip_pos') and not i.get('equip_order') and i['count']>=next(p[2] for p in row['source'] if p[1]==i['type_id']) for i in items),'所选合成材料不足或不可使用')
     daykey=f'{name}:{a.day(now,r)}';count=s['counts'].get(daykey,0)
     a.require(count<r['seasonal_craft_daily_limit'],'今日合成次数已满')
-    for typ,tid,n,lv in row['source']:a.consume(role,tid,n)
+    if name=='rice':
+        for item in items:item['count']-=next(p[2] for p in row['source'] if p[1]==item['type_id'])
+        role['attachments']=[i for i in role['attachments'] if i not in items or i['count']>0]
+    else:
+        for typ,tid,n,lv in row['source']:a.consume(role,tid,n)
     reward=[copy.deepcopy(row['dest'])];s['counts'][daykey]=count+1
     # Bound historical counters while preserving season supplies.
     s['counts']={k:v for k,v in s['counts'].items() if int(k.split(':')[1])>=a.day(now,r)-1}
     if name=='rice':
+        from . import activity_rice
+        s['rice_count']+=1
+        if s['rice_count']%r['seasonal_moon_bonus_every']==0:reward.extend(copy.deepcopy(r['seasonal_moon_bonus']))
         s['rice_news'].insert(0,dict(name=role['role_name'],data=[row['dest'][1]]));s['rice_news']=s['rice_news'][:5]
-        return [summon.event(126,dict(result=0,attach_list=a.prizes(role,reward),luck_list=copy.deepcopy(s['rice_news'])))]
+        return [summon.event(126,dict(result=0,attach_list=a.prizes(role,reward),luck_list=copy.deepcopy(s['rice_news']),
+                                     local_rice_progress=activity_rice.progress(s,r)))]
     s['moon_count']+=1
     if s['moon_count']%r['seasonal_moon_bonus_every']==0:reward.extend(copy.deepcopy(r['seasonal_moon_bonus']))
     s['moon_news'].insert(0,f"{role['role_name']}合成了{NAMES[row['dest'][1]]}");s['moon_news']=s['moon_news'][:5]

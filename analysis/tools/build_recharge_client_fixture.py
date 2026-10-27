@@ -19,7 +19,7 @@ def fixture():
                           rows=[dict(index=1,rmb=50,status=2,prize_list=[dict(object_type=11,attach_type=0,attach_count=50,attach_level=1)])]))
     with tempfile.TemporaryDirectory() as tmp:
         b=Backend(Path(tmp),1,lambda *a,**k:None)
-        role=b.profile();role['level']=60;summon.add_item(role,1156,9);b.save(role)
+        role=b.profile();role['level']=60;summon.add_item(role,1156,9);summon.add_item(role,1152,2);b.save(role)
         now=int(time.time())
         initial=login_fields(decode(welfare.query(role,now,b.welfare_rules))[2]['data'])
         packets=b.respond(encode(1111,dict(serial_num=1,event_id=251,data=summon.lua(dict(
@@ -27,7 +27,13 @@ def fixture():
         purchase=[d for mid,_,d in map(decode,packets) if mid==2998 and d['id']==80]
         packets=b.respond(encode(1127,dict(serial_num=2,flag=2,act_type=22,index=0)),dict(authenticated=True))
         claimed=[d for mid,_,d in map(decode,packets) if mid==2998 and d['id'] in (80,127)]
-        flow=dict(initial=initial,purchase=purchase,claimed=claimed)
+        ordinary=[]
+        for i in range(2):
+            packets=b.respond(encode(1111,dict(serial_num=3+i,event_id=251,data=summon.lua(dict(
+                item_id=102,order_id=f'native-repeat-checkout-{i}',large_count=1,small_count=0)))),dict(authenticated=True))
+            ordinary.append([d for mid,_,d in map(decode,packets) if mid==2998 and d['id']==80])
+            assert b.profile()['recharge']['last_order_id']==f'native-repeat-checkout-{i}'
+        flow=dict(initial=initial,purchase=purchase,claimed=claimed,ordinary=ordinary)
         b.close()
     source='local FIXTURE='+summon.lua(data)+'\nlocal FUND_FLOW='+summon.lua(flow)+'\n'+(ROOT/'tests/recharge_client_regression.lua').read_text()
     return source.replace('-- INSTALL_PATCH',(ROOT/'network_redirect/vip_client.lua').read_text()+'\n'+(ROOT/'network_redirect/welfare_client.lua').read_text())

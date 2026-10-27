@@ -12,6 +12,10 @@ from network_redirect.protocol import decode, encode
 
 class NineSkyTests(ActivityCase):
     def call(self, op=1, **data):
+        if op == 4:
+            state = self.sky_state()
+            data.setdefault('shop_day', state['shop_day'])
+            data.setdefault('shop_revision', state['shop_revision'])
         return self.req(1309, id=op, data=summon.lua(data))
 
     def result(self, events):
@@ -30,7 +34,7 @@ class NineSkyTests(ActivityCase):
 
     def test_free_paid_ten_rolls_original_cost_and_replay(self):
         self.result(self.call())
-        cfg = n.load_rules();cfg['treasure_basis_points']=0
+        cfg = n.load_rules();cfg['treasure_basis_points']=0;cfg['battle_basis_points']=0
         with patch.object(n,'load_rules',return_value=cfg):
             for i in range(5):
                 d=self.result(self.call(2,count=1,index=0))
@@ -48,7 +52,7 @@ class NineSkyTests(ActivityCase):
     def test_all_nine_floors_and_42_routes_match_client(self):
         # Use a disposable role; no mock victory or state increments.
         role=self.b.profile();role['gold_coin']=1000000
-        cfg=n.load_rules();cfg['treasure_basis_points']=0;cfg['double_basis_points']=0
+        cfg=n.load_rules();cfg['treasure_basis_points']=0;cfg['battle_basis_points']=0;cfg['double_basis_points']=0
         s=n.state(role,NOW,cfg);seen={1};cross=[]
         for i in range(120):
             before=copy.deepcopy(s)
@@ -89,17 +93,19 @@ class NineSkyTests(ActivityCase):
 
     def test_cards_mixed_payment_overflow_credit_and_limits(self):
         self.result(self.call());role=self.b.profile();s=role['activity']['nine_sky']
-        s.update(stars=400,cards={'200':2,'500':2});self.b.save(role)
+        s.update(stars=1000,cards={'200':2,'500':2});self.b.save(role)
         self.result(self.call(3,buy_type=1,first_send=True))
-        d=self.result(self.call(4,buy_type=1,index=1,count=1,card_list={200:1}))
-        self.assertEqual(d['stars'],100);self.assertEqual(d['return_credits'],0)
-        d=self.result(self.call(4,buy_type=1,index=2,count=1,card_list={500:1}))
-        self.assertEqual((d['stars'],d['return_credits']),(100,350))
+        high_cost=s['shop'][5]['cost'];low_cost=s['shop'][0]['cost']
+        d=self.result(self.call(4,buy_type=1,index=6,count=1,card_list={200:1}))
+        balance=1000-high_cost+200
+        self.assertEqual(d['stars'],balance);self.assertEqual(d['return_credits'],0)
+        d=self.result(self.call(4,buy_type=1,index=1,count=1,card_list={500:1}))
+        self.assertEqual((d['stars'],d['return_credits']),(balance,500-low_cost))
         self.result(self.call(3,buy_type=2,first_send=True))
         self.result(self.call(4,buy_type=2,index=1,count=1))
-        self.assertEqual(self.sky_state()['credits'],330)
-        for args in [dict(buy_type=1,index=1,count=9,card_list={}),dict(buy_type=1,index=1,count=1,card_list={500:2}),
-                     dict(buy_type=1,index=1,count=1,card_list={999:1}),dict(buy_type=2,index=1,count=0)]:
+        self.assertEqual(self.sky_state()['credits'],500-low_cost-20)
+        for args in [dict(buy_type=1,index=6,count=2,card_list={}),dict(buy_type=1,index=2,count=1,card_list={500:2}),
+                     dict(buy_type=1,index=2,count=1,card_list={999:1}),dict(buy_type=2,index=1,count=0)]:
             before=self.b.profile();self.assertEqual(self.call(4,**args)[0][0],55);self.assertEqual(before,self.b.profile())
 
     def test_palace_resume_purchase_and_stale_encounter(self):
@@ -182,13 +188,13 @@ class NineSkyTests(ActivityCase):
     def test_daily_allowance_expires_but_earned_dice_survive(self):
         role=self.b.profile();cfg=n.load_rules();s=n.state(role,NOW,cfg)
         n.grant(role,s,[1,-2,3,1]);self.assertEqual(s['free_times'],8)
-        cfg['treasure_basis_points']=0
+        cfg['treasure_basis_points']=0;cfg['battle_basis_points']=0
         for i in range(6):n.roll(role,s,dict(count=1,index=0),NOW,cfg)
         self.assertEqual((s['free_times'],s['bonus_dice']),(2,2))
         s=n.state(role,NOW+86400,cfg);self.assertEqual(s['free_times'],7)
 
     def test_ninth_sentinel_batch_uses_portal_and_stays_in_ninth(self):
-        role=self.b.profile();cfg=n.load_rules();cfg['treasure_basis_points']=0
+        role=self.b.profile();cfg=n.load_rules();cfg['treasure_basis_points']=0;cfg['battle_basis_points']=0
         s=n.state(role,NOW,cfg)
         s.update(floor=9,steps=940+99998,cur_point=dict(x=0,y=99998),cur_map=2)
         d=n.roll(role,s,dict(count=10,index=1),NOW,cfg)
@@ -197,3 +203,180 @@ class NineSkyTests(ActivityCase):
         second=d['map_event_list'][1]
         self.assertEqual(second['forward'],n.ROADS[0,second['rand_map']].count('1'))
         self.assertLess(s['cur_point']['y'],99999)
+
+    def test_daily_shop_unique_tiers_saved_selection_and_quota_reset(self):
+        self.result(self.call());s=self.sky_state()
+        self.assertEqual([x['tier'] for x in s['shop']], ['low']*5+['high'])
+        self.assertEqual(len({tuple(x['reward'][:2]) for x in s['shop']}),6)
+        role=self.b.profile();role['activity']['nine_sky'].update(stars=10000,credits=100)
+        self.b.save(role)
+        self.result(self.call(4,buy_type=1,index=1,count=1,card_list={}))
+        self.result(self.call(4,buy_type=2,index=1,count=1))
+        saved=self.sky_state()
+        for _ in range(3):self.result(self.call(3,buy_type=1,first_send=True))
+        self.assertEqual(self.sky_state()['shop'],saved['shop'])
+        self.assertEqual(self.sky_state()['purchases'],saved['purchases'])
+        self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.assertEqual(self.sky_state(),saved)
+        midnight=(s['shop_day']+1)*86400-8*3600
+        with patch('network_redirect.backend.time.time',return_value=midnight):
+            d=self.result(self.call(3,buy_type=1,first_send=True))
+            self.assertEqual(self.sky_state()['purchases'],{'1':[0]*6,'2':[0]*2})
+            self.assertEqual(d['local_snapshot']['shop_day'],s['shop_day']+1)
+            self.assertEqual(self.sky_state()['stars'],saved['stars'])
+        before=self.b.profile()
+        self.assertEqual(self.call(4,buy_type=1,index=1,count=1,card_list={})[0][0],55)
+        self.assertEqual(self.b.profile(),before)
+
+    def test_stale_shop_token_rejected_even_after_other_request_refreshes(self):
+        self.result(self.call());old=self.sky_state()
+        role=self.b.profile();role['activity']['nine_sky']['stars']=10000;self.b.save(role)
+        midnight=(old['shop_day']+1)*86400-8*3600
+        with patch('network_redirect.backend.time.time',return_value=midnight):
+            self.result(self.call())
+            before=self.b.profile()
+            events=self.call(4,buy_type=1,index=1,count=1,card_list={},shop_day=old['shop_day'])
+            self.assertEqual(events[0][0],55);self.assertEqual(self.b.profile(),before)
+            events=self.call(4,buy_type=2,index=1,count=1,shop_revision='stale')
+            self.assertEqual(events[0][0],55);self.assertEqual(self.b.profile(),before)
+            missing=self.req(1309,id=4,data='{buy_type=1,index=1,count=1,card_list={}}')
+            self.assertEqual(missing[0][0],55);self.assertEqual(self.b.profile(),before)
+
+    def test_week_exact_boundary_recycles_odd_stars_once_and_claims_mail(self):
+        self.result(self.call());role=self.b.profile();s=role['activity']['nine_sky']
+        s.update(stars=101,credits=99,cards={'50':2},bonus_dice=3,free_times=4,
+                 steps=99,floor=4,battle_seen=[123],battle_count=1,battle_wins=1)
+        end=s['end'];self.b.save(role)
+        peach=lambda r:sum(i['count'] for i in r['attachments'] if i['attach_type']==5 and i['type_id']==1001)
+        previous=peach(role)
+        with patch('network_redirect.backend.time.time',return_value=end):
+            events=self.call();self.result(events)
+            self.assertIn(13,[e for e,_ in events])
+            fresh=self.sky_state()
+            for k in ('stars','credits','steps'):self.assertEqual(fresh[k],0)
+            self.assertEqual(fresh['cards'],{});self.assertEqual(fresh['free_times'],5)
+            self.assertNotIn('battle_seen',fresh)
+            self.assertTrue(n.status(end)['local_enabled'])
+            self.assertIn(9137,n.market_goods(end))
+            mails=self.b.profile()['welfare']['mails']
+            mail=mails[f'nine-sky-recycle-{s["start"]}']
+            self.assertEqual(mail['prizes'],[[5,1001,51,1]])
+            self.assertTrue(mail['no_expiry']);self.assertEqual(peach(self.b.profile()),previous)
+            self.result(self.call());self.assertEqual(self.b.profile()['welfare']['mails'],mails)
+            self.ok(self.req(1103,mail_id=mail['mail_id'],flag=1))
+            self.assertEqual(peach(self.b.profile()),previous+51)
+            self.req(1103,mail_id=mail['mail_id'],flag=1)
+            self.assertEqual(peach(self.b.profile()),previous+51)
+
+    def test_offline_multiple_weeks_and_restart_do_not_duplicate_mail(self):
+        self.result(self.call());role=self.b.profile();s=role['activity']['nine_sky']
+        s['stars']=100;self.b.save(role);future=s['end']+21*86400
+        with patch('network_redirect.backend.time.time',return_value=future):
+            self.b.snapshot()
+            fresh=self.sky_state()
+            self.assertEqual((fresh['stars'],fresh['free_times']),(0,5))
+            self.assertEqual(fresh['start'],n.period(future,n.load_rules())[0])
+            mails=self.b.profile()['welfare']['mails']
+            self.assertEqual(len([k for k in mails if k.startswith('nine-sky-recycle-')]),1)
+            self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+            self.result(self.call());self.assertEqual(self.b.profile()['welfare']['mails'],mails)
+            with patch('network_redirect.backend.time.time',return_value=future+7*86400):
+                self.result(self.call())
+                self.assertEqual(self.b.profile()['welfare']['mails'],mails)
+
+    def test_heartbeat_rollover_announces_mail_without_inventory_change(self):
+        self.result(self.call());role=self.b.profile();s=role['activity']['nine_sky']
+        s['stars']=2;self.b.save(role)
+        with patch('network_redirect.backend.time.time',return_value=s['end']):
+            replies=self.b.respond(encode(2999,dict(time=0,random_key=0,delay_time=0)),self.state)
+        events=[d['id'] for mid,_,d in map(decode,replies) if mid==2998]
+        self.assertIn(13,events)
+        self.assertEqual(self.sky_state()['stars'],0)
+        self.assertEqual(self.sky_state()['last_recycle']['peaches'],1)
+        self.assertEqual(self.b.profile()['attachments'],role['attachments'])
+
+    def test_week_mail_and_reset_rollback_together_on_encoding_failure(self):
+        self.result(self.call());role=self.b.profile();s=role['activity']['nine_sky']
+        s['stars']=200;self.b.save(role)
+        with patch('network_redirect.backend.time.time',return_value=s['end']), \
+             patch('network_redirect.backend.activity.attributes',side_effect=ValueError('encode failed')):
+            self.assertEqual(self.call()[0][0],55)
+        self.assertEqual(self.b.profile(),role)
+        with patch('network_redirect.backend.time.time',return_value=s['end']):self.result(self.call())
+        self.assertEqual(self.sky_state()['last_recycle']['peaches'],100)
+
+    def test_treasure_weight_boundaries_and_shop_candidate_coverage(self):
+        cfg=n.load_rules();ticket=0
+        for row in cfg['treasure_pool']:
+            for pick in (ticket,ticket+row['weight']-1):
+                with patch.object(n.secrets,'randbelow',return_value=pick):
+                    self.assertEqual(n.treasure(cfg),row['reward'])
+            ticket+=row['weight']
+        self.assertEqual(ticket,100)
+        for choose_last in (False,True):
+            with patch.object(n.secrets,'randbelow',side_effect=lambda size:size-1 if choose_last else 0), \
+                 patch.object(n.secrets,'choice',side_effect=lambda rows:rows[-1] if choose_last else rows[0]):
+                s=n.state(copy.deepcopy(self.b.profile()),NOW,cfg)
+            ids=[x['reward'][1] for x in s['shop']]
+            self.assertEqual(len(set(ids)),6)
+            expected=[x['reward'][1] for x in cfg['star_shop'][:9]][-5:] if choose_last else [x['reward'][1] for x in cfg['star_shop'][:5]]
+            self.assertEqual(ids[:5],expected)
+
+    def test_legacy_fixed_shop_migration_keeps_resources_and_used_quotas(self):
+        role=self.b.profile();cfg=n.load_rules();s=n.state(role,NOW,cfg)
+        s.update(stars=123,credits=456,cards={'50':2},purchases={'1':[2,0,1,3],'2':[4,5]})
+        for k in ('shop','shop_day','shop_revision'):s.pop(k)
+        with patch.object(n.secrets,'choice',side_effect=lambda rows:rows[0]):
+            n.state(role,NOW,cfg)
+        self.assertEqual((s['stars'],s['credits'],s['cards']),(123,456,{'50':2}))
+        self.assertEqual(s['purchases']['1'][5],1)
+        self.assertEqual(s['purchases']['2'],[4,5])
+        before=copy.deepcopy(s);n.state(role,NOW,cfg);self.assertEqual(s,before)
+
+    def test_invalid_refresh_config_is_rejected(self):
+        cases=[('battle_floor_power',[3000]*9),('recycle_stars_per_peach',3),('battle_basis_points',True),
+               ('period_days',8),('timezone_offset_hours',9),('battle_pool',[])]
+        for key,value in cases:
+            cfg=n.load_rules();cfg[key]=value
+            path=Path(self.tmp.name)/'invalid.json';path.write_text(json.dumps(cfg))
+            with self.assertRaises(n.f.Rejected):n.load_rules(path)
+
+    def test_ten_real_battles_and_reward_grants_are_atomic_and_replay_safe(self):
+        from network_redirect import nine_sky_battle
+        self.result(self.call());cfg=n.load_rules()
+        cfg.update(battle_basis_points=10000,treasure_basis_points=0)
+        before=self.b.profile();old_cards=self.sky_state()['cards'].get('100',0)
+        with patch.object(n,'load_rules',return_value=cfg), \
+             patch.object(nine_sky_battle,'reward',return_value=[1,-1,1,100]):
+            result=self.result(self.call(2,count=10,index=1))
+        s=self.sky_state();wins=s['battle_wins']
+        self.assertEqual(len(result['local_battles']),10)
+        self.assertEqual(len(set(s['battle_seen'])),10)
+        self.assertEqual(s['battle_count'],10)
+        self.assertEqual(s['cards'].get('100',0)-old_cards,wins)
+        self.assertEqual(before['gold_coin']-self.b.profile()['gold_coin'],1000)
+        self.assertEqual(result['local_before_snapshot']['steps'],0)
+        self.assertEqual(sum(bool(x['won']) for x in result['local_battles'].values()),wins)
+        for battle in result['local_battles'].values():
+            self.assertEqual(bool(battle['rewards']),battle['won'])
+        self.assertLess(max(map(len,self.replies)),32768)
+        saved=self.b.profile()
+        self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
+        self.assertEqual(self.b.profile(),saved)
+        with patch.object(n,'load_rules',return_value=cfg), \
+             patch.object(nine_sky_battle,'encounter',side_effect=ValueError('battle unavailable')):
+            self.assertEqual(self.call(2,count=10,index=1)[0][0],55)
+        self.assertEqual(self.b.profile(),saved)
+
+    def test_daily_config_revision_keeps_selection_and_limits(self):
+        self.result(self.call());role=self.b.profile();s=role['activity']['nine_sky']
+        s['purchases']['1'][0]=1;self.b.save(role)
+        cfg=n.load_rules();cfg['revision']='nine-sky-test-price-update'
+        for row in cfg['star_shop']:row['cost']+=1
+        with patch.object(n,'load_rules',return_value=cfg):
+            self.result(self.call(3,buy_type=1,first_send=True))
+        updated=self.sky_state()
+        self.assertEqual(updated['purchases'],s['purchases'])
+        self.assertEqual([x['reward'] for x in updated['shop']],[x['reward'] for x in s['shop']])
+        self.assertEqual(updated['shop'][0]['cost'],s['shop'][0]['cost']+1)
+        self.assertEqual(updated['shop_revision'],cfg['revision'])

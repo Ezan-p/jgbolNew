@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-27",
+  "timezone": "Asia/Shanghai",
+  "revision": "rulai-2026-10-27-v3",
+  "original_asset_audit": {
+    "passed": true,
+    "assets": 13,
+    "strings": 10,
+    "csv_tables": 3
+  },
+  "backend_checks": {
+    "command": ".runtime/venv/bin/python -m unittest discover -s tests -p 'test_activity_rulai.py' -v",
+    "passed": true,
+    "count": 15,
+    "seconds": 8.74,
+    "evidence": "targeted_v3_tests.log"
+  },
+  "probability_check": {
+    "method": "exhaust every integer in randbelow(10000)",
+    "outcomes": 10000,
+    "counts_by_slot": [
+      1000,
+      2000,
+      1800,
+      1500,
+      1000,
+      2200,
+      400,
+      100
+    ]
+  },
+  "native_client_checks": {
+    "command": ".runtime/venv/bin/python analysis/tools/verify_rulai_client.py",
+    "passed": true,
+    "count": 19,
+    "evidence": "client_validation.json"
+  },
+  "live_account_resources_changed": false,
+  "limitations": [
+    "Original server reward pool, probabilities, payment thresholds and historical schedule unavailable.",
+    "Original Cocos checks use detached scenes and captured network; no real account orders submitted.",
+    "Prior broad module regressions in validation.json are historical, not rerun for this reward-pool change."
+  ],
+  "source_sha256": {
+    "server_config/rulai_rules.json": "f2661e6770f6d6e62f33586d3c827a10a1e16a573ca6b1e6bc4fb62b0f434fc1",
+    "network_redirect/activity_rulai.py": "c3d1dc8381936bf741adb30ae44c768253698d59704c4d735fd736b122e476db",
+    "network_redirect/rulai_client.lua": "35d82421b2c8b8da137fe6d5aca19c046921468e36280f02ef52dfe2bd85c1bd",
+    "tests/test_activity_rulai.py": "208eb24ce0eb541affa540380a296711ef18ace67b5f30bffb63392ce8a3b3b0",
+    "analysis/tools/rulai_client_harness.lua": "e91e4f3415c413016e4f5d81d4f7a245e56b396ea81f56af599edb8d1ad4966e",
+    "analysis/tools/audit_rulai_rules.py": "a1b0346f1c2d76115348ea65381a6495c8094020bdf2c4e249dfe03f6ce36dc6"
+  }
+}

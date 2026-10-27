@@ -1,0 +1,16 @@
+test_rename_failures_atomic (test_role_profile.ProfileTests) ... FAIL
+
+======================================================================
+FAIL: test_rename_failures_atomic (test_role_profile.ProfileTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_role_profile.py", line 58, in test_rename_failures_atomic
+    self.assertEqual(self.b.profile(), before)
+AssertionError: {'are[9929 chars]': 10, 'activity': {'monday': {'start': 20746,[237 chars]0}}}} != {'are[9929 chars]': 10}
+Diff is 18876 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 1 test in 0.164s
+
+FAILED (failures=1)
+Baseline duty implementation reproduces unrelated rename failure: True

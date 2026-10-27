@@ -1,5 +1,6 @@
 """Native Cocos spirit-land buttons/settlement/animations with disposable storage."""
 import json
+import subprocess
 import sys
 import tempfile
 import time
@@ -67,6 +68,12 @@ def fixtures():
             role=b.profile()
             data['role']={k:role[k] for k in ('role_id','union_id','union_rank','level','gold_coin','silver_coin')}
             data['config']=guild.client_config(b.guild_rules)
+            role=b.profile();role['guild']['instances'].update(reputation=1000,total_reputation=1000);b.save(role)
+            req('shop',91,two_type=1)
+            req('shop_buy_four',91,two_type=2,index=4,buy_count=4)
+            data['next_day_time']=1792728000+86400
+            with patch('network_redirect.backend.time.time',return_value=data['next_day_time']):
+                req('next_day_tasks',83)
         finally:b.close()
     source=(ROOT/'analysis/tools/guild_pet_client_harness.lua').read_text()
     source=source.replace('__FIXTURES__',summon.lua(data)).replace('-- __PET_PATCH__',(ROOT/'network_redirect/guild_pet_client.lua').read_text())
@@ -75,11 +82,12 @@ def fixtures():
 
 def main():
     import frida
+    shop_daily_only='--shop-daily-only' in sys.argv
     config=load_config(ROOT/'game.json');pid=next(p for p,n in processes(config).items() if n==config['package'])
     evaluator=LUA_EVALUATOR.replace('pending={code,resolve};',
         "const task={code,resolve};pending=task;setTimeout(()=>{if(pending===task){pending=null;resolve({status:-1,result:'No Lua frame; enter the game before testing'});}},15000);")
     session=frida.get_device(config['serial'],timeout=10).attach(pid);script=session.create_script(evaluator);script.load()
-    report={};failure=None;started=False
+    report={};failure=None;started=False;preloaded=False
     def evaluate(code):
         answer=script.exports_sync.evaluate(code)
         if answer.get('status')!=0:raise RuntimeError(answer)
@@ -89,9 +97,13 @@ def main():
         while evaluate('local ms=package.loaded.ms;return tostring(ms and ms.d_mainUI and ms.d_mainUI.g_playerInfo and ms.d_mainUI.g_playerInfo.role_id~=nil or false)')!='true':
             if time.monotonic()>deadline:raise RuntimeError('Enter the game before running the fixture')
             time.sleep(.5)
+        preloaded=evaluate('return tostring(package.loaded.ms._localGuildPetRestore~=nil)')=='true'
+        print('live_spirit_land_patch_preloaded',preloaded,flush=True)
         source=fixtures();(ROOT/'.runtime/guild-pet-fixture.lua').write_text(source)
         started=True
         evaluate(source)
+        if shop_daily_only:
+            evaluate("local row=guildPetRun(1);assert(row.ok,row.error);guildPetResults={};local cases=guildPetCases;guildPetCases={};for _,c in ipairs(cases) do if c.name=='pet_shop_native_batch_purchase_and_tiered_prices' or c.name=='daily_expiry_refreshes_open_task_page' or c.name=='daily_refresh_replaces_targets_and_keeps_stable_indices' then guildPetCases[#guildPetCases+1]=c end end;return 'ready'")
         count=int(evaluate('return tostring(#guildPetCases)'))
         for index in range(1,count+1):
             row=login_fields(evaluate('return table.tostring(guildPetRun('+str(index)+'))'))
@@ -99,6 +111,10 @@ def main():
             if not row['ok']:break
             deadline=time.monotonic()+row.get('hold',0)
             while time.monotonic()<deadline:time.sleep(.2)
+            if row['name'] in ('task_win_reward_on_live_task_page','pet_shop_native_batch_purchase_and_tiered_prices'):
+                screenshot=subprocess.run([str(config['adb_path']),'-s',config['serial'],'exec-out','screencap','-p'],capture_output=True,check=True).stdout
+                name='task_rewards' if row['name']=='task_win_reward_on_live_task_page' else 'shop_prices'
+                (ROOT/'analysis/evidence/guild'/('pet_'+name+'.png')).write_bytes(screenshot)
             if row['name'].endswith('_battle_animation'):
                 deadline=time.monotonic()+120
                 while evaluate('return tostring(guildPetBattleReady())')!='true':
@@ -115,9 +131,9 @@ def main():
                 try:close()
                 except Exception:pass
     checks=list(report.get('checks',{}).values());errors=report.get('errors',{})
-    report.update(passed=bool(not failure and report.get('restored') and len(checks)==report.get('expected') and all(c['ok'] for c in checks) and not errors),native_cocos=True,live_account_resources_changed=False)
+    report.update(passed=bool(not failure and report.get('restored') and len(checks)==report.get('expected') and all(c['ok'] for c in checks) and not errors),native_cocos=True,live_account_resources_changed=False,patch_preloaded=preloaded)
     if failure:report['failure']=failure
-    path=ROOT/'analysis/evidence/guild/pet_fixes_client_validation.json';path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+    path=ROOT/'analysis/evidence/guild'/('pet_shop_daily_client_validation.json' if shop_daily_only else 'pet_fixes_client_validation.json');path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print(json.dumps(report,ensure_ascii=False,indent=2))
     if not report['passed']:raise SystemExit(1)
 

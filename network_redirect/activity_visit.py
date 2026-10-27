@@ -85,6 +85,7 @@ def visit_list(role):
 
 def settle(role, req, r):
     i, op = req['visit_index'], req['op_type']
+    receipt = {}
     formation.require(i in (0, 1, 2, 3) and (op in (0, 1) if i == 0 else op in (1, 2)), '拜访参数无效')
     if i:
         visits = role['activity']['visits']
@@ -115,6 +116,19 @@ def settle(role, req, r):
                 formation.require(i == 3 and isinstance(info, dict), '拜访奖励存档无效')
                 reward = [info[k] for k in ('object_type', 'attach_type', 'attach_count', 'attach_level')]
                 state['reward'] = reward
+            old_ids = {item['id'] for item in role['attachments']}
             journey.grant(role, reward)
+            if i == 3:
+                # Keep the actual instances with the claim, not just the displayed
+                # book type. A consumed book must never be reissued on a query.
+                added = [item for item in role['attachments'] if item['id'] not in old_ids]
+                if reward[0] == 6:
+                    formation.require(len(added) == reward[2] and all(
+                        item['attach_type'] == 6 and item['type_id'] == reward[1]
+                        and item['level'] == reward[3] and not item.get('protogenic')
+                        for item in added), '寿星奖励未入包，请重试')
+                state['reward_ids'] = [item['id'] for item in added]
+                receipt = dict(local_prizes=[prize_info(reward)])
             state['claimed'] = True
-    return [summon.event(42, dict(visit_index=i, op_type=op, result=1, visit_list=visit_list(role)))]
+    return [summon.event(42, dict(visit_index=i, op_type=op, result=1,
+                                 visit_list=visit_list(role), **receipt))]

@@ -1,0 +1,164 @@
+{
+  "passed": true,
+  "validation_mode": "20 native checks from a clean login plus 3 isolated shop/daily checks",
+  "backend_tests": {
+    "guild": 158,
+    "pets": 17,
+    "home": 11,
+    "acquisition": 6,
+    "total": 192
+  },
+  "native_checks": [
+    {
+      "error": "",
+      "hold": 0,
+      "name": "open_actual_task_dialog_and_challenge_button",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 0,
+      "name": "settlement_counters_before_battle_playback",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 2,
+      "name": "task_return_rebuild_keeps_updated_counter",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 0,
+      "name": "wild_explore_opens_capture_dialog",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 7,
+      "name": "capture_success_runs_native_animation_and_pet_popup",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 0,
+      "name": "capture_popup_close_unlocks_and_removes_dialog",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 7,
+      "name": "retry_capture_failure_keeps_dialog_interactive",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 7,
+      "name": "failed_capture_unlocks_for_next_attempt",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 10,
+      "name": "last_capture_failure_runs_exit_animation",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 0,
+      "name": "exhausted_capture_dialog_removed_and_can_exit",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 0,
+      "name": "trial_random_five_star_boss_renders_and_plays",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 0,
+      "name": "real_task_battle_animation",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 2,
+      "name": "real_task_battle_return_button_and_reward",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 0,
+      "name": "real_task_win_battle_animation",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 2,
+      "name": "task_win_reward_on_live_task_page",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 0,
+      "name": "real_trial_loss_battle_animation",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 2,
+      "name": "trial_loss_stays_until_return_then_reopens_trial",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 0,
+      "name": "real_trial_win_battle_animation",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 2,
+      "name": "trial_win_return_claim_and_continue",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 0,
+      "name": "claimed_trial_page_remains_active",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 0,
+      "name": "pet_shop_native_batch_purchase_and_tiered_prices",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 2,
+      "name": "daily_expiry_refreshes_open_task_page",
+      "ok": true
+    },
+    {
+      "error": "",
+      "hold": 0,
+      "name": "daily_refresh_replaces_targets_and_keeps_stable_indices",
+      "ok": true
+    }
+  ],
+  "native_check_count": 23,
+  "restored": true,
+  "live_account_resources_changed": false,
+  "raw_reports": [
+    "pet_fixes_client_validation.json",
+    "pet_shop_daily_client_validation.json"
+  ],
+  "note": "The first raw report retains a failed shop harness assertion: it selected the shop query packet instead of the subsequent purchase packet. The harness was corrected and all three shop/daily checks passed in the second report. An earlier repeated-animation Frida native access violation was followed by a service restart and clean login; the subsequent 20 gameplay checks passed without Lua errors.",
+  "rule_revision": "guild-pet-refinement-2026-10-27",
+  "screenshots": [
+    "pet_task_rewards.png",
+    "pet_shop_prices.png"
+  ]
+}

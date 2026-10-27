@@ -28,7 +28,7 @@ class AcquisitionTests(unittest.TestCase):
     def test_paid_and_free_tasks_add_residents_and_one_encounter(self):
         self.ok(88);r=self.role();g=r['guild']['unions'][str(r['union_id'])];before=sum(g['resident_pets'].values())
         self.assertEqual(self.req(86,two_type=2)[-1][1],55)
-        for payment in (1,2):self.ok(84,task_index=1,task_type=1,pay_type=payment)
+        for payment in (1,2):self.ok(84,task_index=payment,task_type=1,pay_type=payment)
         r=self.role();g=r['guild']['unions'][str(r['union_id'])]
         self.assertEqual(sum(g['resident_pets'].values()),before+2)
         self.assertEqual(self.ok(83)[-1][2]['wander_times'],2)

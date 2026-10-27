@@ -6,16 +6,13 @@ local saved={player=ms.d_mainUI.g_playerInfo,config=ms.d_data.g_new_config,guild
  menu=ms.d_u.createMenu,obtain=ms.d_petUI.getPetObtainLayer,act=ms.d_fightUI.actFight,patched=ms._localGuildPetRestore~=nil}
 local function shallow(t) local c={};for k,v in pairs(t or {}) do c[k]=v end;return c end
 local patchedFunctions={}
-for _,entry in ipairs({{ui,'onGetResult'},{ms.d_fightUI,'showFightEnd'},{ms.d_fightUI,'menuHome_private'},
+for _,entry in ipairs({{ui,'onGetResult'},{ui,'sendRequest'},{ui,'showTaskLayer'},{ui,'showMainLayer'},{ui,'showTaskFinish'},
+ {ms.d_fightUI,'showFightEnd'},{ms.d_fightUI,'menuHome_private'},
  {ms.d_petHomeUI,'GetResultInsidePetInfo'},{ms.d_petHomeUI,'createShiLianLayer'},{ms.d_petHomeUI,'GetResultPrize'},
  {ms,'_localGuildPetRestore'}}) do patchedFunctions[#patchedFunctions+1]={entry[1],entry[2],entry[1][entry[2]]} end
 local mapShow=ms.d_mapUI.show;local mapCalls=0
 ms.d_mapUI.show=function(...) mapCalls=mapCalls+1;return mapShow(...) end
-local taskFinish=ui.showTaskFinish;local taskRewards={};local rewardCount=0
-ui.showTaskFinish=function(parent,kind,won,...)
- taskRewards[#taskRewards+1]={won=won,parent=parent or ui.g_pethuntUI.main_layer}
- return taskFinish(parent,kind,won,...)
-end
+local taskRewards={};local rewardCount=0;local rewardLabels={}
 local getItems=ms.d_messageUI.createGetItemsLayer;local rewardParent
 ms.d_messageUI.createGetItemsLayer=function(parent,...)
  rewardParent=parent;return getItems(parent,...)
@@ -25,7 +22,7 @@ ms.d_u.setProperties=function(parent,node,options,...)
  if options.y==0.78 and (options.x==0.7 or options.x==0.75) then timers[#timers+1]=node end
  return properties(parent,node,options,...)
 end
-local sends={};local taps={};local battles={};local obtainClose;local obtainLayer;local battleReturn
+local sends={};local taps={};local battles={};local obtainClose;local obtainLayer;local battleReturn;local taskQueries=0
 ui.g_self={};ui.g_data={};ui.g_pethuntUI={};ms.d_petHomeUI.g_self=shallow(saved.home);ms.d_petHomeUI.g_data={}
 ms.d_mainUI.g_playerInfo=ms.d_c.table_copy(saved.player);ms.d_data.g_new_config=ms.d_c.table_copy(saved.config)
 for k,v in pairs(f.role) do ms.d_mainUI.g_playerInfo[k]=v end
@@ -33,7 +30,9 @@ ms.d_data.g_new_config[8]=f.config;ms.d_xianmengUI.getGuildConfig(f.config)
 ms.d_time.getTime=function() return 1792728000 end
 guildPetErrors={};guildPetResults={};guildPetCases={}
 ms.MS_report_error=function(e) guildPetErrors[#guildPetErrors+1]=tostring(e) end
-ms.d_u.main_server_send_msg=function(mid,d) sends[#sends+1]={mid=mid,data=d} end
+ms.d_u.main_server_send_msg=function(mid,d)
+ sends[#sends+1]={mid=mid,data=d};if mid==1301 and d.id==83 then taskQueries=taskQueries+1 end
+end
 local dispatch={};for mid,fn in pairs(saved.dispatch) do dispatch[mid]=mid==2999 and fn or function() end end
 ms.d_event_mgr.g_msg_fun=dispatch
 ms.d_u.createMenu=function(options,...)
@@ -56,7 +55,7 @@ end
 function guildPetRestore()
  if ms._localGuildPetRestore then ms._localGuildPetRestore() end
  for _,entry in ipairs(patchedFunctions) do entry[1][entry[2]]=entry[3] end
- ms.d_mapUI.show=mapShow;ui.showTaskFinish=taskFinish;ms.d_messageUI.createGetItemsLayer=getItems;ms.d_u.setProperties=properties
+ ms.d_mapUI.show=mapShow;ms.d_messageUI.createGetItemsLayer=getItems;ms.d_u.setProperties=properties
  ms.d_u.createMenu=saved.menu;ms.d_petUI.getPetObtainLayer=saved.obtain;ms.d_fightUI.actFight=saved.act
  ms.d_time.getTime=saved.time;ms.d_u.main_server_send_msg=saved.send;ms.d_event_mgr.g_msg_fun=saved.dispatch;ms.MS_report_error=saved.report
  ms.d_event_mgr.setSpecialFightType(0)
@@ -67,6 +66,18 @@ function guildPetRestore()
 end
 if ms._localGuildPetRestore then ms._localGuildPetRestore() end
 -- __PET_PATCH__
+local taskFinish=ui.showTaskFinish
+ui.showTaskFinish=function(parent,kind,won,...)
+ taskRewards[#taskRewards+1]={won=won,parent=parent or ui.g_pethuntUI.main_layer}
+ return taskFinish(parent,kind,won,...)
+end
+local style=ms.d_u.createByStyle
+ms.d_u.createByStyle=function(options,...)
+ if options.type=='label' and options.y==0.3 then rewardLabels[#rewardLabels+1]=options.string end
+ return style(options,...)
+end
+local oldRestore=guildPetRestore
+guildPetRestore=function() ms.d_u.createByStyle=style;return oldRestore() end
 local function apply(name)
  for _,row in ipairs(f[name]) do
   if row.mid==2998 then ms.d_event_mgr.msg_common_event_2998(nil,row.data,nil)
@@ -88,6 +99,7 @@ step('open_actual_task_dialog_and_challenge_button',function()
  ui.showMainLayer(ms.d_xianmengUI.getXianMengMainLayer());ui.g_self.cur_task_index=1
  ui.showTaskLayer(nil,ui.g_data.main.union_task[1]);assert(taps[602],'challenge button missing')()
  local d=sent(84);assert(d.task_index==1 and d.task_type==2 and d.pay_type==1)
+ assert(d.task_day==ui.g_data.main.task_day,'task request lost its day')
 end)
 step('settlement_counters_before_battle_playback',function()
  apply('challenge');assert(#battles==1 and battles[1].kind==28)
@@ -100,6 +112,9 @@ step('task_return_rebuild_keeps_updated_counter',function()
  assert(ui.g_data.main.free_task_times<=3)
  apply('puzzle')
  assert(ui.g_data.main.free_task_times<=2)
+ assert(#ui.g_data.main.union_task==2 and ui.g_data.main.union_task[2].index==3,'completed target still visible')
+ ui.g_self.cur_task_index=2;ui.showTaskLayer(nil,ui.g_data.main.union_task[2])
+ assert(ui.g_self.cur_task_index==3,'compacted task list lost stable target index')
 end,2)
 step('wild_explore_opens_capture_dialog',function()
  ms.d_xianmengUI.show(ms.d_xianmengUI.showTypeDef.pet);apply('field');apply('explore')
@@ -151,7 +166,7 @@ step('real_task_battle_return_button_and_reward',function()
 end,2)
 step('real_task_win_battle_animation',function()
  assert(ui.g_pethuntUI.main_layer:isRunning(),'task page did not become active')
- battleReturn=nil;rewardCount=#taskRewards;apply('challenge_win')
+ battleReturn=nil;rewardCount=#taskRewards;rewardLabels={};apply('challenge_win')
 end)
 step('task_win_reward_on_live_task_page',function()
  assert(battleReturn)();assert(mapCalls==0)
@@ -160,6 +175,9 @@ step('task_win_reward_on_live_task_page',function()
 end,2)
 step('real_trial_loss_battle_animation',function()
  assert(ui.g_pethuntUI.main_layer:isRunning(),'winning task page did not become active')
+ local found=false;for _,label in ipairs(rewardLabels) do if label=='银两×1000' then found=true end end
+ assert(found,'silver reward name/count missing: '..table.concat(rewardLabels,','))
+ assert(#ui.g_data.main.union_task==0,'completed daily targets still visible')
  battleReturn=nil;apply('trial_fight')
 end)
 step('trial_loss_stays_until_return_then_reopens_trial',function()
@@ -189,5 +207,35 @@ step('trial_win_return_claim_and_continue',function()
 end,2)
 step('claimed_trial_page_remains_active',function()
  assert(ms.d_petHomeUI.g_self.g_Shilian_layer:isRunning());assert(rewardParent:isRunning())
+end)
+step('pet_shop_native_batch_purchase_and_tiered_prices',function()
+ ms.d_xianmengUI.show(ms.d_xianmengUI.showTypeDef.pet)
+ ui.showMainLayer(ms.d_xianmengUI.getXianMengMainLayer())
+ assert(taps[235],'shop entrance missing')();assert(sent(91).two_type==1);apply('shop')
+ local rows=ui.g_data.shop.item_list
+ assert(rows[3].buy_reputation==20 and rows[4].buy_reputation==40 and rows[5].buy_reputation==60)
+ local before=rows[4].left_times
+ sends={}
+ ui.showBatchBuy(nil,rows[4],4)
+ assert(taps[1661],'batch count control missing')(3)
+ assert(taps[1686],'batch confirm missing')()
+ local d=sent(91);assert(d.index==4 and d.buy_count==4 and d.two_type==2)
+ apply('shop_buy_four')
+ assert(ui.g_data.shop.item_list[4].left_times==before-4)
+ assert(ui.g_data.shop.cur_reputation==840 and ui.g_data.shop.item_list[4].buy_reputation==40)
+end)
+step('daily_expiry_refreshes_open_task_page',function()
+ ms.d_time.getTime=function() return f.next_day_time end
+ ms.d_xianmengUI.show(ms.d_xianmengUI.showTypeDef.pet)
+ ui.showMainLayer(ms.d_xianmengUI.getXianMengMainLayer())
+ taskQueries=0
+end,2)
+step('daily_refresh_replaces_targets_and_keeps_stable_indices',function()
+ assert(taskQueries==1,'expired open page did not request one refresh')
+ apply('next_day_tasks')
+ assert(#ui.g_data.main.union_task==3 and ui.g_data.main.free_task_times==3)
+ ui.g_self.cur_task_index=1;ui.showTaskLayer(nil,ui.g_data.main.union_task[1])
+ ui.sendRequest(84,{task_index=ui.g_self.cur_task_index,task_type=2,pay_type=1})
+ local d=sent(84);assert(d.task_day==ui.g_data.main.task_day and d.task_index==1)
 end)
 return 'ready'

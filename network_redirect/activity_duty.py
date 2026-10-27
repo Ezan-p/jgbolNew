@@ -39,7 +39,7 @@ def meta(role):
 
 
 def checkpoint(d):
-    out = {k: copy.deepcopy(d[k]) for k in ('round', 'stars', 'used', 'bonus', 'initial_bonus', 'phase', 'group', 'offers') if k in d}
+    out = {k: copy.deepcopy(d[k]) for k in ('round', 'stars', 'used', 'bonus', 'initial_bonus', 'phase', 'group', 'offers', 'guard_reward') if k in d}
     # A half-run skips already earned rewards, but keeps its saved offers.
     if out['phase'] == 'prize':
         out['phase'] = d.get('after_prize', 'exchange')
@@ -47,7 +47,14 @@ def checkpoint(d):
 
 
 def remember(d):
+    ensure_guard_reward(d)
     d.setdefault('checkpoints', {})[str(d['round'])] = checkpoint(d)
+
+
+def ensure_guard_reward(d):
+    # Roll once before displaying the layer, including a legacy in-progress save.
+    if d['phase'] == 'fight' and d.get('guard_reward', {}).get('round') != d['round']:
+        d['guard_reward'] = duty_balance.guard_reward(d['round'])
 
 
 def half(d):
@@ -66,6 +73,7 @@ def prepare(role, now, r, peers=None):
         return
     d = s.get('duty')
     if d is not None:
+        ensure_guard_reward(d)
         d.setdefault('initial_bonus', [0]*4)
         d.setdefault('checkpoints', {})
         d.setdefault('group', group(role))
@@ -205,6 +213,8 @@ def data(role, r, result=None, peers=None):
         if (not d or d['phase'] == 'finished') and s['duty_runs'] >= r['duty_daily_runs']:
             result = 7
     current = d or dict(round=1, stars=0, used=0, bonus=[0]*4, initial_bonus=[0]*4)
+    if d:
+        ensure_guard_reward(d)
     score = m['records'].get(str(m['day']), {})
     _, pos = rank(role, peers, m['day'])
     ours = sum(1 <= c.get('order', 0) <= 8 for c in role['corteges'])
@@ -215,7 +225,12 @@ def data(role, r, result=None, peers=None):
         cur_get_star=current['stars'], cur_used_star=current['used'], expect_order=pos,
         last_exchange_rate=r['duty_initial_bonus'],
         plus_list=[dict(zip(FIELDS, current['initial_bonus'])), dict(zip(FIELDS, current['bonus']))],
-        lineup_list=[dict(type=plan['type'], gold=0, stars=i, vs=[ours, plan['group']]) for i in (1, 2, 3)])
+        lineup_list=[dict(type=plan['guard_types'][i-1], stars=i, vs=[ours, plan['group']]) for i in (1, 2, 3)])
+    saved_reward = current.get('guard_reward', {})
+    if saved_reward.get('round') == current['round']:
+        p = saved_reward['reward']
+        out['lineup_list'][saved_reward['difficulty']-1]['reward'] = dict(
+            object_type=p[0], attach_type=p[1], attach_count=p[2], attach_level=p[3])
     if d and d['phase'] == 'exchange':
         out['star_exchange'] = copy.deepcopy(d['offers'])
     if d and pending(d):
@@ -301,6 +316,7 @@ def battle(role, req, now, r, jrules, peers=None):
     s = role['activity']; d = s.get('duty')
     require(d is not None and d['phase'] == 'fight', '请先完成祝福、领奖或重开')
     require(req['des_type'] in (1, 2, 3) and req['des_id'] == 0 and req['des_value'] == d['round'], '天命关卡已变化，请刷新后重试')
+    ensure_guard_reward(d)
     cfg = dict(cortege_list=f"{r['battle_npc']}|{r['battle_level']}")
     plan = duty_balance.stage(d['group'], d['round'])
     units = (journey.fighters(role, cfg)[0], duty_balance.enemies(d['group'], d['round'], req['des_type']))
@@ -312,16 +328,21 @@ def battle(role, req, now, r, jrules, peers=None):
     result, lineup, actions = journey.battle(role, cfg, jrules, units=units)
     win = 1 <= result <= 3
     s['fight_id'] += 1; fid = s['fight_id']
+    material_events = []
     if win:
+        from . import activity_seasonal
+        materials = [journey.grant(role, p) for p in activity_seasonal.material_specs(r)]
+        if materials:
+            material_events.append(summon.event(22, dict(prize_type=1, prize_list=materials)))
         d['stars'] += req['des_type']*result
         d['round'] += 1
         rewards = []
         if (d['round']-1) % 3 == 0:
             rewards.append([12, 0, 3*r['duty_silver_per_round'], 1])
             exchange_or_fight(d)
-        reward = duty_balance.drop()
-        if reward:
-            rewards.append(reward)
+        saved_reward = d.pop('guard_reward')
+        if req['des_type'] == saved_reward['difficulty']:
+            rewards.append(copy.deepcopy(saved_reward['reward']))
         if rewards:
             d['pending_rewards'] = rewards
             d['after_prize'] = d['phase']; d['phase'] = 'prize'
@@ -332,7 +353,7 @@ def battle(role, req, now, r, jrules, peers=None):
     return journey.combat_engine.event_packets(actions, fid) + [
         encode(1028, dict(fight_id=fid, first_hand=1, des_name=plan['name'], lineup_count=len(lineup), lineup=lineup)),
         *battle_replay.result_packets(1027, dict(fight_id=fid, fight_type=5, final_result=result, fight_round=len(actions), fight_result=actions)),
-        event(role, r, outcome, peers), summon.event(44, dict(fight_id=fid, fight_type=5))]
+        event(role, r, outcome, peers), *material_events, summon.event(44, dict(fight_id=fid, fight_type=5))]
 
 
 def inspection(role, req, peers):

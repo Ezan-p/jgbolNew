@@ -216,9 +216,4 @@ def sync(role):
 
 def seasonal_rewards(role, now, ar):
     from . import activity_seasonal as season
-    idx=role['activity']['party']['count'];specs=[]
-    for name, table in [('rice',season.RICE),('moon',season.MOON)]:
-        if season.is_open(ar,name,now):
-            rows=list(table.values())
-            specs.extend([typ,tid,ar['seasonal_travel_material_count'],lv] for typ,tid,_,lv in rows[idx%len(rows)]['source'])
-    return [journey.grant(role,p) for p in specs]
+    return [journey.grant(role,p) for p in season.material_specs(ar)]

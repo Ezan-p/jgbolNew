@@ -72,18 +72,18 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     require(set(r.get('seasonal_games',{}))=={'rice','moon','spring_money','spring_cards','fish'},'限时活动分项配置无效')
     for cfg in r['seasonal_games'].values():
         require(isinstance(cfg,dict) and type(cfg.get('enabled'))is bool and all(type(cfg.get(k))is int for k in ('start_time','end_time')) and 0<cfg['start_time']<cfg['end_time']<=2147483647,'限时活动时间配置无效')
-    require(all(type(r.get(k))is int and 1<=r[k]<=1000 for k in ('seasonal_craft_daily_limit','seasonal_moon_bonus_every','seasonal_travel_material_count','fish_daily_nets','fish_gold_per_net','fish_per_catch')),'节日制作次数配置无效')
-    require(type(r.get('spring_daily_coins'))is int and 1<=r['spring_daily_coins']<=10000,'财神奖励无效')
-    require(isinstance(r.get('spring_card_rewards'),list) and len(r['spring_card_rewards'])==4,'字牌奖励缺失')
-    require(set(r.get('seasonal_food_rewards',{}))==set(map(str,(1130,1131,1132,1133,1213,1214,1215,1216,1217))),'节日礼包奖励不完整')
-    for rewards in list(r['seasonal_food_rewards'].values())+[r['spring_card_rewards']]:
+    require(all(type(r.get(k))is int and 1<=r[k]<=1000 for k in ('seasonal_craft_daily_limit','seasonal_moon_bonus_every')),'节日制作次数配置无效')
+    from . import activity_moon
+    r['moon_rules'] = activity_moon.load_rules()
+    require(set(r.get('seasonal_food_rewards',{}))=={'1217'},'历史五星粽子奖励配置无效')
+    for rewards in r['seasonal_food_rewards'].values():
         require(isinstance(rewards,list) and 1<=len(rewards)<=10,'节日礼包奖励无效')
         for p in rewards:
             require(isinstance(p,list) and len(p)==4 and all(type(v)is int for v in p) and 0<p[2]<=1000 and p[3]==1 and (p[0] in (11,12) or p[0]==5 and p[1] in formation.ITEMS or p[0]==6 and p[1] in formation.SKILLS),'节日礼包奖励无效')
     require(isinstance(r.get('abyss_eye_choices'),list) and len(r['abyss_eye_choices'])==4 and len(set(r['abyss_eye_choices']))==4 and all(t in formation.BASES for t in r['abyss_eye_choices']),'火眼金睛选项无效')
     from . import activity_visit
     r['visit_rules'] = activity_visit.load_rules()
-    for key in ('pray_rewards','party_rewards','home_pray_rewards','abyss_event_rewards','abyss_pray_consumes','abyss_map_rewards','land_card_rewards','land_full_card_rewards','seasonal_moon_bonus','fish_pool'):
+    for key in ('pray_rewards','party_rewards','home_pray_rewards','abyss_event_rewards','abyss_pray_consumes','abyss_map_rewards','land_card_rewards','land_full_card_rewards','seasonal_moon_bonus'):
         require(isinstance(r.get(key),list) and len(r[key])>0,'活动奖励缺失')
         for p in r[key]:
             require(isinstance(p,list) and len(p)==4 and all(type(v)is int for v in p),'活动奖励格式错误')
@@ -92,7 +92,7 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     require(all(p[0]==11 and p[1]==0 and p[3]==1 for p in r['pray_rewards']),'神石祈福奖励必须为元宝')
     require(len(r['abyss_map_rewards'])==12 and r['abyss_map_remove_count']+r['abyss_map_paid_draws']<12,'宝图奖盘或次数无效')
     require(set(r.get('train_increase',{}))==set(formation.STATS) and all(type(v)is int and 0<v<=10000 for v in r['train_increase'].values()),'修炼属性配置无效')
-    for name in ('undergo_shop','home_shop','abyss_shop','spring_shop','fish_shop'):
+    for name in ('undergo_shop','home_shop','abyss_shop'):
         require(isinstance(r.get(name),list) and 1<=len(r[name])<=30,'活动商店配置无效')
         for goods in r[name]:
             p=goods.get('reward')
@@ -103,8 +103,12 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
                 q=goods.get('consume')
                 require(isinstance(q,list) and len(q)==4 and all(type(v)is int for v in q) and q[0]==5 and q[1] in formation.ITEMS and 0<q[2]<=1000000 and q[3]==1,'洞府商品消耗无效')
             else:require(type(goods.get('cost'))is int and 0<goods['cost']<=1000000,'活动商品价格无效')
-    require(len(r['fish_shop'])%5==0 and len({x['reward'][1] for x in r['fish_shop']})==len(r['fish_shop']),'东海商品须为完整五项分页且类型不重复')
-    require(5<=len(r['fish_pool'])<=20 and len(r['fish_pool'])%5==0,'原版东海奖池预览需要每行五项完整配置')
+    from . import activity_fish
+    activity_fish.validate(r)
+    from . import activity_caishen
+    activity_caishen.validate(r)
+    from . import activity_tangwang
+    r['tangwang_rules'] = activity_tangwang.load_rules()
     require(r.get('babel_energy_items')=={'20016':10,'20017':25,'20018':80,'20019':200} and all(type(v) is int for v in r['babel_energy_items'].values()),'通天塔恢复配置须符合原版仙露数值')
     require(r['abyss_tick_seconds']<=r['abyss_offline_cap_seconds'] and r['abyss_offline_cap_seconds']//r['abyss_tick_seconds']<=2000,'挂机结算周期过长')
     return r
@@ -113,7 +117,20 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
 def day(now,r):return (now+r['timezone_offset_hours']*3600)//86400
 
 def prepare(role,now,r,peers=None):
+    from . import activity_pavilion
+    activity_pavilion.prepare(role,now,activity_pavilion.load_rules())
     s=role.setdefault('activity',{})
+    from . import activity_tangwang
+    activity_tangwang.state(role,now,r['tangwang_rules'])
+    if 'fish' in s.get('seasonal',{}):
+        from . import activity_fish
+        activity_fish.rollover(role,now,r)
+    if 'spring' in s.get('seasonal',{}):
+        from . import activity_caishen
+        activity_caishen.rollover(role,now,r)
+    if 'nine_sky' in s:
+        from . import activity_nine_sky
+        activity_nine_sky.state(role,now,activity_nine_sky.load_rules())
     if 'yuanshi' in s:
         from . import activity_yuanshi, welfare
         activity_yuanshi.state(role,now,activity_yuanshi.load_rules())
@@ -346,6 +363,8 @@ def battle(role,req,now,r,jrules,frules):
 
 
 def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
+    from . import feature_levels
+    feature_levels.check(role, mid, req)
     s=prepare(role,now,r,peers)
     if mid==1131:
         from . import progression

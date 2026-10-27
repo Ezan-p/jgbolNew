@@ -394,7 +394,12 @@ class Backend:
         for item in after['attachments']:
             if item['id'] not in old or item['attach_type'] != 5:
                 continue
-            attrs = [dict(type=t, value=int(item.get(k, 0))) for k, t in fields.items()
+            # [A] lineupUI.updateItemInfo:656-664 updates effect_value only
+            # through the weapon/armor/artifact stat property. The generic
+            # effect_value (209) branch is deliberately empty in 3.87.
+            main_type = int(formation.ITEMS.get(item['type_id'], {}).get('main_type', 0))
+            item_fields = dict(fields, effect_value={1: 201, 2: 202, 3: 203}.get(main_type, 209))
+            attrs = [dict(type=t, value=int(item.get(k, 0))) for k, t in item_fields.items()
                      if item.get(k, 0) != old[item['id']].get(k, 0)
                      and 0 <= item.get(k, 0) <= 2147483647]
             if attrs:
@@ -541,7 +546,12 @@ class Backend:
             raise ValueError('Business message before login')
         if mid == 2999:
             role = self.profile()
+            seasonal_before = {'attachments': copy.deepcopy(role['attachments'])}
+            nine_before = copy.deepcopy(role.get('activity', {}).get('nine_sky', {}).get('last_recycle'))
             now = int(time.time())
+            from . import activity_pavilion
+            pavilion_before = copy.deepcopy(role.get('pavilion', {}).get('last_recycle'))
+            activity_pavilion.prepare(role, now, activity_pavilion.load_rules())
             previous_month = role.get('xianling', {}).get('month')
             xianling.prepare(role, now)
             previous_day = role.get('daily', {}).get('day')
@@ -550,11 +560,37 @@ class Backend:
             rulai_state = role.get('activity', {}).get('rulai', {})
             rulai_period = activity_rulai.period(now, activity_rulai.load_rules())[0]
             rulai_rollover = rulai_state.get('start') != rulai_period
+            from . import activity_tangwang
+            tw_before = copy.deepcopy(role.get('activity',{}).get('seasonal',{}).get('tangwang'))
+            tw_state = activity_tangwang.state(role,now,self.activity_rules['tangwang_rules'])
             journey.prepare(role, now, self.journey_rules)
             daily.prepare(role, now, self.daily_rules)
+            if 'fish' in role.get('activity',{}).get('seasonal',{}):
+                from . import activity_fish
+                activity_fish.rollover(role,now,self.activity_rules)
+            if 'spring' in role.get('activity',{}).get('seasonal',{}):
+                from . import activity_caishen
+                activity_caishen.rollover(role,now,self.activity_rules)
+            if 'nine_sky' in role.get('activity',{}):
+                from . import activity_nine_sky
+                activity_nine_sky.state(role,now,activity_nine_sky.load_rules())
             self.save(role)
             # Refresh expiring permanent effects without replacing UI-held objects.
             updates = self.panel_attributes(role) + self.journey_attributes(role)
+            if seasonal_before['attachments'] != role['attachments']:
+                updates += self.item_deltas(seasonal_before,role) + self.inventory(role)
+                updates.append(welfare.mail_snapshot(role,now,self.welfare_rules))
+            elif nine_before != role.get('activity', {}).get('nine_sky', {}).get('last_recycle'):
+                updates.append(welfare.mail_snapshot(role,now,self.welfare_rules))
+            if pavilion_before != role.get('pavilion', {}).get('last_recycle'):
+                # Refresh balances only after inventory deletion packets.
+                updates.append(activity_pavilion.update(role, now, self.duty_peers()))
+                updates.append(welfare.mail_snapshot(role, now, self.welfare_rules))
+            if tw_state != tw_before:
+                # Clear expired inventory before the UI rebuilds its selectable cards.
+                updates.append(summon.event(47,dict(local_tangwang_only=True,tangwang_info=activity_tangwang.payload(
+                    tw_state,self.activity_rules['tangwang_rules'],
+                    self.activity_rules['seasonal_games']['spring_cards']['enabled']))))
             if previous_journey_day != role['journey']['day']:
                 # Reset all cached gate counts without changing last_fight_npc.
                 updates += journey.snapshots(role, reset=False)
@@ -853,13 +889,21 @@ class Backend:
     def welfares(self, packet, mid, data):
         serial = data['serial_num']
         if mid == 1102:
-            # Original getMoreSysMail sends serial 0: this is a read, not a
-            # serialized reward mutation. Do not consume the claim watermark.
+            # Original getMoreSysMail sends serial 0. Expiry conversion may
+            # persist here, but reading must not consume the claim watermark.
             try:
                 now = int(time.time())
                 role = self.profile()
+                from . import activity_pavilion
+                before = copy.deepcopy(role)
+                activity_pavilion.prepare(role, now, activity_pavilion.load_rules())
                 state = welfare.prepare(role, now, self.welfare_rules)
                 replies = welfare.mail_request(role, mid, data, now, self.welfare_rules, state)
+                if role.get('pavilion', {}).get('last_recycle') != before.get('pavilion', {}).get('last_recycle'):
+                    replies = self.item_deltas(before, role) + self.inventory(role) + replies
+                    replies += [activity_pavilion.update(role, now, self.duty_peers()),
+                                welfare.mail_snapshot(role, now, self.welfare_rules)]
+                    self.save(role)
                 self.emit('game_mail_read', mail_id=data['mail_id'])
             except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
                 replies = [summon.event(55, {'op_string': str(error) if isinstance(error, formation.Rejected) else '邮件数据无效'})]
@@ -875,7 +919,17 @@ class Backend:
             self.db.execute('BEGIN IMMEDIATE')
             role = json.loads(self.db.execute('SELECT data FROM roles WHERE account=?', (self.account,)).fetchone()[0])
             before = copy.deepcopy(role)
-            events = welfare.settle(role, mid, data, now, self.welfare_rules, login_fields)
+            from . import activity_pavilion
+            activity_pavilion.prepare(role, now, activity_pavilion.load_rules())
+            retired_mail = next((m for key, m in role.get('welfare', {}).get('mails', {}).items()
+                                if mid == 1103 and m['mail_id'] == data['mail_id'] and m['claimed']
+                                and not before.get('welfare', {}).get('mails', {}).get(key, {}).get('claimed', True)), None)
+            if retired_mail:
+                # A direct claim can be the first request after the boundary.
+                # Commit the conversion and refresh this now-empty old mail.
+                events = [summon.event(15, dict(result=1, mail_id=data['mail_id'], attach_count=0, attach_list=[]))]
+            else:
+                events = welfare.settle(role, mid, data, now, self.welfare_rules, login_fields)
             achievements.record_events(role, events, int(time.time()), login_fields)
             replies = self.item_deltas(before, role) + self.inventory(role) + summon.soul_snapshots(role) + [
                 welfare_attributes(role), vip.attrs(role), summon.event(80,dict(local_vip=vip.client_state(role), local_recharge=recharge.client_state(role, now, self.recharge_rules, self.welfare_rules), local_welfare=welfare.client_state(role, now, self.welfare_rules)))] + events + [welfare.hint(role, now, self.welfare_rules),welfare.mail_snapshot(role,now,self.welfare_rules)]
@@ -931,6 +985,9 @@ class Backend:
             if charged > 0:
                 replies += [activity_rulai.sync(role, now), activity_yuanshi.update(role, now),
                             activity_pavilion.update(role, now, self.duty_peers()),
+                            welfare.mail_snapshot(role, now, self.welfare_rules)]
+            elif role.get('pavilion', {}).get('last_recycle') != before.get('pavilion', {}).get('last_recycle'):
+                replies += [activity_pavilion.update(role, now, self.duty_peers()),
                             welfare.mail_snapshot(role, now, self.welfare_rules)]
             self.save(role)
             # Telemetry failure cannot turn a committed payment into a failed
@@ -1166,6 +1223,8 @@ class Backend:
             journey.prepare(role, now, self.journey_rules)
             before = copy.deepcopy(role)
             events = journey.settle(role, mid, data, now, self.journey_rules, self.formation_rules, self.activity_rules)
+            if role.get('activity',{}).get('seasonal',{}).get('tangwang',{}).get('last_recycle') != before.get('activity',{}).get('seasonal',{}).get('tangwang',{}).get('last_recycle'):
+                events.insert(0,welfare.mail_snapshot(role,now,self.welfare_rules))
             achievements.record_events(role, events, int(time.time()), login_fields)
             welfare.track(role,mid,data,events,now,self.welfare_rules)
             hints = daily.track(role, before, mid, data, events, now, self.daily_rules, login_fields)
@@ -1214,6 +1273,12 @@ class Backend:
             before = copy.deepcopy(role)
             events = activity.settle(role, mid, data, now, self.activity_rules,
                                      self.journey_rules, self.formation_rules, login_fields, self.duty_peers())
+            if (role.get('activity',{}).get('nine_sky',{}).get('last_recycle') !=
+                before.get('activity',{}).get('nine_sky',{}).get('last_recycle') or
+                role.get('pavilion',{}).get('last_recycle') != before.get('pavilion',{}).get('last_recycle') or
+                any(role.get('activity',{}).get('seasonal',{}).get(name,{}).get('last_recycle') !=
+                   before.get('activity',{}).get('seasonal',{}).get(name,{}).get('last_recycle') for name in ('fish','spring','tangwang'))):
+                events.insert(0,welfare.mail_snapshot(role,now,self.welfare_rules))
             upgrades = progression.upgrade_events(before, role)
             if upgrades or mid == 1131:
                 events = upgrades + [welfare.hint(role, now, self.welfare_rules)] + events
