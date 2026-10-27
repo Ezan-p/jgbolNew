@@ -195,14 +195,14 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(hp, {(side, order): value for side, units in actions.final_hp.items() for order, value in units.items()})
         self.assertTrue(all(1 <= v['cur_action'] <= len(actions) for v in actions.events))
 
-    def test_event_budget_stops_cleanly_with_encodable_replay(self):
+    def test_event_budget_does_not_end_an_unfinished_battle(self):
         self.rules['battle']['mechanics']['event_budget_bytes'] = 1000
-        b = self.battle([unit(essences={5: (100,)})], [unit(essences={5: (100,)})])
+        b = self.battle([unit(gongji=150, essences={5: (50,)})], [unit(essences={5: (50,)})])
         result, _, actions = b.run()
-        self.assertEqual(actions.stop_reason, 'event_budget')
-        self.assertLess(len(actions), 240)
-        self.assertLess(len(e.event_packets(actions, 9)[0]), 32768)
-        self.assertEqual(result, 0)  # Two living armies cannot be declared defeated on HP ratio.
+        self.assertEqual(actions.stop_reason, 'elimination')
+        self.assertGreater(b.event_bytes, 1000)
+        self.assertEqual(actions.final_hp, {1: {1: 750}, 2: {1: 0}})
+        self.assertEqual(result, 3)
 
     def test_policy_invalid_values_rejected(self):
         for key, bad in [('poison_max_damage', 0), ('rulai_shield_probability', 101),

@@ -1,0 +1,1007 @@
+{
+  "audit_date": "2026-10-27",
+  "timezone": "Asia/Shanghai",
+  "scope": "Post-fix real 1051 requests on disposable databases; earlier 12-case failure report is retained as historical evidence",
+  "source_sha256": {
+    "network_redirect/backend.py": "569b38cf00da80432925e1c8289a4221c4d41b73ba7277229da09ea777f376cd",
+    "network_redirect/journey.py": "f9d2aeb0cc1626d1c51335690dde6593d301bea6078a589bcecd55bd6e905534",
+    "network_redirect/guild.py": "f4c21b2b3ea58cae7b5baafc416a5bc00c480e2ea9be43beac3120616046ea0f",
+    "tests/test_small_bun_contribution.py": "daa8b61d447813d3cc4bfae7bd296fdda3c27904859c0511222cfdb17873cb98"
+  },
+  "cases": [
+    {
+      "item_type": 1020,
+      "name": "小包子",
+      "prerequisites": [],
+      "message_id": 1051,
+      "request": {
+        "serial_num": 10002,
+        "item_type": 1020,
+        "item_id": 3.0,
+        "item_count": 1,
+        "des_type": 1,
+        "des_id": 0
+      },
+      "response": [
+        {
+          "message_id": 1032,
+          "data": {
+            "serial_num": 200001,
+            "id": 3.0,
+            "unit_type": 5,
+            "attr_count": 1,
+            "attr_list": [
+              {
+                "type": 102,
+                "value": 1
+              }
+            ]
+          }
+        },
+        {
+          "message_id": 1034,
+          "data": {
+            "serial_num": 200002,
+            "first_send": true,
+            "cortege_count": 1,
+            "cortege_list": [
+              {
+                "id": 1.0,
+                "order": 1,
+                "cheer_order": 0,
+                "type": 5004,
+                "level": 1,
+                "cur_exp": 0.0,
+                "next_exp": 132.0,
+                "hp": 475,
+                "magic": 133,
+                "gongji": 195,
+                "fangyu": 124,
+                "combat_power": 1189,
+                "culture_point": 0,
+                "hp_plus": 0,
+                "magic_plus": 0,
+                "gongji_plus": 0,
+                "fangyu_plus": 0,
+                "train_increase_field": 0,
+                "train_decrease_field": 0,
+                "train_change_value": 0,
+                "evolve_level": 0,
+                "equiped_ext_skill_limit": 1,
+                "equiped_ext_star_limit": 0,
+                "next_ext_skill_luck_point": 0,
+                "reborn_layer": 0,
+                "reborn_vein_level": 0,
+                "reborn_plus_type": 1
+              }
+            ]
+          }
+        },
+        {
+          "message_id": 1035,
+          "data": {
+            "serial_num": 200003,
+            "first_send": true,
+            "attach_count": 2,
+            "attach_list": [
+              {
+                "id": 2.0,
+                "attach_type": 6,
+                "type_id": 209,
+                "count": 0,
+                "level": 1,
+                "equip_order": 1,
+                "equip_pos": 1,
+                "protogenic": 1,
+                "effect_value": 112,
+                "drill_count": 0,
+                "stone1_level": 0,
+                "stone2_level": 0,
+                "stone3_level": 0,
+                "stone4_level": 0,
+                "prob_compen": 0,
+                "advance_level": 0,
+                "star_count": 0,
+                "cur_spirit_count": 0,
+                "ext_skill_pos": 0,
+                "ext_awaken_pos": 0,
+                "upgrade_level": 0,
+                "reborn_bit": 0,
+                "cast_level": 0,
+                "awaken": 0,
+                "is_lock": 0,
+                "absorb_rate": 0,
+                "shield_rate": 0,
+                "owner_id": 1.0,
+                "star_level": 0
+              },
+              {
+                "id": 3.0,
+                "attach_type": 5,
+                "type_id": 1020,
+                "count": 1,
+                "level": 1,
+                "equip_order": 0,
+                "equip_pos": 0,
+                "protogenic": 0,
+                "effect_value": 0,
+                "drill_count": 0,
+                "stone1_level": 0,
+                "stone2_level": 0,
+                "stone3_level": 0,
+                "stone4_level": 0,
+                "prob_compen": 0,
+                "advance_level": 0,
+                "star_count": 0,
+                "cur_spirit_count": 0,
+                "ext_skill_pos": 0,
+                "ext_awaken_pos": 0,
+                "upgrade_level": 0,
+                "reborn_bit": 0,
+                "cast_level": 0,
+                "awaken": 0,
+                "is_lock": 0,
+                "absorb_rate": 0,
+                "shield_rate": 0,
+                "owner_id": 0.0,
+                "star_level": 0
+              }
+            ]
+          }
+        },
+        {
+          "message_id": 1046,
+          "data": {
+            "serial_num": 200004,
+            "first_send": true,
+            "spirit_count": 0,
+            "spirit_list": []
+          }
+        },
+        {
+          "message_id": 1032,
+          "data": {
+            "serial_num": 200005,
+            "id": 1.0,
+            "unit_type": 1,
+            "attr_count": 26,
+            "attr_list": [
+              {
+                "type": 3,
+                "value": 80
+              },
+              {
+                "type": 5,
+                "value": 0
+              },
+              {
+                "type": 6,
+                "value": 3628800
+              },
+              {
+                "type": 7,
+                "value": 1000
+              },
+              {
+                "type": 8,
+                "value": 100000
+              },
+              {
+                "type": 30,
+                "value": 1189
+              },
+              {
+                "type": 39,
+                "value": 1189
+              },
+              {
+                "type": 71,
+                "value": 8
+              },
+              {
+                "type": 101,
+                "value": 5
+              },
+              {
+                "type": 102,
+                "value": 10
+              },
+              {
+                "type": 64,
+                "value": 1
+              },
+              {
+                "type": 65,
+                "value": 0
+              },
+              {
+                "type": 66,
+                "value": 0
+              },
+              {
+                "type": 91,
+                "value": 30
+              },
+              {
+                "type": 92,
+                "value": 0
+              },
+              {
+                "type": 93,
+                "value": 0
+              },
+              {
+                "type": 511,
+                "value": 0
+              },
+              {
+                "type": 512,
+                "value": 0
+              },
+              {
+                "type": 513,
+                "value": 0
+              },
+              {
+                "type": 514,
+                "value": 0
+              },
+              {
+                "type": 55,
+                "value": 0
+              },
+              {
+                "type": 56,
+                "value": 0
+              },
+              {
+                "type": 57,
+                "value": 0
+              },
+              {
+                "type": 58,
+                "value": 0
+              },
+              {
+                "type": 59,
+                "value": 5
+              },
+              {
+                "type": 60,
+                "value": 5
+              }
+            ]
+          }
+        },
+        {
+          "message_id": 2998,
+          "data": {
+            "serial_num": 200006,
+            "id": 21,
+            "data": "{[\"result\"]=1,[\"type_id\"]=1020,[\"count\"]=1,[\"effect_value\"]=5}",
+            "parsed_data": {
+              "result": 1,
+              "type_id": 1020,
+              "count": 1,
+              "effect_value": 5
+            }
+          }
+        },
+        {
+          "message_id": 1106,
+          "data": {
+            "serial_num": 200007,
+            "req_serial_num": 10002
+          }
+        }
+      ],
+      "emitted": [
+        {
+          "event": "game_request",
+          "message_id": 1051,
+          "bytes": 39,
+          "authenticated": true
+        },
+        {
+          "event": "game_journey_ok",
+          "message_id": 1051,
+          "rules_revision": "2026-10-26-journey-audit"
+        }
+      ],
+      "before": {
+        "role_sha256": "f42741c57a10864594e06440913db3cd48cc1cbc27ba2e6166c8d8d1927a5a8a",
+        "items": [
+          {
+            "id": 3.0,
+            "attach_type": 5,
+            "type_id": 1020,
+            "level": 1,
+            "count": 2
+          }
+        ],
+        "resources": {
+          "strength": 0,
+          "silver_coin": 1000,
+          "gold_coin": 100000,
+          "charge_gold": 0,
+          "vip_level": 1,
+          "union_id": 0,
+          "union_contrib": 0,
+          "cur_union_contrib": 0
+        },
+        "achievement_totals": {
+          "111": 0,
+          "112": 0,
+          "113": 0,
+          "114": 0,
+          "117": 0
+        },
+        "companion": {
+          "id": 1.0,
+          "type": 5004,
+          "level": 1,
+          "cur_exp": 0
+        }
+      },
+      "after": {
+        "role_sha256": "3ac21b4e2983c062bd53df6a0d921d7420b4d5298e22b2d106e6ccfe2b9d08ef",
+        "items": [
+          {
+            "id": 3.0,
+            "attach_type": 5,
+            "type_id": 1020,
+            "level": 1,
+            "count": 1
+          }
+        ],
+        "resources": {
+          "strength": 5,
+          "silver_coin": 1000,
+          "gold_coin": 100000,
+          "charge_gold": 0,
+          "vip_level": 1,
+          "union_id": 0,
+          "union_contrib": 0,
+          "cur_union_contrib": 0
+        },
+        "achievement_totals": {
+          "111": 0,
+          "112": 0,
+          "113": 0,
+          "114": 0,
+          "117": 0
+        },
+        "companion": {
+          "id": 1.0,
+          "type": 5004,
+          "level": 1,
+          "cur_exp": 0
+        }
+      },
+      "role_unchanged": false
+    },
+    {
+      "item_type": 1029,
+      "name": "贡献令",
+      "prerequisites": [
+        {
+          "message_id": 1301,
+          "request": {
+            "serial_num": 10001,
+            "id": 1,
+            "data": "{[\"union_name\"]=\"道具审计仙盟\"}"
+          },
+          "response": [
+            {
+              "message_id": 1034,
+              "data": {
+                "serial_num": 200001,
+                "first_send": true,
+                "cortege_count": 1,
+                "cortege_list": [
+                  {
+                    "id": 1.0,
+                    "order": 1,
+                    "cheer_order": 0,
+                    "type": 5004,
+                    "level": 1,
+                    "cur_exp": 0.0,
+                    "next_exp": 132.0,
+                    "hp": 475,
+                    "magic": 133,
+                    "gongji": 195,
+                    "fangyu": 124,
+                    "combat_power": 1189,
+                    "culture_point": 0,
+                    "hp_plus": 0,
+                    "magic_plus": 0,
+                    "gongji_plus": 0,
+                    "fangyu_plus": 0,
+                    "train_increase_field": 0,
+                    "train_decrease_field": 0,
+                    "train_change_value": 0,
+                    "evolve_level": 0,
+                    "equiped_ext_skill_limit": 1,
+                    "equiped_ext_star_limit": 0,
+                    "next_ext_skill_luck_point": 0,
+                    "reborn_layer": 0,
+                    "reborn_vein_level": 0,
+                    "reborn_plus_type": 1
+                  }
+                ]
+              }
+            },
+            {
+              "message_id": 1035,
+              "data": {
+                "serial_num": 200002,
+                "first_send": true,
+                "attach_count": 1,
+                "attach_list": [
+                  {
+                    "id": 2.0,
+                    "attach_type": 6,
+                    "type_id": 209,
+                    "count": 0,
+                    "level": 1,
+                    "equip_order": 1,
+                    "equip_pos": 1,
+                    "protogenic": 1,
+                    "effect_value": 112,
+                    "drill_count": 0,
+                    "stone1_level": 0,
+                    "stone2_level": 0,
+                    "stone3_level": 0,
+                    "stone4_level": 0,
+                    "prob_compen": 0,
+                    "advance_level": 0,
+                    "star_count": 0,
+                    "cur_spirit_count": 0,
+                    "ext_skill_pos": 0,
+                    "ext_awaken_pos": 0,
+                    "upgrade_level": 0,
+                    "reborn_bit": 0,
+                    "cast_level": 0,
+                    "awaken": 0,
+                    "is_lock": 0,
+                    "absorb_rate": 0,
+                    "shield_rate": 0,
+                    "owner_id": 1.0,
+                    "star_level": 0
+                  }
+                ]
+              }
+            },
+            {
+              "message_id": 1032,
+              "data": {
+                "serial_num": 200003,
+                "id": 1.0,
+                "unit_type": 1,
+                "attr_count": 20,
+                "attr_list": [
+                  {
+                    "type": 141,
+                    "value": 0
+                  },
+                  {
+                    "type": 143,
+                    "value": 0
+                  },
+                  {
+                    "type": 7,
+                    "value": 1000
+                  },
+                  {
+                    "type": 8,
+                    "value": 99500
+                  },
+                  {
+                    "type": 101,
+                    "value": 0
+                  },
+                  {
+                    "type": 102,
+                    "value": 10
+                  },
+                  {
+                    "type": 144,
+                    "value": 2
+                  },
+                  {
+                    "type": 145,
+                    "value": 1
+                  },
+                  {
+                    "type": 146,
+                    "value": 0
+                  },
+                  {
+                    "type": 148,
+                    "value": 0
+                  },
+                  {
+                    "type": 147,
+                    "value": 1793116800
+                  },
+                  {
+                    "type": 151,
+                    "value": 0
+                  },
+                  {
+                    "type": 152,
+                    "value": 0
+                  },
+                  {
+                    "type": 153,
+                    "value": 0
+                  },
+                  {
+                    "type": 154,
+                    "value": 0
+                  },
+                  {
+                    "type": 155,
+                    "value": 0
+                  },
+                  {
+                    "type": 156,
+                    "value": 0
+                  },
+                  {
+                    "type": 157,
+                    "value": 0
+                  },
+                  {
+                    "type": 158,
+                    "value": 0
+                  },
+                  {
+                    "type": 159,
+                    "value": 0
+                  }
+                ]
+              }
+            },
+            {
+              "message_id": 2998,
+              "data": {
+                "serial_num": 200004,
+                "id": 198,
+                "data": "{[\"id\"]=3,[\"has_prize\"]=false}",
+                "parsed_data": {
+                  "id": 3,
+                  "has_prize": false
+                }
+              }
+            },
+            {
+              "message_id": 2998,
+              "data": {
+                "serial_num": 200005,
+                "id": 82,
+                "data": "{[\"event_id\"]=1,[\"result\"]=1}",
+                "parsed_data": {
+                  "event_id": 1,
+                  "result": 1
+                }
+              }
+            },
+            {
+              "message_id": 1301,
+              "data": {
+                "serial_num": 200006,
+                "id": 18,
+                "data": "{[\"query_type\"]=1,[\"union_info\"]={[\"id\"]=2,[\"name\"]=\"道具审计仙盟\",[\"level\"]=1,[\"popularity\"]=0,[\"order\"]=1,[\"cur_count\"]=1,[\"max_count\"]=30,[\"notify\"]=\"欢迎加入仙盟\",[\"notify_ex\"]=\"\",[\"leader_name\"]=\"本地行者\"},[\"role_info\"]={[\"id\"]=1.0,[\"name\"]=\"本地行者\",[\"rank\"]=1,[\"level\"]=80,[\"contrib\"]=0,[\"head_type\"]=1,[\"totalcontrib\"]=0,[\"jointime\"]=1793073600,[\"lastlogin\"]=1793073600,[\"online\"]=true,[\"toporder\"]=0,[\"logout_time\"]=0,[\"combat_power\"]=1189,[\"union_contrib\"]=0,[\"cur_union_contrib\"]=0,[\"contribute\"]=0,[\"tree_state\"]=1,[\"can_plant_tree\"]=false,[\"can_cultivate_tree\"]=true,[\"can_kill_tree\"]=true,[\"cultivate_time\"]=10,[\"union_protect_card\"]=3,[\"max_protect_card\"]=3,[\"can_search_gold\"]=true,[\"can_match_fight\"]=false,[\"has_action_point\"]=false,[\"is_match_time\"]=false,[\"is_bet_time\"]=false,[\"has_bet\"]=false,[\"cross_fight_flag\"]=false,[\"can_rece_award\"]=false,[\"west_config\"]={[\"max_publish_book\"]=3,[\"stop_book_count\"]=3,[\"next_stop_book_cd\"]=60,[\"flush_stop_cd_gold\"]=10,[\"grade_book_max_count\"]=5,[\"book_worth_config\"]={[1]={[\"contribute\"]=10,[\"crash_card\"]=1,[\"union_money\"]=100},[2]={[\"contribute\"]=20,[\"crash_card\"]=2,[\"union_money\"]=200},[3]={[\"contribute\"]=30,[\"crash_card\"]=3,[\"union_money\"]=300},[4]={[\"contribute\"]=40,[\"crash_card\"]=4,[\"union_money\"]=400},[5]={[\"contribute\"]=50,[\"crash_card\"]=5,[\"union_money\"]=500}}}}}"
+              }
+            },
+            {
+              "message_id": 2998,
+              "data": {
+                "serial_num": 200007,
+                "id": 82,
+                "data": "{[\"event_id\"]=7,[\"result\"]=1,[\"role_id\"]=787680729}",
+                "parsed_data": {
+                  "event_id": 7,
+                  "result": 1,
+                  "role_id": 787680729
+                }
+              }
+            },
+            {
+              "message_id": 2998,
+              "data": {
+                "serial_num": 200008,
+                "id": 82,
+                "data": "{[\"event_id\"]=7,[\"result\"]=1,[\"role_id\"]=774958062}",
+                "parsed_data": {
+                  "event_id": 7,
+                  "result": 1,
+                  "role_id": 774958062
+                }
+              }
+            },
+            {
+              "message_id": 2998,
+              "data": {
+                "serial_num": 200009,
+                "id": 82,
+                "data": "{[\"event_id\"]=7,[\"result\"]=1,[\"role_id\"]=750607158}",
+                "parsed_data": {
+                  "event_id": 7,
+                  "result": 1,
+                  "role_id": 750607158
+                }
+              }
+            },
+            {
+              "message_id": 2998,
+              "data": {
+                "serial_num": 200010,
+                "id": 82,
+                "data": "{[\"event_id\"]=7,[\"result\"]=1,[\"role_id\"]=775963831}",
+                "parsed_data": {
+                  "event_id": 7,
+                  "result": 1,
+                  "role_id": 775963831
+                }
+              }
+            },
+            {
+              "message_id": 1106,
+              "data": {
+                "serial_num": 200011,
+                "req_serial_num": 10001
+              }
+            }
+          ]
+        }
+      ],
+      "message_id": 1051,
+      "request": {
+        "serial_num": 10002,
+        "item_type": 1029,
+        "item_id": 3.0,
+        "item_count": 1,
+        "des_type": 1,
+        "des_id": 0
+      },
+      "response": [
+        {
+          "message_id": 1032,
+          "data": {
+            "serial_num": 200012,
+            "id": 3.0,
+            "unit_type": 5,
+            "attr_count": 1,
+            "attr_list": [
+              {
+                "type": 102,
+                "value": 1
+              }
+            ]
+          }
+        },
+        {
+          "message_id": 1034,
+          "data": {
+            "serial_num": 200013,
+            "first_send": true,
+            "cortege_count": 1,
+            "cortege_list": [
+              {
+                "id": 1.0,
+                "order": 1,
+                "cheer_order": 0,
+                "type": 5004,
+                "level": 1,
+                "cur_exp": 0.0,
+                "next_exp": 132.0,
+                "hp": 475,
+                "magic": 133,
+                "gongji": 195,
+                "fangyu": 124,
+                "combat_power": 1189,
+                "culture_point": 0,
+                "hp_plus": 0,
+                "magic_plus": 0,
+                "gongji_plus": 0,
+                "fangyu_plus": 0,
+                "train_increase_field": 0,
+                "train_decrease_field": 0,
+                "train_change_value": 0,
+                "evolve_level": 0,
+                "equiped_ext_skill_limit": 1,
+                "equiped_ext_star_limit": 0,
+                "next_ext_skill_luck_point": 0,
+                "reborn_layer": 0,
+                "reborn_vein_level": 0,
+                "reborn_plus_type": 1
+              }
+            ]
+          }
+        },
+        {
+          "message_id": 1035,
+          "data": {
+            "serial_num": 200014,
+            "first_send": true,
+            "attach_count": 2,
+            "attach_list": [
+              {
+                "id": 2.0,
+                "attach_type": 6,
+                "type_id": 209,
+                "count": 0,
+                "level": 1,
+                "equip_order": 1,
+                "equip_pos": 1,
+                "protogenic": 1,
+                "effect_value": 112,
+                "drill_count": 0,
+                "stone1_level": 0,
+                "stone2_level": 0,
+                "stone3_level": 0,
+                "stone4_level": 0,
+                "prob_compen": 0,
+                "advance_level": 0,
+                "star_count": 0,
+                "cur_spirit_count": 0,
+                "ext_skill_pos": 0,
+                "ext_awaken_pos": 0,
+                "upgrade_level": 0,
+                "reborn_bit": 0,
+                "cast_level": 0,
+                "awaken": 0,
+                "is_lock": 0,
+                "absorb_rate": 0,
+                "shield_rate": 0,
+                "owner_id": 1.0,
+                "star_level": 0
+              },
+              {
+                "id": 3.0,
+                "attach_type": 5,
+                "type_id": 1029,
+                "count": 1,
+                "level": 1,
+                "equip_order": 0,
+                "equip_pos": 0,
+                "protogenic": 0,
+                "effect_value": 0,
+                "drill_count": 0,
+                "stone1_level": 0,
+                "stone2_level": 0,
+                "stone3_level": 0,
+                "stone4_level": 0,
+                "prob_compen": 0,
+                "advance_level": 0,
+                "star_count": 0,
+                "cur_spirit_count": 0,
+                "ext_skill_pos": 0,
+                "ext_awaken_pos": 0,
+                "upgrade_level": 0,
+                "reborn_bit": 0,
+                "cast_level": 0,
+                "awaken": 0,
+                "is_lock": 0,
+                "absorb_rate": 0,
+                "shield_rate": 0,
+                "owner_id": 0.0,
+                "star_level": 0
+              }
+            ]
+          }
+        },
+        {
+          "message_id": 1032,
+          "data": {
+            "serial_num": 200015,
+            "id": 1.0,
+            "unit_type": 1,
+            "attr_count": 20,
+            "attr_list": [
+              {
+                "type": 141,
+                "value": 0
+              },
+              {
+                "type": 143,
+                "value": 0
+              },
+              {
+                "type": 7,
+                "value": 1000
+              },
+              {
+                "type": 8,
+                "value": 99500
+              },
+              {
+                "type": 101,
+                "value": 0
+              },
+              {
+                "type": 102,
+                "value": 10
+              },
+              {
+                "type": 144,
+                "value": 2
+              },
+              {
+                "type": 145,
+                "value": 1
+              },
+              {
+                "type": 146,
+                "value": 100
+              },
+              {
+                "type": 148,
+                "value": 100
+              },
+              {
+                "type": 147,
+                "value": 1793116800
+              },
+              {
+                "type": 151,
+                "value": 0
+              },
+              {
+                "type": 152,
+                "value": 0
+              },
+              {
+                "type": 153,
+                "value": 0
+              },
+              {
+                "type": 154,
+                "value": 0
+              },
+              {
+                "type": 155,
+                "value": 0
+              },
+              {
+                "type": 156,
+                "value": 0
+              },
+              {
+                "type": 157,
+                "value": 0
+              },
+              {
+                "type": 158,
+                "value": 0
+              },
+              {
+                "type": 159,
+                "value": 0
+              }
+            ]
+          }
+        },
+        {
+          "message_id": 2998,
+          "data": {
+            "serial_num": 200016,
+            "id": 198,
+            "data": "{[\"id\"]=3,[\"has_prize\"]=false}",
+            "parsed_data": {
+              "id": 3,
+              "has_prize": false
+            }
+          }
+        },
+        {
+          "message_id": 2998,
+          "data": {
+            "serial_num": 200017,
+            "id": 21,
+            "data": "{[\"result\"]=1,[\"type_id\"]=1029,[\"count\"]=1,[\"effect_value\"]=100}",
+            "parsed_data": {
+              "result": 1,
+              "type_id": 1029,
+              "count": 1,
+              "effect_value": 100
+            }
+          }
+        },
+        {
+          "message_id": 1106,
+          "data": {
+            "serial_num": 200018,
+            "req_serial_num": 10002
+          }
+        }
+      ],
+      "emitted": [
+        {
+          "event": "game_request",
+          "message_id": 1051,
+          "bytes": 39,
+          "authenticated": true
+        },
+        {
+          "event": "game_guild_ok",
+          "operation": null,
+          "rules_revision": "guild-access-2026-10-26"
+        }
+      ],
+      "before": {
+        "role_sha256": "56ea693f5ac4dc4a45cfb5b9416112b9b687d0daa352f6f35a3c1d18a2b051db",
+        "items": [
+          {
+            "id": 3.0,
+            "attach_type": 5,
+            "type_id": 1029,
+            "level": 1,
+            "count": 2
+          }
+        ],
+        "resources": {
+          "strength": 0,
+          "silver_coin": 1000,
+          "gold_coin": 99500,
+          "charge_gold": 0,
+          "vip_level": 1,
+          "union_id": 2,
+          "union_contrib": 0,
+          "cur_union_contrib": 0
+        },
+        "achievement_totals": {
+          "111": 0,
+          "112": 0,
+          "113": 0,
+          "114": 0,
+          "117": 0
+        },
+        "companion": {
+          "id": 1.0,
+          "type": 5004,
+          "level": 1,
+          "cur_exp": 0
+        }
+      },
+      "after": {
+        "role_sha256": "43712bb6fa3b56075cfd55d9094b7666b145069511d70af6b2e143bc618b9364",
+        "items": [
+          {
+            "id": 3.0,
+            "attach_type": 5,
+            "type_id": 1029,
+            "level": 1,
+            "count": 1
+          }
+        ],
+        "resources": {
+          "strength": 0,
+          "silver_coin": 1000,
+          "gold_coin": 99500,
+          "charge_gold": 0,
+          "vip_level": 1,
+          "union_id": 2,
+          "union_contrib": 100,
+          "cur_union_contrib": 100
+        },
+        "achievement_totals": {
+          "111": 0,
+          "112": 0,
+          "113": 0,
+          "114": 0,
+          "117": 0
+        },
+        "companion": {
+          "id": 1.0,
+          "type": 5004,
+          "level": 1,
+          "cur_exp": 0
+        }
+      },
+      "role_unchanged": false
+    }
+  ]
+}

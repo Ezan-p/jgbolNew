@@ -5,6 +5,26 @@ local saved={player=ms.d_mainUI.g_playerInfo,config=ms.d_data.g_new_config,guild
  send=ms.d_u.main_server_send_msg,dispatch=ms.d_event_mgr.g_msg_fun,report=ms.MS_report_error,time=ms.d_time.getTime,
  menu=ms.d_u.createMenu,obtain=ms.d_petUI.getPetObtainLayer,act=ms.d_fightUI.actFight,patched=ms._localGuildPetRestore~=nil}
 local function shallow(t) local c={};for k,v in pairs(t or {}) do c[k]=v end;return c end
+local patchedFunctions={}
+for _,entry in ipairs({{ui,'onGetResult'},{ms.d_fightUI,'showFightEnd'},{ms.d_fightUI,'menuHome_private'},
+ {ms.d_petHomeUI,'GetResultInsidePetInfo'},{ms.d_petHomeUI,'createShiLianLayer'},{ms.d_petHomeUI,'GetResultPrize'},
+ {ms,'_localGuildPetRestore'}}) do patchedFunctions[#patchedFunctions+1]={entry[1],entry[2],entry[1][entry[2]]} end
+local mapShow=ms.d_mapUI.show;local mapCalls=0
+ms.d_mapUI.show=function(...) mapCalls=mapCalls+1;return mapShow(...) end
+local taskFinish=ui.showTaskFinish;local taskRewards={};local rewardCount=0
+ui.showTaskFinish=function(parent,kind,won,...)
+ taskRewards[#taskRewards+1]={won=won,parent=parent or ui.g_pethuntUI.main_layer}
+ return taskFinish(parent,kind,won,...)
+end
+local getItems=ms.d_messageUI.createGetItemsLayer;local rewardParent
+ms.d_messageUI.createGetItemsLayer=function(parent,...)
+ rewardParent=parent;return getItems(parent,...)
+end
+local properties=ms.d_u.setProperties;local timers={};local trialButtons={}
+ms.d_u.setProperties=function(parent,node,options,...)
+ if options.y==0.78 and (options.x==0.7 or options.x==0.75) then timers[#timers+1]=node end
+ return properties(parent,node,options,...)
+end
 local sends={};local taps={};local battles={};local obtainClose;local obtainLayer;local battleReturn
 ui.g_self={};ui.g_data={};ui.g_pethuntUI={};ms.d_petHomeUI.g_self=shallow(saved.home);ms.d_petHomeUI.g_data={}
 ms.d_mainUI.g_playerInfo=ms.d_c.table_copy(saved.player);ms.d_data.g_new_config=ms.d_c.table_copy(saved.config)
@@ -21,6 +41,7 @@ ms.d_u.createMenu=function(options,...)
   if type(row)=='table' and type(row.call_back)=='function' then
    taps[debug.getinfo(row.call_back,'S').linedefined]=row.call_back
    if row.npic=='v2/fightUI/return1.png' then battleReturn=row.call_back end
+   if row.npic then trialButtons[row.npic]=row.call_back end
   end
  end
  return saved.menu(options,...)
@@ -33,7 +54,9 @@ ms.d_fightUI.actFight=function(replay,kind)
  battles[#battles+1]={kind=kind,replay=replay}
 end
 function guildPetRestore()
- if not saved.patched and ms._localGuildPetRestore then ms._localGuildPetRestore() end
+ if ms._localGuildPetRestore then ms._localGuildPetRestore() end
+ for _,entry in ipairs(patchedFunctions) do entry[1][entry[2]]=entry[3] end
+ ms.d_mapUI.show=mapShow;ui.showTaskFinish=taskFinish;ms.d_messageUI.createGetItemsLayer=getItems;ms.d_u.setProperties=properties
  ms.d_u.createMenu=saved.menu;ms.d_petUI.getPetObtainLayer=saved.obtain;ms.d_fightUI.actFight=saved.act
  ms.d_time.getTime=saved.time;ms.d_u.main_server_send_msg=saved.send;ms.d_event_mgr.g_msg_fun=saved.dispatch;ms.MS_report_error=saved.report
  ms.d_event_mgr.setSpecialFightType(0)
@@ -42,6 +65,7 @@ function guildPetRestore()
  ui.g_self=saved.self;ui.g_data=saved.data;ui.g_pethuntUI=saved.panels;ms.d_petHomeUI.g_self=saved.home;ms.d_petHomeUI.g_data=saved.homeData
  guildPetRestore=nil
 end
+if ms._localGuildPetRestore then ms._localGuildPetRestore() end
 -- __PET_PATCH__
 local function apply(name)
  for _,row in ipairs(f[name]) do
@@ -112,7 +136,7 @@ end)
 step('real_task_battle_animation',function()
  ms.d_event_mgr.setSpecialFightType(0)
  ms.d_fightUI.actFight=saved.act
- battleReturn=nil
+ battleReturn=nil;rewardCount=#taskRewards
  apply('challenge')
  assert(ms.d_fightUI.g_fightUI.last_fight_type==28)
 end)
@@ -120,7 +144,50 @@ function guildPetBattleReady() return battleReturn~=nil end
 step('real_task_battle_return_button_and_reward',function()
  assert(#guildPetErrors==0,table.concat(guildPetErrors,'\n'))
  assert(battleReturn)()
- assert(ui.g_pethuntUI.main_layer)
+ assert(mapCalls==0,'battle return opened Journey')
+ assert(ui.g_pethuntUI.main_layer:getParent(),'task page is detached')
+ assert(#taskRewards==rewardCount+1 and taskRewards[#taskRewards].won==2 and taskRewards[#taskRewards].parent:getParent(),'failure settlement popup missing')
  assert(ui.g_data.task_finish.task_type==2)
 end,2)
+step('real_task_win_battle_animation',function()
+ assert(ui.g_pethuntUI.main_layer:isRunning(),'task page did not become active')
+ battleReturn=nil;rewardCount=#taskRewards;apply('challenge_win')
+end)
+step('task_win_reward_on_live_task_page',function()
+ assert(battleReturn)();assert(mapCalls==0)
+ assert(#taskRewards==rewardCount+1 and taskRewards[#taskRewards].won==1,'win reward missing')
+ assert(taskRewards[#taskRewards].parent:getParent())
+end,2)
+step('real_trial_loss_battle_animation',function()
+ assert(ui.g_pethuntUI.main_layer:isRunning(),'winning task page did not become active')
+ battleReturn=nil;apply('trial_fight')
+end)
+step('trial_loss_stays_until_return_then_reopens_trial',function()
+ assert(ms.d_fightUI.g_fightUI.layerFightEnd:isRunning(),'result panel auto-exited')
+ assert(battleReturn)();assert(mapCalls==0)
+ apply('home');sent(79)
+ timers={};trialButtons={};apply('trial_after')
+ assert(ms.d_petHomeUI.g_self.g_Shilian_layer:getParent())
+ assert(#timers==1,'overlapping trial timers')
+ assert(not trialButtons['v2/petHomeUI/pos1.png'],'formation option still present')
+ assert(trialButtons['v2/petHomeUI/challenge1.png'])
+end,2)
+step('real_trial_win_battle_animation',function()
+ assert(ms.d_petHomeUI.g_self.g_Shilian_layer:isRunning(),'trial page did not become active')
+ battleReturn=nil;apply('trial_win')
+end)
+step('trial_win_return_claim_and_continue',function()
+ assert(ms.d_fightUI.g_fightUI.layerFightEnd:isRunning())
+ assert(battleReturn)();apply('home');sent(79);apply('trial_reward_ready')
+ trialButtons={};rewardParent=nil;timers={};apply('trial_claim')
+ assert(rewardParent==ms.d_petHomeUI.g_self.g_Shilian_layer and rewardParent:getParent(),'reward popup lost during rebuild')
+ assert(ms.d_petHomeUI.g_self.g_data.result==1 and ms.d_petHomeUI.g_self.g_data.boss_layer==2)
+ assert(#timers==1 and not trialButtons['v2/petHomeUI/pos1.png'])
+ assert(trialButtons['v2/petHomeUI/challenge1.png'],'next challenge missing')()
+ sent(80)
+ assert(#guildPetErrors==0,table.concat(guildPetErrors,'\n'))
+end,2)
+step('claimed_trial_page_remains_active',function()
+ assert(ms.d_petHomeUI.g_self.g_Shilian_layer:isRunning());assert(rewardParent:isRunning())
+end)
 return 'ready'

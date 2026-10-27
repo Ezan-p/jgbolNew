@@ -603,7 +603,7 @@ class Backend:
             return self.redeem_gift_code(packet, data)
         if vip.handles(mid, data) or mid == 1336 or mid == 1051 and data['item_type'] == 1249:
             return self.vips(packet, mid, data)
-        if mid in guild.HANDLED or mid == 1026 and data['fight_type'] in guild.FIGHTS or mid == 1097 and data['channel'] == 6 or mid == 1051 and data['item_type'] in (1120,1121):
+        if mid in guild.HANDLED or mid == 1026 and data['fight_type'] in guild.FIGHTS or mid == 1097 and data['channel'] == 6 or mid == 1051 and data['item_type'] in (1029,1120,1121):
             return self.guilds(packet, mid, data)
         if mid in daily.HANDLED:
             return self.dailies(packet, mid, data)
@@ -613,7 +613,7 @@ class Backend:
                 or (mid == 1059 and data['flag'] == 3)
                 or (mid == 1201 and data['flag'] in (1, 2))):
             return self.activities(packet, mid, data)
-        if (mid in journey.HANDLED or (mid == 1051 and data['item_type'] in (1022, 1023))
+        if (mid in journey.HANDLED or (mid == 1051 and data['item_type'] in (1020, 1022, 1023))
                 or (mid == 2998 and data['id'] == 3)):
             return self.journeys(packet, mid, data)
         if mid == 1094:
@@ -780,6 +780,8 @@ class Backend:
                 events = guild_combat.fight(role, data, now, self.guild_rules, self.journey_rules)
             elif mid == 1097:
                 events = guild.chat(role, data['chat_msg'], now, self.guild_rules)
+            elif mid == 1051 and data['item_type'] == 1029:
+                events = guild.use_contribution_token(role, data, now, self.guild_rules)
             elif mid == 1051:
                 from . import guild_feast
                 events = guild_feast.open_box(role, data, now, self.guild_rules)

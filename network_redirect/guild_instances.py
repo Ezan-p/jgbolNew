@@ -280,7 +280,8 @@ def settle(role,s,g,op,d,now,r):
         a['train_claimed_stage']=stage;a['train_claimed']=stage==4;a['reputation']+=10*count;a['lucky_bonus']=a.get('lucky_bonus',0)+count
         a['week_score']=a.get('week_score',0)+10*count;a['total_reputation']=a.get('total_reputation',0)+10*count
         money=offline.funds(g,100*count,r)
-        return [u.reply(op,dict(result=1,prize_list=prizes,add_reputation=10*count,add_union_gold=money,add_catch_count=count))]
+        return [u.reply(op,dict(result=1,prize_list=prizes,add_reputation=10*count,add_union_gold=money,add_catch_count=count,
+            trial_state=train_info(role,a,g,now,r)))]
     if op==94:return [catch_update(a,role,None,now)]
     if op==88:return [u.reply(op,inside(a,now,r,g))]
     if op==89:

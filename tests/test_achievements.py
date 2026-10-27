@@ -155,6 +155,110 @@ class AchievementTests(unittest.TestCase):
         self.b.save(role)
         self.assertFalse(a.simulate(self.b.profile(), 101, 1, 'fixture:101', NOW))
 
+    def assert_completion_update(self, out, ident):
+        role = self.b.profile()
+        expected = dict(id=ident, times=1, progress=1)
+        self.assertEqual(self.row(role, ident), expected)
+        update = next(d for m, d in out if m == 1066)
+        self.assertEqual(update['new'], 1)
+        self.assertIn(expected, update['achievements'])
+        self.assertEqual(update['tao_point'], role['tao_point'])
+        attributes = [v for m, d in out if m == 1032 for v in d['attr_list'] if v['type'] == 27]
+        self.assertEqual(attributes, [dict(type=27, value=role['tao_point'])])
+        self.assertEqual(self.b.respond(self.packet, dict(authenticated=True)), self.replies)
+        self.assertEqual(self.b.profile(), role)
+        other = Backend(Path(self.tmp.name), 18770, lambda *x, **k: None)
+        try:
+            self.assertEqual(self.row(other.profile(), ident), expected)
+            self.assertEqual(other.profile()['tao_point'], role['tao_point'])
+        finally:
+            other.close()
+
+    def test_soul_revival_success_failure_replay_and_restart(self):
+        tid = 5005
+        role = self.b.profile()
+        need = f.COMPOSE[int(f.BASES[tid]['quality'])]
+        role.setdefault('souls', {})[str(tid)] = need - 1
+        self.b.save(role)
+        before = self.b.profile()
+        self.request(1083, type_id=tid)
+        self.assertEqual(self.b.profile(), before)
+        role['souls'][str(tid)] = need
+        self.b.save(role)
+        out = self.request(1083, type_id=tid)
+        self.assert_completion_update(out, 119)
+        role = self.b.profile()
+        self.assertEqual(role['souls'][str(tid)], 0)
+        self.assertTrue(any(c['type'] == tid for c in role['corteges']))
+        self.request(1083, type_id=tid)
+        self.assertEqual(self.b.profile(), role)
+
+    def test_revival_requires_consumed_souls_and_new_companion(self):
+        role = self.b.profile()
+        role.setdefault('souls', {})['5005'] = 40
+        before = copy.deepcopy(role)
+        role['corteges'].append(summon.companion(role, 5005))
+        a.track(role, before, 1083, dict(type_id=5005), NOW)
+        self.assertEqual(self.row(role, 119)['times'], 0)
+        before = copy.deepcopy(role)
+        role['souls']['5005'] = 0
+        a.track(role, before, 1083, dict(type_id=5005), NOW)
+        self.assertEqual(self.row(role, 119)['times'], 0)
+
+    def setup_treasure(self):
+        role = self.b.profile()
+        role.update(level=60, gold_coin=100000, silver_coin=100000)
+        self.b.save(role)
+        self.request(1301, id=1, data=summon.lua(dict(union_name='成就测试仙盟')))
+
+    def test_treasure_search_update_replay_restart_and_cap(self):
+        self.setup_treasure()
+        out = self.request(1301, id=43, data=summon.lua(dict(flag=2)))
+        self.assert_completion_update(out, 139)
+        role = self.b.profile()
+        self.assertEqual(role['guild']['instances']['search'], 1)
+        self.assertEqual(role['guild']['instances']['points'], 10)
+        tao = role['tao_point']
+        self.request(1301, id=43, data=summon.lua(dict(flag=6)))
+        self.assertEqual(self.row(self.b.profile(), 139)['times'], 1)
+        self.assertEqual(self.b.profile()['tao_point'], tao)
+        before = self.b.profile()
+        self.request(1301, id=43, data=summon.lua(dict(flag=2)))
+        self.assertEqual(self.b.profile(), before)
+
+    def test_treasure_queries_points_and_failed_sweep_do_not_award(self):
+        self.setup_treasure()
+        for flag in (1, 3):
+            self.request(1301, id=43, data=summon.lua(dict(flag=flag)))
+            self.assertEqual(self.row(self.b.profile(), 139)['times'], 0)
+        role = self.b.profile()
+        summon.add_item(role, 1035, 1)
+        self.b.save(role)
+        self.request(1301, id=43, data=summon.lua(dict(flag=5, index=1)))
+        self.assertEqual(self.row(self.b.profile(), 139)['times'], 0)
+        role = self.b.profile(); role['gold_coin'] = 0; self.b.save(role)
+        before = self.b.profile()
+        self.request(1301, id=43, data=summon.lua(dict(flag=6)))
+        self.assertEqual(self.b.profile(), before)
+
+    def test_treasure_first_sweep_completes(self):
+        self.setup_treasure()
+        out = self.request(1301, id=43, data=summon.lua(dict(flag=6)))
+        self.assert_completion_update(out, 139)
+        self.assertEqual(self.b.profile()['guild']['instances']['search'], self.b.guild_rules['search_daily'])
+
+    def test_treasure_first_search_after_daily_reset(self):
+        self.setup_treasure()
+        self.request(1301, id=43, data=summon.lua(dict(flag=1)))
+        role = self.b.profile()
+        role['guild']['instances']['search'] = self.b.guild_rules['search_daily']
+        self.b.save(role)
+        self.assertEqual(self.row(self.b.profile(), 139)['times'], 0)
+        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+            out = self.request(1301, id=43, data=summon.lua(dict(flag=2)))
+            self.assert_completion_update(out, 139)
+            self.assertEqual(self.b.profile()['guild']['instances']['search'], 1)
+
     def test_failed_results_and_query_events_do_not_award(self):
         role = self.b.profile(); before = copy.deepcopy(role)
         a.record_events(role, [summon.event(43, dict(feed_result=4)), summon.event(40, dict(update_type=1))], NOW, login_fields)

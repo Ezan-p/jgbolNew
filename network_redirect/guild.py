@@ -132,6 +132,25 @@ def contribution(role,n):
     return n
 
 
+def use_contribution_token(role, req, now, rules):
+    """[A] Native 1029 use: guild membership, 1..15 tokens, 100 each."""
+    _, current = prepare(role, now, rules)
+    require(current is not None and str(int(role['role_id'])) in current['members'], '请先加入仙盟再使用贡献令')
+    count = req['item_count']
+    require(req['item_type'] == 1029 and type(count) is int and 1 <= count <= 15, '贡献令使用数量须为1至15')
+    require(req['des_type'] == 1 and req['des_id'] in (0, role['role_id']), '贡献令使用目标无效')
+    item = formation.lookup(role, 'attachments', req['item_id'])
+    require(item['attach_type'] == 5 and item['type_id'] == 1029 and item['count'] >= count
+            and not item.get('is_lock'), '贡献令不足或已锁定')
+    # [B] Fixed item effect; no feast multiplier, guild money or popularity.
+    gain = contribution(role, int(formation.ITEMS[1029]['contrib_plus']) * count)
+    item['count'] -= count
+    if not item['count']:
+        role['attachments'].remove(item)
+    # guilds() prepares again to sync the member row and sends attrs 146/148.
+    return [summon.event(21, dict(result=1, type_id=1029, count=count, effect_value=gain))]
+
+
 def reply(op,data):return encode(1301,dict(id=op,data=summon.lua(data)))
 def notice(op,**data):return summon.event(82,dict(event_id=op,result=1,**data))
 

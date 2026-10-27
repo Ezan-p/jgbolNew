@@ -38,7 +38,8 @@ class Battle:
         self.rules['multi_target_limit'] = self.rules['formation_target_limits'].get(str(slots), self.rules['multi_target_limit'])
         self.policy = self.rules['mechanics']
         self.slots = slots
-        self.limit = min(max_actions or self.rules['max_actions'], self.rules['max_actions'])
+        self.limit = min(self.rules['max_actions'] if max_actions is None else max_actions,
+                         self.rules['max_actions'])
         self.actions = Actions()
         self.round = 0
         self.event_bytes = 0
@@ -149,9 +150,8 @@ class Battle:
         if len(self.actions) >= self.limit:
             self.actions.stop_reason = 'action_limit'
             return False
-        if self.event_bytes >= self.policy['event_budget_bytes']:
-            self.actions.stop_reason = 'event_budget'
-            return False
+        # Event bytes bound transmission chunks, never the simulated fight.
+        # A few heals can fill one chunk while both armies are still alive.
         return True
 
     def logic(self, unit, kind):

@@ -81,7 +81,10 @@ class SpiritLandTests(unittest.TestCase):
             self.assertEqual(len(data['fight_result_list']),1)
             info=self.req(79)[0];self.assertEqual(info['result'],58)
             self.assertEqual(info['cleared_layer'],floor);self.assertEqual(info['boss_layer'],min(4,floor+1))
-            self.assertEqual(self.req(82)[0]['add_catch_count'],1)
+            claim=self.req(82)[0]
+            self.assertEqual(claim['add_catch_count'],1)
+            self.assertEqual(claim['trial_state'],self.req(79)[0])
+            self.assertEqual(claim['trial_state']['result'],54 if floor==4 else 1)
             before=self.b.profile();self.req(82,ok=False);self.assertEqual(self.b.profile(),before)
         self.assertEqual(self.req(79)[0]['result'],54)
         before=self.b.profile();self.req(80,ok=False);self.assertEqual(self.b.profile(),before)

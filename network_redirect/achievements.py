@@ -219,6 +219,12 @@ def track(role, before, mid, req, now):
     if not before: refresh(role, now); return
     old_items = {x['id']: x for x in before.get('attachments', [])}
     old_corts = {x['id']: x for x in before.get('corteges', [])}
+    if mid == 1083:
+        tid = req.get('type_id')
+        # Owning a companion alone does not prove that it came from soul revival.
+        if (before.get('souls', {}).get(str(tid), 0) > role.get('souls', {}).get(str(tid), 0)
+                and any(c['type'] == tid and c['id'] not in old_corts for c in role.get('corteges', []))):
+            add(role, 119)
     for x in role.get('attachments', []):
         old = old_items.get(x['id'])
         if not old: continue
@@ -261,6 +267,12 @@ def track(role, before, mid, req, now):
     if mid == 1301:
         donation = role.get('guild', {}).get('donations', 0) - before.get('guild', {}).get('donations', 0)
         if donation >= 100: add(role, 137)
+        if req.get('id') == 43:
+            search = role.get('guild', {}).get('instances', {})
+            oldsearch = before.get('guild', {}).get('instances', {})
+            # Search counts reset daily; both single searches and sweeps count.
+            previous = oldsearch.get('search', 0) if search.get('day') == oldsearch.get('day') else 0
+            if search.get('search', 0) > previous: add(role, 139)
     escort, oldescort = role.get('guild', {}).get('escort', {}), before.get('guild', {}).get('escort', {})
     active, oldactive = escort.get('active'), oldescort.get('active')
     if active and not oldactive and active['book']['book_level'] >= 4: add(role, 128)

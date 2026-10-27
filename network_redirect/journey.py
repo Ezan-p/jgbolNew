@@ -369,26 +369,33 @@ def attempt(role, kind, gid, cfg, result, now, rules, formation_rules, activity_
 
 def resource_item(role, req, now, rules, buy=False):
     tid = req['type_id'] if buy else req['item_type']
-    require(tid in (1022, 1023), '仅支持包子、仙丹')
-    key = 'strength' if tid == 1022 else 'energy'
+    require(tid in ((1022, 1023) if buy else (1020, 1022, 1023)), '恢复道具类型无效')
+    key = 'energy' if tid == 1023 else 'strength'
     count_key, time_key = key + '_item_count', key + '_item_time'
-    require(role[count_key] < role[key + '_item_limit'], '今日使用次数已达上限')
+    # [B] Small buns are inventory-only supplements, separate from the daily
+    # 1022 purchase/use quota and its achievement counter. Native UI uses one.
+    if tid != 1020:
+        require(role[count_key] < role[key + '_item_limit'], '今日使用次数已达上限')
     if buy:
         index = role[count_key] + 1
         price = int(ITEM_PRICE[index]['price'])
         require(role['gold_coin'] >= price, '元宝不足')
         role['gold_coin'] -= price
     else:
-        require(req['des_type'] == 1 and req['des_id'] in (0, role['role_id']) and req['item_count'] in (0, 1), '包子使用参数无效')
+        counts = (1,) if tid == 1020 else (0, 1)
+        require(req['des_type'] == 1 and req['des_id'] in (0, role['role_id']) and req['item_count'] in counts, '恢复道具使用参数无效')
         item = formation.lookup(role, 'attachments', req['item_id'])
         require(item['attach_type'] == 5 and item['type_id'] == tid and item['count'] >= 1 and not item.get('is_lock'), '物品不足或已锁定')
         item['count'] -= 1
         if not item['count']:
             role['attachments'].remove(item)
-    role[key] += int(formation.ITEMS[tid][key + '_plus'])
-    role[count_key] += 1
-    role[time_key] = now
-    return [summon.event(21, dict(result=1, type_id=tid, count=1))]
+    gain = int(formation.ITEMS[tid][key + '_plus'])
+    role[key] += gain
+    if tid != 1020:
+        role[count_key] += 1
+        role[time_key] = now
+    # [A] commonLayerUI.recvUsedItem formats effect_value for all three items.
+    return [summon.event(21, dict(result=1, type_id=tid, count=1, effect_value=gain))]
 
 
 def settle(role, mid, req, now, rules, formation_rules, activity_rules=None):

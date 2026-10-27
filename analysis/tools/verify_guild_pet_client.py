@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[2]
 sys.path[:0]=[str(ROOT),str(ROOT/'analysis/tools')]
-from network_redirect import summon, guild
+from network_redirect import summon, guild, journey
 from network_redirect.backend import Backend, login_fields
 from network_redirect.protocol import encode, decode
 from verify_guild_client import LUA_EVALUATOR
@@ -32,7 +32,17 @@ def fixtures():
             role=b.profile();role['guild']['unions']['2']['popularity']=4000;b.save(role)
             req('accept',5,role_list=list(map(int,role['guild']['unions']['2']['applications'])))
             req('info',18,query_type=1);req('tasks',83)
-            req('challenge',84,task_index=1,task_type=2,pay_type=1)
+            fighters=journey.fighters
+            def army(strong):
+                def build(*args,**kwargs):
+                    armies=fighters(*args,**kwargs)
+                    if args[0]['role_id']==role['role_id']:
+                        strength=10000000 if strong else 1
+                        for unit in armies[0]:unit.update(hp=strength,max_hp=strength,gongji=strength,fangyu=strength,magic=strength)
+                    return armies
+                return build
+            with patch('network_redirect.journey.fighters',side_effect=army(False)):
+                req('challenge',84,task_index=1,task_type=2,pay_type=1)
             # The capture cases need an earned encounter independently of battle outcome.
             req('puzzle',84,task_index=2,task_type=1,pay_type=1)
             req('field',86,two_type=1);req('explore',86,two_type=2)
@@ -43,7 +53,17 @@ def fixtures():
             with patch('network_redirect.guild_offline.roll',side_effect=lambda s,n:n-1):
                 for i in range(1,4):req('failure'+str(i),87,two_type=2,catch_type=1338)
             req('home',88);req('trial',79)
-            req('trial_fight',80);req('trial_after',79)
+            with patch('network_redirect.journey.fighters',side_effect=army(False)):
+                req('trial_fight',80)
+            req('trial_after',79)
+            with patch('network_redirect.journey.fighters',side_effect=army(True)):
+                req('challenge_win',84,task_index=1,task_type=2,pay_type=1)
+                req('trial_win',80)
+            req('trial_reward_ready',79);req('trial_claim',82);req('trial_next',80)
+            for name,won in [('challenge',False),('challenge_win',True),('trial_fight',False),('trial_win',True)]:
+                replay=next(login_fields(row['data']['data'])['fight_result_list'][1] for row in data[name]
+                            if row['mid']==1301 and row['data']['id'] in (80,85))
+                assert (1<=replay['fight_result_msg']['final_result']<=3)==won,name
             role=b.profile()
             data['role']={k:role[k] for k in ('role_id','union_id','union_rank','level','gold_coin','silver_coin')}
             data['config']=guild.client_config(b.guild_rules)
@@ -56,14 +76,21 @@ def fixtures():
 def main():
     import frida
     config=load_config(ROOT/'game.json');pid=next(p for p,n in processes(config).items() if n==config['package'])
-    session=frida.get_device(config['serial'],timeout=10).attach(pid);script=session.create_script(LUA_EVALUATOR);script.load()
-    report={};failure=None
+    evaluator=LUA_EVALUATOR.replace('pending={code,resolve};',
+        "const task={code,resolve};pending=task;setTimeout(()=>{if(pending===task){pending=null;resolve({status:-1,result:'No Lua frame; enter the game before testing'});}},15000);")
+    session=frida.get_device(config['serial'],timeout=10).attach(pid);script=session.create_script(evaluator);script.load()
+    report={};failure=None;started=False
     def evaluate(code):
         answer=script.exports_sync.evaluate(code)
         if answer.get('status')!=0:raise RuntimeError(answer)
         return answer['result']
     try:
+        deadline=time.monotonic()+45
+        while evaluate('local ms=package.loaded.ms;return tostring(ms and ms.d_mainUI and ms.d_mainUI.g_playerInfo and ms.d_mainUI.g_playerInfo.role_id~=nil or false)')!='true':
+            if time.monotonic()>deadline:raise RuntimeError('Enter the game before running the fixture')
+            time.sleep(.5)
         source=fixtures();(ROOT/'.runtime/guild-pet-fixture.lua').write_text(source)
+        started=True
         evaluate(source)
         count=int(evaluate('return tostring(#guildPetCases)'))
         for index in range(1,count+1):
@@ -72,7 +99,7 @@ def main():
             if not row['ok']:break
             deadline=time.monotonic()+row.get('hold',0)
             while time.monotonic()<deadline:time.sleep(.2)
-            if row['name']=='real_task_battle_animation':
+            if row['name'].endswith('_battle_animation'):
                 deadline=time.monotonic()+120
                 while evaluate('return tostring(guildPetBattleReady())')!='true':
                     if time.monotonic()>deadline:raise RuntimeError('native battle did not finish within 120 seconds')
@@ -80,8 +107,13 @@ def main():
         report=login_fields(evaluate('return table.tostring({checks=guildPetResults,errors=guildPetErrors,expected=#guildPetCases})'))
     except Exception as e:failure=str(e)
     finally:
-        try:report['restored']=evaluate("if guildPetRestore then guildPetRestore() end;return 'restored'")=='restored'
-        finally:script.unload();session.detach()
+        try:report['restored']=not started or evaluate("if guildPetRestore then guildPetRestore() end;return 'restored'")=='restored'
+        except Exception as e:
+            report['restored']=False;failure=failure or str(e)
+        finally:
+            for close in (script.unload,session.detach):
+                try:close()
+                except Exception:pass
     checks=list(report.get('checks',{}).values());errors=report.get('errors',{})
     report.update(passed=bool(not failure and report.get('restored') and len(checks)==report.get('expected') and all(c['ok'] for c in checks) and not errors),native_cocos=True,live_account_resources_changed=False)
     if failure:report['failure']=failure

@@ -1,5 +1,5 @@
 {
-  "audit_time": "2026-10-26T14:26:10.434016+08:00",
+  "audit_time": "2026-10-27T10:27:43.903276+08:00",
   "scope": "当前工作区（含未提交文件）；不创建Backend数据库，不读写角色、不连接模拟器或网络",
   "method": "扫描具名Lua中main_server_send_msg后12行、首次CALL前的协议常量；真实Backend.respond分发，业务入口拦截；未路由候选实际落入game_unimplemented。默认零/空编码及少量显式选择器只验证分发，不验收业务或UI。",
   "limitations": [
@@ -8,7 +8,7 @@
     "返回1106或空列表不代表业务完成；旧渠道与关闭活动也计入未路由ID"
   ],
   "direct_send_id_count": 154,
-  "missing_request_count": 43,
+  "missing_request_count": 37,
   "previous_audit_time": "2026-10-25T20:50:12.672744+08:00",
   "previous_missing_count": 59,
   "previous_now_routed_ids": [
@@ -22,12 +22,18 @@
     1088,
     1091,
     1104,
+    1219,
+    1226,
     1227,
+    1243,
     1303,
     1307,
+    1309,
     1310,
     1330,
-    1350
+    1334,
+    1350,
+    1351
   ],
   "newly_found_missing_ids": [],
   "missing_requests": [
@@ -837,45 +843,6 @@
       ]
     },
     {
-      "id": 1219,
-      "name": "msg_week_activity",
-      "client_references": [
-        "analysis/evidence/lua_named/lua/ui/activityUI.lua.txt:5146",
-        "analysis/evidence/lua_named/lua/ui/mondayUI.lua.txt:345",
-        "analysis/evidence/lua_named/lua/ui/mondayUI.lua.txt:494"
-      ],
-      "status": "unhandled",
-      "probes": [
-        {
-          "selectors": {},
-          "logs": [
-            {
-              "kind": "game_request",
-              "message_id": 1219,
-              "bytes": 17,
-              "authenticated": true
-            },
-            {
-              "kind": "game_unimplemented",
-              "message_id": 1219,
-              "message": "尚未实现的业务消息；不返回伪成功"
-            }
-          ],
-          "status": "unhandled",
-          "responses": [
-            {
-              "id": 2998,
-              "data": {
-                "serial_num": 0,
-                "id": 55,
-                "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1219）\"}"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
       "id": 1220,
       "name": "msg_query_activity_info",
       "client_references": [
@@ -1024,88 +991,6 @@
       ]
     },
     {
-      "id": 1226,
-      "name": "msg_hunt_soul",
-      "client_references": [
-        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:1622",
-        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4345",
-        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4366",
-        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4419",
-        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4444",
-        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4465",
-        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4486",
-        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4506",
-        "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4525"
-      ],
-      "status": "unhandled",
-      "probes": [
-        {
-          "selectors": {},
-          "logs": [
-            {
-              "kind": "game_request",
-              "message_id": 1226,
-              "bytes": 23,
-              "authenticated": true
-            },
-            {
-              "kind": "game_unimplemented",
-              "message_id": 1226,
-              "message": "尚未实现的业务消息；不返回伪成功"
-            }
-          ],
-          "status": "unhandled",
-          "responses": [
-            {
-              "id": 2998,
-              "data": {
-                "serial_num": 0,
-                "id": 55,
-                "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1226）\"}"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": 1243,
-      "name": "msg_random_monday_prize",
-      "client_references": [
-        "analysis/evidence/lua_named/lua/ui/mondayUI.lua.txt:511"
-      ],
-      "status": "unhandled",
-      "probes": [
-        {
-          "selectors": {},
-          "logs": [
-            {
-              "kind": "game_request",
-              "message_id": 1243,
-              "bytes": 15,
-              "authenticated": true
-            },
-            {
-              "kind": "game_unimplemented",
-              "message_id": 1243,
-              "message": "尚未实现的业务消息；不返回伪成功"
-            }
-          ],
-          "status": "unhandled",
-          "responses": [
-            {
-              "id": 2998,
-              "data": {
-                "serial_num": 0,
-                "id": 55,
-                "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1243）\"}"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
       "id": 1304,
       "name": "msg_register_real",
       "client_references": [
@@ -1173,43 +1058,6 @@
                 "serial_num": 0,
                 "id": 55,
                 "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1308）\"}"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": 1309,
-      "name": "msg_nine_sky",
-      "client_references": [
-        "analysis/evidence/lua_named/lua/ui/towerUI.lua.txt:77"
-      ],
-      "status": "unhandled",
-      "probes": [
-        {
-          "selectors": {},
-          "logs": [
-            {
-              "kind": "game_request",
-              "message_id": 1309,
-              "bytes": 16,
-              "authenticated": true
-            },
-            {
-              "kind": "game_unimplemented",
-              "message_id": 1309,
-              "message": "尚未实现的业务消息；不返回伪成功"
-            }
-          ],
-          "status": "unhandled",
-          "responses": [
-            {
-              "id": 2998,
-              "data": {
-                "serial_num": 0,
-                "id": 55,
-                "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1309）\"}"
               }
             }
           ]
@@ -1431,48 +1279,6 @@
       ]
     },
     {
-      "id": 1334,
-      "name": "msg_yuanshi_activity",
-      "client_references": [
-        "analysis/evidence/lua_named/lua/ui/twoYearsCelebrateUI.lua.txt:51",
-        "analysis/evidence/lua_named/lua/ui/twoYearsCelebrateUI.lua.txt:315",
-        "analysis/evidence/lua_named/lua/ui/twoYearsCelebrateUI.lua.txt:368",
-        "analysis/evidence/lua_named/lua/ui/twoYearsCelebrateUI.lua.txt:1924",
-        "analysis/evidence/lua_named/lua/ui/twoYearsCelebrateUI.lua.txt:1991",
-        "analysis/evidence/lua_named/lua/ui/twoYearsCelebrateUI.lua.txt:2536"
-      ],
-      "status": "unhandled",
-      "probes": [
-        {
-          "selectors": {},
-          "logs": [
-            {
-              "kind": "game_request",
-              "message_id": 1334,
-              "bytes": 16,
-              "authenticated": true
-            },
-            {
-              "kind": "game_unimplemented",
-              "message_id": 1334,
-              "message": "尚未实现的业务消息；不返回伪成功"
-            }
-          ],
-          "status": "unhandled",
-          "responses": [
-            {
-              "id": 2998,
-              "data": {
-                "serial_num": 0,
-                "id": 55,
-                "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1334）\"}"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
       "id": 1335,
       "name": "msg_world_imperial",
       "client_references": [
@@ -1641,45 +1447,6 @@
                 "serial_num": 0,
                 "id": 55,
                 "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1346）\"}"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": 1351,
-      "name": "msg_rulai_activity",
-      "client_references": [
-        "analysis/evidence/lua_named/lua/ui/turntableUI.lua.txt:251",
-        "analysis/evidence/lua_named/lua/ui/turntableUI.lua.txt:399",
-        "analysis/evidence/lua_named/lua/ui/turntableUI.lua.txt:1266"
-      ],
-      "status": "unhandled",
-      "probes": [
-        {
-          "selectors": {},
-          "logs": [
-            {
-              "kind": "game_request",
-              "message_id": 1351,
-              "bytes": 16,
-              "authenticated": true
-            },
-            {
-              "kind": "game_unimplemented",
-              "message_id": 1351,
-              "message": "尚未实现的业务消息；不返回伪成功"
-            }
-          ],
-          "status": "unhandled",
-          "responses": [
-            {
-              "id": 2998,
-              "data": {
-                "serial_num": 0,
-                "id": 55,
-                "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1351）\"}"
               }
             }
           ]
@@ -4692,7 +4459,7 @@
         "analysis/evidence/lua_named/lua/ui/mondayUI.lua.txt:345",
         "analysis/evidence/lua_named/lua/ui/mondayUI.lua.txt:494"
       ],
-      "status": "unhandled",
+      "status": "has_sampled_route",
       "probes": [
         {
           "selectors": {},
@@ -4702,24 +4469,10 @@
               "message_id": 1219,
               "bytes": 17,
               "authenticated": true
-            },
-            {
-              "kind": "game_unimplemented",
-              "message_id": 1219,
-              "message": "尚未实现的业务消息；不返回伪成功"
             }
           ],
-          "status": "unhandled",
-          "responses": [
-            {
-              "id": 2998,
-              "data": {
-                "serial_num": 0,
-                "id": 55,
-                "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1219）\"}"
-              }
-            }
-          ]
+          "status": "routed_not_executed",
+          "handler": "activities"
         }
       ]
     },
@@ -4908,7 +4661,7 @@
         "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4506",
         "analysis/evidence/lua_named/lua/ui/soulHuntUI.lua.txt:4525"
       ],
-      "status": "unhandled",
+      "status": "has_sampled_route",
       "probes": [
         {
           "selectors": {},
@@ -4918,24 +4671,10 @@
               "message_id": 1226,
               "bytes": 23,
               "authenticated": true
-            },
-            {
-              "kind": "game_unimplemented",
-              "message_id": 1226,
-              "message": "尚未实现的业务消息；不返回伪成功"
             }
           ],
-          "status": "unhandled",
-          "responses": [
-            {
-              "id": 2998,
-              "data": {
-                "serial_num": 0,
-                "id": 55,
-                "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1226）\"}"
-              }
-            }
-          ]
+          "status": "routed_not_executed",
+          "handler": "activities"
         }
       ]
     },
@@ -5175,7 +4914,7 @@
       "client_references": [
         "analysis/evidence/lua_named/lua/ui/mondayUI.lua.txt:511"
       ],
-      "status": "unhandled",
+      "status": "has_sampled_route",
       "probes": [
         {
           "selectors": {},
@@ -5185,24 +4924,10 @@
               "message_id": 1243,
               "bytes": 15,
               "authenticated": true
-            },
-            {
-              "kind": "game_unimplemented",
-              "message_id": 1243,
-              "message": "尚未实现的业务消息；不返回伪成功"
             }
           ],
-          "status": "unhandled",
-          "responses": [
-            {
-              "id": 2998,
-              "data": {
-                "serial_num": 0,
-                "id": 55,
-                "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1243）\"}"
-              }
-            }
-          ]
+          "status": "routed_not_executed",
+          "handler": "activities"
         }
       ]
     },
@@ -5592,7 +5317,7 @@
       "client_references": [
         "analysis/evidence/lua_named/lua/ui/towerUI.lua.txt:77"
       ],
-      "status": "unhandled",
+      "status": "has_sampled_route",
       "probes": [
         {
           "selectors": {},
@@ -5602,24 +5327,10 @@
               "message_id": 1309,
               "bytes": 16,
               "authenticated": true
-            },
-            {
-              "kind": "game_unimplemented",
-              "message_id": 1309,
-              "message": "尚未实现的业务消息；不返回伪成功"
             }
           ],
-          "status": "unhandled",
-          "responses": [
-            {
-              "id": 2998,
-              "data": {
-                "serial_num": 0,
-                "id": 55,
-                "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1309）\"}"
-              }
-            }
-          ]
+          "status": "routed_not_executed",
+          "handler": "activities"
         }
       ]
     },
@@ -6039,7 +5750,7 @@
         "analysis/evidence/lua_named/lua/ui/twoYearsCelebrateUI.lua.txt:1991",
         "analysis/evidence/lua_named/lua/ui/twoYearsCelebrateUI.lua.txt:2536"
       ],
-      "status": "unhandled",
+      "status": "has_sampled_route",
       "probes": [
         {
           "selectors": {},
@@ -6049,24 +5760,10 @@
               "message_id": 1334,
               "bytes": 16,
               "authenticated": true
-            },
-            {
-              "kind": "game_unimplemented",
-              "message_id": 1334,
-              "message": "尚未实现的业务消息；不返回伪成功"
             }
           ],
-          "status": "unhandled",
-          "responses": [
-            {
-              "id": 2998,
-              "data": {
-                "serial_num": 0,
-                "id": 55,
-                "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1334）\"}"
-              }
-            }
-          ]
+          "status": "routed_not_executed",
+          "handler": "activities"
         }
       ]
     },
@@ -6536,7 +6233,7 @@
         "analysis/evidence/lua_named/lua/ui/turntableUI.lua.txt:399",
         "analysis/evidence/lua_named/lua/ui/turntableUI.lua.txt:1266"
       ],
-      "status": "unhandled",
+      "status": "has_sampled_route",
       "probes": [
         {
           "selectors": {},
@@ -6546,24 +6243,10 @@
               "message_id": 1351,
               "bytes": 16,
               "authenticated": true
-            },
-            {
-              "kind": "game_unimplemented",
-              "message_id": 1351,
-              "message": "尚未实现的业务消息；不返回伪成功"
             }
           ],
-          "status": "unhandled",
-          "responses": [
-            {
-              "id": 2998,
-              "data": {
-                "serial_num": 0,
-                "id": 55,
-                "data": "{[\"op_string\"]=\"该功能尚未接入本地服务端（1351）\"}"
-              }
-            }
-          ]
+          "status": "routed_not_executed",
+          "handler": "activities"
         }
       ]
     },
@@ -6866,41 +6549,50 @@
     "analysis/tools/audit_server_integration.py": "8cbcc7154852168e75671135658752c807557f60a33ddf7e7d139a1234ce15fc",
     "network_redirect/__init__.py": "72fc18cd7029757583f45b64e758fd2ba74945c36c8473ff9a8ebc5035491e4c",
     "network_redirect/accounts.py": "ab6835448b9fa9838210ddc441142731ce05fe17ef6a7acce437afa60e8a6f34",
-    "network_redirect/achievements.py": "a30da59276e9c14c6fce3b691debb8f39cfa228f8f21fce2c6f67bd1872cc10a",
-    "network_redirect/activity.py": "4e4a546ce76cec3b5db50c64ef2280ef8624b2dd3cbf1a21605f3c07e7e94891",
+    "network_redirect/achievements.py": "03008a280f365752718e6848a81e306bcb205c72b75075d01781622d6c8c73d6",
+    "network_redirect/activity.py": "462bad1cf6009b18af5a652746b90e4480868c057bbfe1509af38d3df49d5d83",
     "network_redirect/activity_abyss.py": "90648b8583af2663ebfb35ab84f7e01f19d1aec43e9a330caab732fd6e17aa70",
     "network_redirect/activity_abyss_combat.py": "2cb03858360abc2f0a7f9e90f09719854f737ec543d511c35b4fa3ad9b65897f",
     "network_redirect/activity_abyss_npc.py": "0af98e5014aa4da57dd7fb790c84596132e033c1aacd719d269de8cbe1bb743d",
     "network_redirect/activity_abyss_random.py": "d15f03a35c199480e662595f63d7819723d9aca71550615b035368e61f98e304",
-    "network_redirect/activity_arena.py": "80ab489e1c59d6049901a3be4305104070152d00cb0ec82a00ba6eaee929cf88",
+    "network_redirect/activity_arena.py": "9105fe56bc61f0cf1bdef982004ffec4fba20411c3f7db086a8ee7d46544857e",
     "network_redirect/activity_babel.py": "ec5286816277aa0efc80cfd18839337f15ded557f136ae8fcd4cc769aacdc805",
     "network_redirect/activity_babel_npc.py": "5a5afc99b2e6ab79fb445bb1545b9a72cce2982f2032d949db523e4ff0859c34",
     "network_redirect/activity_convert.py": "6c2985bf8d841ab66022a4f08b069777a659c363dcdff6f7b901b95510531fb0",
     "network_redirect/activity_drug.py": "59d71c453248164da6e980766cc6c6583c0cd1e561ebdb1d2a5da844ee79aaca",
     "network_redirect/activity_duty.py": "40b411c9fb94ae8b3c3e03443532b0d2b21091d4bd563f8b7b9f43823033e1ad",
+    "network_redirect/activity_feed.py": "6cb52e63ebb2b8e0fe976cd27383800e82a008d1c295d96a287628d26b2c0e33",
     "network_redirect/activity_fish.py": "95e8d0981b3120b7b3ec814db959088378a7b246ec0527ae08196ac808459f1d",
     "network_redirect/activity_home.py": "941e1447d8bfbf262ae684fb934880e6cb9b9cfc85ffcd2251d19255930c7f35",
     "network_redirect/activity_home_friends.py": "716d8c14334831a22405e74b7542eea7832cce7428f91da6939be36dccf5d359",
     "network_redirect/activity_home_pets.py": "0c1cea94789b74ac3df518721fb995b7e06dd02a9add7c2c63d895015dd48603",
     "network_redirect/activity_home_welfare.py": "9efac884849072cbd633954a94d71dfafded159ce576911a5b0f5020485d7048",
-    "network_redirect/activity_land.py": "a52596dcf8d4964225b3d4e7ce4271cec94a10cc449c7764158df6283bf73ee0",
+    "network_redirect/activity_hunt.py": "c73717b19fffedf8aeb7206f2c81fb307e8793764a2a45efd0460cb2a56cb2bd",
+    "network_redirect/activity_hunt_geometry.py": "1130c008338fae3de375485223c74285f1d6bcb08622bfd88d8bdf544fc59407",
+    "network_redirect/activity_land.py": "8ee3944ae2d87414d470b5ffd7621b46da82698eb3a096a42d35e3f8e65860c3",
     "network_redirect/activity_land_boss.py": "fa8596e6fcce5cf9b5123175dd493d78d716f3a08b1fbec8cb0975c3b926c04d",
     "network_redirect/activity_land_encounters.py": "b1dcd28884567d19b4ddcf3f759892dcbb956334b022152072a97bf24999a8f4",
     "network_redirect/activity_land_npc.py": "2dccbbfa5b8d76d0835fbe8b569c9bbc821c84c84e738c5f17df566ddf199459",
     "network_redirect/activity_land_rewards.py": "fd7098cb5ff885d56df7cb9c9c7f4cf897712d4810adbe260944761284d8a3cd",
     "network_redirect/activity_land_team.py": "529d50579a467f9a9c500c1bd56c97e62ff061101d5237298670b96f42c2cebd",
+    "network_redirect/activity_monday.py": "50be49013f053bbd275da9c4cde8fadcb7b129aaa626455ae7e9450153f4d183",
+    "network_redirect/activity_nine_sky.py": "a001cebee9ed8526a466a4ee40e9f0f086af1bc234377542b960ed2d48609a11",
     "network_redirect/activity_party.py": "256a72ab551631932c6ce190b1de8bb1201e0246dcb49b5307339fe3538873ee",
-    "network_redirect/activity_pavilion.py": "a45ca864b95085bd9c9679e28955e4aeeb3a001096e22a8c6116e60dd87a9551",
+    "network_redirect/activity_pavilion.py": "011a0cf979e17ae573b44de5512b3990b2950efc67bc0f3dc5332e07ab1e7b98",
     "network_redirect/activity_practice.py": "e39a016b30c1043f89ffd1e3e2e41c017ea2dff965b554cd0684a144eb6f7f79",
     "network_redirect/activity_pray.py": "d33508273744f29027235fd284a537221159aed2a486c5dc83b2adaeeebc6676",
     "network_redirect/activity_rank.py": "00d5e7cb06dfa4a60971687b831ac65964eca4a21763226834509d61dd8c4c44",
     "network_redirect/activity_rape.py": "d899c49716b3c71ceb34c3737dfdfbd5681fa60ee19d661e1e4ae8e9055d3e57",
     "network_redirect/activity_rape_npc.py": "a3c19e4bfb8afd0191e1fea8a6bccff1ad04fcc25cc5b2e50d7a8eace6580da1",
+    "network_redirect/activity_rulai.py": "51e52b90fb807ba69175974dd6bd3570250f1b23dcf7812bb8485ce6b82286cc",
     "network_redirect/activity_seasonal.py": "dc0dc403f398b24984151a154f66e72b5c244c2238f9d7ec859d62e474206190",
     "network_redirect/activity_spring.py": "180c758eca19bb2891d8a43650bdab99f8968694d5f94f67b90c81d2b03283c8",
     "network_redirect/activity_treasure.py": "28a2a0d6e935eacf74899eea025451fdc5e02e2b4fe4b043c240966e52f5d07a",
-    "network_redirect/activity_undergo.py": "9146466b03e004482474f2d121092e20469f9c35986dd355db35a839b765a074",
-    "network_redirect/backend.py": "3a12168df4f5594cb92aef10c50cf44c766bfc54a1bb8fa0b51edeb5e42b93c1",
+    "network_redirect/activity_trial.py": "9af76f827e83df1ba2589257762590e88e960d7a9bff4303670dc5d39db430a3",
+    "network_redirect/activity_undergo.py": "883e654f417885311fa13e67047411196c38b661c20d58ec9225d3e84fbd766f",
+    "network_redirect/activity_visit.py": "2ad27c2cf22ec6f44673614f9ea277439ddae767d5c920ba48368449a32aafa3",
+    "network_redirect/activity_yuanshi.py": "7f67a32b7304827671a0f644a648e5ddf3c8ef649788d3031d10d126efb4a1d4",
+    "network_redirect/backend.py": "a89c0e80ab366276ae39975c1fc32d9415177814d4049f553db4d120dc5d832d",
     "network_redirect/cheer.py": "60f507d146aa0d41c61f6f44877987c380eca243de2a0fadfb9aa09fd4a52d37",
     "network_redirect/cli.py": "d66ec08d8478243bcdd5459581f041f5d2ffb399127cd620a6b05a99a4912e15",
     "network_redirect/combat.py": "4325daa9a6b0d8e8577be28db1c857a2541ca45461fee882fd73c9901ada275a",
@@ -6910,25 +6602,30 @@
     "network_redirect/daily.py": "e7bfa17953ba40cbd05355f662fbe3099feceaeee9a61d343e1d684dfba6bdce",
     "network_redirect/duty_balance.py": "d5b9e6e27d7cfbd8a1b1298c88f8f7c592672883b6e27e3aa53182dd96e292fc",
     "network_redirect/equipment.py": "103002018454bf058608b773ac5b9e0148e4b6163544863f6d2e60aeb935cd7f",
-    "network_redirect/equipment_crafting.py": "a91e93b852c9ca4638cbae0ba09cfdd6a1f282479631461a6e7cc275828b1807",
-    "network_redirect/formation.py": "05ed93d9e8e1d311ccda4b43606d64ac0692574d82a329a95da71f9645223e25",
+    "network_redirect/equipment_crafting.py": "3943b60e6171c64f007c5652b6738472bb56df78e7861bda8b7bfa7aae02fc04",
+    "network_redirect/formation.py": "8bfceeafa89f98e41b03cdd54a36d272337b5b0c6bb192727c32ce57b902da76",
     "network_redirect/gift_codes.py": "1aa56d1b44726e961cdda09a4be18bdef860955308244ed18e9b690ee1eb8fcd",
-    "network_redirect/guild.py": "66273c32bfe911d897868b7139c0fdf4e569034956d625a4e18a6df15f4cc7eb",
-    "network_redirect/guild_activities.py": "8643d1f369e470fc8f9fb2e24977a179795a4e3ad4cf503b79ca5177679a53b8",
-    "network_redirect/guild_combat.py": "d568e22b5fa7817729db4bc7e9c75525e6b88b7177eb176a420cedaacaccd7c2",
-    "network_redirect/guild_escort.py": "c49521e7c5f8d8f7faad10f9474ad85f8963e94b6da31754a73aeef94a403aee",
-    "network_redirect/guild_hunt.py": "69f43a42eacda8c332adcfb5cf35b583f946300064851055c939629bdc695ccc",
-    "network_redirect/guild_instances.py": "0c2db3525b347b2120609ca5cb6a4372841a906316a1eb92521ad8525dc30539",
-    "network_redirect/guild_match.py": "441493952b2f0db0ea172689c18fe5c0cc6eb394a464681c6a51cd94b9fb7a66",
-    "network_redirect/guild_offline.py": "bc21c723b884f14932ca6d4f6e0d22c3c6a9d5c77f9811fd547efd7d41d1e7a8",
-    "network_redirect/immortal.py": "d41a2fff74a890883bffc3845907764ece5eefb47edca6bf1b13e005b8de1729",
+    "network_redirect/guild.py": "2123f8c2e72fea75aee0b1d94727cb647db0289935d86958490936155020d407",
+    "network_redirect/guild_activities.py": "8a2654d5c977e768558d540d4a1c7729e4c2c4b203429c465c65ba0c823d2c53",
+    "network_redirect/guild_combat.py": "1d744c0f5dbfc976b4e614ef4d0edcc38cc0c7ed486a31c9bf189d237044f8da",
+    "network_redirect/guild_escort.py": "fcb494fa4da86891f9b640495ce5b7ce5d3083dd43e9b52416d727b37239a72c",
+    "network_redirect/guild_feast.py": "ab18c267abbe0402cdf08a4a587b98f9214dbf1a00140de3fe6123303fed1cc4",
+    "network_redirect/guild_hunt.py": "311e22af1ee17a2138567af6f5ef666bd8df3b07a1383963fb42a7788cd789de",
+    "network_redirect/guild_instances.py": "674f20d28c9954c0a37903f858b04483bac9d050dbe74d359afb39ea1e59cdab",
+    "network_redirect/guild_match.py": "e02c1ec3ca215c6a6ca6c47ac82137d19061cee478a87b54569d42ccfb58ae0e",
+    "network_redirect/guild_npcs.py": "5e92828cf4a05ae15927620f7d7a727663143ae6ac6147ae00f879d8e550978a",
+    "network_redirect/guild_offline.py": "cfd6f9943df91c29108d88eb5cd5d07de3a939e7c6bcbd6452563317bb3665f0",
+    "network_redirect/guild_trial.py": "1e98caaa2fc70ee204f0d9c807719ff4d3203085b524af46951c5613f728a8f1",
+    "network_redirect/immortal.py": "679a4b43b701627dc798dde27bf8d61fb981485b984ee027f6dbaef021d3af1f",
+    "network_redirect/item_rewards.py": "8c71947ddae6f6b6b504a4d6461d4f51c9bd6228a1bacafe0ae331661278d543",
     "network_redirect/item_sale.py": "d7a1318bfde1be965445e23da4cfcc75258439a4c8cc570f35dbca327cf005b8",
-    "network_redirect/journey.py": "9e63ef6aebe13ed524d26d2a833fa1011ba5b10041200f414d33b8d5fa747755",
-    "network_redirect/market.py": "add406a52f5cdb601caf8a0be98a389d37884338aec963eb20a20de260095a24",
-    "network_redirect/monument.py": "98d8ca8c664f5eb5372fab12f9a1ade1445c17535324565c979e69ef3f837188",
+    "network_redirect/journey.py": "ff42bf0dc822442e85c9c6deac133f2637611f21bc0b6cbe8e683e88691f4a0f",
+    "network_redirect/market.py": "970c7b72b6479713fa0ca9907b2a977b9dd45a79ee6d6c448682d75ead2cbfd7",
+    "network_redirect/monument.py": "bb0c925d32f9c663f14f02ed231b36b3719629614f0b506598a60bb845bcb86c",
     "network_redirect/npc_players.py": "68133d9b039e843b6ae3e6b391fb91b7bb268f3cdfae541feda8c0d1c8a2be02",
     "network_redirect/pets.py": "32865ca74c762d16ec132cc776beb583d396cca581f400c0bd878ce2b2c5570d",
     "network_redirect/protocol.py": "4afe49df476c9148e5066dc3f3af6fcf5bac2f2bfa65d2347b7136a44a1038af",
+    "network_redirect/qiankun_bags.py": "fe88759e0384986695141dbe520051fc3d69bde1070f090abd308bd66852b263",
     "network_redirect/reborn.py": "bb3be3119bbd8ef0a7f859b4ba50c527aeb151f33f49e61d5be8658c93bd7927",
     "network_redirect/reborn_stars.py": "801b125fe17ac3c1a16648daf1fe1dae53bd8387d92537b0323d3640aad3c9d8",
     "network_redirect/repair.py": "0f17702efd60780149b86a904566a66b1c5351306cb41476093108690429bdb4",
@@ -6936,11 +6633,12 @@
     "network_redirect/server.py": "a2108884e8adf97ca4c44685e02d93c0381b943ffa6885a7857edf4a8b24f710",
     "network_redirect/skill_insight.py": "294a8d588297f91f78e7e11a4f42d416d1cdf7c6509ca94c48287a843d18e9e0",
     "network_redirect/spirit_array.py": "292a5313c34109fcb3ad556eba7aa7b1613bb1b2eb7e38653fa3b8ab8f32d1f8",
-    "network_redirect/summon.py": "a5edbb3c23fa997e113858a01159399bfe7002e5723a457290cfadf0d33b0145",
+    "network_redirect/summon.py": "a36dceda17df7617b82ca785025d91fa522b01a5bc72a5903e27e14f5eb3e701",
     "network_redirect/system_mail.py": "eb040b077daf42a69e58d952ea9726042d1f8f14daca7879091595cc673d1763",
     "network_redirect/tls.py": "90e8a8eb9f53d3520876a5fb8b0a5579aa2e7a42f86b21297111ea7637d98012",
-    "network_redirect/vip.py": "9588b84661005ece1e5b54fd7760d6d8c1a5eba394a756881b6870d9f5bb7c0e",
+    "network_redirect/vip.py": "d067f11444805f198930cedb8f5f3df92000a9b3758a65309f84620c1292e814",
     "network_redirect/welfare.py": "3ca43bbcadb19a90128de361dfe662735c07d8c180e1baa120c5a5145e3c4713",
-    "network_redirect/xianling.py": "d185fea3cbbbcd32ffe06e45e3f3191ba4822b33f85bb72cfa27dbcb0dcc1614"
+    "network_redirect/xianling.py": "28f0753adb84b8013d6c6ce597655fc2fb61d330389311b511a1afa35a480c11",
+    "network_redirect/xianyuan_fruit.py": "6171d9b91c44759f4d1b3eaeb609d0634a7f968fad700c82586de5d0cc2c6463"
   }
 }
