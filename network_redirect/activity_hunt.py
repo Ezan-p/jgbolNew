@@ -31,7 +31,9 @@ def load_rules(path=ROOT/'server_config/hunt_rules.json'):
         f.require(type(row['cost']) is int and 0<row['cost']<=100000
                   and type(row['limit']) is int and 0<row['limit']<=100,'捕魂价格或限购无效')
     f.require(r['soul_box_pool']==list(range(5001,5006)),'灵魂宝箱必须产出五星五界魂')
-    f.require(bool(r['upgrade_box_pool']) and all(t in f.ITEMS for t in r['upgrade_box_pool']),'升阶宝箱奖池无效')
+    f.require(bool(r['upgrade_box_pool']) and len(set(r['upgrade_box_pool'])) == len(r['upgrade_box_pool'])
+              and all(t in (1310,1311,1312,1313,1314,1320,1321,1322,1323)
+                      for t in r['upgrade_box_pool']),'升阶宝箱必须产出装备升阶材料')
     return r
 
 

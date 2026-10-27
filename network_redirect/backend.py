@@ -11,7 +11,7 @@ import struct
 import time
 
 from .protocol import encode, decode
-from . import role_profile, achievements, spirit_array, npc_players, gift_codes
+from . import role_profile, achievements, spirit_array, npc_players, gift_codes, xianyuan_fruit
 from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily, guild, vip, xianling, welfare, cheer, monument, equipment
 
 
@@ -226,6 +226,8 @@ class Backend:
         from . import activity_party
         config = config.replace('__PARTY_CONFIG__', summon.lua(activity_party.client_config(role,self.activity_rules)))
         config = config.replace('__IMMORTAL_CONFIG__', summon.lua(immortal.client_config(self.immortal_rules)))
+        config = config.replace('config_end=true', '[27]=' + summon.lua(
+            xianyuan_fruit.client_config(self.immortal_rules['xianyuan_fruit'])) + ',config_end=true')
         realm_config = reborn.client_config(self.reborn_rules)
         for realm, values in realm_config.items():
             values['rights']['open_stone_sys'] = realm >= equipment.load_rules()['reborn_min_realm']

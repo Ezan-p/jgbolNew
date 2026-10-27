@@ -65,7 +65,8 @@ class CraftingTests(unittest.TestCase):
             flag = 3 if int(row['category']) >= 100 else 2
             event = self.convert(flag, [ident], 2)[-1]
             self.assertEqual(event[0], 116, (src, event))
-            allowed = {x[:3] for x in c.parts(row[c.DEST])}
+            from network_redirect import item_rewards
+            allowed = {x[:3] for x in item_rewards.recipe_destinations(row, src[1])}
             self.assertTrue(all((x['object_type'], x['attach_type'], x['attach_level']) in allowed for x in event[1]['item_list'].values()))
             checked += 1
         self.assertGreater(checked, 60)

@@ -6,7 +6,7 @@ local function check(condition, name)
     assert(condition, name)
     reports[#reports+1] = name
 end
-local sent, hints, originalCalls = {}, {}, {}
+local sent, hints, originalCalls, dialogs = {}, {}, {}, {}
 local s = {g_banshu=true, g_allowSummon={false,false,false}, g_summonerCount={0,0,0},
            g_goldSpriteTable={}, g_isInSummonPage=true}
 local ms = {d_data={getItemCountByType=function() return 42 end},d_mainUI={g_playerInfo={gold_coin=1000}},
@@ -14,6 +14,25 @@ local ms = {d_data={getItemCountByType=function() return 42 end},d_mainUI={g_pla
     d_info={show=function(text) hints[#hints+1]=text end},
     d_msg_def={gscl_msg_id={msg_cortege_ramdom_get=1042}},
     d_common_def={cortege_pick_type={pay=3}}}
+local board = {children={}}
+function board:addChild(layer, z, tag) layer.parent = self; layer.tag = tag; self.children[tag] = layer end
+function board:getChildByTag(tag) return self.children[tag] end
+function board:removeChildByTag(tag)
+    if self.children[tag] then self.children[tag]:removeFromParentAndCleanup() end
+end
+s.g_boardLayer = board
+ms.d_u.getGoldCostEnsureLayer = function(data, yes, no)
+    local layer = {data=data}
+    function layer:getParent() return self.parent end
+    function layer:removeFromParentAndCleanup()
+        if self.parent then self.parent.children[self.tag] = nil end
+        self.parent = nil
+    end
+    layer.yes = function() layer:removeFromParentAndCleanup(); yes() end
+    layer.no = function() layer:removeFromParentAndCleanup(); no() end
+    dialogs[#dialogs+1] = layer
+    return layer
+end
 local prices = {17,123,456}
 local parent={children={}}
 function parent:getChildByTag(tag) return self.children[tag] end
@@ -68,7 +87,23 @@ for grade=2,3 do
         ms.d_mainUI.g_playerInfo.gold_coin=prices[grade]*(10-tokens)
         s.updateSummonLabels()
         check(parent.children[707200+grade]==nil,'no ten hint '..grade..' tokens '..tokens)
+        local beforeSend, beforeDialogs = #sent, #dialogs
         s.startSummon(100+grade)
+        local dialog = dialogs[#dialogs]
+        check(#sent==beforeSend and #dialogs==beforeDialogs+1
+            and dialog.data.count==prices[grade]*(10-tokens)
+            and dialog.data.string:find(tostring(prices[grade]*(10-tokens)),1,true),
+            'ten payment asks before sending '..grade..' tokens '..tokens)
+        s.startSummon(100+grade)
+        check(#dialogs==beforeDialogs+1 and #sent==beforeSend,'pending dialog suppresses duplicate click')
+        dialog.no()
+        dialog.yes()
+        check(#sent==beforeSend,'cancel and stale confirm send nothing')
+        s.startSummon(100+grade)
+        dialog = dialogs[#dialogs]
+        dialog.yes()
+        dialog.yes()
+        check(#sent==beforeSend+1,'confirmation sends exactly once')
         check(sent[#sent].data.pick_grade==grade and sent[#sent].data.pick_type==3
             and sent[#sent].data.ten_pick==10,'ten gold request '..grade..' tokens '..tokens)
         local count=#sent
@@ -94,7 +129,10 @@ s.g_summonerCount[2]=0
 ms.d_mainUI.g_playerInfo.gold_coin=369
 local previous=#sent
 s.startSummon(102)
-check(#sent==previous+1 and s.g_summonerCount[2]==7,'refresh stale token cache before ten payment')
+check(#sent==previous and s.g_summonerCount[2]==7 and dialogs[#dialogs].data.count==369,
+    'refresh stale token cache before ten payment')
+dialogs[#dialogs].yes()
+check(#sent==previous+1,'refreshed inventory confirms directly')
 s.getSummonerCount=nil
 ms.d_packageUI.g_packageItemsInfo={}
 check(ms.d_data.getItemCountByType(5,1006)==0,'empty inventory clears token count')
@@ -106,9 +144,48 @@ s.updateSummonNews({first_send=true,lottery_list={{type_id=7,time=101}}})
 check(#s.g_summonNews==1 and s.g_summonNews[1].type_id==7,'short snapshot clears stale rows')
 s.updateSummonNews({first_send=true,lottery_list={}})
 check(#s.g_summonNews==0,'empty snapshot clears news')
+-- Balance/inventory changes while the confirmation is open must be rechecked.
+s.g_summonerCount[2]=7
+ms.d_mainUI.g_playerInfo.gold_coin=10000
+before=#sent
+s.startSummon(102)
+local dialog=dialogs[#dialogs]
+ms.d_mainUI.g_playerInfo.gold_coin=0
+dialog.yes()
+check(#sent==before,'balance reduced in dialog sends nothing')
+ms.d_mainUI.g_playerInfo.gold_coin=10000
+s.startSummon(102)
+dialog=dialogs[#dialogs]
+s.g_summonerCount[2]=1
+dialog.yes()
+check(#sent==before and dialogs[#dialogs]~=dialog and dialogs[#dialogs].data.count==1107,
+    'changed inventory requires new quote')
+dialogs[#dialogs].yes()
+check(#sent==before+1,'new quote confirmed directly')
+before=#sent
+s.startSummon(102)
+ms.d_u.g_is_waiting_1106=true
+dialogs[#dialogs].yes()
+ms.d_u.g_is_waiting_1106=false
+check(#sent==before,'waiting at confirmation sends nothing')
+s.startSummon(102)
+s.g_isInSummonPage=false
+dialogs[#dialogs].yes()
+s.g_isInSummonPage=true
+check(#sent==before,'closed summon page sends nothing')
+s.startSummon(102)
+dialog=dialogs[#dialogs]
+dialog:removeFromParentAndCleanup()
+s.startSummon(102)
+check(dialogs[#dialogs]~=dialog,'detached dialog does not block next summon')
+dialogs[#dialogs].no()
 local wrapper=s.startSummon
 check(run()=='ready' and s.startSummon==wrapper,'installation idempotent')
+s.startSummon(102)
+local cleanupDialog=dialogs[#dialogs]
 s._localGoldRestore()
+cleanupDialog.yes()
+check(not cleanupDialog:getParent() and #sent==before,'cleanup removes dialog and invalidates confirmation')
 check(s.startSummon==oldStart and s.updateSummonLabels==oldLabels and s.g_banshu==true
     and ms.d_data.getItemCountByType==oldItemCount and s.updateSummonNews==oldNews and s.sortNews==oldSort
     and s._localGoldRestore==nil,'cleanup restores original functions')

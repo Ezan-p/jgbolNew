@@ -82,8 +82,10 @@ def settle(role,mid,req,now,r):
     if mid==1051:
         f.require(req['item_type']==1249 and req['item_count']==r['box_cost'] and req['des_type']==5 and req['des_id'] in r['box_targets'],'界魂箱兑换目标或数量无效')
         item=f.lookup(role,'attachments',req['item_id'])
-        f.require(item['type_id']==1249 and item['attach_type']==5 and not item.get('is_lock') and not item.get('owner_id'),'界魂箱实例无效')
-        consume(role,1249,r['box_cost'])
+        f.require(item['type_id']==1249 and item['attach_type']==5 and item.get('count',0)>=r['box_cost']
+                  and not any(item.get(k) for k in ('is_lock','owner_id','equip_pos','equip_order')),'界魂箱实例无效或该叠数量不足')
+        item['count']-=r['box_cost']
+        if not item['count']:role['attachments'].remove(item)
         prize=journey.grant(role,[5,int(req['des_id']),1,1])
         return [summon.event(21,dict(result=1,type_id=1249,count=r['box_cost'],attach_list=[prize]))]
     op,index,n=req['flag'],req['index'],req['count']

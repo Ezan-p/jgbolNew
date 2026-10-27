@@ -461,6 +461,9 @@ def settle(role, mid, req, now, rules, formation_rules, activity_rules=None):
     outcome, prizes = attempt(role, kind, gid, cfg, result, now, rules, formation_rules, activity_rules)
     role['journey']['fight_id'] = role['journey']['fight_id'] % 0x7ffffffe + 1
     fid, ft = role['journey']['fight_id'], req['fight_type']
+    if activity_rules is not None and 1 <= result <= 3:
+        from . import activity_trial
+        prizes += activity_trial.encounter(role, now, activity_rules)
     return combat_engine.event_packets(actions, fid) + [encode(1028, dict(fight_id=fid, first_hand=1, des_name='旅途', lineup_count=len(lineup), lineup=lineup)),
             encode(1027, dict(fight_id=fid, fight_type=ft, final_result=result, fight_round=len(actions), fight_result=actions)),
             summon.event(45, dict(fight_id=fid, obj_type=1, exp_plus=outcome['role_add_exp'])),

@@ -1,0 +1,587 @@
+{
+  "date": "2026-10-26",
+  "official_server_available": false,
+  "inputs": [
+    {
+      "logical": "csv_config/item_base.csv",
+      "sha256": "2b49aa78b7ea27e7f98c896cc984c2f3a69ac6721c6ef167f20cd4b649aff1c7",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/item_name.csv",
+      "sha256": "107da82bd2e8050c6e44dd8da0875f874a56de4cd29db58bc6a4959d3072e685",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/adaptive_spirit_convert.csv",
+      "sha256": "6d1724d75866f33c675fa223b02b8bc47926d5575c1a465d2f73d73d8d30399a",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/cortege/cortege_base_0.csv",
+      "sha256": "55c9d05f8accc205727039a610400209c3a0df3ea6ff7ca395b2c5c7424f7d10",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/cortege/cortege_name_0.csv",
+      "sha256": "8047bc65d74672f6b4038c021d1bd2f72a6f99244bc0094aff806101b4b11971",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/cortege_quality.csv",
+      "sha256": "584f3519f065a44760ef1e4c52a85ca7d33d45252dcc0b0e64989eb7f63db987",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/babel_tower_floor_prize.csv",
+      "sha256": "f7222647fb1d596d2ad0729e8bf80ba053ff8f99433dc13db090c879573fe1ac",
+      "csv_values_match": true
+    },
+    {
+      "logical": "csv_config/exchange_zone.csv",
+      "sha256": "0f53a409a42ff71896c2ccbe009e37f600eb670a3b7e64b18b105d39cbd5d1df",
+      "csv_values_match": true
+    },
+    {
+      "logical": "lua/ui/kickUI.lua",
+      "sha256": "0349ff787cc705b419d3407fdf1c4bae8419f66972d3c98de427def57b315daf"
+    },
+    {
+      "logical": "lua/ui/packageUI.lua",
+      "sha256": "6f5e7e86418fdef9c1ca32aa9cc3c2fc7966d2c8735cae4cbd0982d3ae1f261d"
+    },
+    {
+      "logical": "lua/data.lua",
+      "sha256": "f3d994283064c92bc5ba01ed5bd810785d26cd7509dbac508f96b46b992be5a3"
+    },
+    {
+      "logical": "lua/ui/commonLayerUI.lua",
+      "sha256": "a68b9aa322501ad9e5182c2fb44de452f2c7d5acebbc3c8bffe21f47da40c1d1"
+    },
+    {
+      "logical": "lua/common/common_def.lua",
+      "sha256": "15a4299fc92c50adda7682a4775f2e278e135f49f12d126e105a03d097d9ecf8"
+    }
+  ],
+  "item": {
+    "type_id": "1246",
+    "resource": "99",
+    "quality": "0",
+    "main_type": "6",
+    "sub_type": "3",
+    "top_level": "1",
+    "can_stack": "1",
+    "equip_pos": "0",
+    "effect_field(1-gongji/2-fangyu/3-maxhp/4-strength/5-energy/6-fight_count/7-experience/8-contrib_plus)": "0",
+    "gongji_plus": "0",
+    "fangyu_plus": "0",
+    "maxhp_plus": "0",
+    "strength_plus": "0",
+    "energy_plus": "0",
+    "top_fight_count_plus": "0",
+    "experience_plus": "0",
+    "script_fun": "3",
+    "upgrade_plus": "0",
+    "use_target": "1",
+    "random_weigth": "0",
+    "use_limit": "1",
+    "show_level": "0",
+    "contrib_plus": "0"
+  },
+  "name": {
+    "Ftype_id": "1246",
+    "name": "仙缘果",
+    "desc": "融入顶级神仙魂魄的果子，可逆向归真为指定顶级神仙的魂魄",
+    "introduce": "可指定获得顶级神仙的魂魄",
+    "order": "222",
+    "product_desc": "魂缘万寿山"
+  },
+  "offline_soul_targets": [
+    {
+      "type_id": 5001,
+      "original_name": {
+        "type_id": "5001",
+        "name": "阎罗王",
+        "desc": "阴司天子，地狱死神，掌管生死簿，六道轮回。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5002,
+      "original_name": {
+        "type_id": "5002",
+        "name": "牛魔王",
+        "desc": "自号平天大圣，妻铁扇公主，红孩儿之父。坐骑辟水金睛兽，使混铁棍，魔界混世魔王。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5003,
+      "original_name": {
+        "type_id": "5003",
+        "name": "东海龙王",
+        "desc": "敖广，在所有龙王中出镜率最高，以帮悟空看守兵器闻名于世。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5004,
+      "original_name": {
+        "type_id": "5004",
+        "name": "沙悟净",
+        "desc": "天庭卷帘大将，因打破琉璃盏被罚下界，到流沙河为妖，后护送唐僧西天取经修成正果。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5005,
+      "original_name": {
+        "type_id": "5005",
+        "name": "辟尘大王",
+        "desc": "占青龙山玄英洞的三个犀牛精之一，后被四木禽星咬死，肉被龙王父子享用。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5008,
+      "original_name": {
+        "type_id": "5008",
+        "name": "蝎子精",
+        "desc": "曾在灵山听佛祖讲经，因蜇了如来，逃到毒敌山琵琶洞掳走唐僧成亲，能喷火吐烟，多次打败悟空八戒联手，后被卯日星官降服。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5009,
+      "original_name": {
+        "type_id": "5009",
+        "name": "哪吒",
+        "desc": "三坛海会大神，三头六臂，脚踏风火轮，手执乾坤圈，颈飘混天绫，托塔天王三太子。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5010,
+      "original_name": {
+        "type_id": "5010",
+        "name": "红孩儿",
+        "desc": "火云洞圣婴大王，其父牛魔王，其母铁扇公主，会三昧真火，悟空难敌，后被观音收服，做个善财童子。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5011,
+      "original_name": {
+        "type_id": "5011",
+        "name": "托塔天王",
+        "desc": "官封降魔大元帅，掌托玲珑宝塔，曾率天兵天将下界征伐悟空，几度失利。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5012,
+      "original_name": {
+        "type_id": "5012",
+        "name": "铁扇公主",
+        "desc": "牛魔王之妻，红孩儿之母，持有法宝芭蕉扇，一扇熄火，二扇生风，三扇下雨，曾被悟空骗走熄灭火焰山之火。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5013,
+      "original_name": {
+        "type_id": "5013",
+        "name": "六耳猕猴",
+        "desc": "本领与悟空不相上下，善聆音，能察理，知前后，万物皆明。无名无姓，来历不明，师从蹊跷。四大神猴之一，冒充悟空动机令人费解，答案未揭晓前被如来识破，悟空一棍打死。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5014,
+      "original_name": {
+        "type_id": "5014",
+        "name": "金翅大鹏王",
+        "desc": "如来亲戚金翅大鹏雕，一翅九万里，法力无边，有法宝阴阳二气瓶，入瓶者一时三刻化为浆水，后被如来收服。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5015,
+      "original_name": {
+        "type_id": "5015",
+        "name": "谛听",
+        "desc": "地藏菩萨经案下伏着的通灵神兽。具有保护主人、驱邪避恶、明辨是非之神威；兼备通晓天地、广开财路、济运呈祥之灵兆.",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5017,
+      "original_name": {
+        "type_id": "5017",
+        "name": "青狮大王",
+        "desc": "文殊菩萨坐骑青狮，八百里狮驼岭占山为王，尊为大哥。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5018,
+      "original_name": {
+        "type_id": "5018",
+        "name": "猪八戒",
+        "desc": "天庭天蓬元帅，会三十六般变化，因调戏嫦娥被贬下界，投胎为猪妖，强娶美女高翠兰时被孙悟空降服，随唐僧西行取经，能吃善骗，也成正果。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5019,
+      "original_name": {
+        "type_id": "5019",
+        "name": "白象大王",
+        "desc": "普贤菩萨坐骑白象，同在狮驼岭为王，青狮跟班，做个老二。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5020,
+      "original_name": {
+        "type_id": "5020",
+        "name": "二郎神",
+        "desc": "玉帝外甥，天生三眼，宠物哮天犬，会七十三般变化，与悟空本领不相上下。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5021,
+      "original_name": {
+        "type_id": "5021",
+        "name": "地藏王菩萨",
+        "desc": "尊号“大愿地藏王菩萨”，“地狱未空，誓不成佛，众生度尽，方证菩提”，安忍不动，犹如大地，静虑深密，犹如秘藏。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5022,
+      "original_name": {
+        "type_id": "5022",
+        "name": "孙悟空",
+        "desc": "灵明石猴，会七十二般变化，翻个筋斗十万八千里，手拿定海神针如意金箍棒，保唐僧西天取经，斩妖伏魔。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5023,
+      "original_name": {
+        "type_id": "5023",
+        "name": "唐三藏",
+        "desc": "金蝉子转世，坚定虔诚，最终为唐王取得大乘佛法三藏八十一部真经。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5024,
+      "original_name": {
+        "type_id": "5024",
+        "name": "嫦娥",
+        "desc": "月宫女神，传为后羿之妻，因偷吃王母长生不老药，飘飘然升至月宫，号嫦娥仙子。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5025,
+      "original_name": {
+        "type_id": "5025",
+        "name": "太上老君",
+        "desc": "与世无争，一味炼丹，最大的功劳是帮助悟空炼成火眼金睛。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5026,
+      "original_name": {
+        "type_id": "5026",
+        "name": "九灵元圣",
+        "desc": "太乙真人坐骑九头狮，竹节山九曲盘桓洞众狮祖翁，对唐僧肉不感兴趣，因帮徒子徒孙出气与悟空斗法。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5027,
+      "original_name": {
+        "type_id": "5027",
+        "name": "王母",
+        "desc": "由混沌道气中西华至妙之气凝聚而成，是女仙之首，天上、天下、三界十方的女子得道登仙者，都属她管辖。又称九灵大妙龟山金母。",
+        "": ""
+      },
+      "owned_only": true
+    },
+    {
+      "type_id": 5028,
+      "original_name": {
+        "type_id": "5028",
+        "name": "独角兕大王",
+        "desc": "原是太上老君的座骑青牛。唐僧师徒西去取经经过的一座山叫做金兜山，山前有个金兜洞，那洞中有个独角兕大王。那大王神通广大，威武高强。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5029,
+      "original_name": {
+        "type_id": "5029",
+        "name": "太乙天尊",
+        "desc": "又称东极青华大帝、太乙救苦天尊、太乙真人、太2真人【大误】。相传其为玉皇大帝二侍者之一，配合玉帝统御万类。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5031,
+      "original_name": {
+        "type_id": "5031",
+        "name": "文殊菩萨",
+        "desc": "佛教四大菩萨之一，释迦牟尼佛的左胁侍菩萨，代表聪明智慧。因德才超群，居菩萨之首，故称法王子。在道教中称文殊广法天尊。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5032,
+      "original_name": {
+        "type_id": "5032",
+        "name": "北海龙王",
+        "desc": "敖顺，北海之主，主管北海海底与海面范围内各项大事。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5033,
+      "original_name": {
+        "type_id": "5033",
+        "name": "普贤菩萨",
+        "desc": "中国佛教四大菩萨之一。是象征理德、行德的菩萨，同文殊菩萨的智德、正德相对应，是娑婆世界释迦牟尼佛的右、左胁侍，被称为“华严三圣”。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5034,
+      "original_name": {
+        "type_id": "5034",
+        "name": "菩提祖师",
+        "desc": "收孙悟空为徒，传授他七十二般变化和长生不老的法门。既精通道教也精通佛教的大仙形象：法力高深，弟子众多，教化广泛。山野之民，均受其教化。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5035,
+      "original_name": {
+        "type_id": "5035",
+        "name": "镇元大仙",
+        "desc": "万寿山五庄观观主，地仙之祖，握有神物人参果，延年益寿。法力高深莫测，一展乾坤袖，便能将悟空轻松收入。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5036,
+      "original_name": {
+        "type_id": "5036",
+        "name": "荡魔天尊",
+        "desc": "即真武大帝，全称北极镇天真武玄天上帝玉虚师相金阙化身荡魔永镇终劫济苦天尊。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5039,
+      "original_name": {
+        "type_id": "5039",
+        "name": "南海龙王",
+        "desc": "敖钦，南海之主，主管南海海底与海面范围内各项大事。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5040,
+      "original_name": {
+        "type_id": "5040",
+        "name": "魏征",
+        "desc": "唐朝政治家。曾任谏议大夫、左光禄大夫，封郑国公，谥文贞，以直谏敢言著称，是中国史上最负盛名的谏臣。曾梦中斩杀泾河龙王。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5041,
+      "original_name": {
+        "type_id": "5041",
+        "name": "西海龙王",
+        "desc": "敖闰，西海之主，主管西海海底与海面范围内各项大事。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5042,
+      "original_name": {
+        "type_id": "5042",
+        "name": "半截观音",
+        "desc": "本为金鼻白毛老鼠精，曾因在灵山偷食了燃灯古佛的香花宝烛，被抓后成为托塔李天王干女儿，在陷空山无底洞落草为妖。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5044,
+      "original_name": {
+        "type_id": "5044",
+        "name": "弥勒佛",
+        "desc": "大乘佛教经典中又常被称为阿逸多菩萨，是释迦牟尼佛的继任者，将在未来娑婆世界降生成佛，成为娑婆世界的下一尊佛，在贤劫千佛中将是第五尊佛，常被尊称为当来下生弥勒尊佛。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5045,
+      "original_name": {
+        "type_id": "5045",
+        "name": "灵宝天尊",
+        "desc": "名经宝，居三清的第二位，又称上清大帝或灵宝道君，由元始天王的赤太无元玄黄之气化生，手捧玉如意。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5046,
+      "original_name": {
+        "type_id": "5046",
+        "name": "元始天尊",
+        "desc": "又名“玉清元始天尊”。在“三清”之中位为最尊，也是道教神仙中的第一位尊神。《历代神仙通鉴》称他为“主持天界之祖”。",
+        "": ""
+      },
+      "owned_only": true
+    },
+    {
+      "type_id": 5047,
+      "original_name": {
+        "type_id": "5047",
+        "name": "灵吉菩萨",
+        "desc": "住在小须弥山，法力广大，手使飞龙宝杖，并有如来赐给的定风珠等宝贝。多次帮助唐憎师徒取经途中降服妖怪。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5048,
+      "original_name": {
+        "type_id": "5048",
+        "name": "东华大帝",
+        "desc": "三岛十洲仙翁东华大帝君，即东王公，名金蝉氏\"",
+        "": "号木公，东王公与王母共为道教尊神的东王公，又称“木公”，“东华帝君”。\""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5049,
+      "original_name": {
+        "type_id": "5049",
+        "name": "李世民",
+        "desc": "唐朝第二位皇帝，在位23年，年号贞观。名字取意“济世安民”，他率部征战天下，为大唐统一立下汗马功劳，被封为秦王、天策上将。发动玄武门之变成功登上皇位。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5050,
+      "original_name": {
+        "type_id": "5050",
+        "name": "燃灯古佛",
+        "desc": "因其出生时身边一切光明如灯，故称为燃灯佛或称为锭光佛。又作定光如来、锭光如来、普光如来、灯光如来。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5051,
+      "original_name": {
+        "type_id": "5051",
+        "name": "观音菩萨",
+        "desc": "又作观世音菩萨、观自在菩萨、光世音菩萨等，从字面解释就是“观察（世间民众的）声音”的菩萨，是四大菩萨之一。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5052,
+      "original_name": {
+        "type_id": "5052",
+        "name": "接引佛祖",
+        "desc": "在释迦牟尼未出世前，已经有佛的出现。接引道人便是释迦牟尼前的佛祖，此佛为西方极乐世界的教主，南无阿弥陀佛。能接引念佛人往生西方净土，故又称接引佛。",
+        "": ""
+      },
+      "owned_only": false
+    },
+    {
+      "type_id": 5053,
+      "original_name": {
+        "type_id": "5053",
+        "name": "如来佛祖",
+        "desc": "即佛教教主释迦牟尼，佛教创始人。是三界内的导师，六道四生的慈父，娑婆世界本师。被后世尊称为佛陀、世尊等；汗地尊称他为佛祖，即“佛教祖师”。被世人尊为神明。",
+        "": ""
+      },
+      "owned_only": true
+    }
+  ],
+  "offline_realm_targets": [
+    5001,
+    5002,
+    5003,
+    5004,
+    5005
+  ],
+  "original_client": {
+    "config_section": 27,
+    "soul_object_type": 10,
+    "item_object_type": 5,
+    "unowned_rate": 1,
+    "owned_rate": 10,
+    "realm_rate": 10,
+    "max_batch": 15,
+    "owned_only": [
+      5027,
+      5046,
+      5053
+    ]
+  },
+  "unresolved": [
+    "Original longer_hill server catalog unavailable; local list is inferred",
+    "Original server validation and stack consumption policy unavailable",
+    "Longevity Hill activity 1323 remains unimplemented"
+  ]
+}

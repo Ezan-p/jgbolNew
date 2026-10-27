@@ -23,6 +23,8 @@ ms.d_data.getItemCountByType = function(kind, typeId)
     return originalItemCount(kind, typeId)
 end
 local tenLabelTag = 707200
+local confirmationTag = 707210
+local pendingConfirmation
 s.updateSummonNews = function(data)
     if data.first_send then
         s.g_summonNews = {}
@@ -51,6 +53,12 @@ end
 s.startSummon = function(tag)
     -- Menus can retain the old callback after offline cleanup.
     if not s._localGoldRestore then return originalStart(tag) end
+    if pendingConfirmation then
+        if s.g_boardLayer == pendingConfirmation.parent
+                and s.g_boardLayer:getChildByTag(confirmationTag) then return end
+        pendingConfirmation = nil
+    end
+    if ms.d_u.g_is_waiting_1106 then return end
     local ten = tag == 102 or tag == 103
     local grade = ten and tag - 100 or tag
     -- Ten-pick consumes available tokens first and buys only the missing draws.
@@ -62,18 +70,53 @@ s.startSummon = function(tag)
     if (ten and tokens >= 10) or (not ten and (tokens > 0 or s.g_allowSummon[grade] ~= false)) then
         return originalStart(tag)
     end
-    if ms.d_u.g_is_waiting_1106 then return end
     local price = prices[grade] * (ten and (10 - math.min(10, math.max(0, tokens))) or 1)
     if (ms.d_mainUI.g_playerInfo.gold_coin or 0) < price then
         ms.d_info.show(string.format(ten and '元宝不足，召唤十次还需 %d 元宝' or '元宝不足，本次召唤需要 %d 元宝', price))
         return
     end
-    -- Actual debit, daily limit and reward selection remain server-authoritative.
-    s.g_pay_pick = not ten
-    ms.d_u.main_server_send_msg(ms.d_msg_def.gscl_msg_id.msg_cortege_ramdom_get,
-        {pick_grade=grade, pick_type=ms.d_common_def.cortege_pick_type.pay, ten_pick=ten and 10 or 0})
+    local function send()
+        -- Actual debit, daily limit and rewards remain server-authoritative.
+        s.g_pay_pick = not ten
+        ms.d_u.main_server_send_msg(ms.d_msg_def.gscl_msg_id.msg_cortege_ramdom_get,
+            {pick_grade=grade, pick_type=ms.d_common_def.cortege_pick_type.pay, ten_pick=ten and 10 or 0})
+    end
+    if not ten then return send() end
+    local parent = s.g_boardLayer
+    if not parent or type(ms.d_u.getGoldCostEnsureLayer) ~= 'function' then
+        ms.d_info.show('召唤确认窗口尚未就绪，请重新打开召唤界面')
+        return
+    end
+    local confirmation = {parent=parent}
+    local function cancel()
+        if pendingConfirmation == confirmation then pendingConfirmation = nil end
+    end
+    local function confirm()
+        if pendingConfirmation ~= confirmation then return end
+        pendingConfirmation = nil
+        if not s._localGoldRestore or not s.g_isInSummonPage or s.g_boardLayer ~= parent
+                or ms.d_u.g_is_waiting_1106 then return end
+        if type(s.getSummonerCount) == 'function' then s.getSummonerCount() end
+        -- Never silently charge a different quote if inventory changed in the dialog.
+        if (s.g_summonerCount[grade] or 0) ~= tokens then return s.startSummon(tag) end
+        if (ms.d_mainUI.g_playerInfo.gold_coin or 0) < price then
+            ms.d_info.show(string.format('元宝不足，召唤十次还需 %d 元宝', price))
+            return
+        end
+        send()
+    end
+    confirmation.layer = ms.d_u.getGoldCostEnsureLayer({count=price,
+        string=string.format('现有 %d 张召唤符，是否使用 %d 元宝补足并召唤十次？', tokens, price)}, confirm, cancel)
+    pendingConfirmation = confirmation
+    parent:addChild(confirmation.layer, 300, confirmationTag)
 end
 s._localGoldRestore = function()
+    if pendingConfirmation then
+        if s.g_isInSummonPage and s.g_boardLayer == pendingConfirmation.parent then
+            s.g_boardLayer:removeChildByTag(confirmationTag, true)
+        end
+        pendingConfirmation = nil
+    end
     s.startSummon, s.updateSummonLabels, s.g_banshu = originalStart, originalLabels, originalBanshu
     s.updateSummonNews, s.sortNews = originalNews, originalSort
     ms.d_data.getItemCountByType = originalItemCount

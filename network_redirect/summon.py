@@ -68,6 +68,7 @@ def load_rules(path=RULES_PATH):
                       'activity_soul_count', 'first_guarantee_quality', 'pity_quality'):
             require(integer(config.get(field), 0, 1000000), field)
         require(config['free_cooldown_seconds'] > 0 and config['gold_cost'] > 0, '冷却与价格须大于零')
+        require(config['activity_soul_count'] == (0 if key == '1' else 5), '五星界魂赠送数量：普通为 0，高级／超级为 5')
         require(config.get('token_id') == {'1': 0, '2': 1006, '3': 1007}[key], '客户端召唤符编号')
         require(config.get('token_reward_id') in (0, 1006, 1007), '召唤符奖励编号')
         require(integer(config.get('token_reward_basis_points'), 0, 9999), '召唤符奖励概率')
@@ -121,9 +122,10 @@ def client_source(rules):
     yuanshi_source = Path(__file__).with_name('yuanshi_client.lua').read_text(encoding='utf-8')
     rulai_source = Path(__file__).with_name('rulai_client.lua').read_text(encoding='utf-8')
     nine_source = Path(__file__).with_name('nine_sky_client.lua').read_text(encoding='utf-8')
+    trial_source = Path(__file__).with_name('trial_client.lua').read_text(encoding='utf-8')
     feed_source = feed_source.replace('__FEED_REWARD_TIERS__', lua(feed_rules['feed_reward_tiers']))
     feed_source = feed_source.replace('__FEED_MAX_COUNT__', str(feed_rules['feed_max_count']))
-    return nine_source + '\n' + guild_source + '\n' + visit_source + '\n' + feed_source + '\n' + pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + yuanshi_source + '\n' + rulai_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
+    return trial_source + '\n' + nine_source + '\n' + guild_source + '\n' + visit_source + '\n' + feed_source + '\n' + pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + yuanshi_source + '\n' + rulai_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
 
 
 def lua(value):
@@ -306,9 +308,9 @@ def settle(role, request, now, rules):
             add_item(role, token_id, 1)
             result['token_type'] = token_id
         activity = rules['activity']
-        if (activity['enabled'] and now >= activity['starts_at'] and
+        if (quality == 5 and activity['enabled'] and now >= activity['starts_at'] and
                 (not activity['ends_at'] or now < activity['ends_at']) and config['activity_soul_count']):
-            category = int(BASES[type_id]['category']) if type_id else secrets.choice((1, 2, 3, 4, 5))
+            category = int(BASES[type_id]['category'])
             item_id = 5000 + category
             add_item(role, item_id, config['activity_soul_count'])
             result['prize_info'] = [dict(object_type=5, attach_type=item_id, attach_count=config['activity_soul_count'])]

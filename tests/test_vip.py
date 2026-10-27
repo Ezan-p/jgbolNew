@@ -66,7 +66,7 @@ class VipTests(unittest.TestCase):
         args=dict(item_type=1031,item_id=item['id'],item_count=15,des_type=1,des_id=0)
         self.assertEqual(self.req(1051,**args)[-1][0],55)
         self.fixture(1)
-        with patch('network_redirect.summon.weighted_choice',return_value=0):out=self.req(1051,**args)
+        with patch('network_redirect.qiankun_bags.draw',return_value=[12,1,30000,1]):out=self.req(1051,**args)
         self.assertEqual(out[-1][0],21);self.assertEqual(len(out[-1][1]['attach_list']),15)
         self.assertEqual(self.req(1051,**args)[-1][0],55)
     def test_recharge_replay_and_restart(self):

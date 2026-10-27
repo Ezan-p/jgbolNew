@@ -218,11 +218,12 @@ def recipe_for(item, flag):
 
 
 def apply_recipe(role, item, flag, times, desired=1):
+    from . import item_rewards
     row, src = recipe_for(item, flag)
     f.require(role['level'] >= int(row['min_role_level']), '尚未达到材料转换等级')
     take(role, item, src[3] * times)
     charge(role, parts(row[COST]), times)
-    dest = parts(row[DEST]); rewards = []
+    dest = item_rewards.recipe_destinations(row, item['type_id']); rewards = []
     if flag == 4:
         dest = [x for x in dest if x[1] == desired]
         f.require(len(dest) == 1, '精魄转换目标无效')
@@ -286,7 +287,7 @@ def random_list():
     for row in RECIPES:
         for kind, tid, level, count in parts(row[SRC]):
             c = f.ITEMS.get(tid, {})
-            if kind == 5 and int(c.get('main_type', 0)) == 12 and int(row['category']) in (1, 2, 3):
+            if kind == 5 and int(c.get('main_type', 0)) == 12 and int(row['category']) in (1, 2, 3, 6):
                 rows[int(c['quality']), int(c['sub_type'])] = dict(compose_quality=int(c['quality']), compose_maintype=int(c['sub_type']), material_count=count)
     return list(rows.values())
 
@@ -302,7 +303,9 @@ def compose(role, req, rules):
         f.require(items[0]['attach_type'] == 5 and int(c.get('main_type', 0)) == 12
                   and req['equip_type'] == int(c['sub_type']) and req['equip_quality'] == req['material_quality'] == int(c['quality']), '碎片类型或品质错误')
         rewards = apply_recipe(role, items[0], 2, 1)
-        f.require(all(x[0] == 5 and int(f.ITEMS[x[1]]['main_type']) in (1, 2, 3) for x in rewards), '该碎片不能合成装备')
+        f.require(all(x[0] == 5 and int(f.ITEMS[x[1]]['main_type']) in (1, 2, 3)
+                      or items[0]['type_id'] == 6005 and x[0] == 6 and x[1] in f.SKILLS
+                      for x in rewards), '该碎片不能合成装备或法术')
     else:
         target = req['equip_type']; c = f.ITEMS.get(target, {})
         f.require(c and req['equip_quality'] == int(c['quality']) and req['material_quality'] == rules['activity_material_quality'] and len(items) == rules['activity_material_count'], '活动合成配置已变化')
@@ -323,7 +326,8 @@ def compose(role, req, rules):
                       and not any(item.get(k) for k in ('advance_level', 'star_count', 'cur_spirit_count', 'reborn_bit', 'star_level')), '请选择未养成的对应品质装备')
             dispose(role, item)
     prizes = grant(role, rewards)
-    return [(6, dict(compose_type=op, equip_type=rewards[0][1], attach_list=prizes))]
+    return [(6, dict(compose_type=op, equip_type=rewards[0][1], count=rewards[0][3],
+                     object_type=rewards[0][0], attach_list=prizes))]
 
 
 def settle(role, mid, req, parse):

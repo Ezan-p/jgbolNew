@@ -29,11 +29,12 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
                 'rape_free_refreshes','rape_refresh_gold','rape_single_refresh_gold','duty_daily_runs',
                 'duty_initial_bonus','duty_silver_per_round','party_free_count','party_paid_count',
                 'party_fight_gold','party_bonus_gold','party_bonus_limit','convert_daily_limit',
-                'battle_level','battle_silver','trial_daily_limit','trial_bosses_per_day','trial_boss_hp','trial_cooldown_seconds','home_boss_daily_limit','home_assistant_gold','home_missed_event_penalty',
+                'battle_level','battle_silver','home_boss_daily_limit','home_assistant_gold','home_missed_event_penalty',
                 'abyss_offline_cap_seconds','abyss_tick_seconds','abyss_power_per_crystal','abyss_double_gold','abyss_grid_gold','babel_cell_coins','drug_craft_exp','drug_quality_level_step',
                 'abyss_event_seconds','abyss_event_boss_hp','abyss_event_fight_gold','abyss_steal_max','abyss_map_paid_draws','abyss_map_gold','abyss_map_remove_count','land_tower_start_hour','land_daily_travel','land_daily_attack','land_travel_soul','land_charm_exchange','land_tower_tick','land_tower_soul','land_tower_total','land_tower_duration','land_boss_layers','land_boss_soul','land_hell_unlock_soul','land_hell_daily','land_max_actions','abyss_boss_max_actions'):
         require(type(r.get(key)) is int and 0<r[key]<=1000000,'活动数值无效：'+key)
-    from . import activity_feed
+    from . import activity_feed, activity_trial
+    activity_trial.load_rules()
     activity_feed.validate(r)
     require(r['abyss_boss_max_actions']<=80,'冥仙精魄战报超过协议上限')
     require(r['land_tower_start_hour']<24 and r['land_boss_layers']<=99 and r['land_daily_travel']<=100 and r['land_max_actions']<=80,'逐鹿时段或关卡上限无效')
@@ -81,7 +82,7 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     require(isinstance(r.get('abyss_eye_choices'),list) and len(r['abyss_eye_choices'])==4 and len(set(r['abyss_eye_choices']))==4 and all(t in formation.BASES for t in r['abyss_eye_choices']),'火眼金睛选项无效')
     from . import activity_visit
     r['visit_rules'] = activity_visit.load_rules()
-    for key in ('pray_rewards','party_rewards','trial_rewards','home_pray_rewards','abyss_event_rewards','abyss_pray_consumes','abyss_map_rewards','land_card_rewards','land_full_card_rewards','seasonal_moon_bonus','fish_pool'):
+    for key in ('pray_rewards','party_rewards','home_pray_rewards','abyss_event_rewards','abyss_pray_consumes','abyss_map_rewards','land_card_rewards','land_full_card_rewards','seasonal_moon_bonus','fish_pool'):
         require(isinstance(r.get(key),list) and len(r[key])>0,'活动奖励缺失')
         for p in r[key]:
             require(isinstance(p,list) and len(p)==4 and all(type(v)is int for v in p),'活动奖励格式错误')
@@ -134,15 +135,15 @@ def prepare(role,now,r,peers=None):
     activity_party.prepare(role,now,r)
     from . import activity_duty
     activity_duty.prepare(role,now,r,peers)
+    from . import activity_trial
+    activity_trial.prepare(role,now,r)
     if s.get('day') is None or s['day']<day(now,r):
         s.update(day=day(now,r),feed={},visits={},rank_count=0,rank_claimed=False,
                  rape_refreshes=0,rape_total_refreshes=0,rape_boards=None,party_count=0,
-                 party_paid=0,party_damage=0,party_bonus=0,party_claimed=False,praised=False,
-                 trial=None,trial_count=0,trial_next=0,trial_spawned=0)
+                 party_paid=0,party_damage=0,party_bonus=0,party_claimed=False,praised=False)
         role.update(pray_spirit_times=0,convert_fight_count=0,party_fight_count=0,party_fight_count_plus=0,
                     gongji_plus_rate=0)
     activity_party.sync(role)
-    for key,value in dict(trial=None,trial_count=0,trial_next=0,trial_spawned=0).items():s.setdefault(key,value)
     from . import vip
     role.update(top_order=s['rank_order'],top_score=s['rank_score'],top_fight_limit=vip.limit(role,vip.RANK,r['rank_daily_limit']),
                 rape_flush_limit=vip.limit(role,vip.RAPE,r['rape_free_refreshes']),convert_fight_limit=vip.limit(role,vip.CONVERT,r['convert_daily_limit']))
@@ -242,34 +243,6 @@ def party_info(role,r):
     return activity_party.info(role,r)
 
 
-def trial_state(role,r):
-    s=role['activity']
-    if s['trial'] is None and s['trial_spawned']<r['trial_bosses_per_day']:
-        s['trial_spawned']+=1
-        s['trial']=dict(type_id=r['battle_npc'],show_level=role['level'],name='本地试炼首领',
-            hp=r['trial_boss_hp'],max_hp=r['trial_boss_hp'],is_dead=False,damage=0,
-            prize_list=[prize_spec(p) for p in r['trial_rewards']])
-    return s['trial']
-
-
-def trial_query(role,req,now,r):
-    s=role['activity'];boss=trial_state(role,r);flag=req['flag']
-    require(flag in (1,2,3,4,5,6,7,9),'试炼操作无效')
-    if flag==9:
-        require(boss is not None and boss['is_dead'],'首领尚未击败或已领奖')
-        gain=prizes(role,r['trial_rewards']);s['trial']=None
-        return [summon.event(75,dict(flag=9,result=1,train_data=dict(prize=gain)))]
-    if flag in (2,5):
-        # Encounter generation is a local substitute for the missing server trigger.
-        return [summon.event(75,dict(flag=2,result=1 if boss else 2,train_data=dict(
-            boss_list=[boss] if boss else [],friend_damage_list=[],have_broad=False,
-            last_train_time=s['trial_next'],train_times=s['trial_count'],day_max_train_num=r['trial_daily_limit'])))]
-    if flag in (3,6):return [summon.event(75,dict(flag=flag,result=1,train_data=dict(friend_list=[])))]
-    # No remote player or fabricated invitation is silently treated as real.
-    require(flag==1,'离线存档中没有可邀请或接受的其他玩家')
-    return [summon.event(75,dict(flag=1,result=5,train_data={}))]
-
-
 def query_lineup(role,req,r):
     s=role['activity'];ident=req['des_id']
     from . import activity_rape
@@ -315,6 +288,9 @@ def query_lineup(role,req,r):
 
 def battle(role,req,now,r,jrules,frules):
     ft=req['fight_type'];s=role['activity'];target=None
+    if ft==11:
+        from . import activity_trial
+        return activity_trial.battle(role,req,now,r,jrules)
     if ft==4:
         from . import activity_practice
         return activity_practice.battle(role,req,now,r,jrules)
@@ -343,11 +319,6 @@ def battle(role,req,now,r,jrules,frules):
             require(s['party_paid']<r['party_paid_count'],'今日蟠桃会次数已用完')
             spend(role,'gold_coin',r['party_fight_gold']);s['party_paid']+=1
         role['party_fight_count']=s['party_count'];role['party_fight_count_plus']=s['party_paid']
-    elif ft==11:
-        trial=trial_state(role,r)
-        require(trial is not None and not trial['is_dead'] and req['des_value']==trial['type_id'],'试炼首领不存在或已击败')
-        require(s['trial_count']<r['trial_daily_limit'] and now>=s['trial_next'],'试炼次数不足或正在冷却')
-        s['trial_count']+=1;s['trial_next']=now+r['trial_cooldown_seconds']
     require(any(c.get('order') for c in role['corteges']),'请先上阵神仙')
     cfg=dict(cortege_list=f"{r['battle_npc']}|{r['battle_level']}")
     if ft==6:
@@ -359,7 +330,6 @@ def battle(role,req,now,r,jrules,frules):
         for u in units[0]:u['gongji']=u['gongji']*(100+s['party_bonus']*10)//100
         hp=boss['cur_hp']
         units[1][0].update(hp=hp,max_hp=activity_party.rules()['boss_hp'])
-    if ft==11:units[1][0].update(hp=trial['hp'],max_hp=trial['max_hp'])
     result,lineup,actions=journey.battle(role,cfg,jrules,units=units);win=1<=result<=3
     events=[];s['fight_id']+=1;fid=s['fight_id']
     if ft==6:
@@ -368,13 +338,6 @@ def battle(role,req,now,r,jrules,frules):
         activity_party.record(role,damage,gain,r)
         info=party_info(role,r);info.update(fight_prize=gain,cur_damage=damage)
         events.append(summon.event(29,info))
-    elif ft==11:
-        damage=journey.combat_engine.total_damage(actions)
-        trial['hp']=max(0,trial['hp']-damage);trial['is_dead']=trial['hp']==0
-        trial['damage']+=damage
-        events.append(summon.event(75,dict(flag=8,result=7 if trial['is_dead'] else 1,
-            train_data=dict(prize=[],hp=trial['hp'],train_times=s['trial_count'],last_train_time=s['trial_next'],
-                friend_damage_list=[dict(name=role['role_name'],damage=trial['damage'])]))))
     if win and ft in (2,3):role['silver_coin']+=r['battle_silver']
     return journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name=boss['name'] if ft==6 else '本地活动对手',lineup_count=len(lineup),lineup=lineup)),
         encode(1027,dict(fight_id=fid,fight_type=ft,final_result=result,fight_round=len(actions),fight_result=actions))]+events+[
@@ -483,7 +446,9 @@ def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
         require(s['day']==day(now,r),'祈福日期已回退，请恢复本地时间')
         return pray(role,req,r)
     if mid==1039:return query_lineup(role,req,r)
-    if mid==1064:return trial_query(role,req,now,r)
+    if mid==1064:
+        from . import activity_trial
+        return activity_trial.query(role,req,now,r)
     if mid==1026:return battle(role,req,now,r,jrules,frules)
     if mid==1049:
         typ=req['query_type'];require(1<=typ<=5,'未知排行查询')

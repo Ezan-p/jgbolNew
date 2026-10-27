@@ -16,6 +16,56 @@ do
   ui._localEquipmentRestore=function() ui.onGetResponse=original;ui._localEquipmentRestore=nil end
  end
 end
+-- The shipped fragment result always labels its prize as object_type.item.
+-- Five-star passive fragments produce a skill; use the server's typed prize list.
+do
+ local ms=package.loaded.ms
+ local ui=ms and ms.d_equipPieceUI
+ if ui and not ui._localFragmentRestore then
+  local original=ui.onGetComposeResult
+  ui.onGetComposeResult=function(data)
+   if data.object_type==6 and data.attach_list then
+    local parent=ui.g_equipPieceUI and ui.g_equipPieceUI.main_layer
+    if parent then
+     ui.showPieceInfo()
+     ms.d_commonLayerUI.showPrizeResLayer(parent,data.attach_list)
+    end
+    return
+   end
+   return original(data)
+  end
+  ui._localFragmentRestore=function() ui.onGetComposeResult=original;ui._localFragmentRestore=nil end
+ end
+end
+-- [B] Mirror the narrow 10001 recipe correction in the smith preview.
+-- Original getItemFromStr discards weight, so match both duplicate positions.
+do
+ local ms=package.loaded.ms
+ local data=ms and ms.d_data
+ if data and data.getTransInfoByTypeid and not data._localFragmentPoolRestore then
+  local original=data.getTransInfoByTypeid
+  local changed={}
+  local function fix()
+   for _,row in pairs((data.g_convertTable or {})[10001] or {}) do
+    local src,dst=row.src_material,row.des_material
+    if src and src.attach_type==10001 and dst and #dst==19
+      and dst[3].object_type==5 and dst[3].attach_type==10204
+      and dst[4].attach_type==10204 then
+     changed[#changed+1]=dst[3];dst[3].attach_type=10203
+    end
+   end
+  end
+  data.getTransInfoByTypeid=function(id,...)
+   if id==10001 then fix() end
+   return original(id,...)
+  end
+  fix()
+  data._localFragmentPoolRestore=function()
+   for _,prize in ipairs(changed) do prize.attach_type=10204 end
+   data.getTransInfoByTypeid=original;data._localFragmentPoolRestore=nil
+  end
+ end
+end
 -- 3.87 eventMgr retains event 7 but forgeUI no longer exports updateForgeList.
 -- Bridge it to the shipped activity snapshot reader, preserving original UI.
 do

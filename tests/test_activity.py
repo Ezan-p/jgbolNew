@@ -160,8 +160,8 @@ class ActivityTests(ActivityCase):
         boss=out[-1][1]['train_data']['boss_list'][1]
         self.assertEqual(self.req(1064,flag=9)[0][0],55)
         with patch('network_redirect.activity.journey.battle',return_value=(3,[dict(src_hp=1,des_hp=50000)],
-                [dict(is_src=True,damage_count=8,damage_list=[50000,0,0,0,0,0,0,0])])):
-            self.ok(self.req(1026,fight_type=11,des_type=8,des_value=boss['type_id']))
+                [dict(is_src=True,damage_count=8,damage_list=[50000000,0,0,0,0,0,0,0])])):
+            self.ok(self.req(1026,fight_type=11,des_type=8,des_id=boss['type_id']))
         self.assertTrue(self.b.profile()['activity']['trial']['is_dead'])
         self.ok(self.req(1064,flag=9));before=self.b.profile()
         self.assertEqual(self.req(1064,flag=9)[0][0],55);self.assertEqual(before,self.b.profile())

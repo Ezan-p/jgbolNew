@@ -147,7 +147,7 @@ class HuntTests(ActivityCase):
     def test_card_and_both_reward_boxes_consumable(self):
         self.setup_hunt();self.ok(self.use(1036,3));self.assertEqual(self.hunt()['soul'],300)
         self.assertEqual(self.hunt()['day_score'],0)
-        for box,pool in [(1037,list(range(5001,5006))),(1324,[1032,1033,1034])]:
+        for box,pool in [(1037,list(range(5001,5006))),(1324,[1310,1311,1312,1313,1314,1320,1321,1322,1323])]:
             before=sum(self.amount(t) for t in pool);self.ok(self.use(box,10))
             self.assertEqual(sum(self.amount(t) for t in pool)-before,10)
 

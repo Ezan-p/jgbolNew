@@ -8,7 +8,7 @@ import json
 import secrets
 from pathlib import Path
 
-from . import formation as f, summon
+from . import formation as f, summon, xianyuan_fruit
 from .protocol import encode
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,6 +38,7 @@ def load_rules(path=ROOT / 'server_config/immortal_rules.json'):
     f.require(r.get('essence_initial_slots') == 1, '初始精魄槽位须为1')
     for k in ('essence_unlock_base_percent', 'essence_unlock_luck_step'):
         f.require(type(r.get(k)) is int and 1 <= r[k] <= 100, '精魄开槽概率无效')
+    xianyuan_fruit.validate(r.get('xianyuan_fruit'))
     return r
 
 
@@ -276,7 +277,12 @@ def settle(role, mid, req, rules, parse):
     elif mid == 1322:
         events = upgrade(role, req, rules)
     elif mid == 1051:
-        events = exchange(role, req, rules)
+        from . import item_rewards
+        if req['item_type'] in item_rewards.HANDLED:
+            events = item_rewards.use(role, req)
+        else:
+            events = (xianyuan_fruit.exchange(role, req, rules['xianyuan_fruit'])
+                      if req['item_type'] == xianyuan_fruit.ITEM else exchange(role, req, rules))
     elif mid == 1074:
         events = decompose(role, req) if req['flag'] == 3 else transform(role, req)
     elif mid == 1306:

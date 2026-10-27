@@ -82,7 +82,7 @@ class SummonTests(unittest.TestCase):
         self.assertFalse(any(r['type_id']==1006 for r in role['attachments']))
         self.assertEqual(role['souls']['5004'],150)
         self.assertEqual(len(role['corteges']),1)
-        self.assertEqual(sum(r['count'] for r in role['attachments'] if r['type_id']==5005),20)
+        self.assertEqual(sum(r['count'] for r in role['attachments'] if r['type_id']==5005),50)
         self.assertGreater(next(r['id'] for r in role['attachments'] if r['type_id']==5005),22)
         self.assertEqual(role['summon']['draw_count']['2'],10)
 
@@ -282,6 +282,61 @@ class SummonTests(unittest.TestCase):
         self.assertEqual(len(self.backend.profile()['corteges']),1)
         self.assertIn(1006, [i['type_id'] for i in self.backend.profile()['attachments'] if i['attach_type'] == 5])
 
+    def test_only_five_star_rewards_grant_five_matching_realm_souls(self):
+        for grade in (1, 2, 3):
+            qualities = (2, 3, 4) if grade == 1 else ((3, 4, 5) if grade == 2 else (4, 5))
+            pool = summon.POOLS[self.backend.summon_rules['grades'][str(grade)]['pool']]
+            for quality in qualities:
+                for category in range(1, 6):
+                    type_id = next((t for t in pool if int(summon.BASES[t]['quality']) == quality
+                                    and int(summon.BASES[t]['category']) == category), None)
+                    if type_id is None:
+                        continue
+                    for payment in (1, 2, 3) if grade > 1 else (1, 3):
+                        with self.subTest(grade=grade, quality=quality, category=category, payment=payment):
+                            self.fund()
+                            role = self.backend.profile()
+                            role['summon']['ready_at'][str(grade)] = NOW
+                            role['normal_count'] = 0
+                            self.backend.save(role)
+                            with patch('network_redirect.summon.choose_reward', return_value=(type_id, None)):
+                                result = self.result(self.draw(grade, payment))
+                            items = [i for i in self.backend.profile()['attachments'] if 5001 <= i['type_id'] <= 5005]
+                            if quality == 5:
+                                self.assertEqual([(i['type_id'], i['count']) for i in items], [(5000 + category, 5)])
+                                self.assertEqual(result['prize_info'][1], dict(object_type=5, attach_type=5000 + category, attach_count=5))
+                            else:
+                                self.assertEqual(items, [])
+                                self.assertNotIn('prize_info', result)
+        for grade, token in ((1, 1006), (2, 1007)):
+            self.fund()
+            with patch('network_redirect.summon.choose_reward', return_value=(None, token)):
+                result = self.result(self.draw(grade, 3))
+            self.assertNotIn('prize_info', result)
+            self.assertFalse(any(5001 <= i['type_id'] <= 5005 for i in self.backend.profile()['attachments']))
+
+    def test_mixed_ten_only_five_star_slots_grant_souls_and_replay_is_safe(self):
+        self.fund(gold=300, tokens=7)
+        rewards = [(3027, None), (5004, None), (None, 1007), (5004, None)] + [(3027, None)] * 6
+        with patch('network_redirect.summon.choose_reward', side_effect=rewards):
+            replies = self.draw(2, 3, 10)
+        entries = self.result(replies)['event_data']
+        self.assertEqual([i for i, result in entries.items() if 'prize_info' in result], [2, 4])
+        after = self.backend.profile()
+        self.assertEqual(sum(i['count'] for i in after['attachments'] if i['type_id'] == 5005), 10)
+        self.assertEqual(after['gold_coin'], 0)
+        self.assertEqual(self.backend.respond(self.packet, self.state), replies)
+        self.assertEqual(self.backend.profile(), after)
+
+    def test_five_star_soul_activity_switch_and_window(self):
+        for enabled, start, end, expected in ((False, 0, 0, False), (True, NOW+1, 0, False),
+                                            (True, 0, NOW, False), (True, NOW, NOW+1, True)):
+            self.fund()
+            self.backend.summon_rules['activity'] = dict(enabled=enabled, starts_at=start, ends_at=end)
+            with patch('network_redirect.summon.choose_reward', return_value=(5004, None)):
+                result = self.result(self.draw(2, 3))
+            self.assertEqual('prize_info' in result, expected)
+
     def test_probability_boundaries_and_real_csv_quality(self):
         weights={2:65,3:30,4:5}
         for roll, expected in ((0,2),(64,2),(65,3),(94,3),(95,4),(99,4)):
@@ -364,6 +419,10 @@ class SummonTests(unittest.TestCase):
         bad=copy.deepcopy(base)
         bad['grades']['2']['token_reward_basis_points']=10001
         variants.append(bad)
+        for grade, count in (('1', 1), ('2', 2), ('3', 10)):
+            bad = copy.deepcopy(base)
+            bad['grades'][grade]['activity_soul_count'] = count
+            variants.append(bad)
         for config in variants:
             path.write_text(json.dumps(config))
             with self.assertRaises(ValueError):

@@ -24,10 +24,8 @@ def load_rules(path=ROOT / 'server_config/vip_rules.json'):
         f.require(len(r[key]) == 11 and all(type(n) is int and 0 <= n <= 100000000 for n in r[key]), 'VIP配置数值无效')
     f.require(r['thresholds'][0] == 0 and all(a < b for a,b in zip(r['thresholds'],r['thresholds'][1:])), 'VIP门槛无效')
     f.require(r['daily_gold'][:4] == [0]*4 and r['daily_jade'][0] == 0 and all(r['daily_jade'][1:]), 'VIP福利与原版不符')
-    for row in r['bag_pool']:
-        f.require(type(row['weight']) is int and row['weight'] > 0, '乾坤袋概率无效')
-        typ,tid,n,lv = row['prize']
-        f.require(typ in (5,11,12) and n > 0 and lv == 1 and (typ != 5 or tid in f.ITEMS), '乾坤袋奖励无效')
+    from . import qiankun_bags
+    qiankun_bags.load_rules()
     f.require(len({p['id'] for p in r['products']}) == len(r['products']) and all(type(p['gold']) is int and 0 < p['gold'] <= 1000000 for p in r['products']), '模拟充值商品无效')
     f.require(all(type(p.get('bonus', 0)) is int and 0 <= p.get('bonus', 0) <= 1000000 for p in r['products']), '模拟充值赠送数量无效')
     return r
@@ -58,7 +56,7 @@ def client_config(r):
 
 def handles(mid, req):
     return (mid == 1201 and req['flag'] in (5,7) or
-            mid == 1051 and (req['item_type'] == 1031 or 1101 <= req['item_type'] <= 1110) or
+            mid == 1051 and (1031 <= req['item_type'] <= 1034 or 1101 <= req['item_type'] <= 1110) or
             mid == 1111 and req['event_id'] == 250)
 
 
@@ -68,6 +66,9 @@ def attrs(role):
 
 
 def settle(role, mid, req, now, r, parse):
+    if mid == 1051 and 1031 <= req['item_type'] <= 1034:
+        from . import qiankun_bags
+        return qiankun_bags.use(role, req)
     prepare(role,r); v = level(role)
     if mid == 1111:
         data = parse(req['data'])
@@ -101,20 +102,17 @@ def settle(role, mid, req, now, r, parse):
         return [summon.event(59,dict(type_id=tid,count=1))]
     tid,n=req['item_type'],req['item_count']
     f.require(1 <= n <= 15 and req['des_type'] == 1 and req['des_id'] in (0,role['role_id']), '开包参数无效')
-    f.require(v >= (1 if tid == 1031 else tid-1100), 'VIP等级不足')
+    f.require(v >= tid-1100, 'VIP等级不足')
     item=f.lookup(role,'attachments',req['item_id'])
     f.require(item['type_id']==tid and item['attach_type']==5 and item['count']>=n and not item.get('is_lock'), '礼包不足或已锁定')
     specs=[]
-    if tid == 1031:
-        weights={i:x['weight'] for i,x in enumerate(r['bag_pool'])}
-        specs=[r['bag_pool'][summon.weighted_choice(weights)]['prize'] for _ in range(n)]
-    else:
-        for token in GIFTS[tid-1100]['attach_data'].split('/'):
-            typ,t,lv,count=map(int,token.split('|'))
-            specs.append([typ,t,count*n,lv])
+    for token in GIFTS[tid-1100]['attach_data'].split('/'):
+        typ,t,lv,count=map(int,token.split('|'))
+        specs.append([typ,t,count*n,lv])
     item['count']-=n
     if not item['count']:role['attachments'].remove(item)
-    prizes=[journey.grant(role,p) for p in specs]
+    from . import item_rewards
+    prizes=[item_rewards.grant(role,p) for p in specs]
     return [summon.event(21,dict(result=1,type_id=tid,count=n,attach_list=prizes))]
 
 
