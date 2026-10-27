@@ -149,8 +149,10 @@ class UndergoCompleteTests(TaixuCase):
 class ArenaTests(TaixuCase):
     def test_original_level_50_gate_and_existing_low_level_save(self):
         # Previously created low-level seasons survive the restored entry gate.
-        role=self.b.profile();role['level']=12
+        role=self.b.profile();role['level']=50
         role['activity']['arena']=arena.new_season(role,self.b.activity_rules.get('day',0),NOW)
+        role['activity']['arena'].update(version=1,group=1,viewing=1)
+        role['level']=12
         self.b.save(role)
         for level in (12,49):
             role=self.b.profile();role['level']=level;self.b.save(role);before=self.b.profile()
@@ -159,7 +161,38 @@ class ArenaTests(TaixuCase):
                 self.assertEqual(before,self.b.profile())
         role=self.b.profile();role['level']=50;self.b.save(role)
         self.ok(self.call(1));self.ok(self.call(1,mid=1350))
-        self.assertEqual(self.b.profile()['activity']['arena']['group'],1)
+        self.assertEqual(self.b.profile()['activity']['arena']['group'],4)
+
+    def test_four_groups_preserve_existing_season_and_reject_removed_groups(self):
+        self.arena_enter();self.ok(self.arena_fight())
+        role=self.b.profile();s=role['activity']['arena']
+        s.update(version=1,viewing=2);self.b.save(role)
+        before=copy.deepcopy(s)
+        events=self.call(1,mid=1350);self.ok(events)
+        entry=next(d for e,d in events if e==199)
+        self.assertEqual(set(entry['group_type_level']),{4,5,6,7})
+        self.assertEqual([(g['min_level'],g['max_level']) for g in entry['group_type_level'].values()],
+                         [(50,59),(60,69),(70,79),(80,99)])
+        after=self.b.profile()['activity']['arena']
+        expected=dict(before,version=2,viewing=before['group'])
+        self.assertEqual(after,expected)
+        for group in (1,2,3,8):
+            with self.subTest(group=group):
+                saved=self.b.profile()
+                self.assertEqual(self.call(2,dict(enter_group=group),mid=1350)[0][0],55)
+                self.assertEqual(self.b.profile(),saved)
+
+    def test_advance_button_eligibility(self):
+        self.arena_enter();role=self.b.profile();s=role['activity']['arena']
+        self.assertFalse(arena.board(role,s)['local_arena']['can_advance'])
+        s['stage_fights']=1
+        self.assertTrue(arena.board(role,s)['local_arena']['can_advance'])
+        s['stage_fights']=0;s['competitors']['self']['hp']=0
+        self.assertTrue(arena.board(role,s)['local_arena']['can_advance'])
+        s['settled']=True
+        self.assertFalse(arena.board(role,s)['local_arena']['can_advance'])
+        s['settled']=False;s['viewing']=4
+        self.assertFalse(arena.board(role,s)['local_arena']['can_advance'])
 
     def test_rank_preview_matches_gold_and_holy_peaches_for_every_tier(self):
         self.arena_enter()
@@ -207,9 +240,10 @@ class ArenaTests(TaixuCase):
 
     def test_all_groups_npc_identity_inspection_and_no_cross_group_attack(self):
         s=self.arena_enter();self.assertEqual(len(s['competitors']),20)
-        for group in range(1,8):
+        for group in range(4,8):
             self.ok(self.call(2,dict(enter_group=group),mid=1350))
             role=self.b.profile();s=role['activity']['arena'];rows=arena.board(role,s)['rank_data']
+            self.assertTrue(all(r['area_name']=='' for r in rows))
             npc=next(r for r in rows if not r['is_me'])
             self.assertIsNotNone(npc_players.resolve(npc['obj_id']))
             out=self.call(4,dict(des_id=npc['obj_id'],des_type=1),mid=1350);self.ok(out)
@@ -224,15 +258,48 @@ class ArenaTests(TaixuCase):
         self.assertEqual(self.b.profile(),before)
         self.assertEqual(self.req(1244,fight_type=4,log_time=1,src_id=rec['src_id'],match_type=1)[0][0],55)
 
+    def test_effect_battles_persist_and_replay_in_every_stage(self):
+        from network_redirect import combat_engine
+        effects = combat_engine.Actions()
+        effects.events = [dict(cur_action=1, logic_type=101051, who_use=1, self_use=True,
+                              src_order=1, des_order=1, speak='',
+                              skill_result_list=[dict(field=65, field_plus=10, des_order=1)])]
+        self.arena_enter()
+        with patch('network_redirect.activity_arena.journey.battle', return_value=(1, [], effects)):
+            for stage in range(1, 6):
+                with self.subTest(stage=stage):
+                    events = self.arena_fight(); self.ok(events)
+                    original = next(d for e,d in events if e == 121)
+                    self.assertIn(1, original)
+                    saved = self.b.profile()
+                    s = saved['activity']['arena']; rec = s['records'][-1]
+                    self.assertEqual(s['replays'][str(rec['fight_id'])]['fight_events']['1'], effects.events[0])
+                    self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+                    replay = self.req(1244, fight_type=4, log_time=rec['log_time'],
+                                      src_id=rec['src_id'], match_type=rec['match_type'])
+                    self.ok(replay)
+                    self.assertEqual(next(d for e,d in replay if e == 121), original)
+                    self.assertEqual(self.b.profile(), saved)
+                    self.ok(self.call(7, dict(stage=stage), mid=1350))
+
     @patch('network_redirect.activity_arena.journey.battle',return_value=(1,[],[]))
     def test_complete_tournament_settles_once_then_next_day(self,_):
         self.arena_enter()
         for stage in range(1,6):
-            self.ok(self.arena_fight());self.ok(self.call(7,dict(stage=stage),mid=1350))
+            self.ok(self.arena_fight());events=self.call(7,dict(stage=stage),mid=1350);self.ok(events)
+            board=next(d for e,d in events if e==199)
+            if stage<5:
+                self.assertNotIn('local_prizes',board)
+            else:
+                self.assertEqual(board['local_prizes'],next(d for e,d in events if e==33))
+                self.assertEqual(len(board['local_prizes']),2)
         role=self.b.profile();s=role['activity']['arena'];self.assertTrue(s['settled'])
         self.assertGreater(len(s['settlement']['attach_list']),0)
         before=self.b.profile();self.assertEqual(self.call(7,dict(stage=5),mid=1350)[0][0],55)
         self.assertEqual(before,self.b.profile());self.ok(self.call(1,mid=1350));self.assertEqual(s['day'],self.b.profile()['activity']['arena']['day'])
+        events=self.call(2,mid=1350);self.ok(events)
+        self.assertNotIn('local_prizes',next(d for e,d in events if e==199))
+        self.assertFalse(any(e==33 for e,d in events))
         with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.ok(self.call(1,mid=1350))
         new=self.b.profile()['activity']['arena'];self.assertEqual(new['stage'],1);self.assertFalse(new['settled'])
 

@@ -33,9 +33,9 @@ def rules():
     a.require(5 <= r['arena_size'] <= 30 and r['arena_qualify_count'] <= r['arena_size']
               and r['arena_records'] <= 20, '血战人数或战报上限无效')
     groups = r['arena_groups']
-    a.require(len(groups) == 7 and groups[0][0] <= r['arena_level'] <= groups[-1][1] and groups[-1][1] == 99
+    a.require(len(groups) == 4 and groups[0][0] == r['arena_level'] == 50 and groups[-1][1] == 99
               and all(len(v) == 2 and all(type(n) is int for n in v) and v[0] <= v[1] for v in groups)
-              and all(groups[i][1]+1 == groups[i+1][0] for i in range(6)), '血战等级分组无效')
+              and all(groups[i][1]+1 == groups[i+1][0] for i in range(len(groups)-1)), '血战等级分组无效')
     prizes = r['arena_rank_prizes']
     a.require(bool(prizes) and prizes[0]['front'] == 1 and prizes[-1]['back'] == r['arena_size']
               and all(all(type(p[k]) is int and 0 < p[k] <= 1000000

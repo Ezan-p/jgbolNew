@@ -26,6 +26,10 @@ with tempfile.TemporaryDirectory() as tmp:
     fixtures['update']=arena.board(role,ar,5)
     fixtures['update']['event_info']['reward_score']=100
     fixtures['rank']=arena.board(role,ar,3)
+    ar['settled']=False
+    fixtures['settlement']=arena.board(role,ar)
+    fixtures['settlement']['local_prizes']=arena.settle_prizes(role,ar)
+    fixtures['settlement'].update(arena.board(role,ar))
     b.close()
 script=r'''
 local ms=assert(package.loaded.ms);local ui=assert(ms.d_arenaUI);local map=assert(ms.d_undergoMapUI)
@@ -35,7 +39,9 @@ local function preserve(t)
  local copy={};for k,v in pairs(t) do copy[k]=v end
  saved[#saved+1]={target=t,old=copy}
 end
-for _,name in ipairs({'d_arenaUI','d_undergoMapUI','d_undergoSubLevelUI','d_undergoLineupUI','d_undergoOrdealUI','d_loginUI','d_mainUI','d_commonLayerUI','d_newbieManualUI','d_info'}) do preserve(ms[name]) end
+for _,name in ipairs({'d_arenaUI','d_undergoMapUI','d_undergoSubLevelUI','d_undergoLineupUI','d_undergoOrdealUI','d_loginUI','d_mainUI','d_commonLayerUI','d_newbieManualUI','d_info','d_hz'}) do preserve(ms[name]) end
+-- Exercise the current source even if an older patch is already injected.
+if installedBefore then installedBefore() end
 for _,fn in ipairs({ms.d_undergoOrdealUI.getMainLayer,ms.d_undergoLineupUI.getCurrentPosCharList}) do
  for i=1,20 do local name,value=debug.getupvalue(fn,i);if not name then break end
   if name=='g_self' and type(value)=='table' then preserve(value) end
@@ -84,7 +90,12 @@ check('level49_entry_blocked',function()
  ms.d_undergoOrdealUI.enter();ms.d_undergoOrdealUI.pressEnterUndergoLayer();ui.enter(root)
  assert(#sent==count);ms.d_mainUI.g_playerInfo.level=60
 end)
-check('arena_entry',function() ui.onGetResult(clone(fixtures.entry)) end)
+check('arena_entry_four_groups',function()
+ ui.onGetResult(clone(fixtures.entry))
+ assert(fixtures.entry.group_type_level[1]==nil and fixtures.entry.group_type_level[3]==nil)
+ for group=4,7 do assert(ui.g_arenaUI.main_layer:getChildByTag(9900+group)) end
+ for group=1,3 do assert(not ui.g_arenaUI.main_layer:getChildByTag(9900+group)) end
+end)
 for stage=1,6 do
  check('arena_stage_'..stage,function()
   ui.onGetResult(clone(fixtures['entry_'..stage]))
@@ -113,7 +124,69 @@ check('practice_expired_clock_does_not_poll',function()
 end)
 check('arena_records',function() ui.showBloodHis(root) end)
 check('arena_rank',function() ui.onGetResult(clone(fixtures.rank)) end)
-check('arena_return',function() ui.onFightReturn();assert(sent[#sent].data.id==1);ui.onGetResult(clone(fixtures.entry));assert(sent[#sent].data.id==2) end)
+for stage=1,5 do
+ check('arena_return_stage_'..stage,function()
+  ui.onGetResult(clone(fixtures['entry_'..stage]))
+  ui.onGetResult(clone(fixtures[tostring(stage)]))
+  local update=clone(fixtures[tostring(stage)]);update.id=5
+  update.event_info.cur_fight_count=2;update.event_info.action_point=3
+  update.local_arena.stage_fights=2;ui.onGetResult(update)
+  local name=stage==1 and 'showQualifyFight' or stage==2 and 'showExerFight' or 'showBloodFight'
+  local native=ui[name];local rendered=0
+  ui[name]=function(...) rendered=rendered+1;return native(...) end
+  local count=#sent;local oldDelay=ms.d_u.delay
+  ms.d_undergoOrdealUI.enter() -- The real fightUI calls this before onFightReturn.
+  local ok,err=pcall(ui.onFightReturn,false);ui[name]=native
+  assert(ok,err);assert(ms.d_u.delay==oldDelay)
+  assert(rendered==1,'Current arena must be rendered before return completes')
+  assert(#sent==count,'Fight return must not query entry or group')
+  assert(ui.g_data.rank.event_info.cur_fight_count==2 and ui.g_data.rank.event_info.action_point==3)
+  assert(ui._localStage().stage_fights==2)
+ end)
+end
+check('arena_record_return',function()
+ local count=#sent;local native=ui.showBloodHis;local shown=0
+ ui.showBloodHis=function(...) shown=shown+1;return native(...) end
+ ms.d_undergoOrdealUI.enter()
+ local ok,err=pcall(ui.onFightReturn,true);ui.showBloodHis=native
+ assert(ok,err);assert(shown==1 and #sent==count)
+end)
+check('arena_settlement_popup',function()
+ local native=ms.d_commonLayerUI.showPrizeResLayer;local shown=0
+ ms.d_commonLayerUI.showPrizeResLayer=function(parent,list,...)
+  shown=shown+1
+  assert(parent==ui.g_arenaUI.main_layer and #list==2)
+  assert(list[1].object_type==11 and list[1].attach_count>0)
+  assert(list[2].attach_type==1343 and list[2].attach_count>0)
+  return native(parent,list,...)
+ end
+ local ok,err=pcall(function()
+  ui.onGetResult(clone(fixtures.settlement));assert(shown==1)
+  ui.onGetResult(clone(fixtures['6']));assert(shown==1,'Board refresh must not replay reward popup')
+ end)
+ ms.d_commonLayerUI.showPrizeResLayer=native;assert(ok,err)
+end)
+check('settlement_close_returns_to_entry',function()
+ ui.onGetResult(clone(fixtures.entry_5));ui.onGetResult(clone(fixtures['5']))
+ local previous=ui.g_arenaUI.main_layer;previous:retain()
+ local native=ms.d_u.createMenu;local close
+ ms.d_u.createMenu=function(config,...)
+  for _,item in ipairs(config) do
+   if item.npic=='v2/introUI/close1.png' then close=item.call_back end
+  end
+  return native(config,...)
+ end
+ local ok,err=pcall(function()
+  ui.onGetResult(clone(fixtures.settlement))
+  assert(previous:getParent()==nil,'Previous blood stage must be removed')
+  assert(ui.g_arenaUI.blood_layer==nil,'No blood-stage layer may remain below settlement')
+  local rank=ui.g_arenaUI.rank_parent;rank:retain()
+  assert(close);close()
+  local removed=rank:getParent()==nil;rank:release();assert(removed)
+  for group=4,7 do assert(ui.g_arenaUI.main_layer:getChildByTag(9900+group)) end
+ end)
+ ms.d_u.createMenu=native;previous:release();assert(ok,err)
+end)
 check('map_init',function() map.initMapCsv() end)
 check('map_entry',function() ms.d_undergoOrdealUI.onGetResult(1,clone(maps.initial)) end)
 check('map_progress',function()
@@ -142,7 +215,7 @@ check('shop_purchase',function()
  ms.d_undergoOrdealUI.onGetResult(5,{index=1,attach_list={{object_type=5,attach_type=1001,attach_count=10,attach_level=1,buy_times=19}}})
 end)
 check('day_prize',function() ms.d_undergoOrdealUI.onGetResult(7,clone(prizes)) end)
-if not installedBefore and ui._localTaixuRestore then ui._localTaixuRestore() end
+if ui._localTaixuRestore then ui._localTaixuRestore() end
 for _,scene in ipairs(scenes) do scene:cleanup();scene:release() end
 root:removeFromParentAndCleanup(true)
 for _,entry in ipairs(saved) do

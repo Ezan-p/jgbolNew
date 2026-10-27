@@ -9,6 +9,7 @@ from . import activity as a, activity_undergo as undergo, activity_rank, npc_pla
 from .protocol import encode, decode
 
 STAGES = {1: '冲榜赛', 2: '练习赛', 3: '血战第一阶段', 4: '血战第二阶段', 5: '血战第三阶段', 6: '本届已结算'}
+FIRST_GROUP = 4  # Preserve native group IDs and existing 50+ season rosters.
 
 
 def rules():
@@ -16,11 +17,12 @@ def rules():
 
 
 def group_for(level):
-    return next(i for i, bounds in enumerate(rules()['arena_groups'], 1) if bounds[0] <= level <= bounds[1])
+    return next(i for i, bounds in enumerate(rules()['arena_groups'], FIRST_GROUP) if bounds[0] <= level <= bounds[1])
 
 
 def select_roster(group, day):
-    lo, hi = rules()['arena_groups'][group-1]
+    a.require(FIRST_GROUP <= group < FIRST_GROUP+len(rules()['arena_groups']), '血战分组无效')
+    lo, hi = rules()['arena_groups'][group-FIRST_GROUP]
     pool = [e for e in npc_players.catalog().values() if lo <= e['profile']['level'] <= hi]
     a.require(len(pool) >= rules()['arena_size']-1, '本地NPC库不足以组成血战分组')
     # Stratify by power, so each bracket includes attainable and aspirational opponents.
@@ -35,7 +37,7 @@ def select_roster(group, day):
 
 def new_season(role, day, now):
     group = group_for(role['level'])
-    s = dict(version=1, day=day, clock=now, group=group, viewing=group, stage=1,
+    s = dict(version=2, day=day, clock=now, group=group, viewing=group, stage=1,
              stage_fights=0, fights=0, paid=0, actions=rules()['arena_action_points'],
              records=[], replays={}, settled=False, qualification_claimed=[], competitors={})
     for i, key in enumerate(reversed(select_roster(group, day))):
@@ -50,6 +52,13 @@ def state(role, now, arules):
     day = a.day(now, arules)
     if s:
         a.require(now >= s['clock'], '本地时间早于血战存档时间，请恢复时钟后重试')
+        # Old low-level seasons remain playable after reaching the entry level.
+        # Keep all progress/rewards/opponents; only relocate the removed group.
+        if s['group'] < FIRST_GROUP:
+            s['group'] = group_for(role['level'])
+        if s['viewing'] < FIRST_GROUP:
+            s['viewing'] = s['group']
+        s['version'] = 2
     if s is None or s['settled'] and day > s['day']:
         s = new_season(role, day, now)
         role['activity']['arena'] = s
@@ -80,7 +89,7 @@ def row(role, key, progress, order):
                 head_type=p.get('head_type', 101), vip_level=p.get('vip_level', 0),
                 cortege_type=tid, cortege_layer=layer, inherit_level=p.get('reborn_layer', 0),
                 tao_point=p.get('tao_point', 0), role_combat_power=p.get('role_combat_power', 0),
-                area_name='本地离线', order=order, hp_point=progress['hp'], score=progress['score'], is_me=key == 'self')
+                area_name='', order=order, hp_point=progress['hp'], score=progress['score'], is_me=key == 'self')
 
 
 def prize_specs(prize):
@@ -108,8 +117,8 @@ def schedule(now, stage):
 
 
 def entry(role, s, now):
-    return dict(id=1, role_group=s['group'], group_type_level=[dict(index=i, min_level=b[0], max_level=b[1],
-                inherit_level=0, pick_num=rules()['arena_qualify_count']) for i, b in enumerate(rules()['arena_groups'], 1)],
+    return dict(id=1, role_group=s['group'], group_type_level={i: dict(index=i, min_level=b[0], max_level=b[1],
+                inherit_level=0, pick_num=rules()['arena_qualify_count']) for i, b in enumerate(rules()['arena_groups'], FIRST_GROUP)},
                 schedule_list=schedule(now, s['stage']), offline=True)
 
 
@@ -129,6 +138,7 @@ def board(role, s, op=2):
                     solo_rank_last_half=0, action_point=s['actions'], buy_action_point=rules()['arena_paid_gold'],
                     fight_records=copy.deepcopy(list(reversed(s['records'])))),
                 local_arena=dict(stage=s['stage'], title=STAGES[s['stage']], own=own,
+                    can_advance=own and not s['settled'] and (s['stage_fights'] > 0 or s['competitors']['self']['hp'] <= 0),
                     stage_fights=s['stage_fights'], action_cost=rules()['arena_action_cost'], paid_left=max(0, rules()['arena_paid_limit']-s['paid']),
                     settled=s['settled'], settlement=s.get('settlement', {})), reward_score=0)
 
@@ -235,8 +245,13 @@ def fight(role, s, data, now, jrules):
     record = dict(src_name=role['role_name'], des_name=npc['role']['role_name'], src_id=role['role_id'],
                   des_id=npc['role']['role_id'], final_result=result, log_time=log_time, match_type=rank_type(s), fight_id=fid)
     s['records'] = (s['records']+[record])[-rules()['arena_records']:]
+    # Event 121 mixes numeric effect indices with "fight_id" on the wire.
+    # Persist string keys like JSON does, so formation.prepare's sorted save
+    # comparison can handle battles with effects before the first DB write.
+    # replay_packets restores numeric indices for the native Lua client.
+    saved_effects = {str(k): v for k, v in journey.combat_engine.event_data(actions, fid).items()}
     s['replays'][str(fid)] = dict(line_up_msg=decode(packets[-2])[2], fight_result_msg=decode(packets[-1])[2],
-                                  fight_events=journey.combat_engine.event_data(actions, fid))
+                                  fight_events=saved_effects)
     keep = {str(r['fight_id']) for r in s['records']}
     s['replays'] = {k: v for k, v in s['replays'].items() if k in keep}
     out = board(role, s, 5); out['reward_score'] = reward_score
@@ -264,7 +279,7 @@ def settle(role, req, now, arules, jrules, parse):
         return [response(entry(role, s, now))]
     if op in (2, 3):
         group = data.get('enter_group', s['group'])
-        a.require(type(group) is int and 1 <= group <= 7, '血战分组无效')
+        a.require(type(group) is int and FIRST_GROUP <= group < FIRST_GROUP+len(rules()['arena_groups']), '血战分组无效')
         s['viewing'] = group
         return [response(board(role, s, op))]
     if op == 4:
@@ -279,5 +294,9 @@ def settle(role, req, now, arules, jrules, parse):
         gain = advance(role, s)
         out = board(role, s)
         out['local_entry'] = entry(role, s, now)
+        # Display only the rewards from this settlement, never historical prizes
+        # on ordinary board refreshes or replay returns. Event 33 keeps bag sync.
+        if gain:
+            out['local_prizes'] = gain
         return [response(out)]+([summon.event(33, gain)] if gain else [])
     a.require(False, '血战操作无效')

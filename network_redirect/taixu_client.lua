@@ -15,7 +15,7 @@ do
   local prizeView=false
   local wrappers={}
   local state={}
-  local autoGroup=nil
+  local entryTag=9875
   local function button(parent,text,x,y,fn,size)
    local label=CCLabelTTF:create(text,'arial',size or 24)
    label:setColor(ccc3(255,220,140))
@@ -23,24 +23,83 @@ do
    local menu=CCMenu:createWithItem(item);ms.d_u.setProperties(parent,menu,{x=x,y=y})
    parent:addChild(menu,40);return menu
   end
+  local function optionButton(parent,text,x,y,fn,enabled,width)
+   local w,h=width or 168,46
+   local function face(pressed)
+    local border=CCLayerColor:create(enabled and ccc4(206,157,78,255) or ccc4(105,100,90,255),w,h)
+    local fill=CCLayerColor:create(enabled and (pressed and ccc4(116,65,34,255) or ccc4(66,39,27,255)) or ccc4(49,47,43,255),w-4,h-4)
+    fill:setPosition(ccp(2,2));border:addChild(fill)
+    local label=CCLabelTTF:create(text,'arial',22)
+    label:setColor(enabled and ccc3(255,230,172) or ccc3(153,149,139))
+    label:setPosition(ccp(w/2,h/2));border:addChild(label,1)
+    return border
+   end
+   local item=CCMenuItemSprite:create(face(false),face(true))
+   item:setEnabled(enabled);item:registerScriptTapHandler(fn)
+   local menu=CCMenu:createWithItem(item);ms.d_u.setProperties(parent,menu,{x=x,y=y})
+   menu:setScale(math.min(1,CCDirector:sharedDirector():getWinSize().width/960))
+   parent:addChild(menu,40);return menu
+  end
+  -- The native carousel hard-codes seven slots. Keep the four original high
+  -- group IDs (4..7), but build only their entrance cards and native art.
+  wrappers.show=ui.show
+  ui.show=function(parent,returnFromFight,isRecord)
+   parent=parent or ui.g_arenaUI.parent_layer
+   parent:removeChildByTag(entryTag,true)
+   local layer=CCLayer:create();parent:addChild(layer,1000,entryTag)
+   ui.g_arenaUI.parent_layer=parent;ui.g_arenaUI.main_layer=layer
+   ui.g_arenaUI.qualify_layer=nil;ui.g_arenaUI.blood_layer=nil;ui.g_arenaUI.rank_parent=nil
+   ms.d_u.createSwallowTouchLayer(layer)
+   layer:addChild(ms.d_u.createByStyle({pic='v2/summonUI/advance_bkg.jpg',x=0.5,y=0.5,scaleX=1,scaleY=1}))
+   layer:addChild(ms.d_u.createByStyle({pic='v2/arenaUI/title8.png',x=0.5,y=0.92}))
+   local size=CCDirector:sharedDirector():getWinSize()
+   local entry=ui.g_data.enter
+   local portraits={[4]=5036,[5]=5048,[6]=5027,[7]=5046}
+   for group=4,7 do
+    local info=entry.group_type_level[group]
+    if info then
+     local x=0.185+(group-4)*0.21
+     local own=group==entry.role_group
+     local body=ms.d_data.getBodySprite(portraits[group],true)
+     local bounds=body:getContentSize()
+     body:setAnchorPoint(ccp(0.5,0.5))
+     body:setScale(math.min(size.width*0.18/math.max(1,bounds.width),size.height*0.43/math.max(1,bounds.height)))
+     body:setPosition(ccp(size.width*x,size.height*0.55));layer:addChild(body)
+     local label=CCLabelTTF:create(tostring(info.min_level)..'—'..tostring(info.max_level)..'级','arial',24)
+     label:setColor(own and ccc3(255,220,140) or ccc3(235,225,207))
+     label:setPosition(ccp(size.width*x,size.height*0.29));layer:addChild(label)
+     local selected=group
+     optionButton(layer,own and '进入本组' or '查看分组',x,0.19,function()
+      ui.sendRequest(2,{enter_group=selected})
+     end,true,154):setTag(9900+group)
+    end
+   end
+   layer:addChild(ms.d_u.createMenu({x=0,y=0,{npic='v2/introUI/close1.png',spic='v2/introUI/close2.png',x=0.95,y=0.93,
+    call_back=function() ms.d_u.remove(layer) end}}),10)
+   if returnFromFight~=nil and ui.g_data.rank then
+    local snapshot={};for key,value in pairs(ui.g_data.rank) do snapshot[key]=value end
+    snapshot.id=2;oldResult(snapshot)
+    if isRecord then ui.showBloodHis(ui.g_arenaUI.blood_layer or ui.g_arenaUI.rank_parent) end
+   end
+  end
   local function controls(parent)
    if not parent or not state.title then return end
    parent:removeChildByTag(9876,true)
    local layer=CCLayer:create();parent:addChild(layer,80,9876)
-   local text='本地NPC · '..state.title
+   local text=state.title
    if state.settled then
-    text=text..' · 第'..tostring((state.settlement or {}).order or '-')..'名 · 声望+'..tostring((state.settlement or {}).reputation or 0)..' · 奖励已入包'
+    text=text..' · 第'..tostring((state.settlement or {}).order or '-')..'名 · 声望+'..tostring((state.settlement or {}).reputation or 0)
    else text=text..' · 本阶段已战'..tostring(state.stage_fights or 0)..'场' end
    button(layer,text,0.5,0.955,function()
-    ms.d_info.show('离线血战：每日最多开启一届，未完成的赛程保留。冲榜→练习→血战三阶段；每阶段至少战斗一次，可主动推进。前两阶段战败不扣血，第三阶段扣血。按血量、分数排名，最后结算奖励。对手均为本地NPC。')
+    ms.d_info.show('血战：每日最多开启一届，未完成的赛程保留。冲榜→练习→血战三阶段；每阶段至少战斗一次，可主动推进。前两阶段战败不扣血，第三阶段扣血。按血量、分数排名，最后结算奖励。')
    end,19)
    if state.own and not state.settled then
     local labels={'进入练习赛','进入血战一','进入血战二','进入血战三','结算本届'}
-    button(layer,labels[state.stage] or '推进赛程',0.82,0.9,ui._localAdvance,23)
+    optionButton(layer,labels[state.stage] or '推进赛程',0.80,0.89,ui._localAdvance,state.can_advance==true):setTag(9878)
    end
   end
   ui._localAdvance=function()
-   if state.own and not state.settled then ui.sendRequest(7,{stage=state.stage}) end
+   if state.own and not state.settled and state.can_advance then ui.sendRequest(7,{stage=state.stage}) end
   end
   ui._localStage=function() return state end
   for _,name in ipairs({'showQualifyFight','showExerFight','showBloodFight','showCommonRank','showDoubleRank'}) do
@@ -83,6 +142,15 @@ do
   ui.onGetResult=function(data)
    if data.local_arena then state=data.local_arena end
    if data.local_entry then ui.g_data.enter=data.local_entry end
+   if data.id==1 then
+    ui.g_data.enter=data
+    return ui.show()
+   end
+   if data.id==2 and state.settled then
+    -- The native rank close button only removes its own layer. Rebuild the
+    -- entrance underneath, so it cannot reveal the previous blood stage.
+    ui.show()
+   end
    -- Exercise responses have no original update branch. Keep every native view
    -- on the same authoritative snapshot, including records and score changes.
    if data.id==5 and ui.g_data.rank then
@@ -91,18 +159,18 @@ do
     ui.g_data.reward_score=data.reward_score or 0
    end
    local result=oldResult(data)
-   if data.id==1 and autoGroup then
-    local group=autoGroup;autoGroup=nil;ui.sendRequest(2,{enter_group=group})
+   if data.local_prizes and #data.local_prizes>0 then
+    ms.d_commonLayerUI.showPrizeResLayer(ui.g_arenaUI.main_layer,data.local_prizes)
    end
    return result
   end
-  ui.onFightReturn=function()
-   ms.d_event_mgr.setSpecialFightType(0)
-   autoGroup=ui.g_data.enter and ui.g_data.enter.role_group
-   ui.enter(ms.d_undergoOrdealUI.getMainLayer())
+  ui.onFightReturn=function(isRecord)
+   -- Native return calls our four-group show with delay=0. Restore the current
+   -- authoritative board synchronously, without entry/group network queries.
+   return oldReturn(isRecord)
   end
   ms.d_hz.gethz=function(key,...)
-   if key=='kfight6' and prizeView then return '结算本届后奖励直接到账' end
+   if key=='kfight6' and prizeView then return '结算本届后显示获得奖励' end
    if key=='undergo_info22' then return '玩家等级达到50级开放' end
    if key=='undergo_info16' then return '每日0点恢复神仙次数，当前大关小关进度重置' end
    return oldHz(key,...)
