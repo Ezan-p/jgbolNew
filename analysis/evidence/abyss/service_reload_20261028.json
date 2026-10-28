@@ -1,0 +1,93 @@
+{
+  "old_pid": 32303,
+  "port": 18770,
+  "backup": ".runtime/offline/backups/abyss-before-repair-reload-20261028.sqlite3",
+  "roles_count_before": 2,
+  "roles_sha256_before": "b0bfe4cefffc71d2fbeba16776236c78b9fa47f4760c99649814254b3247f026",
+  "roles_count_after": 2,
+  "roles_sha256_after": "b0bfe4cefffc71d2fbeba16776236c78b9fa47f4760c99649814254b3247f026",
+  "role_data_preserved": true,
+  "checks": [
+    {
+      "time": "2026-10-28T06:30:16.112+00:00",
+      "level": "I",
+      "source": "network",
+      "tag": "observer",
+      "transport": "host",
+      "kind": "probe_result",
+      "message": "probe_result",
+      "result": {
+        "dns": 0,
+        "resolved": "127.0.0.1",
+        "ipv4": {
+          "connect": 0,
+          "ok": true,
+          "caller_port_unchanged": true
+        },
+        "ipv6": {
+          "connect": 0,
+          "ok": true,
+          "caller_port_unchanged": true
+        }
+      },
+      "schema": 1,
+      "session": "20261028T063010Z-ad17e46a",
+      "sequence": 12
+    },
+    {
+      "time": "2026-10-28T06:30:17.822+00:00",
+      "level": "I",
+      "source": "network",
+      "tag": "observer",
+      "transport": "host",
+      "kind": "tls_probe_result",
+      "message": "tls_probe_result",
+      "result": {
+        "status": 200,
+        "cipher": "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+      },
+      "schema": 1,
+      "session": "20261028T063010Z-ad17e46a",
+      "sequence": 23
+    },
+    {
+      "time": "2026-10-28T06:30:18.191+00:00",
+      "level": "I",
+      "source": "network",
+      "tag": "observer",
+      "transport": "host",
+      "kind": "native_tls_probe_result",
+      "message": "native_tls_probe_result",
+      "result": {
+        "curl_result": 0,
+        "http_status": 200,
+        "response_bytes": 24
+      },
+      "schema": 1,
+      "session": "20261028T063010Z-ad17e46a",
+      "sequence": 31
+    },
+    {
+      "time": "2026-10-28T06:30:18.200+00:00",
+      "level": "I",
+      "source": "network",
+      "tag": "observer",
+      "transport": "host",
+      "kind": "redirect_ready",
+      "message": "本地重定向已启用，127.0.0.1:18770",
+      "pid": 45641,
+      "config": "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/game.json",
+      "package": "com.sygame.jingubang.p360",
+      "serial": "emulator-5562",
+      "port": 18770,
+      "offline": true,
+      "session": "20261028T063010Z-ad17e46a",
+      "command": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/ezan/Desktop/vibeCoidng/JGBOLNew/redirect_game.py --config /Users/ezan/Desktop/vibeCoidng/JGBOLNew/game.json run --port 18770 --duration 0 --probe --offline",
+      "schema": 1,
+      "sequence": 32
+    }
+  ],
+  "reloaded": true,
+  "revision": "2026-10-28-playable-v1",
+  "offline": true
+}

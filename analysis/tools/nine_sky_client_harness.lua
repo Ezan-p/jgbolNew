@@ -66,8 +66,23 @@ check('native ten roll animation setup',function()
  response(FIXTURE.after_single);response(FIXTURE.ten);ui.g_self.role_data=ms.d_c.table_copy(FIXTURE.ten.local_snapshot);ui.cancelSwallow()
  assert(ui.g_self.role_data.steps==FIXTURE.ten.local_snapshot.steps)
 end)
-check('native palace reopening and preview',function()
+check('native reentry ignores old palace and clears stale cache',function()
+ local encounter
+ for _,event in pairs(FIXTURE.ten.map_event_list) do if event.tina_shop then encounter=event.tina_shop end end
+ assert(encounter)
+ ui.processTinaInfo(ms.d_c.table_copy(encounter))
+ local legacy=ms.d_c.table_copy(FIXTURE.palace);legacy.tina_shop=ms.d_c.table_copy(encounter)
+ for i=1,2 do
+  response(legacy)
+  assert(not ui.g_towerUI.main_layer:getChildByTag(ui.g_self.Tags.Mystery))
+  assert(not ui.g_self.special_shop_data and not ui.g_self.tinaIndex)
+ end
+end)
+check('native fresh palace encounter and preview',function()
  response(FIXTURE.palace)
+ local encounter
+ for _,event in pairs(FIXTURE.ten.map_event_list) do if event.tina_shop then encounter=event.tina_shop end end
+ ui.processTinaInfo(ms.d_c.table_copy(encounter));ui.showMysteryShopLayer()
  assert(ui.g_self.tinaIndex>0 and #ui.g_self.shop_data[3]==2 and #ui.g_self.shop_data[4]==2)
 end)
 check('native palace item purchase callback',function() response(FIXTURE.palace_buy) end)
@@ -78,6 +93,26 @@ check('native star shop and card picker',function()
  response(FIXTURE.rich);response(FIXTURE.big)
  assert(#ui.g_self.shop_data[1]==6)
  ui.showComplexBuyLayer(1);assert(ui.g_towerUI.BuyInfo and #ui.g_towerUI.BuyInfo.card_list==3)
+end)
+check('native final card shows full bundle count within its border',function()
+ response(FIXTURE.rich)
+ for _,tid in ipairs({1249,1243}) do
+  local data=ms.d_c.table_copy(FIXTURE.big)
+  data.shop_data[6]={attach_data={object_type=5,attach_type=tid,attach_count=tid==1249 and 50 or 1,attach_level=1},
+   buy_limit=1,need_stars=500,need_credits=500,money_type=11,need_count=500}
+  response(data)
+  for _,bought in ipairs({0,1}) do
+   local card=ui.getShopItem(data.shop_data[6],6,bought,1)
+   local title=tolua.cast(card:getChildByTag(91038),'CCLabelTTF');assert(title)
+   local expected=ui.getItemName(data.shop_data[6].attach_data)..(tid==1249 and 'X50' or '')
+   assert(title:getString()==expected,'bundle quantity must not be truncated')
+   local background=tolua.cast(card:getChildren():objectAtIndex(0),'CCNode')
+   local right=background:getPositionX()+background:getContentSize().width*background:getScaleX()
+   assert(title:getPositionX()+title:getContentSize().width*title:getScaleX()<=right-11,'title exceeds card edge')
+   assert(title:getScaleX()>0.5,'title must remain readable')
+  end
+ end
+ response(FIXTURE.big)
 end)
 check('local rendered shop sends version with payment',function()
  ui.sendRequest(4,{buy_type=1,index=1,count=1,card_list={}})

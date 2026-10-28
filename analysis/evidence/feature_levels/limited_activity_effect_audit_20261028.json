@@ -1,0 +1,108 @@
+{
+  "scope": "read-only code audit; all gameplay requests use temporary databases",
+  "checks": {
+    "fish_low_level_daily_gift": {
+      "level": 1,
+      "list_request_accepted": true,
+      "nets_granted": 3,
+      "repeat_grants_extra": 0
+    },
+    "monday_low_level_training_task": {
+      "level": 14,
+      "training_accepted": true,
+      "finish_time": 1792900800,
+      "pending_jade": 10
+    },
+    "monday_low_level_monday_gift": {
+      "level": 14,
+      "claimable_jade_after_login": 30,
+      "prior_day_pending": 10,
+      "monday_free_gift": 20
+    },
+    "low_level_charge": {
+      "level": 1,
+      "accepted": true,
+      "principal_gold": 500,
+      "pavilion_charge_gold": 500,
+      "pavilion_bricks_earned": 60,
+      "pavilion_mail_count": 1,
+      "rulai_charge_gold": 500,
+      "rulai_draws_available": 1,
+      "yuanshi_charge_gold": 500,
+      "yuanshi_activated_gifts": 1,
+      "yuanshi_gift_counts": [
+        1
+      ]
+    },
+    "low_level_claim_pavilion_mail": {
+      "level": 1,
+      "accepted": true,
+      "bricks_claimed": 60
+    },
+    "disabled_action_switches": [
+      {
+        "activity": "monday",
+        "rejected": true,
+        "role_unchanged": true,
+        "message": "天工制物阁未开放或时钟回退"
+      },
+      {
+        "activity": "yuanshi",
+        "rejected": true,
+        "role_unchanged": true,
+        "message": "两周年活动尚未开放或已经结束"
+      },
+      {
+        "activity": "rulai",
+        "rejected": true,
+        "role_unchanged": true,
+        "message": "如来转盘尚未开放或已经结束"
+      },
+      {
+        "activity": "nine_sky",
+        "rejected": true,
+        "role_unchanged": true,
+        "message": "九重天尚未开放"
+      },
+      {
+        "activity": "pavilion",
+        "rejected": true,
+        "role_unchanged": true,
+        "message": "天机阁尚未开放"
+      },
+      {
+        "activity": "fish",
+        "rejected": true,
+        "role_unchanged": true
+      }
+    ],
+    "disabled_charge": {
+      "accepted": true,
+      "pavilion_charge_gold": 0,
+      "rulai_charge_gold": 0,
+      "yuanshi_enrolled": false
+    },
+    "disabled_monday_bootstrap_gift": {
+      "available_jade": 40
+    }
+  },
+  "date": "2026-10-28",
+  "gameplay_code_modified": false,
+  "live_save_modified": false,
+  "interpretation": {
+    "level_locked": "Seven entry/action gates hold, but background benefits bypass levels in monday, fish, yuanshi, rulai, pavilion.",
+    "disabled_switch": "Six activities with switches reject tested actions without modifying role; disabled recharge fan-out does not accrue pavilion/yuanshi/rulai. Existing Monday enrollment still accrues auto Monday gift while disabled.",
+    "calendar": "Fish permanent; rulai/nine_sky weekly and yuanshi/pavilion fortnightly cycles renew with no closed gap. Monday only exchanges on Monday; off-day tasks and rerolls are intentional. Equipment exchange is permanently listed with weekly quota and no independent enabled/time guard.",
+    "existing_assets": "Previously acquired bags and scheduled retirement/refund of existing balances remain effective by existing explicit policy."
+  },
+  "regression": {
+    "tests": 4,
+    "passed": 4,
+    "coverage": [
+      "all configured protocol gates below level, unchanged role and replay",
+      "seven exact opening thresholds",
+      "Monday closed weekdays and midnight boundaries",
+      "fish permanent expired historical time window and disabled switch"
+    ]
+  }
+}

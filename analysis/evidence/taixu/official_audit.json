@@ -10076,7 +10076,7 @@
   "local_rules": {
     "schema_version": 1,
     "mode": "inferred",
-    "revision": "offline-taixu-3",
+    "revision": "offline-taixu-4",
     "undergo_level": 50,
     "challenge_daily_limit": 10,
     "challenge_strength": 2,
@@ -10114,7 +10114,6 @@
     "arena_hp_rank_step": 5,
     "arena_hp_damage": 20,
     "arena_win_score": 100,
-    "arena_qualify_prize_crystals": 20,
     "arena_records": 10,
     "arena_rank_prizes": [
       {
@@ -10122,30 +10121,31 @@
         "back": 1,
         "gold": 500,
         "holy_peach": 10,
-        "reputation": 1000
+        "crystals": 10000
       },
       {
         "front": 2,
         "back": 3,
         "gold": 400,
         "holy_peach": 8,
-        "reputation": 800
+        "crystals": 8000
       },
       {
         "front": 4,
         "back": 10,
         "gold": 250,
         "holy_peach": 5,
-        "reputation": 500
+        "crystals": 5000
       },
       {
         "front": 11,
         "back": 20,
         "gold": 150,
         "holy_peach": 3,
-        "reputation": 300
+        "crystals": 3000
       }
-    ]
+    ],
+    "arena_win_prize_crystals": 100
   },
   "classification": {
     "A": [
@@ -10158,10 +10158,10 @@
       "原包50级入口与all_rank_prize.csv原始档位"
     ],
     "B": [
-      "按用户要求将血战榜奖改为元宝和圣母蟠桃，首次击败20仙晶不变",
+      "按用户要求血战每次胜利100仙晶，榜奖为元宝、圣母蟠桃及分档仙晶",
       "历劫首战开始计时、历史通关日奖保留",
       "按本地NPC库补足血战分组、数值与赛程推进",
-      "离线声望单独记录，不写未经确认的角色字段"
+      "每周一北京时间零点强制刷新未完成赛程，最终奖励不再记录声望"
     ]
   }
 }

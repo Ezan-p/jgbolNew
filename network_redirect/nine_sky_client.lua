@@ -6,7 +6,7 @@ do
  if not ui._localNineSkyRestore then
   local old={}
   for _,key in ipairs({'onGetActResult','cancelSwallow','showFloorTitle','updateActivityStatus',
-   'canJoin','sendRequest','create','showShopLayer','showComplexBuyLayer'}) do old[key]=ui[key] end
+   'canJoin','sendRequest','create','showShopLayer','showComplexBuyLayer','getShopItem'}) do old[key]=ui[key] end
   local pending,meta,timerLayer=nil,nil,nil
   local shopVersions={};local lastRequest=-100;local installed=true
   local battleTag=91037
@@ -101,6 +101,33 @@ do
   end
   ui.create=function(...) return render('main',old.create,...) end
   ui.showShopLayer=function(...) return render('shop',old.showShopLayer,...) end
+  ui.getShopItem=function(row,index,bought,page)
+   if page~=1 and page~=2 then return old.getShopItem(row,index,bought,page) end
+   -- Native titles append X<count> at a fixed font size and overrun the last
+   -- column. Fit the complete title inside its own card, including on purchase redraw.
+   local expected=ui.getItemName(row.attach_data)
+   if row.attach_data.attach_count>1 then expected=expected..'X'..row.attach_data.attach_count end
+   local create=ms.d_u.createByStyle
+   local title
+   ms.d_u.createByStyle=function(style,...)
+    local isTitle=style.type=='label' and style.string==expected and style.fontsize==28
+    local node=create(style,...)
+    if isTitle then title=node end
+    return node
+   end
+   local ok,item=pcall(old.getShopItem,row,index,bought,page)
+   ms.d_u.createByStyle=create
+   if not ok then error(item) end
+   if title then
+    local background=tolua.cast(item:getChildren():objectAtIndex(0),'CCNode')
+    local right=background:getPositionX()+background:getContentSize().width*background:getScaleX()
+    local available=math.max(1,right-title:getPositionX()-12)
+    local width=title:getContentSize().width
+    if width>0 then title:setScale(math.min(title:getScaleX(),available/width)) end
+    title:setTag(91038)
+   end
+   return item
+  end
   ui.updateActivityStatus=function(value,...)
    if value and value.local_permanent then
     -- Status is global; exchange versions are only supplied by a rendered shop.
@@ -182,6 +209,11 @@ do
    end
    if data.flag==1 then
     pending=nil;ui.g_self.card_list=ui.processCardList(data.local_cards or {})
+    -- Old servers/replayed entry packets may still carry the last encounter.
+    -- Only an actual movement event should open the mystery shop.
+    data=ms.d_c.table_copy(data);data.tina_shop=nil
+    if ui.clearTinaInfo then ui.clearTinaInfo() end
+    ui.g_self.tinaIndex=nil
    elseif data.flag==3 and meta then
     shopVersions[data.shop_type]={day=meta.shop_day,revision=meta.shop_revision}
    end

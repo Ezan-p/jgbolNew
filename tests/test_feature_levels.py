@@ -62,6 +62,7 @@ class FeatureLevelTests(unittest.TestCase):
         cases += [(1059, {'flag': f}) for f in (2, 3)]
         cases += [(1131, {'flag': 2})]
         cases += [(1328, {'reborn_type': 3, 'id': 5})]
+        cases += [(1053, {'compose_type': op}) for op in (2, 3)]
         cases += [(1303, {'id': 1})]
         cases += [(1349, {'id': i, 'data': '{}'}) for i in range(1, 8)]
         for mid, req in cases:
@@ -94,7 +95,7 @@ class FeatureLevelTests(unittest.TestCase):
                          (1059, {'flag': 1}), (1201, {'flag': 5}),
                          (1026, {'fight_type': 1}), (1026, {'fight_type': 11}),
                          (1244, {'fight_type': 3}), (1131, {'flag': 1}),
-                         (1343, {'flag': 1}), (1303, {'id': 2}),
+                         (1343, {'flag': 1}), (1303, {'id': 2}), (1053, {'compose_type': 1}),
                          (1328, {'reborn_type': 3, 'id': 6})]:
             with self.subTest(mid=mid, req=req):
                 self.assertIsNone(gates.feature(mid, req))
@@ -102,15 +103,41 @@ class FeatureLevelTests(unittest.TestCase):
         for flag in (0, 1):
             self.assertNotIn(55, [event for event, _ in self.request(1205, flag=flag)])
 
+    def test_limited_activity_opening_boundaries(self):
+        cases = [
+            ('monday', 15, 1219, dict(flag=1, level=0, op_type=0)),
+            ('fishrush', 20, 1208, dict(type_id=0, count=1)),
+            ('twoyears', 20, 1334, dict(flag=0, index=0)),
+            ('rulaitable', 20, 1351, dict(id=0, data='{}')),
+            ('tower', 20, 1309, dict(id=1, data='{}')),
+            ('destiny', 30, 1227, dict(flag=1, index=0, count=0)),
+            ('forge', 30, 1055, dict(flag=0)),
+        ]
+        for key, level, mid, req in cases:
+            with self.subTest(key=key):
+                self.assertEqual(gates.LEVELS[key], level)
+                before = self.role(level - 1)
+                events = self.request(mid, **req)
+                self.assertEqual(events, [(55, {'op_string': f'{gates.NAMES[key]}需角色{level}级开放'})])
+                self.assertEqual(self.b.profile(), before)
+                self.role(level)
+                events = self.request(mid, **req)
+                self.assertNotIn(55, [event for event, _ in events], events)
+                if key == 'forge':
+                    self.assertEqual(events[-1][1]['equip_compose']['min_role_level'], 30)
+
     def test_taixu_shop_purchase_at_12_does_not_unlock_ordeal(self):
         role = self.role(12)
-        cost = self.b.activity_rules['undergo_shop'][0]['cost']
+        self.assertNotIn(55, [event for event, _ in self.request(1349, id=3, data='{}')])
+        role = self.b.profile()
+        offer = role['activity']['undergo']['shop'][0]
+        cost = offer['cost']
         summon.add_item(role, 1366, cost)
         self.b.save(role)
         self.assertNotIn(55, [event for event, _ in self.request(
             1349, id=5, data='{index=1,count=1}')])
         after = self.b.profile()
-        self.assertEqual(after['activity']['undergo']['purchases']['1'], 1)
+        self.assertEqual(after['activity']['undergo']['purchases'][str(offer['reward'][1])], 1)
         self.assertEqual(self.b.respond(self.packet, {'authenticated': True}), self.replies)
         self.assertEqual(after, self.b.profile())
         self.assertEqual(self.request(1349, id=1, data='{}')[0][0], 55)

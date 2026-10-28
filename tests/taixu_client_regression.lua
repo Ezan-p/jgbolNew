@@ -1,11 +1,17 @@
 -- Lua 5.1 callback regression without a running Cocos client.
 -- Native-like layer removal exposes stale-stage bugs in settlement navigation.
+local exitEvent={name='exit'}
 local function node(w,h)
  local n={children={},width=w or 960,height=h or 640,enabled=true}
  function n:addChild(child,z,tag) child.parent=self;child.tag=tag or child.tag;self.children[#self.children+1]=child end
  function n:removeChildByTag(tag) local c=self:getChildByTag(tag);if c then c:removeFromParentAndCleanup(true) end end
  function n:getChildByTag(tag) for _,c in ipairs(self.children) do if c.tag==tag then return c end end end
  function n:removeFromParentAndCleanup()
+  local function exit(child)
+   if child.script then child.script(exitEvent) end
+   for _,nested in ipairs(child.children) do exit(nested) end
+  end
+  exit(self)
   if self.parent then for i,c in ipairs(self.parent.children) do if c==self then table.remove(self.parent.children,i);break end end end
   self.parent=nil
  end
@@ -16,6 +22,8 @@ local function node(w,h)
  function n:setScale(v) self.scale=v end
  function n:setAnchorPoint(v) self.anchor=v end
  function n:setEnabled(v) self.enabled=v end
+ function n:setVisible(v) self.visible=v end
+ function n:registerScriptHandler(fn) self.script=fn end
  function n:getContentSize() return {width=self.width,height=self.height} end
  function n:registerScriptTapHandler(fn) self.callback=fn end
  function n:tap() if self.enabled then return self.callback() end end
@@ -44,9 +52,13 @@ ms.d_u.delay=function() error('Arena return must render synchronously') end
 ms.d_u.createMenu=function(config)
  local n=node();for _,item in ipairs(config) do local b=node();b:registerScriptTapHandler(item.call_back);n:addChild(b) end;return n
 end
-ms.d_commonLayerUI={showPrizeResLayer=function(parent,list) assert(#list==2);popups=popups+1 end}
+ms.d_commonLayerUI={showPrizeResLayer=function(parent,list) assert(#list==3);popups=popups+1 end}
 ms.d_undergoMapUI={show=function() end,canFightNextChallenge=function() end}
 ms.d_undergoOrdealUI={enter=function() end,pressEnterUndergoLayer=function() end,getMainLayer=function() return root end}
+local shopSent,shopResults={},{}
+ms.d_undergoOrdealUI.sendMsg=function(op,data) shopSent[#shopSent+1]={op=op,data=data} end
+ms.d_undergoOrdealUI.onGetResult=function(op,data) shopResults[#shopResults+1]={op=op,data=data} end
+local nativeShopSend,nativeShopResult=ms.d_undergoOrdealUI.sendMsg,ms.d_undergoOrdealUI.onGetResult
 ms.d_event_mgr={setSpecialFightType=function() end}
 local ui={g_data={},g_arenaUI={parent_layer=root}}
 ms.d_arenaUI=ui;package.loaded.ms=ms
@@ -55,6 +67,9 @@ ui.sendRequest=function(id,data) sent[#sent+1]={id=id,data=data} end
 local function render(name,parent)
  parent=parent or ui.g_arenaUI.main_layer
  local n=node();parent:addChild(n)
+ n:registerScriptHandler(function(event)
+  if event=='exit' or type(event)=='table' and event.name=='exit' then n.nativeExited=true end
+ end)
  ui.g_arenaUI[name=='showQualifyFight' and 'qualify_layer' or name=='showBloodFight' and 'blood_layer' or 'rank_parent']=n
  local close=node();close:registerScriptTapHandler(function() ms.d_u.remove(n) end);n:addChild(close);n.close=close
  rendered[#rendered+1]=name
@@ -78,11 +93,15 @@ assert(loadfile('network_redirect/taixu_client.lua'))()
 local patched=ui.show;assert(loadfile('network_redirect/taixu_client.lua'))();assert(patched==ui.show)
 local groups={};for g=4,7 do groups[g]={min_level=50+(g-4)*10,max_level=g==7 and 99 or 59+(g-4)*10} end
 ui.onGetResult({id=1,role_group=5,group_type_level=groups,schedule_list={match_time_list={{},{},{start_time=1}}}})
+local function entryOption(group)
+ local visual=assert(ui.g_arenaUI.main_layer:getChildByTag(9879))
+ return visual:getChildByTag(9900+group)
+end
 for g=4,7 do
- local menu=assert(ui.g_arenaUI.main_layer:getChildByTag(9900+g));menu.item:tap()
+ local menu=assert(entryOption(g));menu.item:tap()
  assert(sent[#sent].id==2 and sent[#sent].data.enter_group==g)
 end
-for g=1,3 do assert(not ui.g_arenaUI.main_layer:getChildByTag(9900+g)) end
+for g=1,3 do assert(not entryOption(g)) end
 local function board(stage,ready,group)
  return {id=2,enter_group=group or 5,rank_type=math.min(stage,3),rank_data={},event_info={in_rank=stage<6},
   local_arena={title='阶段',stage=stage,stage_fights=ready and 1 or 0,can_advance=ready,own=true,settled=stage==6}}
@@ -100,14 +119,57 @@ for stage=1,5 do
  assert(#sent==count and #rendered==before+1)
 end
 ui.onFightReturn(true);assert(rendered[#rendered]=='history')
+for _,event in ipairs({{name='exit'},'exit'}) do
+ exitEvent=event
+ for stage=1,6 do
+  ui.onGetResult({id=1,role_group=5,group_type_level=groups,schedule_list={match_time_list={{},{},{start_time=1}}}})
+  for cycle=1,2 do
+   ui.onGetResult(board(stage,true))
+   local key=stage==1 and 'qualify_layer' or (stage==2 or stage==6) and 'rank_parent' or 'blood_layer'
+   local rank=assert(ui.g_arenaUI[key])
+   rank.close:tap()
+   assert(rank.nativeExited,'Native exit callback must be preserved')
+   assert(ui.g_arenaUI[key]==nil,'Closed board reference must be cleared')
+   assert(ui.g_arenaUI.main_layer:getChildByTag(9879).visible,'Closing any stage must restore entry')
+  end
+  local host=ui.g_arenaUI.main_layer
+  local visual=host:getChildByTag(9879)
+  for _,child in ipairs(visual.children) do
+   if child.children[1] and child.children[1].callback and not child.item then child.children[1]:tap();break end
+  end
+  assert(not host:getParent() and not root:getChildByTag(9875),'Exit must remove the touch-blocking host')
+  assert(not ui.g_arenaUI.main_layer)
+ end
+end
+exitEvent={name='exit'}
 for _,group in ipairs({5,7}) do
+ ui.onGetResult({id=1,role_group=group,group_type_level=groups,schedule_list={match_time_list={{},{},{start_time=1}}}})
  ui.onGetResult(board(5,true,group));local previous=ui.g_arenaUI.main_layer
- local settlement=board(6,false,group);settlement.local_prizes={{object_type=11},{object_type=5}}
+ local settlement=board(6,false,group);settlement.local_prizes={{object_type=11},{object_type=5},{object_type=5,attach_type=1366}}
  ui.onGetResult(settlement)
  assert(not previous:getParent() and not ui.g_arenaUI.blood_layer)
+ assert(not ui.g_arenaUI.main_layer:getChildByTag(9879).visible)
  local rank=ui.g_arenaUI.rank_parent;rank.close:tap();assert(not rank:getParent())
- for g=4,7 do assert(ui.g_arenaUI.main_layer:getChildByTag(9900+g)) end
+ assert(ui.g_arenaUI.main_layer:getChildByTag(9879).visible)
+ for g=4,7 do assert(entryOption(g)) end
+ local stale=rank
+ ui.onGetResult({id=1,role_group=group,group_type_level=groups,schedule_list={match_time_list={{},{},{start_time=1}}}})
+ assert(not stale:getParent() and not ui.g_arenaUI.rank_parent)
+ for g=4,7 do assert(entryOption(g)) end
  local count=popups;ui.onGetResult(board(6,false,group));assert(popups==count)
 end
+local request={index=2,count=3}
+ms.d_undergoOrdealUI.onGetResult(3,{{shop_token='day-one'}})
+ms.d_undergoOrdealUI.sendMsg(5,request)
+assert(shopSent[#shopSent].data.shop_token=='day-one' and request.shop_token==nil)
+ms.d_undergoOrdealUI.onGetResult(5,{index=2,attach_list={{buy_times=2}}})
+ms.d_undergoOrdealUI.sendMsg(5,request)
+assert(shopSent[#shopSent].data.shop_token=='day-one')
+ms.d_undergoOrdealUI.onGetResult(3,{{shop_token='day-two'}})
+ms.d_undergoOrdealUI.sendMsg(5,request)
+assert(shopSent[#shopSent].data.shop_token=='day-two')
+ms.d_undergoOrdealUI.sendMsg(3,{})
+assert(shopSent[#shopSent].data.shop_token==nil and #shopResults==3)
 ui._localTaixuRestore();assert(ui.show==originalShow and ui.onFightReturn==originalReturn)
-print('taixu client regression passed: four groups, enabled/disabled stage buttons, five synchronous returns, record return, both settled rank closes, popup, restore')
+assert(ms.d_undergoOrdealUI.sendMsg==nativeShopSend and ms.d_undergoOrdealUI.onGetResult==nativeShopResult)
+print('taixu client regression passed: four groups, stage buttons, fight/record returns, six-stage exit/reentry with table/string events, native exit handlers, host cleanup, settlement, restore')

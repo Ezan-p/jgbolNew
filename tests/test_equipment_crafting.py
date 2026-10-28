@@ -52,7 +52,11 @@ class CraftingTests(unittest.TestCase):
         before = self.b.profile()
         self.assertEqual(self.compose(ids[0], 2, 2001, ids)[-1][0], 55)
         self.assertEqual(before, self.b.profile())
-        self.assertEqual(self.compose(ids[0], 3, 6002, ids)[-1][0], 6)
+        self.assertEqual(self.compose(ids[0], 3, 6002, ids)[-1][0], 55)
+        self.assertEqual(before, self.b.profile())
+        reset = self.b.profile()['equipment_forge']['week_start'] + c.WEEK
+        with patch.object(c.time, 'time', return_value=reset):
+            self.assertEqual(self.compose(ids[0], 3, 6002, ids)[-1][0], 6)
         self.assertEqual(self.b.profile()['equipment_forge']['exchanged'], 1)
         self.assertEqual(sum(i['count'] for i in self.b.profile()['attachments'] if i['type_id']==6002), 40)
 

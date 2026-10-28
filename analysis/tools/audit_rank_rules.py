@@ -22,7 +22,7 @@ def main():
     for name in ('ui/rankUI','ui/checkLineupUI','ui/fightrecordUI','event_mgr','common/common_def'):
         p=ROOT/'jgbol3.87/assets/release_'/index['lua/'+name+'.lua']
         sources.append(dict(logical=name,path=str(p.relative_to(ROOT)),sha256=hashlib.sha256(p.read_bytes()).hexdigest()))
-    for name in ('analysis/npc_design/v1/catalog.json','server_config/rank_rules.json'):
+    for name in ('analysis/npc_design/v1/catalog.json','server_config/rank_rules.json', rank.rules()['elite_catalog']):
         p=ROOT/name;sources.append(dict(path=name,sha256=hashlib.sha256(p.read_bytes()).hexdigest()))
     rows=[dict(identity=ident,initial_order=ident-930000,npc_id=n['npc_id'],level=n['role']['level'],tier=n['tier'],archetype=n['archetype'],power=n['role']['role_combat_power']) for ident,n in rank.catalog().items()]
     out=ROOT/'analysis/evidence/rank';out.mkdir(exist_ok=True)

@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-28",
+  "timezone": "Asia/Shanghai",
+  "revision": "yuanshi-2026-10-28-fortnight",
+  "backend": {
+    "tests": 22,
+    "passed": 22
+  },
+  "lua51": {
+    "passed": true,
+    "full_client_compilation": true,
+    "checks": [
+      "permanent entry",
+      "14-day countdown",
+      "query at zero",
+      "stale actions blocked",
+      "dialog/cache reset",
+      "patch restoration"
+    ]
+  },
+  "original_assets": {
+    "resources": 9,
+    "strings": 27,
+    "passed": true
+  },
+  "native_cocos": {
+    "passed": false,
+    "completed": false,
+    "reason": "frida.InvalidArgumentError: device not found",
+    "live_account_resources_changed": false
+  },
+  "related": {
+    "activity": {
+      "tests": 61,
+      "passed": 60,
+      "failures": [
+        "LandTests.test_boss_cards_no_duplicate_advance_and_sweep: random gold card reward invalidates unchanged-gold assertion"
+      ]
+    },
+    "recharge": {
+      "tests": 26,
+      "passed": 25,
+      "errors": [
+        "GoldCardRechargeTests.test_same_order_is_account_scoped: second-account fixture lacks summon state"
+      ]
+    },
+    "baseline": "Both issues reproduced with pre-change Yuanshi implementation and period_days=28; land requires controlling random card order to put gold first."
+  },
+  "sha256": {
+    "network_redirect/activity_yuanshi.py": "982e9135bec6f3fa7c36d7e7bd16d21faafe8e323370fa8ee3a5eb5e65cd6291",
+    "network_redirect/yuanshi_client.lua": "9622dbec0e0157820a883e26fd00cd58812ec13c2d20abea9a8bd95efc18a25e",
+    "server_config/yuanshi_rules.json": "a831ba3594d9f45636f8e1eaaaa8ef2e0dc1b228afd3786f2e5731a927130925",
+    "tests/test_activity_yuanshi.py": "aabfb91f919d4233064fddea424c5e602ae0ac9346f2407b812797b7e8c993e1",
+    "tests/yuanshi_client_regression.lua": "c502751b341918881667e911b2471c90b8c83cbcb7b83fbda98a122ac8f62b5d"
+  }
+}

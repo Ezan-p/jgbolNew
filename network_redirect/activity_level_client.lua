@@ -11,10 +11,16 @@ do
   local oldRequire,oldVerify=act.getRequireLevel,act.verifyLevel
   local oldCell,oldCreate=fun.createFunCell,fun.create
   local delegates=setmetatable({},{__mode='k'})
+  -- Local opening levels requested by the user, not original client constants.
+  local overrides={monday=15,fishrush=20,twoyears=20,rulaitable=20,
+   tower=20,destiny=30,forge=30}
   local function level()
    return tonumber(ms.d_mainUI.g_playerInfo.level) or 0
   end
   act.getRequireLevel=function(id)
+   for name,required in pairs(overrides) do
+    if act.activityID[name] and id==act.activityID[name] then return required end
+   end
    -- Native getRequireLevel omits this separate check in activityUI.show.
    if id==act.activityID.tongtianta then return 36 end
    return oldRequire(id) -- Includes Taiwan friends and server-supplied limits.

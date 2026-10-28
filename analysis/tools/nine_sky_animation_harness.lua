@@ -13,7 +13,11 @@ ms.d_activityUI.g_self={main_layer=root};ms.d_activityUI.show=function() end
 ms.d_mainUI.g_playerInfo=ms.d_c.table_copy(ms.d_mainUI.g_playerInfo);ms.d_mainUI.g_playerInfo.gold_coin=1000000
 ms.d_lineupUI.g_usedCharacters={{character={type=5001,reborn_layer=0}}}
 ms.d_time.getTime=function() return FIXTURE.now end
-ms.d_u.main_server_send_msg=function() errors[#errors+1]='unexpected live send' end
+ms.d_u.main_server_send_msg=function(mid,data)
+ -- Other visible panels may poll during this hidden 50-second fixture.
+ -- Capture all traffic, but only tower requests indicate an animation error.
+ if mid==1309 then errors[#errors+1]='unexpected tower send: '..tostring(data and data.id) end
+end
 ms.d_info.show=function(text) if text=='wrong data assertion' then errors[#errors+1]=text end end
 local menu=ms.d_u.createMenu
 ms.d_u.createMenu=function(styles,...)

@@ -16,6 +16,11 @@ def rules():
     return undergo.rules()
 
 
+def week_start(day):
+    # Unix day zero was Thursday. Weeks begin Monday in the activity timezone.
+    return day-(day+3) % 7
+
+
 def group_for(level):
     return next(i for i, bounds in enumerate(rules()['arena_groups'], FIRST_GROUP) if bounds[0] <= level <= bounds[1])
 
@@ -36,10 +41,11 @@ def select_roster(group, day):
 
 
 def new_season(role, day, now):
+    day = week_start(day)
     group = group_for(role['level'])
-    s = dict(version=2, day=day, clock=now, group=group, viewing=group, stage=1,
+    s = dict(version=3, day=day, week_start_day=day, clock=now, group=group, viewing=group, stage=1,
              stage_fights=0, fights=0, paid=0, actions=rules()['arena_action_points'],
-             records=[], replays={}, settled=False, qualification_claimed=[], competitors={})
+             records=[], replays={}, settled=False, competitors={})
     for i, key in enumerate(reversed(select_roster(group, day))):
         s['competitors'][key] = dict(score=(rules()['arena_size']-i)*100, hp=rules()['arena_hp_base'])
     s['competitors']['self'] = dict(score=0, hp=rules()['arena_hp_base'])
@@ -58,8 +64,12 @@ def state(role, now, arules):
             s['group'] = group_for(role['level'])
         if s['viewing'] < FIRST_GROUP:
             s['viewing'] = s['group']
-        s['version'] = 2
-    if s is None or s['settled'] and day > s['day']:
+        s['version'] = 3
+        s.setdefault('week_start_day', week_start(s['day']))
+        s.pop('qualification_claimed', None)
+        s.pop('reputation', None)
+        s.get('settlement', {}).pop('reputation', None)
+    if s is None or week_start(day) > s['week_start_day']:
         s = new_season(role, day, now)
         role['activity']['arena'] = s
     s['clock'] = now
@@ -78,7 +88,7 @@ def ranking(s):
 def row(role, key, progress, order):
     if key == 'self':
         p = role
-        c = next((c for c in role['corteges'] if c.get('order') == 1), role['corteges'][0])
+        c = next((c for c in role['corteges'] if c.get('order') == 1), next(iter(role['corteges']), {'type': 4061}))
         tid, layer = c['type'], c.get('reborn_layer', 0)
     else:
         entry = npc_players.catalog()[key]; p = entry['profile']
@@ -93,8 +103,8 @@ def row(role, key, progress, order):
 
 
 def prize_specs(prize):
-    # User-requested ranking rewards; leave the original CSV and first-win crystals intact.
-    return [[11, 0, prize['gold'], 1], [5, 1343, prize['holy_peach'], 1]]
+    return [[11, 0, prize['gold'], 1], [5, 1343, prize['holy_peach'], 1],
+            [5, 1366, prize['crystals'], 1]]
 
 
 def prize_info():
@@ -160,14 +170,11 @@ def settle_prizes(role, s):
     order = ranking(s).index('self')+1
     prize = next((p for p in rules()['arena_rank_prizes'] if p['front'] <= order <= p['back']), None)
     gain = []
-    reputation = prize['reputation'] if prize else 0
     if prize:
         for spec in prize_specs(prize):
             gain.append(journey.grant(role, spec))
-    # No unverified role property is written: local blood-reputation is persisted
-    # as an activity statistic and shown on the settlement screen.
-    s['reputation'] = s.get('reputation', 0)+reputation
-    s.update(settled=True, stage=6, settlement=dict(order=order, reputation=reputation, attach_list=gain))
+    s.pop('reputation', None)
+    s.update(settled=True, stage=6, settlement=dict(order=order, attach_list=gain))
     return gain
 
 
@@ -224,12 +231,10 @@ def fight(role, s, data, now, jrules):
     npc = npc_players.get(key)
     result, lineup, actions = journey.battle(role, {}, jrules, units=(activity_rank.units(role), activity_rank.units(npc['role'])))
     win = 1 <= result <= 3
-    gain = []; reward_score = 0
+    gain = [journey.grant(role, [5, 1366, rules()['arena_win_prize_crystals'], 1])] if win else []
+    reward_score = 0
     if s['stage'] == 1 and win:
         mine['score'] = max(mine['score']+rules()['arena_win_score'], enemy['score']+1)
-        if key not in s['qualification_claimed']:
-            gain = [journey.grant(role, [5, 1366, rules()['arena_qualify_prize_crystals'], 1])]
-            s['qualification_claimed'].append(key)
     elif s['stage'] >= 3:
         if win:
             reward_score = rules()['arena_win_score']; mine['score'] += reward_score
@@ -260,8 +265,11 @@ def fight(role, s, data, now, jrules):
                      rewards=gain, attach_list=gain, send_prize_list=gain, role_add_exp=0, exp_list={}, silver_coin=0))]
 
 
-def replay(role, data):
-    s = role['activity'].get('arena', {})
+def replay(role, data, now, arules):
+    previous = role['activity'].get('arena')
+    s = state(role, now, arules)
+    if s is not previous:
+        return [response(entry(role, s, now))]
     record = next((r for r in s.get('records', []) if r['log_time'] == data.get('log_time')
                    and r['src_id'] == data.get('src_id') and r['match_type'] == data.get('match_type')), None)
     a.require(record is not None, '血战战报不存在或已过期')
@@ -274,7 +282,12 @@ def replay(role, data):
 def settle(role, req, now, arules, jrules, parse):
     data = parse(req['data']) if req['data'] else {}
     a.require(isinstance(data, dict), '血战参数无效')
+    previous = role['activity'].get('arena')
     s = state(role, now, arules); op = req['id']
+    # An old screen may submit a fight/advance/replay across the weekly boundary.
+    # Commit the new season and return its entrance without spending or settling.
+    if previous is not None and s is not previous and op != 1:
+        return [response(entry(role, s, now))]
     if op == 1:
         return [response(entry(role, s, now))]
     if op in (2, 3):

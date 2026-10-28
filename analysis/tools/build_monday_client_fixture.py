@@ -27,6 +27,13 @@ def main():
         fixtures['open']=m.snapshot(role,monday,r)
         fixtures['opening_claim']=unpack(m.settle(role,1219,dict(flag=2,level=0,op_type=0),monday)[0])
         fixtures['buy']=unpack(m.settle(role,1219,dict(flag=3,level=1,op_type=0),monday)[0])
+        fixtures['catalog']=[]
+        for index,row in enumerate(r['slots']):
+            for entry in row['pool']:
+                for spec in m.candidates(entry):
+                    preview=copy.deepcopy(role)
+                    preview['activity']['monday']['goods'][index]=spec
+                    fixtures['catalog'].append(m.snapshot(preview,monday,r))
         fixtures['next']=m.snapshot(role,monday+86400,r)
         b.close()
     text='local FIXTURE='+summon.lua(fixtures)+'\n'+(ROOT/'analysis/tools/monday_client_harness.lua').read_text()

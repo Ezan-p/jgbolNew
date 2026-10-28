@@ -43,7 +43,39 @@ class DutyTests(ActivityCase):
             self.b.save(copy.deepcopy(saved))
             with patch.object(duty.journey, 'battle', return_value=(4, [], [])) as battle:
                 self.ok(self.req(1026, fight_type=5, des_value=1, des_type=difficulty))
-            self.assertEqual(battle.call_args.kwargs['units'][1], balance.enemies(group, 1, difficulty))
+            self.assertEqual(battle.call_args.kwargs['units'][1], balance.enemies(group, 1, difficulty, saved['activity']['duty']['enemy_set']))
+
+    def test_enemy_set_persists_on_query_reload_resume_and_changes_on_restart(self):
+        with patch.object(balance, 'choose_enemy_set', return_value=2) as draw:
+            self.start()
+            self.assertEqual(draw.call_count, 1)
+        first = self.info(flag=1)['lineup_list']
+        with patch.object(balance, 'choose_enemy_set', side_effect=AssertionError('rerolled')):
+            self.assertEqual(first, self.info(flag=1)['lineup_list'])
+            self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+            self.assertEqual(first, self.info(flag=1)['lineup_list'])
+            self.fight(4)
+            self.info(plus_type=4, plus_index=1)
+            self.assertEqual(self.b.profile()['activity']['duty']['enemy_set'], 2)
+            self.assertEqual(first, self.info(flag=1)['lineup_list'])
+        self.fight(4)
+        with patch.object(balance.secrets, 'randbelow', return_value=0):
+            self.info(plus_type=4, plus_index=0)
+        self.assertEqual(self.b.profile()['activity']['duty']['enemy_set'], 0)
+
+    def test_enemy_set_yesterday_and_legacy_compatibility(self):
+        with patch.object(balance, 'choose_enemy_set', return_value=1):
+            self.start()
+        self.pass_stages(3)
+        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+            self.info(plus_type=5, plus_index=1)
+            self.assertEqual(self.b.profile()['activity']['duty']['enemy_set'], 1)
+        # A legacy current run has no set id: it must retain original set zero.
+        r = self.b.profile(); r['activity']['duty'].pop('enemy_set')
+        self.b.save(r)
+        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+            self.info(flag=1)
+        self.assertEqual(self.b.profile()['activity']['duty']['enemy_set'], 0)
 
     def test_unrewarded_guard_and_loss_never_grant_displayed_reward(self):
         self.start(); self.set_guard_reward([5, 1031, 1, 1], 2)
@@ -75,9 +107,9 @@ class DutyTests(ActivityCase):
         self.assertEqual(self.b.profile()['gold_coin'], before+30)
         self.assertEqual(sum('reward' in row for row in self.info(flag=1)['lineup_list'].values()), 1)
 
-    def test_half_snapshot_preserves_visible_guard_without_pending_prize(self):
+    def test_resume_snapshot_preserves_visible_guard_without_pending_prize(self):
         self.start(); self.pass_stages(12)
-        before = duty.half(self.b.profile()['activity']['duty'])
+        before = duty.resume(self.b.profile()['activity']['duty'])
         self.fight(4); self.info(plus_type=4, plus_index=1)
         d = self.b.profile()['activity']['duty']
         self.assertEqual(d['guard_reward'], before['guard_reward'])
@@ -175,12 +207,14 @@ class DutyTests(ActivityCase):
         self.assertEqual(self.req(1043, plus_type=4, plus_index=0)[0][0], 55)
         self.assertEqual(self.b.profile()['activity']['duty_runs'], 3)
 
-    def test_half_resume_uses_snapshot_not_zero_bonus(self):
+    def test_resume_resume_uses_snapshot_not_zero_bonus(self):
         self.start(); self.pass_stages(15)
-        old = self.b.profile()['activity']['duty']; saved = duty.half(old)
+        old = self.b.profile()['activity']['duty']; saved = duty.resume(old)
         self.fight(4)
         preview = self.info(flag=1)
         self.assertEqual(preview['revert_begin_round'], saved['round'])
+        self.assertEqual(preview['revert_plus_list'], preview['plus_list'])
+        self.assertGreater(sum(sum(row.values()) for row in preview['revert_plus_list'].values()), 0)
         d = self.info(plus_type=4, plus_index=1)
         self.assertEqual(d['cur_round'], saved['round']-1)
         self.assertEqual(d['cur_get_star'], saved['stars'])
@@ -198,7 +232,7 @@ class DutyTests(ActivityCase):
         self.assertEqual(d['max_get_star'], best)
         self.assertEqual(sum(d['plus_list'][2].values())+sum(d['plus_list'][1].values()), 0)
 
-    def test_yesterday_half_and_first_day_does_not_consume_query(self):
+    def test_yesterday_resume_and_first_day_does_not_consume_query(self):
         self.start(); self.pass_stages(15)
         with patch('network_redirect.backend.time.time', return_value=NOW+86400):
             for _ in range(2):
@@ -207,7 +241,7 @@ class DutyTests(ActivityCase):
             self.assertEqual(self.req(1043, plus_type=4, plus_index=1)[0][0], 55)
             d = self.info(plus_type=5, plus_index=1)
             self.assertEqual(d['fight_count'], 2)
-            self.assertEqual(d['cur_round'], 6)
+            self.assertEqual(d['cur_round'], 15)
             self.assertEqual(self.req(1043, plus_type=5, plus_index=1)[0][0], 55)
 
     def test_yesterday_restart_option(self):
@@ -265,8 +299,7 @@ class DutyTests(ActivityCase):
         r['activity']['duty_runs'] = 1; self.b.save(r)
         self.assertEqual(self.info(flag=1)['cur_round'], 15)
         self.info(plus_type=2, plus_index=3); self.fight(4)
-        self.assertEqual(self.req(1043, plus_type=4, plus_index=1)[0][0], 55)
-        self.info(plus_type=4, plus_index=0)
+        self.assertEqual(self.info(plus_type=4, plus_index=1)['cur_round'], 15)
 
     def test_actual_account_ranking_and_inspection(self):
         self.start(); self.pass_stages(3)
@@ -283,6 +316,88 @@ class DutyTests(ActivityCase):
         self.ok(out)
         self.assertEqual(next(d for e,d in out if e == 11)['role_name'], '第二玩家')
         self.assertEqual(self.req(1039, des_type=1, des_id=2**40, flag=3)[0][0], 55)
+
+    def preview(self, **req):
+        out = self.req(1039, **dict(dict(des_type=1, des_id=0, flag=duty.INSPECTION_FLAG), **req))
+        self.ok(out)
+        return next(d for e, d in out if e == 11)
+
+    def test_inspection_is_read_only_and_includes_current_run_blessing(self):
+        self.start()
+        role = self.b.profile()
+        role['activity']['duty'].update(initial_bonus=[10, 0, 20, 0], bonus=[5, 25, 10, 35])
+        self.b.save(role)
+        before = copy.deepcopy(self.b.profile())
+        source = next(c for c in before['corteges'] if c.get('order') == 1)
+        for request in ({}, dict(des_id=duty.alias(role), flag=3)):
+            view = self.preview(**request)
+            shown = next(c for c in view['cortege_list'].values() if c['id'] == source['id'])
+            self.assertTrue(view['read_only'] and view['is_read_only'] and view['duty_preview'])
+            self.assertEqual(view['client_flag'], 0)
+            self.assertNotEqual(view['role_id'], role['role_id'])
+            for stat, display, percent in zip(duty.STATS,
+                    ('max_hp_show', 'max_magic_show', 'wuligongji_show', 'wulifangyu_show'), (115,125,130,135)):
+                self.assertEqual(shown[stat], source[stat] * percent // 100)
+                self.assertEqual(shown[display], shown[stat])
+            self.assertGreater(shown['combat_power'], source['combat_power'])
+            self.assertEqual(self.b.profile()['corteges'], before['corteges'])
+            self.assertEqual(self.b.profile()['max_combat_power'], before['max_combat_power'])
+        normal = self.preview(des_id=role['role_id'], flag=0)
+        self.assertNotIn('duty_preview', normal)
+        shown = next(c for c in normal['cortege_list'].values() if c['id'] == source['id'])
+        for stat in duty.STATS:
+            self.assertEqual(shown[stat], source[stat])
+
+    def test_preview_equipment_has_native_goss_default(self):
+        role = self.b.profile()
+        item = dict(id=duty.formation.new_id(role), type_id=1001, count=1,
+                    attach_type=5, level=1)
+        role['attachments'].append(item)
+        item.update(equip_order=1, equip_pos=1)
+        item.pop('goss_plus', None)
+        item.pop('advance_level', None)
+        self.b.save(role)
+        before = copy.deepcopy(self.b.profile())
+        view = self.preview()
+        self.assertEqual(next(i for i in view['equip_list'].values()
+                              if i['id'] == item['id'])['goss_plus'], 0)
+        self.assertTrue(all('advance_level' in i for i in view['equip_list'].values()))
+        self.assertEqual(self.b.profile()['attachments'], before['attachments'])
+
+    def test_preview_without_run_restart_and_cross_day(self):
+        base = self.preview()['cortege_list'][1]['gongji']
+        self.assertIsNone(self.b.profile()['activity']['duty'])
+        self.assertEqual(self.b.profile()['activity']['duty_runs'], 0)
+        self.start()
+        self.assertEqual(self.preview()['cortege_list'][1]['gongji'], base*110//100)
+        self.fight(4)
+        self.info(plus_type=4, plus_index=0)
+        self.assertEqual(self.preview()['cortege_list'][1]['gongji'], base)
+        self.info(plus_type=1, plus_index=3)
+        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+            self.assertEqual(self.preview()['cortege_list'][1]['gongji'], base)
+
+    def test_peer_preview_uses_its_own_run_and_ignores_stale_day(self):
+        self.start()
+        peer = copy.deepcopy(self.b.profile())
+        peer.update(register_account='peer', role_name='第二玩家')
+        peer['activity']['duty']['bonus'] = [0,0,35,0]
+        self.b.save(peer, 'peer')
+        base = peer['corteges'][0]['gongji']
+        self.assertEqual(self.preview(des_id=duty.alias(peer), flag=3)['cortege_list'][1]['gongji'], base*145//100)
+        peer['activity']['duty_meta']['day'] -= 1
+        self.b.save(peer, 'peer')
+        before = copy.deepcopy(self.b.duty_peers())
+        self.assertEqual(self.preview(des_id=duty.alias(peer), flag=3)['cortege_list'][1]['gongji'], base)
+        self.assertEqual(self.b.duty_peers(), before)
+
+    def test_duty_preview_rejects_invalid_context(self):
+        for args in (dict(des_type=2), dict(des_id=1), dict(fight_id=1)):
+            request = dict(des_type=1, des_id=0, flag=duty.INSPECTION_FLAG)
+            request.update(args)
+            self.assertEqual(self.req(1039, **request)[0][0], 55)
+        role = self.b.profile(); role['level'] = 11; self.b.save(role)
+        self.assertEqual(self.req(1039, des_type=1, flag=duty.INSPECTION_FLAG)[0][0], 55)
 
     def test_ranking_all_five_groups_csv_boundaries(self):
         for g in range(4, 9):
@@ -315,15 +430,30 @@ class DutyTests(ActivityCase):
                 self.assertEqual(self.b.profile()['gold_coin'], before)
 
     def test_bonus_only_affects_battle_units_and_preview_matches(self):
-        self.start(); before = self.b.profile()
+        self.start()
+        role = self.b.profile()
+        role['activity']['duty'].update(initial_bonus=[10,0,0,0], bonus=[5,25,30,35])
+        self.b.save(role)
+        before = self.b.profile()
+        preview = self.preview()['cortege_list']
         seen = []
-        def run(role, cfg, rules, **kw):
-            seen.append(copy.deepcopy(kw['units']))
-            return 3, [], []
-        with patch('network_redirect.activity_duty.journey.battle', side_effect=run):
+        engine = duty.journey.combat_engine.Battle
+        def run(battle):
+            seen.append(copy.deepcopy(battle.initial))
+            return engine_run(battle)
+        engine_run = engine.run
+        with patch.object(engine, 'run', run):
             self.ok(self.req(1026, fight_type=5, des_type=3, des_value=1))
-        original, _ = duty.journey.fighters(before, dict(cortege_list='1001|1'))
-        self.assertEqual(seen[0][0][0]['gongji'], original[0]['gongji']*110//100)
+        for unit in seen[0][0]:
+            shown = next(c for c in preview.values() if c['id']==unit['companion_id'])
+            for stat in duty.STATS:
+                self.assertEqual(unit[stat], shown[stat])
+            self.assertEqual(unit['max_hp'], shown['hp'])
+        normal, _ = duty.journey.fighters(before, dict(cortege_list='1001|1'))
+        for unit in normal:
+            source = next(c for c in before['corteges'] if c['id']==unit['companion_id'])
+            for stat in duty.STATS:
+                self.assertEqual(unit[stat], source[stat])
         self.assertEqual(self.b.profile()['corteges'], before['corteges'])
 
     def test_unresolved_battle_does_not_award_win(self):
@@ -453,7 +583,7 @@ class DutyTests(ActivityCase):
             self.assertEqual(self.req(1026, fight_type=5, des_type=3, des_value=1)[0][0], 55)
         self.assertEqual(before, self.b.profile())
 
-    def test_pending_random_prizes_cross_day_and_half_never_duplicates(self):
+    def test_pending_random_prizes_cross_day_and_resume_never_duplicates(self):
         self.start(); self.pass_stages(6)
         self.set_guard_reward([11, 0, 20, 1])
         self.fight()
@@ -482,17 +612,15 @@ class DutyTests(ActivityCase):
         self.info(plus_type=2, plus_index=3)
         self.assertEqual(self.b.profile()['activity']['duty']['bonus'][2], 5)
 
-    def test_half_keeps_group_and_saved_offers(self):
+    def test_resume_keeps_group_and_current_bonus(self):
         self.start(); self.pass_stages(12)
         r = self.b.profile(); d = r['activity']['duty']
-        saved = d['checkpoints']['6']
-        saved.update(phase='exchange', offers=[dict(field=177, value=15, star=27)], stars=54, used=9)
-        original_group = d['group']
+        original = copy.deepcopy(d)
         d['phase'] = 'finished'; r['cortege_count'] = 4; self.b.save(r)
         self.info(plus_type=4, plus_index=1)
         d = self.b.profile()['activity']['duty']
-        self.assertEqual(d['group'], original_group)
-        self.assertEqual(d['offers'], saved['offers'])
+        for key in ('group', 'round', 'stars', 'used', 'bonus', 'initial_bonus'):
+            self.assertEqual(d[key], original[key])
         self.assertFalse(duty.pending(d))
 
     def test_each_bonus_tier_debits_its_saved_cost_and_value(self):

@@ -41,19 +41,42 @@ do
   replace(secret,'showPrizePage',function(parent,...)
    remainingLabel=nil;remainingParent=nil
    local s=secret.g_self;local data=s.prize_data or {}
-   -- Older running servers/cached pages contain 25 rewards, but the native
-   -- carousel creates only 18 buttons. Its selected slot can otherwise be
-   -- 19..25 and abort rendering before the controls/close button are created.
+   -- Repair a cached 25-slot page until the new server response arrives.
    if data.prize_items and #data.prize_items>18 then
     for i=#data.prize_items,19,-1 do data.prize_items[i]=nil end
-    data.sort_list={} -- Rebuild from the retained server indices and order.
+    data.sort_list={}
    end
    if data.free_times~=nil then s.free_times=data.free_times end
    local count=s.fight_count
    if data.cleared_layer~=nil then s.fight_count=data.cleared_layer end
    local create=ms.d_u.createByStyles
+   local menu=ms.d_u.createMenu
+   ms.d_u.createMenu=function(styles,buttons,...)
+    if styles[3] and styles[3].call_back==secret.pressCloseSearch then
+     if s.free_times>0 then
+      styles[1].npic='v2/secretArea/onekey_money1.png'
+      styles[1].spic='v2/secretArea/onekey_money2.png'
+      styles[1].dispic='v2/secretArea/onekey_money3.png'
+      local w=ms.d_u.getRealScale(s.prize_bkg)
+      parent:addChild(create({type='label',fontsize=26,string=tostring(data.sweep_gold_cost or 10),x=0.5+0.4*w,y=styles[1].y,color={235,225,185}}),200)
+     end
+     local function draw(flag)
+      if (s.free_times or 0)<=0 then return end
+      secret.send_msg_union_event(43,{flag=flag})
+     end
+     styles[1].call_back=function()
+      if (s.free_times or 0)<=0 then return end
+      ms.d_quitUI.createYesNoByStyle(parent,{string=string.format('消耗%d元宝，探宝剩余%d次？',data.sweep_gold_cost or 10,s.free_times)},function() draw(6) end)
+     end
+     styles[2].call_back=function() draw(2) end
+    end
+    return menu(styles,buttons,...)
+   end
    local costNodes={}
    ms.d_u.createByStyles=function(options,...)
+    if options.type=='label' and options.string==string.format(ms.d_hz.gethz('secretArea_prize_tink1'),s.fight_count,data.max_free_times or s.fight_count) then
+     options.string=string.format('今日已通关%d/%d层，累计获得%d次探宝机会。',data.cleared_layer or 0,data.max_layer or 3,data.earned_search_times or 0)
+    end
     local node=create(options,...)
     if options.type=='label' and options.string==string.format(ms.d_hz.gethz('secretArea_free_times'),s.free_times) then
      rememberLabel(node,parent)
@@ -65,7 +88,7 @@ do
     return node
    end
    local ok,result=pcall(nativePage,parent,...)
-   ms.d_u.createByStyles=create;s.fight_count=count
+   ms.d_u.createByStyles=create;ms.d_u.createMenu=menu;s.fight_count=count
    if not ok then error(result) end
    if s.free_times==0 then
     local w,h=ms.d_u.getRealScale(s.prize_bkg)
@@ -88,6 +111,16 @@ do
   end)
   local nativeSearch=secret.callback_fam_search_gold
   replace(secret,'callback_fam_search_gold',function(data,...)
+   if data.result==1 and (data.flag==2 or data.flag==6) and data.board_size==18 then
+    -- Use the authoritative board and counts for both single and sweep results.
+    secret.g_self.prize_data=data;data.sort_list={}
+    secret.setFreeTimes(data.free_times,data.fight_count)
+    secret.showPrizePage(secret.g_self.main_layer)
+    local prizes={}
+    for _,p in pairs(data.prize_list or {}) do prizes[#prizes+1]=p end
+    ms.d_commonLayerUI.showPrizeResLayer(secret.g_self.g_parent_layer,prizes)
+    return
+   end
    if data.result==1 and data.flag~=7 then
     local cached=secret.g_self.prize_data
     if cached then
@@ -104,7 +137,21 @@ do
    local s=secret.g_self;local team=s.teams_info and s.teams_info.team
    local count=s.fight_count
    if team and team.cleared_layer~=nil then s.fight_count=team.cleared_layer end
-   local ok,result=pcall(nativeTeam,...);s.fight_count=count
+   local menu=ms.d_u.createMenu
+   ms.d_u.createMenu=function(styles,buttons,...)
+    -- Keep the native timestamp/label logic. Only the primary action needs
+    -- to continue after the first fight instead of switching permanently.
+    if team and team.can_continue~=nil and styles[5] and styles[6] and styles[6].call_back==secret.getTeamsInfo then
+     local action=styles[5]
+     if team.can_continue then
+      action.npic='v2/worldTreeUI/fight1.png';action.spic='v2/worldTreeUI/fight2.png';action.call_back=secret.pressFight
+     else
+      action.npic='v2/secretArea/explore21.png';action.spic='v2/secretArea/explore22.png';action.call_back=secret.pressExplore
+     end
+    end
+    return menu(styles,buttons,...)
+   end
+   local ok,result=pcall(nativeTeam,...);s.fight_count=count;ms.d_u.createMenu=menu
    if not ok then error(result) end
    return result
   end)

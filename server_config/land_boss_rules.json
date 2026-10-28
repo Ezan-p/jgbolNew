@@ -1,14 +1,18 @@
 {
   "schema_version": 1,
   "mode": "inferred",
-  "revision": "land-tower-roster-2026-10-26-v1",
-  "normal_level_step": 2,
-  "hell_level_step": 3,
+  "revision": "land-tower-growth-2026-10-28-v3",
+  "normal_start_level": 3,
+  "hell_start_level": 4,
+  "normal_level_step": 6,
+  "hell_level_step": 8,
+  "stat_percent": 115,
+  "min_floor_growth_percent": 3,
   "skill_level": 1,
   "guard_layer_step": 8,
   "notes": {
     "A": "原包神仙类型、形象、基础四维、成长系数与初始法术；原版未找到镇妖塔逐层首领映射。",
-    "B": "64层名单、顺序、等级和护卫安排均为推测。逐层按原神仙成长计算，四维不得低于前一层首领对应值加1。每8层增加一位护卫，护卫依次使用前面的层首领。冥界使用同一名单，更高等级。"
+    "B": "64层名单、顺序、等级和护卫安排为离线设定。普通等级3+6×(层数-1)，冥界4+8×(层数-1)。原神仙成长与初始被动结算后四维乘115%向下取整，再取不低于上一层对应值×103%向上取整。每8层增加一位护卫，沿用前层首领已结算的属性，不重复乘系数。"
   },
   "floors": [
     {

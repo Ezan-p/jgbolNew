@@ -32,8 +32,8 @@ report=dict(client='3.87',official_server_available=False,inputs=inputs,contract
     classification={'A':['mode1=挑战,mode2=历劫','cortege_list=神仙ID→阵位','原版81关及守卫与修炼',
        '挑战每日10次/2体力，历劫0体力/每神仙4次','72小时退关/每日当前小关重置',
        '血战七组、冲榜、练习、三段血战、血量优先排名','原包50级入口与all_rank_prize.csv原始档位'],
-      'B':['按用户要求将血战榜奖改为元宝和圣母蟠桃，首次击败20仙晶不变','历劫首战开始计时、历史通关日奖保留','按本地NPC库补足血战分组、数值与赛程推进',
-           '离线声望单独记录，不写未经确认的角色字段']})
+      'B':['按用户要求血战每次胜利100仙晶，榜奖为元宝、圣母蟠桃及分档仙晶','历劫首战开始计时、历史通关日奖保留','按本地NPC库补足血战分组、数值与赛程推进',
+           '每周一北京时间零点强制刷新未完成赛程，最终奖励不再记录声望']})
 out=ROOT/'analysis/evidence/taixu';out.mkdir(parents=True,exist_ok=True)
 (out/'official_audit.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print('Verified',len(inputs),'original inputs and',len(u.GATES),'gates')

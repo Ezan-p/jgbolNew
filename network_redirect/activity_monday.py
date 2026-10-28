@@ -9,6 +9,16 @@ from . import formation as f, summon, journey
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def candidates(entry):
+    return entry.get('choices') if isinstance(entry, dict) else [entry]
+
+
+def draw(row, current=None):
+    # Each displayed category has equal weight regardless of its variant count.
+    pool = [entry for entry in row['pool'] if current not in candidates(entry)]
+    return copy.deepcopy(secrets.choice(candidates(secrets.choice(pool))))
+
+
 def load_rules(path=ROOT / 'server_config/monday_rules.json'):
     r = json.loads(Path(path).read_text())
     f.require(r.get('schema_version') == 1 and r.get('mode') == 'inferred'
@@ -24,12 +34,17 @@ def load_rules(path=ROOT / 'server_config/monday_rules.json'):
         f.require(type(row.get('cost')) is int and 1 <= row['cost'] <= 100000, '天工价格无效')
         pool = row.get('pool')
         f.require(isinstance(pool, list) and len(pool) >= 2, '天工换货池不足')
-        for p in pool:
+        rewards = []
+        for entry in pool:
+            options = candidates(entry)
+            f.require(isinstance(options, list) and bool(options), '天工商品类别为空')
+            rewards.extend(options)
+        for p in rewards:
             f.require(isinstance(p, list) and len(p) == 4 and all(type(v) is int for v in p), '天工奖励格式无效')
             typ, tid, n, lv = p
             f.require(1 <= n <= 100000 and lv == 1 and
                       (typ == 5 and tid in f.ITEMS or typ in (11, 12) and tid == 0), '天工奖励无效')
-        f.require(len({tuple(p) for p in pool}) == len(pool), '天工候选商品重复')
+        f.require(len({tuple(p) for p in rewards}) == len(rewards), '天工候选商品重复')
     return r
 
 
@@ -39,6 +54,14 @@ def calendar(now, r):
     # A season starts on Tuesday and ends after the following Monday sale.
     start = day - (weekday - 2) % 7
     return day, weekday, start
+
+
+def prepare(role, now):
+    """Settle existing saves even when the player does not open the shop."""
+    old = copy.deepcopy(role.get('activity', {}).get('monday'))
+    if old is None:
+        return False
+    return state(role, now, load_rules()) != old
 
 
 def state(role, now, r):
@@ -58,7 +81,7 @@ def state(role, now, r):
                 now=now, rules=welfare.load_rules())
             store = role['activity']
         s = dict(start=start, day=day, clock=now, jade=0, pending=0,
-                 goods=[copy.deepcopy(secrets.choice(row['pool'])) for row in r['slots']],
+                 goods=[draw(row) for row in r['slots']],
                  random_time=[0]*4, task={})
         store['monday'] = s
     elif day > s['day']:
@@ -66,6 +89,13 @@ def state(role, now, r):
         if task.get('finish_time') and not task.get('recv_time'):
             s['pending'] += task['gain']
         s.update(day=day, task={})
+    if s.get('catalog_revision') != r['revision']:
+        # Upgrade obsolete offers once without resetting jade, tasks or the
+        # player's daily change allowance; valid previews remain selected.
+        for i, row in enumerate(r['slots']):
+            if not any(s['goods'][i] in candidates(entry) for entry in row['pool']):
+                s['goods'][i] = draw(row)
+        s['catalog_revision'] = r['revision']
     if not s['task']:
         gain = r['monday_jade'] * (2 if role.get('vip_level', 0) > 0 else 1) if weekday == 1 else r['daily_jade']
         s['task'] = dict(cur_task=r['task_rotation'][day % 9], finish_time=now if weekday == 1 else 0,
@@ -114,8 +144,7 @@ def settle(role, mid, req, now):
         f.require(weekday != 1, '开业当天不能更换商品')
         old_time = s['random_time'][index-1]
         f.require(not old_time or calendar(old_time, r)[0] < day, '这件物品今日已更换')
-        choices = [p for p in r['slots'][index-1]['pool'] if p != s['goods'][index-1]]
-        s['goods'][index-1] = copy.deepcopy(secrets.choice(choices))
+        s['goods'][index-1] = draw(r['slots'][index-1], s['goods'][index-1])
         s['random_time'][index-1] = now
         from . import activity as a
         # 142 uses common_op_result.success=0; 112 instead checks result=1.

@@ -53,9 +53,13 @@ class AccountTests(unittest.TestCase):
         backend = state['backend']
         backend.reborn_replies[100] = ('old', [])
         backend.last_reborn_serial = 100
+        backend.guide_replies[100] = ('old', [])
+        backend.last_guide_serial = 100
         state = self.enter(self.auth_as('alice', 'login')['token'])
         self.assertEqual(state['backend'].reborn_replies, {})
         self.assertEqual(state['backend'].last_reborn_serial, 0)
+        self.assertEqual(state['backend'].guide_replies, {})
+        self.assertEqual(state['backend'].last_guide_serial, 0)
 
     def test_password_validation_and_hashes(self):
         self.auth_as('alice')

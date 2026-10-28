@@ -90,7 +90,9 @@ class GuildSocialNpcTests(unittest.TestCase):
         self.assertEqual(len(self.b.profile()['guild']['unions']['2']['feast']['gifts']), 3)
         self.req(66, des_id=gifts[1]['des_id'])
         fortune = self.req(18, query_type=15)[-1]['fortune_info']
-        self.assertEqual(len(fortune), 4)
+        from network_redirect import monument_wealth
+        self.assertEqual(len(fortune),len(monument_wealth.rules()['npcs']))
+        self.assertEqual(self.b.profile()['monument_wealth']['current']['normal_gift'],0)
 
     def test_saved_match_roster_survives_restart_and_changes_next_day(self):
         first = self.req(18, query_type=13)[-1]['des_member_list']

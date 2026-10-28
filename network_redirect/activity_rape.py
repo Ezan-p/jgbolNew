@@ -55,8 +55,9 @@ def ensure(role, now, r):
     s.setdefault('rape_total_refreshes',s.get('rape_refreshes',0))
     boards = s.get('rape_boards')
     if 'rape_recent_npcs' not in s:
-        npcs.remember(role,[t['npc_id'] for b in boards or [] for rows in b['form_list'].values()
-                            for t in rows.values() if t.get('npc_id')],rules())
+        npcs.remember(role,[t['npc_id'] for b in (boards or []) if isinstance(b,dict)
+                            for rows in (b.get('form_list') or {}).values() if isinstance(rows,dict)
+                            for t in rows.values() if isinstance(t,dict) and t.get('npc_id')],rules())
     if boards is None:
         dice = roll_forms()
         straight = dice[1]-dice[0] == dice[2]-dice[1] and abs(dice[1]-dice[0]) == 1
@@ -70,20 +71,91 @@ def ensure(role, now, r):
                                reward_claimed=False,form_list={'1':{},'2':rows}))
         s['rape_boards']=boards
         npcs.remember(role,used,rules())
+    # A partially-written/legacy board can survive a reconnect with one
+    # column missing its form_list entries.  Treat the die (form_type) as the
+    # source of truth and restore only the missing guard slots.  Without this
+    # repair the board is considered valid forever and the client renders an
+    # empty column after a refresh.
+    if not isinstance(boards, list):
+        boards = []
+        s['rape_boards'] = boards
+    if len(boards) < 3:
+        dice = roll_forms()
+        straight = dice[1]-dice[0] == dice[2]-dice[1] and abs(dice[1]-dice[0]) == 1
+        skill_count = rules()['straight_skill_count'] if straight else 1
+        pool = reward_pool() or r['rape_skills']
+        used = [t['npc_id'] for b in boards if isinstance(b, dict)
+                for rows in (b.get('form_list') or {}).values() if isinstance(rows, dict)
+                for t in rows.values() if isinstance(t, dict) and t.get('npc_id')]
+        for i in range(len(boards), 3):
+            count = dice[i]
+            rows = {}
+            for j in range(count):
+                target = opponent(role, j, used=used)
+                used.append(target['npc_id'])
+                target.update(index=j + 1, rand=6 - j)
+                rows[str(next_id(s))] = target
+            boards.append(dict(version=2, form_type=count, skill_type=secrets.choice(pool),
+                               skill_count=skill_count, reward_claimed=False,
+                               form_list={'1': {}, '2': rows}))
+        npcs.remember(role, used, rules())
     # Upgrade old boards in place without erasing victories or issuing rewards again.
-    used=[t['npc_id'] for b in boards for rows in b['form_list'].values()
-          for t in rows.values() if t.get('npc_id')]
+    used=[t['npc_id'] for b in boards if isinstance(b,dict)
+          for rows in (b.get('form_list') or {}).values() if isinstance(rows,dict)
+          for t in rows.values() if isinstance(t,dict) and t.get('npc_id')]
     migrated=[]
     for i,b in enumerate(boards):
+        if not isinstance(b, dict):
+            b = boards[i] = {}
+        form_list = b.setdefault('form_list', {})
+        if not isinstance(form_list, dict):
+            form_list = b['form_list'] = {}
+        # JSON saves from an older handler may contain numeric keys.  Keep the
+        # canonical string keys used by battle/inspection while accepting both.
+        for key in (1, 2):
+            if str(key) not in form_list and key in form_list:
+                form_list[str(key)] = form_list.pop(key)
+        form_list.setdefault('1', {})
+        if not isinstance(form_list['1'], dict):
+            form_list['1'] = {}
+        if not isinstance(form_list.get('2'), dict):
+            form_list['2'] = {}
         if b.get('version',1)<2:
             # Keep legacy progress and already-issued rewards; align the die with
             # its existing guards instead of adding or removing live opponents.
-            b['form_type']=sum(len(rows) for rows in b['form_list'].values())
+            b['form_type']=sum(len(rows) for rows in form_list.values() if isinstance(rows,dict))
             b['version']=2
-        b.setdefault('form_type',i+1)
-        b['form_list'].setdefault('1',{})
-        b.setdefault('reward_claimed', all(t['has_win'] for rows in b['form_list'].values() for t in rows.values()))
-        for rows in b['form_list'].values():
+        desired = b.get('form_type')
+        if type(desired) is not int or not 1 <= desired <= 6:
+            # Old version-2 saves omitted form_type; retain the historical
+            # column fallback so a missing third column is restored as a full
+            # third column rather than a single accidental guard.
+            desired = max(1, min(6, len(form_list['2']) or i + 1))
+            b['form_type'] = desired
+        rows = form_list['2']
+        b.setdefault('reward_claimed', all(isinstance(t, dict) and t.get('has_win')
+                                           for group in form_list.values() for t in group.values()))
+        # Legacy rows did not persist their visual slot metadata.  Normalize
+        # those rows before deciding which slots are absent, otherwise every
+        # legacy guard would be duplicated during repair.
+        for j, t in enumerate(rows.values()):
+            if isinstance(t, dict):
+                t.setdefault('index', j + 1)
+                t.setdefault('rand', 3 - j)
+        # Fill absent slots in-place so IDs, victories, and visual order of
+        # existing guards remain stable across refreshes/reconnects.
+        occupied = {int(t.get('index')) for t in rows.values()
+                    if isinstance(t, dict) and isinstance(t.get('index'), int)}
+        for slot in range(1, desired + 1):
+            if slot in occupied:
+                continue
+            target = opponent(role, slot - 1, used=used)
+            target.update(index=slot, rand=6 - slot + 1,
+                          has_win=bool(b.get('reward_claimed')))
+            rows[str(next_id(s))] = target
+            used.append(target['npc_id'])
+            migrated.append(target['npc_id'])
+        for rows in form_list.values():
             for j,t in enumerate(rows.values()):
                 t.setdefault('index',j+1);t.setdefault('rand',3-j)
                 if 'npc_id' not in t:

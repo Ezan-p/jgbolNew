@@ -1,0 +1,251 @@
+{
+  "inputs": [
+    {
+      "logical": "csv_config/task_guide_prize.csv",
+      "asset": "95e170792543e1e9dc50572c7758dbda.data",
+      "sha256": "4659bbd9f5da94b18a6eb32e9754c38585b64126d7aadfb82e0f2157dee2ea27",
+      "csv_values_match": true,
+      "rows": 14
+    },
+    {
+      "logical": "csv_config/guide_schedule.csv",
+      "asset": "5551faaee6c6225bd896b13cecfd84e0.data",
+      "sha256": "50f680da6a076af1470899403a9f03fe86daac703949621b34c6b5dd8997af43",
+      "csv_values_match": true,
+      "rows": 23
+    },
+    {
+      "logical": "lua/ui/tianShuUI.lua",
+      "asset": "49dd4be9228a3f60a31741fa3a3d08a2.data",
+      "sha256": "a48da9ad22e3442ae217c65f3db7bf750726c2edb64b38b2bd156b2b1a29e3b7"
+    },
+    {
+      "logical": "lua/ui/guideUI.lua",
+      "asset": "853b2b7dcd5700d0f2a488705aa9ffc3.data",
+      "sha256": "e87c33899ecf70b9acf402934af1db28bcccb8338a372879a3d9469d8e8f7a6c"
+    },
+    {
+      "logical": "lua/data.lua",
+      "asset": "addd745afbcab3049f3e12eed115a370.data",
+      "sha256": "f3d994283064c92bc5ba01ed5bd810785d26cd7509dbac508f96b46b992be5a3"
+    },
+    {
+      "logical": "lua/event_mgr.lua",
+      "asset": "ae0f40d1631f06ad6e89a50dc5ea4c26.data",
+      "sha256": "ad671dc53da75f3f413e6ca0519cbbee0bf114a7b49864bb3c38f723ab4b77ed"
+    },
+    {
+      "logical": "lua/common/common_def.lua",
+      "asset": "13a640e1f35a7599fe90dd31c8098b15.data",
+      "sha256": "15a4299fc92c50adda7682a4775f2e278e135f49f12d126e105a03d097d9ecf8"
+    },
+    {
+      "logical": "lua/common/msg_def.lua",
+      "asset": "6dc7effc05688bb493fa72368df65d46.data",
+      "sha256": "12cbfbed63d3696347bf066bd61836b287d129323dd4a147f792814b0493a049"
+    }
+  ],
+  "original_contracts": {
+    "task_guide_prize": "14 rows; preserve CSV order; type|id|level|count, two &-separated variants",
+    "tianShuUI:395-415": "1201 flag=4 id=stage; tutorial uses 1204 stage=13",
+    "tianShuUI:417-459": "event 57 task_stage/prize_list; stage12 opens monthCardUI",
+    "tianShuUI:636-645,724-745": "ordered claim progression",
+    "tianShuUI:647-672": "bit zero removed: stage n maps to 1<<n",
+    "tianShuUI:674-685": "CSV task order and stage12 month card special case",
+    "data:3942-3945": "client config key 2 -> tianShuUI.goldConfig",
+    "event_mgr:2042-2044": "attribute12 updates task_progress and redraws hint; attribute13 missing",
+    "text:month_exp": "三天月卡",
+    "tianShuUI:702-722": "all rewards claimed hides book; completion is cached"
+  },
+  "inferred_policies": {
+    "schema_version": 1,
+    "reward_variant": 1,
+    "account_policy": "local_account",
+    "evidence": "A: original task_guide_prize.csv and tianShuUI; B: first reward variant, local account replacement, historical recovery; user override: level 9 gives 50 gold instead of three-day month card",
+    "level9_gold": 50
+  },
+  "rewards": [
+    {
+      "stage": 1,
+      "name": "第一次boss战斗胜利并获得三星评价",
+      "original_raw": "11|1|1|20&11|1|1|20",
+      "local_specs": [
+        [
+          11,
+          1,
+          20,
+          1
+        ]
+      ]
+    },
+    {
+      "stage": 10,
+      "name": "将主角等级提升至3级",
+      "original_raw": "11|1|1|30&11|1|1|30",
+      "local_specs": [
+        [
+          11,
+          1,
+          30,
+          1
+        ]
+      ]
+    },
+    {
+      "stage": 11,
+      "name": "第一次完成装备强化",
+      "original_raw": "11|1|1|50&11|1|1|50",
+      "local_specs": [
+        [
+          11,
+          1,
+          50,
+          1
+        ]
+      ]
+    },
+    {
+      "stage": 2,
+      "name": "将主角等级提升至5级",
+      "original_raw": "11|1|1|50&11|1|1|50",
+      "local_specs": [
+        [
+          11,
+          1,
+          50,
+          1
+        ]
+      ]
+    },
+    {
+      "stage": 3,
+      "name": "第一次参与主角修炼并获得胜利",
+      "original_raw": "11|1|1|50&11|1|1|50",
+      "local_specs": [
+        [
+          11,
+          1,
+          50,
+          1
+        ]
+      ]
+    },
+    {
+      "stage": 4,
+      "name": "第一次在封神榜中挑战并获得胜利",
+      "original_raw": "11|1|1|50&11|1|1|50",
+      "local_specs": [
+        [
+          11,
+          1,
+          50,
+          1
+        ]
+      ]
+    },
+    {
+      "stage": 13,
+      "name": "主角等级提升到7级",
+      "original_raw": "5|3019|1|1&5|3019|1|1",
+      "local_specs": [
+        [
+          5,
+          3019,
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "stage": 5,
+      "name": "第一次在渡劫活动中挑战对手并获得胜利",
+      "original_raw": "11|1|1|50&11|1|1|50",
+      "local_specs": [
+        [
+          11,
+          1,
+          50,
+          1
+        ]
+      ]
+    },
+    {
+      "stage": 12,
+      "name": "主角等级提升到9级",
+      "original_raw": "&",
+      "local_specs": [
+        [
+          11,
+          1,
+          50,
+          1
+        ]
+      ]
+    },
+    {
+      "stage": 6,
+      "name": "将主角等级提升至12级",
+      "original_raw": "11|1|1|50&11|1|1|50",
+      "local_specs": [
+        [
+          11,
+          1,
+          50,
+          1
+        ]
+      ]
+    },
+    {
+      "stage": 7,
+      "name": "第一次在天命之战中成功闯过10关",
+      "original_raw": "11|1|1|100&11|1|1|50",
+      "local_specs": [
+        [
+          11,
+          1,
+          100,
+          1
+        ]
+      ]
+    },
+    {
+      "stage": 8,
+      "name": "第一次将法术升级至3级",
+      "original_raw": "11|1|1|100&11|1|1|50",
+      "local_specs": [
+        [
+          11,
+          1,
+          100,
+          1
+        ]
+      ]
+    },
+    {
+      "stage": 9,
+      "name": "在大闹蟠桃会活动中完成20次战斗",
+      "original_raw": "11|1|1|100&11|1|1|50",
+      "local_specs": [
+        [
+          11,
+          1,
+          100,
+          1
+        ]
+      ]
+    },
+    {
+      "stage": 14,
+      "name": "通过个人中心绑定账号并注册实名信息",
+      "original_raw": "11|1|1|50&11|1|1|50",
+      "local_specs": [
+        [
+          11,
+          1,
+          50,
+          1
+        ]
+      ]
+    }
+  ]
+}

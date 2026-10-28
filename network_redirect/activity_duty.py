@@ -4,16 +4,36 @@ Ranking contains actual local-account results, never fabricated NPC scores.
 """
 import copy
 import hashlib
-from . import formation, journey, summon, achievements, role_profile, cheer, duty_balance
+from . import formation, journey, summon, achievements, role_profile, cheer, duty_balance, combat_power
 from . import battle_replay
 from .protocol import encode
 
 require = formation.require
 FIELDS = (174, 175, 176, 177)  # hp, magic, attack, defence
 STATS = ('hp', 'magic', 'gongji', 'fangyu')
+INSPECTION_FLAG = 51  # Local-only 1039 context: current player's duty preview.
 PRIZES = summon.rows('duty_topprize_config.csv')
 COLUMNS = {4: 'lineup_four', 5: 'lineup_five', 6: 'lineup_six',
            7: 'lineup_seven', 8: 'lineup_eight'}
+
+
+def blessing_modifiers(duty):
+    """Return the temporary four-stat modifiers for one active duty run."""
+    duty = duty or {}
+    initial = list(duty.get('initial_bonus') or ())
+    bonus = list(duty.get('bonus') or ())
+    return [(int(initial[i]) if i < len(initial) else 0)
+            + (int(bonus[i]) if i < len(bonus) else 0)
+            for i in range(len(STATS))]
+
+
+def apply_blessing(unit, modifiers, *, sync_max_hp=False):
+    """Apply duty modifiers to a detached unit or preview snapshot."""
+    for stat, modifier in zip(STATS, modifiers):
+        unit[stat] = int(unit[stat]) * (100 + modifier) // 100
+    if sync_max_hp:
+        unit['max_hp'] = unit['hp']
+    return unit
 
 
 def day(now, r):
@@ -39,8 +59,8 @@ def meta(role):
 
 
 def checkpoint(d):
-    out = {k: copy.deepcopy(d[k]) for k in ('round', 'stars', 'used', 'bonus', 'initial_bonus', 'phase', 'group', 'offers', 'guard_reward') if k in d}
-    # A half-run skips already earned rewards, but keeps its saved offers.
+    out = {k: copy.deepcopy(d[k]) for k in ('round', 'stars', 'used', 'bonus', 'initial_bonus', 'phase', 'group', 'enemy_set', 'offers', 'guard_reward') if k in d}
+    # A resumed run skips already earned rewards, but keeps its saved offers.
     if out['phase'] == 'prize':
         out['phase'] = d.get('after_prize', 'exchange')
     return out
@@ -57,12 +77,18 @@ def ensure_guard_reward(d):
         d['guard_reward'] = duty_balance.guard_reward(d['round'])
 
 
-def half(d):
-    # Retain the former offline half-round formula. Actual snapshots replace
-    # the former invented zero-bonus/history-best shortcut.
-    target = max(1, (d['round'] - 1) // 2)
-    candidates = [int(k) for k in d.get('checkpoints', {}) if int(k) <= target]
-    return copy.deepcopy(d['checkpoints'][str(max(candidates))]) if candidates else None
+def resume(d):
+    """Resume the actual current stage; never restore an earlier checkpoint."""
+    saved = checkpoint(d)
+    if saved['phase'] == 'finished':
+        saved['phase'] = 'fight'
+    return saved
+
+
+def bonus_tables(snapshot):
+    snapshot = snapshot or {}
+    return [dict(zip(FIELDS, snapshot.get(key, [0]*4)))
+            for key in ('initial_bonus', 'bonus')]
 
 
 def prepare(role, now, r, peers=None):
@@ -77,6 +103,9 @@ def prepare(role, now, r, peers=None):
         d.setdefault('initial_bonus', [0]*4)
         d.setdefault('checkpoints', {})
         d.setdefault('group', group(role))
+        # Legacy active runs retain their original schedule, without a reroll.
+        d.setdefault('enemy_set', 0)
+        m['last_enemy_set'] = d['enemy_set']
         if d['phase'] == 'exchange' and 'offers' not in d:
             exchange_or_fight(d)
         # Old saves contain no trustworthy earlier snapshots or victory grades.
@@ -112,7 +141,7 @@ def record(role):
     # Best single run, not the sum of three attempts or rounds * 3.
     if row is None or (d['stars'], d['round']-1) >= (row['stars'], row['rounds']):
         m['records'][key] = dict(stars=d['stars'], rounds=d['round']-1,
-            group=d['group'], half=half(d), bonus=copy.deepcopy(d['bonus']))
+            group=d['group'], resume=resume(d), bonus=copy.deepcopy(d['bonus']))
     s['duty_best'] = max(s.get('duty_best', 0), d['round']-1)
 
 
@@ -208,7 +237,7 @@ def data(role, r, result=None, peers=None):
     d = s.get('duty')
     if result is None:
         result = {'initial':1, 'fight':3, 'prize':6, 'exchange':5, 'finished':11}.get((d or {}).get('phase'), 2)
-        if not d and m['yesterday'] and m['yesterday'].get('half'):
+        if not d and m['yesterday'] and m['yesterday'].get('resume'):
             result = 12
         if (not d or d['phase'] == 'finished') and s['duty_runs'] >= r['duty_daily_runs']:
             result = 7
@@ -218,7 +247,7 @@ def data(role, r, result=None, peers=None):
     score = m['records'].get(str(m['day']), {})
     _, pos = rank(role, peers, m['day'])
     ours = sum(1 <= c.get('order', 0) <= 8 for c in role['corteges'])
-    plan = duty_balance.stage(current.get('group', group(role)), current['round'])
+    plan = duty_balance.stage(current.get('group', group(role)), current['round'], current.get('enemy_set', 0))
     out = dict(result=result, cur_round=current['round']-1,
         max_fight_round=score.get('rounds', 0), max_get_star=score.get('stars', 0),
         fight_count=max(0, r['duty_daily_runs']-s['duty_runs']),
@@ -235,13 +264,13 @@ def data(role, r, result=None, peers=None):
         out['star_exchange'] = copy.deepcopy(d['offers'])
     if d and pending(d):
         out['silver_prize'] = [dict(object_type=p[0], attach_type=p[1], attach_count=p[2], attach_level=p[3]) for p in pending(d)]
-    restored = half(d) if d else None
+    restored = resume(d) if d else None
     out.update(revert_begin_round=restored['round'] if restored else 1,
-        revert_plus_list=dict(zip(FIELDS, [a+b for a,b in zip(restored['bonus'], restored['initial_bonus'])])) if restored else dict.fromkeys(FIELDS, 0))
-    last = m['yesterday'] or {}; h = last.get('half')
+        revert_plus_list=bonus_tables(restored))
+    last = m['yesterday'] or {}; h = last.get('resume')
     out.update(last_get_star=last.get('stars', 0), last_max_fight_round=last.get('rounds', 0),
         last_half_begin_round=h['round'] if h else 1,
-        last_plus_list=dict(zip(FIELDS, [a+b for a,b in zip(h['bonus'], h['initial_bonus'])])) if h else dict.fromkeys(FIELDS, 0))
+        last_plus_list=bonus_tables(h))
     return out
 
 
@@ -255,6 +284,9 @@ def start(role, r, restored=None):
     s['duty_runs'] += 1
     d = dict(round=1, stars=0, used=0, bonus=[0]*4, initial_bonus=[0]*4,
              phase='initial', group=group(role), checkpoints={})
+    d['enemy_set'] = (restored.get('enemy_set', 0) if restored else
+                      duty_balance.choose_enemy_set(meta(role).get('last_enemy_set',
+                          (s.get('duty') or {}).get('enemy_set'))))
     if restored:
         d.update(copy.deepcopy(restored))
         # Skipped-stage rewards were already earned; never grant them twice.
@@ -263,6 +295,7 @@ def start(role, r, restored=None):
         if d['phase'] == 'exchange':
             exchange_or_fight(d)
     s['duty'] = d
+    meta(role)['last_enemy_set'] = d['enemy_set']
     remember(d)
 
 
@@ -273,7 +306,7 @@ def update(role, req, now, r, peers=None):
     require(req['flag'] == 0 or op == 0, '查询不能携带天命操作')
     if op == 0:
         if req['flag'] == 0 and (d is None or d['phase'] == 'finished'):
-            if d is None and meta(role)['yesterday'] and meta(role)['yesterday'].get('half'):
+            if d is None and meta(role)['yesterday'] and meta(role)['yesterday'].get('resume'):
                 return [event(role, r, 12, peers)]
             if d and s['duty_runs'] < r['duty_daily_runs']:
                 return [event(role, r, 11, peers)]
@@ -282,14 +315,14 @@ def update(role, req, now, r, peers=None):
         return [event(role, r, peers=peers)]
     if op == 5:
         last = meta(role)['yesterday'] or {}
-        require(d is None and s['duty_runs'] == 0 and last.get('half') and idx in (0, 1), '昨日半程记录不可用')
-        start(role, r, last['half'] if idx else None)
+        require(d is None and s['duty_runs'] == 0 and last.get('resume') and idx in (0, 1), '昨日续关记录不可用')
+        start(role, r, last['resume'] if idx else None)
         return [event(role, r, peers=peers)]
     require(d is not None, '请先开始天命之战')
     if op == 4:
         require(d['phase'] == 'finished' and idx in (0, 1), '本轮尚未结束或重开选项无效')
-        saved = half(d) if idx else None
-        require(not idx or saved is not None, '旧存档缺少半程快照，请重新挑战')
+        saved = resume(d) if idx else None
+        require(not idx or saved is not None, '当前续关记录不可用')
         start(role, r, saved)
     elif op == 1:
         require(d['phase'] == 'initial' and 1 <= idx <= 4, '初始祝福已选择或选项无效')
@@ -318,13 +351,12 @@ def battle(role, req, now, r, jrules, peers=None):
     require(req['des_type'] in (1, 2, 3) and req['des_id'] == 0 and req['des_value'] == d['round'], '天命关卡已变化，请刷新后重试')
     ensure_guard_reward(d)
     cfg = dict(cortege_list=f"{r['battle_npc']}|{r['battle_level']}")
-    plan = duty_balance.stage(d['group'], d['round'])
-    units = (journey.fighters(role, cfg)[0], duty_balance.enemies(d['group'], d['round'], req['des_type']))
+    plan = duty_balance.stage(d['group'], d['round'], d.get('enemy_set', 0))
+    units = (journey.fighters(role, cfg)[0], duty_balance.enemies(d['group'], d['round'], req['des_type'], d.get('enemy_set', 0)))
     require(bool(units[0]), '请先上阵神仙')
+    modifiers = blessing_modifiers(d)
     for u in units[0]:
-        for stat, bonus, initial in zip(STATS, d['bonus'], d['initial_bonus']):
-            u[stat] = u[stat]*(100+bonus+initial)//100
-        u['max_hp'] = u['hp']
+        apply_blessing(u, modifiers, sync_max_hp=True)
     result, lineup, actions = journey.battle(role, cfg, jrules, units=units)
     win = 1 <= result <= 3
     s['fight_id'] += 1; fid = s['fight_id']
@@ -349,29 +381,53 @@ def battle(role, req, now, r, jrules, peers=None):
         remember(d); record(role)
     else:
         d['phase'] = 'finished'; record(role)
-    outcome = 8 if win else 11 if half(d) and s['duty_runs'] < r['duty_daily_runs'] else 9
+    outcome = 8 if win else 11 if resume(d) and s['duty_runs'] < r['duty_daily_runs'] else 9
     return journey.combat_engine.event_packets(actions, fid) + [
         encode(1028, dict(fight_id=fid, first_hand=1, des_name=plan['name'], lineup_count=len(lineup), lineup=lineup)),
         *battle_replay.result_packets(1027, dict(fight_id=fid, fight_type=5, final_result=result, fight_round=len(actions), fight_result=actions)),
         event(role, r, outcome, peers), *material_events, summon.event(44, dict(fight_id=fid, fight_type=5))]
 
 
-def inspection(role, req, peers):
+def inspection(role, req, peers, frules=None):
     require(req['des_type'] == 1, '天命榜阵容类型无效')
-    target = next((p for p in [role]+list(peers or []) if alias(p) == req['des_id']), None)
+    if req.get('flag') == INSPECTION_FLAG:
+        require(req['des_id'] == 0 and req.get('fight_id', 0) == 0, '天命阵容查询参数无效')
+        target = role
+    else:
+        target = next((p for p in [role]+list(peers or []) if alias(p) == req['des_id']), None)
     require(target is not None, '天命榜角色不存在')
-    chars = [dict(copy.deepcopy(c), type_id=c['type'], max_hp_show=c['hp'], max_magic_show=c['magic'],
-                  wuligongji_show=c['gongji'], wulifangyu_show=c['fangyu'])
-             for c in target['corteges'] if 1 <= c.get('order', 0) <= 8]
+    # Duty blessings are temporary modifiers owned by the run.  The normal
+    # formation remains untouched; only the read-only snapshot shown from the
+    # duty board receives the current run's effective values.
+    duty = target.get('activity', {}).get('duty')
+    # Peer saves are read-only and may not have rolled over since last login.
+    if target.get('activity', {}).get('duty_meta', {}).get('day') != meta(role)['day']:
+        duty = None
+    modifiers = blessing_modifiers(duty)
+    weights = (frules or formation.load_rules())['combat_weights']
+    chars = []
+    for source in sorted(target['corteges'], key=lambda c: c.get('order', 0)):
+        if not 1 <= source.get('order', 0) <= 8:
+            continue
+        c = copy.deepcopy(source)
+        apply_blessing(c, modifiers)
+        c['combat_power'] = combat_power.score_panel(c, weights, combat_power.essence_score(target, c)['total'])
+        c.update(type_id=c['type'], max_hp_show=c['hp'], max_magic_show=c['magic'],
+                 wuligongji_show=c['gongji'], wulifangyu_show=c['fangyu'])
+        chars.append(c)
     out = dict(role_id=alias(target), role_name=target['role_name'], level=target['level'],
         vip_level=target.get('vip_level', 0), head_type=target.get('head_type', 1), rank=0,
         title_info={}, animal_info={}, hole_train={}, cortege_list=chars, equip_list=[],
-        ext_skill_list={}, ext_star_list={})
+        ext_skill_list={}, ext_star_list={}, read_only=True, is_read_only=True,
+        # Tianming has no d_activityUI.g_self; use the running-scene viewer.
+        duty_preview=True, client_flag=0)
     out.update(cheer.inspection(target))
     for i in target['attachments']:
         if not i.get('equip_order') or not i.get('equip_pos'):
             continue
-        row = dict(copy.deepcopy(i), order=i['equip_order'])
+        # Native calItemValue reads both fields unconditionally, even on old gear.
+        row = dict(copy.deepcopy(i), order=i['equip_order'], goss_plus=i.get('goss_plus', 0),
+                   advance_level=i.get('advance_level', 0))
         if i['attach_type'] == 6 and i['equip_order'] <= 8:
             out['skill_list'].append(row)
         elif i['attach_type'] == 5:

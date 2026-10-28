@@ -5,7 +5,7 @@ from unittest.mock import patch
 from test_activity import ActivityCase, NOW
 from network_redirect import activity, activity_rank as rank, summon, formation
 from network_redirect.backend import Backend
-from network_redirect.protocol import decode
+from network_redirect.protocol import decode, encode
 
 
 class RankTests(ActivityCase):
@@ -30,7 +30,7 @@ class RankTests(ActivityCase):
 
     def test_inspection_matches_full_fighting_roster_and_skills(self):
         self.board()
-        for ident in (930001,930050,930099):
+        for ident in (930001,930002,930003,930004,930005,930050,930099):
             out=self.req(1039,des_type=2,des_id=ident);self.ok(out)
             data=next(d for e,d in out if e==11);npc=rank.catalog()[ident]['role']
             chars=list(data['cortege_list'].values());expected=[c for c in npc['corteges'] if c['order']]
@@ -38,6 +38,24 @@ class RankTests(ActivityCase):
             self.assertEqual(sum(c['wuligongji_show'] for c in chars),sum(c['gongji'] for c in expected))
             self.assertTrue(data['equip_list']);self.assertTrue(data['skill_list'])
             self.assertTrue(all(len(p)<=32768 for p in self.replies))
+
+    def test_elites_stronger_with_remaining_ladder_and_sources_unchanged(self):
+        from network_redirect import npc_players
+        from analysis.tools import build_npc_catalog as design
+        current = rank.catalog()
+        original_rules = copy.deepcopy(rank.rules())
+        original_rules.pop('elite_npcs')
+        with patch.object(rank, 'rules', return_value=original_rules):
+            original = rank.catalog.__wrapped__()
+        self.assertEqual({k:v for k,v in current.items() if k > 930005},
+                         {k:v for k,v in original.items() if k > 930005})
+        for ident in range(930001,930006):
+            npc = current[ident]
+            self.assertGreater(npc['role']['role_combat_power'], original[ident]['role']['role_combat_power'])
+            design.validate(copy.deepcopy(npc))
+        source = npc_players.get('npc_v1_l99_t1_attack')['role']
+        self.assertEqual({c['evolve_level'] for c in source['corteges'] if c['order']}, {49})
+        self.assertEqual({c['evolve_level'] for c in current[930001]['role']['corteges'] if c['order']}, {99})
 
     def test_win_rewards_five_cards_one_actual_award(self):
         before=self.b.profile();fight,events=self.fight(99);after=self.b.profile()
@@ -81,25 +99,60 @@ class RankTests(ActivityCase):
             self.assertEqual(self.board()['fight_count'],self.b.profile()['top_fight_limit'])
             self.assertEqual(self.b.profile()['activity']['rank_extra'],0)
 
-    def test_half_hour_offline_cap_and_clock_rollback(self):
+    def test_token_batch_uses_inventory_preserves_score_and_replays_once(self):
+        r=self.b.profile();summon.add_item(r,1021,100);self.b.save(r)
+        token=next(i for i in r['attachments'] if i['type_id']==1021)
+        before=self.b.profile()
+        events=self.req(1051,item_type=1021,item_id=token['id'],item_count=100,des_type=1)
+        self.ok(events)
+        result=next(d for e,d in events if e==21)
+        self.assertEqual(result,dict(result=1,type_id=1021,count=100,effect_value=300))
+        self.assertNotIn(1022,[m for m,_,d in self.decoded])
+        after=self.b.profile()
+        self.assertEqual(after['activity']['rank_score'],before['activity']['rank_score'])
+        self.assertEqual(after['activity']['rank_extra'],300)
+        self.assertFalse(any(i['id']==token['id'] for i in after['attachments']))
+        self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
+        self.assertEqual(after,self.b.profile())
+        self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.assertEqual(after,self.b.profile())
+
+    def test_token_invalid_batch_and_unusable_stack_are_atomic(self):
+        r=self.b.profile();summon.add_item(r,1021,2);self.b.save(r)
+        token=next(i for i in r['attachments'] if i['type_id']==1021)
+        for override in (dict(item_count=3),dict(item_count=101),dict(des_type=2),dict(des_id=999999),dict(item_id=999999)):
+            before=self.b.profile()
+            request=dict(item_type=1021,item_id=token['id'],item_count=1,des_type=1)
+            request.update(override)
+            self.assertEqual(self.req(1051,**request)[0][0],55)
+            self.assertEqual(before,self.b.profile())
+        for field in ('is_lock','equip_pos','owner_id'):
+            r=self.b.profile();next(i for i in r['attachments'] if i['id']==token['id'])[field]=1
+            self.b.save(r);before=self.b.profile()
+            self.assertEqual(self.req(1051,item_type=1021,item_id=token['id'],item_count=1,des_type=1)[0][0],55)
+            self.assertEqual(before,self.b.profile())
+            next(i for i in r['attachments'] if i['id']==token['id'])[field]=0;self.b.save(r)
+
+    def test_daily_score_offline_cap_and_clock_rollback(self):
         self.board();base=self.b.profile()['activity']['rank_score']
         with patch('network_redirect.backend.time.time',return_value=NOW+1799):self.board()
         self.assertEqual(self.b.profile()['activity']['rank_score'],base)
         with patch('network_redirect.backend.time.time',return_value=NOW+1800):self.board();self.board()
-        self.assertEqual(self.b.profile()['activity']['rank_score'],base+rank.score(100))
+        self.assertEqual(self.b.profile()['activity']['rank_score'],base)
         with patch('network_redirect.backend.time.time',return_value=NOW-86400):self.board()
-        self.assertEqual(self.b.profile()['activity']['rank_score'],base+rank.score(100))
+        self.assertEqual(self.b.profile()['activity']['rank_score'],base)
         with patch('network_redirect.backend.time.time',return_value=NOW+40*86400):self.board()
-        self.assertEqual(self.b.profile()['activity']['rank_score'],base+337*rank.score(100))
+        self.assertEqual(self.b.profile()['activity']['rank_score'],base+7*rank.score(100,'day_score'))
 
     def test_previous_day_best_claim_and_historical_promotions(self):
         self.fight(99);self.assertEqual(self.req(1201,flag=2)[0][0],55)
         with patch('network_redirect.backend.time.time',return_value=NOW+86400):
-            self.ok(self.req(1201,flag=2));r=self.b.profile()
+            self.board();r=self.b.profile()
+            self.assertEqual(r['activity']['rank_score'],rank.score(99)+rank.score(99,'day_score'))
             self.assertEqual(r['activity']['rank_previous_best'],99)
             self.assertEqual(self.req(1201,flag=2)[0][0],55);self.assertEqual(r,self.b.profile())
-            self.ok(self.req(1203,exchange_type=7));self.assertEqual(self.req(1203,exchange_type=7)[0][0],55)
-        self.assertEqual(self.req(1203,exchange_type=9)[0][0],55)
+            self.ok(self.req(1203,exchange_type=5));self.assertEqual(self.req(1203,exchange_type=5)[0][0],55)
+        self.assertEqual(self.req(1203,exchange_type=10)[0][0],55)
 
     def test_defence_once_daily_and_revenge_uses_same_npc(self):
         self.fight(99)
@@ -144,7 +197,7 @@ class RankTests(ActivityCase):
         rows=self.board()['show_list'];self.assertEqual(sum(v['top_relation']==2 for v in rows),5)
         fight,_=self.fight(2);self.assertGreaterEqual(fight['final_result'],4)
         s=self.b.profile()['activity'];self.assertEqual(s['rank_order'],2);self.assertEqual(rank.identity(s,1),930002)
-        self.ok(self.req(1203,exchange_type=9))
+        self.ok(self.req(1203,exchange_type=10))
 
     def test_ladder_permutation_and_migration_preserve_balances(self):
         r=self.b.profile();s=r['activity'];s.update(rank_order=40,rank_score=54321,rank_count=3,rank_promotions=[4,5]);s.pop('rank_version');self.b.save(r)
@@ -157,3 +210,77 @@ class RankTests(ActivityCase):
     def test_all_inspection_packets_fit_protocol(self):
         r=self.b.profile()
         for ident in rank.catalog(): self.assertLessEqual(len(rank.inspection(r,ident)),32768)
+
+
+    def test_exchange_prices_rewards_and_insufficient_score(self):
+        for index,cost,tid,count in ((1,5000,1001,10),(2,50000,1001,100),(3,500000,1343,10)):
+            r=self.b.profile();r['activity']['rank_score']=cost-1;self.b.save(r)
+            before=self.b.profile();self.assertEqual(self.req(1203,exchange_type=index)[0][0],55)
+            self.assertEqual(before,self.b.profile())
+            r['activity']['rank_score']=cost;self.b.save(r)
+            owned=lambda r:sum(v['count'] for v in r['attachments'] if v['type_id']==tid and v['attach_type']==5)
+            before=owned(r);self.ok(self.req(1203,exchange_type=index));after=self.b.profile()
+            self.assertEqual(owned(after)-before,count);self.assertEqual(after['activity']['rank_score'],0)
+
+    def test_seven_promotion_thresholds_gold_and_duplicates(self):
+        tiers=[(4,500,50),(5,100,100),(6,50,200),(7,30,300),(8,20,400),(9,10,1000),(10,1,2000)]
+        self.assertEqual([v['promote_order'] for v in rank.rules()['exchanges'] if v['promote_order']],[v[1] for v in tiers])
+        for index,order,gold in tiers:
+            r=self.b.profile();r['activity']['rank_reached_order']=order+1;self.b.save(r)
+            self.assertEqual(self.req(1203,exchange_type=index)[0][0],55)
+            r['activity']['rank_reached_order']=order;self.b.save(r);before=self.b.profile()
+            events=self.req(1203,exchange_type=index);self.ok(events);after=self.b.profile()
+            self.assertNotIn(1022,[m for m,_,d in self.decoded])
+            self.assertEqual(next(d for e,d in events if e==36)[1],dict(object_type=11,attach_type=1,attach_count=gold,attach_level=1))
+            state=next(d['local_rank'] for e,d in events if e==80 and 'local_rank' in d)
+            self.assertTrue(state['promote_prize'] & (1 << (index-2)))
+            self.assertEqual(after['gold_coin']-before['gold_coin'],gold)
+            self.assertEqual(after['attachments'],before['attachments'])
+            self.assertEqual(self.req(1203,exchange_type=index)[0][0],55)
+            self.assertEqual(after,self.b.profile())
+
+    def test_legacy_claims_migrate_by_threshold_and_pending_paid_once(self):
+        r=self.b.profile();s=r['activity'];s.pop('rank_reward_version',None)
+        s.update(rank_promotions=[4,5,6,7,8,9],rank_pending_score=4400,rank_score=12345,rank_reached_order=1)
+        self.b.save(r);self.board();s=self.b.profile()['activity']
+        self.assertEqual(s['rank_promotions'],[4,5,9,10]);self.assertEqual(s['rank_score'],16745)
+        self.board();self.assertEqual(self.b.profile()['activity']['rank_score'],16745)
+        for index in (4,5,9,10):self.assertEqual(self.req(1203,exchange_type=index)[0][0],55)
+        for index in (6,7,8):self.ok(self.req(1203,exchange_type=index))
+
+    def test_midnight_best_rank_daily_cap_restart_and_clock_rollback(self):
+        r=self.b.profile();s=r['activity'];s.update(rank_day_best=20,rank_reached_order=20)
+        self.b.save(r);midnight=(s['rank_day']+1)*86400-8*3600
+        with patch('network_redirect.backend.time.time',return_value=midnight-1):self.board()
+        self.assertEqual(self.b.profile()['activity']['rank_score'],0)
+        with patch('network_redirect.backend.time.time',return_value=midnight):
+            self.board();before=self.b.profile();self.assertEqual(before['activity']['rank_score'],rank.score(20,'day_score'))
+            self.board();self.assertEqual(before,self.b.profile())
+            self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+            self.board();self.assertEqual(before,self.b.profile())
+        with patch('network_redirect.backend.time.time',return_value=midnight-10):self.board()
+        self.assertEqual(self.b.profile()['activity']['rank_score'],rank.score(20,'day_score'))
+        r=self.b.profile();r['activity']['rank_score']=16777214;self.b.save(r)
+        with patch('network_redirect.backend.time.time',return_value=midnight+86400):self.board()
+        self.assertEqual(self.b.profile()['activity']['rank_score'],16777215)
+
+    def test_cross_rank_disabled_and_no_mutation(self):
+        before=self.b.profile()
+        for mid,data in [(1232,{}),(1233,{}),(1231,{}),(1234,{}),(1235,{}),(1236,{}),(1238,{}),(1026,dict(fight_type=18)),(1244,dict(fight_type=3))]:
+            result=self.req(mid,**data)
+            self.assertEqual(result,[(55,{'op_string':'离线模式，暂未开启'})])
+            self.assertEqual(before,self.b.profile())
+
+
+    def test_heartbeat_credits_at_midnight_without_opening_board(self):
+        r=self.b.profile();s=r['activity'];s.update(rank_day_best=30,rank_count=3,rank_extra=6)
+        self.b.save(r);midnight=(s['rank_day']+1)*86400-8*3600
+        heartbeat=encode(2999,{})
+        with patch('network_redirect.backend.time.time',return_value=midnight):
+            packets=self.b.respond(heartbeat,self.state);decoded=[decode(p) for p in packets]
+            after=self.b.profile();self.assertEqual(after['activity']['rank_score'],rank.score(30,'day_score'))
+            self.assertEqual(after['activity']['rank_count'],0);self.assertEqual(after['activity']['rank_extra'],0)
+            self.assertNotIn(1022,[m for m,_,d in decoded])
+            self.assertTrue(any(a['type']==131 and a['value']==rank.score(30,'day_score') for m,_,d in decoded if m==1032 for a in d['attr_list']))
+            self.b.respond(heartbeat,self.state)
+            self.assertEqual(self.b.profile()['activity']['rank_score'],after['activity']['rank_score'])

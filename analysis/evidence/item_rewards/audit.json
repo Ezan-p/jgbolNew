@@ -275,22 +275,23 @@
       "handler": "item_rewards.py",
       "rule": {
         "name": "99重阳礼包",
-        "mode": "fixed",
+        "mode": "fixed_random",
         "prizes": [
           [
             12,
             1,
-            10000,
+            100000,
             1
           ],
           [
             5,
             1001,
-            10,
+            100,
             1
           ]
         ],
-        "reason": "B：原包未提供该礼包内容；离线通用小礼包给予1万银币和10蟠桃。"
+        "reason": "用户图一：固定奖励全给，额外池每包抽1项；银币10万和概率为离线补全，非原服概率。",
+        "pool": "seasonal_1084"
       }
     },
     {
@@ -306,22 +307,23 @@
       "handler": "item_rewards.py",
       "rule": {
         "name": "圣诞狂欢礼包",
-        "mode": "fixed",
+        "mode": "fixed_random",
         "prizes": [
           [
             12,
             1,
-            10000,
+            100000,
             1
           ],
           [
             5,
             1001,
-            10,
+            100,
             1
           ]
         ],
-        "reason": "B：原包未提供该礼包内容；离线通用小礼包给予1万银币和10蟠桃。"
+        "reason": "用户图一：固定奖励全给，额外池每包抽1项；银币10万和概率为离线补全，非原服概率。",
+        "pool": "seasonal_1085"
       }
     },
     {
@@ -337,22 +339,23 @@
       "handler": "item_rewards.py",
       "rule": {
         "name": "元旦欢乐礼包",
-        "mode": "fixed",
+        "mode": "fixed_random",
         "prizes": [
           [
             12,
             1,
-            10000,
+            100000,
             1
           ],
           [
             5,
             1001,
-            10,
+            100,
             1
           ]
         ],
-        "reason": "B：原包未提供该礼包内容；离线通用小礼包给予1万银币和10蟠桃。"
+        "reason": "用户图一：固定奖励全给，额外池每包抽1项；银币10万和概率为离线补全，非原服概率。",
+        "pool": "seasonal_1086"
       }
     },
     {
@@ -460,22 +463,23 @@
       "handler": "item_rewards.py",
       "rule": {
         "name": "新年礼包",
-        "mode": "fixed",
+        "mode": "fixed_random",
         "prizes": [
           [
             12,
             1,
-            10000,
+            100000,
             1
           ],
           [
             5,
             1001,
-            10,
+            100,
             1
           ]
         ],
-        "reason": "B：原包未提供该礼包内容；离线通用小礼包给予1万银币和10蟠桃。"
+        "reason": "用户图一：固定奖励全给，额外池每包抽1项；银币10万和概率为离线补全，非原服概率。",
+        "pool": "seasonal_1098"
       }
     },
     {
@@ -491,22 +495,17 @@
       "handler": "item_rewards.py",
       "rule": {
         "name": "元宵礼包",
-        "mode": "fixed",
+        "mode": "fixed_random",
         "prizes": [
           [
             12,
             1,
-            10000,
-            1
-          ],
-          [
-            5,
-            1001,
-            10,
+            100000,
             1
           ]
         ],
-        "reason": "B：原包未提供该礼包内容；离线通用小礼包给予1万银币和10蟠桃。"
+        "reason": "用户图一：固定奖励全给，额外池每包抽1项；银币10万和概率为离线补全，非原服概率。",
+        "pool": "seasonal_1099"
       }
     },
     {
@@ -939,7 +938,7 @@
       "handler": "item_rewards.py",
       "rule": {
         "name": "灵石礼包",
-        "mode": "fixed",
+        "mode": "fixed_random",
         "prizes": [
           [
             5,
@@ -960,7 +959,8 @@
             1
           ]
         ],
-        "reason": "B：灵石礼包给予三类1级灵石各1。"
+        "reason": "用户图二：三类1级灵石各1必得，额外随机1颗；等级权重60/30/9/1，同级三类等概率。",
+        "pool": "seasonal_1205"
       }
     },
     {
@@ -1029,7 +1029,7 @@
         "order": "6",
         "product_desc": "活动期间合成"
       },
-      "handler": "activity_seasonal.py / activity_rules.json seasonal_food_rewards (B fixed)",
+      "handler": "activity_rice.py / moon_rules.json (B shared weighted pools, independent draws)",
       "rule": null
     },
     {
@@ -1042,7 +1042,7 @@
         "order": "7",
         "product_desc": "活动期间合成"
       },
-      "handler": "activity_seasonal.py / activity_rules.json seasonal_food_rewards (B fixed)",
+      "handler": "activity_rice.py / moon_rules.json (B shared weighted pools, independent draws)",
       "rule": null
     },
     {
@@ -1055,7 +1055,7 @@
         "order": "8",
         "product_desc": "活动期间合成"
       },
-      "handler": "activity_seasonal.py / activity_rules.json seasonal_food_rewards (B fixed)",
+      "handler": "activity_rice.py / moon_rules.json (B shared weighted pools, independent draws)",
       "rule": null
     },
     {
@@ -1068,7 +1068,7 @@
         "order": "9",
         "product_desc": "活动期间合成"
       },
-      "handler": "activity_seasonal.py / activity_rules.json seasonal_food_rewards (B fixed)",
+      "handler": "activity_rice.py / moon_rules.json (B shared weighted pools, independent draws)",
       "rule": null
     },
     {
@@ -1081,7 +1081,7 @@
         "order": "10",
         "product_desc": "活动期间合成"
       },
-      "handler": "activity_seasonal.py / activity_rules.json seasonal_food_rewards (B fixed)",
+      "handler": "activity_seasonal.py / activity_rules.json seasonal_food_rewards (B legacy fixed)",
       "rule": null
     },
     {
@@ -1873,22 +1873,23 @@
       "handler": "item_rewards.py",
       "rule": {
         "name": "春节礼包",
-        "mode": "fixed",
+        "mode": "fixed_random",
         "prizes": [
           [
             12,
             1,
-            10000,
+            100000,
             1
           ],
           [
             5,
             1001,
-            10,
+            100,
             1
           ]
         ],
-        "reason": "B：原包未提供该礼包内容；离线通用小礼包给予1万银币和10蟠桃。"
+        "reason": "用户图一：固定奖励全给，额外池每包抽1项；银币10万和概率为离线补全，非原服概率。",
+        "pool": "seasonal_1247"
       }
     },
     {
@@ -7126,6 +7127,524 @@
           1
         ],
         "probability": "1/2"
+      }
+    ],
+    "seasonal_1247": [
+      {
+        "reward": [
+          11,
+          1,
+          400,
+          1
+        ],
+        "probability": "3/20"
+      },
+      {
+        "reward": [
+          11,
+          1,
+          500,
+          1
+        ],
+        "probability": "1/10"
+      },
+      {
+        "reward": [
+          5,
+          1156,
+          2,
+          1
+        ],
+        "probability": "3/20"
+      },
+      {
+        "reward": [
+          5,
+          1152,
+          1,
+          1
+        ],
+        "probability": "1/100"
+      },
+      {
+        "reward": [
+          5,
+          1156,
+          3,
+          1
+        ],
+        "probability": "2/25"
+      },
+      {
+        "reward": [
+          11,
+          1,
+          350,
+          1
+        ],
+        "probability": "1/5"
+      },
+      {
+        "reward": [
+          5,
+          1007,
+          5,
+          1
+        ],
+        "probability": "11/100"
+      },
+      {
+        "reward": [
+          5,
+          1006,
+          10,
+          1
+        ],
+        "probability": "1/5"
+      }
+    ],
+    "seasonal_1098": [
+      {
+        "reward": [
+          11,
+          1,
+          400,
+          1
+        ],
+        "probability": "3/20"
+      },
+      {
+        "reward": [
+          11,
+          1,
+          500,
+          1
+        ],
+        "probability": "1/10"
+      },
+      {
+        "reward": [
+          5,
+          1156,
+          2,
+          1
+        ],
+        "probability": "3/20"
+      },
+      {
+        "reward": [
+          5,
+          1152,
+          1,
+          1
+        ],
+        "probability": "1/100"
+      },
+      {
+        "reward": [
+          5,
+          1156,
+          3,
+          1
+        ],
+        "probability": "2/25"
+      },
+      {
+        "reward": [
+          11,
+          1,
+          350,
+          1
+        ],
+        "probability": "1/5"
+      },
+      {
+        "reward": [
+          5,
+          1007,
+          5,
+          1
+        ],
+        "probability": "11/100"
+      },
+      {
+        "reward": [
+          5,
+          1006,
+          10,
+          1
+        ],
+        "probability": "1/5"
+      }
+    ],
+    "seasonal_1084": [
+      {
+        "reward": [
+          5,
+          1007,
+          5,
+          1
+        ],
+        "probability": "1/10"
+      },
+      {
+        "reward": [
+          5,
+          1006,
+          10,
+          1
+        ],
+        "probability": "1/5"
+      },
+      {
+        "reward": [
+          5,
+          1095,
+          1,
+          1
+        ],
+        "probability": "1/20"
+      },
+      {
+        "reward": [
+          5,
+          1015,
+          300,
+          1
+        ],
+        "probability": "1/5"
+      },
+      {
+        "reward": [
+          5,
+          1041,
+          10,
+          1
+        ],
+        "probability": "1/4"
+      },
+      {
+        "reward": [
+          5,
+          1042,
+          10,
+          1
+        ],
+        "probability": "1/5"
+      }
+    ],
+    "seasonal_1085": [
+      {
+        "reward": [
+          5,
+          1249,
+          30,
+          1
+        ],
+        "probability": "1/20"
+      },
+      {
+        "reward": [
+          5,
+          10001,
+          20,
+          1
+        ],
+        "probability": "3/20"
+      },
+      {
+        "reward": [
+          5,
+          10000,
+          100,
+          1
+        ],
+        "probability": "1/4"
+      },
+      {
+        "reward": [
+          5,
+          1093,
+          10,
+          1
+        ],
+        "probability": "1/5"
+      },
+      {
+        "reward": [
+          5,
+          1320,
+          20,
+          1
+        ],
+        "probability": "3/20"
+      },
+      {
+        "reward": [
+          5,
+          1321,
+          20,
+          1
+        ],
+        "probability": "1/10"
+      },
+      {
+        "reward": [
+          5,
+          1322,
+          10,
+          1
+        ],
+        "probability": "7/100"
+      },
+      {
+        "reward": [
+          5,
+          1323,
+          10,
+          1
+        ],
+        "probability": "3/100"
+      }
+    ],
+    "seasonal_1086": [
+      {
+        "reward": [
+          5,
+          1156,
+          2,
+          1
+        ],
+        "probability": "1/10"
+      },
+      {
+        "reward": [
+          11,
+          1,
+          400,
+          1
+        ],
+        "probability": "3/20"
+      },
+      {
+        "reward": [
+          11,
+          1,
+          500,
+          1
+        ],
+        "probability": "1/10"
+      },
+      {
+        "reward": [
+          5,
+          1032,
+          20,
+          1
+        ],
+        "probability": "3/20"
+      },
+      {
+        "reward": [
+          5,
+          1033,
+          30,
+          1
+        ],
+        "probability": "1/5"
+      },
+      {
+        "reward": [
+          5,
+          1031,
+          10,
+          1
+        ],
+        "probability": "1/20"
+      },
+      {
+        "reward": [
+          5,
+          1034,
+          40,
+          1
+        ],
+        "probability": "1/4"
+      }
+    ],
+    "seasonal_1099": [
+      {
+        "reward": [
+          5,
+          1001,
+          500,
+          1
+        ],
+        "probability": "1/4"
+      },
+      {
+        "reward": [
+          5,
+          1023,
+          10,
+          1
+        ],
+        "probability": "1/5"
+      },
+      {
+        "reward": [
+          5,
+          1022,
+          10,
+          1
+        ],
+        "probability": "1/5"
+      },
+      {
+        "reward": [
+          5,
+          1156,
+          2,
+          1
+        ],
+        "probability": "2/25"
+      },
+      {
+        "reward": [
+          5,
+          1246,
+          3,
+          1
+        ],
+        "probability": "1/50"
+      },
+      {
+        "reward": [
+          5,
+          1002,
+          10,
+          1
+        ],
+        "probability": "1/10"
+      },
+      {
+        "reward": [
+          5,
+          1020,
+          20,
+          1
+        ],
+        "probability": "3/20"
+      }
+    ],
+    "seasonal_1205": [
+      {
+        "reward": [
+          5,
+          1090,
+          1,
+          1
+        ],
+        "probability": "1/5"
+      },
+      {
+        "reward": [
+          5,
+          1091,
+          1,
+          1
+        ],
+        "probability": "1/5"
+      },
+      {
+        "reward": [
+          5,
+          1092,
+          1,
+          1
+        ],
+        "probability": "1/5"
+      },
+      {
+        "reward": [
+          5,
+          1090,
+          1,
+          2
+        ],
+        "probability": "1/10"
+      },
+      {
+        "reward": [
+          5,
+          1091,
+          1,
+          2
+        ],
+        "probability": "1/10"
+      },
+      {
+        "reward": [
+          5,
+          1092,
+          1,
+          2
+        ],
+        "probability": "1/10"
+      },
+      {
+        "reward": [
+          5,
+          1090,
+          1,
+          3
+        ],
+        "probability": "3/100"
+      },
+      {
+        "reward": [
+          5,
+          1091,
+          1,
+          3
+        ],
+        "probability": "3/100"
+      },
+      {
+        "reward": [
+          5,
+          1092,
+          1,
+          3
+        ],
+        "probability": "3/100"
+      },
+      {
+        "reward": [
+          5,
+          1090,
+          1,
+          4
+        ],
+        "probability": "1/300"
+      },
+      {
+        "reward": [
+          5,
+          1091,
+          1,
+          4
+        ],
+        "probability": "1/300"
+      },
+      {
+        "reward": [
+          5,
+          1092,
+          1,
+          4
+        ],
+        "probability": "1/300"
       }
     ]
   },

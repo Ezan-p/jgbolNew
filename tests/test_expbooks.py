@@ -1,10 +1,11 @@
 """All original scroll IDs over the real wire, plus settlement boundary regressions."""
 import copy
+import time
 import unittest
 from pathlib import Path
 
 from network_redirect import achievements, formation as f, summon
-from network_redirect.protocol import decode
+from network_redirect.protocol import MAX_PACKET, decode
 from tests import test_formation
 
 
@@ -165,6 +166,77 @@ class ExpbookTests(unittest.TestCase):
         self.backend.close()
         self.backend = type(self.backend)(Path(self.directory.name), 18770, lambda *a, **k: None)
         self.assertEqual(self.backend.profile(), before)
+
+    def test_million_scroll_batch_stays_compact_and_debits_once(self):
+        self.configure(level=99)
+        identity = self.add_item(1041, 1_000_003)
+        started = time.perf_counter()
+        out = self.consume([(1041, 1_000_000)])
+        elapsed = time.perf_counter() - started
+        role = self.backend.profile()
+        self.assertEqual(self.total_exp(role['corteges'][0]), 1_200_000_000)
+        self.assertEqual(dict(self.events(out))[65]['experience'], 1_200_000_000)
+        self.assertEqual(f.lookup(role, 'attachments', identity)['count'], 3)
+        request = decode(self.packet)[2]
+        self.assertEqual(request['roll_count'], 1)
+        self.assertEqual(request['roll_list'], [dict(type_id=1041, count=1_000_000)])
+        # A million units remain one stack and one wire request, never a million
+        # response objects. Use a generous latency ceiling to catch severe stalls.
+        self.assertLess(elapsed, 5.0)
+        self.assertLess(len(self.replies), 64)
+        self.assertLess(sum(map(len, self.replies)), 64 * 1024)
+        snapshots = [item for mid, _, data in out if mid == 1035 for item in data['attach_list']]
+        self.assertEqual(next(item['count'] for item in snapshots if item['id'] == identity), 3)
+        self.assertEqual(self.backend.respond(self.packet, self.state), self.replies)
+        self.assertEqual(self.backend.profile(), role)
+        self.performance_metrics = dict(scroll_count=1_000_000, elapsed_seconds=elapsed,
+                                        response_packets=len(self.replies),
+                                        response_bytes=sum(map(len, self.replies)))
+
+    def test_large_scroll_inventory_is_fully_chunked_before_result(self):
+        role = self.configure(level=99)
+        # Exercise more than four native byte-count packets, with huge stack
+        # counts and every original scroll tier; no live account is modified.
+        for index in range(600):
+            role['attachments'].append(dict(id=f.new_id(role), attach_type=5,
+                type_id=1041 + index % 40, count=1_000_000, level=1,
+                equip_order=0, equip_pos=0))
+        self.backend.save(role)
+        started = time.perf_counter()
+        out = self.consume([(1041, 1)])
+        elapsed = time.perf_counter() - started
+        after = self.backend.profile()
+        chunks = [(index, data) for index, (mid, _, data) in enumerate(out) if mid == 1035]
+        self.assertEqual([data['first_send'] for _, data in chunks], [True, False, False, False, False])
+        self.assertTrue(all(0 < data['attach_count'] <= 128 for _, data in chunks))
+        snapshot = [item for _, data in chunks for item in data['attach_list']]
+        self.assertEqual(len(snapshot), len(after['attachments']))
+        self.assertEqual({item['id']: item['count'] for item in snapshot},
+                         {item['id']: item['count'] for item in after['attachments']})
+        result_index = next(index for index, (mid, _, data) in enumerate(out)
+                            if mid == 2998 and data['id'] == 65)
+        self.assertLess(chunks[-1][0], result_index)
+        self.assertEqual(self.total_exp(after['corteges'][0]), 1200)
+        self.assertEqual(sum(item['count'] for item in snapshot if item['type_id'] == 1041), 14_999_999)
+        self.assertTrue(all(len(packet) <= MAX_PACKET for packet in self.replies))
+        self.assertLess(sum(map(len, self.replies)), 256 * 1024)
+        self.assertLess(elapsed, 5.0)
+        self.performance_metrics = dict(inventory_stacks=600, inventory_scrolls=600_000_000,
+                                        elapsed_seconds=elapsed, inventory_packets=len(chunks),
+                                        response_bytes=sum(map(len, self.replies)))
+
+    def test_large_experience_result_keeps_double_precision_on_wire(self):
+        self.configure(level=99)
+        self.add_item(1080, 20)
+        out = self.consume([(1080, 20)])
+        expected = 3_120_000_000
+        self.assertEqual(dict(self.events(out))[65]['experience'], expected)
+        actual = self.backend.profile()['corteges'][0]
+        snapshot = next(c for mid, _, data in out if mid == 1034
+                        for c in data['cortege_list'] if c['id'] == self.ids[0])
+        self.assertEqual(self.total_exp(actual), expected)
+        self.assertEqual((snapshot['level'], snapshot['cur_exp']),
+                         (actual['level'], actual['cur_exp']))
 
 
 if __name__ == '__main__': unittest.main()

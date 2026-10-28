@@ -71,6 +71,8 @@ def new_union(ident,name,r):
 
 def prepare(role,now,r):
     from . import guild_match,guild_feast
+    from . import monument_wealth
+    monument_wealth.prepare(role,now)
     guild_feast.rollover(role,now,r)
     guild_match.rollover(role,now,r)
     s=role.setdefault('guild',dict(unions={},next_id=2,applications=[],day=-1))
@@ -348,6 +350,8 @@ def settle(role,req,now,r,parse,daily_rules):
         if op==36:
             count=positive(d,'count',r['donate_limit']);require(s['donations']+count<=r['donate_limit'],'今日捐献额度不足')
             pay(role,'gold_coin',count);s['donations']+=count;offline.funds(g,count*r['donate_money_rate'],r);g['popularity']+=count;contribution(role,count*r['donate_contrib_rate'])
+            from . import monument_wealth
+            monument_wealth.record(role,now,donation_money=count*r['donate_money_rate'])
         if op==15:
             authorize(role,r,14);require(t['state']==2,'当前不能培育');require(s['cultivations']<r['cultivate_limit'],'今日培育次数已用完')
             require(d.get('cultivate_record_count')==s['cultivations'] and d.get('cultivate_record_time')==s['day'],'培育任务已过期，请刷新')

@@ -18,6 +18,8 @@ with tempfile.TemporaryDirectory() as tmp:
     maps['complete']=u.detail(s)
     prizes=dict(day_prize=u.day_prize(s),attach_list=[dict(object_type=5,attach_type=1366,attach_count=360,attach_level=1)])
     shop=u.shop(s,b.activity_rules)
+    shop_catalog=[dict(activity.prize_spec(p['reward']), crystals=p['cost'], buy_times=p['limit'],
+                       shop_token='catalog-fixture') for p in b.activity_rules['undergo_shop']]
     ar=arena.state(role,NOW,b.activity_rules);fixtures={'entry':arena.entry(role,ar,NOW)}
     for stage in range(1,7):
         ar.update(stage=stage,settled=stage==6,stage_fights=1)
@@ -69,6 +71,7 @@ map.g_mapUI.lastFightMapID=0;map.g_mapUI.lastFightMapID_elite=0
 '''
 script+='\n'+(ROOT/'network_redirect/taixu_client.lua').read_text()+'\n'
 script+='local fixtureTime='+str(NOW)+'\nlocal fixtures='+summon.lua(fixtures)+'\nlocal maps='+summon.lua(maps)+'\nlocal shop='+summon.lua(shop)+'\nlocal prizes='+summon.lua(prizes)+'\n'
+script+='local shopCatalog='+summon.lua(shop_catalog)+'\n'
 script+=r'''
 local now=ms.d_time.getTime()
 for name,data in pairs(fixtures) do
@@ -93,9 +96,40 @@ end)
 check('arena_entry_four_groups',function()
  ui.onGetResult(clone(fixtures.entry))
  assert(fixtures.entry.group_type_level[1]==nil and fixtures.entry.group_type_level[3]==nil)
- for group=4,7 do assert(ui.g_arenaUI.main_layer:getChildByTag(9900+group)) end
- for group=1,3 do assert(not ui.g_arenaUI.main_layer:getChildByTag(9900+group)) end
+ local visual=assert(ui.g_arenaUI.main_layer:getChildByTag(9879))
+ for group=4,7 do assert(visual:getChildByTag(9900+group)) end
+ for group=1,3 do assert(not visual:getChildByTag(9900+group)) end
 end)
+for stage=1,6 do
+ check('arena_exit_reenter_stage_'..stage,function()
+  local native=ms.d_u.createMenu;local close
+  ms.d_u.createMenu=function(config,...)
+   for _,item in ipairs(config) do
+    if item.npic=='v2/introUI/close1.png' then close=item.call_back end
+   end
+   return native(config,...)
+  end
+  local ok,err=pcall(function()
+   for cycle=1,2 do
+    ui.g_arenaUI.parent_layer=root
+    ui.onGetResult(clone(fixtures['entry_'..stage]))
+    local closeEntry=assert(close)
+    ui.onGetResult(clone(fixtures[tostring(stage)]))
+    -- Settlement rebuilds its own entrance, so capture that callback below
+    -- by removing the host through the same native remove helper instead.
+    local key=stage==1 and 'qualify_layer' or (stage==2 or stage==6) and 'rank_parent' or 'blood_layer'
+    assert(ui.g_arenaUI[key]);assert(close);close()
+    assert(ui.g_arenaUI[key]==nil,'Closed rank reference must be cleared')
+    local host=assert(root:getChildByTag(9875))
+    assert(host:getChildByTag(9879):isVisible(),'Entry must be visible after rank close')
+    if stage==6 then ms.d_u.remove(host) else closeEntry() end
+    assert(not root:getChildByTag(9875),'Touch-blocking host must be removed')
+    assert(ui.g_arenaUI.main_layer==nil,'Closed entrance reference must be cleared')
+   end
+  end)
+  ms.d_u.createMenu=native;assert(ok,err)
+ end)
+end
 for stage=1,6 do
  check('arena_stage_'..stage,function()
   ui.onGetResult(clone(fixtures['entry_'..stage]))
@@ -155,9 +189,10 @@ check('arena_settlement_popup',function()
  local native=ms.d_commonLayerUI.showPrizeResLayer;local shown=0
  ms.d_commonLayerUI.showPrizeResLayer=function(parent,list,...)
   shown=shown+1
-  assert(parent==ui.g_arenaUI.main_layer and #list==2)
+  assert(parent==ui.g_arenaUI.main_layer and #list==3)
   assert(list[1].object_type==11 and list[1].attach_count>0)
   assert(list[2].attach_type==1343 and list[2].attach_count>0)
+  assert(list[3].attach_type==1366 and list[3].attach_count>0)
   return native(parent,list,...)
  end
  local ok,err=pcall(function()
@@ -167,6 +202,9 @@ check('arena_settlement_popup',function()
  ms.d_commonLayerUI.showPrizeResLayer=native;assert(ok,err)
 end)
 check('settlement_close_returns_to_entry',function()
+ -- Fight-return fixtures capture detached scenes; lifecycle callbacks require
+ -- this close check to run under the active scene's isolated root.
+ ui.g_arenaUI.parent_layer=root
  ui.onGetResult(clone(fixtures.entry_5));ui.onGetResult(clone(fixtures['5']))
  local previous=ui.g_arenaUI.main_layer;previous:retain()
  local native=ms.d_u.createMenu;local close
@@ -180,10 +218,12 @@ check('settlement_close_returns_to_entry',function()
   ui.onGetResult(clone(fixtures.settlement))
   assert(previous:getParent()==nil,'Previous blood stage must be removed')
   assert(ui.g_arenaUI.blood_layer==nil,'No blood-stage layer may remain below settlement')
+  assert(not ui.g_arenaUI.main_layer:getChildByTag(9879):isVisible(),'Entry options must be hidden behind settlement rank')
   local rank=ui.g_arenaUI.rank_parent;rank:retain()
   assert(close);close()
   local removed=rank:getParent()==nil;rank:release();assert(removed)
-  for group=4,7 do assert(ui.g_arenaUI.main_layer:getChildByTag(9900+group)) end
+  local visual=assert(ui.g_arenaUI.main_layer:getChildByTag(9879));assert(visual:isVisible())
+  for group=4,7 do assert(visual:getChildByTag(9900+group)) end
  end)
  ms.d_u.createMenu=native;previous:release();assert(ok,err)
 end)
@@ -210,9 +250,25 @@ check('map_complete',function()
  ms.d_undergoOrdealUI.onGetResult(6,clone(maps.complete));map.g_mapUI.jy_mode=2;map.show()
  assert(not map.canFightNextChallenge(10,1))
 end)
-check('shop',function() ms.d_undergoOrdealUI.onGetResult(3,clone(shop)) end)
+for page=1,3 do
+ check('shop_catalog_'..page,function()
+  local rows={};for i=(page-1)*6+1,page*6 do rows[#rows+1]=clone(shopCatalog[i]) end
+  ms.d_undergoOrdealUI.onGetResult(3,rows)
+ end)
+end
+check('shop',function()
+ assert(#shop==6)
+ ms.d_undergoOrdealUI.onGetResult(3,clone(shop))
+end)
+check('shop_request_token',function()
+ ms.d_undergoOrdealUI.sendMsg(5,{index=1,count=2})
+ assert(sent[#sent].mid==1349 and sent[#sent].data.id==5)
+ local request=assert(loadstring('return '..sent[#sent].data.data))()
+ assert(request.index==1 and request.count==2 and request.shop_token==shop[1].shop_token)
+end)
 check('shop_purchase',function()
- ms.d_undergoOrdealUI.onGetResult(5,{index=1,attach_list={{object_type=5,attach_type=1001,attach_count=10,attach_level=1,buy_times=19}}})
+ local reward=clone(shop[1]);reward.buy_times=reward.buy_times-1
+ ms.d_undergoOrdealUI.onGetResult(5,{index=1,attach_list={reward}})
 end)
 check('day_prize',function() ms.d_undergoOrdealUI.onGetResult(7,clone(prizes)) end)
 if ui._localTaixuRestore then ui._localTaixuRestore() end

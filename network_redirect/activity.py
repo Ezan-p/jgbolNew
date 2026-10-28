@@ -31,7 +31,7 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
                 'duty_initial_bonus','duty_silver_per_round','party_free_count','party_paid_count',
                 'party_fight_gold','party_bonus_gold','party_bonus_limit','convert_daily_limit',
                 'battle_level','battle_silver','home_boss_daily_limit','home_assistant_gold','home_missed_event_penalty',
-                'abyss_offline_cap_seconds','abyss_tick_seconds','abyss_power_per_crystal','abyss_double_gold','abyss_grid_gold','babel_cell_coins','drug_craft_exp','drug_quality_level_step',
+                'abyss_offline_cap_seconds','abyss_tick_seconds','abyss_power_per_crystal','abyss_crystal_tick_cap','abyss_shop_daily_count','abyss_double_gold','abyss_grid_gold','babel_cell_coins','drug_craft_exp','drug_quality_level_step',
                 'abyss_event_seconds','abyss_event_boss_hp','abyss_event_fight_gold','abyss_steal_max','abyss_map_paid_draws','abyss_map_gold','abyss_map_remove_count','land_tower_start_hour','land_daily_travel','land_daily_attack','land_travel_soul','land_charm_exchange','land_tower_tick','land_tower_soul','land_tower_total','land_tower_duration','land_boss_layers','land_boss_soul','land_hell_unlock_soul','land_hell_daily','land_max_actions','abyss_boss_max_actions'):
         require(type(r.get(key)) is int and 0<r[key]<=1000000,'活动数值无效：'+key)
     from . import activity_feed, activity_trial
@@ -83,12 +83,13 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     require(isinstance(r.get('abyss_eye_choices'),list) and len(r['abyss_eye_choices'])==4 and len(set(r['abyss_eye_choices']))==4 and all(t in formation.BASES for t in r['abyss_eye_choices']),'火眼金睛选项无效')
     from . import activity_visit
     r['visit_rules'] = activity_visit.load_rules()
-    for key in ('pray_rewards','party_rewards','home_pray_rewards','abyss_event_rewards','abyss_pray_consumes','abyss_map_rewards','land_card_rewards','land_full_card_rewards','seasonal_moon_bonus'):
-        require(isinstance(r.get(key),list) and len(r[key])>0,'活动奖励缺失')
+    for key in ('pray_rewards','party_rewards','home_pray_rewards','abyss_event_rewards','abyss_pray_consumes','abyss_map_rewards','land_card_rewards','land_full_card_rewards','land_sweep_rewards','seasonal_moon_bonus'):
+        require(isinstance(r.get(key),list) and (len(r[key])>0 or key=='party_rewards'),'活动奖励缺失')
         for p in r[key]:
             require(isinstance(p,list) and len(p)==4 and all(type(v)is int for v in p),'活动奖励格式错误')
             typ,tid,n,lv=p
             require(0<n<=1000000 and 1<=lv<=200 and ((typ in (11,12)) or (typ==5 and tid in formation.ITEMS)),'活动奖励无效')
+    require(len(r['land_card_rewards'])>=5 and len({tuple(p) for p in r['land_card_rewards']})==len(r['land_card_rewards']),'猎魂翻牌奖池至少需要5档不同奖励')
     require(all(p[0]==11 and p[1]==0 and p[3]==1 for p in r['pray_rewards']),'神石祈福奖励必须为元宝')
     require(len(r['abyss_map_rewards'])==12 and r['abyss_map_remove_count']+r['abyss_map_paid_draws']<12,'宝图奖盘或次数无效')
     require(set(r.get('train_increase',{}))==set(formation.STATS) and all(type(v)is int and 0<v<=10000 for v in r['train_increase'].values()),'修炼属性配置无效')
@@ -103,6 +104,20 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
                 q=goods.get('consume')
                 require(isinstance(q,list) and len(q)==4 and all(type(v)is int for v in q) and q[0]==5 and q[1] in formation.ITEMS and 0<q[2]<=1000000 and q[3]==1,'洞府商品消耗无效')
             else:require(type(goods.get('cost'))is int and 0<goods['cost']<=1000000,'活动商品价格无效')
+    require(type(r.get('undergo_shop_daily_count')) is int and r['undergo_shop_daily_count']==6, '幻境商店每日须抽取6种商品')
+    require(isinstance(r.get('undergo_shop_revision'),str) and bool(r['undergo_shop_revision']), '幻境商店版本缺失')
+    expected_undergo = {1001:20,1343:1,1024:1,1002:1,1041:1,1034:1,1033:1,1032:1,1031:1,
+                        1249:3,1313:1,1320:1,1321:1,1322:1,1323:1,1310:5,1311:5,1312:5}
+    require(len(r['undergo_shop'])==len(expected_undergo) and
+            {p['reward'][1]:p['reward'][2] for p in r['undergo_shop']}==expected_undergo,
+            '幻境商店商品池或单次兑换数量无效')
+    require(all(p['limit'] == (3 if p['cost'] >= 1000 else 5) for p in r['undergo_shop']),
+            '幻境商店每份1000仙晶及以上限兑3次，其余限兑5次')
+    require(type(r.get('abyss_shop_daily_count')) is int and 1<=r['abyss_shop_daily_count']<=len(r['abyss_shop']), '九幽每日商品数量无效')
+    require(isinstance(r.get('abyss_shop_revision'),str) and bool(r['abyss_shop_revision']), '九幽商店版本缺失')
+    require(len({tuple(x['reward']) for x in r['abyss_shop']})==len(r['abyss_shop']), '九幽商店商品不得重复')
+    from . import abyss_balance
+    abyss_balance.load_rules()
     from . import activity_fish
     activity_fish.validate(r)
     from . import activity_caishen
@@ -119,6 +134,8 @@ def day(now,r):return (now+r['timezone_offset_hours']*3600)//86400
 def prepare(role,now,r,peers=None):
     from . import activity_pavilion
     activity_pavilion.prepare(role,now,activity_pavilion.load_rules())
+    from . import activity_monday
+    activity_monday.prepare(role,now)
     s=role.setdefault('activity',{})
     from . import activity_tangwang
     activity_tangwang.state(role,now,r['tangwang_rules'])
@@ -201,6 +218,7 @@ def feed_data(role,r):
 
 
 def statuses(role,now,r,flag,peers=None):
+    from . import equipment_crafting
     from .activity_land import status as land_status
     s=role['activity']
     if flag==0:
@@ -214,7 +232,9 @@ def statuses(role,now,r,flag,peers=None):
                                    nine_sky_data=activity_nine_sky.status(now),
                                    yuanshi_info=activity_yuanshi.client_config(now),
                                    spring_info=welfare.spring_info(role,now,welfare.load_rules()),
-                                   imperial_exam=dict(start_time=0,end_time=0),**seasonal_status(role,now,r)))
+                                   imperial_exam=dict(start_time=0,end_time=0),
+                                   **equipment_crafting.compose_list(role,equipment_crafting.load_rules(),now),
+                                   **seasonal_status(role,now,r)))
     require(flag==1,'未知活动页')
     return summon.event(48,dict(party_start_period=[dict(begin_seconds=r['party_period'][0],end_seconds=r['party_period'][1])],
         last_convert_type=s.get('last_convert_type',0),cur_fight_count=r['duty_daily_runs']-s['duty_runs'],
@@ -352,7 +372,7 @@ def battle(role,req,now,r,jrules,frules):
     events=[];s['fight_id']+=1;fid=s['fight_id']
     if ft==6:
         damage=min(hp,journey.combat_engine.total_damage(actions))
-        gain=prizes(role,r['party_rewards'])+activity_party.seasonal_rewards(role,now,r)
+        gain=activity_party.fight_rewards(role,damage,r)+activity_party.seasonal_rewards(role,now,r)
         activity_party.record(role,damage,gain,r)
         info=party_info(role,r);info.update(fight_prize=gain,cur_damage=damage)
         events.append(summon.event(29,info))
@@ -404,7 +424,7 @@ def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
         return activity_arena.settle(role,req,now,r,jrules,parse)
     if mid == 1244 and req['fight_type'] == 4:
         from . import activity_arena
-        return activity_arena.replay(role,req)
+        return activity_arena.replay(role,req,now,r)
     from . import activity_duty
     if mid==1043:
         return activity_duty.update(role,req,now,r,peers)
@@ -413,8 +433,9 @@ def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     if mid==1049 and req['query_type']==4:
         activity_duty.guard(role,now,r)
         return [summon.event(39,activity_duty.rank_data(role,peers))]
-    if mid==1039 and 2**40<=req['des_id']<2**41:
-        return activity_duty.inspection(role,req,peers)
+    if mid==1039 and (req['flag']==activity_duty.INSPECTION_FLAG or 2**40<=req['des_id']<2**41):
+        activity_duty.guard(role,now,r)
+        return activity_duty.inspection(role,req,peers,frules)
     if mid in (1029,1041,1060,1072) or mid==1026 and req['fight_type'] in (3,12):
         from . import activity_rape
         return activity_rape.settle(role,mid,req,now,r,jrules,parse)

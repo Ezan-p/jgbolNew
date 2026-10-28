@@ -4,7 +4,6 @@ This is local balance evidence, never a claim about original server tables.
 All activity progress and rewards live in disposable roles.
 """
 import copy
-import csv
 import json
 import random
 import sys
@@ -21,18 +20,8 @@ from network_redirect.protocol import decode
 
 def main():
     out = ROOT/'analysis/evidence/duty'; out.mkdir(parents=True, exist_ok=True)
-    rows = []
-    for group in range(4, 9):
-        for stage in range(1, 121):
-            plan = balance.stage(group, stage)
-            for difficulty, power in enumerate(plan['targets'], 1):
-                rows.append(dict(group=group, stage=stage, difficulty=difficulty, npc_id=plan['npc_id'],
-                    name=plan['name'], archetype=plan['archetype'], source_level=plan['level'],
-                    source_power=plan['power'], target_power=power,
-                    stat_scale=round(power/plan['power'], 6),
-                    source_file=npc_players.catalog()[plan['npc_id']]['source_file']))
-    with (out/'stage_schedule.csv').open('w', newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=list(rows[0])); writer.writeheader(); writer.writerows(rows)
+    from export_duty_enemy_sets import export
+    rows = export()
 
     now = 1792814400; results = []
     with tempfile.TemporaryDirectory() as tmp:
@@ -47,7 +36,8 @@ def main():
                         rng = random.Random(seed)
                         role = backend.profile(); role.update(copy.deepcopy(npc['role']))
                         activity.prepare(role, now, backend.activity_rules)
-                        duty.start(role, backend.activity_rules)
+                        with patch('secrets.randbelow', side_effect=rng.randrange):
+                            duty.start(role, backend.activity_rules)
                         duty.update(role, dict(plus_type=1, plus_index=3, flag=0), now, backend.activity_rules)
                         d = role['activity']['duty']; grades = {}; max_actions = 0; drops = []; exchanges = 0
                         with patch('secrets.randbelow', side_effect=rng.randrange):
@@ -68,7 +58,7 @@ def main():
                                     idx, _ = min(options, key=lambda x: ((176,177,174,175).index(x[1]['field']), x[1]['star']))
                                     duty.update(role, dict(plus_type=2, plus_index=idx, flag=0), now, backend.activity_rules)
                                     exchanges += 1
-                        row = dict(npc_id=key, group=d['group'], power=npc['role']['role_combat_power'], difficulty=difficulty,
+                        row = dict(npc_id=key, group=d['group'], enemy_set=d['enemy_set'], power=npc['role']['role_combat_power'], difficulty=difficulty,
                             cleared=d['round']-1, final_grade=grade, grades=grades, max_actions=max_actions,
                             stars=d['stars'], used=d['used'], bonus=d['bonus'], exchanges=exchanges,
                             drops=drops, seed=seed, reached_test_limit=d['round'] == 121)

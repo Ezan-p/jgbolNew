@@ -3,6 +3,8 @@
 The original protocol names are misleading: mode=1/undergo is 挑战;
 mode=2/challenge is the timed 历劫. Keep these wire names for compatibility.
 """
+import copy
+import hashlib
 import json
 import math
 from fractions import Fraction
@@ -26,7 +28,7 @@ def rules():
               'arena_level', 'arena_size', 'arena_qualify_count', 'arena_qualify_fights',
               'arena_practice_fights', 'arena_action_points', 'arena_action_cost', 'arena_paid_limit',
               'arena_paid_gold', 'arena_hp_base', 'arena_hp_rank_step', 'arena_hp_damage',
-              'arena_win_score', 'arena_qualify_prize_crystals', 'arena_records'):
+              'arena_win_score', 'arena_win_prize_crystals', 'arena_records'):
         a.require(type(r[k]) is int and 0 < r[k] <= 1000000, '太虚数值无效：'+k)
     a.require(r['challenge_daily_limit'] == 10 and r['companion_daily_limit'] == 4
               and r['ordeal_window_seconds'] == 259200, '历劫次数/时限与原客户端不一致')
@@ -40,7 +42,7 @@ def rules():
     prizes = r['arena_rank_prizes']
     a.require(bool(prizes) and prizes[0]['front'] == 1 and prizes[-1]['back'] == r['arena_size']
               and all(all(type(p[k]) is int and 0 < p[k] <= 1000000
-                          for k in ('front', 'back', 'gold', 'holy_peach', 'reputation'))
+                          for k in ('front', 'back', 'gold', 'holy_peach', 'crystals'))
                       and p['front'] <= p['back'] for p in prizes)
               and all(prizes[i]['back']+1 == prizes[i+1]['front'] for i in range(len(prizes)-1)),
               '血战排名奖励无效')
@@ -72,6 +74,7 @@ def state(role, now, r):
             s['challenge'] = mid*100+1
             s['started'] += periods*rules()['ordeal_window_seconds']
     s['clock'] = now
+    refresh_shop(s, role, r, today)
     owned = {c['id'] for c in role['corteges']}
     s['lineup'] = {str(p): cid for p, cid in s['lineup'].items() if cid in owned and 1 <= int(p) <= 9}
     if not s['lineup']:
@@ -99,10 +102,34 @@ def detail(s, **extra):
         day_prize=day_prize(s)), **extra)
 
 
+def refresh_shop(s, role, r, today):
+    """Persist six distinct daily offers; preserve same-day usage across migration."""
+    revision = r['undergo_shop_revision']
+    if s.get('shop_day') == today and s.get('shop_revision') == revision:
+        return
+    # Old saves used four fixed display indices. Convert before reordering.
+    if 'shop_revision' not in s:
+        s['purchases'] = {str(tid): s.get('purchases', {}).get(str(i), 0)
+                          for i, tid in enumerate((1001, 1343, 1034, 1024), 1)}
+    seed = f"{revision}:{today}:{role.get('role_id', role.get('id', 0))}"
+    catalog = {row['reward'][1]: row for row in r['undergo_shop']}
+    current = s.get('shop', [])
+    # A same-day balance update changes quotas, not the selected goods/order.
+    if (s.get('shop_day') == today and len(current) == r['undergo_shop_daily_count']
+            and len({row['reward'][1] for row in current}) == len(current)
+            and all(row['reward'][1] in catalog for row in current)):
+        offers = [catalog[row['reward'][1]] for row in current]
+    else:
+        offers = sorted(r['undergo_shop'], key=lambda row: hashlib.sha256(
+            f"{seed}:{row['reward'][1]}".encode()).digest())[:r['undergo_shop_daily_count']]
+    s.update(shop=copy.deepcopy(offers), shop_day=today, shop_revision=revision,
+             shop_token=hashlib.sha256(seed.encode()).hexdigest()[:24])
+
+
 def shop(s, r):
     return [dict(a.prize_spec(row['reward']), crystals=row['cost'],
-                 buy_times=row['limit']-s['purchases'].get(str(i), 0))
-            for i, row in enumerate(r['undergo_shop'], 1)]
+                 buy_times=max(0, row['limit']-s['purchases'].get(str(row['reward'][1]), 0)),
+                 shop_token=s['shop_token']) for row in s['shop']]
 
 
 def next_gate(gid):
@@ -158,13 +185,17 @@ def settle(role, req, now, r, jrules, frules, parse):
     if op == 2:
         return [response(2, {})]
     if op == 3:
+        s['shop_view_token'] = s['shop_token']
         return [response(3, shop(s, r))]
     if op == 5:
         idx, n = data.get('index'), data.get('count', 1)
-        a.require(type(idx) is int and 1 <= idx <= len(r['undergo_shop']) and type(n) is int and n > 0, '兑换参数无效')
-        row = r['undergo_shop'][idx-1]; used = s['purchases'].get(str(idx), 0)
+        a.require(type(idx) is int and 1 <= idx <= len(s['shop']) and type(n) is int and n > 0, '兑换参数无效')
+        # Native clients send indices only; upgraded clients bind the exact view.
+        a.require(data.get('shop_token', s.get('shop_view_token')) == s['shop_token'],
+                  '幻境商店已刷新，请重新打开商店后兑换')
+        row = s['shop'][idx-1]; key = str(row['reward'][1]); used = s['purchases'].get(key, 0)
         a.require(used+n <= row['limit'], '今日兑换次数不足')
-        a.consume(role, 1366, row['cost']*n); s['purchases'][str(idx)] = used+n
+        a.consume(role, 1366, row['cost']*n); s['purchases'][key] = used+n
         p = row['reward']; gain = a.prizes(role, [[p[0], p[1], p[2]*n, p[3]]])
         gain[0]['buy_times'] = row['limit']-used-n
         return [response(5, dict(index=idx, attach_list=gain))]

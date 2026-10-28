@@ -23,6 +23,13 @@ def main():
         for op in (1,7,9,10,13,16):
             packet=abyss.settle(role,dict(id=op,data='{}'),now+3600,b.activity_rules,b.journey_rules,login_fields)[0]
             fixtures[str(op)]=login_fields(decode(packet)[2]['data'])
+        for region in range(1,10):
+            s.update(boss=1+(region-1)*9,layer=1+(region-1)*9)
+            fixtures['region'+str(region)]={}
+            for op in (1,16):
+                packet=abyss.settle(role,dict(id=op,data='{}'),now+3600,b.activity_rules,b.journey_rules,login_fields)[0]
+                fixtures['region'+str(region)][str(op)]=login_fields(decode(packet)[2]['data'])
+        s.update(boss=81,layer=81)
         for kind in range(1,6):
             s['events']=[events.create(kind,b.activity_rules)]
             packet=events.settle(role,s,dict(op_type=0),now+3600,b.activity_rules,b.journey_rules)[0]
@@ -32,6 +39,7 @@ def main():
             fixtures[label]=login_fields(decode(maps.settle(role,s,3,data,now+3600,b.activity_rules)[0])[2]['data'])
         b.close()
     script='local FIXTURE='+summon.lua(fixtures)+'\n'
+    script+='local ABYSS_PATCH='+summon.lua((ROOT/'network_redirect/abyss_client.lua').read_text())+'\n'
     script+=(ROOT/'analysis/tools/abyss_client_harness.lua').read_text()
     out=ROOT/'.runtime/abyss-native-fixture.lua';out.write_text(script)
     print(out)

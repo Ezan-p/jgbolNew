@@ -1,0 +1,73 @@
+{
+  "inputs": [
+    {
+      "logical": "lua/ui/forgeUI.lua",
+      "asset": "f97d00d743c97d7e4dc630dd25219614.data",
+      "sha256": "1cea39eec6913b68950ea9917fb42bcbb5c5e7016bdcbf52cdc9c81328cdbb2a"
+    },
+    {
+      "logical": "lua/ui/funUI.lua",
+      "asset": "5dd8b529cd13d0983be4c09ea5cd56db.data",
+      "sha256": "0551c970ff68fdc33625dd35036bcc7b3ecf0e058d6c04ecef4876c42a41214d"
+    },
+    {
+      "logical": "lua/ui/activityUI.lua",
+      "asset": "f94624a6c6a5f4034d0fdf2e315f0904.data",
+      "sha256": "b62f2dffa9e3707ce73f2b5fedbb147433544d735ec722519d377a31698f134f"
+    },
+    {
+      "logical": "lua/ui/packageUI.lua",
+      "asset": "96d7bfc80446c4ad76e979a14eb48185.data",
+      "sha256": "6f5e7e86418fdef9c1ca32aa9cc3c2fc7966d2c8735cae4cbd0982d3ae1f261d"
+    },
+    {
+      "logical": "csv_config/item_buy_config.csv",
+      "asset": "2c90e37f0e9c8feb40c30c1131832898.data",
+      "sha256": "3a460c707b62cf9d9bd4eb3e66b4932ab76b4f5461d623bb22c44792e374c047",
+      "csv_values_match": true,
+      "rows": 23
+    },
+    {
+      "logical": "csv_config/material_transform.csv",
+      "asset": "74475b93ebfa39bcdf5aee1e8ecb2dc9.data",
+      "sha256": "03714b78b7b2fca242239633f500694d68e1d1ff258ae8bb79bd28bc32dc254c",
+      "csv_values_match": true,
+      "rows": 80
+    }
+  ],
+  "verified_original": {
+    "wire": "1055 query; 1053 compose_type 1/2/3; events 7 and 6",
+    "forgeUI:579-581": "returnBack calls activityUI.returnBack without removing its own layer",
+    "forgeUI:734-782": "getForgeResult subtracts reward count from left_times at L755",
+    "forgeUI:785-818": "query left_times=count_limit-exchanged_count; flag=1 means forged",
+    "forgeUI:141-155": "materials iterate main_type weapon through guard, matching quality and equip_order=0",
+    "forgeUI:640-663": "enhanced equipment above level 10 triggers confirmation in original UI",
+    "forgeUI:488,544": "both target/name loops are fixed at three slots",
+    "forgeUI:77-81": "5-star tokens 1008/1009/1010; 4-star tokens 1011/1012/1013",
+    "item_buy_config": "six token prices 1500/1500/2000/200/200/500, count=1, VIP=0",
+    "packageUI:1903-1904": "using item 1003 calls forgeUI.show",
+    "funUI": "forge entry absent from funConfig and activity list"
+  },
+  "inferred_local": {
+    "rules": {
+      "schema_version": 1,
+      "mode": "inferred",
+      "revision": "2026-10-27.equipment-exchange.weekly.3",
+      "compose_min_level": 5,
+      "transform_min_level": 25,
+      "six_star_min_level": 1,
+      "sale_min_level": 1,
+      "transform_gold": 0,
+      "six_star_refund_rate": 1,
+      "dispose_stones": "return",
+      "activity_material_count": 5,
+      "activity_material_quality": 4,
+      "exchange_shards": 40,
+      "exchange_limit": 1,
+      "notes": "用户授权推测：活动长期开放，每周一北京时间00:00重置，装备与碎片兑换共用每周1次额度，下周可再次选择同一装备；未使用额度不累计；5件四星换指定装备并消耗原版锻造符，或40碎片。重铸消耗原版1100符，不额外收元宝；六星材料装备返还100%强化与进阶投入。原表配方、权重、六星20颗1369、出售价格直接读原包。 2026-10-27：活动材料类别按原UI限武器／防具；强化装备按原UI允许选择，超过10级确认后消耗；本地不返还强化银币，进阶／铸星／转生材料继续保护，镶嵌灵石返还。锻造符1008–1013在本地活动期恢复集市出售，价格、数量、VIP及排序读原item_buy_config.csv；常驻销售时间是补全策略。",
+      "six_star_min_realm": 4
+    },
+    "offered_equipment": 61,
+    "details": "Local catalog, 5 non-advanced 4-star weapons/armor, 40 shards per transaction, level 5, no enhancement silver refund, protection of advanced/reborn materials, ongoing activity and token sale period are server-policy completions, not verified original server values. User-requested weekly policy: one shared equipment/shard exchange per role, resetting Monday 00:00 UTC+8 without carryover; same equipment may be exchanged again next week."
+  }
+}

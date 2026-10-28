@@ -57,7 +57,23 @@ def period(now, r):
 def client_config(now, r=None):
     r = r or load_rules()
     start, end = period(now, r)
-    return dict(begin_time=start if r['enabled'] else 0, end_time=end if r['enabled'] else 0)
+    # end_time remains a wire-compatible cycle deadline, never an activity expiry.
+    return dict(begin_time=start if r['enabled'] else 0, end_time=end if r['enabled'] else 0,
+                permanent=r['enabled'], refresh_time=end if r['enabled'] else 0)
+
+
+def clear_offerings(role):
+    """Extra wishes expire with the cycle, including locked stacks/pending mail."""
+    role['attachments'] = [i for i in role.get('attachments', [])
+                           if not (i['attach_type'] == 5 and i['type_id'] == 1807)]
+    for mail in role.get('welfare', {}).get('mails', {}).values():
+        if mail['claimed']:
+            continue
+        prizes = mail['prizes']
+        mail['prizes'] = [p for p in prizes if not (p[0] == 5 and p[1] == 1807)]
+        if len(prizes) != len(mail['prizes']):
+            mail['claimed'] = not mail['prizes']
+            mail['mail_body'] += '\n元始祈愿本期已刷新，未领取的祈愿供品已清空。'
 
 
 def state(role, now, r):
@@ -66,11 +82,17 @@ def state(role, now, r):
     activity = role.setdefault('activity', {})
     s = activity.get('yuanshi')
     if s is None or now >= s['clock'] and start > s['start']:
+        if s is not None:
+            clear_offerings(role)
         s = dict(start=start, end=end, clock=now, day=day, free=r['daily_free'],
                  progress=0, claimed=False, wishes=0, wish_days=0, wished_today=False,
                  offering_stock=0, bag_bought=0, charge_gold=0, activated=[],
                  gift_counts=[], entitlement_day=-1, activation_day=-1)
         activity['yuanshi'] = s
+    if now >= s['clock'] and start == s['start']:
+        # Shorten legacy 28-day saves in the same fortnight without wiping
+        # current progress. The next boundary performs the normal full reset.
+        s['end'] = end
     if now >= s['clock'] and day > s['day']:
         # Only enrolled days count; no gifts or free attempts accrue while absent.
         s['offering_stock'] += day - s['day'] - int(s['wished_today'])
@@ -89,7 +111,7 @@ def snapshot(s, r):
                 wish_times=s['wish_days'], gift_list=list(s['gift_counts']),
                 gift_config=[dict(prize_list=[a.prize_spec(p) for p in rows]) for rows in r['gifts']],
                 is_today_charge=s['activation_day'] == s['day'], claimed=s['claimed'],
-                begin_time=s['start'], end_time=s['end'])
+                begin_time=s['start'], end_time=s['end'], permanent=True, refresh_time=s['end'])
 
 
 def shop(s, r):

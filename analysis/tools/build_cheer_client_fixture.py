@@ -32,7 +32,8 @@ local function apply(mid,d)
  elseif mid==2998 and d.id==95 then ui.onGetCheerResults(assert(loadstring('return '..d.data))()) end
 end
 ''']
-    lines.append('ms.d_mainUI.g_playerInfo='+summon.lua(dict(role, role_id=role['role_id'])))
+    # Only client scalar fields belong in g_playerInfo; server-only nested state may contain None.
+    lines.append('ms.d_mainUI.g_playerInfo='+summon.lua({k:v for k,v in role.items() if isinstance(v,(str,int,float,bool))}))
     lines.append('ui.initCost('+summon.lua(cheer.client_config(b.cheer_rules))+')')
     rc=reborn.client_config(b.reborn_rules);rc[4]['rights']['open_cheer_skill']=True
     lines.append('ms.d_roleRebornUI.initData('+summon.lua(rc)+')')
@@ -63,6 +64,7 @@ end
     request('skill_wash',13,pos=2);request('skill_wash_confirm',15)
     request('skill_unload',11,pos=2)
     request('innate_query',12,identity=ids[1])
+    for order in range(4, 9): request('open_positive_'+str(order),8,order)
     request('open_reverse',8,9);request('reverse_supporter',1,9,ids[2]);request('reverse_target',2,9,ids[0])
     for n in range(2,11):request('reverse_upgrade_'+str(n),3,9)
     request('reverse_skill_open',9,9,pos=2)

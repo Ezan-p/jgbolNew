@@ -1,0 +1,860 @@
+{
+  "date": "2026-10-28",
+  "revision": "2026-10-28-seven-gifts-user-pools-2",
+  "status": "implemented_in_workspace",
+  "source": "User images: contents and stone rates; local design: silver and other rates",
+  "original_server_probabilities_verified": false,
+  "visible_ui_verified": false,
+  "original_inputs": [
+    {
+      "logical": "csv_config/item_name.csv",
+      "asset": "70cb741174c493cf0a6d5de29ad7894c.data",
+      "sha256": "107da82bd2e8050c6e44dd8da0875f874a56de4cd29db58bc6a4959d3072e685",
+      "csv_matches": true
+    },
+    {
+      "logical": "csv_config/item_base.csv",
+      "asset": "803063b5ac66c77a4fe454fbc3ca9697.data",
+      "sha256": "2b49aa78b7ea27e7f98c896cc984c2f3a69ac6721c6ef167f20cd4b649aff1c7",
+      "csv_matches": true
+    },
+    {
+      "logical": "csv_config/item_buy_config.csv",
+      "asset": "2c90e37f0e9c8feb40c30c1131832898.data",
+      "sha256": "3a460c707b62cf9d9bd4eb3e66b4932ab76b4f5461d623bb22c44792e374c047",
+      "csv_matches": true
+    },
+    {
+      "logical": "csv_config/item_receive_config.csv",
+      "asset": "5af928685c8a740865ba8d36b22782e0.data",
+      "sha256": "e62cca8d35b1d14b6c3c5991b74a124cd2570934ae97d9025d62fded597649c8",
+      "csv_matches": true
+    },
+    {
+      "logical": "csv_config/gift_config.csv",
+      "asset": "4d02a335388caca25da5e6a2a50910e4.data",
+      "sha256": "c01fe7b869098e13b71e89b943941992999ff6e172ee4954604d2641d953493a",
+      "csv_matches": true
+    },
+    {
+      "logical": "csv_config/exchange_zone.csv",
+      "asset": "593d60d817729db8e8d75ded6e43a487.data",
+      "sha256": "0f53a409a42ff71896c2ccbe009e37f600eb670a3b7e64b18b105d39cbd5d1df",
+      "csv_matches": true
+    },
+    {
+      "logical": "csv_config/stone_cost_worth.csv",
+      "asset": "0a16b5948cefb130985b48a1377c7d6d.data",
+      "sha256": "8a441d12ec13e02f8331ffe580d770791048ab2ecfc2d979b90158142aa1944a",
+      "csv_matches": true
+    }
+  ],
+  "items": {
+    "1247": {
+      "name": "春节礼包",
+      "rule": {
+        "name": "春节礼包",
+        "mode": "fixed_random",
+        "prizes": [
+          [
+            12,
+            1,
+            100000,
+            1
+          ],
+          [
+            5,
+            1001,
+            100,
+            1
+          ]
+        ],
+        "reason": "用户图一：固定奖励全给，额外池每包抽1项；银币10万和概率为离线补全，非原服概率。",
+        "pool": "seasonal_1247"
+      },
+      "fixed_probability": "1",
+      "bonus": [
+        {
+          "reward": [
+            11,
+            1,
+            400,
+            1
+          ],
+          "name": "元宝",
+          "probability": "3/20",
+          "expected_quantity_per_100": "6000"
+        },
+        {
+          "reward": [
+            11,
+            1,
+            500,
+            1
+          ],
+          "name": "元宝",
+          "probability": "1/10",
+          "expected_quantity_per_100": "5000"
+        },
+        {
+          "reward": [
+            5,
+            1156,
+            2,
+            1
+          ],
+          "name": "传世金卡（小）",
+          "probability": "3/20",
+          "expected_quantity_per_100": "30"
+        },
+        {
+          "reward": [
+            5,
+            1152,
+            1,
+            1
+          ],
+          "name": "传世金卡",
+          "probability": "1/100",
+          "expected_quantity_per_100": "1"
+        },
+        {
+          "reward": [
+            5,
+            1156,
+            3,
+            1
+          ],
+          "name": "传世金卡（小）",
+          "probability": "2/25",
+          "expected_quantity_per_100": "24"
+        },
+        {
+          "reward": [
+            11,
+            1,
+            350,
+            1
+          ],
+          "name": "元宝",
+          "probability": "1/5",
+          "expected_quantity_per_100": "7000"
+        },
+        {
+          "reward": [
+            5,
+            1007,
+            5,
+            1
+          ],
+          "name": "超级召唤符",
+          "probability": "11/100",
+          "expected_quantity_per_100": "55"
+        },
+        {
+          "reward": [
+            5,
+            1006,
+            10,
+            1
+          ],
+          "name": "高级召唤符",
+          "probability": "1/5",
+          "expected_quantity_per_100": "200"
+        }
+      ],
+      "bonus_probability_sum": "1"
+    },
+    "1084": {
+      "name": "99重阳礼包",
+      "rule": {
+        "name": "99重阳礼包",
+        "mode": "fixed_random",
+        "prizes": [
+          [
+            12,
+            1,
+            100000,
+            1
+          ],
+          [
+            5,
+            1001,
+            100,
+            1
+          ]
+        ],
+        "reason": "用户图一：固定奖励全给，额外池每包抽1项；银币10万和概率为离线补全，非原服概率。",
+        "pool": "seasonal_1084"
+      },
+      "fixed_probability": "1",
+      "bonus": [
+        {
+          "reward": [
+            5,
+            1007,
+            5,
+            1
+          ],
+          "name": "超级召唤符",
+          "probability": "1/10",
+          "expected_quantity_per_100": "50"
+        },
+        {
+          "reward": [
+            5,
+            1006,
+            10,
+            1
+          ],
+          "name": "高级召唤符",
+          "probability": "1/5",
+          "expected_quantity_per_100": "200"
+        },
+        {
+          "reward": [
+            5,
+            1095,
+            1,
+            1
+          ],
+          "name": "乾坤逆转符",
+          "probability": "1/20",
+          "expected_quantity_per_100": "5"
+        },
+        {
+          "reward": [
+            5,
+            1015,
+            300,
+            1
+          ],
+          "name": "乾坤符箓",
+          "probability": "1/5",
+          "expected_quantity_per_100": "6000"
+        },
+        {
+          "reward": [
+            5,
+            1041,
+            10,
+            1
+          ],
+          "name": "仙佛密卷",
+          "probability": "1/4",
+          "expected_quantity_per_100": "250"
+        },
+        {
+          "reward": [
+            5,
+            1042,
+            10,
+            1
+          ],
+          "name": "高级仙佛密卷",
+          "probability": "1/5",
+          "expected_quantity_per_100": "200"
+        }
+      ],
+      "bonus_probability_sum": "1"
+    },
+    "1085": {
+      "name": "圣诞狂欢礼包",
+      "rule": {
+        "name": "圣诞狂欢礼包",
+        "mode": "fixed_random",
+        "prizes": [
+          [
+            12,
+            1,
+            100000,
+            1
+          ],
+          [
+            5,
+            1001,
+            100,
+            1
+          ]
+        ],
+        "reason": "用户图一：固定奖励全给，额外池每包抽1项；银币10万和概率为离线补全，非原服概率。",
+        "pool": "seasonal_1085"
+      },
+      "fixed_probability": "1",
+      "bonus": [
+        {
+          "reward": [
+            5,
+            1249,
+            30,
+            1
+          ],
+          "name": "五法界魂箱",
+          "probability": "1/20",
+          "expected_quantity_per_100": "150"
+        },
+        {
+          "reward": [
+            5,
+            10001,
+            20,
+            1
+          ],
+          "name": "紫色精魄碎片",
+          "probability": "3/20",
+          "expected_quantity_per_100": "300"
+        },
+        {
+          "reward": [
+            5,
+            10000,
+            100,
+            1
+          ],
+          "name": "精魄石",
+          "probability": "1/4",
+          "expected_quantity_per_100": "2500"
+        },
+        {
+          "reward": [
+            5,
+            1093,
+            10,
+            1
+          ],
+          "name": "金刚钻",
+          "probability": "1/5",
+          "expected_quantity_per_100": "200"
+        },
+        {
+          "reward": [
+            5,
+            1320,
+            20,
+            1
+          ],
+          "name": "近古水晶",
+          "probability": "3/20",
+          "expected_quantity_per_100": "300"
+        },
+        {
+          "reward": [
+            5,
+            1321,
+            20,
+            1
+          ],
+          "name": "上古水晶",
+          "probability": "1/10",
+          "expected_quantity_per_100": "200"
+        },
+        {
+          "reward": [
+            5,
+            1322,
+            10,
+            1
+          ],
+          "name": "远古水晶",
+          "probability": "7/100",
+          "expected_quantity_per_100": "70"
+        },
+        {
+          "reward": [
+            5,
+            1323,
+            10,
+            1
+          ],
+          "name": "太古水晶",
+          "probability": "3/100",
+          "expected_quantity_per_100": "30"
+        }
+      ],
+      "bonus_probability_sum": "1"
+    },
+    "1086": {
+      "name": "元旦欢乐礼包",
+      "rule": {
+        "name": "元旦欢乐礼包",
+        "mode": "fixed_random",
+        "prizes": [
+          [
+            12,
+            1,
+            100000,
+            1
+          ],
+          [
+            5,
+            1001,
+            100,
+            1
+          ]
+        ],
+        "reason": "用户图一：固定奖励全给，额外池每包抽1项；银币10万和概率为离线补全，非原服概率。",
+        "pool": "seasonal_1086"
+      },
+      "fixed_probability": "1",
+      "bonus": [
+        {
+          "reward": [
+            5,
+            1156,
+            2,
+            1
+          ],
+          "name": "传世金卡（小）",
+          "probability": "1/10",
+          "expected_quantity_per_100": "20"
+        },
+        {
+          "reward": [
+            11,
+            1,
+            400,
+            1
+          ],
+          "name": "元宝",
+          "probability": "3/20",
+          "expected_quantity_per_100": "6000"
+        },
+        {
+          "reward": [
+            11,
+            1,
+            500,
+            1
+          ],
+          "name": "元宝",
+          "probability": "1/10",
+          "expected_quantity_per_100": "5000"
+        },
+        {
+          "reward": [
+            5,
+            1032,
+            20,
+            1
+          ],
+          "name": "金丝乾坤袋",
+          "probability": "3/20",
+          "expected_quantity_per_100": "300"
+        },
+        {
+          "reward": [
+            5,
+            1033,
+            30,
+            1
+          ],
+          "name": "银绸乾坤袋",
+          "probability": "1/5",
+          "expected_quantity_per_100": "600"
+        },
+        {
+          "reward": [
+            5,
+            1031,
+            10,
+            1
+          ],
+          "name": "VIP乾坤袋",
+          "probability": "1/20",
+          "expected_quantity_per_100": "50"
+        },
+        {
+          "reward": [
+            5,
+            1034,
+            40,
+            1
+          ],
+          "name": "棉布乾坤袋",
+          "probability": "1/4",
+          "expected_quantity_per_100": "1000"
+        }
+      ],
+      "bonus_probability_sum": "1"
+    },
+    "1098": {
+      "name": "新年礼包",
+      "rule": {
+        "name": "新年礼包",
+        "mode": "fixed_random",
+        "prizes": [
+          [
+            12,
+            1,
+            100000,
+            1
+          ],
+          [
+            5,
+            1001,
+            100,
+            1
+          ]
+        ],
+        "reason": "用户图一：固定奖励全给，额外池每包抽1项；银币10万和概率为离线补全，非原服概率。",
+        "pool": "seasonal_1098"
+      },
+      "fixed_probability": "1",
+      "bonus": [
+        {
+          "reward": [
+            11,
+            1,
+            400,
+            1
+          ],
+          "name": "元宝",
+          "probability": "3/20",
+          "expected_quantity_per_100": "6000"
+        },
+        {
+          "reward": [
+            11,
+            1,
+            500,
+            1
+          ],
+          "name": "元宝",
+          "probability": "1/10",
+          "expected_quantity_per_100": "5000"
+        },
+        {
+          "reward": [
+            5,
+            1156,
+            2,
+            1
+          ],
+          "name": "传世金卡（小）",
+          "probability": "3/20",
+          "expected_quantity_per_100": "30"
+        },
+        {
+          "reward": [
+            5,
+            1152,
+            1,
+            1
+          ],
+          "name": "传世金卡",
+          "probability": "1/100",
+          "expected_quantity_per_100": "1"
+        },
+        {
+          "reward": [
+            5,
+            1156,
+            3,
+            1
+          ],
+          "name": "传世金卡（小）",
+          "probability": "2/25",
+          "expected_quantity_per_100": "24"
+        },
+        {
+          "reward": [
+            11,
+            1,
+            350,
+            1
+          ],
+          "name": "元宝",
+          "probability": "1/5",
+          "expected_quantity_per_100": "7000"
+        },
+        {
+          "reward": [
+            5,
+            1007,
+            5,
+            1
+          ],
+          "name": "超级召唤符",
+          "probability": "11/100",
+          "expected_quantity_per_100": "55"
+        },
+        {
+          "reward": [
+            5,
+            1006,
+            10,
+            1
+          ],
+          "name": "高级召唤符",
+          "probability": "1/5",
+          "expected_quantity_per_100": "200"
+        }
+      ],
+      "bonus_probability_sum": "1"
+    },
+    "1099": {
+      "name": "元宵礼包",
+      "rule": {
+        "name": "元宵礼包",
+        "mode": "fixed_random",
+        "prizes": [
+          [
+            12,
+            1,
+            100000,
+            1
+          ]
+        ],
+        "reason": "用户图一：固定奖励全给，额外池每包抽1项；银币10万和概率为离线补全，非原服概率。",
+        "pool": "seasonal_1099"
+      },
+      "fixed_probability": "1",
+      "bonus": [
+        {
+          "reward": [
+            5,
+            1001,
+            500,
+            1
+          ],
+          "name": "蟠桃",
+          "probability": "1/4",
+          "expected_quantity_per_100": "12500"
+        },
+        {
+          "reward": [
+            5,
+            1023,
+            10,
+            1
+          ],
+          "name": "仙丹",
+          "probability": "1/5",
+          "expected_quantity_per_100": "200"
+        },
+        {
+          "reward": [
+            5,
+            1022,
+            10,
+            1
+          ],
+          "name": "包子",
+          "probability": "1/5",
+          "expected_quantity_per_100": "200"
+        },
+        {
+          "reward": [
+            5,
+            1156,
+            2,
+            1
+          ],
+          "name": "传世金卡（小）",
+          "probability": "2/25",
+          "expected_quantity_per_100": "16"
+        },
+        {
+          "reward": [
+            5,
+            1246,
+            3,
+            1
+          ],
+          "name": "仙缘果",
+          "probability": "1/50",
+          "expected_quantity_per_100": "6"
+        },
+        {
+          "reward": [
+            5,
+            1002,
+            10,
+            1
+          ],
+          "name": "人参果",
+          "probability": "1/10",
+          "expected_quantity_per_100": "100"
+        },
+        {
+          "reward": [
+            5,
+            1020,
+            20,
+            1
+          ],
+          "name": "小包子",
+          "probability": "3/20",
+          "expected_quantity_per_100": "300"
+        }
+      ],
+      "bonus_probability_sum": "1"
+    },
+    "1205": {
+      "name": "灵石礼包",
+      "rule": {
+        "name": "灵石礼包",
+        "mode": "fixed_random",
+        "prizes": [
+          [
+            5,
+            1090,
+            1,
+            1
+          ],
+          [
+            5,
+            1091,
+            1,
+            1
+          ],
+          [
+            5,
+            1092,
+            1,
+            1
+          ]
+        ],
+        "reason": "用户图二：三类1级灵石各1必得，额外随机1颗；等级权重60/30/9/1，同级三类等概率。",
+        "pool": "seasonal_1205"
+      },
+      "fixed_probability": "1",
+      "bonus": [
+        {
+          "reward": [
+            5,
+            1090,
+            1,
+            1
+          ],
+          "name": "武器灵石",
+          "probability": "1/5",
+          "expected_quantity_per_100": "20"
+        },
+        {
+          "reward": [
+            5,
+            1091,
+            1,
+            1
+          ],
+          "name": "防具灵石",
+          "probability": "1/5",
+          "expected_quantity_per_100": "20"
+        },
+        {
+          "reward": [
+            5,
+            1092,
+            1,
+            1
+          ],
+          "name": "法宝灵石",
+          "probability": "1/5",
+          "expected_quantity_per_100": "20"
+        },
+        {
+          "reward": [
+            5,
+            1090,
+            1,
+            2
+          ],
+          "name": "武器灵石",
+          "probability": "1/10",
+          "expected_quantity_per_100": "10"
+        },
+        {
+          "reward": [
+            5,
+            1091,
+            1,
+            2
+          ],
+          "name": "防具灵石",
+          "probability": "1/10",
+          "expected_quantity_per_100": "10"
+        },
+        {
+          "reward": [
+            5,
+            1092,
+            1,
+            2
+          ],
+          "name": "法宝灵石",
+          "probability": "1/10",
+          "expected_quantity_per_100": "10"
+        },
+        {
+          "reward": [
+            5,
+            1090,
+            1,
+            3
+          ],
+          "name": "武器灵石",
+          "probability": "3/100",
+          "expected_quantity_per_100": "3"
+        },
+        {
+          "reward": [
+            5,
+            1091,
+            1,
+            3
+          ],
+          "name": "防具灵石",
+          "probability": "3/100",
+          "expected_quantity_per_100": "3"
+        },
+        {
+          "reward": [
+            5,
+            1092,
+            1,
+            3
+          ],
+          "name": "法宝灵石",
+          "probability": "3/100",
+          "expected_quantity_per_100": "3"
+        },
+        {
+          "reward": [
+            5,
+            1090,
+            1,
+            4
+          ],
+          "name": "武器灵石",
+          "probability": "1/300",
+          "expected_quantity_per_100": "1/3"
+        },
+        {
+          "reward": [
+            5,
+            1091,
+            1,
+            4
+          ],
+          "name": "防具灵石",
+          "probability": "1/300",
+          "expected_quantity_per_100": "1/3"
+        },
+        {
+          "reward": [
+            5,
+            1092,
+            1,
+            4
+          ],
+          "name": "法宝灵石",
+          "probability": "1/300",
+          "expected_quantity_per_100": "1/3"
+        }
+      ],
+      "bonus_probability_sum": "1"
+    }
+  },
+  "verification": "tests/test_item_rewards.py; tests.log records executed regression suite"
+}

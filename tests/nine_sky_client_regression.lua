@@ -50,8 +50,13 @@ ui.showShopLayer=function(page)
  assert(ms.d_time.getRestTime()==nil)
 end
 ui.showComplexBuyLayer=function() ui.g_towerUI.main_layer:addChild(node(),2,2) end
+ui.clearTinaInfo=function()
+ ui.g_self.special_shop_data=nil;ui.g_self.special_role_shop_data=nil
+ ui.g_self.shop_data[3]=nil;ui.g_self.shop_data[4]=nil
+end
 ui.onGetActResult=function(d)
  if d.flag==1 then
+  assert(not d.tina_shop,'entry must not replay a palace encounter')
   ui.g_self.role_data=copy(d.role_sky_data or d.local_snapshot)
   ui.g_towerUI.main_layer=node();root:addChild(ui.g_towerUI.main_layer);ui.create()
  elseif d.flag==3 then
@@ -81,6 +86,16 @@ check('permanent entry and week label',function()
  assert(ui.canJoin());assert(styles[1].string=='周重置倒计时')
  assert(ms.d_time.getRestTime()=='native countdown')
  assert(ui.g_towerUI.main_layer:getChildByTag(5).text=='0天 00:16:40')
+end)
+check('reentry suppresses legacy palace and clears cached encounter',function()
+ for _,sold in ipairs({false,true}) do
+  ui.g_self.tinaIndex=3;ui.g_self.special_shop_data={{}}
+  ui.g_self.special_role_shop_data={sold and 1 or 0};ui.g_self.shop_data[3]={{}}
+  local legacy={shop_index=3,role_buy_list={{sold and 1 or 0},{sold and 2 or 0,sold and 2 or 0}}}
+  local d=response(1,s,{tina_shop=legacy})
+  assert(d.tina_shop==legacy,'do not mutate replay packet')
+  assert(not ui.g_self.tinaIndex and not ui.g_self.special_shop_data and not ui.g_self.shop_data[3])
+ end
 end)
 check('always fetch full catalog and bind purchase version',function()
  ui.sendRequest(3,{buy_type=1,first_send=false});assert(sent[#sent].data.first_send)

@@ -154,25 +154,27 @@ do
   for _,name in ipairs({'pressOneKey1','pressOneKey2','pressOneKey3'}) do
    if old[name] then ui[name]=function() ms.d_info.show('请手动拖入金牌组合兑换') end end
   end
-  -- The introduction contains only recipes, with no auto-combine controls or rewards after them.
+  -- Reuse the native gold/brown panel and layout, replacing only its copy.
   ui.showTips=function()
    if not active() then return end
    local main=ui.g_cardUI.main_layer;main:removeChildByTag(91094,true)
-   local layer=CCLayerColor:create(ccc4(25,20,15,245));main:addChild(layer,100,91094)
-   ms.d_u.createSwallowTouchLayer(layer)
-   local function label(text,y,size)
-    layer:addChild(ms.d_u.createByStyles({type='label',font='arial',fontsize=size,x=0.5,y=y,
-     string=text,color={254,235,185}}),2)
+   local getConfig,savedTips=ms.d_data.getCardTipConfig,ms.d_data.g_card_tip
+   local gethz=ms.d_hz.gethz
+   ms.d_data.getCardTipConfig=function()
+    ms.d_data.g_card_tip={'国庆快乐：可兑换特殊奖励','国庆有礼：可兑换特殊奖励','欢度国庆：可兑换特殊奖励'}
    end
-   label('唐王集卡诏 · 组合介绍',0.87,32)
-   label('组合一：国庆快乐',0.73,30)
-   label('组合二：国庆有礼',0.62,30)
-   label('组合三：欢度国庆',0.51,30)
-   label('按上述顺序手动放入四枚金牌，再点击兑换',0.37,24)
-   label(string.format('每日领%d枚随机金牌；关卡胜利有%d%%概率掉落1枚',data and data.daily_cards or 4,data and data.travel_drop_percent or 30),0.26,24)
-   label('每周一0点刷新，剩余金牌按1:1邮件返还蟠桃',0.15,24)
-   layer:addChild(ms.d_u.createMenu({x=0,y=0,{npic='v2/introUI/close1.png',spic='v2/introUI/close2.png',
-    x=0.95,y=0.93,scalexx=0.1,call_back=function() main:removeChildByTag(91094,true) end}}),3)
+   ms.d_hz.gethz=function(key,...)
+    if key=='springCardTip6' then return '收集到以下组合会有特殊奖励：' end
+    if key=='springCardTip7' then return '放入四枚金牌，未构成以上组合也可进行兑换' end
+    return gethz(key,...)
+   end
+   local ok,result=pcall(old.showTips)
+   ms.d_data.getCardTipConfig=getConfig;ms.d_data.g_card_tip=savedTips;ms.d_hz.gethz=gethz
+   if not ok then error(result) end
+   -- Native showTips adds its panel last; tag it to prevent duplicate overlays.
+   local children=main:getChildren()
+   tolua.cast(children:objectAtIndex(children:count()-1),'CCNode'):setTag(91094)
+   return result
   end
   ui._localTangwangRestore=function()
    for k,v in pairs(old) do ui[k]=v end

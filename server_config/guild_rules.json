@@ -150,7 +150,7 @@
   "team_size": 5,
   "team_min_fighters": 3,
   "team_daily": 3,
-  "search_daily": 5,
+  "search_daily": 15,
   "catch_daily": 3,
   "catch_gold": 20,
   "team_rewards": [
@@ -162,6 +162,12 @@
     ]
   ],
   "train_rewards": [
+    [
+      12,
+      0,
+      50000,
+      1
+    ],
     [
       5,
       1001,
@@ -222,34 +228,35 @@
   "match_loss_life": 1,
   "match_target_loss": 1,
   "match_max_streak": 5,
+  "train_reference_level": 50,
   "train_floors": [
     {
       "level": 50,
-      "hp": 10000,
-      "attack": 900,
-      "defense": 300,
-      "magic": 800
+      "hp": 150000,
+      "attack": 9000,
+      "defense": 3000,
+      "magic": 8000
     },
     {
       "level": 65,
-      "hp": 20000,
-      "attack": 1400,
-      "defense": 500,
-      "magic": 1200
+      "hp": 375000,
+      "attack": 22500,
+      "defense": 7500,
+      "magic": 20000
     },
     {
       "level": 80,
-      "hp": 35000,
-      "attack": 2100,
-      "defense": 800,
-      "magic": 1800
+      "hp": 937500,
+      "attack": 56250,
+      "defense": 18750,
+      "magic": 50000
     },
     {
       "level": 100,
-      "hp": 55000,
-      "attack": 3000,
-      "defense": 1200,
-      "magic": 2600
+      "hp": 2343750,
+      "attack": 140625,
+      "defense": 46875,
+      "magic": 125000
     }
   ],
   "train_hp": 10000,
@@ -442,31 +449,49 @@
     [
       12,
       0,
-      500,
+      50000,
       1
     ],
     [
       12,
       0,
-      1500,
+      100000,
+      1
+    ],
+    [
+      11,
+      0,
+      20,
+      1
+    ],
+    [
+      11,
+      0,
+      50,
       1
     ],
     [
       5,
       1001,
-      2,
+      20,
       1
     ],
     [
       5,
-      1003,
-      1,
+      1001,
+      50,
       1
     ],
     [
-      12,
-      0,
-      2500,
+      5,
+      1029,
+      3,
+      1
+    ],
+    [
+      5,
+      1029,
+      5,
       1
     ]
   ],
@@ -659,5 +684,16 @@
         ]
       ]
     }
+  ],
+  "search_per_layer": 5,
+  "search_reward_slots": [
+    4,
+    4,
+    1,
+    1,
+    4,
+    2,
+    1,
+    1
   ]
 }

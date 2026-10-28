@@ -66,28 +66,6 @@ do
   end
  end
 end
--- 3.87 eventMgr retains event 7 but forgeUI no longer exports updateForgeList.
--- Bridge it to the shipped activity snapshot reader, preserving original UI.
-do
- local ms=package.loaded.ms
- local ui=ms and ms.d_forgeUI
- if ui and not ui._localCraftingRestore then
-  local original=ui.updateForgeList
-  local originalShow,originalNeed=ui.show,ui.isNeedUpdateList
-  ui.isNeedUpdateList=function() return not ui.canJoin() end
-  ui.show=function(parent)
-   if not ui.canJoin() then ms.d_u.main_server_send_msg(ms.d_msg_def.gscl_msg_id.msg_query_compose_list,{flag=0});return end
-   return originalShow(parent or (ms.d_mainUI.g_mainUI and ms.d_mainUI.g_mainUI.main_layer))
-  end
-  ui.updateForgeList=function(data)
-   if not data.equip_compose then if original then return original(data) end; return end
-   ui.updateActivityStatus(data)
-   if data.show then ui.show() end
-  end
-  ui._localCraftingRestore=function() ui.updateForgeList=original;ui.show=originalShow;ui.isNeedUpdateList=originalNeed;ui._localCraftingRestore=nil end
- end
-end
-
 -- Batch sale retains its category array even when inventory snapshots replace it.
 -- Remove consumed IDs from that same array before the original result refresh.
 do

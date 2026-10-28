@@ -18,15 +18,22 @@ CONTAINERS = frozenset(t for t, r in f.ITEMS.items()
                        if int(r['main_type']) in (6, 7, 8)) - NON_CONTAINERS
 HANDLED = CONTAINERS - SPECIAL
 PATH = f.ROOT / 'server_config/item_reward_rules.json'
+# User-specified one-way rewards. These target containers use dedicated handlers
+# and cannot lead back to a seasonal gift through this rules file.
+CONTAINER_REWARDS = {1085: frozenset((1249,)),
+                     1086: frozenset((1031, 1032, 1033, 1034))}
 
 
-def valid_prize(p):
+def valid_prize(p, source=None):
     f.require(isinstance(p, list) and len(p) == 4
               and all(type(v) is int for v in p), '宝箱奖励格式无效')
     kind, tid, count, level = p
-    f.require(1 <= count <= 1000000 and level == 1 and (
+    valid_level = level == 1 or (source == 1205 and kind == 5
+                                and tid in (1090, 1091, 1092) and 2 <= level <= 4)
+    f.require(1 <= count <= 1000000 and valid_level and (
         kind in (11, 12) and tid == 1 or
-        kind == 5 and tid in f.ITEMS and tid not in CONTAINERS or
+        kind == 5 and tid in f.ITEMS and (
+            tid not in CONTAINERS or tid in CONTAINER_REWARDS.get(source, ())) or
         kind == 6 and tid in f.SKILLS or kind == 10 and tid in f.BASES), '宝箱奖励无效或循环产出宝箱')
 
 
@@ -34,22 +41,26 @@ def load_rules():
     r = json.loads(PATH.read_text(encoding='utf-8'))
     f.require(r.get('schema_version') == 1 and r.get('mode') == 'inferred', '宝箱配置须标注推测来源')
     f.require(set(r['items']) == set(map(str, HANDLED)), '宝箱配置未完整覆盖道具')
-    for pool in r['pools'].values():
+    pool_sources = defaultdict(list)
+    for source, rule in r['items'].items():
+        f.require(rule['mode'] in ('fixed', 'random', 'fixed_random')
+                  and bool(rule.get('reason')), '宝箱规则来源缺失')
+        if rule['mode'] in ('random', 'fixed_random'):
+            f.require(rule['pool'] in r['pools'], '宝箱奖池不存在')
+            pool_sources[rule['pool']].append(int(source))
+        if rule['mode'] in ('fixed', 'fixed_random'):
+            f.require(isinstance(rule['prizes'], list) and rule['prizes'], '礼包奖励缺失')
+            for p in rule['prizes']:
+                valid_prize(p, int(source))
+    for name, pool in r['pools'].items():
         f.require(isinstance(pool, list) and pool, '宝箱奖池不能为空')
         for group in pool:
             f.require(type(group['weight']) is int and 0 < group['weight'] <= 1000000
                       and isinstance(group['candidates'], list) and group['candidates'], '宝箱概率配置无效')
             for prize in group['candidates']:
-                valid_prize(prize)
+                for source in pool_sources.get(name, [None]):
+                    valid_prize(prize, source)
             f.require(len({tuple(p) for p in group['candidates']}) == len(group['candidates']), '宝箱候选重复')
-    for rule in r['items'].values():
-        f.require(rule['mode'] in ('fixed', 'random') and bool(rule.get('reason')), '宝箱规则来源缺失')
-        if rule['mode'] == 'random':
-            f.require(rule['pool'] in r['pools'], '宝箱奖池不存在')
-        else:
-            f.require(isinstance(rule['prizes'], list) and rule['prizes'], '礼包奖励缺失')
-            for p in rule['prizes']:
-                valid_prize(p)
     patches = r['fragment_overrides']
     f.require(set(patches) == {'10001'}, '碎片覆盖范围无效')
     patch = patches['10001']
@@ -82,10 +93,11 @@ def use(role, req):
               ('is_lock', 'owner_id', 'equip_pos', 'equip_order')), '宝箱不足、已锁定或不可使用')
     rules = load_rules()
     rule = rules['items'][str(tid)]
-    if rule['mode'] == 'random':
-        specs = [draw(rules['pools'][rule['pool']]) for _ in range(count)]
-    else:
-        specs = [[k, t, n * count, lv] for k, t, n, lv in rule['prizes']]
+    specs = []
+    if rule['mode'] in ('fixed', 'fixed_random'):
+        specs.extend([k, t, n * count, lv] for k, t, n, lv in rule['prizes'])
+    if rule['mode'] in ('random', 'fixed_random'):
+        specs.extend(draw(rules['pools'][rule['pool']]) for _ in range(count))
     totals = defaultdict(int)
     for kind, target, n, level in specs:
         totals[kind, target, level] += n

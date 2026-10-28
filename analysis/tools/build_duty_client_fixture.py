@@ -57,7 +57,7 @@ local ms=assert(package.loaded.ms);local ui=assert(ms.d_endlessFightUI)
 local act=ms.d_activityUI;local login=ms.d_loginUI
 local saved={};for k,v in pairs(ui) do saved[k]=v end
 local auxiliary={}
-for _,name in ipairs({'d_messageUI','d_commonLayerUI','d_lineupUI','d_mysteryUI'}) do
+for _,name in ipairs({'d_messageUI','d_commonLayerUI','d_lineupUI','d_mysteryUI','d_charPositionUI'}) do
  local t=ms[name];local old={};for k,v in pairs(t) do old[k]=v end
  auxiliary[#auxiliary+1]={target=t,old=old}
 end

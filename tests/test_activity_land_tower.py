@@ -2,8 +2,8 @@
 import copy
 import random
 from unittest.mock import patch
-from tests.test_activity import ActivityCase
-from network_redirect import activity_land as land, activity_land_encounters as encounters
+from tests.test_activity import ActivityCase, NOW
+from network_redirect import activity, activity_land as land, activity_land_encounters as encounters
 from network_redirect import activity_land_boss as boss, activity_land_npc as npc, formation, summon, journey
 from network_redirect.backend import Backend, login_fields
 from network_redirect.protocol import MAX_PACKET, decode
@@ -12,6 +12,149 @@ from pathlib import Path
 
 class LandTowerTests(ActivityCase):
     def land(self,op,**d):return self.req(1302,id=op,data=summon.lua(d))
+
+    def test_tower_growth_starts_at_the_tuned_level_and_increases_per_floor(self):
+        normal=encounters.schedule(False)
+        hell=encounters.schedule(True)
+        self.assertEqual(normal[0]['level'],3)
+        self.assertEqual(hell[0]['level'],4)
+        self.assertEqual(normal[0]['power'],769)
+        self.assertGreater(hell[0]['power'],normal[0]['power'])
+        self.assertGreater(normal[-1]['power'],normal[0]['power']*200)
+        self.assertGreater(hell[-1]['power'],hell[0]['power']*300)
+        # Every floor now advances by the configured level step, so template
+        # growth is visible in addition to the monotonic carry-forward guard.
+        self.assertEqual(normal[1]['level']-normal[0]['level'],6)
+        self.assertEqual(hell[1]['level']-hell[0]['level'],8)
+        self.assertEqual(normal[-1]['level'],381)
+        self.assertEqual(hell[-1]['level'],508)
+        self.assertGreater(normal[-1]['power'],198892*2)
+        self.assertGreater(hell[-1]['power'],261038*2)
+        for rows in (normal,hell):
+            for previous,current in zip(rows,rows[1:]):
+                for stat in formation.STATS:
+                    self.assertGreaterEqual(current['units'][0][stat]*100,
+                                            previous['units'][0][stat]*103)
+
+    def test_card_pool_has_all_eight_requested_reward_tiers(self):
+        self.assertEqual(self.b.activity_rules['land_card_rewards'],[
+            [12,0,10000,1],[12,0,30000,1],[11,0,20,1],
+            [5,1001,1,1],[5,1001,3,1],[5,10000,5,1],
+            [5,10000,10,1],[5,10001,1,1]])
+
+    def test_new_cards_are_unique_shuffled_and_persist_until_claimed(self):
+        self.ok(self.land(1))
+        pool=self.b.activity_rules['land_card_rewards']
+        boards=[]
+        for hell in (False,True):
+            key='hell' if hell else 'boss'; count=3 if hell else 5
+            query,flip,advance=(24,23,25) if hell else (12,14,15)
+            role=self.b.profile();s=role['activity']['land']
+            s.update(soul_count=10000,unlocked=[1]);self.b.save(role)
+            # Fix only the draw RNG; victory still uses the actual battle engine.
+            with patch.object(boss.secrets,'SystemRandom',return_value=random.Random(30 if hell else 41)):
+                out=self.land(4,flag=1,des_type=4 if hell else 3,des_id=1,cur_num=1)
+            self.ok(out);self.assertTrue(out[-1][1]['is_win'])
+            pending=self.b.profile()['activity']['land'][key]
+            chosen=pending['rewards'];boards.append(chosen)
+            self.assertEqual(len(chosen),count)
+            self.assertEqual(len({tuple(p) for p in chosen}),count)
+            self.assertTrue(all(p in pool for p in chosen))
+            self.assertNotEqual(chosen,sorted(chosen,key=pool.index))
+            self.ok(self.land(query))
+            self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+            self.ok(self.land(query))
+            self.assertEqual(self.b.profile()['activity']['land'][key],pending)
+            for index in range(count,0,-1):
+                before=self.b.profile()
+                result=self.land(flip,index=index);self.ok(result)
+                self.assertEqual(result[-1][1]['attach_data'],activity.prize_spec(chosen[index-1]))
+                extras=self.b.activity_rules['land_full_card_rewards'] if index==1 else []
+                self.assertEqual(result[-1][1]['extra_prize_list'],
+                    {i:activity.prize_spec(p) for i,p in enumerate(extras,1)} if extras else {})
+                rewards=[chosen[index-1]]+extras
+                current=self.b.profile()
+                cost=self.b.activity_rules['land_card_gold'][count-index]
+                for typ,field in ((11,'gold_coin'),(12,'silver_coin')):
+                    gain=sum(p[2] for p in rewards if p[0]==typ)
+                    self.assertEqual(current[field]-before[field],gain-(cost if typ==11 else 0))
+                for tid in (1001,10000,10001):
+                    inventory=lambda r:sum(p['count'] for p in r['attachments'] if p['attach_type']==5 and p['type_id']==tid)
+                    self.assertEqual(inventory(current)-inventory(before),sum(p[2] for p in rewards if p[:2]==[5,tid]))
+                self.assertEqual(self.land(flip,index=index)[0][0],55)
+                self.assertEqual(self.b.profile(),current)
+            before=self.b.profile()
+            self.assertEqual(self.land(flip,index=count+1)[0][0],55)
+            self.assertEqual(self.b.profile(),before)
+            self.ok(self.land(advance))
+            # Clearing an old floor again must not produce another reward board.
+            self.ok(self.land(4,flag=1,des_type=4 if hell else 3,des_id=1,cur_num=1))
+            self.assertIsNone(self.b.profile()['activity']['land'][key])
+        self.assertNotEqual(boards[0][:3],boards[1])
+        self.assertEqual({tuple(p) for board in boards for p in board},{tuple(p) for p in pool})
+
+    def test_sweep_keeps_its_peaches_after_card_pool_change(self):
+        self.ok(self.land(1));role=self.b.profile()
+        role['activity']['land']['boss_layer']=3;self.b.save(role)
+        result=self.land(13);self.ok(result)
+        self.assertEqual(result[-1][1]['sweep_list'],
+                         {i:{1:activity.prize_spec([5,1001,10,1])} for i in range(1,4)})
+
+    def test_legacy_three_card_hell_board_remains_claimable(self):
+        self.ok(self.land(1));role=self.b.profile();s=role['activity']['land']
+        s['hell']=dict(layer=1,cards=[],rewards=[[5,1343,1,1]]*3)
+        self.b.save(role)
+        self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.ok(self.land(24))
+        for index in (3,1,2):
+            result=self.land(23,index=index);self.ok(result)
+            self.assertEqual(result[-1][1]['attach_data'],activity.prize_spec([5,1343,1,1]))
+        self.ok(self.land(25))
+        self.assertEqual(self.b.profile()['activity']['land']['inv_boss_layer'],1)
+
+    def test_tower_detail_preserves_tower_id_for_attack_request(self):
+        when=NOW+8*3600
+        with patch('network_redirect.backend.time.time',return_value=when):
+            self.ok(self.land(1))
+            detail=self.land(11,tower_id=14)[-1][1]['tower_info']
+            self.assertEqual(detail['tower_id'],14)
+            # The native client copies towerInfo.tower_id into the following
+            # prey_fight request.  This must remain a valid tower after the
+            # query/detail round trip.
+            self.ok(self.land(4,flag=1,des_type=2,des_id=detail['tower_id']))
+
+    def test_each_unlocked_map_rebuilds_its_own_towers_and_travel(self):
+        self.ok(self.land(1))
+        role=self.b.profile();s=role['activity']['land']
+        s.update(boss_layer=48,soul_count=10000)
+        self.b.save(role)
+        for level in (2,3,4):
+            self.ok(self.land(2,des_level=level))
+            current=self.b.profile()['activity']['land']
+            self.assertEqual(set(current['towers']),{str(level*10+i) for i in range(1,5)})
+            self.ok(self.land(3));self.assertLessEqual(len(self.b.profile()['activity']['land']['travel']),4)
+            self.ok(self.land(17))
+
+    def test_inverse_tower_migrates_legacy_progress_and_clamps_daily_count(self):
+        self.ok(self.land(1))
+        role=self.b.profile();s=role['activity']['land']
+        s.update(boss_layer=4,inv_boss_layer=2,soul_count=10000,
+                 inv_history={'1':dict(score=3000,cur_num=1),
+                              '2':dict(score=3000,cur_num=1)},
+                 hell_counts={'1':99})
+        s.pop('unlocked',None)
+        self.b.save(role)
+        out=self.land(24);self.ok(out)
+        data=out[-1][1]['data']
+        self.assertEqual(data['boss_info']['boss_layer'],3)
+        self.assertFalse(data['boss_info']['is_open'])
+        self.assertEqual(data['boss_info']['can_fight_count'],3)
+        self.assertTrue(data['history'][1]['is_open'])
+        self.assertTrue(data['history'][2]['is_open'])
+        self.assertEqual(self.b.profile()['activity']['land']['unlocked'],[1,2])
+        # A legacy per-layer counter above the configured daily limit is
+        # exposed as zero and cannot be bypassed by submitting a fight.
+        self.assertEqual(self.land(4,flag=1,des_type=4,des_id=1,cur_num=1)[0][0],55)
 
     def test_hell_64_shield_events_do_not_truncate_winning_battle(self):
         self.ok(self.land(1));r=self.b.profile();identity=r['role_id']

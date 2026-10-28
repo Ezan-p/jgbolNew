@@ -111,12 +111,34 @@ class GuildWarFeastTests(unittest.TestCase):
         self.assertEqual(self.role()['gold_coin'],before['gold_coin'])
         self.assertEqual(self.feast()['gift_data'][4]['count'],0)
         self.req(67,gift_type=2,count=2)
+        self.assertEqual(self.req(18,query_type=15)[-1]['order'],0)
+        row=self.role()['monument_wealth']['current']
+        self.assertEqual((row['normal_gift'],row['advanced_gift'],row['donation_money']),(2,2,0))
+        self.now=NOW+3*86400
         row=next(v for v in self.req(18,query_type=15)[-1]['fortune_info'].values() if v['id']==1)
-        self.assertEqual((row['normal_gift'],row['advanced_gift'],row['contribute']),(2,2,120))
+        self.assertEqual((row['normal_gift'],row['advanced_gift'],row['fortune']),(2,2,1120))
 
     def test_nonvip_gift_rejected_without_spending(self):
         self.req(65,feast_type=1);role=self.role();role['vip_level']=0;self.b.save(role);before=self.role()
         self.req(67,ok=False,gift_type=1,count=2);self.assertEqual(before,self.role())
+
+    def test_wealth_donation_recording_failure_replay_and_week_reset(self):
+        board=self.req(18,query_type=15)[-1]['fortune_info']
+        before=self.role()['monument_wealth']['current']['donation_money']
+        self.req(36,count=20)
+        self.assertEqual(self.role()['monument_wealth']['current']['donation_money'],before+200)
+        # Replaying the same serialized request must not add another donation.
+        packet=encode(1301,dict(serial_num=self.serial,id=36,data=summon.lua(dict(count=20))))
+        self.b.respond(packet,{'authenticated':True})
+        self.assertEqual(self.role()['monument_wealth']['current']['donation_money'],before+200)
+        self.req(36,ok=False,count=100)
+        self.assertEqual(self.role()['monument_wealth']['current']['donation_money'],before+200)
+        self.assertEqual(self.req(18,query_type=15)[-1]['fortune_info'],board)
+        self.now=NOW+3*86400
+        self.req(36,count=1)
+        row=next(v for v in self.req(18,query_type=15)[-1]['fortune_info'].values() if v['id']==1)
+        self.assertEqual((row['fortune'],row['donation_money']),(1020,200))
+        self.assertEqual(self.role()['monument_wealth']['current']['donation_money'],10)
 
     def test_tree_buff_is_limited_50_percent_not_global_multiplier(self):
         self.req(65,feast_type=2);self.req(68)

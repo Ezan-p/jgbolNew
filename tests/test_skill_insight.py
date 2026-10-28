@@ -124,6 +124,7 @@ class InsightTests(unittest.TestCase):
             name = cheer.NAMES[order - 1]
             item = dict(attach_type=6, type_id=22, level=10, equip_order=order+8, equip_pos=2)
             role = {'cheer_' + name + '_effect':1, name + '_skill_level':100,
+                    'cheer_' + name + '_level':10, cheer.skill_mask(order, 2)[0]:cheer.skill_mask(order, 2)[1],
                     'corteges':[dict(id=2, order=0, cheer_order=order)], 'attachments':[item]}
             pending = {1:{s:Decimal(1000) for s in f.STATS}, 2:{s:Decimal(100) for s in f.STATS}}
             before = {s:Decimal(1000) for s in f.STATS}

@@ -4,9 +4,11 @@ Called only on Backend's detached role; failures discard every debit and reward.
 """
 from collections import defaultdict
 from decimal import Decimal
+from datetime import datetime, timezone, timedelta
 import json
 import secrets
-from . import formation as f, equipment, summon
+import time
+from . import formation as f, equipment, summon, feature_levels
 
 HANDLED = {1053, 1055, 1056, 1074, 1079, 1225}
 RECIPES = summon.rows('material_transform.csv')
@@ -28,7 +30,7 @@ def load_rules():
     f.require(r['exchange_shards'] == 40, '碎片兑换配置无效')
     f.require(r['six_star_refund_rate'] == 1 and r['dispose_stones'] == 'return', '装备返还配置无效')
     f.require(type(r['activity_material_count']) is int and 1 <= r['activity_material_count'] <= 50, '合成数量配置无效')
-    f.require(type(r['exchange_limit']) is int and 1 <= r['exchange_limit'] <= 100, '兑换次数配置无效')
+    f.require(type(r['exchange_limit']) is int and r['exchange_limit'] == 1, '每周兑换上限必须为1次')
     f.require(r['activity_material_quality'] in (1, 2, 3, 4, 5), '合成品质配置无效')
     return r
 
@@ -273,16 +275,62 @@ def material_transform(role, req):
                       transform_list=prizes, compensate_list=refunds))]
 
 
-def compose_list(role, rules):
-    state = role.get('equipment_forge', {})
+WEEK = 7 * 86400
+CHINA_TIME = timezone(timedelta(hours=8))
+
+
+def prepare_week(role, now=None):
+    """Monday 00:00 UTC+8. Missed weeks never accumulate; clocks cannot rewind."""
+    now = int(time.time() if now is None else now)
+    day = (now + 8 * 3600) // 86400
+    week_start = (day - (day + 3) % 7) * 86400 - 8 * 3600
+    state = role.setdefault('equipment_forge', {})
+    if 'week_start' not in state:
+        # Lifetime records have no timestamps: archive, do not invent this week's usage.
+        if state.get('appointed') or state.get('exchanged'):
+            state['legacy'] = dict(appointed=list(state.get('appointed', [])),
+                                   exchanged=state.get('exchanged', 0))
+        state.update(week_start=week_start, used=0, appointed=[], exchanged=0)
+    elif week_start > state['week_start']:
+        state.update(week_start=week_start, used=0, appointed=[], exchanged=0)
+    return state
+
+
+def weekly_notice(state):
+    reset = datetime.fromtimestamp(state['week_start'] + WEEK, CHINA_TIME).strftime('%Y-%m-%d %H:%M')
+    return '本周装备兑换次数已用完（1/1），下次刷新：' + reset + '（北京时间）'
+
+
+def compose_list(role, rules, now=None):
+    state = prepare_week(role, now)
     appoint = []
     for tid, c in f.ITEMS.items():
         if int(c['main_type']) in (1, 2, 3) and int(c['quality']) in (4, 5):
             appoint.append(dict(material_type=tid, material_quality=rules['activity_material_quality'], material_count=rules['activity_material_count'], flag=1 if str(tid) in state.get('appointed', []) else 0))
-    exchange = dict(count_limit=rules['exchange_limit'], exchanged_count=state.get('exchanged', 0))
+    exchange = dict(count_limit=rules['exchange_limit'], exchanged_count=state['used'])
     for tid in (6001, 6002, 6003, 6004):
         exchange[tid] = dict(need_count=rules['activity_material_count'], need_quality=rules['activity_material_quality'])
-    return dict(equip_compose=dict(start_time=1, end_time=2147483647, appoint=appoint, exchange=exchange))
+    return dict(equip_compose=dict(start_time=1, end_time=2147483647,
+                                  weekly_remaining=max(0, rules['exchange_limit'] - state['used']),
+                                  weekly_limit=rules['exchange_limit'],
+                                  weekly_reset_at=state['week_start'] + WEEK,
+                                  weekly_notice=weekly_notice(state),
+                                  min_role_level=feature_levels.LEVELS['forge'], appoint=appoint, exchange=exchange))
+
+
+def market_goods():
+    """[A] Original token prices; [B] available during the local ongoing event."""
+    goods = {}
+    for row in summon.rows('item_buy_config.csv'):
+        kind, tid, count = map(int, row['type_id'].split('|'))
+        if tid not in range(1008, 1014):
+            continue
+        index, price = int(row['index']), int(row['buy_price'])
+        goods[index] = dict(index=index, object_type=kind, type_id=tid, count=count,
+                            buy_price=price, origin_price=price, money_type=11,
+                            vip_level=int(row['vip_level']), order=int(row['order']),
+                            begin_time=1, end_time=2147483647, buy_limit_times=0, is_day_limit=0)
+    return goods
 
 
 def random_list():
@@ -299,6 +347,11 @@ def compose(role, req, rules):
     f.require(role['level'] >= rules['compose_min_level'], '尚未达到装备合成等级')
     op = req['compose_type']
     f.require(op in (1, 2, 3), '装备合成类型无效')
+    now = int(time.time())
+    if op in (2, 3):
+        feature_levels.require(role, 'forge')
+        state = prepare_week(role, now)
+        f.require(state['used'] < rules['exchange_limit'], weekly_notice(state))
     items = selected(role, req['material_list'], req['material_count'])
     if op == 1:
         f.require(len(items) == 1, '请选择一叠装备碎片')
@@ -312,7 +365,6 @@ def compose(role, req, rules):
     else:
         target = req['equip_type']; c = f.ITEMS.get(target, {})
         f.require(c and req['equip_quality'] == int(c['quality']) and req['material_quality'] == rules['activity_material_quality'] and len(items) == rules['activity_material_count'], '活动合成配置已变化')
-        state = role.setdefault('equipment_forge', dict(appointed=[], exchanged=0))
         if op == 2:
             main, quality = int(c['main_type']), int(c['quality'])
             f.require(main in (1, 2, 3) and quality in (4, 5) and str(target) not in state['appointed'], '该装备不可锻造或已锻造')
@@ -324,18 +376,27 @@ def compose(role, req, rules):
             state['exchanged'] += 1
             rewards = [(5, target, 1, rules['exchange_shards'])]
         for item in items:
-            _, q = gear(item)
-            f.require(q == rules['activity_material_quality'] and item.get('level', 1) == 1
-                      and not any(item.get(k) for k in ('advance_level', 'star_count', 'cur_spirit_count', 'reborn_bit', 'star_level')), '请选择未养成的对应品质装备')
+            main, q = gear(item)
+            # Native forgeUI permits enhanced gear and confirms level > 10.
+            # Advanced/reborn gear is excluded by the explicit local policy.
+            f.require(main in (1, 2) and q == rules['activity_material_quality']
+                      and not any(item.get(k) for k in ('advance_level', 'star_count', 'cur_spirit_count', 'reborn_bit', 'star_level')), '请选择未进阶、铸星或转生的对应品质武器或防具')
             dispose(role, item)
+        state['used'] += 1
     prizes = grant(role, rewards)
-    return [(6, dict(compose_type=op, equip_type=rewards[0][1], count=rewards[0][3],
-                     object_type=rewards[0][0], attach_list=prizes))]
+    result = dict(compose_type=op, equip_type=rewards[0][1], count=rewards[0][3],
+                  object_type=rewards[0][0], attach_list=prizes)
+    if op in (2, 3):
+        # count is the reward quantity, never the number of exchanges consumed.
+        result.update(compose_list(role, rules, now))
+        result['exchange_notice'] = '兑换成功！' + weekly_notice(state)
+    return [(6, result)]
 
 
 def settle(role, mid, req, parse):
     r = load_rules()
     if mid == 1055:
+        feature_levels.require(role, 'forge')
         f.require(req['flag'] in (0, 1), '配方查询参数无效')
         return [(98, random_list()), (7, dict(compose_list(role, r), show=req['flag'] == 0))]
     if mid == 1053:

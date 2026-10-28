@@ -45,7 +45,7 @@ def prepare(role,now,r):
 
 
 def avatar(role):
-    c=next((c for c in role['corteges'] if c.get('order')==1),role['corteges'][0])
+    c=next((c for c in role['corteges'] if c.get('order')==1),next(iter(role['corteges']), {'type': 4061}))
     return dict(show_type=c['type'],cortege_layer=c.get('evolve_level',0))
 
 
@@ -103,9 +103,9 @@ def champions(role,now,r,grules,arules):
     from . import guild_feast
     stats=guild_feast.ranking(role,s,now,grules)['fortune_info']
     if stats:
-        v=min(stats,key=lambda v:(-v['fortune'],-v['contribute'],v['id']))
+        v=stats[0]
         result[5]=dict(name=v['name'],show_type=r['battle_npc'],cortege_layer=0)
-        if v['id']==role['role_id']:result[5].update(avatar(role))
+        if 'show_type' in v:result[5].update(show_type=v['show_type'],cortege_layer=v['cortege_layer'])
     else:result[5]=dict(name='虚位以待')
     return dict(champion_list=result)
 
@@ -204,6 +204,8 @@ def weekly_html():
     return ('<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             '<title>名人山周刊</title><body><h1>名人山·本地周刊</h1><p>【B】离线模拟版，非原服历史新闻。</p>'
             '<p>名人山展示跨服仙盟战、仙盟战、财富榜、封神榜、跨服论道五类荣誉。冠军与榜单按本地存档更新。</p>'
-            '<p>财富榜尚无人参与时显示“虚位以待”；在仙盟宴席赠礼后可查看记录。未加入仙盟也可浏览公开赛程。</p>'
+            '<p>财富榜每周一北京时间00:00结算，离线后下次进入游戏补结算；周内榜单和财富冠军保持不变。'
+            '评分为VIP等级×1000＋本周捐赠仙盟资金÷10（取整）＋普通赠礼盒×10＋高级赠礼盒×50。'
+            'NPC评分固定，仅累计玩家数据；首次结算前展示NPC基准榜。长期离线保留最近参与周的结算结果。</p>'
             '<p>跨服论道采用每日模拟赛事，免费挑战和刷新额度沿用原版常量，奖励与离线规则详见项目名人山规则文档。</p>'
             '<p>关闭此窗口返回游戏。</p></body></html>').encode('utf-8')

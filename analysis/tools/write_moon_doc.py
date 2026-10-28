@@ -132,18 +132,18 @@ def main():
 - 元宝、银两到账前验证不超过协议有符号32位上限2147483647；超限整次开箱拒绝，不扣月饼。
 - 同一会话、同序号、同报文重传复用原响应，不再次随机、不重复扣除或发奖；同序号更换内容被拒绝。请求缓存不宣称跨服务重启永久有效。已消耗库存、余额和制作进度随角色存档保留。
 - 关闭游戏期间没有自动战斗或挂机材料产出；这里的“离线”指不依赖远端官方服务，仍须运行本地游戏后端。
-- 原有粽子奖池及端午材料轮换规则保持原实现，本次只更新缘聚中秋。
+- 后续粽叶飘香已同步为同样的四池概率与数量、制作规则；两活动独立抽取材料和开箱结果，并各自累计制作进度。详见[粽叶飘香说明](粽叶飘香离线活动实现说明.md)。
 
 ## 10. 配置与接入文件
 
 | 文件 | 作用 |
 |---|---|
 | [`moon_rules.json`](../server_config/moon_rules.json) | 四池分组、完整候选ID、数量、整数权重、材料分布 |
-| [`activity_moon.py`](../network_redirect/activity_moon.py) | 配置校验、本机抽奖、逐个开奖、指定堆叠扣除、类型化发奖 |
+| [`activity_moon.py`](../network_redirect/activity_moon.py)、[`activity_food.py`](../network_redirect/activity_food.py) | 配置校验、本机抽奖、两活动共用的逐个开奖、指定堆叠扣除、类型化发奖 |
 | [`activity_seasonal.py`](../network_redirect/activity_seasonal.py) | 常驻开关、一次性材料迁移、旅途掉落入口、制作和累计赠礼、月饼使用分发 |
 | [`activity_party.py`](../network_redirect/activity_party.py) | 蟠桃会每次有效挑战材料结算 |
 | [`activity_duty.py`](../network_redirect/activity_duty.py) | 天命每关胜利材料即时到账 |
-| [`activity.py`](../network_redirect/activity.py) | 加载并校验中秋独立规则；旧固定配置只保留粽子 |
+| [`activity.py`](../network_redirect/activity.py) | 加载并校验中秋独立规则；旧固定配置只保留历史五星粽子1217 |
 | [`moon_client.lua`](../network_redirect/moon_client.lua) | 原生界面常驻、删除倒计时图样及递归更新、制作开关和个人累计文案 |
 | [`summon.py`](../network_redirect/summon.py)、[`summon_client.js`](../network_redirect/summon_client.js) | 安装和撤销Lua适配 |
 | [`test_activity_moon.py`](../tests/test_activity_moon.py) | 概率全区间、108个候选实际到账、掉落来源、存档和异常回滚 |

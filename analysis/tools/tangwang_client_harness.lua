@@ -95,15 +95,17 @@ check('native reward callback',function()
  ui.onGetExchangeResponse(ms.d_c.table_copy(FIXTURE.reward));assert(prize and #prize==1)
  assert(prize[1].attach_type==6005 and prize[1].attach_count==3, (function() local v={} for k,x in pairs(prize[1]) do v[#v+1]=tostring(k)..'='..tostring(x) end return table.concat(v,',') end)())
 end)
-check('introduction recipes only and no automatic actions',function()
+check('native introduction special reward copy and no automatic actions',function()
  local n=#sent;ui.showTips();local layer=ui.g_cardUI.main_layer:getChildByTag(91094);assert(layer)
  local labels={};local function walk(node)
   if tolua.type(node)=='CCLabelTTF' then labels[#labels+1]=node:getString() end
   local children=node:getChildren();if children then for i=0,children:count()-1 do walk(tolua.cast(children:objectAtIndex(i),'CCNode')) end end
  end
  walk(layer);local text=table.concat(labels,'\n')
- assert(text:find('组合一：国庆快乐',1,true) and text:find('组合三：欢度国庆',1,true))
- assert(not text:find('可兑换',1,true) and not text:find('自动组合',1,true));assert(#sent==n)
+ for _,name in ipairs({'国庆快乐','国庆有礼','欢度国庆'}) do assert(text:find(name..'：可兑换特殊奖励',1,true)) end
+ assert(text:find('放入四枚金牌',1,true))
+ assert(not text:find('五法界魂箱',1,true) and not text:find('破障丹',1,true) and not text:find('元宝',1,true))
+ assert(not text:find('自动组合',1,true));assert(#sent==n)
  ui.g_cardUI.main_layer:removeChildByTag(91094,true)
 end)
 check('weekly boundary blocks both direct and pending confirm',function()

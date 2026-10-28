@@ -53,7 +53,8 @@ def state(role,now,r):
         if str(i) in s['charms'] and s['boss_layer']>=int(row['need_boss']):s['charms'][str(i)]['unlock']=True
         if int(row['auto_open']) and s['boss_layer']>=int(row['need_boss']):
             s['charms'].setdefault(str(i),dict(unlock=True,is_open=True,key=0,value=0))
-    from .activity_land_boss import migrate_scores
+    from .activity_land_boss import migrate_inverse, migrate_scores
+    migrate_inverse(s,r)
     migrate_scores(s)
     from .activity_land_rewards import titles
     titles(role,s,now)
@@ -152,7 +153,7 @@ def tower_view(role,s,t,now,r):
         players=[dict(member(role,dict(s,grid_count=count)) if m['id']==role['role_id'] else npc.view(m['npc_id'],count,m['id']),had_soulcount=0) for m in s['team']['members']]
     else:players=([dict(member(role,s),had_soulcount=0)] if owned else [defender])
     head=players[0]
-    return dict(t,player_list=players,is_owner=owned,end_time=t['expire'],role_list=[],
+    return dict(t,tower_id=t['id'],player_list=players,is_owner=owned,end_time=t['expire'],role_list=[],
         owner_id=role['role_id'] if owned else defender['id'],fps_count=r['land_tower_soul'],
         soul_speed=r['land_tower_soul'],expect_soul=t['left_soul'],fight_power=sum(m.get('power',0) for m in players),
         cortege_count=sum(m['cortege_count'] for m in players),type_id=head['type_id'],cortege_layer=head['cortege_layer'])
@@ -167,7 +168,13 @@ def settle(role,req,now,r,jrules,parse):
     if op==2:
         dest=d.get('des_level');a.require(type(dest)is int and dest in MAPS and dest!=s['map_level'],'地图无效')
         a.require(not s.get('team') and not s['tower_id'] and s['boss_layer']>=int(MAPS[dest]['need_boss_layer']),'尚未解锁地图或正在占塔')
-        a.spend(s,'soul_count',int(MAPS[dest]['soul_count']));s['map_level']=dest;s['travel']=None
+        a.spend(s,'soul_count',int(MAPS[dest]['soul_count']))
+        s['map_level']=dest
+        s['travel']=None
+        # Towers belong to the current map.  Drop the previous map's cached
+        # rows so a subsequent detail/attack request cannot resolve a stale
+        # tower id after switching maps.
+        s['towers']={}
         return [response(2,s,r,tower_info=towers(s,now,r))]
     if op==3:
         a.require(status(now,r)['cur_status']==1,'当前是占塔时段')
@@ -195,7 +202,7 @@ def settle(role,req,now,r,jrules,parse):
         news(s,now,f"游历挑战{target['name']}：{'胜利' if win else '未获胜'}，获得{reward}魂力。")
         s['travel']=None
         return replay_response(4,s,r,replay,fight_type=1,is_win=win,soul_count=reward,**(dict(charm_data=drop) if drop else {}))
-    if op==6:return [response(6,s,r,charm_get=bag(s),exchange_consume=r['land_charm_exchange'])]
+    if op==6:return [response(6,s,r,charm_show=charm_show(s),charm_get=bag(s),exchange_consume=r['land_charm_exchange'])]
     if op==7:
         idx=d.get('index');a.require(type(idx)is int and idx in CHARMS,'符咒位置无效');row=CHARMS[idx]
         c=s['charms'].setdefault(str(idx),dict(unlock=s['boss_layer']>=int(row['need_boss']),is_open=False,key=0,value=0))

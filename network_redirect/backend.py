@@ -11,7 +11,7 @@ import struct
 import time
 
 from .protocol import encode, decode
-from . import progression, role_profile, achievements, spirit_array, npc_players, gift_codes, xianyuan_fruit
+from . import tian_shu, new_role_guide, progression, role_profile, achievements, spirit_array, npc_players, gift_codes, xianyuan_fruit
 from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily, guild, vip, xianling, welfare, recharge, cheer, monument, equipment
 
 
@@ -117,6 +117,11 @@ class Backend:
         self.last_market_serial = 0
         self.immortal_replies = {}
         self.last_immortal_serial = 0
+        self.guide_replies = {}
+        self.last_guide_serial = 0
+        self.tian_shu_rules = tian_shu.load_rules()
+        self.tian_shu_replies = {}
+        self.last_tian_shu_serial = 0
         self.journey_replies = {}
         self.last_journey_serial = 0
 
@@ -145,8 +150,13 @@ class Backend:
             changed = reborn.prepare(role, self.reborn_rules) or changed
             if 'journey' not in role:
                 changed = journey.prepare(role, int(time.time()), self.journey_rules) or changed
+            else:
+                # Every consumer must see recovered balances, including features
+                # outside journey and requests arriving before the next heartbeat.
+                journey.recover_resources(role, int(time.time()), self.journey_rules)
             formation.recalculate(role, self.formation_rules)
             achievements.refresh(role, int(time.time()))
+            tian_shu.refresh(role)
             if changed or role != original_role:
                 self.save(role, account, gameplay=False)
             return role
@@ -156,6 +166,8 @@ class Backend:
                     next_exp=100, silver_coin=1000, gold_coin=0, strength=60, energy=10,
                     head_type=1, guide_progress=0x7fffffff, cortege_count=FORMATION_SLOTS[1],
                     attachments=[])
+        if account != 'local-player':
+            role.update(guide_progress=0, corteges=[])
         formation.prepare(role, self.formation_rules)
         journey.prepare(role, int(time.time()), self.journey_rules)
         self.save(role, account, gameplay=False)
@@ -176,9 +188,16 @@ class Backend:
         context = self.achievement_context if gameplay and account == self.account else None
         mid, req = context or (0, {})
         from . import activity_monday
+        from . import monument_wealth
+        if 'role_id' in role and 'role_name' in role:
+            monument_wealth.prepare(role, int(time.time()))
         activity_monday.track(role, before_achievements, mid, req, int(time.time()))
         achievements.track(role, before_achievements, mid, req, int(time.time()))
+        tian_shu.refresh(role)
         updates = achievements.packets(role, new=1, previous=before_achievements) if context and before_achievements else []
+        if context and before_achievements and any(
+                role[k] != before_achievements.get(k, 0) for k in ('task_progress', 'task_prize')):
+            updates += tian_shu.sync(role)
         self.db.execute('INSERT OR REPLACE INTO roles VALUES (?,?)',
                         (account, json.dumps(role, ensure_ascii=False)))
         self.db.commit()
@@ -216,6 +235,7 @@ class Backend:
         self.save(role)
         vip.prepare(role, self.vip_rules)
         config = CLIENT_CONFIG.replace('__MARKET_CONFIG__', summon.lua(goods))
+        config = config.replace('config_end=true', '[2]=' + summon.lua(tian_shu.client_config(self.tian_shu_rules)) + ',config_end=true')
         config = config.replace('__PROGRESSION_HINT__', summon.lua(progression.info(role, int(time.time()))))
         from . import activity_monday
         config = config.replace('config_end=true', '[21]=' + str(activity_monday.hint(role, int(time.time()))) + ',config_end=true')
@@ -246,11 +266,15 @@ class Backend:
         # Bootstrap follows this bounded legacy snapshot with full-precision attributes.
         for name in cheer.NAMES[8:]:
             login_snapshot[name + '_skill_level'] = min(255, login_snapshot[name + '_skill_level'])
+        # Unlimited inventory consumables can exceed the legacy one-byte counts.
+        for key in ('strength_item_count', 'energy_item_count'):
+            login_snapshot[key] = min(255, login_snapshot[key])
         replies = [encode(2998, dict(id=80, data=config)),
                 encode(1017, dict(login_snapshot, reconnect=reconnect))] + self.inventory()
         role = self.profile()
         replies += self.power_attributes(role)
         replies += cheer.attributes(role)
+        replies += self.journey_attributes(role)
         from . import equipment_crafting
         replies.append(summon.event(98, equipment_crafting.random_list()))
         replies += summon.soul_snapshots(role)
@@ -531,15 +555,21 @@ class Backend:
             self.last_immortal_serial = 0
             self.activity_replies.clear()
             self.last_activity_serial = 0
+            self.guide_replies.clear()
+            self.last_guide_serial = 0
+            self.tian_shu_replies.clear()
+            self.last_tian_shu_serial = 0
             self.journey_replies.clear()
             self.last_journey_serial = 0
             state['market_sale_time'] = market.sale_time(int(time.time()), self.market_rules)
+            state['market_rotation_start'] = market.rotation_start(int(time.time()), self.market_rules)
             self.emit('game_login_ok', message='本地账号通过 LS→BS 认证')
             return [encode(1002, {'result': 0})] + self.bootstrap()
         if mid == 1016:
             if data['account'] == self.account and data['random_key'] == self.random_key:
                 state['authenticated'] = True
                 state['market_sale_time'] = market.sale_time(int(time.time()), self.market_rules)
+                state['market_rotation_start'] = market.rotation_start(int(time.time()), self.market_rules)
                 return [encode(2996, {'ret': 0})] + self.bootstrap(reconnect=True)
             return [encode(2996, {'ret': 1})]
         if not state.get('authenticated'):
@@ -549,6 +579,15 @@ class Backend:
             seasonal_before = {'attachments': copy.deepcopy(role['attachments'])}
             nine_before = copy.deepcopy(role.get('activity', {}).get('nine_sky', {}).get('last_recycle'))
             now = int(time.time())
+            rank_state = role.get('activity', {})
+            rank_changed = (rank_state.get('rank_day', -1) < activity.day(now, self.activity_rules)
+                            or rank_state.get('rank_reward_version', 1) < 2)
+            if rank_changed:
+                activity.prepare(role, now, self.activity_rules, self.duty_peers())
+            from . import activity_monday
+            monday_start = role.get('activity', {}).get('monday', {}).get('start')
+            activity_monday.prepare(role, now)
+            monday_changed = monday_start != role.get('activity', {}).get('monday', {}).get('start')
             from . import activity_pavilion
             pavilion_before = copy.deepcopy(role.get('pavilion', {}).get('last_recycle'))
             activity_pavilion.prepare(role, now, activity_pavilion.load_rules())
@@ -577,6 +616,11 @@ class Backend:
             self.save(role)
             # Refresh expiring permanent effects without replacing UI-held objects.
             updates = self.panel_attributes(role) + self.journey_attributes(role)
+            if rank_changed:
+                from . import activity_rank
+                updates += activity.attributes(role) + [activity_rank.client_state(role)]
+            if monday_changed:
+                updates.append(welfare.mail_snapshot(role, now, self.welfare_rules))
             if seasonal_before['attachments'] != role['attachments']:
                 updates += self.item_deltas(seasonal_before,role) + self.inventory(role)
                 updates.append(welfare.mail_snapshot(role,now,self.welfare_rules))
@@ -616,6 +660,10 @@ class Backend:
                 return [packet for serial, packet in self.reply_history if serial > last]
             self.emit('game_replay_unavailable', message_id=mid, message='请求不在当前响应缓存范围内')
             return []
+        if mid == 1204:
+            return self.new_role_guides(packet, data)
+        if mid == 1201 and data['flag'] == 4:
+            return self.tian_shu_claims(packet, data)
         npc_target = (data.get('des_id') if mid in (1039,1078) else data.get('des_role_id') if mid == 1067 else None)
         if mid == 1091 or ((mid in (1039,1067) or mid == 1078 and data.get('flag') == 2) and npc_players.handles(npc_target)):
             return self.npc_queries(packet, mid, data)
@@ -637,6 +685,10 @@ class Backend:
             return self.spirit_arrays(packet, data)
         if mid in role_profile.HANDLED:
             return self.role_profiles(packet, mid, data)
+        if (mid in (1231, 1232, 1233, 1234, 1235, 1236, 1238)
+                or mid == 1026 and data['fight_type'] == 18
+                or mid == 1244 and data['fight_type'] == 3):
+            return self.complete(data['serial_num'], [summon.event(55, dict(op_string='离线模式，暂未开启'))])
         if monument.handles(mid, data):
             return self.monuments(packet, mid, data)
         if recharge.handles(mid, data):
@@ -681,6 +733,71 @@ class Backend:
         if data and data.get('serial_num'):
             return self.complete(data['serial_num'], [summon.event(55, {'op_string': '该功能尚未接入本地服务端（%d）' % mid})])
         return []
+
+    def tian_shu_claims(self, packet, data):
+        serial = data['serial_num']
+        cached = self.tian_shu_replies.get(serial) if serial else None
+        if cached and cached[0] == packet:
+            return cached[1]
+        if serial and serial <= self.last_tian_shu_serial:
+            return self.complete(serial, [summon.event(55, dict(op_string='天书请求已过期，请重新打开天书'))])
+        try:
+            now = int(time.time())
+            self.profile()
+            self.db.execute('BEGIN IMMEDIATE')
+            role = json.loads(self.db.execute('SELECT data FROM roles WHERE account=?', (self.account,)).fetchone()[0])
+            before = copy.deepcopy(role)
+            event = tian_shu.claim(role, data['id'], now, self.tian_shu_rules)
+            replies = (self.item_deltas(before, role) + self.inventory(role)
+                       + self.journey_attributes(role) + [recharge.attrs(role)])
+            replies.append(event)
+            self.save(role)
+            self.emit('game_tian_shu_ok', stage=data['id'])
+        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error, sqlite3.Error) as error:
+            self.db.rollback()
+            replies = [summon.event(55, dict(op_string=str(error) if isinstance(error, formation.Rejected)
+                                           else '天书数据无效，请重新登录'))]
+            self.emit('game_tian_shu_rejected', stage=data['id'], message=str(error))
+        replies = self.complete(serial, replies)
+        if serial:
+            self.last_tian_shu_serial = serial
+            self.tian_shu_replies[serial] = (packet, replies)
+            if len(self.tian_shu_replies) > 256:
+                del self.tian_shu_replies[next(iter(self.tian_shu_replies))]
+        return replies
+
+    def new_role_guides(self, packet, data):
+        serial = data['serial_num']
+        cached = self.guide_replies.get(serial) if serial else None
+        if cached and cached[0] == packet:
+            return cached[1]
+        if serial and serial <= self.last_guide_serial:
+            return self.complete(serial, [summon.event(55, dict(op_string='引导请求已过期，请重新登录'))])
+        try:
+            now = int(time.time())
+            role = self.profile()
+            journey.prepare(role, now, self.journey_rules)
+            before = copy.deepcopy(role)
+            events = new_role_guide.settle(role, data, now, self)
+            formation.prepare(role, self.formation_rules)
+            formation.recalculate(role, self.formation_rules)
+            replies = (self.companion_deltas(before, role) + self.item_deltas(before, role)
+                       + self.inventory(role) + journey.updates(role, before)
+                       + self.journey_attributes(role) + [new_role_guide.attributes(role)]
+                       + progression.upgrade_events(before, role) + events)
+            self.save(role)
+            self.emit('game_guide_ok', stage=data['stage'])
+        except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
+            replies = [summon.event(55, dict(op_string=str(error) if isinstance(error, formation.Rejected)
+                                          else '引导数据无效，请重新登录'))]
+            self.emit('game_guide_rejected', stage=data['stage'], message=str(error))
+        replies = self.complete(serial, replies)
+        if serial:
+            self.last_guide_serial = serial
+            self.guide_replies[serial] = (packet, replies)
+            if len(self.guide_replies) > 256:
+                del self.guide_replies[next(iter(self.guide_replies))]
+        return replies
 
     def npc_queries(self, packet, mid, data):
         """NPC lookup is read-only: no player preparation, rewards or inventory writes."""
@@ -896,6 +1013,8 @@ class Backend:
                 role = self.profile()
                 from . import activity_pavilion
                 before = copy.deepcopy(role)
+                from . import activity_monday
+                monday_changed = activity_monday.prepare(role, now)
                 activity_pavilion.prepare(role, now, activity_pavilion.load_rules())
                 state = welfare.prepare(role, now, self.welfare_rules)
                 replies = welfare.mail_request(role, mid, data, now, self.welfare_rules, state)
@@ -903,6 +1022,9 @@ class Backend:
                     replies = self.item_deltas(before, role) + self.inventory(role) + replies
                     replies += [activity_pavilion.update(role, now, self.duty_peers()),
                                 welfare.mail_snapshot(role, now, self.welfare_rules)]
+                    self.save(role)
+                elif monday_changed:
+                    replies.append(welfare.mail_snapshot(role, now, self.welfare_rules))
                     self.save(role)
                 self.emit('game_mail_read', mail_id=data['mail_id'])
             except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
@@ -1106,6 +1228,7 @@ class Backend:
             snapshot = market.panic_snapshot(role, now, self.market_rules)
             self.save(role)
             state['market_sale_time'] = snapshot['activity_data']['sale_time']
+            state['market_rotation_start'] = market.rotation_start(now, self.market_rules)
             # The original query has no request serial and does not wait for 1106.
             return self.number_replies([summon.event(138, snapshot)])
         try:
@@ -1113,6 +1236,7 @@ class Backend:
                 goods = market.catalog(role, now, self.market_rules)
                 replies = [summon.event(24, dict(goods, first_send=1))]
                 state['market_sale_time'] = goods['panic_buy_list']['activity_data']['sale_time']
+                state['market_rotation_start'] = market.rotation_start(now, self.market_rules)
             else:
                 before = copy.deepcopy(role)
                 if mid == 1057:
@@ -1120,6 +1244,8 @@ class Backend:
                         raise market.Rejected(2)
                     result = market.buy(role, data, now, self.market_rules)
                 else:
+                    if state.get('market_rotation_start') != market.rotation_start(now, self.market_rules):
+                        raise market.Rejected(4)
                     result = market.panic_buy(role, data, now, self.market_rules,
                                               state.get('market_sale_time'))
                 replies = self.item_deltas(before, role) + self.inventory(role) + [
@@ -1284,6 +1410,8 @@ class Backend:
                 events = upgrades + [welfare.hint(role, now, self.welfare_rules)] + events
             achievements.record_events(role, events, int(time.time()), login_fields)
             welfare.track(role,mid,data,events,int(time.time()),self.welfare_rules)
+            if mid == 1026:
+                tian_shu.record_events(role, events)
             events = daily.track(role, before, mid, data, events, now, self.daily_rules, login_fields) + events
             formation.prepare(role, self.formation_rules)
             immortal.prepare(role, self.immortal_rules)

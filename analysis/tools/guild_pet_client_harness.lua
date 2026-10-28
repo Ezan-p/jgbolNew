@@ -13,8 +13,9 @@ for _,entry in ipairs({{ui,'onGetResult'},{ui,'sendRequest'},{ui,'showTaskLayer'
 local mapShow=ms.d_mapUI.show;local mapCalls=0
 ms.d_mapUI.show=function(...) mapCalls=mapCalls+1;return mapShow(...) end
 local taskRewards={};local rewardCount=0;local rewardLabels={}
-local getItems=ms.d_messageUI.createGetItemsLayer;local rewardParent
+local getItems=ms.d_messageUI.createGetItemsLayer;local rewardParent;local trialRewardItems
 ms.d_messageUI.createGetItemsLayer=function(parent,...)
+ trialRewardItems=(...)
  rewardParent=parent;return getItems(parent,...)
 end
 local properties=ms.d_u.setProperties;local timers={};local trialButtons={}
@@ -78,6 +79,13 @@ ms.d_u.createByStyle=function(options,...)
 end
 local oldRestore=guildPetRestore
 guildPetRestore=function() ms.d_u.createByStyle=style;return oldRestore() end
+local styles=ms.d_u.createByStyles;local trialLabels={}
+ms.d_u.createByStyles=function(options,...)
+ if options.type=='label' then trialLabels[options.string or '']=true end
+ return styles(options,...)
+end
+local restoreStyles=guildPetRestore
+guildPetRestore=function() ms.d_u.createByStyles=styles;return restoreStyles() end
 local function apply(name)
  for _,row in ipairs(f[name]) do
   if row.mid==2998 then ms.d_event_mgr.msg_common_event_2998(nil,row.data,nil)
@@ -200,6 +208,12 @@ step('trial_win_return_claim_and_continue',function()
  trialButtons={};rewardParent=nil;timers={};apply('trial_claim')
  assert(rewardParent==ms.d_petHomeUI.g_self.g_Shilian_layer and rewardParent:getParent(),'reward popup lost during rebuild')
  assert(ms.d_petHomeUI.g_self.g_data.result==1 and ms.d_petHomeUI.g_self.g_data.boss_layer==2)
+ assert(trialLabels['银两×50000'] and trialLabels['银两×100000'] and trialLabels['银两×150000'])
+ assert(trialLabels['蟠桃×5'] and trialLabels['蟠桃×10'] and trialLabels['蟠桃×15'])
+ assert(trialLabels['四层：银两×200000 蟠桃×20'])
+ local rewards=trialRewardItems.attach_list
+ assert(#rewards==2 and rewards[1].object_type==12 and rewards[1].attach_count==50000)
+ assert(rewards[2].object_type==5 and rewards[2].attach_type==1001 and rewards[2].attach_count==5)
  assert(#timers==1 and not trialButtons['v2/petHomeUI/pos1.png'])
  assert(trialButtons['v2/petHomeUI/challenge1.png'],'next challenge missing')()
  sent(80)

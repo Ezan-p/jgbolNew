@@ -88,6 +88,8 @@ def load_rules(path=ROOT / 'server_config/journey_rules.json'):
                         ('normal_flush_daily_limit', 0, 10), ('defeat_companion_exp_percent', 0, 100),
                         ('defeat_silver_percent', 0, 100)]:
         require(type(r.get(key)) is int and lo <= r[key] <= hi, '旅途配置无效：' + key)
+    require(r['strength_recovery_seconds'] == 1800 and r['energy_recovery_seconds'] == 3600,
+            '自然恢复周期须与原版倒计时一致：体力1800秒、精力3600秒')
     b = r.get('battle', {})
     for key, lo, hi in [('max_actions', 16, 255), ('minimum_damage_percent', 1, 100),
                         ('multi_target_limit', 1, 8)]:
@@ -100,6 +102,28 @@ def load_rules(path=ROOT / 'server_config/journey_rules.json'):
             and r.get('first_win_extra_exp') == 'all_active_companions', '不支持的旅途结算策略')
     validate_catalog()
     return r
+
+
+def recover_resources(role, now, rules):
+    """Settle fixed server-time ticks before any gameplay resource changes.
+
+    Native playerInfoUI counts down to minute 0/30 for strength and minute 0
+    for energy. Checkpoints track processed ticks, including ticks discarded
+    at the cap; neither repeated requests nor offline time at cap can bank them.
+    """
+    state = role.setdefault('journey', dict(gates={}, claimed_maps=[], fight_id=0))
+    role['renew_time1'] = role['renew_time2'] = 0
+    for key, cap in (('strength', 30), ('energy', 15)):
+        role.setdefault(key, 0)
+        clock = key + '_recovery_at'
+        interval = rules[key + '_recovery_seconds']
+        last = state.setdefault(clock, now)
+        # Keep a future checkpoint on clock rollback: never award a tick twice.
+        units = max(0, now // interval - last // interval)
+        if units:
+            if role[key] < cap:
+                role[key] = min(cap, role[key] + units)
+            state[clock] = now // interval * interval
 
 
 def prepare(role, now, rules):
@@ -122,16 +146,7 @@ def prepare(role, now, rules):
         role.setdefault(key, 0)
     role.setdefault('cur_exp', 0)
     role['next_exp'] = int(formation.LEVELS[role['level']]['upgrade_exp'])
-    for key, cap in (('strength', 30), ('energy', 15)):
-        role.setdefault(key, 0)
-        clock = key + '_recovery_at'
-        last = state.setdefault(clock, now)
-        if role[key] >= cap:
-            state[clock] = now
-        elif now > last:
-            units = (now - last) // rules[key + '_recovery_seconds']
-            role[key] = min(cap, role[key] + units)
-            state[clock] = now if role[key] >= cap else last + units * rules[key + '_recovery_seconds']
+    recover_resources(role, now, rules)
     return old != json.dumps(role, sort_keys=True)
 
 
@@ -373,30 +388,34 @@ def resource_item(role, req, now, rules, buy=False):
     require(tid in ((1022, 1023) if buy else (1020, 1022, 1023)), '恢复道具类型无效')
     key = 'energy' if tid == 1023 else 'strength'
     count_key, time_key = key + '_item_count', key + '_item_time'
-    # [B] Small buns are inventory-only supplements, separate from the daily
-    # 1022 purchase/use quota and its achievement counter. Native UI uses one.
-    if tid != 1020:
-        require(role[count_key] < role[key + '_item_limit'], '今日使用次数已达上限')
+    count = 1
+    # Small buns remain separate from the regular consumable daily counter.
+    # Inventory use is unlimited; the legacy quota only gates quick purchases.
     if buy:
+        require(role[count_key] < role[key + '_item_limit'], '今日快捷购买次数已达上限')
         index = role[count_key] + 1
         price = int(ITEM_PRICE[index]['price'])
         require(role['gold_coin'] >= price, '元宝不足')
         role['gold_coin'] -= price
     else:
-        counts = (1,) if tid == 1020 else (0, 1)
-        require(req['des_type'] == 1 and req['des_id'] in (0, role['role_id']) and req['item_count'] in counts, '恢复道具使用参数无效')
+        count = req['item_count']
+        # Older regular-bun/elixir clients send zero to mean one item.
+        if type(count) is int and count == 0 and tid != 1020:
+            count = 1
+        require(req['des_type'] == 1 and req['des_id'] in (0, role['role_id'])
+                and type(count) is int and count >= 1, '恢复道具使用参数无效')
         item = formation.lookup(role, 'attachments', req['item_id'])
-        require(item['attach_type'] == 5 and item['type_id'] == tid and item['count'] >= 1 and not item.get('is_lock'), '物品不足或已锁定')
-        item['count'] -= 1
+        require(item['attach_type'] == 5 and item['type_id'] == tid and item['count'] >= count and not item.get('is_lock'), '物品不足或已锁定')
+        item['count'] -= count
         if not item['count']:
             role['attachments'].remove(item)
-    gain = int(formation.ITEMS[tid][key + '_plus'])
+    gain = int(formation.ITEMS[tid][key + '_plus']) * count
     role[key] += gain
     if tid != 1020:
-        role[count_key] += 1
+        role[count_key] += count
         role[time_key] = now
     # [A] commonLayerUI.recvUsedItem formats effect_value for all three items.
-    return [summon.event(21, dict(result=1, type_id=tid, count=1, effect_value=gain))]
+    return [summon.event(21, dict(result=1, type_id=tid, count=count, effect_value=gain))]
 
 
 def settle(role, mid, req, now, rules, formation_rules, activity_rules=None):

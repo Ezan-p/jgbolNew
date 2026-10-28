@@ -1,7 +1,8 @@
 """Role-level access checks recovered from the shipped 3.87 client.
 
-Only fixed client gates live here. Server-supplied levels and per-recipe /
-per-object requirements remain in their owning modules. A missing gate is not
+Original fixed gates and explicitly requested local activity gates live here.
+Other server-supplied levels and per-recipe / per-object requirements remain
+in their owning modules. A missing gate is not
 evidence that the original server opened a feature at level one.
 """
 from . import formation
@@ -16,6 +17,11 @@ ACTIVITY_LEVELS = {
     # Separate explicit check in activityUI.pressBtn, lines 1378–1381.
     'tongtianta': 36,
 }
+# User-requested local policy; keep separate from the original-asset audit.
+LOCAL_ACTIVITY_LEVELS = {
+    'monday': 15, 'fishrush': 20, 'twoyears': 20, 'rulaitable': 20,
+    'tower': 20, 'destiny': 30, 'forge': 30,
+}
 NAMES = {
     'xiulian': '主角修炼', 'fengshenbang': '封神榜', 'dujie': '渡劫',
     'tianmingzhizhan': '天命之战', 'undergo': '太虚幻境',
@@ -25,9 +31,13 @@ NAMES = {
     'tongtianta': '通天塔', 'undergo_play': '太虚幻境历劫', 'pet': '宠物系统',
     'exp_pill': '经验丹', 'exp_drug': '药灵丹',
     'equip_asc': '装备封神', 'buff': '新手每日礼包',
+    'monday': '天工制物阁', 'fishrush': '东海寻宝', 'twoyears': '元始祈愿',
+    'rulaitable': '如来大转盘', 'tower': '九重天', 'destiny': '天机阁',
+    'forge': '装备兑换',
 }
 LEVELS = dict(ACTIVITY_LEVELS, undergo_play=50, pet=50, exp_pill=65,
               exp_drug=70, equip_asc=70, buff=3)
+LEVELS.update(LOCAL_ACTIVITY_LEVELS)
 
 # Shared messages are intentionally resolved below, not assigned wholesale.
 MESSAGES = {
@@ -37,12 +47,16 @@ MESSAGES = {
     1226: 'soulHunt', 1302: 'land',
     1329: 'abyss', 1348: 'home',
     1353: 'tongtianta', 1330: 'pet', 1202: 'pantaohui',
+    1219: 'monday', 1243: 'monday', 1208: 'fishrush', 1334: 'twoyears',
+    1351: 'rulaitable', 1309: 'tower', 1227: 'destiny', 1055: 'forge',
 }
 FIGHTS = {2: 'fengshenbang', 3: 'dujie', 12: 'dujie', 4: 'xiulian',
           5: 'tianmingzhizhan', 6: 'pantaohui', 10: 'cortCall'}
 
 
 def feature(mid, request):
+    if mid == 1053 and request.get('compose_type') in (2, 3):
+        return 'forge'
     if mid == 1349:
         # Outer activity/menu and its shop: 12; enter the ordeal maps: 50.
         return 'undergo' if request.get('id') in (3, 5) else 'undergo_play'

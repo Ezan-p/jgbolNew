@@ -243,6 +243,11 @@ class AchievementTests(unittest.TestCase):
         role.update(level=60, gold_coin=100000, silver_coin=100000)
         self.b.save(role)
         self.request(1301, id=1, data=summon.lua(dict(union_name='成就测试仙盟')))
+        self.unlock_treasure()
+
+    def unlock_treasure(self):
+        self.request(1301, id=43, data=summon.lua(dict(flag=1)))
+        role=self.b.profile();role['guild']['instances']['layer']=3;self.b.save(role)
 
     def test_treasure_search_update_replay_restart_and_cap(self):
         self.setup_treasure()
@@ -288,6 +293,7 @@ class AchievementTests(unittest.TestCase):
         self.b.save(role)
         self.assertEqual(self.row(self.b.profile(), 139)['times'], 0)
         with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+            self.unlock_treasure()
             out = self.request(1301, id=43, data=summon.lua(dict(flag=2)))
             self.assert_completion_update(out, 139)
             self.assertEqual(self.b.profile()['guild']['instances']['search'], 1)

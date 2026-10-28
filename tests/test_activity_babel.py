@@ -9,6 +9,15 @@ from network_redirect.protocol import decode
 
 
 class BabelTests(ActivityCase):
+    SHOP_POOL = {
+        1001: (10, 100, 10), 1022: (1, 100, 3), 1023: (1, 100, 3),
+        20016: (1, 50, 3), 20017: (1, 100, 3), 20018: (1, 250, 2),
+        20019: (1, 500, 1), 20005: (1, 50, 3), 20006: (1, 50, 5),
+        20010: (1, 200, 3), 20011: (1, 150, 3), 20012: (1, 100, 3),
+        1034: (1, 50, 5), 1033: (1, 100, 5), 1032: (1, 300, 3),
+        10000: (2, 100, 3), 10001: (5, 100, 5),
+    }
+
     def call(self, op=1, **data):
         out = self.req(1353, id=op, data=summon.lua(data)); self.ok(out)
         return [v['data'] for e,v in out if e == 203]
@@ -36,15 +45,18 @@ class BabelTests(ActivityCase):
         self.reject(10,item_type=20019,count=2)
 
     def test_half_hour_midnight_and_clock_backwards(self):
-        self.call(); self.edit(energy=20,life=10,refresh_times=0,purchases={'2':2})
+        self.call(); shop = self.call(8)[0]
+        limits = shop['my_shop']
+        index = next(i for i in range(1, 7) if limits[i]['limit'] >= 2)
+        self.edit(energy=20,life=10,refresh_times=0,purchases={str(index):2})
         with patch('network_redirect.backend.time.time',return_value=NOW+1799):
             self.call(); self.assertEqual(self.saved()['energy'],20)
         with patch('network_redirect.backend.time.time',return_value=NOW+1800):
             self.call(); self.assertEqual(self.saved()['energy'],21)
             self.call(); self.assertEqual(self.saved()['energy'],21)
         with patch('network_redirect.backend.time.time',return_value=NOW+43200):
-            self.call(); s=self.saved(); self.assertEqual((s['life'],s['energy'],s['refresh_times']),(100,44,1))
-            self.assertFalse(s['purchases'])
+            self.call(); s=self.saved(); self.assertEqual((s['life'],s['energy'],s['refresh_times']),(100,44,0))
+            self.assertEqual(s['purchases'], {str(index):2})
         self.call(); self.assertEqual(self.saved()['energy'],44)
         with patch('network_redirect.backend.time.time',return_value=NOW+3*86400):
             self.call(); self.assertEqual(self.saved()['energy'],100)
@@ -58,13 +70,60 @@ class BabelTests(ActivityCase):
         self.reject(11)
 
     def test_shop_client_remaining_and_atomic_limits(self):
-        self.call(); role=self.b.profile(); summon.add_item(role,20000,2000); self.b.save(role)
-        self.call(4,index=2,count=3); shop=self.call(8)[0]
-        self.assertEqual(shop['my_shop'][2]['limit']-shop['my_exchange'][2],2)
-        self.call(4,index=2,count=2); self.reject(4,index=2,count=1)
+        self.call(); shop=self.call(8)[0]
+        index = next(i for i in range(1, 7) if shop['my_shop'][i]['limit'] >= 3)
+        cost = shop['my_shop'][index]['need_coin']
+        role=self.b.profile(); summon.add_item(role,20000,cost * 10 + 200); self.b.save(role)
+        self.call(4,index=index,count=3); shop=self.call(8)[0]
+        self.assertEqual(shop['my_shop'][index]['limit']-shop['my_exchange'][index],
+                         shop['my_shop'][index]['limit']-3)
+        remaining = shop['my_shop'][index]['limit'] - 3
+        if remaining:
+            self.call(4,index=index,count=remaining)
+        self.reject(4,index=index,count=1)
         self.call(9); shop=self.call(8)[0]
-        self.assertEqual(shop['my_exchange'][2],0)
+        self.assertEqual(list(shop['my_exchange'].values()), [0] * len(shop['my_shop']))
         self.reject(9)
+
+    def shop_signature(self, data):
+        return tuple((item['reward'][1]['attach_type'], item['reward'][1]['attach_count'],
+                      item['need_coin'], item['limit']) for item in data['my_shop'].values())
+
+    def assert_shop_subset(self, data):
+        self.assertEqual(len(data['my_shop']), 6)
+        ids = []
+        for item in data['my_shop'].values():
+            reward = item['reward'][1]
+            tid = reward['attach_type']; ids.append(tid)
+            self.assertIn(tid, self.SHOP_POOL)
+            quantity, price, limit = self.SHOP_POOL[tid]
+            self.assertEqual((reward['attach_count'], item['need_coin'], item['limit']),
+                             (quantity, price, limit))
+        self.assertEqual(len(ids), len(set(ids)), '随机商品不能重复占槽')
+
+    def test_shop_random_subset_is_stable_until_week_rollover(self):
+        self.call(); first = self.call(8)[0]
+        self.assert_shop_subset(first)
+        self.assertEqual(first, self.call(8)[0])
+        before = self.saved()
+        role=self.b.profile(); summon.add_item(role,20000,1000); self.b.save(role)
+        self.call(4, index=1, count=1)
+        self.assertEqual(self.saved()['purchases'].get('1'), 1)
+
+        # Reopening the local backend must retain the same weekly selection and
+        # purchase counters; random selection is performed only at the week boundary.
+        snapshot = self.b.profile(); self.b.close()
+        self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        self.assertEqual(snapshot, self.b.profile())
+        reopened = self.call(8)[0]
+        self.assertEqual(self.shop_signature(first), self.shop_signature(reopened))
+
+        next_week = npc.start(before['week'] + 1, self.b.activity_rules)
+        with patch('network_redirect.backend.time.time', return_value=next_week):
+            refreshed = self.call(8)[0]
+        self.assert_shop_subset(refreshed)
+        self.assertEqual(list(refreshed['my_exchange'].values()), [0] * len(refreshed['my_shop']))
+        self.assertEqual(self.saved()['week'], npc.week(next_week, self.b.activity_rules))
 
     def test_tools_keys_loot_and_revisit_no_refill(self):
         self.call()
@@ -150,6 +209,22 @@ class BabelTests(ActivityCase):
         self.call(); self.call()
         self.assertEqual(babel.item_count(self.b.profile(),20000),120)
         self.assertEqual(self.saved()['floors']['1'][0][1]['elem_type'],0)
+
+    def test_partial_legacy_state_migrates_shared_fight_and_limits(self):
+        self.call(); role=self.b.profile(); s=role['activity']['babel']
+        role['activity'].pop('fight_id', None)
+        s.update(max_life=0, max_energy='bad', life=-5, energy=-1,
+                 purchases={'1': 999, '2': 'bad'}, day=activity.day(NOW, self.b.activity_rules), coin_count='bad')
+        s['floors']='bad'; s['locale']={'row':'bad','column':99}
+        self.b.save(role)
+        # A direct 1353 query must migrate the save before any battle request.
+        self.call()
+        migrated=self.saved()
+        self.assertEqual(self.b.profile()['activity']['fight_id'], 100000)
+        self.assertEqual((migrated['max_life'], migrated['max_energy'], migrated['life'], migrated['energy']),
+                         (100, 100, 100, 100))
+        self.assertEqual(migrated['purchases'], {'1': migrated['shop_goods'][0][3]})
+        self.assertEqual(migrated['day'], activity.day(NOW, self.b.activity_rules))
 
     def test_replay_and_forged_input_roll_back(self):
         self.call(); role=self.b.profile(); summon.add_item(role,20019,3); self.b.save(role)

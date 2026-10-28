@@ -100,8 +100,11 @@
     "1807 grants one extra prayer; 1808 gives level=role*2 Yuanshi; after receiving, prayer yields souls",
     "getChar and pray both send flag2,index0; native getChar lacks a widget binding"
   ],
+  "U": [
+    "permanent activity; 14-day repeating refresh; countdown is time until reset, not closure"
+  ],
   "B": [
-    "28-day repeating local season; no official historical schedule",
+    "local cycle anchor 1970-01-05 00:00 UTC+8; no official historical schedule",
     "unfinished wishes grant one reward including the wish reaching100: silver100000/baozi1/pill1/gold_bag1/VIP_bag1 at40/25/20/10/5%; user pool, inferred quantities and weights",
     "enroll on first entry/recharge; 1 free prayer/day, +10 percent, 1 soul after claim",
     "full progress next flag2 claims for free; duplicate grants40 souls; max original experience table level",
@@ -110,16 +113,16 @@
     "recharge uses existing local simulation; 10 gold/RMB, cumulative base gold excludes bonus",
     "one activation/day; any daily recharge grants each previously activated gift once; claims carry in season",
     "one click claims all copies of one gift; gift contents in configuration",
-    "season rollover clears event progress/unclaimed gifts/stock, retains inventory and gods",
+    "cycle rollover clears progress/free wishes/charge/gifts/shop counts and all1807 offerings including pending mail; retains other rewards and gods",
     "use native funUI entry; restore missing portrait button, refresh cached shop and recharge status"
   ],
   "inferred_config": {
     "schema_version": 1,
     "mode": "inferred",
-    "revision": "yuanshi-2026-10-27-v2",
+    "revision": "yuanshi-2026-10-28-fortnight",
     "enabled": true,
     "timezone_offset_hours": 8,
-    "period_days": 28,
+    "period_days": 14,
     "daily_free": 1,
     "progress_per_wish": 10,
     "souls_per_wish": 1,

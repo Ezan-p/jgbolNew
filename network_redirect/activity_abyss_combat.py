@@ -27,5 +27,8 @@ def battle(role,units,rules,effect_values,max_actions=None):
     from .combat_engine import Battle
     # The historical 80-action override was a serialization workaround. Use
     # the common combat limit now that extra events are transported in chunks.
-    result, lineup, actions = Battle(role, units, rules, extras=effect_values, max_actions=max_actions).run()
+    # [B] The layer's essence belongs to its leader, not every guard.
+    units=copy.deepcopy(units)
+    if units[1]:min(units[1],key=lambda u:u['order'])['extras']=effect_values.copy()
+    result, lineup, actions = Battle(role, units, rules, max_actions=max_actions).run()
     return result, lineup, actions, actions.events

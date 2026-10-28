@@ -14,6 +14,7 @@ local function check(name,fn)
 end
 local ok,err=xpcall(function()
  if ui._localProgressionRestore then ui._localProgressionRestore() end
+ if ms.d_mainUI._localProgressionRewardsRestore then ms.d_mainUI._localProgressionRewardsRestore() end
  ui.g_self={buff_type=1}
  ms.d_mainUI.g_playerInfo=ms.d_c.table_copy(ms.d_mainUI.g_playerInfo)
  ms.d_mainUI.g_playerInfo.level=4
@@ -68,6 +69,33 @@ local ok,err=xpcall(function()
  check('native_expired_entry',function()
   ms.d_data.g_new_config[24].buff_data.buff_type=0
   assert(not ui.checkHasLevelBuff() and not ui.checkHasLevelBuffFlag())
+ end)
+ check('all_milestones_and_adjacent_level_labels',function()
+  local create=ms.d_u.createByStyle
+  local labels={}
+  ms.d_u.createByStyle=function(style,...)
+   if style.type=='label' and type(style.string)=='string' then labels[#labels+1]=style.string end
+   return create(style,...)
+  end
+  local function countLabel(name)
+   local n=0;for _,text in ipairs(labels) do if text==name then n=n+1 end end;return n
+  end
+  for _,case in ipairs(FIXTURE.milestones) do
+   ms.d_mainUI.g_playerInfo.level=case.target
+   ms.d_event_mgr.msg_common_event_2998(nil,case.event,nil)
+   local originalInfo=ms.d_data.getCertainInfo
+   local item=originalInfo(5,1152);local name=item.name
+   labels={}
+   ms.d_mainUI.playerLevelUp(layer)
+   assert(countLabel(name..' ×'..case.count)==(case.count>0 and 1 or 0),'milestone count/label '..case.level)
+   assert(countLabel(originalInfo(5,1020).name..' ×'..(1+math.floor(case.level/10)))==case.target-case.level+1,'base rewards '..case.level)
+   local goldName=originalInfo(11,1).name
+   local gold=case.level%10==0 and 100 or case.level%5==0 and 50 or 20
+   assert(countLabel(tostring(gold)..goldName)==1,'gold tier '..case.level)
+   if case.target>case.level then assert(countLabel('20'..goldName)==1,'ordinary gold '..case.target) end
+   assert(ms.d_data.getCertainInfo==originalInfo and item.name==name,'shared item info changed')
+  end
+  ms.d_u.createByStyle=create
  end)
 end,debug.traceback)
 for i=#saved,1,-1 do

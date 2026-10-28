@@ -1,0 +1,46 @@
+{
+  "session": "20261028T045702Z-d460be30",
+  "rules_revision": "offline-rank-daily-2026-10-28-v3",
+  "checks": {
+    "probe_result": {
+      "dns": 0,
+      "resolved": "127.0.0.1",
+      "ipv4": {
+        "connect": 0,
+        "ok": true,
+        "caller_port_unchanged": true
+      },
+      "ipv6": {
+        "connect": 0,
+        "ok": true,
+        "caller_port_unchanged": true
+      }
+    },
+    "tls_probe_result": {
+      "status": 200,
+      "cipher": "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+    },
+    "native_tls_probe_result": {
+      "curl_result": 0,
+      "http_status": 200,
+      "response_bytes": 24
+    }
+  },
+  "core_tests": {
+    "rank": 24,
+    "monument": 11,
+    "backend": 18
+  },
+  "activity_regression": {
+    "tests": 538,
+    "passed": 536,
+    "failures": [
+      "nine_sky rollback: resource recovery timestamp changed",
+      "trial level-one base: single test and all 16 trial tests pass on rerun; cause not confirmed"
+    ]
+  },
+  "trial_module_rerun": {
+    "tests": 16,
+    "passed": 16
+  }
+}

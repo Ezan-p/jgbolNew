@@ -7,6 +7,7 @@ from .protocol import encode, decode
 
 ROOT = Path(__file__).resolve().parents[1]
 TYPES = {20,22,7,16,23,21,24,32,33,34,35,36,48,60,67,71,74}
+PERMANENT_TYPES = {20,22,7,16,23,21,32}
 
 
 def load_rules(path=ROOT/'server_config/welfare_rules.json'):
@@ -22,6 +23,8 @@ def load_rules(path=ROOT/'server_config/welfare_rules.json'):
                   all(a['rmb']<b['rmb'] for a,b in zip(rows,rows[1:])), '充值奖励档位无效')
     f.require(bool(r['fund']) and all(type(x['level']) is int and 1<=x['level']<=99 for x in r['fund'])
               and all(a['level']<b['level'] for a,b in zip(r['fund'],r['fund'][1:])), '成长基金等级档位无效')
+    f.require(bool(r['upgrade']) and all(type(x['level']) is int and 1<=x['level']<=99 for x in r['upgrade'])
+              and all(a['level']<b['level'] for a,b in zip(r['upgrade'],r['upgrade'][1:])), '新手成长等级档位无效')
     def validate(obj):
         if isinstance(obj,dict):
             for k,v in obj.items():
@@ -40,10 +43,18 @@ def prepare(role, now, r):
     d=daily.day(now,r)
     s=role.setdefault('welfare',dict(start=now,login_days=[],claims=[],charge_days={},turn_results={},group_count=0,group_paid=0))
     if d not in s['login_days']:s['login_days'].append(d)
-    if now>=s['start']+r['season_days']*86400:s.setdefault('end_level',s.get('last_level',role['level']))
-    else:s['last_level']=role['level']
+    # Growth rewards are permanent. Keep legacy fields/claims, but never use
+    # the former season's frozen level to determine an unclaimed reward.
+    s['last_level']=role['level']
     for k in ('first_charge','first_charge_gift','take_charge_gift_time','buy_growup'):role.setdefault(k,0)
     s.setdefault('single_max_gold',0)
+    # Daily exchange receipts from older saves remain consumed for life.
+    # Keep the original receipts as well, so upgrading never unlocks a replay.
+    for key in tuple(s['claims']):
+        parts=key.split(':')
+        if len(parts)==3 and parts[0]=='32' and parts[1].isdigit():
+            lifetime=':'.join(parts[:2])
+            if lifetime not in s['claims']:s['claims'].append(lifetime)
     # Prior saves used lifetime claims for the native weekly reward. Preserve
     # those claims for the upgrade week, then let the next Monday reset them.
     if not s.get('weekly_claims_migrated'):
@@ -66,8 +77,11 @@ def record_charge(role, gold, now, r, fund=False):
         role['first_charge']=1
         # [A] first-charge-double; [B] eligible local gold products, bonus excluded.
         role['gold_coin']+=gold
-    if not s['start']<=now<s['start']+r['season_days']*86400:return
+    active=s['start']<=now<s['start']+r['season_days']*86400
+    if not active and 23 not in r['order']:return
     s['charge_days'][key]=s['charge_days'].get(key,0)+gold
+    # Permanent cumulative recharge continues; retired seasonal rewards do not.
+    if not active:return
     # A transaction is one charge even when it spends multiple card stacks.
     # Never reconstruct single-charge progress from historical daily totals.
     s['single_max_gold']=max(s['single_max_gold'],gold)
@@ -177,7 +191,7 @@ def catalog(role,now,r):
     active=start<=now<end
     out={20:dict(prize_list=specs(first_prizes()))}
     out[22]=dict(prize_list={x['level']:specs(x['prizes']) for x in r['fund']},role_info={x['level']:dict(take_prize=claimed(s,22,x['level']),can_take=bool(role['buy_growup'] and level>=x['level'] and not claimed(s,22,x['level']))) for x in r['fund']})
-    out[7]=dict(end_time=end,prize_list=[dict(min_level=x['level'],attach_list=specs(x['prizes'])) for x in r['upgrade']],role_info=dict(level=s.get('end_level',level)),had_taken_gift=claimed(s,7,0))
+    out[7]=dict(end_time=0,permanent=True,can_take=level>=r['upgrade'][0]['level'] and not claimed(s,7,0),prize_list=[dict(min_level=x['level'],attach_list=specs(x['prizes'])) for x in r['upgrade']],role_info=dict(level=level),had_taken_gift=claimed(s,7,0))
     out[16]=dict(end_time=end,prize_list=[specs(x['prizes']) for x in r['login']],role_info=[dict(take_prize=claimed(s,16,i)) for i in range(1,min(count,len(r['login']))+1)])
     rows={i:dict(prize_info=dict(min_money_range=x['rmb'],prize_list=specs(x['prizes'])),status=status(s,23,i,money>=x['rmb'])) for i,x in enumerate(r['charge'],1)}
     rows.update(start_time=start,end_time=end,total_charge_count=money);out[23]=dict(prize_list=rows)
@@ -185,8 +199,8 @@ def catalog(role,now,r):
         role_info={i:claimed(s,21,i) for i in range(11)},role_vip_level=vip,can_take_all=money>0 and not claimed(s,21,0),
         vip_list=[dict(min_vip_count=x['count'],had_vip_count=int(vip>=x['vip'])) for x in r['carnival']])
     out[24]=group(role,now,r)
-    out[32]=dict(end_time=end,flush_time=(d+1)*86400-r['timezone_offset_hours']*3600,
-        combine_list=[dict(src_list=specs(x['src']),des_list=specs(x['prizes'])) for x in r['exchange']],take_flag=[claimed(s,32,i,d) for i in range(1,len(r['exchange'])+1)])
+    out[32]=dict(end_time=0,flush_time=0,
+        combine_list=[dict(src_list=specs(x['src']),des_list=specs(x['prizes'])) for x in r['exchange']],take_flag=[claimed(s,32,i) for i in range(1,len(r['exchange'])+1)])
     steps=[]
     for i,x in enumerate(r['turn'],1):
         key=str(i)
@@ -213,6 +227,9 @@ def catalog(role,now,r):
     out[74]=dict(id=1,data=dict(isopen=active,rmb=today,total_charge=week_money,charge_rmb=today,
         charge_data=[dict(rmb=x['rmb'],status=status(s,74,i,today>=x['rmb'],d),prize_list=specs(x['prizes'])) for i,x in enumerate(r['charge'],1)],
         total_charge_data=[dict(rmb=x['rmb'],status=status(s,74,100*i,week_money>=x['rmb'],week_period(d)),prize_list=specs(x['prizes'])) for i,x in enumerate(r['daily_total'],1)]))
+    for a in PERMANENT_TYPES:
+        out[a].update(permanent=True,end_time=0)
+    out[23]['prize_list'].update(permanent=True,end_time=0)
     return {a:out[a] for a in r['order']}
 
 
@@ -224,6 +241,7 @@ def hint(role,now,r):
     # Explicit false values also clear hints cached by an older client session.
     flags={a:False for a in TYPES}
     if 20 in c:flags[20]=bool(role['first_charge_gift'] and not role['take_charge_gift_time'])
+    if 7 in c:flags[7]=c[7]['can_take']
     if 22 in c:flags[22]=any(x['can_take'] for x in c[22]['role_info'].values())
     if 16 in c:flags[16]=any(not x['take_prize'] for x in c[16]['role_info'])
     if 35 in c:flags[35]=not c[35]['had_took']
@@ -269,7 +287,7 @@ def settle(role,mid,req,now,r,parse):
         # [A] event_mgr forwards this payload to firstChargeUI/rechargeUI/actNoticeUI
         # onReceiveGiftResult, which reads data.attach_list directly.
         return [summon.event(60,dict(attach_list=ps))]
-    f.require(now<s['start']+r['season_days']*86400 or mid==1127 and req['act_type'] in (7,22),'福利活动已结束')
+    f.require(now<s['start']+r['season_days']*86400 or mid==1127 and req['act_type'] in PERMANENT_TYPES,'福利活动已结束')
     if mid==1239:
         n=req['buy_count'];g=r['group'];old=s['group_count']
         f.require(1<=n<=g['limit']-old,'团购数量超出限购')
@@ -294,8 +312,8 @@ def settle(role,mid,req,now,r,parse):
         for x in r['fund']:
             if role['level']>=x['level'] and not claimed(s,a,x['level']):take(x['level'],x['prizes'])
     elif a==7:
-        f.require(i==0 and now>=s['start']+r['season_days']*86400,'等级奖励尚未结算')
-        lv=s.setdefault('end_level',role['level']);eligible=[x for x in r['upgrade'] if lv>=x['level']]
+        f.require(i==0,'成长奖励领取索引无效')
+        eligible=[x for x in r['upgrade'] if role['level']>=x['level']]
         f.require(bool(eligible),'等级不足');take(0,eligible[-1]['prizes'])
     elif a==16:
         f.require(i==0,'登录领奖索引无效')
@@ -309,7 +327,7 @@ def settle(role,mid,req,now,r,parse):
         f.require(0<=i<=10,'全民福利编号无效')
         take(i,r['carnival_all'] if i==0 else r['carnival'][i-1]['prizes'],c[21]['can_take_all'] if i==0 else role.get('vip_level',0)>=i)
     elif a==32:
-        f.require(1<=i<=len(r['exchange']),'兑换编号无效');x=r['exchange'][i-1];take(i,x['prizes'],period=d)
+        f.require(1<=i<=len(r['exchange']),'兑换编号无效');x=r['exchange'][i-1];take(i,x['prizes'])
         for p in x['src']:
             if p[0] in (11,12):
                 k='gold_coin' if p[0]==11 else 'silver_coin';f.require(role[k]>=p[2],'兑换货币不足');role[k]-=p[2]

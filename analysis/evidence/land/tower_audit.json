@@ -1,10 +1,97 @@
 {
-  "revision": "land-tower-roster-2026-10-26-v1",
+  "revision": "land-tower-growth-2026-10-28-v3",
   "rule_class": "B",
   "floors_per_world": 64,
   "distinct_chiefs": 64,
   "strictly_increasing_chief_stats": true,
   "strictly_increasing_army_power": true,
+  "growth": {
+    "normal_start_level": 3,
+    "hell_start_level": 4,
+    "normal_level_step": 6,
+    "hell_level_step": 8,
+    "stat_percent": 115,
+    "min_floor_growth_percent": 3
+  },
+  "rewards": {
+    "pool": [
+      [
+        12,
+        0,
+        10000,
+        1
+      ],
+      [
+        12,
+        0,
+        30000,
+        1
+      ],
+      [
+        11,
+        0,
+        20,
+        1
+      ],
+      [
+        5,
+        1001,
+        1,
+        1
+      ],
+      [
+        5,
+        1001,
+        3,
+        1
+      ],
+      [
+        5,
+        10000,
+        5,
+        1
+      ],
+      [
+        5,
+        10000,
+        10,
+        1
+      ],
+      [
+        5,
+        10001,
+        1,
+        1
+      ]
+    ],
+    "normal_cards": 5,
+    "hell_cards": 3,
+    "draw": "uniform_without_replacement_random_order",
+    "costs": [
+      0,
+      20,
+      50,
+      100,
+      200
+    ],
+    "full_card_rewards": [
+      [
+        5,
+        1001,
+        20,
+        1
+      ]
+    ],
+    "sweep_rewards": [
+      [
+        5,
+        1001,
+        10,
+        1
+      ]
+    ]
+  },
+  "unit_rows": 576,
   "original_sources": [
     "analysis/configs/cortege/cortege_base_0.csv",
     "analysis/configs/cortege/cortege_name_0.csv"

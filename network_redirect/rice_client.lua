@@ -2,11 +2,12 @@
 do
  local ms=package.loaded.ms
  local ui=ms and ms.d_ricePuddingUI
- if not ui or not ms.d_hz or not ms.d_u then return 'pending' end
+ if not ui or not ms.d_hz or not ms.d_u or not ms.d_commonLayerUI then return 'pending' end
  if not ui._localRiceRestore then
   local old={}
   for _,key in ipairs({'updateActivityStatus','canJoin','tickTime','create','cook','showNews','onGetResult'}) do old[key]=ui[key] end
   local hz=ms.d_hz.gethz
+  local usedItem=ms.d_commonLayerUI.recvUsedItem
   local enabled=__RICE_ENABLED__
   local originalEnd=ui.g_self.end_time
   local progress={rice_count=0,left_process=__RICE_BONUS_EVERY__}
@@ -16,6 +17,17 @@ do
    rice3='制作了',rice4='获得'
   }
   ms.d_hz.gethz=function(key,...) return labels[key] or hz(key,...) end
+  ms.d_commonLayerUI.recvUsedItem=function(data,...)
+   -- The shipped callback has a mooncake branch but no zongzi result branch.
+   if data and data.type_id and data.type_id>=1213 and data.type_id<=1217 and data.result==1 then
+    ms.d_packageUI.updateItemCellInfo(data.type_id)
+    if data.attach_list and #data.attach_list>0 then
+     ms.d_commonLayerUI.showPrizeResLayer(CCDirector:sharedDirector():getRunningScene(),data.attach_list)
+    end
+    return
+   end
+   return usedItem(data,...)
+  end
   ui.updateActivityStatus=function(data,...)
    if data and data.local_permanent then enabled=data.local_enabled end
    if data and data.rice_count then progress=data end
@@ -78,6 +90,7 @@ do
   ui._localRiceRestore=function()
    for key,value in pairs(old) do ui[key]=value end
    ui.g_self.end_time=originalEnd
+   ms.d_commonLayerUI.recvUsedItem=usedItem
    ms.d_hz.gethz=hz;ui._localRiceRestore=nil
   end
  end

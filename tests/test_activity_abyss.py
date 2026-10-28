@@ -3,7 +3,7 @@ import copy
 from pathlib import Path
 from unittest.mock import patch
 from tests.test_activity import ActivityCase, NOW
-from network_redirect import activity, activity_abyss as abyss, activity_drug as drug, npc_players, summon
+from network_redirect import activity, activity_abyss as abyss, activity_drug as drug, npc_players, summon, abyss_balance
 from network_redirect.backend import Backend
 
 
@@ -48,22 +48,40 @@ class AbyssTests(ActivityCase):
             self.assertEqual(s['bag'][0]['attach_type'],tid)
         with patch('network_redirect.backend.time.time',return_value=NOW+4*86400):
             self.call(10);s=self.b.profile()['activity']['abyss']
-            self.assertEqual(len(s['bag']),30)
-            self.assertEqual(s['crystals'],576*max(1,self.b.profile()['role_combat_power']//100))
+            self.assertLessEqual(len(s['bag']),4)
+            self.assertEqual(sum(x['attach_count'] for x in s['bag']),576)
+            self.assertGreater(s['item_count'],0)
+            gain=abyss_balance.crystal_tick(self.b.profile(),s,r)
+            self.assertEqual(s['crystals'],576*gain)
             self.call(10);self.assertEqual(s,self.b.profile()['activity']['abyss'])
 
     def test_double_expiry_partial_purchase_and_daily_statistics(self):
         with patch('network_redirect.backend.time.time',return_value=NOW+150):self.call(14,buy_hour=1)
         with patch('network_redirect.backend.time.time',return_value=NOW+3600):
             self.call(9);s=self.b.profile()['activity']['abyss']
-            gain=max(1,self.b.profile()['role_combat_power']//100)
+            r=self.b.activity_rules
+            gain=abyss_balance.crystal_tick(self.b.profile(),s,r)
             self.assertEqual(s['crystals'],23*gain)  # no retroactive double first tick
         with patch('network_redirect.backend.time.time',return_value=NOW+86400):
             stats=self.call(9)['day_record']
             midnight=((NOW+8*3600)//86400+1)*86400-8*3600
             expected=(NOW+86400-midnight)//300+1
             self.assertEqual(stats['fight_count'],expected)
+            self.assertEqual(stats['now_fight_len'],r['abyss_tick_seconds'])
             self.assertEqual(stats['crystals'],expected*gain)
+
+    def test_shop_pool_is_six_items_and_refreshes_once_per_day(self):
+        first=self.call(13)
+        first_rows=list(first['shop_list'].values())
+        self.assertEqual(len(first_rows),self.b.activity_rules['abyss_shop_daily_count'])
+        self.assertEqual(len({(x['object_type'],x['attach_type'],x['attach_count'],x['attach_level']) for x in first_rows}),6)
+        self.assertEqual(first,self.call(13))
+        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+            second=self.call(13)
+        self.assertNotEqual(first['shop_day'],second['shop_day'])
+        second_rows=list(second['shop_list'].values())
+        self.assertEqual(len(second_rows),6)
+        self.assertTrue(all(x['buy_times']>0 for x in second_rows))
 
     def test_legacy_crystals_claim_exchange_and_no_duplicate(self):
         role=self.b.profile();s=role['activity']['abyss']
@@ -72,18 +90,49 @@ class AbyssTests(ActivityCase):
         self.call(5);role=self.b.profile()
         self.assertEqual(role['activity']['abyss']['crystals'],444)
         self.assertFalse(any(i['type_id']==1441 for i in role['attachments']))
+        shop=self.call(13)['shop_list'];self.assertTrue(shop)
+        row=shop[1];role=self.b.profile();role['activity']['abyss']['crystals']+=row['crystals'];self.b.save(role)
         self.call(12,index=1,count=1)
-        self.assertEqual(self.b.profile()['activity']['abyss']['crystals'],344)
-        self.call(1);self.assertEqual(self.b.profile()['activity']['abyss']['crystals'],344)
+        self.assertEqual(self.b.profile()['activity']['abyss']['crystals'],444)
+        self.call(1);self.assertEqual(self.b.profile()['activity']['abyss']['crystals'],444)
+
+    def test_boss_quota_loss_restart_midnight_and_complete(self):
+        info=self.call(16)['specter_info']
+        self.assertEqual((info['fight_boss_times'],info['max_fight_count']),(0,5))
+        # Real losing battles consume quota while retaining floor and pills.
+        role=self.b.profile();state=role['activity']['abyss']
+        state.update(boss=80,pills={'1':1501},reductions=[10000,0,0,0])
+        self.b.save(role)
+        for used in range(1,6):
+            result=self.call(6)
+            self.assertFalse(result['is_win'])
+            self.assertEqual(result['specter_info']['fight_boss_times'],used)
+            self.assertEqual(result['specter_info']['boss_layer'],80)
+        before=self.b.profile()
+        self.assertEqual(self.req(1329,id=6,data='{}')[0][0],55)
+        self.assertEqual(before,self.b.profile())
+        self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.assertEqual(self.call(16)['specter_info']['fight_boss_times'],5)
+        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+            result=self.call(6)  # Direct click from yesterday's exhausted panel.
+            self.assertEqual(result['specter_info']['fight_boss_times'],1)
+            self.assertEqual(self.b.profile()['activity']['abyss']['pills'],{'1':1501})
+            role=self.b.profile();role['activity']['abyss'].update(boss=81,complete=True)
+            self.b.save(role);before=self.b.profile()
+            error=self.req(1329,id=6,data='{}')
+            self.assertEqual(error[0][0],55)
+            self.assertIn('全部通关',str(error))
+            self.assertEqual(before,self.b.profile())
 
     def test_pills_all_essence_families_and_grades(self):
         for recipe in range(25,29):
             for grade in range(4):
                 role=self.b.profile();s=role['activity']['abyss'];s['recipes']=[recipe]
-                row=drug.RECIPES[recipe];role['drug_level']=int(row['min_level'])+grade*self.b.activity_rules['drug_quality_level_step']
+                row=drug.RECIPES[recipe];role['drug_level']=int(row['min_level'])
                 for part in row['study_material(attach_type|attach_count|need_silver)'].split('/'):
                     tid,n,_=map(int,part.split('|'));summon.add_item(role,tid,n)
-                packets=drug.settle(role,s,21,dict(index=recipe),self.b.activity_rules)
+                with patch.object(drug.secrets,'randbelow',return_value=(0,60,85,95)[grade]):
+                    packets=drug.settle(role,s,21,dict(index=recipe),self.b.activity_rules)
                 tid=int(row['attach_type'])+20*grade
                 self.assertTrue(any(i['type_id']==tid for i in role['attachments']),(recipe,grade,tid,packets))
 

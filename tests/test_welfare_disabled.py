@@ -10,8 +10,8 @@ from network_redirect.backend import Backend, login_fields
 from network_redirect.protocol import decode, encode
 
 NOW = 1793066400
-REMOVED = {24, 33, 34, 35, 48, 67, 71, 74}
-RETAINED = [20, 22, 7, 16, 23, 21, 32, 36, 60]
+REMOVED = {24, 33, 34, 35, 36, 48, 60, 67, 71, 74}
+RETAINED = [20, 22, 7, 16, 23, 21, 32]
 
 
 class DisabledWelfareTests(unittest.TestCase):

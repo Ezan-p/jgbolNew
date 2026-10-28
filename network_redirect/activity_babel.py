@@ -9,8 +9,18 @@ FLOORS = summon.rows('babel_tower_floor_prize.csv')
 MAX_FLOOR = max(int(row['floor_r']) for row in FLOORS)
 GUARDS = (7, 8, 9, 20010, 20011, 20012, 20013, 20014, 20015)
 TOOLS = {20003: 20005, 20004: 20006, 20007: 20010, 20008: 20011, 20009: 20012}
-GOODS = ((1001, 10, 100, 10), (20016, 1, 50, 5), (20006, 1, 50, 5),
-         (1023, 1, 100, 5), (1343, 1, 150, 5), (1034, 1, 100, 5))
+# The client always renders six slots.  The original product table is absent
+# from the offline package, so this pool is the explicit local design supplied
+# for the offline activity.  A player's six slots are sampled without
+# replacement and persisted for the current Babel week.
+SHOP_POOL = ((1001, 10, 100, 10), (1022, 1, 100, 3), (1023, 1, 100, 3),
+             (20016, 1, 50, 3), (20017, 1, 100, 3), (20018, 1, 250, 2),
+             (20019, 1, 500, 1), (20005, 1, 50, 3), (20006, 1, 50, 5),
+             (20010, 1, 200, 3), (20011, 1, 150, 3), (20012, 1, 100, 3),
+             (1034, 1, 50, 5), (1033, 1, 100, 5), (1032, 1, 300, 3),
+             (10000, 2, 100, 3), (10001, 5, 100, 5))
+SHOP_SLOT_COUNT = 6
+SHOP_POOL_SET = frozenset(SHOP_POOL)
 
 
 def response(op, data):
@@ -39,28 +49,134 @@ def reveal(s):
             grid[row-1][col-1]['visible'] = True
 
 
+def valid_shop_goods(goods):
+    if not isinstance(goods, list) or len(goods) != SHOP_SLOT_COUNT:
+        return False
+    normalized = []
+    for item in goods:
+        if not isinstance(item, (list, tuple)) or len(item) != 4:
+            return False
+        if not all(type(value) is int for value in item) or tuple(item) not in SHOP_POOL_SET:
+            return False
+        normalized.append(tuple(item))
+    return len(set(normalized)) == SHOP_SLOT_COUNT
+
+
+def random_shop_goods(previous=None):
+    """Draw six distinct pool entries, changing the catalog on a refresh."""
+    chosen = secrets.SystemRandom().sample(SHOP_POOL, SHOP_SLOT_COUNT)
+    if previous and valid_shop_goods(previous) and tuple(chosen) == tuple(map(tuple, previous)):
+        available = [item for item in SHOP_POOL if item not in chosen]
+        chosen[-1] = secrets.choice(available)
+    return [list(item) for item in chosen]
+
+
 def state(role, now, r):
-    s = role['activity'].setdefault('babel', dict(cur_floor=1, history_floor=1, max_floor=MAX_FLOOR,
+    # `activity.prepare` normally creates the shared fight counter.  Older
+    # offline saves can enter this handler directly (or predate that field),
+    # so migrate it here as well before a guard battle allocates a replay id.
+    activity = role.setdefault('activity', {})
+    if type(activity.get('fight_id')) is not int or activity['fight_id'] < 0:
+        activity['fight_id'] = 100000
+    defaults = dict(cur_floor=1, history_floor=1, max_floor=MAX_FLOOR,
         life=100, max_life=100, energy=100, max_energy=100, coin_count=0,
-        floors={}, purchases={}, refresh_times=1, day=-1))
+        floors={}, purchases={}, refresh_times=1, day=-1)
+    s = activity.get('babel')
+    if not isinstance(s, dict):
+        s = activity['babel'] = copy.deepcopy(defaults)
+    # Keep malformed/partial legacy sections from turning a read-only query
+    # into a permanent KeyError/TypeError.  Valid above-cap energy remains
+    # untouched; only impossible values are repaired.
+    if type(s.get('max_life')) is not int or s['max_life'] <= 0:
+        s['max_life'] = 100
+    if type(s.get('max_energy')) is not int or s['max_energy'] <= 0:
+        s['max_energy'] = 100
+    if type(s.get('life')) is not int or s['life'] < 0:
+        s['life'] = s['max_life']
+    else:
+        s['life'] = min(s['life'], s['max_life'])
+    if type(s.get('energy')) is not int or s['energy'] < 0:
+        s['energy'] = s['max_energy']
+    if type(s.get('max_floor')) is not int or not 1 <= s['max_floor'] <= MAX_FLOOR:
+        s['max_floor'] = MAX_FLOOR
+    for key in ('cur_floor', 'history_floor'):
+        if type(s.get(key)) is not int or not 1 <= s[key] <= s['max_floor']:
+            s[key] = 1
+    if s['history_floor'] < s['cur_floor']:
+        s['history_floor'] = s['cur_floor']
+    if type(s.get('floors')) is not dict:
+        s['floors'] = {}
+    current_key = str(s['cur_floor'])
+    grid = s['floors'].get(current_key)
+    valid_grid = (isinstance(grid, list) and len(grid) == 5 and
+                  all(isinstance(row, list) and len(row) == 8 and
+                      all(isinstance(cell, dict) and type(cell.get('elem_type')) is int
+                          and type(cell.get('visible')) is bool for cell in row)
+                      for row in grid))
+    if not valid_grid:
+        s['floors'].pop(current_key, None)
+    locale = s.get('locale')
+    if (not isinstance(locale, dict) or type(locale.get('row')) is not int or
+            type(locale.get('column')) is not int or
+            not 1 <= locale['row'] <= 5 or not 1 <= locale['column'] <= 8):
+        s['locale'] = dict(row=1, column=1)
+    if type(s.get('purchases')) is not dict:
+        s['purchases'] = {}
+    if type(s.get('refresh_times')) is not int or not 0 <= s['refresh_times'] <= 1:
+        s['refresh_times'] = 1
+    if type(s.get('day')) is not int:
+        s['day'] = -1
+    if type(s.get('opponents')) is not dict:
+        s['opponents'] = {}
     # Migrate old saves without restoring already collected cells or coins.
-    s.setdefault('week', npc.week(now, r)); s.setdefault('reached_at', now)
-    s.setdefault('opponents', {}); s.setdefault('complete', False)
-    s.setdefault('participated', s['history_floor'] > 1)
-    now = max(now, s.setdefault('clock', now)); s['clock'] = now
+    if type(s.get('week')) is not int:
+        s['week'] = npc.week(now, r)
+    if type(s.get('reached_at')) is not int:
+        s['reached_at'] = now
+    if type(s.get('complete')) is not bool:
+        s['complete'] = False
+    if type(s.get('participated')) is not bool:
+        s['participated'] = s['history_floor'] > 1
+    if type(s.get('clock')) is not int:
+        s['clock'] = now
+    now = max(now, s['clock']); s['clock'] = now
+    previous_week = s['week']
     npc.rollover(role, s, now, r)
+    week_changed = s['week'] != previous_week
+    if (week_changed or type(s.get('shop_week')) is not int or
+            s.get('shop_week') != s['week'] or not valid_shop_goods(s.get('shop_goods'))):
+        old_goods = s.get('shop_goods') if valid_shop_goods(s.get('shop_goods')) else None
+        s['shop_week'] = s['week']
+        s['shop_goods'] = random_shop_goods(old_goods if week_changed else None)
+        s['purchases'] = {}
+        s['refresh_times'] = 1
+    elif type(s.get('refresh_times')) is not int or not 0 <= s['refresh_times'] <= 1:
+        s['refresh_times'] = 1
+    # Limit values belong to the persisted catalog.  This also migrates old
+    # purchase counters after the six slots have changed.
+    s['purchases'] = {
+        str(i): min(s['shop_goods'][i - 1][3], value)
+        for i in range(1, SHOP_SLOT_COUNT + 1)
+        for value in [s['purchases'].get(str(i), 0)]
+        if type(value) is int and value > 0
+    }
     if s['day'] < a.day(now, r):
-        s.update(day=a.day(now,r), life=s['max_life'], refresh_times=1, purchases={})
+        # Life is daily; the shop catalog and its limits are weekly.
+        s.update(day=a.day(now,r), life=s['max_life'])
     # [A] Half-hour recovery; [B] one point each tick, cap 100. Above-cap
     # consumable energy is preserved, and full-cap ticks are not banked.
     tick = now // 1800
-    previous = s.setdefault('energy_tick', tick)
+    if type(s.get('energy_tick')) is not int:
+        s['energy_tick'] = tick
+    previous = s['energy_tick']
     if tick > previous:
         if s['energy'] < s['max_energy']:
             s['energy'] = min(s['max_energy'], s['energy'] + tick-previous)
         s['energy_tick'] = tick
     if str(s['cur_floor']) not in s['floors']:
         generate(s)
+    if type(s.get('coin_count')) is not int or s['coin_count'] < 0:
+        s['coin_count'] = 0
     if not s.get('coin_inventory'):
         existing = item_count(role, 20000)
         if s['coin_count'] > existing:
@@ -91,7 +207,7 @@ def info(s):
 def shop(s):
     # [A] Client subtracts my_exchange from limit itself (Lua L1113-1114).
     goods = [dict(reward=[a.prize_spec([5,tid,n,1])], need_coin=cost, limit=limit)
-             for tid,n,cost,limit in GOODS]
+             for tid,n,cost,limit in s['shop_goods']]
     return dict(coin_count=s['coin_count'], refresh_times=s['refresh_times'], my_shop=goods,
                 my_exchange=[s['purchases'].get(str(i),0) for i in range(1,7)])
 
@@ -139,10 +255,12 @@ def settle(role, req, now, r, jrules, parse):
     if op in (8,9,4):
         if op == 9:
             a.require(s['refresh_times'] > 0 and s['coin_count'] >= 200, '通天币不足或刷新次数已用完')
-            coins(role,s,-200); s['refresh_times'] -= 1; s['purchases'] = {}
+            coins(role,s,-200); s['refresh_times'] -= 1
+            s['shop_goods'] = random_shop_goods(s['shop_goods'])
+            s['purchases'] = {}
         if op == 4:
             idx, n = data.get('index'), data.get('count',1)
-            a.require(type(idx) is int and 1 <= idx <= 6 and type(n) is int and 1 <= n <= 100, '兑换数量无效')
+            a.require(type(idx) is int and 1 <= idx <= SHOP_SLOT_COUNT and type(n) is int and 1 <= n <= 100, '兑换数量无效')
             goods = shop(s)['my_shop'][idx-1]; count = s['purchases'].get(str(idx),0)
             a.require(n <= goods['limit']-count and s['coin_count'] >= goods['need_coin']*n, '兑换次数或通天币不足')
             coins(role,s,-goods['need_coin']*n); s['purchases'][str(idx)] = count+n

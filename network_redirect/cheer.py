@@ -39,6 +39,12 @@ def prepare(role, rules=None):
     role.setdefault('cheer_pending', {})
     for key in ATTRS:
         role.setdefault(key, 0)
+    if role.get('cheer_skill_mask_version', 1) < 2:
+        # [A] tianShuUI.getBitInGuideIndex discards bit zero before cheer UI indexes it.
+        # [B] Migrate the former local zero-based encoding once, preserving bought slots.
+        for key in ('cheer_skill_open', 'cheer_skill_ni_open'):
+            role[key] = (role[key] & 0xffff) << 1
+        role['cheer_skill_mask_version'] = 2
     if rules and rules['is_open']:
         for order in (1, 2):
             if role['level'] >= rules['cheer_level_limit'][order - 1]:
@@ -64,7 +70,7 @@ def attributes(role):
 
 
 def skill_mask(order, pos):
-    return ('cheer_skill_open' if order <= 8 else 'cheer_skill_ni_open', 1 << (((order - 1) % 8) * 2 + pos - 2))
+    return ('cheer_skill_open' if order <= 8 else 'cheer_skill_ni_open', 1 << (((order - 1) % 8) * 2 + pos - 1))
 
 
 def skill_open(role, order, pos):
@@ -87,7 +93,10 @@ def settle(role, req, r):
         if 4 <= order <= 8 or order >= 11:
             f.require(role['cheer_' + NAMES[order - 2] + '_level'] > 0, '请先开启前方阵位')
         if order > 8:
-            f.require(role['cheer_' + NAMES[order - 9] + '_level'] > 0, '请先开启对应正八卦位')
+            # [A] Original canShowChangeBtn requires all eight positive positions.
+            f.require(all(role['cheer_' + n + '_level'] > 0 for n in NAMES[:8]), '请先开启全部正八卦位')
+            # [B] Enforce the original first-entry (order 9) flow on direct requests too.
+            f.require(order == 9 or role['cheer_unheaven_level'] > 0, '请先开启逆·乾阵位')
         item = r['open_cheer_item'][order - 1]
         f.debit_item(role, item['type_id'], item['count'])
         role[level_key] = 1
@@ -181,7 +190,8 @@ def settle(role, req, r):
 def bonuses(role, c, values, pending):
     """[B] Explicit chosen target; positive and reverse support sum without feedback."""
     for order, name in enumerate(NAMES, 1):
-        if role.get('cheer_' + name + '_effect', 0) != c['order']:
+        if (role.get('cheer_' + name + '_level', 0) <= 0
+                or role.get('cheer_' + name + '_effect', 0) != c['order']):
             continue
         supporter = next((x for x in role['corteges'] if x.get('cheer_order') == order and not x.get('order')), None)
         if not supporter or supporter['id'] not in pending:
@@ -190,6 +200,8 @@ def bonuses(role, c, values, pending):
             values[stat] += pending[supporter['id']][stat] * Decimal(role.get(name + '_' + stat + '_plus', 0)) / 1000
         for item in role['attachments']:
             if item.get('equip_order') != order + 8 or item.get('equip_pos') not in (2, 3):
+                continue
+            if not skill_open(role, order, item['equip_pos']):
                 continue
             cfg = f.SKILLS.get(item['type_id'], {})
             field = int(cfg.get('effect_field(1-gongji，2-fangyu，3-magic，4-intensity，5-hp)', 0))

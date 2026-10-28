@@ -162,14 +162,18 @@ def validate_rules(r):
     require(set(rates)=={'1338','1339','1340','1341'} and all(type(v)is int and 0<v<=100 for v in rates.values()) and rates['1338']<rates['1339']<rates['1340']<rates['1341']==100,'镇魂符概率配置无效')
     require(type(r.get('train_support_percent'))is int and 1<=r['train_support_percent']<=100,'点赞增益配置无效')
     require(r['catch_success_percent']<=100 and r['pet_limit']<=240 and r['search_daily']<=18,'概率、兽栏或棋盘配置越界')
+    require(r['team_daily']==3,'秘境每日最多挑战三层')
+    require(type(r.get('search_per_layer'))is int and r['search_per_layer']>0 and r['search_daily']==r['team_daily']*r['search_per_layer'],'探宝次数必须按通关层数配置')
     require(r['train_resident_required']==240,'原版试炼需要240只栖息宠物')
     floors=r.get('train_floors')
+    require(type(r.get('train_reference_level')) is int and 1<=r['train_reference_level']<=100,'试炼基准等级无效')
     require(isinstance(floors,list) and len(floors)==4,'试炼必须配置四层')
     for index,floor in enumerate(floors):
         require(isinstance(floor,dict),'试炼层配置无效')
         for key in ('level','hp','attack','defense','magic'):
             require(type(floor.get(key)) is int and 0<floor[key]<=100000000,'试炼属性无效：'+key)
             if index:require(floor[key]>floors[index-1][key],'试炼难度必须逐层递增：'+key)
+    require(floors[0]['level']==r['train_reference_level'],'试炼首层等级必须等于基准等级')
     require(type(r.get('team_min_fighters')) is int and r['team_min_fighters']==3,'秘境至少三人出战')
     require(r['train_support_limit']<=20 and r['team_min_fighters']<=r['team_size']<=5,'活动人数配置越界')
     for k in ('hunt_weekend_open','npc_auto_accept','train_weekend_only','lucky_weekend_only'):require(type(r.get(k))is bool,'开关配置无效：'+k)
@@ -192,6 +196,9 @@ def validate_rules(r):
     require(r['pet_types'] and all(type(v)is int and v in valid for v in r['pet_types']),'灵兽类型配置无效')
     require(r['search_rewards'],'寻宝奖励池为空')
     for p in r['search_rewards']:daily.validate_prize(p)
+    require(all(p[0] in (11,12) or p[0]==5 and p[1] in (1001,1029) for p in r['search_rewards']),'寻宝奖励仅允许银两、元宝、蟠桃和贡献令')
+    slots=r.get('search_reward_slots')
+    require(isinstance(slots,list) and len(slots)==len(r['search_rewards']) and all(type(n)is int and n>0 for n in slots) and sum(slots)==18,'寻宝奖励必须配置18格')
     require(set(r['west_config']['book_worth_config'])==set(map(str,range(1,6))),'取经品质配置不完整')
 
 

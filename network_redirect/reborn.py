@@ -16,6 +16,8 @@ FATES = summon.rows('equip_reborn_fate.csv')
 CHAIN = {int(next(iter(r.values()))): r['effect_list'] for r in summon.rows('equip_reborn_level_plus.csv')}
 HANDLED = {1328, 1332, 1337, 1338, 1339, 1340, 1341, 1342}
 STAT = {1: 'gongji', 2: 'fangyu', 3: 'hp', 4: 'magic'}
+# roleRebornUI L991/997/1004: DIVVN C=3 indexes numeric constant 9.
+FLOORS_PER_REGION = 9
 
 
 def load_rules(path=ROOT / 'server_config/reborn_rules.json'):
@@ -23,13 +25,18 @@ def load_rules(path=ROOT / 'server_config/reborn_rules.json'):
     f.require(r['schema_version'] == 1 and r['mode'] == 'inferred', '转生配置须标记 inferred')
     f.require(len(r['realms']) == 4, '主角境界配置须为4阶')
     f.require(r['restore_gold'] == 200, '原版觉醒还原消耗200元宝')
-    previous = 0
+    previous = previous_boss = previous_level = 0
     for x in r['realms']:
         f.require(type(x['level']) is int and x['level'] in f.LEVELS and
+                  x['level'] >= previous_level and
                   type(x['count']) is int and 0 <= x['count'] <= 255 and
-                  previous < x['max_layer'] <= 9, '境界配置无效')
-        f.require(type(x['boss_layer']) is int and x['boss_layer'] > 0 and x['boss_layer'] % 3 == 0, '首领展示边界须为3的倍数')
+                  type(x['max_layer']) is int and previous < x['max_layer'] <= 9 and
+                  type(x['required_layer']) is int and 0 <= x['required_layer'] <= previous,
+                  '境界配置无效')
+        f.require(type(x['boss_layer']) is int and previous_boss < x['boss_layer'] <= 81 and
+                  x['boss_layer'] % FLOORS_PER_REGION == 0, '区域展示边界须递增且为9的倍数（最多81层）')
         previous = x['max_layer']
+        previous_boss, previous_level = x['boss_layer'], x['level']
         f.require(x['material'] in f.ITEMS and type(x['cost']) is int and x['cost'] > 0, '境界材料配置无效')
     f.require(previous == 9, '境界必须覆盖九转')
     for k in ('daily_divinations', 'buy_limit', 'buy_cost', 'pending_limit'):

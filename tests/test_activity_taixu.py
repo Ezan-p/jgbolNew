@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 from test_activity import ActivityCase, NOW
-from network_redirect import activity_undergo as u, activity_arena as arena, npc_players, summon
+from network_redirect import activity, activity_undergo as u, activity_arena as arena, npc_players, summon
 from network_redirect.backend import Backend
 from network_redirect.protocol import decode
 
@@ -134,12 +134,15 @@ class UndergoCompleteTests(TaixuCase):
         self.assertEqual(self.b.profile()['activity']['undergo']['challenge'],u.END)
 
     def test_shop_bounds_rollover_and_insufficient_balance(self):
-        self.ok(self.call(1)); before=self.b.profile()
+        self.ok(self.call(3)); before=self.b.profile()
         self.assertEqual(self.call(5,dict(index=1,count=1))[0][0],55);self.assertEqual(before,self.b.profile())
         role=self.b.profile();summon.add_item(role,1366,100000);self.b.save(role)
-        self.ok(self.call(5,dict(index=1,count=20)))
+        limit = self.b.profile()['activity']['undergo']['shop'][0]['limit']
+        self.ok(self.call(5,dict(index=1,count=limit)))
         self.assertEqual(self.call(5,dict(index=1,count=1))[0][0],55)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.ok(self.call(5,dict(index=1,count=1)))
+        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+            self.assertEqual(self.call(5,dict(index=1,count=1))[0][0],55)
+            self.ok(self.call(3));self.ok(self.call(5,dict(index=1,count=1)))
 
     def test_legacy_rewards_are_not_reissued(self):
         role=self.b.profile();role['activity']['undergo']=dict(gate=201,challenge=101,lineup={},passed=list(range(101,110)),day=-1)
@@ -179,7 +182,7 @@ class ArenaTests(TaixuCase):
     def test_original_level_50_gate_and_existing_low_level_save(self):
         # Previously created low-level seasons survive the restored entry gate.
         role=self.b.profile();role['level']=50
-        role['activity']['arena']=arena.new_season(role,self.b.activity_rules.get('day',0),NOW)
+        role['activity']['arena']=arena.new_season(role,activity.day(NOW,self.b.activity_rules),NOW)
         role['activity']['arena'].update(version=1,group=1,viewing=1)
         role['level']=12
         self.b.save(role)
@@ -203,7 +206,7 @@ class ArenaTests(TaixuCase):
         self.assertEqual([(g['min_level'],g['max_level']) for g in entry['group_type_level'].values()],
                          [(50,59),(60,69),(70,79),(80,99)])
         after=self.b.profile()['activity']['arena']
-        expected=dict(before,version=2,viewing=before['group'])
+        expected=dict(before,version=3,viewing=before['group'])
         self.assertEqual(after,expected)
         for group in (1,2,3,8):
             with self.subTest(group=group):
@@ -223,7 +226,7 @@ class ArenaTests(TaixuCase):
         s['settled']=False;s['viewing']=4
         self.assertFalse(arena.board(role,s)['local_arena']['can_advance'])
 
-    def test_rank_preview_matches_gold_and_holy_peaches_for_every_tier(self):
+    def test_rank_preview_matches_three_rewards_for_every_tier(self):
         self.arena_enter()
         for expected in arena.rules()['arena_rank_prizes']:
             role=self.b.profile();s=role['activity']['arena'];s['stage']=5
@@ -237,19 +240,22 @@ class ArenaTests(TaixuCase):
             self.assertEqual(role['gold_coin']-before['gold_coin'],expected['gold'])
             def count(r,tid):return sum(x['count'] for x in r['attachments'] if x['type_id']==tid and x['attach_type']==5)
             self.assertEqual(count(role,1343)-count(before,1343),expected['holy_peach'])
-            for tid in (1001,1029,1366):self.assertEqual(count(role,tid),count(before,tid))
+            self.assertEqual(count(role,1366)-count(before,1366),expected['crystals'])
+            self.assertNotIn('reputation',s)
+            self.assertNotIn('reputation',s['settlement'])
+            for tid in (1001,1029):self.assertEqual(count(role,tid),count(before,tid))
 
     @patch('network_redirect.activity_arena.journey.battle',return_value=(1,[],[]))
-    def test_first_defeat_still_grants_only_twenty_crystals_once(self,_):
+    def test_repeat_victories_grant_one_hundred_crystals_each(self,_):
         self.arena_enter();role=self.b.profile();s=role['activity']['arena']
         key=arena.ranking(s)[-2];target=npc_players.catalog()[key]['profile']['role_id']
         def count(r):return sum(x['count'] for x in r['attachments'] if x['type_id']==1366 and x['attach_type']==5)
         before=self.b.profile();self.ok(self.arena_fight(des_id=target))
-        after=self.b.profile();self.assertEqual(count(after)-count(before),20)
+        after=self.b.profile();self.assertEqual(count(after)-count(before),100)
         self.assertEqual(after['gold_coin'],before['gold_coin'])
         s=after['activity']['arena'];order=arena.ranking(s).index(key)+1
         self.ok(self.arena_fight(des_id=target,des_order=order))
-        self.assertEqual(count(self.b.profile()),count(after))
+        self.assertEqual(count(self.b.profile())-count(after),100)
 
     @patch('network_redirect.activity_arena.journey.battle',return_value=(4,[],[]))
     def test_practice_transition_is_one_board_with_future_formal_start(self,_):
@@ -312,7 +318,7 @@ class ArenaTests(TaixuCase):
                     self.ok(self.call(7, dict(stage=stage), mid=1350))
 
     @patch('network_redirect.activity_arena.journey.battle',return_value=(1,[],[]))
-    def test_complete_tournament_settles_once_then_next_day(self,_):
+    def test_complete_tournament_settles_once_then_next_week(self,_):
         self.arena_enter()
         for stage in range(1,6):
             self.ok(self.arena_fight());events=self.call(7,dict(stage=stage),mid=1350);self.ok(events)
@@ -321,7 +327,7 @@ class ArenaTests(TaixuCase):
                 self.assertNotIn('local_prizes',board)
             else:
                 self.assertEqual(board['local_prizes'],next(d for e,d in events if e==33))
-                self.assertEqual(len(board['local_prizes']),2)
+                self.assertEqual(len(board['local_prizes']),3)
         role=self.b.profile();s=role['activity']['arena'];self.assertTrue(s['settled'])
         self.assertGreater(len(s['settlement']['attach_list']),0)
         before=self.b.profile();self.assertEqual(self.call(7,dict(stage=5),mid=1350)[0][0],55)
@@ -330,6 +336,8 @@ class ArenaTests(TaixuCase):
         self.assertNotIn('local_prizes',next(d for e,d in events if e==199))
         self.assertFalse(any(e==33 for e,d in events))
         with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.ok(self.call(1,mid=1350))
+        self.assertTrue(self.b.profile()['activity']['arena']['settled'])
+        with patch('network_redirect.backend.time.time',return_value=NOW+86400*7):self.ok(self.call(1,mid=1350))
         new=self.b.profile()['activity']['arena'];self.assertEqual(new['stage'],1);self.assertFalse(new['settled'])
 
     @patch('network_redirect.activity_arena.journey.battle',return_value=(4,[],[]))
@@ -374,7 +382,80 @@ class ArenaTests(TaixuCase):
 
     def test_unfinished_season_persists_across_midnight(self):
         s=self.arena_enter();roster=copy.deepcopy(s['competitors'])
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400*10):self.ok(self.call(1,mid=1350))
+        with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.ok(self.call(1,mid=1350))
         after=self.b.profile()['activity']['arena'];self.assertEqual(after['competitors'],roster);self.assertEqual(after['day'],s['day'])
+
+    @patch('network_redirect.activity_arena.journey.battle',return_value=(1,[],[]))
+    def test_every_stage_win_rewards_and_replays_do_not_reward(self,_):
+        def crystals(role):
+            return sum(x['count'] for x in role['attachments'] if x['type_id']==1366)
+        self.arena_enter()
+        for stage in range(1,6):
+            before=crystals(self.b.profile())
+            for _ in range(2):
+                events=self.arena_fight();self.ok(events)
+                prize=next(d for e,d in events if e==44)['attach_list'][1]
+                self.assertEqual((prize['attach_type'],prize['attach_count']),(1366,100))
+            self.assertEqual(crystals(self.b.profile())-before,200)
+            role=self.b.profile();rec=role['activity']['arena']['records'][-1]
+            self.ok(self.req(1244,fight_type=4,log_time=rec['log_time'],src_id=rec['src_id'],match_type=rec['match_type']))
+            self.assertEqual(self.b.profile(),role)
+            self.ok(self.call(7,dict(stage=stage),mid=1350))
+
+    @patch('network_redirect.activity_arena.journey.battle',return_value=(1,[],[]))
+    def test_monday_midnight_discards_unfinished_season_and_old_replay(self,_):
+        self.arena_enter();self.ok(self.arena_fight());self.ok(self.call(7,dict(stage=1),mid=1350))
+        role=self.b.profile();old=role['activity']['arena'];rec=old['records'][-1]
+        boundary=(old['week_start_day']+7)*86400-self.b.activity_rules['timezone_offset_hours']*3600
+        with patch('network_redirect.backend.time.time',return_value=boundary-1):
+            self.ok(self.call(1,mid=1350))
+        self.assertEqual(self.b.profile()['activity']['arena']['stage'],2)
+        before=self.b.profile()
+        with patch('network_redirect.backend.time.time',return_value=boundary):
+            events=self.req(1244,fight_type=4,log_time=rec['log_time'],src_id=rec['src_id'],match_type=rec['match_type'])
+            self.ok(events)
+        self.assertEqual(next(d for e,d in events if e==199)['id'],1)
+        after=self.b.profile();fresh=after['activity']['arena']
+        self.assertEqual(fresh['week_start_day'],old['week_start_day']+7)
+        self.assertEqual((fresh['stage'],fresh['stage_fights'],fresh['paid'],fresh['actions']),(1,0,0,9))
+        self.assertEqual(fresh['records'],[]);self.assertEqual(fresh['replays'],{})
+        self.assertNotIn('settlement',fresh)
+        self.assertEqual(after['attachments'],before['attachments'])
+        self.assertEqual(after['gold_coin'],before['gold_coin'])
+        self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        with patch('network_redirect.backend.time.time',return_value=boundary+1):
+            self.ok(self.call(1,mid=1350))
+        self.assertEqual(self.b.profile()['activity']['arena']['week_start_day'],fresh['week_start_day'])
+
+    @patch('network_redirect.activity_arena.journey.battle',return_value=(1,[],[]))
+    def test_cross_week_old_fight_or_settlement_only_refreshes(self,battle):
+        self.arena_enter()
+        for operation in ('fight','settle'):
+            role=self.b.profile();s=role['activity']['arena']
+            s.update(stage=1 if operation=='fight' else 5,stage_fights=1,paid=3)
+            self.b.save(role);before=self.b.profile();calls=battle.call_count
+            boundary=(s['week_start_day']+7)*86400-8*3600
+            with patch('network_redirect.backend.time.time',return_value=boundary):
+                events=self.arena_fight() if operation=='fight' else self.call(7,dict(stage=5),mid=1350)
+                self.ok(events)
+            self.assertEqual(next(d for e,d in events if e==199)['id'],1)
+            self.assertEqual(battle.call_count,calls)
+            after=self.b.profile()
+            self.assertEqual(after['attachments'],before['attachments'])
+            self.assertEqual(after['gold_coin'],before['gold_coin'])
+            self.assertEqual(after['activity']['arena']['stage_fights'],0)
+
+    def test_legacy_same_week_migrates_without_restarting_or_regranting(self):
+        self.arena_enter();role=self.b.profile();s=role['activity']['arena']
+        s.pop('week_start_day');s.update(version=2,day=activity.day(NOW,self.b.activity_rules),
+            settled=True,stage=6,reputation=1000,qualification_claimed=['old'],
+            settlement=dict(order=1,reputation=1000,attach_list=[]))
+        self.b.save(role);before=self.b.profile()
+        self.ok(self.call(1,mid=1350));after=self.b.profile();s=after['activity']['arena']
+        self.assertTrue(s['settled']);self.assertEqual(s['stage'],6)
+        self.assertNotIn('reputation',s);self.assertNotIn('reputation',s['settlement'])
+        self.assertNotIn('qualification_claimed',s)
+        self.assertEqual(after['attachments'],before['attachments'])
+        self.assertEqual(after['gold_coin'],before['gold_coin'])
 
 if __name__=='__main__':unittest.main()

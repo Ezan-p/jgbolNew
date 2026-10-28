@@ -21,7 +21,14 @@ def rules():
         formation.require(type(tid) is int and tid in formation.BASES and tid in journey.NPCS
                           and NAMES.get(tid) == f['name'], '镇妖塔首领必须使用原版神仙')
         formation.require(int(journey.NPCS[tid]['chushijineng']) in formation.SKILLS, '镇妖塔首领法术缺失')
-    formation.require(1 <= r['normal_level_step'] < r['hell_level_step'] <= 3
+    formation.require(all(type(r.get(k)) is int for k in (
+        'normal_start_level', 'hell_start_level', 'normal_level_step',
+        'hell_level_step', 'stat_percent', 'min_floor_growth_percent')),
+        '镇妖塔成长配置必须为整数')
+    formation.require(1 <= r['normal_start_level'] < r['hell_start_level'] <= 8
+                      and 1 <= r['normal_level_step'] < r['hell_level_step'] <= 8
+                      and 100 <= r['stat_percent'] <= 200
+                      and 1 <= r['min_floor_growth_percent'] <= 10
                       and r['skill_level'] == 1 and r['guard_layer_step'] == 8, '镇妖塔成长配置无效')
     return r
 
@@ -31,14 +38,19 @@ def schedule(hell=False):
     r = rules(); leaders = []; result = []
     weights = formation.load_rules()['combat_weights']
     for floor in r['floors']:
-        layer = floor['layer']; level = layer*r['hell_level_step' if hell else 'normal_level_step']
+        layer = floor['layer']; mode = 'hell' if hell else 'normal'
+        level = r[mode+'_start_level'] + (layer-1)*r[mode+'_level_step']
         _, units = journey.fighters({'corteges':[]}, dict(
             cortege_list=f"{floor['type_id']}|{level}", skill_level=r['skill_level']))
         lead = units[0]
+        for stat in formation.STATS:
+            lead[stat] = lead[stat]*r['stat_percent']//100
         if leaders:
-            # Different archetypes have different base ratios. Prevent a change
-            # of character from making a later chief weaker in any base stat.
-            for stat in formation.STATS:lead[stat] = max(lead[stat],leaders[-1][stat]+1)
+            # Enforce meaningful growth even when switching to an archetype
+            # whose template has a lower base stat. Integer ceiling avoids drift.
+            for stat in formation.STATS:
+                minimum = (leaders[-1][stat]*(100+r['min_floor_growth_percent'])+99)//100
+                lead[stat] = max(lead[stat],minimum)
         lead['max_hp'] = lead['hp']; leaders.append(lead)
         count = min(8,1+(layer-1)//r['guard_layer_step'])
         army = copy.deepcopy(list(reversed(leaders[-count:])))

@@ -1,9 +1,10 @@
 """九幽 [A] original floor/drop/boss tables; [B] offline accumulation/economy."""
 import copy
 import csv
+import hashlib
 import secrets
 from . import activity as a, formation, journey, summon
-from . import battle_replay
+from . import battle_replay, abyss_balance
 from .protocol import encode
 from . import activity_abyss_combat as combat
 HANG={int(x['layer']):x for x in summon.rows('specter_hang_ouput.csv')}
@@ -31,6 +32,15 @@ def weighted(rows, weight):
         if roll<0:return row
 
 
+def store_drop(s, prize):
+    """A bag slot holds one item identity; repeated ticks stack instead of vanishing."""
+    for item in s['bag']:
+        if all(item[k]==prize[k] for k in ('object_type','attach_type','attach_level')):
+            item['attach_count']+=prize['attach_count'];return True
+    if len(s['bag'])>=s['grid_count']:return False
+    s['bag'].append(prize);return True
+
+
 def news(s,text,now):
     row=dict(tip=text,tip_type=3,time=now)
     for key in ('news','pending_news'):
@@ -50,14 +60,68 @@ def grant(role,s,specs):
 def response(op,**data):return summon.event(173,dict(flag=op,**data))
 
 
+def _shop_id(product):
+    """Stable identity for a daily offer, independent of its display index."""
+    return ':'.join(str(value) for value in product['reward'])
+
+
+def refresh_shop(s,role,r,today):
+    """Create one deterministic six-item offer list per role and local day.
+
+    The server persists the selected products so reconnects do not reshuffle the
+    list.  The revision is part of the key and also migrates old four-item
+    saves when the pool changes.
+    """
+    revision=r['abyss_shop_revision'];count=r['abyss_shop_daily_count']
+    current=s.get('shop')
+    if (s.get('shop_day')!=today or s.get('shop_revision')!=revision or
+            not isinstance(current,list) or len(current)!=count):
+        role_id=role.get('role_id',role.get('id',0))
+        seed=f'{revision}:{today}:{role_id}'
+        offers=sorted(r['abyss_shop'],key=lambda p: hashlib.sha256(
+            f'{seed}:{_shop_id(p)}'.encode()).digest())[:count]
+        s['shop']=copy.deepcopy(offers)
+        s['shop_day']=today
+        s['shop_revision']=revision
+        s['purchases']={}
+    else:
+        s.setdefault('purchases',{})
+    return s['shop']
+
+
 def state(role,now,r):
     s=role['activity'].setdefault('abyss',dict(layer=1,boss=1,crystals=0,last_time=now,double_end=0,grid_count=30,
         bag=[],reductions=[0]*4,pills={},day=-1))
+    s.setdefault('last_time',now);s.setdefault('double_end',0);s.setdefault('grid_count',30)
+    s.setdefault('bag',[]);s.setdefault('reductions',[0]*4);s.setdefault('pills',{});s.setdefault('day',-1)
+    from . import activity_drug as drug
+    # Older saves may already be in the last regions without the new course XP.
+    # Catch up training once; never replay historical money/item boss rewards.
+    if not s.get('training_course_received'):
+        cleared=81 if s.get('complete') else max(0,s['boss']-1)
+        if cleared:
+            drug.add_exp(role,abyss_balance.course_total(cleared))
+            known=s.setdefault('recipes',[])
+            known.extend(idx for idx,row in drug.RECIPES.items() if idx not in known and
+                         int(row['min_level'])<=min(role['drug_level'],abyss_balance.course_level(cleared)))
+            news(s,'已补齐此前通关的炼药熟练度与可学配方；已有资源和通关进度保留。',now)
+        s['training_course_received']=True
+    drug.flags(role,s)  # Rebuild legacy flags from authoritative learned recipe IDs.
+    # Merge historical duplicate slots without losing any stored drops. Existing
+    # overflow identities are retained until claimed, even above today's capacity.
+    old=s['bag'];s['bag']=[]
+    for prize in old:
+        if not store_drop(s,copy.deepcopy(prize)):s['bag'].append(copy.deepcopy(prize))
     s.setdefault('npc_epoch_day',a.day(now,r))
     from .activity_abyss_npc import settle_day
     settle_day(role,s,now,r)
-    if s['day']!=a.day(now,r):s.update(day=a.day(now,r),boss_count=0,purchases={},fight_count=0,item_count=0,earned=0,events_finished=0)
+    clock_day=a.day(now,r)
+    stored_day=s.get('day',-1)
+    today=max(stored_day,clock_day)
+    if stored_day!=today:s.update(day=today,boss_count=0,purchases={},fight_count=0,item_count=0,earned=0,events_finished=0)
     s.setdefault('double_start',s['last_time'])  # compatibility with old saves
+    s.setdefault('purchases',{})
+    refresh_shop(s,role,r,today)
     # Old builds granted boss crystals as normal items. Convert once by removing
     # those stacks in the same persisted transaction, without losing the reward.
     legacy=[i for i in role['attachments'] if i['attach_type']==5 and i['type_id']==1441]
@@ -66,25 +130,29 @@ def state(role,now,r):
     from .activity_abyss_random import accrue
     accrue(s,now,r)
     # [B] Each tick is settled once, bounded by the offline cap; no client time.
-    step=r['abyss_tick_seconds'];elapsed=max(0,now-s['last_time'])
+    step=r['abyss_tick_seconds'];last_time=s['last_time']
+    if now<last_time:
+        last_time=now;s['last_time']=now
+    elapsed=max(0,now-last_time)
     all_ticks=elapsed//step;ticks=min(all_ticks,r['abyss_offline_cap_seconds']//step)
     if ticks:
         earned=items=0
+        base_gain=abyss_balance.crystal_tick(role,s,r)
         # [B] Keep the latest capped complete ticks, with each tick attributed to
         # its own local day and only fully covered double periods multiplied.
         for index in range(all_ticks-ticks+1,all_ticks+1):
-            at=s['last_time']+index*step;today=a.day(at,r)==s['day']
+            at=last_time+index*step;today=a.day(at,r)==s['day']
             count=2 if s['double_start']<=at-step and at<=s['double_end'] else 1
-            gain=count*max(1,role.get('role_combat_power',100)//r['abyss_power_per_crystal'])
+            gain=count*base_gain
             s['crystals']+=gain;earned+=gain
             if today:s['earned']+=gain;s['fight_count']+=1
             for _ in range(count):
-                if len(s['bag'])>=s['grid_count']:continue
                 _,entries=weighted(DROPS[s['layer']],lambda row:row[0])
                 typ,tid,lv,n,_=weighted(entries,lambda row:row[4])
-                s['bag'].append(a.prize_spec([typ,tid,n,lv]));items+=n
+                items+=n
                 if today:s['item_count']+=n
-        s['last_time']+=all_ticks*step
+                store_drop(s,a.prize_spec([typ,tid,n,lv]))
+        s['last_time']=last_time+all_ticks*step
         news(s,f"第{s['layer']}层挂机结算{ticks}次，获得魂晶{earned}、道具{items}件。"+
              ('临时背包已满，请及时领取。' if len(s['bag'])>=s['grid_count'] else ''),now)
     return s
@@ -105,14 +173,23 @@ def bag(s,r):return dict(bag_list=copy.deepcopy(s['bag']),grid_count=s['grid_cou
 
 
 def enemies(s):
-    out=[]
+    out=[];balance=abyss_balance.rules();scale=balance['region_stat_percent'][abyss_balance.region(s['boss'])]
     for pos,token in enumerate(next(v for k,v in BOSSES[s['boss']].items() if k and k.startswith('cortege_list')).split('/'),1):
         tid,lv=map(int,token.split('|'));n=NPCS[tid]
         u=dict(type=tid,order=pos,level=1,evolve=0,reborn=0,skills=[])
         for key,column,idx in (('gongji','base_gongji',0),('fangyu','base_fangyu',1),('hp','base_max_hp',2),('magic','base_max_magic',3)):
-            u[key]=int(n[column])
+            u[key]=max(1,int(n[column])*scale//100)
+        # Original magic values reach 36 million, while their missing skill
+        # logic is unknown. Bound the inferred spell budget before pill effects.
+        u['magic']=min(u['magic'],u['gongji']*balance['magic_attack_cap_percent']//100)
         u['max_hp']=u['hp'];sk=int(n['chushijineng'] or 0)
         if sk in formation.SKILLS:u['skills']=[(sk,lv)]
+        elif pos==1:
+            inherited=int(journey.NPCS[int(n['base_type_id'])]['chushijineng'])
+            skill=formation.SKILLS.get(inherited,{})
+            if skill.get('use_mode(1-active，2-passive)')!='1' or int(skill.get('use_probability',0))<=0:
+                inherited=balance['leader_fallback_skill']
+            u['skills']=[(inherited,lv)]
         out.append(u)
     # [B] A drug debuffs the displayed aggregate once, distributed by base
     # attribute. Allocate rounding in slot order; every living unit retains 1.
@@ -127,6 +204,17 @@ def enemies(s):
     return out
 
 
+def reductions(s,pills):
+    base=enemies(dict(s,reductions=[0]*4));result=[0]*4
+    for used in pills.values():
+        if used not in PILLS:continue
+        for token in PILLS[used].split('/'):
+            idx,value,rate=map(int,token.split('|'))
+            stat=sum(u[('gongji','fangyu','hp','magic')[idx-1]] for u in base)
+            result[idx-1]+=stat*value//100 if rate else value
+    return result
+
+
 def boss(role,s,now):
     from .activity_drug import bag as drug_bag
     units=enemies(s);raw=enemies(dict(s,reductions=[0]*4))
@@ -136,8 +224,8 @@ def boss(role,s,now):
         use_pill_list={int(k):v for k,v in s['pills'].items()},drug_bag=drug_bag(role),drug_material=drug_bag(role)[1]))
 
 
-def shop(s,r):return [dict(a.prize_spec(p['reward']),crystals=p['cost'],buy_times=p['limit']-s['purchases'].get(str(i),0))
-    for i,p in enumerate(r['abyss_shop'],1)]
+def shop(s,r):return [dict(a.prize_spec(p['reward']),crystals=p['cost'],buy_times=max(0,p['limit']-s['purchases'].get(_shop_id(p),0)))
+    for p in s['shop']]
 
 
 def settle(role,req,now,r,jrules,parse):
@@ -158,6 +246,10 @@ def settle(role,req,now,r,jrules,parse):
         data=standings(role,s,now,r);data['top_type']=top
         return [response(7,**data)]
     if op in (1,2):
+        if op==1 and not s.get('starter_received'):
+            grant(role,s,abyss_balance.rules()['starter_rewards']);s['starter_received']=True
+            news(s,'入门补给：药灵丹40颗、银币10万、元宝50。使用药灵丹可到药徒圆满，学习四类初阶配方后炼药挑战。',now)
+            news(s,'炼药等级比配方要求高3级后必出极品；通关获得炼药熟练度、配方与购材银币。同类挂机道具自动堆叠。',now)
         if op==2:
             dest=d.get('des_area');a.require(type(dest)is int and 1<=dest<=s['boss'] and dest in HANG,'该层尚未解锁');s['layer']=dest
         s['pending_news']=[]
@@ -165,7 +257,7 @@ def settle(role,req,now,r,jrules,parse):
     if op==15:
         pending=copy.deepcopy(s.get('pending_news',[]));s['pending_news']=[]
         return [response(15,new_list=pending,specter_info=specter(s,now))]
-    if op==9:return [response(9,day_record=dict(fight_count=s['fight_count'],now_fight_len=0,win_rate=100,
+    if op==9:return [response(9,day_record=dict(fight_count=s['fight_count'],now_fight_len=r['abyss_tick_seconds'],win_rate=100,
         crystals=s['earned'],item_count=s['item_count'],event_count=s['events_finished']),specter_info=specter(s,now))]
     if op==10:return [response(10,bag_info=bag(s,r))]
     if op==5:
@@ -184,13 +276,18 @@ def settle(role,req,now,r,jrules,parse):
     if op in (12,13):
         if op==12:
             i,n=d.get('index'),d.get('count',1)
-            a.require(type(i)is int and 1<=i<=len(r['abyss_shop']) and type(n)is int and n>0,'九幽兑换参数无效')
-            p=r['abyss_shop'][i-1];used=s['purchases'].get(str(i),0)
+            a.require(type(i)is int and 1<=i<=len(s['shop']) and type(n)is int and n>0,'九幽兑换参数无效')
+            if 'shop_day' in d or 'shop_revision' in d:
+                a.require(d.get('shop_day')==s['shop_day'] and d.get('shop_revision')==s['shop_revision'],
+                          '九幽商店已刷新，请重新打开商店')
+            p=s['shop'][i-1];key=_shop_id(p);used=s['purchases'].get(key,0)
             a.require(used+n<=p['limit'] and s['crystals']>=p['cost']*n,'魂晶或兑换次数不足')
-            s['crystals']-=p['cost']*n;s['purchases'][str(i)]=used+n;reward=p['reward']
+            s['crystals']-=p['cost']*n;s['purchases'][key]=used+n;reward=p['reward']
             gain=a.prizes(role,[[reward[0],reward[1],reward[2]*n,reward[3]]]);gain[0]['buy_times']=p['limit']-used-n;gain[0]['crystals']=p['cost']
-            return [response(12,index=i,attach_list=gain,specter_info=specter(s,now),crystal_count=s['crystals'])]
-        return [response(13,shop_list=shop(s,r))]
+            return [response(12,index=i,attach_list=gain,specter_info=specter(s,now),crystal_count=s['crystals'],
+                             shop_day=s['shop_day'],shop_revision=s['shop_revision'])]
+        return [response(13,shop_list=shop(s,r),shop_day=s['shop_day'],shop_revision=s['shop_revision'],
+                          next_refresh=(s['shop_day']+1)*86400-r['timezone_offset_hours']*3600)]
     if op==16:return [response(16,**boss(role,s,now))]
     if op==17:
         a.require(not s.get('complete'),'九幽已通关，无需继续用药')
@@ -200,24 +297,23 @@ def settle(role,req,now,r,jrules,parse):
             a.require(tid in PILLS,'请选择普通属性药品')
             entries=[list(map(int,x.split('|'))) for x in PILLS[tid].split('/')]
             a.require(all(x[0]==slot for x in entries),'药品不适用于此药槽')
+            proposed=dict(s['pills'],**{str(slot):tid})
+            before=enemies(dict(s,reductions=reductions(s,s['pills'])))
+            after=enemies(dict(s,reductions=reductions(s,proposed)))
+            key=('gongji','fangyu','hp','magic')[slot-1]
+            a.require(sum(u[key] for u in after)<sum(u[key] for u in before),
+                      '该药品不能进一步削弱当前冥仙属性，不消耗药品')
         else:
             a.require(tid in combat.DRUGS,'请选择精魄药品')
             before=combat.effects(BOSSES[s['boss']],s['pills'])
             after=combat.effects(BOSSES[s['boss']],dict(s['pills'],**{str(slot):tid}))
             a.require(any(after[k]<v for k,v in before.items()),'该药品不能进一步削弱当前冥仙精魄')
         a.consume(role,tid,1);s['pills'][str(slot)]=tid
-        # [B] Replacing a slot discards its previous effect; recompute reductions
-        # against unmodified boss stats, preventing repeated multiplicative use.
-        s['reductions']=[0]*4;base=enemies(s)
-        for used in s['pills'].values():
-            if used not in PILLS:continue
-            for token in PILLS[used].split('/'):
-                idx,value,rate=map(int,token.split('|'))
-                stat=sum(u[('gongji','fangyu','hp','magic')[idx-1]] for u in base)
-                s['reductions'][idx-1]+=stat*value//100 if rate else value
+        s['reductions']=reductions(s,s['pills'])
         return [response(17,**boss(role,s,now))]
     if op==6:
-        a.require(s['boss_count']<5 and not s.get('complete'),'今日冥仙挑战次数已满或已经通关九幽')
+        a.require(not s.get('complete'),'九幽八十一层已全部通关，可继续挂机、炼药和兑换')
+        a.require(s['boss_count']<5,'今日冥仙挑战次数已用尽，每日0点恢复5次')
         a.require(any(c.get('order') for c in role['corteges']),'请先上阵神仙')
         ours,_=journey.fighters(role,dict(cortege_list=f"{r['battle_npc']}|1"));extras=combat.effects(BOSSES[s['boss']],s['pills']);fight_events=[]
         if extras:
@@ -225,10 +321,15 @@ def settle(role,req,now,r,jrules,parse):
         else:result,lineup,actions=journey.battle(role,{},jrules,units=(ours,enemies(s)))
         s['boss_count']+=1;win=1<=result<=3;gain=[]
         if win:
-            specs=[]
-            for token in BOSSES[s['boss']]['prirze_list'].split('/'):
-                typ,tid,lv,n=map(int,token.split('|'));specs.append([typ,tid,n,lv])
-            gain=grant(role,s,specs)
+            floor=s['boss'];gain=grant(role,s,abyss_balance.victory_rewards(floor))
+            from . import activity_drug as drug
+            xp=abyss_balance.course_total(floor)-abyss_balance.course_total(floor-1)
+            drug.add_exp(role,xp)
+            recipes=s.setdefault('recipes',[])
+            learned=[idx for idx,row in drug.RECIPES.items() if idx not in recipes and
+                     int(row['min_level'])<=min(role['drug_level'],abyss_balance.course_level(floor))]
+            recipes.extend(learned);drug.flags(role,s)
+            news(s,f'通关炼药熟练度+{xp}，领悟药方{len(learned)}种；奖励银币可用于购买下一战药材。',now)
             record=dict(tip=f"{role['role_name']}击败第{s['boss']}层冥仙。",tip_type=3,time=now)
             s.setdefault('fight_news',[]).append(record);s['fight_news']=s['fight_news'][-20:]
             news(s,record['tip'],now)

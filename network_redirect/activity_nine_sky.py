@@ -56,9 +56,9 @@ def load_rules(path=ROOT / 'server_config/nine_sky_rules.json'):
         f.require(all(type(row.get('weight')) is int and 1 <= row['weight'] <= 10000 for row in r[name]), '九重天奖励权重缺失')
     low = [x for x in r['star_shop'] if x.get('tier') == 'low']
     high = [x for x in r['star_shop'] if x.get('tier') == 'high']
-    f.require(len(low) == 9 and len(high) == 4 and
+    f.require(len(low) == 9 and len(high) == 5 and
               [x['reward'] for x in low] == [[5, t, 1, 1] for t in (1022,1023,1041,1033,1006,1032,1024,1042,1007)] and
-              {tuple(x['reward']) for x in high} == {(10,5027,5,1),(10,5036,5,1),(5,1031,5,1),(5,1249,30,1)}, '九重商会奖励池不完整')
+              {tuple(x['reward']) for x in high} == {(10,5027,5,1),(10,5036,5,1),(5,1031,5,1),(5,1249,50,1),(5,1243,1,1)}, '九重商会奖励池不完整')
     f.require(low[0]['cost'] >= 50 and all(x['cost'] < y['cost'] for x,y in zip(low,low[1:])) and
               all(x['limit'] == 1 for x in r['star_shop']), '九重商会定价须递增、每种每日限兑一份')
     return r
@@ -344,8 +344,9 @@ def settle(role, req, now, parse, peers=None):
     if op == 1:
         f.require(not data and text.replace(' ', '').replace('\n', '').replace('\t', '') == '{}', '九重天进入参数无效')
         result = dict(flag=1, role_sky_data=snapshot(s), const_data=dict(one_rock_money=r['one_rock_money']), top_data=top(role, s, peers))
-        if s['palaces']:
-            result['tina_shop'] = palace_data(s, max(map(int, s['palaces'])), r)
+        # Entry is a state query, not a new encounter. Native flag=1 with
+        # tina_shop reopens the previous palace on every visit, even sold out.
+        # Keep its purchase ledger; only roll events may open a palace.
     elif op == 2:
         result = roll(role, s, data, now, r)
     elif op == 3:

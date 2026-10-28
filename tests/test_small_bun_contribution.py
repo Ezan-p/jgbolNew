@@ -159,8 +159,6 @@ class ConsumableTests(unittest.TestCase):
             bad = [dict(item_count=0), dict(item_count=65535), dict(item_count=16),
                    dict(item_count=3), dict(des_type=4), dict(des_id=99999),
                    dict(item_id=99999999), dict(item_id=other)]
-            if tid == 1020:
-                bad.append(dict(item_count=2))
             for overrides in bad:
                 with self.subTest(tid=tid, overrides=overrides):
                     before = self.b.profile()
@@ -215,13 +213,66 @@ class ConsumableTests(unittest.TestCase):
         self.assertEqual(self.b.profile()['strength'], 10)
         self.assertEqual(self.b.profile()['cur_union_contrib'], 200)
 
-    def test_regular_resource_callbacks_and_quotas_remain_valid(self):
+    def test_regular_resource_callbacks_and_counts_remain_valid(self):
         for tid, key in ((1022, 'strength'), (1023, 'energy')):
             before = self.b.profile()
             self.use(tid, self.add(tid), item_count=0)
             self.assertEqual(self.events[21]['effect_value'], 10)
             self.assertEqual(self.b.profile()[key], before[key]+10)
             self.assertEqual(self.b.profile()[key+'_item_count'], before[key+'_item_count']+1)
+
+    def test_resource_batches_inventory_effect_counts_and_replay(self):
+        for tid, key, gain in ((1020, 'strength', 5), (1022, 'strength', 10), (1023, 'energy', 10)):
+            ident = self.add(tid, 301)
+            before = self.b.profile()
+            self.use(tid, ident, item_count=300)
+            self.assertEqual(self.events[21], dict(result=1, type_id=tid, count=300, effect_value=300*gain))
+            after = self.b.profile()
+            self.assertEqual(after[key], before[key]+300*gain)
+            self.assertEqual(after[key+'_item_count'], before[key+'_item_count']+(0 if tid==1020 else 300))
+            self.assertEqual(next(i['count'] for i in after['attachments'] if i['id']==ident), 1)
+            self.assertEqual(self.b.respond(self.packet, {'authenticated': True}), self.replies)
+            self.assertEqual(self.b.profile(), after)
+            self.use(tid, ident, item_count=2)
+            self.assertIn(55, self.events)
+            self.assertEqual(self.b.profile(), after)
+            self.use(tid, ident)
+            self.assertNotIn(55, self.events)
+            self.assertFalse(any(i['id']==ident for i in self.b.profile()['attachments']))
+        before = self.b.profile()
+        self.b.close()
+        self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        after = self.b.profile()
+        for key in ('strength', 'energy', 'strength_item_count', 'energy_item_count', 'attachments'):
+            self.assertEqual(after[key], before[key])
+
+    def test_regular_resources_unlimited_and_reconnect_after_byte_boundary(self):
+        for tid, key, attr in ((1022, 'strength', 55), (1023, 'energy', 57)):
+            ident = self.add(tid, 3)
+            r = self.b.profile()
+            r[key+'_item_count'] = 255
+            self.b.save(r)
+            before = self.b.profile()[key]
+            for _ in range(3):
+                self.use(tid, ident)
+                self.assertNotIn(55, self.events)
+                self.assertEqual(self.events[21]['effect_value'], 10)
+            self.assertEqual(self.b.profile()[key], before+30)
+            self.assertEqual(self.attrs()[attr], 258)
+            # Exhaustion must still reject without crediting resources.
+            self.use(tid, ident)
+            self.assertIn(55, self.events)
+            self.assertEqual(self.b.profile()[key], before+30)
+            # Both login paths encode a bounded legacy snapshot and then the
+            # exact count; the persistent achievement counter remains intact.
+            for reconnect in (False, True):
+                rows = [decode(p) for p in self.b.bootstrap(reconnect=reconnect)]
+                login = next(d for m, _, d in rows if m == 1017)
+                self.assertEqual(login[key+'_item_count'], 255)
+                attrs = {a['type']: a['value'] for m, _, d in rows if m == 1032
+                         and d['unit_type'] == 1 for a in d['attr_list']}
+                self.assertEqual(attrs[attr], 258)
+                self.assertEqual(self.b.profile()[key+'_item_count'], 258)
 
 
 if __name__ == '__main__':

@@ -16,13 +16,14 @@ function ccp(x,y) return {x=x,y=y} end
 tolua={cast=function(n) return n end}
 CCLabelTTF={create=function(_,text) local n=node();n.text=text;return n end}
 local infos,sends,selected={},0,0
-local thresholds={[3]=6,[5]=12,[12]=12,[23]=15,[25]=15,[36]=20,[47]=27}
-local act={activityID={tongtianta=13}}
+local thresholds={[3]=6,[5]=12,[12]=12,[23]=15,[25]=15,[36]=20,[39]=27}
+local act={activityID={tongtianta=13,monday=32,fishrush=27,twoyears=46,
+ rulaitable=49,tower=37,destiny=47,forge=26}}
 function act.getRequireLevel(id) return thresholds[id] or 0 end
 function act.verifyLevel() return true end
 function act.show(id) if act.verifyLevel(id) then sends=sends+1 end end
 local fun={g_funUI={},funConfig={}}
-for _,id in ipairs({3,5,12,13,23,25,36,47,49}) do fun.funConfig[id]={hasCCBI=true} end
+for _,id in ipairs({3,5,12,13,23,25,36,39,47,49,32,27,46,37,26,29}) do fun.funConfig[id]={hasCCBI=true} end
 local fail=false
 function fun.createFunCell(parent,row)
  parent:addChild(node())
@@ -35,7 +36,7 @@ function fun.create()
     unrelated=function() return 42 end}}
  function view:setDelegate(d) self.delegate=d end
  fun.g_funUI.funTableView=view
- fun.g_funUI.fun_list={{id=23,index=1,hint=1},{id=49,index=2}}
+ fun.g_funUI.fun_list={{id=23,index=1,hint=1},{id=29,index=2}}
  return 'native-result'
 end
 local ms={d_activityUI=act,d_funUI=fun,d_mainUI={g_playerInfo={level=1}},
@@ -52,7 +53,9 @@ check('selected-row redraw remains gray',function()
  fun.g_funUI.last_selected=1;assert(draw(23).children[1].color.r==100)
 end)
 check('threshold minus one blocks and exact threshold allows without stale cache',function()
- for _,id in ipairs({3,5,12,13,23,36,47}) do
+ local requested={[32]=15,[27]=20,[46]=20,[49]=20,[37]=20,[47]=30,[26]=30}
+ for id,n in pairs(requested) do assert(act.getRequireLevel(id)==n) end
+ for _,id in ipairs({3,5,12,13,23,36,47,32,27,46,49,37,26}) do
   local n=act.getRequireLevel(id);ms.d_mainUI.g_playerInfo.level=n-1
   local before=sends;act.show(id);assert(sends==before and infos[#infos]=='角色达到'..n..'级开放')
   ms.d_mainUI.g_playerInfo.level=n;act.show(id);assert(sends==before+1)
@@ -61,12 +64,12 @@ check('threshold minus one blocks and exact threshold allows without stale cache
 end)
 check('native regional and dynamic server levels remain live',function()
  thresholds[25]=1;assert(act.getRequireLevel(25)==1)
- thresholds[47]=38;ms.d_mainUI.g_playerInfo.level=37
- assert(not act.verifyLevel(47));assert(infos[#infos]=='角色达到38级开放')
+ thresholds[39]=38;ms.d_mainUI.g_playerInfo.level=37
+ assert(not act.verifyLevel(39));assert(infos[#infos]=='角色达到38级开放')
 end)
 check('no-level activity retains native colors, badge and animation',function()
  ms.d_mainUI.g_playerInfo.level=1
- local p=draw(49);assert(#p.children==2 and p.children[2].badge and p.children[1].animation)
+ local p=draw(29);assert(#p.children==2 and p.children[2].badge and p.children[1].animation)
 end)
 check('native renderer error restores shared config',function()
  fail=true;local ok=pcall(draw,23);fail=false

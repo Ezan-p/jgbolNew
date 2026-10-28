@@ -1,4 +1,5 @@
 {
+  "daily_npc_count": 20,
   "official_server_available": false,
   "classification": {
     "A": [
@@ -11,15 +12,23 @@
       "日伤害榜、福星、NPC阵容查看、排行榜点赞"
     ],
     "B": [
-      "风伯／太上老君／福星按日期与轮次稳定随机",
-      "99名本地NPC及确定性参与模拟",
-      "1000万血首领循环刷新",
-      "伤害、幸运点公式及奖励数量",
-      "每日榜自动入包与未领周奖保留",
-      "节日材料轮换掉落"
+      "风伯／太上老君／福星按日期稳定随机",
+      "每日20名NPC及静态随机伤害，仅用于排名",
+      "1000万血同一首领循环补满，仅玩家扣血",
+      "每10000伤害1蟠桃，单场最多100",
+      "每日榜自动入包，幸运排行和周奖停用",
+      "节日材料独立随机掉落"
     ]
   },
   "files": [
+    {
+      "path": "network_redirect/party_client.lua",
+      "sha256": "bd112377cd9a624ddc5a8e8c4fcd4a10ed763946172f90b059e0220cc65bfeb3"
+    },
+    {
+      "path": "network_redirect/activity_party.py",
+      "sha256": "f25daa0fc540ad51bfd0f0fc2e3c6a0a66128930e06d8b17da7f0fa323e1bc81"
+    },
     {
       "path": "analysis/evidence/lua_named/lua/ui/worldBossUI.lua.txt",
       "sha256": "6c51ae4fde1709b9517f6cde16ea592f929b174422c73fce0bec97e48b3d2049"
@@ -34,11 +43,11 @@
     },
     {
       "path": "server_config/party_rules.json",
-      "sha256": "dc9fd2eae5499023a900c6006710118fd8ecda83cd917d1fe87164e84ebe004d"
+      "sha256": "28c68d0313ef376c023e68470d5d5dcb58e2ab236dcd285437fce2f1ca09ee74"
     },
     {
       "path": "server_config/activity_rules.json",
-      "sha256": "ca9fccfa7394835960e29e2302407dba2492d0d45f0d0fa97d5b1d867a3a79a4"
+      "sha256": "43e9647ea36a64749d5b2231662311021d521769107cee148b496f13f4b135a3"
     }
   ],
   "npcs": [

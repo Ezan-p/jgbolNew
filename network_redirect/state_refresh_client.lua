@@ -41,7 +41,12 @@ do
    return function(item,character)
     if ownPosition() then item=currentItem(item) or item end
     previewCharacter=character
-    return original(item,character)
+    local result=original(item,character)
+    -- Native show sets this before removing the previous popup. That popup's
+    -- exit handler clears it again; restore it after replacement so subsequent
+    -- deltas still know which visible item to redraw.
+    if ownPosition() then position.g_lastItemIntro=item end
+    return result
    end
   end)
   local function refreshPreview()

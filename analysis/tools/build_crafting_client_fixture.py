@@ -1,6 +1,7 @@
 """Run real 3.87 UI callbacks with a disposable backend; never spend live items."""
 import sys
 import tempfile
+from unittest.mock import patch
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT))
@@ -38,7 +39,9 @@ end
 ms.d_mainUI.g_playerInfo=ms.d_c.table_copy(saved.player)
 if ms.d_batchSaleUI._localSaleRestore then ms.d_batchSaleUI._localSaleRestore() end
 if ms.d_forgeUI._localCraftingRestore then ms.d_forgeUI._localCraftingRestore() end
-""",(ROOT/'network_redirect/equipment_client.lua').read_text()]
+if ms.d_forgeUI._localExchangeRestore then ms.d_forgeUI._localExchangeRestore() end
+""",(ROOT/'network_redirect/equipment_client.lua').read_text(),
+ (ROOT/'network_redirect/equipment_exchange_client.lua').read_text()]
  for key in ('level','reborn_layer','silver_coin','gold_coin'):lines.append('ms.d_mainUI.g_playerInfo.'+key+'='+str(role[key]))
  for p in b.inventory(role):
   mid,_,d=decode(p);lines.append('apply('+str(mid)+','+summon.lua(d)+')')
@@ -57,7 +60,8 @@ if ms.d_forgeUI._localCraftingRestore then ms.d_forgeUI._localCraftingRestore() 
  request('forge_query_and_page',1055,flag=0,check="assert(ms.d_forgeUI.canJoin());assert(not ms.d_forgeUI.isNeedUpdateList())")
  request('appointed_compose_callback',1053,compose_type=2,equip_type=2001,equip_quality=5,material_quality=4,material_count=5,material_list=[dict(id=i) for i in forge_ids])
  step('exchange_page','ms.d_forgeUI.ForgeTypeBtnPressed(3);ms.d_forgeUI.targetChanged(1)')
- request('exchange_compose_callback',1053,compose_type=3,equip_type=6001,equip_quality=4,material_quality=4,material_count=5,material_list=[dict(id=i) for i in exchange_ids])
+ with patch.object(c.time, 'time', return_value=b.profile()['equipment_forge']['week_start'] + c.WEEK):
+  request('exchange_compose_callback',1053,compose_type=3,equip_type=6001,equip_quality=4,material_quality=4,material_count=5,material_list=[dict(id=i) for i in exchange_ids])
  step('fragment_page','ms.d_equipPieceUI.show(parent(),6002)')
  request('fragment_compose_callback',1053,compose_type=1,equip_type=2,equip_quality=5,material_quality=5,material_count=1,material_list=[dict(id=fragment)],check='assert(item(%d).count==40)'%fragment)
  step('smith_page','ms.d_mainUI.show();ms.d_mainUI.g_allBoardlayer={};parent():removeChildByTag(ms.d_mainUI.boardID.smith,true);ms.d_smithUI.show(assert(ms.d_data.getTransInfoByTypeid(1313)))')

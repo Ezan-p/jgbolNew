@@ -93,24 +93,32 @@ def client_source(rules):
     template = Path(__file__).with_name('summon_client.lua').read_text(encoding='utf-8')
     template = Path(__file__).with_name('progression_client.lua').read_text(encoding='utf-8') + '\n' + template
     template = Path(__file__).with_name('activity_entry_client.lua').read_text(encoding='utf-8') + '\n' + template
+    template = Path(__file__).with_name('party_client.lua').read_text(encoding='utf-8') + '\n' + template
     template = Path(__file__).with_name('activity_level_client.lua').read_text(encoding='utf-8') + '\n' + template
     from . import vip
     vip_source = Path(__file__).with_name('vip_client.lua').read_text(encoding='utf-8')
     welfare_source = Path(__file__).with_name('welfare_client.lua').read_text(encoding='utf-8')
     monument_source = Path(__file__).with_name('monument_client.lua').read_text(encoding='utf-8')
     equipment_source = Path(__file__).with_name('equipment_client.lua').read_text(encoding='utf-8')
+    equipment_source += '\n' + Path(__file__).with_name('equipment_exchange_client.lua').read_text(encoding='utf-8')
+    equipment_source += '\n' + Path(__file__).with_name('market_client.lua').read_text(encoding='utf-8')
     equipment_source += '\n' + Path(__file__).with_name('state_refresh_client.lua').read_text(encoding='utf-8')
+    equipment_source += '\n' + Path(__file__).with_name('resource_item_client.lua').read_text(encoding='utf-8')
+    equipment_source += '\n' + Path(__file__).with_name('expbook_client.lua').read_text(encoding='utf-8')
+    equipment_source += '\n' + Path(__file__).with_name('tian_shu_client.lua').read_text(encoding='utf-8')
     equipment_source += '\n' + Path(__file__).with_name('skill_client.lua').read_text(encoding='utf-8')
     equipment_source += '\n' + Path(__file__).with_name('soul_refresh_client.lua').read_text(encoding='utf-8')
     reborn_source = Path(__file__).with_name('reborn_client.lua').read_text(encoding='utf-8')
     pray_source = Path(__file__).with_name('pray_client.lua').read_text(encoding='utf-8')
     pray_source = pray_source.replace('__PRAY_COSTS__', lua([int(r['spirit_coins']) for r in rows('pray_spirit_config.csv')]))
     rape_source = Path(__file__).with_name('rape_client.lua').read_text(encoding='utf-8')
-    rank_source = Path(__file__).with_name('rank_client.lua').read_text(encoding='utf-8')
+    from . import activity_rank
+    rank_source = activity_rank.client_source()
     pet_source = Path(__file__).with_name('pet_client.lua').read_text(encoding='utf-8')
     taixu_source = Path(__file__).with_name('taixu_client.lua').read_text(encoding='utf-8')
     babel_source = Path(__file__).with_name('babel_client.lua').read_text(encoding='utf-8')
     home_source = Path(__file__).with_name('home_client.lua').read_text(encoding='utf-8')
+    home_source += '\n' + Path(__file__).with_name('abyss_client.lua').read_text(encoding='utf-8')
     visit_source = Path(__file__).with_name('visit_client.lua').read_text(encoding='utf-8')
     pavilion_source = Path(__file__).with_name('pavilion_client.lua').read_text(encoding='utf-8')
     from . import activity_pavilion

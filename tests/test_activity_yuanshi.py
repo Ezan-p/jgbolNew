@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 from test_activity import ActivityCase
 
-NOW = 1793150400  # 2026-10-28 12:00 UTC+8, safely inside the 28-day season
+NOW = 1793150400  # Safely inside the 2026-10-26 through 2026-11-09 fortnight.
 from network_redirect import activity_yuanshi as y, formation, summon
 from network_redirect.backend import Backend, login_fields
 from network_redirect.protocol import encode, decode
@@ -49,6 +49,79 @@ class YuanshiTests(ActivityCase):
         cfg = next(c[24]['yuanshi_info'] for c in configs if 24 in c)
         self.assertLess(cfg['begin_time'], NOW)
         self.assertGreater(cfg['end_time'], NOW)
+        self.assertTrue(cfg['permanent'])
+        self.assertEqual(cfg['refresh_time'], cfg['end_time'])
+        self.assertEqual(cfg['end_time'] - cfg['begin_time'], 14 * 86400)
+
+    def test_fortnight_boundary_clears_all_activity_resources_and_pending_offerings(self):
+        self.data(self.call())
+        role = self.b.profile(); s = role['activity']['yuanshi']; end = s['end']
+        s.update(progress=100, claimed=True, free=7, wishes=35, wish_days=10,
+                 wished_today=True, offering_stock=12, bag_bought=1, charge_gold=500,
+                 activated=[s['day']], gift_counts=[9], entitlement_day=s['day'], activation_day=s['day'])
+        summon.add_item(role, 1807, 11); summon.add_item(role, 1808, 2)
+        stack = next(i for i in role['attachments'] if i['type_id'] == 1807)
+        role['attachments'].append(dict(stack, id=formation.new_id(role), count=3, is_lock=True))
+        y.grant_yuanshi(role); role.setdefault('souls', {})['5046'] = 17
+        role.setdefault('welfare', {})['mails'] = {
+            'mixed': dict(claimed=False, prizes=[[5, 1807, 4, 1], [5, 1808, 1, 1]], mail_body='mixed'),
+            'only': dict(claimed=False, prizes=[[5, 1807, 2, 1]], mail_body='only')}
+        kept = copy.deepcopy({k: role[k] for k in ('gold_coin', 'corteges', 'souls')})
+        y.state(role, end - 1, y.load_rules())
+        self.assertEqual(role['activity']['yuanshi']['progress'], 100)
+        self.assertTrue(any(i['type_id'] == 1807 for i in role['attachments']))
+        fresh = y.state(role, end, y.load_rules())
+        self.assertEqual(fresh, y.state({}, end, y.load_rules()))
+        self.assertEqual(fresh['end'], end + 14 * 86400)
+        self.assertFalse(any(i['attach_type'] == 5 and i['type_id'] == 1807 for i in role['attachments']))
+        self.assertEqual(sum(i['count'] for i in role['attachments'] if i['type_id'] == 1808), 2)
+        self.assertEqual({k: role[k] for k in kept}, kept)
+        self.assertEqual(role['welfare']['mails']['mixed']['prizes'], [[5, 1808, 1, 1]])
+        self.assertTrue(role['welfare']['mails']['only']['claimed'])
+        summon.add_item(role, 1807, 1)
+        y.state(role, end + 1, y.load_rules())
+        self.assertTrue(any(i['type_id'] == 1807 for i in role['attachments']), 'reset repeated within cycle')
+
+    def test_legacy_28_day_save_migrates_deadline_then_resets_once(self):
+        role = self.b.profile(); old = dict(y.load_rules(), period_days=28)
+        s = y.state(role, NOW, old); s.update(progress=70, free=0, gift_counts=[2])
+        summon.add_item(role, 1807, 3)
+        new = y.state(role, NOW, y.load_rules())
+        self.assertEqual((new['progress'], new['gift_counts']), (70, [2]))
+        self.assertEqual(new['end'] - new['start'], 14 * 86400)
+        self.assertTrue(any(i['type_id'] == 1807 for i in role['attachments']))
+        self.assertEqual(y.state(role, new['end'], y.load_rules())['progress'], 0)
+        self.assertFalse(any(i['type_id'] == 1807 for i in role['attachments']))
+        # An old save first opened in the second half must reset immediately.
+        role = self.b.profile(); s = y.state(role, NOW, old); s['progress'] = 80
+        summon.add_item(role, 1807, 3)
+        self.assertEqual(y.state(role, s['start'] + 14 * 86400, y.load_rules())['progress'], 0)
+
+    def test_offline_multiple_cycles_bootstrap_and_restart(self):
+        self.data(self.call(2)); self.charge(2)
+        r = self.b.profile(); summon.add_item(r, 1807, 3); self.b.save(r)
+        future = self.ys()['end'] + 28 * 86400
+        with patch('network_redirect.backend.time.time', return_value=future):
+            self.b.bootstrap()
+            self.assertEqual(self.amount(1807), 0)
+            self.assertEqual((self.ys()['progress'], self.ys()['gift_counts'], self.ys()['offering_stock']), (0, [], 0))
+            self.data(self.call(2)); self.assertEqual(self.ys()['free'], 0)
+            self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+            self.assertEqual(self.data(self.call())['free_times'], 0)
+
+    def test_charge_at_rollover_starts_first_tier_and_cannot_claim_old_tiers(self):
+        self.charge(2); self.data(self.call(1, 1))
+        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+            self.charge(2)
+        end = self.ys()['end']
+        with patch('network_redirect.backend.time.time', return_value=end):
+            self.charge(1)
+            self.assertEqual(self.ys()['charge_gold'], 100)
+            self.assertEqual(self.ys()['gift_counts'], [1])
+            self.assertEqual(len(self.ys()['activated']), 1)
+            self.assertEqual(self.amount(1807), 0)
+            self.assertEqual(self.call(1, 2)[0][0], 55)
+            self.data(self.call(1, 1)); self.assertEqual(self.amount(1807), 1)
 
     def test_free_offering_progress_claim_then_souls(self):
         r = self.b.profile(); summon.add_item(r, 1807, 10); self.b.save(r)

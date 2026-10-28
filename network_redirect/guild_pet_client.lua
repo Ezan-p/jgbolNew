@@ -162,6 +162,31 @@ do
    -- Use its first timer for the active deadline, with only one timer closure.
    if data.rest_time then data.last_time=data.rest_time;data.rest_time=false end
    local menu=ms.d_u.createMenu
+   local gethz,styles=ms.d_hz.gethz,ms.d_u.createByStyles
+   if data.trial_reward_mode=='silver_peach' then
+    local function amount(floor,typ,tid)
+     local row=(data.train_prize or {})[floor] or {}
+     for _,item in pairs(row.prize_list or {}) do
+      if item.object_type==typ and item.attach_type==tid then return item.attach_count end
+     end
+     return 0
+    end
+    local silverRow,peachRow=0,0
+    local labels={pet_reward_info1='通关一层累计',pet_reward_info2='通关二层累计',pet_reward_info3='通关三层累计',
+     pet_reward_info4='银两×',pet_reward_info5='蟠桃×',pet_reward_info11='蟠桃×',
+     pet_reward_info6='四层：银两×'..amount(4,12,0)..' 蟠桃×'..amount(4,5,1001)}
+    ms.d_hz.gethz=function(key,...) return labels[key] or gethz(key,...) end
+    ms.d_u.createByStyles=function(style,...)
+     if style.type=='label' and type(style.string)=='string' then
+      if style.string:find('银两×',1,true)==1 then
+       silverRow=silverRow+1;style.string='银两×'..amount(silverRow,12,0)
+      elseif style.string=='蟠桃×' then
+       peachRow=peachRow+1;style.string='蟠桃×'..amount(peachRow,5,1001)
+      elseif style.string==labels.pet_reward_info6 then style.fontsize=16 end
+     end
+     return styles(style,...)
+    end
+   end
    ms.d_u.createMenu=function(options,...)
     local filtered={}
     for k,v in pairs(options) do if type(k)~='number' then filtered[k]=v end end
@@ -172,6 +197,7 @@ do
    end
    local ok,result=pcall(createTrial,...)
    ms.d_u.createMenu=menu
+   ms.d_hz.gethz=gethz;ms.d_u.createByStyles=styles
    if not ok then error(result) end
    return result
   end)
@@ -179,6 +205,12 @@ do
   local prize=pet.GetResultPrize
   replace(pet,'GetResultPrize',function(data,...)
    if data.result~=1 or not data.trial_state then return prize(data,...) end
+   if data.trial_state.trial_reward_mode=='silver_peach' then
+    pet.g_self.g_data=data.trial_state
+    pet.updataShiLianLayer()
+    ms.d_messageUI.createGetItemsLayer(pet.g_self.g_Shilian_layer,{result=1,attach_list=data.prize_list},500)
+    return
+   end
    -- Preserve the native reputation/capture counters, then attach rewards to
    -- the refreshed page so rebuilding the next floor cannot destroy the popup.
    local popup=ms.d_messageUI.createGetItemsLayer

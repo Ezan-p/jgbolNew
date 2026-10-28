@@ -40,6 +40,10 @@ class ItemRewardTests(unittest.TestCase):
                     self.assertEqual(got, {(k,t,lv):n*2 for k,t,n,lv in rule['prizes']})
                 else:
                     allowed = {(k,t,lv) for g in rules['pools'][rule['pool']] for k,t,n,lv in g['candidates']}
+                    if rule['mode'] == 'fixed_random':
+                        allowed.update((k,t,lv) for k,t,n,lv in rule['prizes'])
+                        for k,t,n,lv in rule['prizes']:
+                            self.assertGreaterEqual(got[k,t,lv], n*2)
                     self.assertTrue(set(got) <= allowed)
                 for (kind, target, level), count in got.items():
                     profile = self.b.profile()
@@ -51,6 +55,130 @@ class ItemRewardTests(unittest.TestCase):
                 before = self.b.profile()
                 self.assertEqual(self.b.respond(self.packet, {'authenticated': True}), self.replies)
                 self.assertEqual(before, self.b.profile())
+
+    def test_market_qiankun_gifts_purchase_and_open_give_full_quantities(self):
+        role = self.b.profile()
+        role['gold_coin'] = 1000
+        self.b.save(role)
+        def amount(tid):
+            return sum(i['count'] for i in self.b.profile()['attachments']
+                       if i['attach_type'] == 5 and i['type_id'] == tid)
+        goods = self.req(1057, first_send=1, page_id=2)[0][1]['rich_item_list'][204]
+        self.assertEqual((goods['type_id'], goods['count'], goods['buy_price']), (1206, 1, 100))
+        for purchase_count in (1, 2):
+            before = amount(1206)
+            gold = self.b.profile()['gold_coin']
+            result = self.req(1057, first_send=0, page_id=2, index=204,
+                              type_id=1206, count=purchase_count)[0][1]
+            self.assertEqual(result['result'], 1)
+            self.assertEqual(result['attach_list'][1]['attach_count'], purchase_count)
+            self.assertEqual(amount(1206)-before, purchase_count)
+            self.assertEqual(self.b.profile()['gold_coin'], gold-100*purchase_count)
+            packet, replies = self.packet, self.replies
+            self.assertEqual(self.b.respond(packet, {'authenticated': True}), replies)
+            self.assertEqual(amount(1206)-before, purchase_count)
+        gifts = [i for i in self.b.profile()['attachments'] if i['type_id'] == 1206]
+        self.assertEqual(len(gifts), 3)
+        for gift in gifts:
+            self.assertEqual(gift['count'], 1)
+            before = amount(1015)
+            result = self.use(1206, gift['id'])[-1]
+            self.assertEqual(result[0], 21)
+            prize = result[1]['attach_list'][1]
+            self.assertEqual((prize['attach_type'], prize['attach_count']), (1015, 100))
+            self.assertEqual(amount(1015)-before, 100)
+            packet, replies = self.packet, self.replies
+            self.assertEqual(self.b.respond(packet, {'authenticated': True}), replies)
+            self.assertEqual(amount(1015)-before, 100)
+        self.assertEqual(amount(1206), 0)
+
+    def test_seven_gifts_every_bonus_exact_fixed_inventory_and_replay(self):
+        rules = r.load_rules()
+        baseline = self.b.profile()
+        for tid in (1247, 1084, 1085, 1086, 1098, 1099, 1205):
+            rule = rules['items'][str(tid)]
+            self.assertEqual(rule['mode'], 'fixed_random')
+            for group in rules['pools'][rule['pool']]:
+                for prize in group['candidates']:
+                    with self.subTest(tid=tid, prize=prize):
+                        self.b.save(copy.deepcopy(baseline))
+                        ident = self.add(tid)
+                        before = self.b.profile()
+                        with patch.object(r, 'draw', return_value=prize) as draw:
+                            event = self.use(tid, ident)[-1]
+                        self.assertEqual(event[0], 21, event)
+                        draw.assert_called_once()
+                        expected = Counter()
+                        for k,t,n,lv in rule['prizes'] + [prize]:
+                            expected[k,t,lv] += n
+                        got = {(p['object_type'],p['attach_type'],p['attach_level']):p['attach_count']
+                               for p in event[1]['attach_list'].values()}
+                        self.assertEqual(got, dict(expected))
+                        after = self.b.profile()
+                        self.assertFalse(any(x['id']==ident for x in after['attachments']))
+                        for (kind,target,level),count in expected.items():
+                            if kind in (11,12):
+                                field = 'gold_coin' if kind==11 else 'silver_coin'
+                                self.assertEqual(after[field]-before[field],count)
+                            else:
+                                def amount(role):
+                                    return sum(x['count'] for x in role['attachments']
+                                               if (x['attach_type'],x['type_id'],x.get('level',1))
+                                               ==(kind,target,level))
+                                self.assertEqual(amount(after)-amount(before),count)
+                                if target in (1090,1091,1092):
+                                    stones = [x for x in after['attachments']
+                                              if x['type_id']==target and x.get('level',1)==level]
+                                    self.assertTrue(all(x['count']==1 for x in stones))
+                        # Acquiring a gold card does not redeem it or recharge.
+                        self.assertEqual(after.get('vip_level'),before.get('vip_level'))
+                        self.assertEqual(after.get('charge_gold'),before.get('charge_gold'))
+                        self.assertEqual(after.get('recharge'),before.get('recharge'))
+                        self.assertEqual(self.b.respond(self.packet, {'authenticated':True}),self.replies)
+                        self.assertEqual(after,self.b.profile())
+
+    def test_seven_gifts_batch_draws_and_same_level_stone_merge(self):
+        ident = self.add(1247,count=3)
+        with patch.object(r,'draw',side_effect=[[11,1,400,1],[5,1156,2,1],[11,1,500,1]]) as draw:
+            event = self.use(1247,ident,3)[-1]
+        self.assertEqual(event[0],21,event)
+        self.assertEqual(draw.call_count,3)
+        got = {(p['object_type'],p['attach_type'],p['attach_level']):p['attach_count']
+               for p in event[1]['attach_list'].values()}
+        self.assertEqual(got,{(12,1,1):300000,(5,1001,1):300,(11,1,1):900,(5,1156,1):2})
+        ident = self.add(1205,count=2)
+        with patch.object(r,'draw',side_effect=[[5,1090,1,1],[5,1090,1,4]]):
+            event = self.use(1205,ident,2)[-1]
+        got = {(p['attach_type'],p['attach_level']):p['attach_count']
+               for p in event[1]['attach_list'].values()}
+        self.assertEqual(got,{(1090,1):3,(1090,4):1,(1091,1):2,(1092,1):2})
+
+    def test_seven_gifts_allowlist_and_level_scope(self):
+        for source,target in ((1085,1249),(1086,1031),(1086,1032),(1086,1033),(1086,1034)):
+            r.valid_prize([5,target,1,1],source)
+        for source,target,level in ((1084,1032,1),(1085,1085,1),(1086,1247,1),
+                                    (1081,1249,1),(1205,1090,5),(1085,1090,2),(1205,1001,2)):
+            with self.assertRaises(ValueError):
+                r.valid_prize([5,target,1,level],source)
+        # Sharing a whitelisted pool must not grant that permission to other gifts.
+        rules = r.load_rules()
+        rules['items']['1081'] = dict(mode='random',pool='seasonal_1085',reason='test')
+        with patch.object(r.json,'loads',return_value=rules), self.assertRaises(ValueError):
+            r.load_rules()
+
+    def test_seven_gifts_currency_overflow_and_encoding_failure_are_atomic(self):
+        ident = self.add(1247)
+        role = self.b.profile(); role['gold_coin']=2147483647; self.b.save(role)
+        before = self.b.profile()
+        with patch.object(r,'draw',return_value=[11,1,400,1]):
+            self.assertEqual(self.use(1247,ident)[-1][0],55)
+        self.assertEqual(before,self.b.profile())
+        role['gold_coin']=1000; self.b.save(role)
+        before = self.b.profile()
+        with patch.object(r,'draw',return_value=[5,1152,1,1]), \
+                patch.object(self.b,'inventory',side_effect=ValueError('wire failure')):
+            self.assertEqual(self.use(1247,ident)[-1][0],55)
+        self.assertEqual(before,self.b.profile())
 
     def test_all_weight_tickets_exact_and_all_candidates_reachable(self):
         # Exhausting integer tickets verifies precise mass and both ends of every interval.

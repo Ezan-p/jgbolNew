@@ -11,7 +11,6 @@ from .protocol import encode, decode
 ROOT = Path(__file__).resolve().parents[1]
 require = formation.require
 SCORE = summon.rows('top_score.csv')
-EXCHANGE = {int(v['index']): v for v in summon.rows('top_score_exchange.csv')}
 
 
 @lru_cache(maxsize=1)
@@ -19,13 +18,28 @@ def rules():
     r = json.loads((ROOT/'server_config/rank_rules.json').read_text())
     require(r['mode'] == 'inferred' and 10 <= r['size'] <= 20000, '封神榜配置无效')
     require(1 <= r['offline_days'] <= 30 and 1 <= r['records'] <= 20, '封神榜存储上限无效')
-    require(r['tick_seconds'] == 1800 and r['token_chances'] == 3, '封神榜原版时间或令牌配置无效')
+    require(r['tick_seconds'] == 86400 and r['token_chances'] == 3, '封神榜每日结算或令牌配置无效')
     require(0 < r['max_extra_chances'] <= 65500, '封神榜额外次数无效')
     require(bool(r['cards']), '封神榜奖池为空')
     for row in r['cards']:
         require(len(row) == 5 and all(type(x) is int and x >= 0 for x in row), '封神榜奖池无效')
         require(row[0] == 5 and row[1] in formation.ITEMS and row[2] > 0 and row[3] == 1 and row[4] > 0, '封神榜奖励无效')
     return r
+
+
+# Keep extracted original CSVs intact; UI and server share the configured rules.
+EXCHANGE = {v['index']: dict(score=v['score'], promote_order=v['promote_order'],
+    **{'prize_list(object_type|sub_type|count/...)': '|'.join(map(str,v['prize']))})
+    for v in rules()['exchanges']}
+
+
+def client_source():
+    exchange = [dict(score=v['score'], promoteOrder=v['promote_order'],
+        object_type=v['prize'][0], sub_type=v['prize'][1], count=v['prize'][2])
+        for v in rules()['exchanges']]
+    scores = [dict(upper=int(v['begin']), lower=int(v['end']), score=int(v['day_score'])) for v in SCORE]
+    return Path(__file__).with_name('rank_client.lua').read_text().replace(
+        '__RANK_EXCHANGES__', summon.lua(exchange)).replace('__RANK_DAILY_SCORES__', summon.lua(scores))
 
 
 @lru_cache(maxsize=1)
@@ -43,7 +57,24 @@ def catalog():
     candidates.sort(key=lambda n: (-n['role']['role_combat_power'], n['npc_id']))
     # Equally spaced absolute-power samples: permanent opponents, no player scaling.
     size = rules()['size']
-    return {930000+i: candidates[(i-1)*(len(candidates)-1)//(size-2)] for i in range(1, size)}
+    ladder = {930000+i: candidates[(i-1)*(len(candidates)-1)//(size-2)] for i in range(1, size)}
+    # Keep permanent scene IDs (and saved swaps) intact; only replace five templates.
+    elite_keys = rules().get('elite_npcs', [])
+    if elite_keys:
+        require(len(elite_keys) == 5 and len(set(elite_keys)) == 5, '封神榜前五配置无效')
+        elites = npc_players.source_file(rules()['elite_catalog'])
+        for order, key in enumerate(elite_keys, 1):
+            require(key in elites, '封神榜前五模板不存在')
+            npc = npc_players.decorate(elites[key])
+            require(npc['battle_validation']['status'] != 'replay_limit_observed', '封神榜前五模板回放风险')
+            combat_power.recalculate(npc['role'], formation.load_rules())
+            require(npc['role']['role_combat_power'] > ladder[930000+order]['role']['role_combat_power'],
+                    '封神榜前五战力须高于原模板')
+            ladder[930000+order] = npc
+        powers = [n['role']['role_combat_power'] for n in ladder.values()]
+        require(powers == sorted(powers, reverse=True), '封神榜战力顺序无效')
+        require(len({n['npc_id'] for n in ladder.values()}) == len(ladder), '封神榜模板重复')
+    return ladder
 
 
 def score(order, column='score'):
@@ -64,19 +95,26 @@ def prepare(role, now, arules):
         s.update(rank_version=1, rank_order=order, rank_clock=now, rank_day=day,
                  rank_day_best=order, rank_previous_best=0, rank_pending_score=0,
                  rank_extra=0, rank_origin_order=order, rank_slots={}, rank_records=[], rank_defence_day=day)
-    s.setdefault('rank_pending_score', 0)
+    if s.get('rank_reward_version', 1) < 2:
+        # Preserve claims by rank threshold, never by the newly reordered row ID.
+        old_to_new = {6: 4, 7: 5, 8: 9, 9: 10}
+        s['rank_promotions'] = sorted({old_to_new[i] for i in s.get('rank_promotions', []) if i in old_to_new})
+        # A pending legacy daily award is credited once during migration.
+        s['rank_score'] = min(16777215, s['rank_score'] + s.get('rank_pending_score', 0))
+        s.update(rank_reward_version=2, rank_pending_score=0)
     old_day = s['rank_day']
     if day > old_day:
-        s['rank_previous_best'] = s['rank_day_best'] if day == old_day+1 else s['rank_order']
-        s['rank_pending_score'] = score(s['rank_previous_best'], 'day_score')
+        elapsed = day-old_day
+        s['rank_previous_best'] = s['rank_day_best'] if elapsed == 1 else s['rank_order']
+        if role['level'] >= 6:
+            days = min(elapsed, r['offline_days'])
+            first_order = s['rank_day_best'] if elapsed <= r['offline_days'] else s['rank_order']
+            gain = score(first_order, 'day_score') + (days-1)*score(s['rank_order'], 'day_score')
+            s['rank_score'] = min(16777215, s['rank_score']+gain)
+            role['top_day_prize_time'] = day*86400-arules['timezone_offset_hours']*3600
         s.update(rank_day=day, rank_day_best=s['rank_order'], rank_extra=0)
-    if role['level'] >= 6 and now >= s['rank_clock']:
-        ticks = min((now-s['rank_clock'])//r['tick_seconds'], r['offline_days']*48)
-        if ticks:
-            s['rank_score'] = min(16777215, s['rank_score'] + ticks*score(s['rank_order']))
-            s['rank_clock'] = now-(now-s['rank_clock'])%r['tick_seconds']
-    elif role['level'] < 6:
-        s['rank_clock'] = max(now, s['rank_clock'])
+    s.update(rank_pending_score=0, rank_claimed=True)
+    s['rank_clock'] = max(now, s['rank_clock'])
     role.update(top_order=s['rank_order'], top_score=s['rank_score'], top_fight_count=s['rank_count'],
                 top_fight_count_plus=s['rank_extra'], top_first_promote_time=masks(s)[0], top_first_promote_prize=masks(s)[1])
     return s
@@ -119,7 +157,7 @@ def board(role):
     rows = []
     for order in sorted(orders | set(range(1, 11))):
         if order == s['rank_order']:
-            c = next((c for c in role['corteges'] if c.get('order') == 1),role['corteges'][0])
+            c = next((c for c in role['corteges'] if c.get('order') == 1),next(iter(role['corteges']), {'type': 4061}))
             rows.append(dict(id=role['role_id'], type=1, order=order, name=role['role_name'], level=role['level'], cortege=c['type'], cortege_layer=c.get('evolve_level',0), top_relation=1))
         else:
             row = opponent(s, order)
@@ -133,7 +171,8 @@ def board(role):
 def client_state(role):
     s = role['activity']
     return summon.event(80, dict(local_rank=dict(previous_best=s['rank_previous_best'], pending_score=s['rank_pending_score'],
-        current_order=s['rank_order'])))
+        current_order=s['rank_order'], score=s['rank_score'],
+        promote_time=masks(s)[0], promote_prize=masks(s)[1])))
 
 
 def units(role):
@@ -232,17 +271,15 @@ def settle(role, mid, req, now, arules, jrules):
                 summon.event(80,dict(local_rank_show_records=True))]
     if mid == 1051:
         n = req['item_count'] or 1
-        require(1 <= n <= 100 and req['des_type'] in (0,1) and req['des_id'] in (0,role['role_id']), '封神令牌使用参数无效')
-        require(req['item_id'] == 0 or any(i['id']==req['item_id'] and i['type_id']==1021 and i['attach_type']==5 and not i.get('owner_id') and not i.get('is_lock') for i in role['attachments']), '封神令牌不存在')
-        require(s['rank_extra']+3*n <= rules()['max_extra_chances'], '今日额外挑战次数已达上限')
-        a.consume(role,1021,n); s['rank_extra'] += 3*n
+        require(type(n) is int and 1 <= n <= 100 and req['des_type'] in (0,1) and req['des_id'] in (0,role['role_id']), '封神令牌使用参数无效')
+        require(req['item_id'] == 0 or any(i['id']==req['item_id'] and i['type_id']==1021 and i['attach_type']==5 and i['count']>0 and not i.get('owner_id') and not i.get('equip_pos') and not i.get('is_lock') for i in role['attachments']), '封神令牌不存在')
+        gain = rules()['token_chances'] * n
+        require(s['rank_extra']+gain <= rules()['max_extra_chances'], '今日额外挑战次数已达上限')
+        a.consume(role,1021,n); s['rank_extra'] += gain
         prepare(role,now,arules)
-        return [client_state(role),board(role),summon.event(21,dict(result=1,type_id=1021,count=n))]
+        return [client_state(role),summon.event(21,dict(result=1,type_id=1021,count=n,effect_value=gain))]
     if mid == 1201:
-        require(s['rank_pending_score']>0 and not s['rank_claimed'], '暂无昨日奖励或今日已领取')
-        gain = s['rank_pending_score']; s['rank_score'] = min(16777215,s['rank_score']+gain)
-        s['rank_pending_score']=0; s['rank_claimed']=True; role['top_day_prize_time']=now
-        return [client_state(role),board(role),summon.event(34,dict(attach_count=gain))]
+        raise formation.Rejected('排名日积分每日零点自动入账，无需手动领取')
     if mid == 1203:
         cfg = EXCHANGE.get(req['exchange_type']); require(cfg is not None,'积分兑换项目无效')
         cost, promotion = int(cfg['score']), int(cfg['promote_order'])
@@ -253,5 +290,8 @@ def settle(role, mid, req, now, arules, jrules):
             claims.append(req['exchange_type'])
         s['rank_score'] -= cost
         specs = [[int(v) for v in x.split('|')]+[1] for x in cfg['prize_list(object_type|sub_type|count/...)'].split('/')]
-        return [client_state(role),board(role),summon.event(36,a.prizes(role,specs))]
+        rewards = a.prizes(role,specs)
+        prepare(role,now,arules)
+        # Refresh the open exchange page in place; 1022 navigates back to the board.
+        return [client_state(role),summon.event(36,rewards)]
     raise formation.Rejected('封神榜操作无效')

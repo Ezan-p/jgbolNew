@@ -1,0 +1,31 @@
+test_same_order_is_account_scoped (tests.test_recharge.GoldCardRechargeTests) ... ERROR
+test_month_boundaries_and_replayed_old_order (tests.test_xianling.XianlingTests) ... ERROR
+test_enter_and_bootstrap (tests.test_xianling.XianlingTests) ... ok
+
+======================================================================
+ERROR: test_same_order_is_account_scoped (tests.test_recharge.GoldCardRechargeTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_recharge.py", line 164, in test_same_order_is_account_scoped
+    self.stock(1, 0)
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_recharge.py", line 41, in stock
+    if large: summon.add_item(role, 1152, large)
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/summon.py", line 233, in add_item
+    role['attachments'].append(dict(id=next_id(role), attach_type=5, type_id=type_id, count=count, level=1))
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/summon.py", line 213, in next_id
+    state = role['summon']
+KeyError: 'summon'
+
+======================================================================
+ERROR: test_month_boundaries_and_replayed_old_order (tests.test_xianling.XianlingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_xianling.py", line 69, in test_month_boundaries_and_replayed_old_order
+    with patch('network_redirect.backend.time.time',return_value=nov-1):self.assertEqual(self.req()[-1][1]['month_charge'],5000)
+KeyError: 'month_charge'
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.931s
+
+FAILED (errors=2)
+Compared using HEAD item_rewards.py and HEAD item_reward_rules.json in memory; other workspace files unchanged.

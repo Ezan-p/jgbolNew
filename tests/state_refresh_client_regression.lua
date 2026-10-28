@@ -24,7 +24,11 @@ local parent={
 }
 local position={g_isQuitBoard=false,g_charPosUI={charInfoLayer=parent,isReadOnly=false},tagDef={usedItemIntro=29}}
 position.showItemIntro=function(item)
- position.g_lastItemIntro=item;preview={level=item.level,effect=item.effect_value};previewCount=previewCount+1;open=true
+ position.g_lastItemIntro=item
+ -- Original 3.87 removes the old node after assigning the new selection;
+ -- the removed node's exit callback clears g_lastItemIntro.
+ if open then position.g_lastItemIntro=nil end
+ preview={level=item.level,effect=item.effect_value};previewCount=previewCount+1;open=true
 end
 local equipment={showEnhanceLayer=function(_,item) return item end}
 local ms={d_packageUI=bag,d_lineupUI=lineup,d_charPositionUI=position,d_equipmentUpgradeUI=equipment,
@@ -55,6 +59,7 @@ assert(selected.csvInfo.name=='weapon')
 bag.getDateFormServer({first_send=true,attach_list={item(4,175)}})
 lineup.updateItemInfo({id=11,fields={level=5,effect_value=200}})
 assert(selected.level==5 and selected.effect_value==200 and preview.effect==200)
+assert(position.g_lastItemIntro==selected,'old popup exit discarded the new selection')
 checks[#checks+1]='equipment keeps its live reference across chunks, consecutive snapshots and deltas'
 local hero={id=1,type=5001,level=3,culture_point=100,cur_exp=0,hp_plus=0}
 lineup.getDateFormServer({first_send=true,cortege_list={hero}})
@@ -77,6 +82,7 @@ lineup.getDateFormServer({first_send=false,cortege_list={{id=1,type=5001,level=1
 assert(lineup.g_characterInfo[1]~=hero)
 checks[#checks+1]='removed instances and converted types are not resurrected from old indexes'
 position.g_charPosUI.isReadOnly=true
+open=false
 position.showItemIntro(stale)
 local calls=previewCount
 lineup.updateItemInfo({id=11,fields={level=7,effect_value=250}})

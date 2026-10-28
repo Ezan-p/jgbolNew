@@ -75,14 +75,14 @@ class ActivityTests(ActivityCase):
         self.ok(self.req(1026,fight_type=4,des_type=1,des_id=0,des_value=0))
         r=self.b.profile();self.assertEqual(r['rule_index'],56);self.assertEqual(r['corteges'][0]['hp'],hp+20)
         self.assertEqual(self.req(1026,fight_type=4,des_type=1)[0][0],55)
-    def test_rank_fight_claim_and_exchange_original_csv(self):
+    def test_rank_fight_daily_score_and_exchange(self):
         self.ok(self.req(1021,flag=0));self.ok(self.req(1026,fight_type=2,des_type=2,des_value=99,des_id=930099))
         r=self.b.profile();self.assertEqual(r['activity']['rank_order'],99)
         self.assertEqual(self.req(1201,flag=2)[0][0],55)
         with patch('network_redirect.backend.time.time',return_value=NOW+86400):
-            self.ok(self.req(1201,flag=2));self.assertEqual(self.req(1201,flag=2)[0][0],55)
-        self.ok(self.req(1203,exchange_type=7));before=self.b.profile()
-        self.assertEqual(self.req(1203,exchange_type=7)[0][0],55);self.assertEqual(before,self.b.profile())
+            self.ok(self.req(1021,flag=0));self.assertEqual(self.req(1201,flag=2)[0][0],55)
+        self.ok(self.req(1203,exchange_type=5));before=self.b.profile()
+        self.assertEqual(self.req(1203,exchange_type=5)[0][0],55);self.assertEqual(before,self.b.profile())
     def test_rank_rejects_forged_target_and_insufficient_energy(self):
         before=self.b.profile();self.assertEqual(self.req(1026,fight_type=2,des_type=2,des_value=1,des_id=77)[0][0],55)
         self.assertEqual(before,self.b.profile())
@@ -185,10 +185,14 @@ class ActivityTests(ActivityCase):
         for col in (2,3):self.ok(self.req(1353,id=2,data=summon.lua(dict(target_pos=dict(row=1,column=col)))))
         self.assertEqual(self.b.profile()['activity']['babel']['coin_count'],50)
     def test_babel_shop_costs_limits_and_restoration(self):
-        self.ok(self.req(1353,id=1,data='{}'));r=self.b.profile();s=r['activity']['babel'];s.update(life=50,energy=20);summon.add_item(r,20000,1000);self.b.save(r)
-        self.ok(self.req(1353,id=8,data='{}'))
-        self.ok(self.req(1353,id=4,data='{index=2,count=5}'))
-        before=self.b.profile();self.assertEqual(self.req(1353,id=4,data='{index=2,count=1}')[0][0],55);self.assertEqual(before,self.b.profile())
+        self.ok(self.req(1353,id=1,data='{}'));r=self.b.profile();s=r['activity']['babel'];s.update(life=50,energy=20);summon.add_item(r,20000,1000);summon.add_item(r,20016,1);self.b.save(r)
+        shop=next(data['data'] for event,data in self.req(1353,id=8,data='{}')
+                   if event==203 and data['id']==8)
+        index=max(range(1,7), key=lambda i: shop['my_shop'][i]['limit'])
+        buy_count=shop['my_shop'][index]['limit']
+        cost=shop['my_shop'][index]['need_coin'];r=self.b.profile();summon.add_item(r,20000,cost*buy_count+200);self.b.save(r)
+        self.ok(self.req(1353,id=4,data=summon.lua(dict(index=index,count=buy_count))))
+        before=self.b.profile();self.assertEqual(self.req(1353,id=4,data=summon.lua(dict(index=index,count=1)))[0][0],55);self.assertEqual(before,self.b.profile())
         self.ok(self.req(1353,id=10,data='{item_type=20016,count=1}'))
         self.ok(self.req(1353,id=11,data='{}'))
         r=self.b.profile();self.assertEqual(r['activity']['babel']['energy'],30);self.assertEqual(r['activity']['babel']['life'],100)
@@ -214,7 +218,8 @@ class UndergoTests(ActivityCase):
             self.assertEqual(before,self.b.profile())
     def test_undergo_shop_and_day_prize(self):
         self.ok(self.req(1349,id=1,data='{}'))
-        r=self.b.profile();summon.add_item(r,1366,1000);self.b.save(r)
+        self.ok(self.req(1349,id=3,data='{}'))
+        r=self.b.profile();summon.add_item(r,1366,10000);self.b.save(r)
         self.ok(self.req(1349,id=5,data='{index=1,count=1}'))
         self.assertEqual(self.req(1349,id=7,data='{index=1}')[0][0],55)
         r=self.b.profile();r['activity']['undergo']['challenge_passed']=list(range(101,110));self.b.save(r)
@@ -421,8 +426,9 @@ class HomeAbyssTests(ActivityCase):
         self.assertEqual(self.req(1329,id=20,data='{index=1}')[0][0],55);self.assertEqual(before,self.b.profile())
         for i,n in ((1,2),(2,1),(3,8)):
             self.ok(self.req(1329,id=23,data=summon.lua(dict(index1=1,index2=i,count=n))))
-        self.ok(self.req(1329,id=21,data='{index=1}'))
-        r=self.b.profile();self.assertEqual(r['drug_study_flag'],1);self.assertEqual(r['drug_exp'],10)
+        with patch('network_redirect.activity_drug.secrets.randbelow',return_value=0):
+            self.ok(self.req(1329,id=21,data='{index=1}'))
+        r=self.b.profile();self.assertEqual(r['drug_study_flag'],2);self.assertEqual(r['drug_exp'],10)
         self.assertEqual(self.req(1329,id=21,data='{index=1}')[0][0],55)
         self.ok(self.req(1329,id=17,data='{index=1,type_id=1501}'))
         r=self.b.profile();self.assertEqual(r['activity']['abyss']['reductions'][0],10000)
@@ -481,7 +487,11 @@ class LandTests(ActivityCase):
         self.assertEqual(self.land(4,flag=1,des_type=1,des_id=942001)[0][0],55)
         s=self.b.profile()['activity']['land'];self.assertEqual(s['soul_count'],100);self.assertEqual(s['travel_count'],1)
     def test_charm_unlock_equip_unequip_and_atomic_compose(self):
-        self.ok(self.land(1));r=self.b.profile();s=r['activity']['land'];s['soul_count']=10000;s['bag']={'1':{'5':4}};self.b.save(r)
+        self.ok(self.land(1))
+        charm_query=self.land(6)[-1][1]
+        self.assertEqual(len(charm_query['charm_show']),44)
+        self.assertEqual(charm_query['charm_show'][1],dict(unlock=True,is_open=False,key=0,value=0))
+        r=self.b.profile();s=r['activity']['land'];s['soul_count']=10000;s['bag']={'1':{'5':4}};self.b.save(r)
         self.ok(self.land(7,index=1,is_unlock=False));self.ok(self.land(8,index=1,key=1,value=5))
         self.assertEqual(self.b.profile()['activity']['land']['bag']['1']['5'],3)
         self.ok(self.land(8,index=1,key=0,value=0));self.assertEqual(self.b.profile()['activity']['land']['bag']['1']['5'],4)
@@ -497,9 +507,13 @@ class LandTests(ActivityCase):
         self.ok(self.land(12));self.ok(self.land(4,flag=1,des_type=3,des_id=1,cur_num=1))
         pending=self.b.profile()['activity']['land']['boss'];self.assertIsNotNone(pending)
         self.assertEqual(self.land(4,flag=1,des_type=3,des_id=1,cur_num=1)[0][0],55)
-        before=self.b.profile()['gold_coin'];self.ok(self.land(14,index=1));self.assertEqual(before,self.b.profile()['gold_coin'])
+        # A card can itself award gold; verify the fee after including that gain.
+        gold=lambda spec:spec[2] if spec[0]==11 else 0
+        before=self.b.profile()['gold_coin'];self.ok(self.land(14,index=1))
+        self.assertEqual(before+gold(pending['rewards'][0]),self.b.profile()['gold_coin'])
         self.assertEqual(self.land(14,index=1)[0][0],55)
-        self.ok(self.land(14,index=2));self.assertEqual(self.b.profile()['gold_coin'],before-20)
+        self.ok(self.land(14,index=2))
+        self.assertEqual(self.b.profile()['gold_coin'],before-20+sum(gold(p) for p in pending['rewards'][:2]))
         for i in (3,4):self.ok(self.land(14,index=i))
         last=self.land(14,index=5);self.ok(last);self.assertEqual(last[-1][1]['extra_prize_list'][1]['attach_count'],20)
         self.assertEqual(self.land(14,index=5)[0][0],55)

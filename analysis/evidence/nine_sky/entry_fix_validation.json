@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-27",
+  "passed": true,
+  "issue": "Repeated entry replayed the last palace, including sold-out offers.",
+  "fix": "No tina_shop in entry response; client strips legacy entry palace data and clears its cached encounter. Roll palace events unchanged.",
+  "tests": {
+    "backend": 24,
+    "lua51": 11,
+    "native_cocos": 31,
+    "timed_ten_roll_animation": true
+  },
+  "runtime": {
+    "client_hot_patch_installed": true,
+    "installation_result": "nine-sky-entry-fix installed; refreshed=false",
+    "server_restart_performed": false
+  },
+  "account_resources_modified": false,
+  "animation_note": "First run caught unrelated panel polling; scoped request assertion to tower protocol 1309 and reran successfully, all sends remain captured.",
+  "source_sha256": {
+    "network_redirect/activity_nine_sky.py": "0ef39e10b4b90db89fb6377e4494192398b32bba26e240782c67a0488c503047",
+    "network_redirect/nine_sky_client.lua": "f0fe1029e8d93f23ca40b49691001d8cc7f2b534c1cb988594a077817554ac23"
+  }
+}

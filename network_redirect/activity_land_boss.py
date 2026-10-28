@@ -28,12 +28,39 @@ def migrate_scores(s):
     s['score_version']=2
 
 
+def migrate_inverse(s,r):
+    """Restore inverse-tower unlocks from progress/history in older saves."""
+    unlocked=set()
+    raw_unlocked=s.get('unlocked',[])
+    for value in raw_unlocked if isinstance(raw_unlocked,(list,tuple,set)) else ():
+        if type(value) is int and 1<=value<=r['land_boss_layers']:
+            unlocked.add(value)
+    # A cleared inverse layer could only have been reached after its unlock.
+    # Older saves did not persist the separate unlock list, so derive it from
+    # the authoritative progress/history fields.
+    progress=s.get('inv_boss_layer',0)
+    if type(progress) is int and progress>0:
+        unlocked.update(range(1,min(progress,r['land_boss_layers'])+1))
+    history=s.get('inv_history',{})
+    for key in history if isinstance(history,dict) else ():
+        try:layer=int(key)
+        except (TypeError,ValueError):continue
+        if 1<=layer<=r['land_boss_layers']:
+            unlocked.add(layer)
+    s['unlocked']=sorted(unlocked)
+    s.setdefault('hell_counts',{})
+
+
 def boss(s,r,hell=False,layer=None):
     passed=s['inv_boss_layer' if hell else 'boss_layer'];layer=layer or min(passed+1,r['land_boss_layers'])
     enemy=encounters.encounter(layer,hell)
+    counts=s.get('hell_counts',{})
+    used=counts.get(str(layer),0)
+    if type(used) is not int:used=0
+    remaining=max(0,r['land_hell_daily']-used) if hell else r['land_hell_daily']
     return dict(boss_layer=layer,type_id=enemy['type_id'],name=enemy['name'],fight_power=enemy['power'],cortege_count=len(enemy['units']),
-        need_soul=r['land_boss_soul']*layer,score=score(s,s['grid_count']),isweeken=False,is_open=not hell or layer in s['unlocked'],
-        unlock_layer=layer,unlock_soul=r['land_hell_unlock_soul'],can_fight_count=r['land_hell_daily']-s['hell_counts'].get(str(layer),0),
+        need_soul=r['land_boss_soul']*layer,score=score(s,s['grid_count']),isweeken=False,is_open=not hell or layer in s.get('unlocked',[]),
+        unlock_layer=layer,unlock_soul=r['land_hell_unlock_soul'],can_fight_count=remaining,
         fight_count_limit=r['land_hell_daily'],cur_num=s['grid_count'])
 
 
@@ -98,8 +125,9 @@ def settle(role,s,op,d,now,r,jrules):
             a.require(layer in s['unlocked'] and row['can_fight_count']>0,'冥界未解锁或挑战次数不足')
             s['hell_counts'][str(layer)]=s['hell_counts'].get(str(layer),0)+1
         a.spend(s,'soul_count',row['need_soul'])
-        result,replay=land.simulate(role,s,r,jrules,layer*(3 if hell else 2),row['cortege_count'],n,
-                                  encounter=encounters.encounter(layer,hell));win=1<=result<=3
+        encounter=encounters.encounter(layer,hell)
+        result,replay=land.simulate(role,s,r,jrules,encounter['level'],row['cortege_count'],n,
+                                  encounter=encounter);win=1<=result<=3
         old=s[history].get(str(layer),{});earned=score(s,n)
         newscore=max(old.get('score',0),earned) if win else old.get('score',0)
         reward=win and layer>s[progress]
@@ -109,7 +137,9 @@ def settle(role,s,op,d,now,r,jrules):
                 s[history][str(layer)]=dict(score=newscore,cur_num=n)
         land.news(s,now,f"{'冥界' if hell else '普通'}首领第{layer}层：{'胜利' if win else '未获胜'}。")
         if reward:
-            s[key]=dict(layer=layer,cards=[],rewards=[copy.deepcopy(secrets.choice(r['land_card_rewards'])) for _ in range(3 if hell else 5)])
+            # sample returns distinct pool entries in random position order.
+            rewards=secrets.SystemRandom().sample(r['land_card_rewards'],3 if hell else 5)
+            s[key]=dict(layer=layer,cards=[],rewards=copy.deepcopy(rewards))
         return land.replay_response(4,s,r,replay,fight_type=4 if hell else 3,des_level=layer,is_win=win,is_reward=reward,
             return_soul=0,card_list=[],cost_gold_list=r['land_card_gold'])
     if op in (14,23):
@@ -128,7 +158,7 @@ def settle(role,s,op,d,now,r,jrules):
         a.require(s['boss_layer']>0 and not s['swept'] and s['boss'] is None,'没有可扫荡首领或今日已扫荡')
         s['swept']=True;gains=[]
         for layer in range(1,s['boss_layer']+1):
-            p=copy.deepcopy(r['land_card_rewards'][0]);gains.append(a.prizes(role,[p]))
+            gains.append(a.prizes(role,r['land_sweep_rewards']))
         return [response(13,sweep_list=gains)]
     if op in (28,29):
         # Original enum has no active request caller; return persisted history only.

@@ -73,11 +73,42 @@ class WelfareTests(unittest.TestCase):
   self.assertEqual(r,self.b.profile())
   self.req(1111,event_id=251,data='{item_id=101,order_id="welfare-order-002",large_count=0,small_count=2}')
   self.assertEqual(self.b.profile()['gold_coin'],360)
- def test_upgrade_after_deadline_uses_frozen_level(self):
-  self.ready();self.assertTrue(self.error(self.claim(7)))
-  role=self.b.profile();role['welfare']['start']=NOW-31*86400;role['welfare']['last_level']=20;self.b.save(role)
+ def test_upgrade_after_old_deadline_uses_current_level(self):
+  self.ready()
+  role=self.b.profile();role['welfare']['start']=NOW-31*86400;role['welfare']['last_level']=20;role['welfare']['end_level']=20;self.b.save(role)
   before=self.b.profile()['gold_coin'];self.assertFalse(self.error(self.claim(7)))
-  self.assertEqual(self.b.profile()['gold_coin']-before,300)
+  self.assertEqual(self.b.profile()['gold_coin']-before,1500)
+ def test_permanent_growth_level_boundaries_and_lifetime_claim(self):
+  for level,amount in [(9,0),(10,100),(19,100),(20,300),(29,300),(30,600),(39,600),(40,1000),(49,1000),(50,1500),(99,1500)]:
+   with self.subTest(level=level):
+    role=self.b.profile();role['level']=level
+    role.pop('welfare',None);self.b.save(role)
+    before=self.b.profile()['gold_coin']
+    catalog=welfare.catalog(role,NOW,self.b.welfare_rules)[7]
+    self.assertTrue(catalog['permanent']);self.assertEqual(catalog['end_time'],0)
+    self.assertEqual(catalog['can_take'],amount>0)
+    self.assertEqual(self.error(self.claim(7)),amount==0)
+    self.assertEqual(self.b.profile()['gold_coin']-before,amount)
+    if amount:
+     role=self.b.profile();role['level']=99;self.b.save(role)
+     self.assertTrue(self.error(self.claim(7)))
+     self.assertFalse(welfare.catalog(role,NOW+400*86400,self.b.welfare_rules)[7]['can_take'])
+ def test_growth_replay_restart_and_legacy_claim(self):
+  self.ready();packet=encode(1127,dict(serial_num=500,act_type=7,index=0,flag=2));auth=dict(authenticated=True)
+  with patch('network_redirect.backend.time.time',return_value=NOW):
+   first=self.b.respond(packet,auth);saved=self.b.profile()
+   self.assertEqual(first,self.b.respond(packet,auth));self.assertEqual(saved,self.b.profile())
+  self.b.close();self.b=Backend(Path(self.tmp.name),1,lambda *a,**k:None)
+  before=self.b.profile();self.assertTrue(self.error(self.claim(7)));self.assertEqual(before,self.b.profile())
+  self.assertEqual(saved['gold_coin'],before['gold_coin'])
+  self.assertIn('7:0',before['welfare']['claims'])
+ def test_growth_invalid_index_and_red_dot(self):
+  self.ready();before=self.b.profile()
+  self.assertTrue(self.error(self.claim(7,1)));self.assertEqual(before,self.b.profile())
+  def flag():
+   data=login_fields(decode(welfare.hint(self.b.profile(),NOW,self.b.welfare_rules))[2]['data'])
+   return data[24]['activity_info']['had_prize_flag'][7]
+  self.assertTrue(flag());self.claim(7);self.assertFalse(flag())
  def test_atomic_exchange_and_invalid_requests(self):
   for a,i in [(0,0),(255,1),(32,255),(33,255),(35,255),(71,101),(74,255),(48,0)]:
    before=self.b.profile();self.assertTrue(self.error(self.claim(a,i)));self.assertEqual(before,self.b.profile())

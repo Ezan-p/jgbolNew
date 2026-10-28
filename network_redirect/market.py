@@ -1,6 +1,7 @@
 """Original market wire/UI contract [A], explicit local server policy [B]."""
 import json
 import math
+import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -31,21 +32,22 @@ def load_rules(path=RULES_PATH):
     require(integer(rules.get('cheap_daily_limit'), 1, 1000))
     require(integer(rules.get('max_batch_count'), 1, 999))
     p = rules['panic']
-    # [A] String.plist sales1 explicitly promises Tue/Thu 12:00 and 18:00.
-    require(p.get('weekdays') == [1, 3] and p.get('hours') == [12, 18])
+    # User schedule: Tue/Thu/Sat, retaining native 12:00 and 18:00 sessions.
+    require(p.get('weekdays') == [1, 3, 5] and p.get('hours') == [12, 18])
     require(integer(p['stock'], 1, 100000))
-    for key in ('first', 'second'):
-        item = p[key]
-        require(item['type_id'] in NAMES and item['type_id'] in formation.ITEMS
-                and formation.ITEMS[item['type_id']]['can_stack'] == '1')
-        require(integer(item['count'], 1, 10000) and integer(item['price'], 1, 1000000))
-    discounts = p['first']['discounts']
-    require(isinstance(discounts, list) and len(discounts) == 6
-            and all(type(d) in (float, int) and math.isfinite(d) and 0 < d <= 1
-                    and math.floor(p['first']['price'] * d) >= 1 for d in discounts)
-            and discounts == sorted(discounts, reverse=True))
-    require(integer(p['second']['panic_price'], 1, p['second']['price']))
-    require(integer(p['second']['per_buy_limit'], 1, 10000))
+    require(p['stock'] == 3 and p['per_buy_limit'] == 1 and p['discount_percent'] == 70)
+    require(isinstance(p.get('pairs'), list) and 1 <= len(p['pairs']) <= 1000)
+    for pair in p['pairs']:
+        require(integer(pair.get('weight'), 1, 1000000))
+        for key in ('first', 'second'):
+            item = pair[key]
+            require(item['type_id'] in NAMES and item['type_id'] in formation.ITEMS)
+            require(formation.ITEMS[item['type_id']]['can_stack'] == '1' or item['count'] == 1)
+            require(integer(item['count'], 1, 10000) and integer(item['price'], 2, 1000000))
+    for type_id, override in rules.get('cheap_overrides', {}).items():
+        require(int(type_id) in NAMES)
+        for key, value in override.items():
+            require(key in ('count', 'origin_price') and integer(value, 1, 1000000))
     return rules
 
 
@@ -65,15 +67,39 @@ def sale_time(now, rules):
     return max(active) if active else min(t for t in candidates if t >= now)
 
 
+def rotation_start(now, rules):
+    start = day_start(now, rules)
+    weekday = datetime.fromtimestamp(start + rules['reset_utc_offset_hours'] * 3600, timezone.utc).weekday()
+    return start - next(d for d in range(7) if (weekday - d) % 7 in rules['panic']['weekdays']) * 86400
+
+
+def selected_pair(state, rules):
+    pair = rules['panic']['pairs'][state['pair_index']]
+    return (dict(pair['first'], discounts=[0.7] * 6, panic_price=pair['first']['price'] * 70 // 100),
+            dict(pair['second'], panic_price=pair['second']['price'] * 70 // 100,
+                 per_buy_limit=rules['panic']['per_buy_limit']))
+
+
 def prepare(role, now, rules):
     state = role.setdefault('market', {})
     day = day_start(now, rules)
     if state.get('day') != day:
         state.update(day=day, purchases={})
-    start = sale_time(now, rules)
-    if state.get('panic', {}).get('sale_time') != start:
-        state['panic'] = dict(sale_time=start, sold=0, last_buy_item1=0,
-                              has_buy_item2=0, item1_sale_price=rules['panic']['first']['price'])
+    cycle = rotation_start(now, rules)
+    if state.get('panic', {}).get('rotation_start') != cycle:
+        # Stable independent draw per role/cycle: queries, failures and restarts
+        # cannot reroll the candidate. Consecutive identical draws are allowed.
+        seed = f"market-pairs:{role.get('role_id', 0)}:{cycle}".encode()
+        pairs = rules['panic']['pairs']
+        ticket = int.from_bytes(hashlib.sha256(seed).digest(), 'big') % sum(p['weight'] for p in pairs)
+        for index, pair in enumerate(pairs):
+            if ticket < pair['weight']:
+                break
+            ticket -= pair['weight']
+        state['panic'] = dict(rotation_start=cycle, pair_index=index, sold=0,
+                              last_buy_item1=0, has_buy_item2=0,
+                              item1_sale_price=rules['panic']['pairs'][index]['first']['price'] * 70 // 100)
+    state['panic']['sale_time'] = sale_time(now, rules)
     return state
 
 
@@ -83,14 +109,14 @@ def attachment(type_id, count):
 
 def panic_snapshot(role, now, rules):
     state = prepare(role, now, rules)['panic']
-    first, second = rules['panic']['first'], rules['panic']['second']
+    first, second = selected_pair(state, rules)
     return dict(activity_data=dict(
         sale_time=state['sale_time'],
         sale_index=rules['panic']['hours'].index((state['sale_time'] - day_start(state['sale_time'], rules)) // 3600) + 1,
         item1_sale_count=max(0, rules['panic']['stock'] - state['sold']),
         item1_sale_price=state['item1_sale_price'],
         sale_item=[dict(item=attachment(first['type_id'], first['count']), price=first['price'],
-                        panic_discount=first['discounts']),
+                        panic_discount=first['discounts'], panic_price=first['panic_price']),
                    dict(item=attachment(second['type_id'], second['count']), price=second['price'],
                         panic_price=second['panic_price'], per_buy_limit=second['per_buy_limit'])]),
         role_data=dict(last_buy_item1=state['last_buy_item1'], has_buy_item2=state['has_buy_item2']))
@@ -108,6 +134,8 @@ def catalog(role, now, rules):
         object_type, type_id, count = map(int, raw['type_id'].split('|'))
         index, page = int(raw['index']), int(raw['page_id'])
         price = int(raw['buy_price'])
+        override = rules.get('cheap_overrides', {}).get(str(type_id), {}) if page == 1 else {}
+        count = override.get('count', count)
         # [A] Native monthCardUI promises one extra discounted Soul Fate Pill
         # per day. The same remaining quantity is enforced by buy(), so expiry
         # or renewal changes eligibility without resetting today's purchases.
@@ -119,20 +147,29 @@ def catalog(role, now, rules):
             vip_level=int(raw['vip_level']), order=int(raw['order']),
             # [B] missing original-price fields: use matching normal unit price,
             # or the actual price when no normal listing survives.
-            origin_price=normal_prices[type_id] * count if type_id in normal_prices else price,
+            origin_price=override.get('origin_price', normal_prices[type_id] * count if type_id in normal_prices else price),
             begin_time=state['day'], end_time=state['day'] + 86400 - 1,
             buy_limit_times=max(0, daily_limit - state['purchases'].get(str(index), 0))
                             if page == 1 else 0, is_day_limit=1)
     from . import cheer
     result['rich_item_list'].update(cheer.market_goods(role))
-    from . import activity_nine_sky
-    result['rich_item_list'].update(activity_nine_sky.market_goods(now))
+    from . import equipment_crafting
+    forge_goods = equipment_crafting.market_goods()
+    for row in forge_goods.values():
+        row['name'] = NAMES[row['type_id']]
+    result['rich_item_list'].update(forge_goods)
     result.update(panic_buy_list=panic_snapshot(role, now, rules),
                   item_begin_time=0, item_end_time=0, server_time=now)
     return result
 
 
 def grant(role, type_id, count):
+    # Some original seasonal gifts cannot stack; preserve each inventory ID.
+    if formation.ITEMS[type_id]['can_stack'] == '0':
+        for _ in range(count):
+            role['attachments'].append(dict(id=formation.new_id(role), attach_type=5,
+                type_id=type_id, count=1, level=1, equip_order=0, equip_pos=0))
+        return
     item = next((i for i in role['attachments'] if i['attach_type'] == 5 and i['type_id'] == type_id), None)
     if item:
         if item['count'] + count > 2147483647:
@@ -165,11 +202,14 @@ def buy(role, request, now, rules):
     state = role['market']['purchases']
     state[str(index)] = state.get(str(index), 0) + count
     return dict(first_send=0, result=1, type_id=row['type_id'], count=count,
-                index=index, page_id=page)
+                index=index, page_id=page, attach_list=[attachment(row['type_id'], row['count'] * count)])
 
 
 def current_price(now, start, first):
-    # [A] Lua math.floor(price * discounts[ceil(elapsed / 600)]).
+    # Fixed-price pools use the same integer quote for preview and settlement.
+    if 'panic_price' in first:
+        return first['panic_price']
+    # Legacy stepped-price contract. [A] Lua floor(price * discount).
     if start < now <= start + 3600:
         return math.floor(first['price'] * first['discounts'][(now - start - 1) // 600])
     return first['price']
@@ -188,12 +228,12 @@ def panic_buy(role, request, now, rules, expected_sale_time):
             raise Rejected(5)
         if state['last_buy_item1'] and now < state['last_buy_item1'] + 10:
             raise Rejected(1)
-        item = rules['panic']['first']
+        item = selected_pair(state, rules)[0]
         price = current_price(now, start, item)
     elif index == 2:
         if state['sold'] < rules['panic']['stock']:
             raise Rejected(4)
-        item = rules['panic']['second']
+        item = selected_pair(state, rules)[1]
         if state['has_buy_item2'] >= item['per_buy_limit']:
             raise Rejected(3)
         price = item['panic_price']

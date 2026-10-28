@@ -170,7 +170,7 @@ class GuildNpcCombatTests(unittest.TestCase):
         with patch('network_redirect.guild_instances.simulate',return_value=fake):
             for _ in range(3):self.request(80)
         role=self.backend.profile();a=role['guild']['instances']
-        self.assertEqual(a['train_hp'],9700)
+        self.assertEqual(a['train_hp'],a['train_bosses'][0]['hp']-300)
         self.assertEqual(a['train_end'],NOW+self.backend.guild_rules['train_seconds'])
         a.update(train_cleared=1,train_floor=2,train_hp=20000,train_floor_attempts=0);self.backend.save(role)
         self.assertEqual(self.request(79)[-1][2]['result'],58)

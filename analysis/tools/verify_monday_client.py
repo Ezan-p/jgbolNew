@@ -22,7 +22,7 @@ def main():
     finally:
         script.unload();session.detach()
     checks=list(login_fields(result.get('result','')).values()) if result.get('status')==0 else []
-    passed=len(checks)==8 and all(c['passed'] for c in checks)
+    passed=len(checks)==9 and all(c['passed'] for c in checks)
     out=ROOT/'analysis/evidence/monday';out.mkdir(exist_ok=True)
     (out/'client_validation.json').write_text(json.dumps(dict(passed=passed,checks=checks,raw=result,
         native_cocos=True,network_sends_captured=True,detached_layer=True,live_resources_changed=False),ensure_ascii=False,indent=2)+'\n')

@@ -172,7 +172,7 @@ def main():
         # Native result touch handler only closes the result overlay.
         check('ascension result closes onto the refreshed soul list', 'ms.d_feishengUI.onTouch()')
         capture('souls_after_ascension.png')
-        report['rendered_first_ascension'] = json.loads(evaluate('return package.loaded.ms.d_json.encode({rows=soulTest.rows,labels=soulTest.labels})'))
+        report['rendered_first_ascension'] = json.loads(evaluate('local rows={};for id,row in pairs(soulTest.rows) do rows[tostring(id)]=row end;return package.loaded.ms.d_json.encode({rows=rows,labels=soulTest.labels})'))
         check('spending the final soul stack clears native rows and the captured row count',
               f'ms.d_feishengUI.show({tid},soulTest.info({tid}));' + stages[1] +
               ';assert(#ms.d_data.g_soulsInfoTable==0);assert(#soulTest.state().currentShowTable==0);assert(soulTest.state().currentTableView.dataSource.tableViewNumberOfRows()==1)')

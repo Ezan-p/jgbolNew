@@ -230,6 +230,7 @@ class GuildTests(unittest.TestCase):
             with self.subTest(op=op,d=d):self.ok(op,**d)
     def test_search_shop_and_card(self):
         self.create();self.ok(26);self.ok(43,flag=1)
+        role=self.role();role['guild']['instances']['layer']=1;self.b.save(role)
         self.ok(43,flag=2);self.ok(43,flag=2);self.ok(43,flag=3);self.ok(43,flag=4,index=1)
         r=self.role();self.assertEqual(r['guild']['instances']['points'],0)
         self.assertEqual(self.req(43,flag=4,index=1)[-1][1],55);self.assertEqual(self.role(),r)
@@ -374,11 +375,16 @@ class GuildTests(unittest.TestCase):
         self.assertEqual(self.req(14)[-1][1],55);self.assertEqual(before,self.role())
         self.assertEqual(self.ok(34)[-1][2]['require_pop'],50)
         self.ok(36,count=50);self.ok(14)
+        self.ok(43,flag=1)
+        role=self.role();role['guild']['instances']['layer']=1;self.b.save(role)
         before=self.role();self.ok(43,flag=6);after=self.role()
-        self.assertEqual(before['gold_coin']-after['gold_coin'],10)
+        gold_reward=sum(x['attach_count'] for x in after['guild']['instances']['board'] if x['object_type']==11)
+        self.assertEqual(before['gold_coin']-after['gold_coin'],10-gold_reward)
         self.assertEqual(len({x['index'] for x in after['guild']['instances']['board']}),5)
         self.assertEqual(self.req(43,flag=6)[-1][1],55);self.assertEqual(after,self.role())
         with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+            self.ok(43,flag=1)
+            r=self.role();r['guild']['instances']['layer']=1;self.b.save(r)
             r=self.role();r['gold_coin']=0;self.b.save(r);before=self.role()
             self.assertEqual(self.req(43,flag=6)[-1][1],55);self.assertEqual(before,self.role())
 
@@ -393,8 +399,10 @@ class GuildTests(unittest.TestCase):
 
     def test_feast_statistics_and_expiry(self):
         self.create();self.prepare_feast();self.ok(65,feast_type=1);self.ok(67,gift_type=2,count=2);self.ok(66,des_id=1)
-        row=self.ok(18,query_type=15)[-1][2]['fortune_info'][1]
+        self.assertEqual(self.ok(18,query_type=15)[-1][2]['order'],0)
+        row=next(v for v in self.role()['guild']['unions']['2']['feast']['stats'].values() if v['id']==1)
         self.assertEqual((row['fortune'],row['contribute'],row['advanced_gift']),(105,100,2))
+        self.assertEqual(self.role()['monument_wealth']['current']['advanced_gift'],2)
         with patch('network_redirect.backend.time.time',return_value=NOW+86401):
             data=next(d['feast_data'] for m,i,d in self.ok(18,query_type=14) if m==1301 and i==18)
             self.assertFalse(data['can_rece_award']);self.assertFalse(data['gift_data'][1]['can_grab'])
@@ -465,10 +473,10 @@ class GuildTests(unittest.TestCase):
             self.ok(80)
             for _ in range(3):self.ok(78)
             before=self.role();self.assertEqual(self.req(78)[-1][1],55);self.assertEqual(before,self.role())
-        a=self.role()['guild']['instances'];self.assertEqual(a['train_hp'],9900)
+        a=self.role()['guild']['instances'];self.assertEqual(a['train_hp'],149900)
         self.assertEqual(a['train_support'],3);self.assertEqual(sum(v['damage'] for v in a['train_damage'].values()),100)
         data=self.ok(79)[-1][2];self.assertEqual(data['rest_time'],NOW+3600)
-        self.assertEqual(data['boss_info']['boss_hp'],9900)
+        self.assertEqual(data['boss_info']['boss_hp'],149900)
 
     def test_escort_protection_raid_and_blacklist(self):
         self.ok(4,union_id=1)
@@ -509,8 +517,8 @@ class GuildTests(unittest.TestCase):
         self.ok(82);self.assertEqual(self.role()['guild']['instances']['train_claimed_stage'],1)
         before=self.role();self.assertEqual(self.req(82)[-1][1],55);self.assertEqual(before,self.role())
         r=self.role();r['guild']['instances'].update(train_hp=0,train_done=True);self.b.save(r)
-        self.ok(82);self.assertEqual(self.role()['guild']['instances']['reputation'],40)
-        self.assertEqual(self.role()['guild']['unions']['2']['money'],1400)
+        self.ok(82);self.assertEqual(self.role()['guild']['instances']['reputation'],0)
+        self.assertEqual(self.role()['guild']['unions']['2']['money'],1000)
 
     def test_capture_token_and_abandon_contract(self):
         from network_redirect import journey
@@ -527,6 +535,7 @@ class GuildTests(unittest.TestCase):
     def test_search_board_persists_and_matches_granted_prize(self):
         self.create();first=self.ok(43,flag=1)[-1][2]
         self.assertEqual(len(first['prize_items']),18);self.assertEqual(set(first['search_order'].values()),set(range(1,19)))
+        role=self.role();role['guild']['instances']['layer']=1;self.b.save(role)
         second=self.ok(43,flag=1)[-1][2];self.assertEqual(first['prize_items'],second['prize_items'])
         self.ok(43,flag=2);a=self.role()['guild']['instances']
         self.assertTrue(a['search_tiles'][0]['had_token'])

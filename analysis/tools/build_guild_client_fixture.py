@@ -70,7 +70,7 @@ local function captureMenu(run,firstLine)
  local found;local original=ms.d_u.createMenu
  withOverride(ms.d_u,'createMenu',function(options,...)
   for _,v in pairs(options) do
-   if type(v)=='table' and type(v.call_back)=='function' and debug.getinfo(v.call_back,'S').linedefined==firstLine then found=v.call_back end
+   if type(v)=='table' and type(v.call_back)=='function' and (debug.getinfo(v.call_back,'S').linedefined==firstLine or v.npic==firstLine) then found=v.call_back end
   end
   return original(options,...)
  end,run)
@@ -275,7 +275,7 @@ end)""")
  lines.append("step('team_native_floor_label',function() local ui=ms.d_secretAreaUI;local found;local create=ms.d_u.createByStyle;withOverride(ms.d_u,'createByStyle',function(options,...) if type(options.string)=='string' and options.string:find('今日秘境开启层数',1,true) then found=options.string end;return create(options,...) end,function() ui.showTeamPage() end);assert(found and found:find('1 / 3',1,true),'floor display confused attempts with progress: '..tostring(found));assert(ui.g_self.fight_count==2) end)")
  lines.append("step('treasure_capture_count',function() guild_count_labels={};local create=ms.d_u.createByStyles;guild_count_create=create;ms.d_u.createByStyles=function(options,...) local text=options.string;if type(text)=='string' and text:find('今日可免费探宝次数',1,true) then guild_count_labels[#guild_count_labels+1]=text end;return create(options,...) end end)")
  request('treasure_status',43,flag=1)
- lines.append("step('treasure_native_click',function() local ui=ms.d_secretAreaUI;local press=captureMenu(function() ui.showPrizePage(ui.g_self.main_layer) end,1671);press() end)")
+ lines.append("step('treasure_native_click',function() local ui=ms.d_secretAreaUI;local press=captureMenu(function() ui.showPrizePage(ui.g_self.main_layer) end,'v2/secretArea/explore1.png');press() end)")
  request('treasure_move',43,flag=2)
  lines.append("step('treasure_remaining_after_one',function() local ui=ms.d_secretAreaUI;assert(ui.g_self.free_times==4);assert(ui.g_self.prize_data.free_times==4);assert(guild_count_labels[#guild_count_labels]:find('4',1,true),'visible count did not refresh') end,32)")
  request('treasure_sweep',43,flag=6)

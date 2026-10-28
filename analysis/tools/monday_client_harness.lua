@@ -59,6 +59,13 @@ check('closure switches back to preview and resets balance',function()
  ui.onGetActivityStatus(FIXTURE.next)
  assert(ui.g_mondayUI.week_day==2 and ui.g_mondayUI.own==0 and ui.g_mondayUI.changeBtns)
 end)
+check('all configured concrete goods render in original purchase UI',function()
+ assert(#FIXTURE.catalog>23)
+ for _,data in ipairs(FIXTURE.catalog) do
+  ui.onGetActivityStatus(data)
+  assert(ui.g_mondayUI.week_day==1 and ui.g_mondayUI.BuyBtns)
+ end
+end)
 root:removeAllChildrenWithCleanup(true);root:release()
 for i=#saved,1,-1 do local row=saved[i];for k in pairs(row.t) do row.t[k]=nil end;for k,v in pairs(row.old) do row.t[k]=v end end
 ms.MS_report_error=report

@@ -109,18 +109,8 @@ def data(role, s, g, now, r):
 
 
 def ranking(role, s, now, r):
-    rows = []
-    for g in s['unions'].values():
-        f = feast(s, g, now, r)
-        rows.extend(dict(v) for v in f['stats'].values())
-    # One account can have participated in more than one guild; merge its score.
-    merged = {}
-    for row in rows:
-        previous = merged.setdefault(row['id'], dict(row, fortune=0, contribute=0, normal_gift=0, advanced_gift=0))
-        for k in ('fortune', 'contribute', 'normal_gift', 'advanced_gift'): previous[k] += row[k]
-    rows = sorted(merged.values(), key=lambda v: (-v['fortune'], -v['contribute'], v['id']))
-    for i, row in enumerate(rows, 1): row['rank'] = i
-    return dict(query_type=15, order=next((v['rank'] for v in rows if v['id'] == role['role_id']), 0), fortune_info=rows)
+    from . import monument_wealth
+    return monument_wealth.ranking(role, now)
 
 
 def settle(role, s, g, op, d, now, r):
@@ -163,6 +153,8 @@ def settle(role, s, g, op, d, now, r):
             gain = u.contribution(role, cfg['contrib']*count)
             rowstats['contribute'] += gain; rowstats['fortune'] += cfg['contrib']*count
             rowstats['normal_gift' if typ == 1 else 'advanced_gift'] += count
+            from . import monument_wealth
+            monument_wealth.record(role, now, **{'normal_gift' if typ == 1 else 'advanced_gift': count})
             gift(f, g['members'][rid], cfg, count, now)
         elif op == 66:
             ident = u.positive(d, 'des_id')

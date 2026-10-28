@@ -14,6 +14,7 @@ end
 for _,name in ipairs({'d_abyssUI','d_treasureMapUI','d_mainUI','d_data','d_u','d_info','d_yaoshendianUI','d_lineupUI'}) do
  if ms[name] then preserve(ms[name]) end
 end
+assert(loadstring(ABYSS_PATCH))()
 ui.g_self=clone(ui.g_self)
 ms.d_treasureMapUI.g_self=clone(ms.d_treasureMapUI.g_self)
 ms.d_mainUI.g_playerInfo=clone(ms.d_mainUI.g_playerInfo)
@@ -35,6 +36,30 @@ check('temporary bag',function() ui.onGetResult(FIXTURE['10']) end)
 check('soul crystal shop',function() ui.onGetResult(FIXTURE['13']) end)
 check('daily statistics',function() ui.onGetResult(FIXTURE['9']) end)
 check('floor81 boss and pill slots',function() ui.onGetResult(FIXTURE['16']) end)
+for region=1,9 do
+ check('region '..region..' hook and boss',function()
+  ui.onGetResult(FIXTURE['region'..region]['1'])
+  ui.onGetResult(FIXTURE['region'..region]['16'])
+ end)
+end
+check('native challenge callback 5/5',function()
+ local create=ms.d_u.createMenu;local challenge
+ ms.d_u.createMenu=function(config,...)
+  for _,row in ipairs(config) do
+   if row.npic=='v2/abyssUI/challenge1.png' then challenge=row.call_back end
+  end
+  return create(config,...)
+ end
+ local ok,err=pcall(function()
+  ui.onGetResult(FIXTURE['16']);assert(challenge,'missing challenge button')
+  challenge();assert(sent[#sent].mid==1329 and sent[#sent].data.id==6)
+ end)
+ ms.d_u.createMenu=create;assert(ok,err)
+end)
+check('signed 40-recipe flags',function()
+ local bits=ms.d_yaoshendianUI.getBitFromTwoInt(-2,1022)
+ for i=1,40 do assert(bits[i]==1,'recipe '..i) end
+end)
 check('top20 NPC ranking',function() ui.onGetResult(FIXTURE['7']) end)
 for kind=1,5 do
  check('random event '..kind,function() ui.onGetResult(FIXTURE['event'..kind]) end)

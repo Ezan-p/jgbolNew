@@ -3,26 +3,40 @@ from . import guild as u,journey,daily,summon,npc_players
 from .guild_combat import simulate, replay_damage, record_events, recent_records, client_records, replay_reply
 from . import guild_offline as offline, guild_trial
 
-SEARCH_BOARD_SIZE = 18  # Native secretAreaUI draws 6 + 3 + 6 + 3 slots.
+SEARCH_BOARD_SIZE = 18
+SEARCH_BOARD_VERSION = 4
 
 
 def search_board(a,s,r):
-    """Keep server reward indices stable when repairing legacy 25-slot saves."""
-    if not a.get('search_tiles'):
-        a['search_tiles']=[dict(item=daily.spec(r['search_rewards'][offline.roll(s,len(r['search_rewards']))]),had_token=i<a['search']) for i in range(SEARCH_BOARD_SIZE)]
-        positions=list(range(1,SEARCH_BOARD_SIZE+1));a['search_order']=[]
-        while positions:a['search_order'].append(positions.pop(offline.roll(s,len(positions))))
-    elif len(a['search_tiles'])>SEARCH_BOARD_SIZE:
-        # Daily searches consume the first five server indices. Remove only
-        # surplus display candidates; never reroll prizes or refund searches.
-        a['search_tiles']=a['search_tiles'][:SEARCH_BOARD_SIZE]
-        order=a['search_order'][:SEARCH_BOARD_SIZE]
-        ranks={value:index for index,value in enumerate(sorted(order),1)}
-        a['search_order']=[ranks[value] for value in order]
-        for row in a['board']:
-            index=row.get('server_index',0)
-            if 1<=index<=SEARCH_BOARD_SIZE:
-                row['index']=row['random_sort']=a['search_order'][index-1]
+    """Keep valid slots stable and replace obsolete rewards, even claimed icons.
+
+    Claimed slots remain consumed; historical grants and inventory are unchanged.
+    Validate the contents on every query, not just the saved version marker.
+    """
+    pool=[daily.spec(p) for p,n in zip(r['search_rewards'],r['search_reward_slots']) for _ in range(n)]
+    previous=a.get('search_tiles',[])
+    tiles=[]
+    for i in range(SEARCH_BOARD_SIZE):
+        item=previous[i]['item'] if i<len(previous) else None
+        if item in pool:pool.remove(item)
+        else:item=None
+        tiles.append(dict(item=item,had_token=i<a['search']))
+    for tile in tiles:
+        if tile['item'] is None:tile['item']=pool.pop(offline.roll(s,len(pool)))
+    order=a.get('search_order',[])[:len(tiles)]
+    # Compress legacy 25-slot positions while preserving reward/server indices.
+    ranks={value:index for index,value in enumerate(sorted(order),1)}
+    order=[ranks[value] for value in order]
+    for row in a['board']:
+        index=row.get('server_index',0)
+        if 1<=index<=len(order):row['index']=row['random_sort']=order[index-1]
+    positions=[i for i in range(1,SEARCH_BOARD_SIZE+1) if i not in order]
+    while positions:order.append(positions.pop(offline.roll(s,len(positions))))
+    a.update(search_tiles=tiles,search_order=order,search_board_version=SEARCH_BOARD_VERSION)
+
+
+def search_limit(a,r):
+    return min(r['search_daily'],min(a.get('layer',0),r['team_daily'])*r['search_per_layer'])
 
 
 def state(s):
@@ -55,7 +69,7 @@ def team_info(role,a,g,r):
             members.append(dict(g['members'][rid],head_type=first.get('type',5004),
                                 cortege_layer=first.get('reborn_layer',0),finish_fam_data=a.get('layer',0)))
     return dict(teams=members,captain=t.get('captain',role['role_id']) if t else 0,max_count=r['team_size'],free_times=r['team_daily'],fight_count=a['team_fights'],
-        apply_list=team_applications(t,r),last_search_time=a.get('team_last_fight_time',0) if a['team_fights'] else 0,max_layer=r['team_daily'],cleared_layer=a.get('layer',0),fam_id=1,fam_count=max(1,len(members)),can_support_fight=True)
+        apply_list=team_applications(t,r),last_search_time=a.get('team_last_fight_time',0) if a['team_fights'] else 0,max_layer=r['team_daily'],cleared_layer=a.get('layer',0),can_continue=a['team_fights']<r['team_daily'] and a.get('layer',0)<r['team_daily'],search_free_times=max(0,search_limit(a,r)-a['search']),fam_id=1,fam_count=max(1,len(members)),can_support_fight=True)
 
 
 def team_list(role,a,g,r):
@@ -103,7 +117,7 @@ def train_stage(a,r):
 
 
 def train_info(role,a,g,now,r):
-    guild_trial.prepare(a,role['guild'],r)
+    guild_trial.prepare(a,role['guild'],r,role['level'])
     boss=guild_trial.current(a)
     # [A] Only has_prize (58) draws the native claim button; had_closed (54)
     # never does. Keep an earned but unclaimed stage available after expiry.
@@ -120,8 +134,8 @@ def train_info(role,a,g,now,r):
     transition=(day+(5-weekday if weekday<5 else 7-weekday))*86400-r['timezone_offset_hours']*3600
     if not r['train_weekend_only']:transition=(day+1)*86400-r['timezone_offset_hours']*3600
     end=a.get('train_end',0)
-    return dict(result=result,last_time=min(end,transition) if end>now else transition,rest_time=end if end>now else False,
-        pet_info=resident_info(g,r),train_prize={i:dict(add_union_gold=i*100,add_reputation=i*10,prize_list=[daily.spec(p[:2]+[p[2]*i,p[3]]) for p in r['train_rewards']]) for i in range(1,5)},
+    return dict(result=result,trial_reward_mode='silver_peach',last_time=min(end,transition) if end>now else transition,rest_time=end if end>now else False,
+        pet_info=resident_info(g,r),train_prize={i:dict(add_union_gold=0,add_reputation=0,add_catch_count=0,prize_list=[daily.spec(p[:2]+[p[2]*i,p[3]]) for p in r['train_rewards']]) for i in range(1,5)},
         boss_type=boss['type_id'],boss_layer=a['train_floor'],cleared_layer=a['train_cleared'],max_layer=4,remaining_attempts=max(0,r['train_attempt_limit']-a['train_floor_attempts']),has_record=bool(a['train_record']),boss_info=dict(type_id=boss['type_id'],boss_hp=a.get('train_hp') if a.get('train_hp') is not None else boss['hp'],boss_full_hp=boss['hp'],level=boss['level']),
         name=g['members'].get(str(a.get('appoint',role['role_id'])),{}).get('name',role['role_name']),support=a.get('train_support',0),can_support=in_window and a['train_open'] and not a['train_done'] and now<a['train_end'] and a.get('train_support',0)<r['train_support_limit'],damage_rank=sorted(a.get('train_damage',{}).values(),key=lambda v:-v['damage']))
 
@@ -202,6 +216,7 @@ def settle(role,s,g,op,d,now,r):
             u.require(isinstance(fighters,list) and all(type(v)is int and v>0 for v in fighters),'出战名单格式无效')
             u.require(len(fighters)==len(set(fighters)) and set(map(str,fighters))==set(members),'出战名单必须包含全部队员且不得重复')
             u.require(a['team_fights']<r['team_daily'],'秘境挑战次数已用完')
+            u.require(a.get('layer',0)<r['team_daily'],'今日秘境三层已通关')
             actors=[]
             for ident in fighters:
                 actor=role if ident==role['role_id'] else (npc_players.get(ident) or {}).get('role')
@@ -222,8 +237,8 @@ def settle(role,s,g,op,d,now,r):
         search_board(a,s,r)
         prizes=[];sweep_prizes={};new_broadcast=[]
         if flag in (2,6):
-            n=1 if flag==2 else r['search_daily']-a['search']
-            u.require(n>0 and a['search']+n<=r['search_daily'],'今日寻宝次数已用完')
+            n=1 if flag==2 else search_limit(a,r)-a['search']
+            u.require(n>0 and a['search']+n<=search_limit(a,r),'探宝次数不足，请先探索通关秘境')
             if flag==6:u.pay(role,'gold_coin',r['search_sweep_gold'])
             for _ in range(n):
                 a['search']+=1;a['points']+=10
@@ -242,10 +257,10 @@ def settle(role,s,g,op,d,now,r):
         if flag==7:
             u.require(a['team'] is not None,'请先加入队伍')
             return [u.reply(op,dict(result=1,flag=7,fam_info=team_info(role,a,g,r)))]
-        return [u.reply(op,dict(result=1,flag=flag,index=d.get('index',0),attach_list=prizes,free_times=r['search_daily']-a['search'],search_count=a['search'],cleared_layer=a.get('layer',0),max_layer=r['team_daily'],fight_count=a['team_fights'],sweep_gold_cost=r['search_sweep_gold'],token_index=min(a['search']+1,SEARCH_BOARD_SIZE+1),my_broad_data=a['board'][-1] if flag==2 else new_broadcast,gold_cost=10,all_point=a['points'],get_point=10,prize_list=sweep_prizes if flag==6 else prizes,prize_items=a['search_tiles'],search_order=a['search_order'],max_free_times=r['search_daily'],broad_data=a['board'],store_items=stock(),board_size=SEARCH_BOARD_SIZE,flush_time=(s['day']+1)*86400-r['timezone_offset_hours']*3600))]
+        return [u.reply(op,dict(result=1,flag=flag,index=d.get('index',0),attach_list=prizes,free_times=max(0,search_limit(a,r)-a['search']),search_count=a['search'],cleared_layer=a.get('layer',0),max_layer=r['team_daily'],fight_count=a['team_fights'],sweep_gold_cost=r['search_sweep_gold'],token_index=min(a['search']+1,SEARCH_BOARD_SIZE+1),my_broad_data=a['board'][-1] if flag==2 else new_broadcast,gold_cost=10,all_point=a['points'],get_point=10,prize_list=sweep_prizes if flag==6 else prizes,prize_items=a['search_tiles'],search_order=a['search_order'],max_free_times=r['search_daily'],earned_search_times=search_limit(a,r),broad_data=a['board'],store_items=stock(),board_size=SEARCH_BOARD_SIZE,flush_time=(s['day']+1)*86400-r['timezone_offset_hours']*3600))]
     if op==79:return [u.reply(op,train_info(role,a,g,now,r))]
     if op in (80,78):
-        guild_trial.prepare(a,s,r)
+        guild_trial.prepare(a,s,r,role['level'])
         u.require(not r['train_weekend_only'] or weekend(s),'仙盟试炼仅周末开放')
         if op==80:
             if not a['train_open']:
@@ -295,10 +310,8 @@ def settle(role,s,g,op,d,now,r):
         last=a.get('train_claimed_stage',0);u.require(stage>last,'尚未达到下一阶段或奖励已领取')
         count=stage-last
         prizes=[journey.grant(role,p[:2]+[p[2]*count,p[3]]) for p in r['train_rewards']]
-        a['train_claimed_stage']=stage;a['train_claimed']=stage==4;a['reputation']+=10*count;a['lucky_bonus']=a.get('lucky_bonus',0)+count
-        a['week_score']=a.get('week_score',0)+10*count;a['total_reputation']=a.get('total_reputation',0)+10*count
-        money=offline.funds(g,100*count,r)
-        return [u.reply(op,dict(result=1,prize_list=prizes,add_reputation=10*count,add_union_gold=money,add_catch_count=count,
+        a['train_claimed_stage']=stage;a['train_claimed']=stage==4
+        return [u.reply(op,dict(result=1,prize_list=prizes,add_reputation=0,add_union_gold=0,add_catch_count=0,
             trial_state=train_info(role,a,g,now,r)))]
     if op==94:return [catch_update(a,role,None,now)]
     if op==88:return [u.reply(op,inside(a,now,r,g))]

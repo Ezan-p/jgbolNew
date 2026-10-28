@@ -65,7 +65,7 @@ def joint_units(roles):
 
 
 def choose_enemy(role,s,*,power=None,layer=0,excluded=()):
-    """[B] Pick among nearby-power immutable players, growing 8% per layer."""
+    """[B] Raise target by 8 percentage points per floor; random NPC power may fall."""
     from .guild_offline import roll
     own=power if power is not None else sum(c.get('combat_power',0) for c in role['corteges'] if 1<=c.get('order',0)<=8)
     target=max(1,own)*(75+min(100,layer*8))//100
@@ -92,7 +92,7 @@ def simulate(role,s,r,jrules,ft,name,hp=None,*,enemy_npc=None,ally_roles=None,ac
     if ft==27:
         from . import guild_trial
         a=s.setdefault('instances',{})
-        guild_trial.prepare(a,s,r);trial=guild_trial.current(a);npc=trial['type_id']
+        guild_trial.prepare(a,s,r,role['level']);trial=guild_trial.current(a);npc=trial['type_id']
         name=f"仙盟试炼第{a['train_floor']}层"
     if ft==13:
         # [A] cortege_base/name_0: 9001 is the original 仙盟守护树.

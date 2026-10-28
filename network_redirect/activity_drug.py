@@ -1,5 +1,6 @@
 """药神殿 original recipe/cost/recycling tables [A], craft quality/XP [B]."""
-from . import activity as a, formation, summon
+import secrets
+from . import activity as a, formation, summon, abyss_balance
 RECIPES={int(x['study_type']):x for x in summon.rows('specter_drug_study.csv')}
 LEVELS={int(x['level']):int(x['need_exp(shuliandu)']) for x in summon.rows('specter_druggist_config.csv')}
 TRANSFORM={int(x['src_material(object_type|attach_type|attach_level|attach_count)'].split('|')[1]):x
@@ -21,7 +22,10 @@ def bag(role):
 
 def flags(role,s):
     nums=[0,0]
-    for i in s.setdefault('recipes',[]):nums[(i-1)//32]|=1<<((i-1)%32)
+    # Native getBitFromInt discards bit zero, returning 31 recipe bits per word.
+    for i in s.setdefault('recipes',[]):nums[(i-1)//31]|=1<<((i-1)%31+1)
+    # 1017/1032 use signed int32. Preserve the high bit through two's complement.
+    nums=[n if n<2**31 else n-2**32 for n in nums]
     role['drug_study_flag'],role['drug_study_flag2']=nums
     return dict(drug_study_flag=nums[0],drug_study_flag2=nums[1])
 
@@ -33,6 +37,20 @@ def add_exp(role,n):
     role['drug_exp']+=n
     while role['drug_level']<max(LEVELS) and role['drug_exp']>=LEVELS[role['drug_level']]:
         role['drug_exp']-=LEVELS[role['drug_level']];role['drug_level']+=1
+
+
+def quality_weights(level, recipe):
+    a.require(type(level) is int and int(recipe['min_level']) <= level <= max(LEVELS), '炼药等级超出药方范围')
+    return abyss_balance.rules()['quality_weights'][min(3, level-int(recipe['min_level']))]
+
+
+def craft_quality(level, recipe):
+    weights = quality_weights(level, recipe)
+    roll = secrets.randbelow(sum(weights))
+    for grade, weight in enumerate(weights):
+        roll -= weight
+        if roll < 0:
+            return grade
 
 
 def use_exp(role,req):
@@ -72,9 +90,9 @@ def settle(role,s,op,d,r):
         else:
             a.require(idx in s['recipes'] and role['drug_level']>=int(row['min_level']),'尚未学会该药方')
             for tid,n,_ in parts:a.consume(role,tid,n)
-            # [B] Deterministic grade bands make the absent quality distribution
-            # reproducible; only real item variants are emitted.
-            grade=min(3,max(0,role['drug_level']-int(row['min_level']))//r['drug_quality_level_step'])
+            # [B] All qualities are reachable at the recipe's legal unlock level;
+            # three levels of mastery guarantee the best grade (including 33->36).
+            grade=craft_quality(role['drug_level'],row)
             # [A] Essence drugs are interleaved by family: 1597/1617/1637/1657,
             # whereas ordinary attribute drugs use four consecutive IDs.
             tid=int(row['attach_type'])+grade*(20 if int(row['type'])==5 else 1)

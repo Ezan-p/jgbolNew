@@ -1,4 +1,5 @@
 """Exercise original 3.87 Cocos callbacks in one isolated frame, with no live writes."""
+import copy
 import json
 from pathlib import Path
 import sys
@@ -8,7 +9,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from network_redirect import progression, summon
+from network_redirect import progression, summon, formation
 from network_redirect.backend import Backend
 from network_redirect.protocol import decode
 from android_emulator.config import load_config
@@ -25,6 +26,15 @@ def main():
         data = dict(now=now, query=progression.info(role, now),
                     upgrade=decode(progression.upgrade_events(before, role)[0])[2],
                     claim=decode(progression.settle(role, dict(op_type=0, flag=2, id=0), now)[0])[2])
+        data['milestones'] = []
+        for level, count in ((5,0),(10,0),(15,0),(20,1),(30,1),(40,1),(50,1),(60,1),(70,2),(80,2),(90,2),(99,3)):
+            role = b.profile(); role.update(level=level-1, cur_exp=0)
+            progression.prepare(role, now)
+            before = copy.deepcopy(role)
+            target = min(99, level+1)
+            progression.add_exp(role, sum(int(formation.LEVELS[n]['upgrade_exp']) for n in range(level-1, target)), now)
+            data['milestones'].append(dict(level=level, count=count, target=target,
+                                           event=decode(progression.upgrade_events(before, role)[0])[2]))
         b.close()
     source = 'local FIXTURE=' + summon.lua(data) + '\n' + (ROOT / 'tests/progression_client_regression.lua').read_text()
     source = source.replace('-- INSTALL_PATCH', (ROOT / 'network_redirect/progression_client.lua').read_text())
@@ -64,7 +74,7 @@ Interceptor.attach(m.getExportByName('lua_pcall'),{onEnter(args){
                 if sep and rest.startswith(('true:', 'false:')):
                     ok, _, error = rest.partition(':')
                     checks.append(dict(name=name, passed=ok == 'true', error=error))
-    passed = len(checks) == 7 and all(c['passed'] for c in checks)
+    passed = len(checks) == 8 and all(c['passed'] for c in checks)
     report = dict(passed=passed, checks=checks, raw=messages, native_cocos=True,
                   live_account_resources_changed=False, network_sends_captured=True)
     path = ROOT / 'analysis/evidence/progression_client_validation.json'

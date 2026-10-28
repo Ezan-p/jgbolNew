@@ -116,7 +116,8 @@ class WelfareRechargeTests(unittest.TestCase):
             welfare.spring_settle(role, 1215, dict(prize_id=1), end, self.rules)
         before = copy.deepcopy(role['welfare']['charge_days'])
         welfare.record_charge(role, 5000, end, self.rules)
-        self.assertEqual(role['welfare']['charge_days'], before)
+        self.assertEqual(sum(role['welfare']['charge_days'].values()), sum(before.values()) + 5000)
+        self.assertEqual(welfare.catalog(role, end, self.rules)[23]['prize_list']['total_charge_count'], 600)
         self.assertEqual(role['welfare']['single_max_gold'], 1000)
 
     def test_weekly_monday_zero_boundary_and_daily_independence(self):

@@ -1,0 +1,20 @@
+test_same_order_is_account_scoped (tests.test_recharge.GoldCardRechargeTests) ... ERROR
+
+======================================================================
+ERROR: test_same_order_is_account_scoped (tests.test_recharge.GoldCardRechargeTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_recharge.py", line 164, in test_same_order_is_account_scoped
+    self.stock(1, 0)
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_recharge.py", line 41, in stock
+    if large: summon.add_item(role, 1152, large)
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/summon.py", line 237, in add_item
+    role['attachments'].append(dict(id=next_id(role), attach_type=5, type_id=type_id, count=count, level=1))
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/summon.py", line 217, in next_id
+    state = role['summon']
+KeyError: 'summon'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.235s
+
+FAILED (errors=1)

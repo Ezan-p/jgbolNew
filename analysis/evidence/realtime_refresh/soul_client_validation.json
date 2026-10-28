@@ -3,7 +3,13 @@
   "temporary_backend": true,
   "live_account_resources_changed": false,
   "network_sends_captured": true,
-  "checks": [],
+  "checks": [
+    "original soul list displays temporary backend inventory",
+    "first ascension redraws original soul cells without reopening the list",
+    "ascension result closes onto the refreshed soul list",
+    "spending the final soul stack clears native rows and the captured row count",
+    "empty soul list remains empty after closing the result"
+  ],
   "unit_checks": [
     "empty open soul tab gains rows",
     "ascension refreshes counts and requirements",
@@ -17,7 +23,24 @@
     "hidden and released scene guarded",
     "original handlers restored"
   ],
-  "passed": false,
-  "error": "{'status': 2, 'result': \"guild-regression:1: ...te_\\\\lua_cache\\\\lua1\\\\d19d37b5c61d8c8412a44bc59a626486.data:2680: invalid 'self' in function 'getChildByTag'\\nstack traceback:\\n\\t...te_\\\\lua_cache\\\\lua1\\\\485e72cd1d350f15fde3aa9d633ee8fe.data:81: in function <...te_\\\\lua_cache\\\\lua1\\\\485e72cd1d350f15fde3aa9d633ee8fe.data:76>\\n\\t[C]: in function 'getChildByTag'\\n\\t...te_\\\\lua_cache\\\\lua1\\\\d19d37b5c61d8c8412a44bc59a626486.data:2680: in function 'clearLayer'\\n\\t...te_\\\\lua_cache\\\\lua1\\\\6690dc048d6ff5a5b26de6eb3f02b769.data:1272: in function 'showTmpGotStars'\\n\\t...te_\\\\lua_cache\\\\lua1\\\\6690dc048d6ff5a5b26de6eb3f02b769.data:2638: in function <...te_\\\\lua_cache\\\\lua1\\\\6690dc048d6ff5a5b26de6eb3f02b769.data:2630>\\n\\t...te_\\\\lua_cache\\\\lua1\\\\f51a074baf4303fa195eecb02c7f873c.data:1811: in function <...te_\\\\lua_cache\\\\lua1\\\\f51a074baf4303fa195eecb02c7f873c.data:1223>\\n\\t...te_\\\\lua_cache\\\\lua1\\\\f51a074baf4303fa195eecb02c7f873c.data:234: in function <...te_\\\\lua_cache\\\\lua1\\\\f51a074baf4303fa195eecb02c7f873c.data:233>\\n\\t[C]: in function 'xpcall'\\n\\t...te_\\\\lua_cache\\\\lua1\\\\f51a074baf4303fa195eecb02c7f873c.data:236: in function 'handleSavedPackages'\\n\\t...te_\\\\lua_cache\\\\lua1\\\\f51a074baf4303fa195eecb02c7f873c.data:273: in function <...te_\\\\lua_cache\\\\lua1\\\\f51a074baf4303fa195eecb02c7f873c.data:259>\\n\\t...te_\\\\lua_cache\\\\lua1\\\\f51a074baf4303fa195eecb02c7f873c.data:201: in function <...te_\\\\lua_cache\\\\lua1\\\\f51a074baf4303fa195eecb02c7f873c.data:164>\\n\\t[C]: in function 'get_socket_status'\\n\\t...te_\\\\lua_cache\\\\lua1\\\\80166b641b6c584062f5196b1b2860ba.data:345: in function <...te_\\\\lua_cache\\\\lua1\\\\80166b641b6c584062f5196b1b2860ba.data:333>\"}",
+  "scene_setup_messages": [],
+  "rendered_first_ascension": {
+    "rows": {
+      "5004": {
+        "need": 0,
+        "count": 45
+      }
+    },
+    "labels": [
+      "沙悟净",
+      "数量: 45",
+      "584",
+      "237",
+      "151",
+      "162"
+    ]
+  },
+  "requests_intercepted": 0,
+  "passed": true,
   "restored": true
 }

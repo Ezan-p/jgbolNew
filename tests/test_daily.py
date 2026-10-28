@@ -104,6 +104,88 @@ class DailyTests(unittest.TestCase):
             self.assertEqual(before,self.role())
         self.assertEqual(self.req(id=3,data='{has_prize=true}')[-1][0],55)
 
+    def test_gold_cards_preview_grant_replay_and_restart(self):
+        expected = [
+            [[12, 0, 5000, 1]],
+            [[5, 1022, 1, 1], [5, 1156, 1, 1]],
+            [[11, 0, 20, 1]],
+            [[5, 1023, 1, 1]],
+            [[11, 0, 50, 1], [5, 1152, 1, 1]],
+        ]
+        role = self.role()
+        for kind in range(1, 10):
+            daily.record(role, kind, 1000, NOW, self.b.daily_rules)
+        self.b.save(role)
+        preview = self.req(id=1, data='{}')[-1][1]['point_prize']
+        for ident, prizes in enumerate(expected, 1):
+            self.assertEqual(list(preview[ident]['prize_list'].values()),
+                             [daily.spec(p) for p in prizes])
+            before = self.role()
+            out = self.req(id=2, data=summon.lua({'prize_id': ident}))[-1][1]
+            self.assertEqual(list(out['prize_list'].values()), [daily.spec(p) for p in prizes])
+            after = self.role()
+            for typ, tid, count, _ in prizes:
+                if typ == 5:
+                    def stock(r):
+                        return sum(a['count'] for a in r['attachments']
+                                   if a['attach_type'] == 5 and a['type_id'] == tid)
+                    self.assertEqual(stock(after) - stock(before), count)
+                else:
+                    key = 'gold_coin' if typ == 11 else 'silver_coin'
+                    self.assertEqual(after[key] - before[key], count)
+            self.assertEqual(after.get('recharge'), before.get('recharge'))
+            self.assertEqual(self.b.respond(self.packet, {'authenticated': True}), self.replies)
+            self.assertEqual(after, self.role())
+        self.b.close()
+        self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        for ident in (2, 5):
+            self.assertEqual(self.req(id=2, data=summon.lua({'prize_id': ident}))[-1][0], 55)
+            self.assertEqual(after, self.role())
+
+    def test_gold_card_claim_failure_rolls_back_all_prizes(self):
+        role = self.role()
+        for kind in range(1, 10):
+            daily.record(role, kind, 1000, NOW, self.b.daily_rules)
+        self.b.save(role)
+        grant = journey.grant
+        def fail_card(role, prize):
+            if prize[1] in (1152, 1156):
+                raise ValueError('injected card grant failure')
+            return grant(role, prize)
+        for ident in (2, 5):
+            before = self.role()
+            with patch('network_redirect.daily.journey.grant', side_effect=fail_card):
+                self.assertEqual(self.req(id=2, data=summon.lua({'prize_id': ident}))[-1][0], 55)
+            self.assertEqual(before, self.role())
+            self.assertEqual(self.req(id=2, data=summon.lua({'prize_id': ident}))[-1][1]['status'], 3)
+
+    def test_gold_card_boxes_daily_and_weekly_boundaries(self):
+        r = self.b.daily_rules
+        midnight = (daily.day(NOW, r) + 1) * 86400 - r['timezone_offset_hours'] * 3600
+        monday = ((daily.week(NOW, r) + 1) * 7 - 3) * 86400 - r['timezone_offset_hours'] * 3600
+        with patch('network_redirect.backend.time.time', return_value=midnight - 1):
+            role = self.role()
+            for kind in range(1, 10):
+                daily.record(role, kind, 1000, midnight - 1, r)
+            self.b.save(role)
+            for ident in (2, 5):
+                self.req(id=2, data=summon.lua({'prize_id': ident}))
+        for now, total, status in ((midnight, 110, 3), (monday - 1, 110, 3), (monday, 0, 1)):
+            with patch('network_redirect.backend.time.time', return_value=now):
+                out = self.req(id=1, data='{}')[-1][1]
+                self.assertEqual(out['point'], total)
+                self.assertTrue(all(row['cur_point'] == 0 for row in out['point_data'].values()))
+                for ident in (2, 5):
+                    self.assertEqual(out['point_prize'][ident]['status'], status)
+                    self.assertEqual(self.req(id=2, data=summon.lua({'prize_id': ident}))[-1][0], 55)
+        with patch('network_redirect.backend.time.time', return_value=monday):
+            role = self.role()
+            for kind in range(1, 10):
+                daily.record(role, kind, 1000, monday, r)
+            self.b.save(role)
+            for ident in (2, 5):
+                self.assertEqual(self.req(id=2, data=summon.lua({'prize_id': ident}))[-1][1]['status'], 3)
+
     def test_encode_failure_rolls_back_rewards_and_flags(self):
         before = self.role()
         with patch('network_redirect.backend.encode', side_effect=ValueError('injected wire failure')):

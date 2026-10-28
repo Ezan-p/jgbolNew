@@ -29,7 +29,7 @@ class XianlingTests(unittest.TestCase):
     def fixture(self,tid=1140,n=1000):
         r=self.b.profile();r['gold_coin']=10000;summon.add_item(r,tid,n);self.b.save(r);return self.b.profile()
     def test_enter_and_bootstrap(self):
-        d=self.req()[-1][1];self.assertEqual(len(d['exchange_list']),7);self.assertEqual(d['take_list'],{1:1,2:1,3:1,4:1})
+        d=self.req()[-1][1];self.assertEqual(len(d['exchange_list']),9);self.assertEqual(d['take_list'],{1:1,2:1,3:1,4:1})
         self.assertEqual(d['shop_data']['attach_list'][1]['attach_type'],1249);self.assertEqual(d['shop_data']['need_gold'],10);self.assertEqual(d['canbuy_count'],1)
         cfg=login_fields(decode(self.b.bootstrap()[0])[2]['data']);self.assertFalse(cfg[24]['vip_shop']['had_gift'])
     def test_batch_exchange_exact_cost_and_replay(self):

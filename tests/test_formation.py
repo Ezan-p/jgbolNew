@@ -164,7 +164,8 @@ class FormationTests(unittest.TestCase):
         after = self.backend.profile()
         self.assertEqual(after['silver_coin'], before['silver_coin'] - 50)
         self.assertEqual(formation.lookup(after, 'attachments', item)['level'], 2)
-        self.assertEqual(self.events(rows)[0][1]['upgrade_list'][1]['new_level'], 2)
+        # Completing the first enhancement also pushes the novice-book state.
+        self.assertEqual(dict(self.events(rows))[2]['upgrade_list'][1]['new_level'], 2)
         self.assertEqual(self.backend.respond(self.packet, self.state), self.replies)
         self.assertEqual(self.backend.profile(), after)
         after['level'] = 1
@@ -443,9 +444,12 @@ class FormationTests(unittest.TestCase):
         self.add_item(1313, 100)
         self.add_item(1320, 100)
         args = dict(equip_id=item, equip_order=0, is_one_key=False)
+        role = self.backend.profile()
+        role['level'] = 39
+        self.backend.save(role)
         self.rejected(1073, flag=1, **args)
         role = self.backend.profile()
-        role['level'] = 60
+        role['level'] = 40
         self.backend.save(role)
         self.ok(1073, flag=1, **args)
         equip = formation.lookup(self.backend.profile(), 'attachments', item)
@@ -476,6 +480,7 @@ class FormationTests(unittest.TestCase):
     def test_advance_configuration_reaches_original_client(self):
         config = login_fields(decode(self.backend.bootstrap()[0])[2]['data'])
         self.assertEqual(config[23], self.backend.formation_rules['equipment_advance'])
+        self.assertEqual(config[23]['min_role_level'], 40)
 
 
 if __name__ == '__main__':

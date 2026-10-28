@@ -1,6 +1,6 @@
 """Replay treasure search in native Cocos without spending live account resources.
 
-Run while the secret-area treasure page is open; reloads the latest adapter.
+Uses an isolated scene layer and reloads the latest adapter.
 --repair-live also redraws that page from its settled cache, without another draw.
 """
 import copy
@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 import sys
 import tempfile
+import subprocess
+import time
 from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -33,15 +35,24 @@ def fixtures():
                 assert not any(m==2998 and d['id']==55 for m,_,d in rows),rows
                 return next((login_fields(d['data']) for m,_,d in rows if m==1301 and d['id']==op),None)
             req(1,union_name='探宝回归')
+            role=b.profile()
+            req(5,role_list=list(map(int,role['guild']['unions']['2']['applications'])))
+            req(26)
+            applicants=list(map(int,b.profile()['guild']['instances']['team']['applications']))
+            req(28,role_list=applicants[:2])
+            role=b.profile();a=role['guild']['instances']
+            a.update(layer=1,team_fights=1,team_last_fight_time=1792728000)
+            b.save(role)
+            team=req(44)
             initial=req(43,flag=1)
-            role=b.profile();role['guild']['instances']['search_order']=list(range(1,19));b.save(role)
+            role=b.profile();role['guild']['instances']['search_order']=list(range(18,0,-1));b.save(role)
             initial=req(43,flag=1)
+            single=req(43,flag=2)
             sweep=req(43,flag=6)
-            legacy=copy.deepcopy(initial)
-            for i in range(19,26):legacy['prize_items'][i]=copy.deepcopy(initial['prize_items'][i-18])
-            legacy['search_order']=dict(enumerate([15,9,7,3,20,11,17,22,1,6,13,19,8,23,21,5,18,14,10,12,25,24,4,16,2],1))
-            legacy['board_size']=25
-            return dict(initial=initial,sweep=sweep,legacy=legacy)
+            role=b.profile();role['guild']['instances'].update(layer=3,team_fights=3);b.save(role)
+            complete=req(44)
+            return dict(initial=initial,single=single,sweep=sweep,team=team,complete=complete)
+
         finally:b.close()
 
 
@@ -63,6 +74,35 @@ def main():
         source=source.replace('__FIXTURES__',summon.lua(fixtures()))
         source=source.replace('-- __PATCH__',(ROOT/'network_redirect/guild_activity_client.lua').read_text())
         report.update(login_fields(evaluate(source)))
+        if report.get('passed'):
+            preview=source[:source.index('local ok,err=xpcall(function()')]
+            preview+="ui.callback_fam_search_gold(copy(fixtures.initial));return 'preview'"
+            evaluate(preview)
+            time.sleep(.5)
+            raw=subprocess.check_output([str(config['adb_path']),'-s',config['serial'],'exec-out','screencap','-p'])
+            (ROOT/'analysis/evidence/guild/search_18_slots.png').write_bytes(raw)
+            evaluate("guild_search_restore();return 'restored'")
+            report['screenshot']='search_18_slots.png'
+            preview=source[:source.index('local ok,err=xpcall(function()')]
+            preview+="state.teams_info=copy(fixtures.team);state.teams_info.team.last_search_time=ms.d_time.getTime();state.fight_count=1;state.free_times=3;ui.showTeamPage();return 'team preview'"
+            evaluate(preview)
+            time.sleep(.5)
+            raw=subprocess.check_output([str(config['adb_path']),'-s',config['serial'],'exec-out','screencap','-p'])
+            (ROOT/'analysis/evidence/guild/search_single_action.png').write_bytes(raw)
+            evaluate("guild_search_restore();return 'restored'")
+            report['team_screenshot']='search_single_action.png'
+        if report.get('passed') and '--repair-team' in sys.argv:
+            report['live_team_page']=evaluate('''
+local ui=package.loaded.ms.d_secretAreaUI;local s=ui.g_self
+local ok,parent=pcall(function() return s.main_layer:getParent() end)
+if not ok or not parent or not s.teams_info or not s.teams_info.team or s.teams_info.team.cleared_layer==nil then return 'not visible' end
+local send=ui.send_msg_union_event
+ui.send_msg_union_event=function(op,data) if op~=41 then return send(op,data) end end
+local rendered,err=pcall(ui.showTeamPage)
+ui.send_msg_union_event=send
+if not rendered then error(err) end
+return 'refreshed without combat'
+''')
         if report.get('passed') and '--repair-live' in sys.argv:
             report['live_page_repaired']=evaluate("local u=package.loaded.ms.d_secretAreaUI;u.showPrizePage(u.g_self.main_layer);assert(u.g_self.prize_btns[3]:isEnabled());return 'repaired'")=='repaired'
     finally:

@@ -37,3 +37,66 @@ do
   end
  end
 end
+
+-- The main duty button used to call loadData/create on the editable formation.
+-- Fetch a fresh server snapshot instead; flags below are local protocol context.
+do
+ local ms=package.loaded.ms
+ local duty=ms and ms.d_endlessFightUI
+ local position=ms and ms.d_charPositionUI
+ if not duty or not duty.showCharPos or not position or not position.showOthersInfo then return 'pending' end
+ if not duty._localDutyPreviewRestore then
+  local oldShow=duty.showCharPos
+  local oldInfo=position.showOthersInfo
+  local originals={}
+  local function isPreview()
+   local layer=position.g_charPosUI
+   return layer and layer.playerInfo and layer.playerInfo.duty_preview
+  end
+  duty.showCharPos=function()
+   return ms.d_u.main_server_send_msg(ms.d_msg_def.gscl_msg_id.msg_query_lineup_info,
+    {des_type=1,des_id=0,flag=51,fight_id=0})
+  end
+  position.showOthersInfo=function(info,...)
+   if not isPreview() then return oldInfo(info,...) end
+   position.g_charPosUI.isReadOnly=true
+   -- Native comparison buttons open the ordinary self cache, losing the duty
+   -- snapshot. Omit them only while constructing this preview's info panel.
+   local menu=ms.d_u.createMenu
+   ms.d_u.createMenu=function(styles,...)
+    local filtered={}
+    for k,v in pairs(styles) do
+     if type(k)~='number' then filtered[k]=v end
+    end
+    for _,v in ipairs(styles) do
+     if v.npic~='v2/charPositionUI/mine1.png' and v.npic~='v2/charPositionUI/yours1.png' then
+      filtered[#filtered+1]=v
+     end
+    end
+    return menu(filtered,...)
+   end
+   local ok,result=pcall(oldInfo,info,...)
+   ms.d_u.createMenu=menu
+   if not ok then error(result) end
+   return result
+  end
+  -- Protect delayed refreshes and direct callbacks as well as native controls.
+  for _,name in ipairs({'reloadData','requestChangeChar','requestChangeOrder','requestChangeItem',
+                        'showChgCharLayer','createChgPos','compareCharPosition'}) do
+   local original=position[name]
+   if original then
+    originals[name]=original
+    position[name]=function(...)
+     if isPreview() then return end
+     return original(...)
+    end
+   end
+  end
+  duty._localDutyPreviewRestore=function()
+   duty.showCharPos=oldShow
+   position.showOthersInfo=oldInfo
+   for name,original in pairs(originals) do position[name]=original end
+   duty._localDutyPreviewRestore=nil
+  end
+ end
+end

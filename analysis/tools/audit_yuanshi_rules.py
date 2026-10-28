@@ -42,7 +42,8 @@ def main():
            'two shop positions, need_gold and remaining buy_times; wish_times label is days',
            '1807 grants one extra prayer; 1808 gives level=role*2 Yuanshi; after receiving, prayer yields souls',
            'getChar and pray both send flag2,index0; native getChar lacks a widget binding'],
-        B=['28-day repeating local season; no official historical schedule',
+        U=['permanent activity; 14-day repeating refresh; countdown is time until reset, not closure'],
+        B=['local cycle anchor 1970-01-05 00:00 UTC+8; no official historical schedule',
            'unfinished wishes grant one reward including the wish reaching100: silver100000/baozi1/pill1/gold_bag1/VIP_bag1 at40/25/20/10/5%; user pool, inferred quantities and weights',
            'enroll on first entry/recharge; 1 free prayer/day, +10 percent, 1 soul after claim',
            'full progress next flag2 claims for free; duplicate grants40 souls; max original experience table level',
@@ -51,7 +52,7 @@ def main():
            'recharge uses existing local simulation; 10 gold/RMB, cumulative base gold excludes bonus',
            'one activation/day; any daily recharge grants each previously activated gift once; claims carry in season',
            'one click claims all copies of one gift; gift contents in configuration',
-           'season rollover clears event progress/unclaimed gifts/stock, retains inventory and gods',
+           'cycle rollover clears progress/free wishes/charge/gifts/shop counts and all1807 offerings including pending mail; retains other rewards and gods',
            'use native funUI entry; restore missing portrait button, refresh cached shop and recharge status'],
         inferred_config=y.load_rules())
     (out/'official_audit.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
