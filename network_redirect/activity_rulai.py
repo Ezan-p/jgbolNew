@@ -3,7 +3,7 @@ import json
 import secrets
 from pathlib import Path
 
-from . import activity as a, formation as f, summon
+from . import activity as a, feature_levels, formation as f, summon
 
 ROOT = Path(__file__).resolve().parents[1]
 BAGS = {}
@@ -86,6 +86,8 @@ def schedule(now, r):
 
 
 def sync(role, now):
+    if role.get('level', 1) < feature_levels.LEVELS['rulaitable']:
+        return summon.event(80, {})
     r = load_rules()
     s = state(role, now, r)
     flag = r['enabled'] and (remaining(s, r) > 0 or bonus_status(s, r) == 2)
@@ -94,7 +96,8 @@ def sync(role, now):
 
 def record_charge(role, amount, now):
     r = load_rules()
-    if not r['enabled'] or amount <= 0:
+    if (not r['enabled'] or amount <= 0
+            or role.get('level', 1) < feature_levels.LEVELS['rulaitable']):
         return
     s = state(role, now, r)
     guard(s, now, r)

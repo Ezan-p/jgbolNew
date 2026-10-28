@@ -3,7 +3,7 @@ import json
 import secrets
 from pathlib import Path
 
-from . import activity as a, formation as f, summon
+from . import activity as a, feature_levels, formation as f, summon
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -122,14 +122,15 @@ def shop(s, r):
 
 def update(role, now):
     r = load_rules()
-    if not r['enabled']:
+    if not r['enabled'] or role.get('level', 1) < feature_levels.LEVELS['twoyears']:
         return summon.event(80, {})
     return summon.event(80, dict(local_yuanshi=snapshot(state(role, now, r), r)))
 
 
 def record_charge(role, amount, now):
     r = load_rules()
-    if not r['enabled'] or amount <= 0:
+    if (not r['enabled'] or amount <= 0
+            or role.get('level', 1) < feature_levels.LEVELS['twoyears']):
         return
     s = state(role, now, r)
     guard(s, now, r)

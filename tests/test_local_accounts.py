@@ -118,6 +118,25 @@ class AccountTests(unittest.TestCase):
             self.auth.authenticate({'action': 'resume'}, credential)
         self.assertEqual(self.auth.db.execute('SELECT count(*) FROM remembered_logins').fetchone()[0], 0)
 
+    def test_switch_requires_password_and_preserves_progress(self):
+        result = self.auth_as('alice', remember=True)
+        state = self.enter(result['token'])
+        backend = state['backend']
+        role = backend.profile(); role['gold_coin'] = 1234; backend.save(role)
+        pending = decode(self.auth.respond(encode(3001, dict(
+            id=68, data='{access_token="' + result['token'] + '"}')), {})[0])[2]
+        reconnect = encode(1016, dict(account='alice', random_key=backend.random_key))
+        self.auth.authenticate({'action': 'forget'}, result['remember_token'])
+        with self.assertRaises(ValueError):
+            self.auth.authenticate({'action': 'resume'}, result['remember_token'])
+        with self.assertRaises(ValueError):
+            self.auth.respond(encode(2999, {}), state)
+        self.assertEqual(decode(self.auth.respond(reconnect, {})[0])[2]['ret'], 1)
+        ticket = encode(1001, {k: pending[k] for k in ('auth_key', 'seed', 'account')})
+        self.assertEqual(decode(self.auth.respond(ticket, {})[0])[2]['result'], 1)
+        restored = self.enter(self.auth_as('alice', 'login')['token'])
+        self.assertEqual(restored['backend'].profile()['gold_coin'], 1234)
+
     def test_rate_limit(self):
         for i in range(12):
             with self.assertRaises(ValueError):

@@ -154,6 +154,7 @@ class Backend:
                 # Every consumer must see recovered balances, including features
                 # outside journey and requests arriving before the next heartbeat.
                 journey.recover_resources(role, int(time.time()), self.journey_rules)
+            new_role_guide.recover_tutorial_level(role, int(time.time()))
             formation.recalculate(role, self.formation_rules)
             achievements.refresh(role, int(time.time()))
             tian_shu.refresh(role)
@@ -986,7 +987,8 @@ class Backend:
             before = copy.deepcopy(role)
             result, event = gift_codes.settle(self.db, role, self.account, data, int(time.time()), self.gift_code_rules)
             if result == 1:
-                replies = self.item_deltas(before, role) + self.inventory(role) + [welfare_attributes(role), event]
+                replies = (self.item_deltas(before, role) + self.inventory(role)
+                           + summon.soul_snapshots(role) + [welfare_attributes(role), event])
                 self.save(role)  # One SQLite commit for rewards and redemption ledger.
             else:
                 self.db.rollback()

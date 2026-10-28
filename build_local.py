@@ -22,13 +22,31 @@ def build(output=None):
         text, count = re.subn(pattern, lambda m: m[1] + body + '\n.end method', text, flags=re.S)
         if count != 1:
             raise RuntimeError('Unexpected bridge method: ' + name)
-    for name in ('login', 'switchAccount'):
-        replace(name, '''    .locals 1
-    const/4 v0, SWITCH_FLAG
+    replace('login', """    .locals 2
+    sget-object v0, Lcom/syyx/sdkproxy/ThirdPartyAPI;->m_map:Ljava/util/Map;
+    const-string v1, "acc_login_change_switch"
+    invoke-interface {v0, v1}, Ljava/util/Map;->remove(Ljava/lang/Object;)Ljava/lang/Object;
+    const/4 v0, 0x0
     sput-boolean v0, Lcom/syyx/sdkproxy/LocalLogin;->switching:Z
     sget-object v0, Lcom/syyx/sdkproxy/ThirdPartyAPI;->m_ui_instance:Landroid/app/Activity;
     invoke-static {v0}, Lcom/syyx/sdkproxy/LocalLogin;->show(Landroid/app/Activity;)V
-    return-void'''.replace('SWITCH_FLAG', '0x1' if name == 'switchAccount' else '0x0'))
+    return-void""")
+    # updateUI.onTouchLoginMobile marks ordinary entry before calling switchAccount.
+    # Consume that marker so the explicit onTouchAccLogin button always signs out,
+    # including when it is the first button pressed after a cold start.
+    replace('switchAccount', """    .locals 2
+    sget-object v0, Lcom/syyx/sdkproxy/ThirdPartyAPI;->m_map:Ljava/util/Map;
+    const-string v1, "acc_login_change_switch"
+    invoke-interface {v0, v1}, Ljava/util/Map;->remove(Ljava/lang/Object;)Ljava/lang/Object;
+    move-result-object v0
+    const-string v1, "true"
+    invoke-virtual {v1, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+    move-result v0
+    xor-int/lit8 v0, v0, 0x1
+    sput-boolean v0, Lcom/syyx/sdkproxy/LocalLogin;->switching:Z
+    sget-object v0, Lcom/syyx/sdkproxy/ThirdPartyAPI;->m_ui_instance:Landroid/app/Activity;
+    invoke-static {v0}, Lcom/syyx/sdkproxy/LocalLogin;->show(Landroid/app/Activity;)V
+    return-void""")
     # No channel initialization, purchase, forums or shutdown hooks can open SDK UI.
     text = re.sub(r'    invoke-static \{v0\}, Lcom/qihoo/gamecenter/sdk/matrix/Matrix;->init\(Landroid/app/Activity;\)V', '', text)
     for name in ('onDestroy', 'pay', 'purchase', 'purchase_By_infos', 'forum', 'showMMap', 'getLoginInfo', 'refreshBalance'):
@@ -66,7 +84,7 @@ def build(output=None):
             tree.getroot().remove(child)
     tree.write(manifest, encoding='utf-8', xml_declaration=True)
     metadata = directory / 'apktool.yml'
-    metadata.write_text(metadata.read_text().replace('versionCode: 87', 'versionCode: 90'))
+    metadata.write_text(metadata.read_text().replace('versionCode: 87', 'versionCode: 91'))
     unsigned = ROOT / '.runtime/local-unsigned.apk'
     aligned = ROOT / '.runtime/local-aligned.apk'
     apktool('b', '-p', framework, '-o', unsigned, directory)

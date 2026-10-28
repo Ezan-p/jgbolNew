@@ -15,6 +15,7 @@ def load_rules(path=ROOT / 'server_config/progression_rules.json'):
     for key, low, high in (('bun_levels_per_increment', 1, 99), ('bun_increment', 1, 1000),
                            ('newbie_days', 1, 30), ('newbie_max_level', 4, 99),
                            ('newbie_daily_strength', 1, 10000), ('newbie_bonus_percent', 0, 300),
+                           ('newbie_role_bonus_percent', 0, 300),
                            ('timezone_offset_hours', -12, 14)):
         formation.require(type(r.get(key)) is int and low <= r[key] <= high, '升级配置数值无效：' + key)
     milestones = r.get('milestone_rewards')
@@ -112,10 +113,10 @@ def strength_bonus(role, consumed, now=None, r=None):
     s = prepare(role, now, r)
     eligible = 0
     if (0 <= day(now, r) - s['start_day'] < r['newbie_days']
-            and 3 <= role['level'] < r['newbie_max_level']):
+            and 1 <= role['level'] < r['newbie_max_level']):
         eligible = min(consumed, max(0, r['newbie_daily_strength'] - s['strength_used']))
         s['strength_used'] += eligible
-    return eligible, r['newbie_bonus_percent']
+    return eligible, r['newbie_role_bonus_percent']
 
 
 def info(role, now, r=None):
@@ -127,7 +128,7 @@ def info(role, now, r=None):
     return dict(flag=1, buff_type=1 if active else 0,
                 can_take=active and today not in s['claimed_days'],
                 left_times=max(0, r['newbie_days'] - len(s['claimed_days'])), left_days=left,
-                exp_add=r['newbie_bonus_percent'] if active and role['level'] < r['newbie_max_level'] else 0,
+                exp_add=r['newbie_role_bonus_percent'] if left > 0 and role['level'] < r['newbie_max_level'] else 0,
                 exp_plus=0, expect_level=r['newbie_max_level'], max_strength=r['newbie_daily_strength'],
                 attach_list=[dict(object_type=p[0], attach_type=p[1], attach_count=p[2], attach_level=p[3])
                              for p in r['newbie_daily_rewards']])

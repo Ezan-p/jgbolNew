@@ -1,7 +1,7 @@
 """Original 1204/35 onboarding contract [A], explicit offline battle policy [B]."""
 import re
 
-from . import formation, summon, journey, combat_engine, role_profile, tian_shu
+from . import formation, summon, journey, combat_engine, role_profile, tian_shu, progression
 from .protocol import encode
 
 SCHEDULE = {int(r['stage']): int(r['pre_stage']) for r in summon.rows('guide_schedule.csv')}
@@ -21,20 +21,48 @@ def attributes(role):
                    dict(type=29, value=role['head_type'])]))
 
 
+def ensure_tutorial_level(role, now):
+    # [A] guideFightEnd5 waits for the level-2 confirmation before task guidance.
+    # [B] Ordinary offline gate XP is insufficient, so fill only the deficit.
+    if role['level'] != 1:
+        return 0
+    gain = max(0, int(formation.LEVELS[1]['upgrade_exp']) - role['cur_exp'])
+    progression.add_exp(role, gain, now)
+    return gain
+
+
+def recover_tutorial_level(role, now):
+    progress = role.get('guide_progress', LEGACY_COMPLETE)
+    through_ten = (1 << 11) - 2
+    if progress != LEGACY_COMPLETE and progress & through_ten == through_ten:
+        ensure_tutorial_level(role, now)
+
+
+def fighters(role, cfg):
+    units = journey.fighters(role, cfg)
+    # [A] Keep the original gate roster, levels and all combat attributes.
+    # [B] Tutorial NPCs use normal attacks, avoiding random spell bursts while
+    # the player is still locked into the prescribed starting formation.
+    # Player skills and NPC passives retain their normal behavior.
+    for enemy in units[1]:
+        enemy['skill_probabilities'] = {skill: 0 for skill, _ in enemy['skills']}
+    return units
+
+
 def fight(role, stage, now, backend):
     gid = GATES[stage]
     cfg = journey.GATES[1][gid]
     formation.require(journey.unlocked(role, 1, gid), '教学关卡尚未解锁')
     journey.check_attempt(role, 1, gid, cfg, 1)
-    units = journey.fighters(role, cfg)
-    # [B] Tutorial two demonstrates defeat; other lessons demonstrate victory.
-    # Use real combat actions rather than announcing a result with an empty replay.
-    for unit in units[0 if stage == 4 else 1]:
-        unit.update(hp=1, max_hp=1, magic=1, gongji=1, fangyu=1)
+    units = fighters(role, cfg)
     result, lineup, actions = journey.battle(role, cfg, backend.journey_rules, units=units)
-    formation.require((4 <= result <= 6 if stage == 4 else 1 <= result <= 3), '教学战斗结果异常')
+    # The unused stage-4 route may win or lose naturally; never weaken the
+    # player's units to manufacture the old defeat demonstration.
+    formation.require((0 <= result <= 6 if stage == 4 else 1 <= result <= 3), '教学战斗结果异常')
     outcome, prizes = journey.attempt(role, 1, gid, cfg, result, now,
                                      backend.journey_rules, backend.formation_rules)
+    if stage == 10:
+        outcome['role_add_exp'] += ensure_tutorial_level(role, now)
     role['journey']['fight_id'] = role['journey']['fight_id'] % 0x7ffffffe + 1
     fid = role['journey']['fight_id']
     return combat_engine.event_packets(actions, fid) + [
@@ -51,6 +79,13 @@ def settle(role, req, now, backend):
     formation.require(stage in SCHEDULE, '未知的新角色引导阶段')
     formation.require(not done(role, stage), '该引导阶段已经完成，请重新登录恢复进度')
     pre = SCHEDULE[stage]
+    # 3.87 guideUI.show (source line 388) jumps from the first fight directly
+    # to summon; getGuideState also resumes a missing stage 4 at summon.
+    # Keep the table's explicit stage-4 route, but accept the native 3 -> 5
+    # route and close its progress gap only when the summon succeeds.
+    skip_second_fight = stage == 5 and not done(role, 4)
+    if skip_second_fight:
+        pre = 3
     formation.require(not pre or done(role, pre), '请先完成前置引导')
     response = dict(stage=stage)
     events = []
@@ -100,4 +135,6 @@ def settle(role, req, now, backend):
         # Actual gameplay continues through the existing activity protocols.
         pass
     role['guide_progress'] |= 1 << stage
+    if skip_second_fight:
+        role['guide_progress'] |= 1 << 4
     return events if stage in GATES else [summon.event(35, response)]

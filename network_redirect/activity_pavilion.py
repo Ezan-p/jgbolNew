@@ -3,7 +3,7 @@ import copy
 import json
 from pathlib import Path
 
-from . import formation as f, journey, summon
+from . import feature_levels, formation as f, journey, summon
 
 ROOT = Path(__file__).resolve().parents[1]
 SHOP = {int(x['index']): x for x in summon.rows('exchange_zone.csv')}
@@ -166,7 +166,9 @@ def mail(role, key, title, prizes, now, body='天机阁活动奖励，请领取�
 def record_charge(role, gold, now):
     """Called only after a new, validated local recharge order succeeds."""
     r = load_rules()
-    if not r['enabled']:
+    # Recharge bypasses the activity request gate; use the same unlock level.
+    # Ignore locked-period principal entirely so it cannot earn rewards later.
+    if not r['enabled'] or role.get('level', 1) < feature_levels.LEVELS['destiny']:
         return
     s = prepare(role, now, r)
     guard(s, now, r)

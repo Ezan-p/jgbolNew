@@ -69,7 +69,7 @@ class JourneyTests(unittest.TestCase):
         self.assertTrue(result['fight_result'])
         self.assertEqual(after['strength'], before['strength'] - 1)
         self.assertEqual(after['silver_coin'], before['silver_coin'] + 150)
-        self.assertEqual(after['cur_exp'], 5)
+        self.assertEqual(after['cur_exp'], 10)
         self.assertTrue(journey.unlocked(after, 1, 102))
         mids = [m for m, _, d in self.decoded]
         self.assertLess(mids.index(1028), mids.index(1027))
@@ -324,7 +324,7 @@ class JourneyTests(unittest.TestCase):
         self.fixture(cur_exp=39)
         self.fight()
         r = self.b.profile()
-        self.assertEqual((r['level'], r['cur_exp'], r['next_exp']), (2, 4, 110))
+        self.assertEqual((r['level'], r['cur_exp'], r['next_exp']), (2, 9, 110))
         self.assertEqual(r['cortege_count'], int(formation.LEVELS[2]['cortege_count']))
 
     def test_bad_config_fails_closed(self):

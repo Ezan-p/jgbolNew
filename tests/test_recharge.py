@@ -38,6 +38,7 @@ class GoldCardRechargeTests(unittest.TestCase):
 
     def stock(self, large=20, small=40):
         role = self.b.profile()
+        summon.prepare(role, NOW, self.b.summon_rules)
         if large: summon.add_item(role, 1152, large)
         if small: summon.add_item(role, 1156, small)
         self.b.save(role)
@@ -56,9 +57,11 @@ class GoldCardRechargeTests(unittest.TestCase):
     def assert_statistics(self, role, gold):
         self.assertEqual(role['charge_gold'], gold)
         self.assertEqual(role['xianling']['charge'], gold)
-        self.assertEqual(role['pavilion']['charge_gold'], gold)
-        self.assertEqual(role['activity']['rulai']['charge_gold'], gold)
-        self.assertEqual(role['activity']['yuanshi']['charge_gold'], gold)
+        # These orders are paid by fresh roles before the activity unlocks.
+        # Later fund reward levels must not backfill that principal either.
+        self.assertEqual(role['pavilion']['charge_gold'], 0)
+        self.assertEqual(role['activity'].get('rulai', {}).get('charge_gold', 0), 0)
+        self.assertEqual(role['activity'].get('yuanshi', {}).get('charge_gold', 0), 0)
         key = str(daily.day(NOW, self.b.welfare_rules))
         self.assertEqual(role['welfare']['charge_days'][key], gold)
 
@@ -91,9 +94,9 @@ class GoldCardRechargeTests(unittest.TestCase):
         self.assertEqual(self.count(1152), 0)
         self.assert_statistics(self.b.profile(), 500)
 
-    def test_counts_types_exact_value_and_server_owned_price(self):
+    def test_counts_types_minimum_value_and_server_owned_price(self):
         self.stock()
-        for large, small in [(0, 0), (0, 9), (0, 11), (2, 0), (-1, 20),
+        for large, small in [(0, 0), (0, 9), (-1, 20),
                              (True, 0), (1.0, 0), ('1', 0), (1, -1)]:
             with self.subTest(large=large, small=small):
                 self.unchanged(lambda: self.charge(large=large, small=small))
@@ -105,6 +108,50 @@ class GoldCardRechargeTests(unittest.TestCase):
         role = self.b.profile()
         self.assertIn(role['charge_gold'], (0, 500))
         self.assertLess(role['gold_coin'], 10000)
+
+    def test_large_card_buys_45_rmb_fund_without_change_or_extra_credit(self):
+        self.stock(1, 0)
+        before = self.b.profile()
+        self.charge(item=202, large=1, order='overpaid-fund-order')
+        role = self.b.profile()
+        self.assertEqual((self.count(1152), self.count(1156)), (0, 0))
+        self.assertEqual(role['buy_growup'], 1)
+        self.assertEqual(role['gold_coin'], before['gold_coin'])
+        self.assertEqual(role.get('first_charge', 0), before.get('first_charge', 0))
+        self.assert_statistics(role, 450)
+        self.assertEqual(role['recharge']['orders']['overpaid-fund-order']['rmb'], 45)
+        self.charge(item=202, large=1, order='overpaid-fund-order')
+        self.assertEqual(self.b.profile(), role)
+        self.b.close(); self.b = Backend(Path(self.tmp.name), 18790, lambda *a, **k: None)
+        self.charge(item=202, large=1, order='overpaid-fund-order')
+        self.assertEqual(self.b.profile(), role)
+        self.unchanged(lambda: self.charge(item=202, large=1, small=1, order='overpaid-fund-order'))
+
+    def test_overpaid_gold_and_month_consume_selected_cards_at_product_price(self):
+        self.stock(4, 20)
+        self.charge(item=102, large=1, small=1, order='overpaid-mixed-order')
+        role = self.b.profile()
+        self.assertEqual((self.count(1152), self.count(1156)), (3, 19))
+        self.assert_statistics(role, 500)
+        order = role['recharge']['orders']['overpaid-mixed-order']
+        self.assertEqual((order['gold'], order['bonus'], order['first_bonus']), (500, 50, 500))
+        self.charge(item=201, large=2, order='overpaid-month-order')
+        self.assertEqual(self.count(1152), 1)
+        self.assertEqual(self.b.profile()['month_card_time'], NOW + 30 * 86400)
+        self.assert_statistics(self.b.profile(), 1000)
+        self.charge(item=102, large=0, small=11, order='overpaid-small-order')
+        self.assertEqual(self.count(1156), 8)
+        self.assert_statistics(self.b.profile(), 1500)
+
+    def test_overpayment_still_requires_inventory_and_rolls_back_on_failure(self):
+        self.stock(1, 0)
+        self.unchanged(lambda: self.charge(item=202, large=2))
+        with patch.object(self.b, 'inventory', side_effect=struct.error('injected encoding failure')):
+            self.unchanged(lambda: self.charge(item=202, order='overpaid-rollback-order'))
+        self.charge(item=202, order='overpaid-rollback-order')
+        self.assertEqual(self.count(1152), 0)
+        self.assertEqual(self.b.profile()['buy_growup'], 1)
+        self.assert_statistics(self.b.profile(), 450)
 
     def test_two_unlocked_stacks_consumed_without_touching_locked_stack(self):
         self.stock(1, 0)
@@ -217,6 +264,7 @@ class GoldCardRechargeTests(unittest.TestCase):
         self.assertEqual(self.count(1156), 1)
 
     def test_period_boundary_charge_resets_event_ledgers_without_resetting_vip(self):
+        role = self.b.profile(); role['level'] = 20; self.b.save(role)
         self.stock()
         self.charge()
         _, end = activity_rulai.period(NOW, activity_rulai.load_rules())

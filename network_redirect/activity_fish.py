@@ -120,8 +120,10 @@ def payload(s, r):
 
 
 def status(role, now, r):
+    from . import feature_levels
     s=state(role,now,r)
-    if is_open(r) and s['gift_day'] < s['day']:
+    if (is_open(r) and role.get('level', 1) >= feature_levels.LEVELS['fishrush']
+            and s['gift_day'] < s['day']):
         if r['fish_daily_nets']:a.prizes(role,[[5,1026,r['fish_daily_nets'],1]])
         s['gift_day']=s['day']
     return dict(search_gold_data=payload(s,r))

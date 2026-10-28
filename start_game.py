@@ -40,7 +40,7 @@ def main(argv=None):
         raise RuntimeError('等待安卓启动超时：' + last_error)
     installed = adb(config, 'shell', 'pm', 'path', config['package'], timeout=30)
     package_info = adb(config, 'shell', 'dumpsys', 'package', config['package'], timeout=30) if installed.startswith('package:') else ''
-    needs_install = not installed.startswith('package:') or (config.get('apk_variant') == 'local-accounts' and 'versionCode=90 ' not in package_info)
+    needs_install = not installed.startswith('package:') or (config.get('apk_variant') == 'local-accounts' and 'versionCode=91 ' not in package_info)
     reset_done = False
     if not args.client_only and (args.repair or (needs_install and config.get('apk_variant') == 'local-accounts')):
         # Stop stale Frida before package replacement: Android's package watcher

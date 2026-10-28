@@ -4,7 +4,7 @@ local saved,checks,sent,errors,buttons={},{},{},{},{}
 local function preserve(t)
  local old={};for k,v in pairs(t) do old[k]=v end;saved[#saved+1]={t=t,old=old}
 end
-for _,t in ipairs({ui,ms.d_mainUI,ms.d_data,ms.d_u,ms.d_time,ms.d_commonLayerUI,ms.d_alert}) do preserve(t) end
+for _,t in ipairs({ui,ms.d_mainUI,ms.d_data,ms.d_hz,ms.d_u,ms.d_time,ms.d_commonLayerUI,ms.d_alert}) do preserve(t) end
 local report=ms.MS_report_error
 ms.MS_report_error=function(e) errors[#errors+1]=tostring(e) end
 local layer=CCLayer:create();layer:retain()
@@ -40,6 +40,8 @@ local ok,err=xpcall(function()
  end)
  check('native_daily_reward_panel',function()
   ui.callback_getBuffData(ms.d_c.table_copy(FIXTURE.query))
+  assert(ui.g_self.data.exp_add==100)
+  assert(string.format(ms.d_hz.gethz('lub_tink_add2'),ui.g_self.data.exp_add)=='主角修为加成:100%')
   assert(ui.g_self.data.can_take and ui.g_self.blackmask)
   assert(buttons['v2/actNoticeUI/get1.png'])
  end)

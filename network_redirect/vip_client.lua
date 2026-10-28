@@ -119,6 +119,7 @@ do
             if not selection or selection.order_id then return end
             local large,small = inventory()
             local limit = kind == 'large_count' and large or small
+            selection.overpay_confirm = nil
             selection[kind] = math.max(0,math.min(limit,selection[kind]+amount))
             renderPanel()
         end
@@ -127,16 +128,28 @@ do
             local large,small = inventory()
             local due = selection.product.rmb
             local n = math.min(large,math.floor(due/50))
+            selection.overpay_confirm = nil
             selection.large_count,selection.small_count = n,math.min(small,(due-50*n)/5)
+            if 50*selection.large_count+5*selection.small_count<due and large>n then
+                selection.large_count,selection.small_count = n+1,0
+            end
             renderPanel()
         end
-        local function confirm()
+        local function confirm(approved)
             if not selection then return end
             local s = selection
             if not s.order_id then
                 local large,small = inventory()
-                if 50*s.large_count+5*s.small_count ~= s.product.rmb then ms.d_info.show('所选金卡总额须等于本次充值金额');return end
-                if s.large_count>large or s.small_count>small then ms.d_info.show('可用金卡不足，请调整数量');return end
+                local paid = 50*s.large_count+5*s.small_count
+                if paid<s.product.rmb then ms.d_info.show('所选金卡总额不足本次充值金额');return end
+                if s.large_count>large or s.small_count>small then
+                    s.overpay_confirm=nil;renderPanel()
+                    ms.d_info.show('可用金卡不足，请调整数量');return
+                end
+                if paid>s.product.rmb and not (approved==true and s.overpay_confirm) then
+                    s.overpay_confirm=true;renderPanel();return
+                end
+                s.overpay_confirm=nil
                 orderSequence = orderSequence+1
                 s.order_id = tostring(os.time())..'-'..tostring(math.random(100000,999999))..'-'..tostring(orderSequence)
                 pendingCheckout=s
@@ -196,7 +209,23 @@ do
             local s=selection
             local large,small=inventory()
             local paid=s.large_count*50+s.small_count*5
-            local ready=paid==s.product.rmb and s.large_count<=large and s.small_count<=small
+            local ready=paid>=s.product.rmb and s.large_count<=large and s.small_count<=small
+            if s.overpay_confirm then
+                text(box,'超额支付确认',390,453,28,ccc3(255,224,160))
+                fittedText(box,s.product.name or '充值',390,399,24,nil,650)
+                text(box,'所选金卡 '..paid..' 元，应付 '..s.product.rmb..' 元',390,347,25)
+                text(box,'超出 '..(paid-s.product.rmb)..' 元不找零、不退还',390,291,24,ccc3(255,180,122))
+                text(box,'充值额度及奖励仍按商品金额计算',390,245,22)
+                text(box,'确认后将消耗全部所选金卡，是否继续？',390,197,22)
+                local action='v2/crossServerUI/btn_bkg.png'
+                skinButton(box,action,nil,'返回修改',260,94,190,56,function()
+                    if selection==s then s.overpay_confirm=nil;renderPanel() end
+                end,true,19864)
+                skinButton(box,action,nil,'仍然充值',520,94,190,56,function()
+                    if selection==s and s.overpay_confirm then confirm(true) end
+                end,ready,19865)
+                return
+            end
             fittedText(box,(s.product.name or '充值')..'  ·  需抵扣 '..s.product.rmb..' 元',390,472,23,ccc3(255,224,160),650)
             local rows={{key='large_count',name='大传世金卡',tid=1152,rmb=50,owned=large,y=396},
                         {key='small_count',name='小传世金卡',tid=1156,rmb=5,owned=small,y=286}}
@@ -227,7 +256,7 @@ do
             elseif s.large_count>large or s.small_count>small then status='库存已变化，请重新选择金卡'
             elseif large*50+small*5<s.product.rmb then status='金卡不足，还缺 '..(s.product.rmb-large*50-small*5)..' 元面值'
             elseif paid<s.product.rmb then status='还差 '..(s.product.rmb-paid)..' 元，请增加金卡'
-            elseif paid>s.product.rmb then status='多选 '..(paid-s.product.rmb)..' 元，请减少金卡' end
+            elseif paid>s.product.rmb then status='超出 '..(paid-s.product.rmb)..' 元不找零，确认后仍可充值' end
             fittedText(box,status,390,151,19,ready and ccc3(174,218,135) or ccc3(255,180,122),650)
             local action='v2/crossServerUI/btn_bkg.png'
             skinButton(box,action,nil,s.order_id and '关闭面板' or '取消',166,94,166,56,closePanel,true,19861)

@@ -6,12 +6,18 @@ do
  if not (ui and main and main.levelUpBox) then return 'pending' end
  if not ui._localProgressionRestore then
   local old=ui.showLevelUpBuff
+  local oldHz=ms.d_hz.gethz
+  ms.d_hz.gethz=function(key,...)
+   if key=='lub_tink_add2' then return '主角修为加成:%d%%' end
+   return oldHz(key,...)
+  end
   ui.showLevelUpBuff=function(...)
    ui.g_self.data=nil
    return old(...)
   end
   ui._localProgressionRestore=function()
    ui.showLevelUpBuff=old
+   ms.d_hz.gethz=oldHz
    ui._localProgressionRestore=nil
   end
  end

@@ -312,8 +312,11 @@ class NineSkyTests(ActivityCase):
         s['stars']=200;self.b.save(role)
         with patch('network_redirect.backend.time.time',return_value=s['end']), \
              patch('network_redirect.backend.activity.attributes',side_effect=ValueError('encode failed')):
+            # Profile reads persist elapsed resource recovery before settlement.
+            # Compare against that baseline, so this tests activity rollback.
+            role = self.b.profile()
             self.assertEqual(self.call()[0][0],55)
-        self.assertEqual(self.b.profile(),role)
+            self.assertEqual(self.b.profile(),role)
         with patch('network_redirect.backend.time.time',return_value=s['end']):self.result(self.call())
         self.assertEqual(self.sky_state()['last_recycle']['peaches'],100)
 

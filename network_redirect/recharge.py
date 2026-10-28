@@ -118,7 +118,7 @@ def settle(role, mid, req, now, r, vr, wr, parse):
         f.require(isinstance(order, str) and ORDER.fullmatch(order) and not order.startswith('bag-'), '充值订单编号无效')
         f.require(all(type(n) is int and 0 <= n <= r['max_cards_per_order'] for n in (large, small)) and
                   0 < large + small <= r['max_cards_per_order'], '金卡数量无效')
-        f.require(large * r['large_rmb'] + small * r['small_rmb'] == p['rmb'], '金卡面值合计必须等于商品金额')
+        f.require(large * r['large_rmb'] + small * r['small_rmb'] >= p['rmb'], '金卡面值合计不足商品金额')
         fingerprint = dict(item_id=p['id'], large_count=large, small_count=small)
     previous = state['orders'].get(order)
     if previous:
@@ -140,6 +140,7 @@ def settle(role, mid, req, now, r, vr, wr, parse):
         role['month_card_time'] = max(now, role.get('month_card_time', 0)) + r['month_days'] * 86400
     if p['kind'] == 'fund':
         role['buy_growup'] = 1
+    # Excess card value is not returned or credited; benefits use the product price.
     principal = p['rmb'] * r['gold_per_rmb']
     was_first = not role.get('first_charge') and p['kind'] in ('gold', 'card')
     record(role, principal, now, vr, wr, double=p['kind'] in ('gold', 'card'))

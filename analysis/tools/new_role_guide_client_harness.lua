@@ -33,6 +33,13 @@ local ok,err=xpcall(function()
   guide.getGuideState();assert(not ms.d_mainUI.g_isNeedGuide)
  end)
  local called
+ replace(guide,'guideFightEndFunc',function() called='fight_end' end)
+ check('first_fight_skips_second_fight',function()
+  guide.g_currentGuide=guide.guideState.guideFightEnd
+  guide.show()
+  assert(called=='fight_end')
+  assert(guide.g_currentGuide==guide.guideState.guideSummon)
+ end)
  replace(guide,'g_dialogIndex',1)
  replace(guide,'showDialog',function() called='dialog' end)
  replace(guide,'packSummonData',function() return {} end)

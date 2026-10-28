@@ -138,6 +138,58 @@ class PavilionTests(ActivityCase):
         self.assertEqual(self.amount(1141), 1350)
         for index in range(1, 5): self.assertEqual(self.call(3, index=index)[0][0], 55)
 
+    def test_locked_recharge_not_counted_or_backfilled_after_unlock(self):
+        role = self.b.profile(); role['level'] = 29; self.b.save(role)
+        before = self.b.profile()
+        self.charge('locked-pavilion-order')
+        locked = self.b.profile()
+        self.assertEqual(locked['charge_gold'] - before['charge_gold'], 10000)
+        self.assertGreater(locked['gold_coin'], before['gold_coin'])
+        self.assertGreater(locked['vip_level'], before['vip_level'])
+        self.assertEqual(locked['pavilion'], before['pavilion'])
+        self.assertFalse(any(k.startswith('pavilion-charge-') for k in locked['welfare'].get('mails', {})))
+        self.assertEqual(self.amount(1141), 0)
+
+        locked['level'] = 30; self.b.save(locked)
+        self.charge('locked-pavilion-order')  # Replaying the old order cannot grant bricks.
+        self.assertEqual(self.b.profile()['pavilion'], before['pavilion'])
+        self.charge('unlocked-pavilion-order', product=101)
+        role = self.b.profile()
+        self.assertEqual(role['pavilion']['charge_gold'], 100)
+        self.assertEqual(role['pavilion']['bricks_earned'], 20)  # 10 RMB + first tier only.
+        data = self.data(self.call())
+        self.assertEqual(data['charge_money'], 10)
+        self.assertEqual(data['exchange_info'][1]['left_buy_count'], 3)
+        self.assertEqual(data['charge_info'][2]['state'], 1)  # Locked recharge adds no global progress.
+        self.claim_mails(); self.assertEqual(self.amount(1141), 20)
+
+    def test_locked_month_fund_and_bag_card_skip_pavilion_rewards(self):
+        role = self.b.profile(); role['level'] = 29; self.b.save(role)
+        before = self.b.profile()['pavilion']
+        for product in (201, 202):
+            self.charge(f'locked-product-{product}', product=product)
+        role = self.b.profile()
+        self.assertGreater(role['month_card_time'], NOW)
+        self.assertEqual(role['buy_growup'], 1)
+        card = next(i for i in role['attachments'] if i['type_id'] == 1152)
+        self.req(1051, item_id=card['id'], item_type=1152, item_count=1,
+                 des_type=1, des_id=role['role_id'])
+        role = self.b.profile()
+        self.assertEqual(role['charge_gold'], 1450)  # 50 + 45 + 50 RMB.
+        self.assertEqual(role['pavilion'], before)
+        self.assertFalse(any(k.startswith('pavilion-charge-') for k in role['welfare'].get('mails', {})))
+        self.assertEqual(self.amount(1141), 0)
+
+    def test_locked_fractional_principal_does_not_carry_into_unlock(self):
+        role = self.b.profile(); role['level'] = 29
+        before = copy.deepcopy(role)
+        p.record_charge(role, 9, NOW)
+        self.assertEqual(role, before)
+        role['level'] = 30
+        p.record_charge(role, 1, NOW)
+        self.assertEqual(role['pavilion']['charge_gold'], 1)
+        self.assertEqual(role['pavilion']['bricks_earned'], 0)
+
     def test_bad_inputs_locked_and_insufficient_atomic(self):
         for kw in (dict(flag=0),dict(flag=4),dict(flag=1,count=1),dict(flag=3,index=1),
                    dict(flag=2,index=99,count=1),dict(flag=2,index=1,count=0),

@@ -324,9 +324,13 @@ def experience(role, cfg, win, rules, formation_rules, bonus_exp=0, now=None):
     level = role['level']
     gain = int(formation.LEVELS[level]['win_exp' if win else 'lose_exp']) * int(cfg['strenth_consume'])
     from . import progression
-    eligible, percent = progression.strength_bonus(role, int(cfg['strenth_consume']), now)
+    progression_rules = progression.load_rules()
+    eligible, percent = progression.strength_bonus(role, int(cfg['strenth_consume']), now, progression_rules)
     gain += int(formation.LEVELS[level]['win_exp' if win else 'lose_exp']) * eligible * percent // 100
     progression.add_exp(role, gain, now)
+    # Only protagonist XP uses the new level-1, +100% bonus. Other rewards
+    # retain their level-3 threshold and percentage, sharing the daily budget.
+    percent = progression_rules['newbie_bonus_percent'] if level >= 3 else 0
     exp = int(cfg['exp']) * (100 if win else rules['defeat_companion_exp_percent']) // 100 + bonus_exp
     exp += exp * eligible * percent // (100 * max(1, int(cfg['strenth_consume'])))
     exp_list = {}

@@ -1,5 +1,6 @@
 """Real 1104 packets, original event-18 contract and atomic coupon settlement."""
 import copy
+import json
 import tempfile
 import unittest
 from concurrent.futures import ThreadPoolExecutor
@@ -185,6 +186,90 @@ class GiftCodeTests(unittest.TestCase):
         rules = copy.deepcopy(self.b.gift_code_rules)
         rules['codes'].append(copy.deepcopy(rules['codes'][0]))
         with self.assertRaises(formation.Rejected): gift_codes.validate(rules)
+
+    def test_requested_fixed_gifts_and_all_nineteen_souls(self):
+        rows = self.b.gift_code_rules['codes'][2:]
+        self.assertEqual(len(rows), 25)
+        expected = dict(zip(
+            ['王母', '太乙天尊', '北海龙王', '菩提祖师', '镇元大仙', '荡魔天尊',
+             '南海龙王', '魏征', '西海龙王', '弥勒佛', '灵宝天尊', '元始天尊',
+             '灵吉菩萨', '东华大帝', '李世民', '燃灯古佛', '观音菩萨', '接引佛祖', '如来佛祖'],
+            [5027, 5029, 5032, 5034, 5035, 5036, 5039, 5040, 5041, 5044,
+             5045, 5046, 5047, 5048, 5049, 5050, 5051, 5052, 5053]))
+        self.assertEqual({r['name'].removesuffix('魂魄大礼'): r['prizes'][0][1]
+                          for r in rows if r['prizes'] and r['prizes'][0][0] == 10}, expected)
+        for row in rows:
+            if row.get('random_prizes'):
+                continue
+            with self.subTest(code=row['code']):
+                before = self.b.profile()
+                result = self.request(row['code'])
+                self.assertEqual(result['result'], 1)
+                after = self.b.profile()
+                for kind, tid, count, level in row['prizes']:
+                    if kind == 10:
+                        self.assertEqual(count, 40)
+                        self.assertEqual(after['souls'].get(str(tid), 0) - before.get('souls', {}).get(str(tid), 0), 40)
+                        snapshot = next(d for m, _, d in self.decoded if m == 1046)
+                        self.assertIn(dict(type_id=tid, count=after['souls'][str(tid)]), snapshot['spirit_list'])
+                    elif kind == 5:
+                        total = lambda role: sum(i['count'] for i in role['attachments'] if i['attach_type'] == 5 and i['type_id'] == tid)
+                        self.assertEqual(total(after) - total(before), count)
+                    else:
+                        key = 'silver_coin' if kind == 12 else 'gold_coin'
+                        self.assertEqual(after[key] - before[key], count)
+                self.reject(13, code=row['code'])
+        self.assertEqual(len(self.claims()), 24)
+        saved = self.b.profile()
+        self.b.close()
+        self.b = self.backend()
+        self.assertEqual(self.b.profile()['souls'], saved['souls'])
+
+    def test_random_finished_equipment_snapshot_and_replay(self):
+        before = self.b.profile()
+        with patch('network_redirect.gift_codes.choice', side_effect=lambda pool: pool[-1]) as draw:
+            result = self.request('JGEQUIP5')
+        self.assertEqual(draw.call_count, 4)
+        self.assertEqual(result['result'], 1)
+        self.assertEqual(result['attach_count'], 4)
+        after = self.b.profile()
+        added = [i for i in after['attachments'] if i['id'] not in {x['id'] for x in before['attachments']}]
+        self.assertEqual(len(added), 4)
+        self.assertEqual(len({i['id'] for i in added}), 4)
+        for item, category in zip(added, ['weapon', 'armor', 'artifact', 'passive']):
+            self.assertEqual([item['attach_type'], item['type_id'], 1, item['level']], gift_codes.random_pool(category)[-1])
+            self.assertGreater(item['effect_value'], 0)
+            self.assertFalse(item.get('owner_id'))
+        ledger = json.loads(self.claims()[0][5])
+        self.assertEqual(ledger, [gift_codes.random_pool(c)[-1] for c in ['weapon', 'armor', 'artifact', 'passive']])
+        replies, packet = self.replies, self.packet
+        with patch('network_redirect.gift_codes.choice', side_effect=AssertionError('redraw')):
+            self.assertEqual(self.b.respond(packet, {'authenticated': True}), replies)
+            self.reject(13, code='JGEQUIP5')
+        self.assertEqual(after, self.b.profile())
+
+    def test_random_and_soul_failure_roll_back(self):
+        for code in ('JGEQUIP5', 'JGWANGMU40'):
+            with self.subTest(code=code):
+                self.b.profile()  # Complete migrations before injecting save failure.
+                with patch.object(self.b, 'save', side_effect=ValueError('save failure')):
+                    self.reject(15, code=code)
+                self.assertEqual(self.request(code)['result'], 1)
+
+    def test_soul_overflow_rolls_back(self):
+        role = self.b.profile()
+        role.setdefault('souls', {})['5027'] = 2147483640
+        self.b.save(role)
+        self.reject(15, code='JGWANGMU40')
+
+    def test_invalid_random_and_soul_config(self):
+        for change in ({'random_prizes': ['unknown']}, {'random_prizes': 'weapon'},
+                       {'prizes': [[10, 999999, 40, 1]]}, {'prizes': [[6, 999999, 1, 1]]},
+                       {'random_prizes': ['weapon'] * 21}):
+            rules = copy.deepcopy(self.b.gift_code_rules)
+            rules['codes'][0].update(change)
+            with self.subTest(change=change), self.assertRaises(formation.Rejected):
+                gift_codes.validate(rules)
 
 
 if __name__ == '__main__':

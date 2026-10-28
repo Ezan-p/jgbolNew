@@ -171,7 +171,8 @@ class ProgressionTests(unittest.TestCase):
                            ('milestone_rewards', {'20': [[5, 1152, 0, 1]]}),
                            ('milestone_rewards', {'20': [[5, 999999, 1, 1]]}),
                            ('milestone_rewards', {'20': [[5, 1152, 1, 1]] * 3}),
-                           ('newbie_bonus_percent', True), ('level_rewards', [[11, 1, -1, 1]])]:
+                           ('newbie_bonus_percent', True), ('newbie_role_bonus_percent', True),
+                           ('level_rewards', [[11, 1, -1, 1]])]:
             rules = progression.load_rules(); rules[key] = value
             path = Path(self.tmp.name) / 'invalid.json'; path.write_text(json.dumps(rules))
             with self.assertRaises(formation.Rejected): progression.load_rules(path)
@@ -196,7 +197,9 @@ class ProgressionTests(unittest.TestCase):
         self.assertEqual(events[-1][0], 44)
         self.assertIn(2, [e for e, d in events])
         after = self.b.profile()
-        self.assertEqual((after['level'], after['cur_exp']), (2, 4))
+        self.assertEqual((after['level'], after['cur_exp']), (2, 9))
+        gain = next(d['exp_plus'] for e, d in events if e == 45 and d['obj_type'] == 1)
+        self.assertEqual(gain, 10)
         self.assertEqual(self.buns(after) - self.buns(before), 1)
         self.assertEqual(self.b.respond(self.packet, self.state), self.replies)
         self.assertEqual(self.b.profile(), after)
@@ -236,16 +239,33 @@ class ProgressionTests(unittest.TestCase):
         r['progression']['strength_used'] = 59
         cfg = dict(strenth_consume='3', exp='100', money='120')
         xp, _, silver = journey.experience(r, cfg, True, self.b.journey_rules, self.b.formation_rules, now=NOW)
-        self.assertEqual((xp, silver), (52, 140))  # 15*3 + floor(15*.5), 120+floor(120/3*.5)
+        self.assertEqual((xp, silver), (60, 140))  # 15*3 + 15*1; silver retains +50%.
         self.assertEqual(r['progression']['strength_used'], 60)
         xp, _, silver = journey.experience(r, cfg, False, self.b.journey_rules, self.b.formation_rules, now=NOW)
         self.assertEqual(xp, 21)
         self.assertEqual(progression.strength_bonus(r, 2, NOW + 86400)[0], 2)
 
     def test_bonus_level_boundary_and_expiry(self):
-        for level, elapsed, expected in [(2, 0, 0), (3, 0, 1), (29, 0, 1), (30, 0, 0), (3, 7, 0)]:
+        for level, elapsed, expected in [(1, 0, 1), (2, 0, 1), (3, 0, 1), (29, 0, 1),
+                                         (30, 0, 0), (1, 6, 1), (1, 7, 0), (3, 7, 0)]:
             r = self.role(level=level)
             self.assertEqual(progression.strength_bonus(r, 1, NOW + elapsed*86400)[0], expected)
+
+    def test_role_bonus_starts_at_one_and_preserves_other_rewards(self):
+        cfg = dict(strenth_consume='1', exp='101', money='101')
+        for level, expected_xp, expected_silver in [(1, 10, 101), (2, 20, 101),
+                                                   (3, 30, 151), (29, 290, 151), (30, 150, 101)]:
+            with self.subTest(level=level):
+                r = self.role(level=level, cur_exp=0)
+                r['progression']['strength_used'] = 0
+                for c in r['corteges']:
+                    c.update(level=1, cur_exp=0)
+                xp, exps, silver = journey.experience(r, cfg, True, self.b.journey_rules,
+                                                       self.b.formation_rules, now=NOW)
+                self.assertEqual((xp, silver), (expected_xp, expected_silver))
+                self.assertTrue(exps)
+                self.assertTrue(all(value == expected_silver for value in exps.values()))
+                self.assertEqual(progression.info(r, NOW)['exp_add'], 100 if level < 30 else 0)
 
     def test_bootstrap_and_welfare_hint_do_not_hide_entry(self):
         self.role(level=3)
@@ -298,7 +318,8 @@ class ProgressionTests(unittest.TestCase):
         events = self.req(1061, tollgate_type=1, tollgate_id=101, sweep_count=10)
         self.assertNotIn(55, [e for e, d in events])
         r = self.b.profile()
-        self.assertEqual((r['level'], r['cur_exp'], self.buns(r)), (2, 94, 1))
+        # 10 at level 1, six fights at 20, then three at 30: 220 total XP.
+        self.assertEqual((r['level'], r['cur_exp'], self.buns(r)), (3, 109, 2))
         self.assertIn(63, [e for e, d in events]); self.assertIn(2, [e for e, d in events])
         r['level'] = 4; r['cur_exp'] = int(formation.LEVELS[4]['upgrade_exp']) - 1
         progression.add_exp(r, 1, NOW)
