@@ -1,0 +1,11 @@
+[req]
+distinguished_name=dn
+x509_extensions=leaf
+prompt=no
+[dn]
+CN=JGBOL Offline Loopback
+[leaf]
+basicConstraints=critical,CA:TRUE
+keyUsage=critical,digitalSignature,keyEncipherment,keyCertSign
+extendedKeyUsage=serverAuth
+subjectAltName=IP:113.105.245.176,IP:119.145.5.182,IP:123.103.22.250,IP:123.103.63.60,IP:127.0.0.1,IP:192.168.10.108,DNS:app.meizu.com,DNS:bbs.996.com,DNS:di.syyx.com,DNS:jgb.syyx.com,DNS:jgbkf.syyx.com,DNS:jgbol-local.invalid,DNS:jgbupdate02.shangyoo.com,DNS:jgbupdate02.syyx.com,DNS:jgbupdate04.shangyoo.com,DNS:jgbupdate04.syyx.com,DNS:localhost,DNS:mgs.syyx.com,DNS:sx01-mxybs01.shangyoo.com,DNS:www.windowsphone.com
