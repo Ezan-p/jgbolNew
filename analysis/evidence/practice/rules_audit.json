@@ -1,5 +1,5 @@
 {
-  "revision": "2026-10-26-yanluowang-v1",
+  "revision": "2026-10-30-progressive-rewards-v2",
   "stage_count": 95,
   "original_sources": [
     "analysis/configs/cortege/cortege_base_0.csv:5001",
@@ -7,7 +7,14 @@
     "analysis/evidence/lua_named/lua/ui/practiceUI.lua.txt:51-291",
     "analysis/evidence/lua_named/lua/event_mgr.lua.txt:1406-1420"
   ],
-  "inferred": "阎罗王等级=已成功修炼次数+1，法术1级；每胜随机一项等权奖励，增量沿用activity_rules.train_increase；失败不消耗次数，无资源费用",
+  "inferred": "阎罗王等级=已成功修炼次数+1，法术1级；第n次成功随机一项等权奖励，单次增量=activity_rules.train_increase对应基础值×n；失败不推进次数，无资源费用；旧存档累计加成保留，不追溯补发",
+  "reward_base": {
+    "hp": 20,
+    "gongji": 5,
+    "fangyu": 5,
+    "magic": 10
+  },
+  "reward_formula": "train_increase[stat] * (rule_index + 1)",
   "native_protocol": {
     "request": 1026,
     "fight_type": 4,

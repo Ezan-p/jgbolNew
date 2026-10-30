@@ -7,6 +7,7 @@ from . import feature_levels, formation as f, journey, summon
 
 ROOT = Path(__file__).resolve().parents[1]
 SHOP = {int(x['index']): x for x in summon.rows('exchange_zone.csv')}
+SHOP.update({int(x['index']): x for x in summon.rows('fate_rebuild/exchange_zone.csv')})
 GIFTS = {kind: {int(x['index']): x for x in summon.rows('gift_config.csv')
                 if int(x['gift_type']) == kind} for kind in (1, 2)}
 
@@ -37,7 +38,7 @@ def load_rules(path=ROOT / 'server_config/pavilion_rules.json'):
                        ('ascension_extra_rmb', 100000), ('ascension_extra_limit', 100),
                        ('batch_limit', 9999)):
         f.require(type(r.get(key)) is int and 1 <= r[key] <= upper, '天机配置数值无效：' + key)
-    f.require(set(SHOP) == set(range(1, 10)), '天机原版商品缺失')
+    f.require(set(SHOP) == set(range(1, 11)), '天机商品缺失')
     for row in SHOP.values():
         f.require(int(row['max_buy_count']) > 0 and int(row['goldon_count']) > 0, '天机原表价格无效')
         for p in specs(row['attach_list']) + specs(row['gift_prize']):

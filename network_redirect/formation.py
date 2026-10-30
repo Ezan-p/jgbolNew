@@ -4,6 +4,7 @@ All mutations operate on a detached role. Backend serializes every response befo
 committing; validation failures therefore cannot partially debit an inventory.
 """
 from decimal import Decimal, ROUND_FLOOR
+import copy
 import csv
 import json
 from pathlib import Path
@@ -217,7 +218,10 @@ def migrate_level_culture(c, rules=None):
 
 def prepare(role, rules):
     """Idempotent migration: retain IDs, skill levels, resources and companion progress."""
-    before = json.dumps(role, sort_keys=True)
+    # Fresh battle effects mix numeric action indices with named metadata.
+    # Compare the detached state directly: JSON key sorting cannot order those
+    # keys, and persistence must not be required before formation migration.
+    before = copy.deepcopy(role)
     role.setdefault('attachments', [])
     if 'corteges' not in role:
         role.setdefault('summon', {})
@@ -262,7 +266,7 @@ def prepare(role, rules):
     from . import cheer
     cheer.prepare(role)
     recalculate(role, rules)
-    return before != json.dumps(role, sort_keys=True)
+    return before != role
 
 
 def recalculate(role, rules):

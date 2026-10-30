@@ -135,7 +135,9 @@ def engrave(role, req, rules, parse):
         locks = list(raw.values())
     else:
         locks = raw
-    f.require(all(type(n) is int and 1 <= n <= 4 for n in locks) and len(set(locks)) == len(locks), '锁定槽位无效')
+    from .fate_rebuild import essence_slots
+    slots = essence_slots(c)
+    f.require(all(type(n) is int and n in slots for n in locks) and len(set(locks)) == len(locks), '锁定槽位无效')
     installed = [i for i in role['attachments'] if i['attach_type'] == 5 and i['type_id'] in ESSENCES and i.get('owner_id') == c['id']]
     f.require(all(i['type_id'] != src['type_id'] for i in installed), '不能重复铭刻同一种精魄')
     bypos = {i['ext_skill_pos']: i for i in installed}
@@ -147,7 +149,7 @@ def engrave(role, req, rules, parse):
         pos = predecessor['ext_skill_pos']
         f.require(pos not in locks, '同系旧精魄已锁定')
     else:
-        free = [p for p in range(1, c['equiped_ext_skill_limit'] + 1) if p not in bypos]
+        free = [p for p in slots if p not in bypos]
         candidates = [p for p in bypos if p not in locks]
         if free:
             pos = min(free)

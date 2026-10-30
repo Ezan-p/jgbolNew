@@ -271,8 +271,57 @@ class YuanshiTests(ActivityCase):
         r = self.b.profile(); summon.add_item(r, 1808, 2); self.b.save(r)
         item = next(i for i in r['attachments'] if i['type_id'] == 1808)
         req.update(item_id=item['id'], item_count=2)
-        self.ok(self.req(1051, **req)); self.assertEqual(self.b.profile()['souls']['5046'], 80)
+        self.ok(self.req(1051, **req)); self.assertEqual(self.b.profile()['souls']['5046'], 240)
         self.assertEqual(self.req(1051, **req)[0][0], 55)
+
+    def test_bag_duplicate_souls_follow_current_role_level_and_persist(self):
+        r = self.b.profile(); y.grant_yuanshi(r)
+        r.setdefault('souls', {})['5046'] = 7
+        summon.add_item(r, 1808, 4); self.b.save(r)
+        item = next(i for i in r['attachments'] if i['type_id'] == 1808)
+        for level, count in [(10, 1), (61, 1), (99, 2)]:
+            with self.subTest(level=level, count=count):
+                r = self.b.profile(); r['level'] = level; self.b.save(r)
+                before = self.b.profile()['souls']['5046']
+                events = self.req(1051, item_type=1808, item_id=item['id'],
+                                  item_count=count, des_type=1, des_id=0)
+                self.ok(events)
+                reward = next(d for e, d in events if e == 21)
+                self.assertEqual(reward['count'], count)
+                self.assertEqual(list(reward['attach_list'].values()),
+                                 [dict(object_type=10, attach_type=5046,
+                                       attach_count=level * 2, attach_level=1)] * count)
+                after = self.b.profile()
+                self.assertEqual(after['souls']['5046'] - before, level * 2 * count)
+                self.assertEqual(self.b.respond(self.packet, self.state_for_wire()), self.replies)
+                self.assertEqual(self.b.profile(), after)
+        self.assertEqual(self.amount(1808), 0)
+        self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        self.assertEqual(self.b.profile()['souls']['5046'], 545)
+
+    def test_bag_batch_first_companion_then_level_based_souls(self):
+        r = self.b.profile(); summon.add_item(r, 1808, 3); self.b.save(r)
+        item = next(i for i in r['attachments'] if i['type_id'] == 1808)
+        events = self.req(1051, item_type=1808, item_id=item['id'],
+                          item_count=3, des_type=1, des_id=0)
+        self.ok(events)
+        rewards = next(d for e, d in events if e == 21)['attach_list']
+        self.assertEqual([p['object_type'] for p in rewards.values()], [4, 10, 10])
+        r = self.b.profile()
+        companions = [c for c in r['corteges'] if c['type'] == 5046]
+        self.assertEqual(len(companions), 1)
+        self.assertEqual(companions[0]['level'], 120)
+        self.assertEqual(r['souls']['5046'], 240)
+        self.assertEqual(self.amount(1808), 0)
+        self.assertFalse(r['activity'].get('yuanshi', {}).get('claimed', False))
+
+    def test_progress_claim_duplicate_keeps_own_conversion(self):
+        r = self.b.profile(); y.grant_yuanshi(r)
+        y.state(r, NOW, y.load_rules())['progress'] = 100
+        self.b.save(r)
+        d = self.data(self.call(2))
+        self.assertEqual(d['prize_list'][1]['attach_count'], 40)
+        self.assertEqual(self.b.profile()['souls']['5046'], 40)
 
     def test_invalid_input_lock_balance_and_atomicity(self):
         self.data(self.call(2))

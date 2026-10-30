@@ -71,7 +71,7 @@ class PavilionTests(ActivityCase):
         status = next(d for e, d in events if e == 47)['pavilion_data']
         self.assertLess(status['begin_time'], NOW); self.assertGreater(status['end_time'], NOW)
         d = self.data(self.call())
-        self.assertEqual(len(d['exchange_info']), 9)
+        self.assertEqual(len(d['exchange_info']), 10)
         self.assertEqual(len(d['charge_info']), 4)
         for i, row in p.SHOP.items():
             self.assertEqual(d['exchange_info'][i]['left_buy_count'], int(row['max_buy_count']))

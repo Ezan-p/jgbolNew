@@ -20,7 +20,8 @@ def main():
         role = b.profile()
         role['level'] = 20
         activity.prepare(role, now, b.activity_rules)
-        role['activity']['trial_meta']['type_id'] = 5022
+        with patch.object(trial.secrets, 'choice', return_value=5022), patch.object(trial.secrets, 'randbelow', return_value=0):
+            trial.encounter(role, now, b.activity_rules)
         b.save(role)
         serial = 100000
         def req(mid, **data):
@@ -36,7 +37,7 @@ def main():
         f['fight'], f['wire'] = req(1026, fight_type=11, des_type=8, des_id=5022)
         # Native UI kill/claim paths use a separately prepared dead disposable boss.
         role = b.profile()
-        role['activity']['trial'].update(hp=0, is_dead=True)
+        role['activity']['trial_bosses'][0].update(hp=0, is_dead=True)
         b.save(role)
         f['dead'], _ = req(1064, flag=2)
         f['claim'], _ = req(1064, flag=9)
@@ -44,6 +45,14 @@ def main():
         f['kill'] = copy.deepcopy(f['fight'])
         f['kill']['result'] = 7
         f['kill']['train_data']['hp'] = 0
+        role = b.profile()
+        for tid, roll in [(5022,0),(5001,70),(5045,95)]:
+            with patch.object(trial.secrets, 'choice', return_value=tid), patch.object(trial.secrets, 'randbelow', side_effect=[0,roll]):
+                trial.encounter(role, now, b.activity_rules)
+        for boss,count in zip(role['activity']['trial_bosses'],(10,0,3)):
+            boss['train_times']=count
+        b.save(role)
+        f['multiple'], _ = req(1064, flag=2)
         b.close()
     f['pool'] = list(f['pool'])
     source = 'local FIXTURE=' + summon.lua(f) + '\n'

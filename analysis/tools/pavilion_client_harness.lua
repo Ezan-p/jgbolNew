@@ -38,8 +38,8 @@ check('activity status and enter request',function()
  ui.updateActivityStatus(FIXTURE.status);assert(ui.canJoin());ui.enter();assert(sent[#sent].mid==1227 and sent[#sent].data.flag==1)
 end)
 check('entry response',function() ui.onGetResult(FIXTURE.entry);assert(ui.g_csv.shop[9]) end)
-for page=1,3 do check('shop page '..page,function() ui.g_self.cur_page=page;ui.showPageDeatail(page) end) end
-for index=1,9 do check('purchase dialog '..index,function()
+for page=1,4 do check('shop page '..page,function() ui.g_self.cur_page=page;ui.showPageDeatail(page) end) end
+for index=1,10 do check('purchase dialog '..index,function()
  ui.showBuyItem(root,index);ui.showDynamicBuyLayer();assert(ui.g_destinyUI.buyInfo.singlePrice==ui.g_csv.shop[index].goldon_count);ui.closeBuyItemLayer()
 end) end
 check('native coupon batch purchase request',function()

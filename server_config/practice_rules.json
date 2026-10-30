@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "mode": "inferred",
-  "revision": "2026-10-26-yanluowang-v1",
+  "revision": "2026-10-30-progressive-rewards-v2",
   "enemy_type": 5001,
   "enemy_first_level": 1,
   "enemy_levels_per_win": 1,
@@ -9,6 +9,6 @@
   "reward_weights": {"hp": 1, "magic": 1, "gongji": 1, "fangyu": 1},
   "provenance": {
     "original": "practiceUI: 5级开放，level-4-rule_index次；1026类型4；结果页单项属性；5001阎罗王原表基础、成长和天生法术207",
-    "inferred": "阎罗王等级=已成功修炼次数+1，法术1级；每胜随机一项等权奖励，增量沿用activity_rules.train_increase；失败不消耗次数，无资源费用"
+    "inferred": "阎罗王等级=已成功修炼次数+1，法术1级；第n次成功随机一项等权奖励，单次增量=activity_rules.train_increase对应基础值×n；失败不推进次数，无资源费用；旧存档累计加成保留，不追溯补发"
   }
 }

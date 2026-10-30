@@ -1,3 +1,33 @@
+-- equipmentUpgradeUI:722-724 grays both buttons whenever a multi-step
+-- response finishes, even when our ten-attempt batch stops below the cap.
+-- Scope the correction to that result function and its delayed animation
+-- closure; other screens and createEnhanceLayer keep the native utility.
+do
+ local ms=package.loaded.ms
+ local ui=ms and ms.d_equipmentUpgradeUI
+ if ui and ui.changeEquipmentInfo and ui.checkEquipmentCanUpgrade
+   and ui.checkCanBatchUpgrade and not ui._localEnhanceButtonsRestore then
+  local original=ui.changeEquipmentInfo
+  local env=getfenv(original)
+  local active=true
+  local utilities=setmetatable({grayMenuItem=function(button,...)
+   local buttons=ui.g_enhanceButtons
+   if active and ui.g_skill_anim_on==false and buttons
+     and (button==buttons[2] or button==buttons[3])
+     and ui.checkEquipmentCanUpgrade(false)==0
+     and (button==buttons[2] or ui.checkCanBatchUpgrade(false)) then
+    return
+   end
+   return ms.d_u.grayMenuItem(button,...)
+  end},{__index=ms.d_u})
+  local proxy=setmetatable({d_u=utilities},{__index=ms})
+  setfenv(original,setmetatable({d_ms=proxy},{__index=env,__newindex=env}))
+  ui._localEnhanceButtonsRestore=function()
+   active=false
+   setfenv(original,env);ui._localEnhanceButtonsRestore=nil
+  end
+ end
+end
 -- Local protocol adapter: original lineupUI explicitly ignores owner_id deltas.
 -- Keep double-precision ownership in event 83; preserve selected object references.
 do

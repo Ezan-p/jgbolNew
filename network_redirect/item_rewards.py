@@ -91,7 +91,22 @@ def use(role, req):
     f.require(item['attach_type'] == 5 and item['type_id'] == tid and item.get('level', 1) == 1
               and item['count'] >= count and not any(item.get(k) for k in
               ('is_lock', 'owner_id', 'equip_pos', 'equip_order')), '宝箱不足、已锁定或不可使用')
-    rules = load_rules()
+    prizes = open_contents(role, tid, count)
+    item['count'] -= count
+    if not item['count']:
+        role['attachments'].remove(item)
+    return [(21, dict(result=1, type_id=tid, count=count, attach_list=prizes))]
+
+
+def open_contents(role, tid, count=1, rules=None):
+    """Grant contents on a detached role; caller pays inventory or recipe cost.
+
+    Escort ten-compose opens each newly rolled bag immediately, while native
+    single-compose and inventory use pay for a stored bag through use().
+    """
+    f.require(tid in HANDLED and type(count) is int and 1 <= count <= 15,
+              '宝箱类型或数量无效（每批1至15个）')
+    rules = load_rules() if rules is None else rules
     rule = rules['items'][str(tid)]
     specs = []
     if rule['mode'] in ('fixed', 'fixed_random'):
@@ -104,11 +119,7 @@ def use(role, req):
     for kind, field in ((11, 'gold_coin'), (12, 'silver_coin')):
         f.require(role.get(field, 0) + sum(n for (k, _, _), n in totals.items() if k == kind)
                   <= 2147483647, '宝箱货币奖励超出上限')
-    item['count'] -= count
-    if not item['count']:
-        role['attachments'].remove(item)
-    prizes = [grant(role, [k, t, n, lv]) for (k, t, lv), n in sorted(totals.items())]
-    return [(21, dict(result=1, type_id=tid, count=count, attach_list=prizes))]
+    return [grant(role, [k, t, n, lv]) for (k, t, lv), n in sorted(totals.items())]
 
 
 def recipe_destinations(row, source_type):

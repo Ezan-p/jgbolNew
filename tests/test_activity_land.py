@@ -80,10 +80,14 @@ class OfflineLandTests(ActivityCase):
 
     def test_complete_64_layers_both_worlds_real_battles(self):
         self.ok(self.land(1));r=self.b.profile();identity=r['role_id']
-        # A designed endgame army; no mocked wins and no edited combat attributes.
+        # A designed endgame army with a full set of activity charms. This is
+        # an isolated flow fixture for the stronger towers, not a natural grind.
         model=next(n for n in npc.catalog().values() if n['role']['level']==99 and n['tier']=='T2')
         r.update(copy.deepcopy(model['role']));r['role_id']=identity
-        r['activity']['land']['soul_count']=100000;self.b.save(r)
+        r['activity']['land'].update(soul_count=100000,
+            charms={str(i):dict(key=(i-1)%4+1,value=30,unlock=True,is_open=True)
+                    for i in land.CHARMS})
+        self.b.save(r)
         for layer in range(1,65):
             s=self.b.profile()['activity']['land']
             result=self.land(4,flag=1,des_type=3,des_id=layer,cur_num=s['grid_count']);self.ok(result)
@@ -92,7 +96,7 @@ class OfflineLandTests(ActivityCase):
             s=self.b.profile()['activity']['land'];grid=s['grid_count']+1
             if grid in land.GRIDS and layer>=int(land.GRIDS[grid]['boss_layer']):self.ok(self.land(9,grid_count=grid))
             if layer in (16,32,48):self.ok(self.land(2,des_level=layer//16+1))
-            self.ok(self.land(26,index=layer))
+            self.assertTrue(self.land(24)[-1][1]['data']['boss_info']['is_open'])
             result=self.land(4,flag=1,des_type=4,des_id=layer,cur_num=self.b.profile()['activity']['land']['grid_count']);self.ok(result)
             self.assertTrue(result[-1][1]['is_win'],('hell',layer))
             self.ok(self.land(23,index=1));self.ok(self.land(25))

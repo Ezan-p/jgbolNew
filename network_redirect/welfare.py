@@ -423,7 +423,9 @@ def settle_anniversary_mail(role,now,r,s):
     if money<r['anniversary']['min_rmb']:return
     # Single local participant is rank one; both original preview rows apply.
     prizes=r['anniversary']['prizes']*2
-    mails['anniversary']=dict(mail_id=800000001,mail_title='感恩充值特惠奖励',
+    # Daily/activity mails may already occupy the original fixed mail ID.
+    identity=max({800000000}|{m['mail_id'] for m in mails.values()})+1
+    mails['anniversary']=dict(mail_id=identity,mail_title='感恩充值特惠奖励',
         mail_body='充值达标及本地排行奖励，请领取附件。',recv_time=now,
         send_time=now,prizes=prizes,claimed=False)
 

@@ -192,10 +192,12 @@ class GuildTests(unittest.TestCase):
 
     def test_donate_store_limits(self):
         self.create();self.req(36,count=100);self.assertEqual(self.role()['cur_union_contrib'],100)
-        self.req(38);out=self.req(40,item_id=1,buy_count=5);self.assertEqual(out[-1][2]['item_info']['buy_times'],0)
+        stock=self.ok(38)[-1][2]['item_list']
+        row=next(x for x in stock.values() if x['cost_contrib']==20)
+        out=self.ok(40,item_id=row['id'],buy_count=row['buy_times']);self.assertEqual(out[-1][2]['item_info']['buy_times'],0)
         r=self.role();self.assertEqual(r['cur_union_contrib'],0)
-        self.assertEqual(self.req(40,item_id=1,buy_count=1)[-1][1],55);self.assertEqual(self.role(),r)
-        self.req(39);self.assertEqual(self.req(38)[-1][2]['item_list'][1]['buy_times'],5)
+        self.assertEqual(self.req(40,item_id=row['id'],buy_count=1)[-1][1],55);self.assertEqual(self.role(),r)
+        self.ok(39);self.assertEqual(self.role()['guild']['purchases'],{})
         for d in ({'count':-1},{'count':1.5},{'count':True},{'count':101}):self.assertEqual(self.req(36,**d)[-1][1],55)
     def test_announcement_rename_dismiss(self):
         self.create();self.req(19,new_notify='新公告');self.req(71,new_notify='内部公告');self.req(51,new_name='新仙盟')
@@ -392,7 +394,7 @@ class GuildTests(unittest.TestCase):
         self.create();self.ok(36,count=10)
         first=self.ok(38)[-1][2]['item_list']
         self.ok(39);second=self.ok(38)[-1][2]['item_list']
-        self.assertNotEqual(first[1]['item'],second[1]['item'])
+        self.assertNotEqual(first,second)
         log=self.role()['guild']['unions']['2']['money_log']
         self.assertEqual(log[-1]['change'],100)
         self.assertEqual(log[-1]['balance'],1100)

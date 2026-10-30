@@ -40,13 +40,14 @@ if (ESSENCE_CONFIG.get('version') != SCORE_VERSION or ESSENCE_CONFIG.get('mode')
 
 def essence_score(role, c):
     """V1.1 fixed scores; combat effects never get applied to permanent stats here."""
-    slots = max(0, min(4, c.get('equiped_ext_skill_limit', 0)))
+    from .fate_rebuild import essence_slots
+    slots = essence_slots(c)
     candidates = []
     for item in role.get('attachments', []):
         kind, level, pos = item.get('type_id'), item.get('level'), item.get('ext_skill_pos')
         if (item.get('attach_type') != 5 or item.get('owner_id') != c['id']
                 or kind not in ESSENCE_SCORES or type(level) is not int or not 1 <= level <= 5
-                or type(pos) is not int or not 1 <= pos <= slots or item.get('count', 0) <= 0):
+                or type(pos) is not int or pos not in slots or item.get('count', 0) <= 0):
             continue
         candidates.append(dict(id=item['id'], type_id=kind, level=level, slot=pos,
                                family=kind % 100, base=ESSENCE_SCORES[kind][level - 1]))
@@ -217,6 +218,8 @@ def recalculate(role, rules, now=None):
             continue
         values = {s: Decimal(base[b]) + Decimal(base[g]) * (c['level'] - 1) + c.get(s + '_plus', 0)
                   for s, b, g in zip(STATS, BASE_COLUMNS, GROWTH_COLUMNS)}
+        from . import fate_rebuild
+        fate_rebuild.base_bonuses(c, base, values)
         trace = {}
         record(trace, 'base_and_culture', values)
         # [A] feishengUI.createCharInfo:453-556: floor(growth * 3) per
@@ -256,6 +259,7 @@ def recalculate(role, rules, now=None):
         reborn.bonuses(role, c, values, equipped)
         record(trace, 'rebirth', values)
         reborn_stars.bonuses(role, c, values)
+        fate_rebuild.bonuses(c, values)
         record(trace, 'awakening_and_stars', values)
         rates = {s: 0 for s in STATS}
         if c.get('order', 0):

@@ -2,12 +2,13 @@
 do
  local ms=package.loaded.ms
  local ui=ms and ms.d_moonCakeUI
- if not ui or not ms.d_hz or not ms.d_u then return 'pending' end
+ if not ui or not ms.d_hz or not ms.d_u or not ms.d_data or not ms.d_data.createBatchUse or not ms.d_packageUI then return 'pending' end
  if not ui._localMoonRestore then
   local old={}
-  for _,key in ipairs({'updateActivityStatus','canJoin','tickTime','create','cook','showNews'}) do old[key]=ui[key] end
+  for _,key in ipairs({'updateActivityStatus','canJoin','tickTime','create','cook','showNews','onGetResult'}) do old[key]=ui[key] end
   local hz=ms.d_hz.gethz
   local enabled=__MOON_ENABLED__
+__SEASONAL_CRAFT_HELPER__
   local originalEnd=ui.g_self.end_time
   local labels={
    mooncake1='每累计制作__MOON_BONUS_EVERY__个月饼，额外领取蟠桃×__MOON_BONUS_COUNT__',
@@ -20,6 +21,7 @@ do
    return labels[key] or hz(key,...)
   end
   ui.updateActivityStatus=function(data,...)
+   updateCraft(data)
    if data and data.local_permanent then enabled=data.local_enabled end
    local result=old.updateActivityStatus(data,...)
    originalEnd=ui.g_self.end_time
@@ -29,10 +31,12 @@ do
    return result
   end
   ui.canJoin=function() return enabled end
-  ui.cook=function(...)
-   if not enabled then ms.d_info.show('缘聚中秋暂未开放');return end
-   ui.g_self.end_time=math.huge
-   return old.cook(...)
+  ui.cook=function(index)
+   return craftBatch(index,'moon',ui.g_moonCakeUI)
+  end
+  ui.onGetResult=function(data,...)
+   updateCraft(data)
+   return old.onGetResult(data,...)
   end
   ui.tickTime=function()
    local layer=ui.g_moonCakeUI and ui.g_moonCakeUI.main_layer

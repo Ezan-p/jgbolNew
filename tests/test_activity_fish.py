@@ -79,11 +79,13 @@ class FishTests(ActivityCase):
         self.assertEqual(self.fishing(),s)
         # Every candidate can occupy the first low / high position.
         cfg=self.b.activity_rules
-        for idx in range(6):
-            role=copy.deepcopy(self.b.profile());role['activity']['seasonal'].pop('fish')
-            with patch.object(fish,'randbelow',side_effect=[idx,0,0,0,idx]):s=fish.state(role,NOW,cfg)
-            self.assertEqual(s['shop'][0],cfg['fish_shop'][idx])
-            self.assertEqual(s['shop'][4],cfg['fish_shop'][idx+6])
+        for tier,position in (('low',0),('high',4)):
+            candidates=[x for x in cfg['fish_shop'] if x['tier']==tier]
+            for idx,row in enumerate(candidates):
+                role=copy.deepcopy(self.b.profile());role['activity']['seasonal'].pop('fish')
+                rolls=[0]*5;rolls[position]=idx
+                with patch.object(fish,'randbelow',side_effect=rolls):s=fish.state(role,NOW,cfg)
+                self.assertEqual(s['shop'][position],row)
 
     def test_batch_exchange_limit_and_atomic_rejections(self):
         with patch.object(fish,'randbelow',return_value=0):self.status()
@@ -166,17 +168,22 @@ class FishTests(ActivityCase):
         self.assertEqual(self.req(1208,count=1,type_id=0)[0][0],55);self.assertEqual(before,self.b.profile())
 
     def test_new_low_shop_values_and_settlement(self):
-        expected={1007:(5,3),1343:(5,1),1024:(5,3),1042:(5,1),1032:(3,3),1031:(5,1)}
-        for idx,(tid,(cost,limit)) in enumerate(expected.items()):
+        expected={1007:(1,5,3),1343:(1,5,1),1024:(1,5,3),1042:(1,5,1),
+                  1032:(1,3,3),1031:(1,5,1),1310:(5,5,10),1311:(5,5,10),1312:(5,5,10)}
+        for idx,(tid,(quantity,cost,limit)) in enumerate(expected.items()):
             with patch('network_redirect.backend.time.time',return_value=NOW+idx*86400), patch.object(fish,'randbelow',side_effect=[idx,0,0,0,0]):
                 data=self.status()
             row=data['exchange_data'][1]
-            self.assertEqual((row['type_id'],row['attach_count'],row['cost_fish_count'],row['count']),(tid,1,cost,limit))
+            self.assertEqual((row['type_id'],row['attach_count'],row['cost_fish_count'],row['count']),(tid,quantity,cost,limit))
             self.rich();before=self.count(tid);balance=self.count(1027)
             self.ok(self.req(1208,count=limit,type_id=tid))
-            self.assertEqual(self.count(tid)-before,limit)
+            self.assertEqual(self.count(tid)-before,quantity*limit)
             self.assertEqual(balance-self.count(1027),cost*limit)
+            after=self.b.profile()
+            self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
+            self.assertEqual(after,self.b.profile())
             self.assertEqual(self.req(1208,count=1,type_id=tid)[0][0],55)
+            self.assertEqual(after,self.b.profile())
 
     def test_shop_revision_migrates_without_reroll_or_quota_reset(self):
         with patch.object(fish,'randbelow',return_value=0):self.status()

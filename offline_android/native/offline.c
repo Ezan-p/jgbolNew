@@ -238,8 +238,8 @@ void Java_com_jgbol_offline_NativeBridge_install(void *env, void *klass, void *r
     close(ca_fd);
     int fd = open(path, 0);
     if (fd < 0) { throw_error(env, "Bundled Lua patches are missing"); return; }
-    /* Guard the early VM startup; the unmodified 44-patch body follows it. */
-    const char *guard = "if not package or not package.loaded or type(package.loaded.ms)~='table' then return 'pending' end\n";
+    /* Startup branding precedes the gameplay-ms guard in the generated Lua. */
+    const char *guard = "if not package or not package.loaded then return 'pending' end\n";
     patch_source = malloc(MAX_PATCH + 1);
     if (!patch_source) { close(fd); throw_error(env, "Cannot allocate bundled Lua patches"); return; }
     patch_size = strlen(guard);

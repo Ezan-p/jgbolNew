@@ -1,6 +1,6 @@
 """Original west-op wire contract; explicit local escort economy and opponents [B]."""
 import math
-from . import guild as u, journey, activity, guild_offline as offline, guild_npcs, npc_players
+from . import guild as u, journey, activity, guild_offline as offline, guild_npcs, npc_players, item_rewards
 
 # [A] ui_escortUI.lua L84, max_stopable (ordinary grades 3, highest grade 1).
 MAX_STOPABLE={1:3,2:3,3:3,4:3,5:1}
@@ -112,7 +112,17 @@ def settle(role,s,g,d,now,r):
     if flag==2:
         n=d.get('ten_pick',1);u.require(type(n)is int and n in (1,10),'合成数量无效')
         for tid in (1301,1302,1303):activity.consume(role,tid,n)
-        out.update(ten_pick=n,item_list=[journey.grant(role,p[:2]+[p[2]*n,p[3]]) for p in r['escort_compose_rewards']])
+        weights=r['escort_compose']['bag_weights']
+        bags=[int(u.summon.weighted_choice(weights)) for _ in range(n)]
+        if n==1:
+            # [A] Native onGetComposeResult shows the item, then sends 1051.
+            prizes=[item_rewards.grant(role,[5,bags[0],1,1])]
+        else:
+            # [A] showTenComposeLayer expects one LIST of final prizes per roll.
+            # [B] Roll/open ten independent bags using the same inventory pool.
+            rules=item_rewards.load_rules()
+            prizes=[item_rewards.open_contents(role,tid,rules=rules) for tid in bags]
+        out.update(ten_pick=n,item_list=prizes)
     elif flag in (3,9):
         e['road']=road;active=e['active']
         out.update(book_list=books(role,g,e,now,road),query_type=d.get('query_type',1),can_rece_prize=bool(active and now>=active['book']['end_time']),on_road_type=active['road'] if active else 0)

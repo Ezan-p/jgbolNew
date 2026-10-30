@@ -44,7 +44,12 @@ def attach_owned_bonuses(role, units):
         for unit in selected:
             unit['training_bonuses'] = bonuses.copy()
     spirit_array.attach_combat(role, selected)
+    from . import fate_rebuild
     for unit in selected:
+        owner = next((c for c in roster if c['id'] == unit.get('companion_id')), None) if unit.get('companion_id') else next(
+            (c for c in roster if c.get('order') == unit['order'] and c['type'] == unit['type']), None)
+        if owner:
+            fate_rebuild.combat_bonuses(owner, unit)
         unit['_combat_loadout_attached'] = True
 
 

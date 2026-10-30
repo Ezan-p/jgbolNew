@@ -139,13 +139,13 @@ class ItemRewardTests(unittest.TestCase):
 
     def test_seven_gifts_batch_draws_and_same_level_stone_merge(self):
         ident = self.add(1247,count=3)
-        with patch.object(r,'draw',side_effect=[[11,1,400,1],[5,1156,2,1],[11,1,500,1]]) as draw:
+        with patch.object(r,'draw',side_effect=[[11,1,400,1],[5,1156,4,1],[11,1,500,1]]) as draw:
             event = self.use(1247,ident,3)[-1]
         self.assertEqual(event[0],21,event)
         self.assertEqual(draw.call_count,3)
         got = {(p['object_type'],p['attach_type'],p['attach_level']):p['attach_count']
                for p in event[1]['attach_list'].values()}
-        self.assertEqual(got,{(12,1,1):300000,(5,1001,1):300,(11,1,1):900,(5,1156,1):2})
+        self.assertEqual(got,{(12,1,1):300000,(5,1001,1):300,(11,1,1):900,(5,1156,1):4})
         ident = self.add(1205,count=2)
         with patch.object(r,'draw',side_effect=[[5,1090,1,1],[5,1090,1,4]]):
             event = self.use(1205,ident,2)[-1]
@@ -294,7 +294,8 @@ class ItemRewardTests(unittest.TestCase):
         self.assertEqual(before,self.b.profile())
 
     def test_every_fragment_recipe_real_wire(self):
-        fragments={t for t,row in r.NAMES.items() if '碎片' in row['name']}
+        # Soul fragments are spent directly by 1357 cultivation, not forged.
+        fragments={t for t,row in r.NAMES.items() if '碎片' in row['name']} - {1375}
         checked=set();baseline=self.b.profile()
         for row in c.RECIPES:
             for kind,tid,level,count in c.parts(row[c.SRC]):

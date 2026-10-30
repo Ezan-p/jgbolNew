@@ -1,5 +1,6 @@
 """Original wire end-to-end rank flow against an isolated SQLite save."""
 import copy
+import random
 from pathlib import Path
 from unittest.mock import patch
 from test_activity import ActivityCase, NOW
@@ -9,6 +10,31 @@ from network_redirect.protocol import decode, encode
 
 
 class RankTests(ActivityCase):
+    def test_rank_44_skill_effects_settle_persist_and_replay_once(self):
+        role = self.b.profile()
+        role['activity'].update(rank_order=45, rank_origin_order=100, rank_slots={})
+        # A matching NPC roster survives long enough to exercise real effects.
+        npc = rank.catalog()[930044]['role']
+        for key in ('corteges', 'attachments'):
+            role[key] = copy.deepcopy(npc[key])
+        self.b.save(role)
+        before = self.b.profile()
+        with patch('network_redirect.combat.secrets.randbelow', side_effect=random.Random(17).randrange):
+            _, events = self.fight(44)
+        after = self.b.profile()
+        record = after['activity']['rank_records'][-1]
+        self.assertTrue(any(str(k).isdigit() for k in record['fight_events']))
+        self.assertEqual(after['energy'], before['energy'] - 1)
+        self.assertEqual(after['activity']['rank_count'], before['activity']['rank_count'] + 1)
+        self.assertIn(44, [event for event, _ in events])
+        self.assertEqual(self.b.respond(self.packet, self.state), self.replies)
+        self.assertEqual(self.b.profile(), after)
+        self.b.close()
+        self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        self.assertEqual(self.b.profile(), after)
+        self.ok(self.req(1244, fight_type=2))
+        self.assertEqual(self.b.profile(), after)
+
     def test_daily_points_for_challenges_caps_failures_replay_and_next_day(self):
         def points(): return self.b.profile().get('daily', {}).get('points', {}).get('10', 0)
         self.board(); self.assertEqual(points(), 0)

@@ -258,7 +258,11 @@ class DutyTests(ActivityCase):
             self.info(flag=1); self.info(flag=1)
             r = self.b.profile()
             self.assertEqual(r['silver_coin'], silver+3000)
-            self.assertEqual(r['gold_coin'], gold+duty.rank_reward(g, 1))
+            self.assertEqual(r['gold_coin'], gold)
+            mail = next(m for k, m in r['welfare']['mails'].items() if k.startswith('duty-rank-'))
+            self.assertEqual(mail['prizes'], [[11, 1, duty.rank_reward(g, 1), 1]])
+            self.ok(self.req(1103, mail_id=mail['mail_id'], flag=1))
+            self.assertEqual(self.b.profile()['gold_coin'], gold+duty.rank_reward(g, 1))
             self.assertIsNone(r['activity']['duty'])
             self.assertIn('113', r['profile_titles'])
             self.assertGreaterEqual(achievements.state(r)['totals']['216'], 1)
@@ -476,6 +480,10 @@ class DutyTests(ActivityCase):
         g = peer['activity']['duty']['group']
         with patch('network_redirect.backend.time.time', return_value=NOW+86400):
             self.info(flag=1)
+            self.assertEqual(self.b.profile()['gold_coin'], before)
+            mail = self.b.profile()['welfare']['mails']['duty-rank-'+key]
+            self.assertEqual(mail['prizes'], [[11, 1, duty.rank_reward(g, 2), 1]])
+            self.ok(self.req(1103, mail_id=mail['mail_id'], flag=1))
             self.assertEqual(self.b.profile()['gold_coin'], before+duty.rank_reward(g, 2))
         # Querying another account never settles or grants it anything.
         self.assertEqual(self.b.profile('peer')['activity'], old_peer['activity'])
@@ -499,6 +507,7 @@ class DutyTests(ActivityCase):
                 self.assertEqual(self.req(1043, flag=1)[0][0], 55)
         self.assertEqual(self.b.profile()['activity'], before['activity'])
         self.assertEqual(self.b.profile()['gold_coin'], before['gold_coin'])
+        self.assertEqual(self.b.profile().get('welfare'), before.get('welfare'))
 
     def test_failed_run_daily_task_exactly_once(self):
         self.start(); before = copy.deepcopy(self.b.profile().get('daily'))
@@ -601,7 +610,9 @@ class DutyTests(ActivityCase):
         g = self.b.profile()['activity']['duty']['group']
         with patch('network_redirect.backend.time.time', return_value=NOW+86400):
             self.info(flag=1); self.info(flag=1)
-            self.assertEqual(self.b.profile()['gold_coin'], before+20+duty.rank_reward(g, 1))
+            self.assertEqual(self.b.profile()['gold_coin'], before+20)
+            mail = next(m for k, m in self.b.profile()['welfare']['mails'].items() if k.startswith('duty-rank-'))
+            self.assertEqual(mail['prizes'], [[11, 1, duty.rank_reward(g, 1), 1]])
             self.info(plus_type=5, plus_index=1)
             self.assertFalse(duty.pending(self.b.profile()['activity']['duty']))
 

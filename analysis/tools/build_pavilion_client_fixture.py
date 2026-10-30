@@ -14,7 +14,7 @@ def main():
     now=int(time.time())
     with tempfile.TemporaryDirectory() as tmp:
         b=Backend(Path(tmp),18770,lambda *a,**k:None)
-        role=b.profile(); r=p.load_rules()
+        role=b.profile(); role['level']=99; r=p.load_rules()
         p.record_charge(role,10000,now)
         summon.add_item(role,1141,3000)
         def req(flag,index=0,count=0,ten_card=0,five_card=0):
@@ -22,7 +22,7 @@ def main():
         fixtures=dict(entry=req(1),status=p.status(role,now),exchange=req(2,3,2),gift=req(3,1))
         fixtures['ascension'] = []
         for gold in (0, 10000, 30000):
-            trial = b.profile()
+            trial = b.profile(); trial['level']=99
             if gold:
                 p.record_charge(trial, gold, now)
             summon.add_item(trial, 1141, 4000)

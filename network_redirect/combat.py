@@ -88,7 +88,7 @@ def select_skill(actor, rules=None):
             if rules and effect(actor, 9)[0]:
                 tier = 'advanced' if actor.get('essence_ids', {}).get(9, 10109) >= 10200 else 'normal'
                 bonus = rules['mechanics']['penetration_proc_bonus'][tier]
-            if roll(min(100, probability + bonus)):
+            if roll(min(100, probability + bonus + actor.get('fate_penetration_proc',0))):
                 return tid, level
     return 1, 1
 
@@ -139,6 +139,17 @@ def damage(actor, target, skill_id, level, rules, scale=100, *, settle=True):
                   + attack_flat - guard_flat)
     # Star critical/survival and HP clamp are applied before the single final floor.
     defend = target.get('reborn_traits', {})
+    raw *= 1 + F(str(actor.get('reborn_traits', {}).get('fate_damage', 0))) / 100
+    raw *= max(0, 1 - F(str(defend.get('fate_absorb', 0))) / 100)
+    fate = actor.get('fate_traits', {})
+    defense_fate = target.get('fate_traits', {})
+    raw *= 1 + F(str(fate.get('damage',[0])[0])) / 100
+    raw *= max(0, 1-F(str(defense_fate.get('absorb',[0])[0]))/100)
+    if not normal:
+        raw *= 1+F(str(fate.get('spell_damage',[0])[0]))/100
+    if target.get('poison'):
+        raw *= 1+F(str(fate.get('poison_damage',[0])[0]))/100
+    raw += F(target.get('max_hp',target['hp']))*F(str(fate.get('target_hp_damage',[0])[0]))/100
     if not settle:
         defend = dict(defend, survival_count=0)
     return reborn_stars.combat_hit(max(0, raw * F(scale, 100)), target['hp'] if settle else 2147483647, normal,
@@ -177,6 +188,7 @@ def begin_action(actor, round_no):
     """[B] War intent uses completed pairs of rounds; intimidation lasts one action."""
     base = actor.setdefault('base_gongji', actor['gongji'])
     actor['gongji'] = max(0, F(base) * (1 + (round_no // 2) * effect(actor, 12)[0] / 100)
+                          * (1 + max(0,round_no-1)*F(str(actor.get('fate_traits',{}).get('round_attack',[0])[0]))/100)
                           - F(base) * actor.pop('attack_reduction', 0) / 100)
 
 

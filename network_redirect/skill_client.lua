@@ -8,6 +8,47 @@ do
   local upgrade=ms.d_skillUpgradeUI
   local upgradeShow=upgrade and upgrade.show
   local upgradeResult=upgrade and upgrade.showServerRet
+  local handbook=ms.d_handbookUI
+  local handbookShow=handbook and handbook.showSkill
+  local handbookDetail=handbook and handbook.showHandbookDetail
+  if handbookShow then
+   handbook.showSkill=function(...)
+    -- IDs 2..11 are internal battle/test skills (11 is an unnamed tile on
+    -- older servers). Keep the shared templates
+    -- intact: the handbook builds its own grid and hit map from this reader.
+    local catalog=ui.g_itemSkillTable
+    local visible={}
+    for id,skill in pairs(catalog or {}) do
+     local number=tonumber(id)
+     if not (number and number>=1 and number<=11) then visible[id]=skill end
+    end
+    ui.g_itemSkillTable=visible
+    local ok,result=pcall(handbookShow,...)
+    ui.g_itemSkillTable=catalog
+    if not ok then error(result,0) end
+    return result
+   end
+  end
+  if handbookDetail then
+   handbook.showHandbookDetail=function(id,...)
+    if id~=21 or not handbook.g_self or handbook.g_self.last_tag~=6 then
+     return handbookDetail(id,...)
+    end
+    -- Native createSkillLabel reads current_characterInfo.magic for Rulai.
+    -- A catalog preview has no owner; use zero owner bonus even if a prior
+    -- formation visit left a selected character cached in this module.
+    local position=ms.d_charPositionUI
+    local state=position.g_charPosUI
+    local preview={}
+    for key,value in pairs(state or {}) do preview[key]=value end
+    preview.current_characterInfo={magic=0}
+    position.g_charPosUI=preview
+    local ok,result=pcall(handbookDetail,id,...)
+    position.g_charPosUI=state
+    if not ok then error(result,0) end
+    return result
+   end
+  end
   local previous={}
   local hintTag=91106
   local function index()
@@ -107,6 +148,8 @@ do
    ui.getDateFormServer=receive;ui.showPackage=show;ui.refreshPackage=refresh
    if upgradeShow then upgrade.show=upgradeShow end
    if upgradeResult then upgrade.showServerRet=upgradeResult end
+   if handbookShow then handbook.showSkill=handbookShow end
+   if handbookDetail then handbook.showHandbookDetail=handbookDetail end
    local board=ui.g_packageUI and ui.g_packageUI.board_layer
    -- Scene teardown can free the Cocos node before its Lua exit callback runs.
    if ui.g_isInPackage and board then pcall(function() board:removeChildByTag(hintTag,true) end) end

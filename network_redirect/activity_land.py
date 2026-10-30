@@ -21,6 +21,11 @@ def status(now,r):
                 begin_time=begin,end_time=attack if now<attack else begin+86400)
 
 
+def weekly_due(role,now,r):
+    s=role.get('activity',{}).get('land')
+    return s is not None and 'week' in s and (a.day(now,r)-4)//7>s['week']
+
+
 def state(role,now,r):
     s=role['activity'].setdefault('land',dict(map_level=1,soul_count=0,grid_count=2,boss_layer=0,
         inv_boss_layer=0,total_score=0,tower_id=0,charms={},bag={},travel=None,day=-1,boss=None,hell=None,

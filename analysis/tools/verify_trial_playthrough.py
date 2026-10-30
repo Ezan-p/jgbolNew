@@ -1,4 +1,4 @@
-"""All daily bosses against real formations; no live account reads or writes."""
+"""All encounter tiers against real formations; no live account reads or writes."""
 import copy
 import csv
 import json
@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from network_redirect import activity, activity_trial as trial, npc_players
+from network_redirect import activity, activity_trial as trial, npc_players, formation
 from network_redirect.backend import Backend
 from network_redirect.protocol import decode
 
@@ -33,15 +33,14 @@ def main():
                 role.update(copy.deepcopy(npc_players.get(key)['role']))
                 templates.append((key, role))
             for label, template in templates:
-                for tid in trial.POOL:
+                for tid, tier_roll in ((t, roll) for t in trial.POOL for roll in (0,70,95)):
                     role = copy.deepcopy(template)
                     role.pop('activity', None)
                     activity.prepare(role, NOW, backend.activity_rules)
-                    role['activity']['trial_meta']['type_id'] = tid
-                    trial.query(role, dict(flag=2, id=0), NOW, backend.activity_rules)
-                    boss = role['activity']['trial']
+                    with patch.object(trial.secrets, 'choice', return_value=tid), patch.object(trial.secrets, 'randbelow', return_value=tier_roll):
+                        boss = trial.spawn(role, role['activity'], rules)
                     unit = boss['unit']
-                    bosses.append(dict(sample=label, type_id=tid, name=trial.NAMES[tid], level=unit['level'],
+                    bosses.append(dict(sample=label, tier=boss['tier'], type_id=tid, name=trial.NAMES[tid], level=unit['level'],
                         hp=unit['hp'], attack=unit['gongji'], defense=unit['fangyu'], magic=unit['magic'],
                         skill=unit['skills'][0][0] if unit['skills'] else 0))
                     rng = random.Random(tid * 100 + role['level'])
@@ -57,9 +56,20 @@ def main():
                             if boss['is_dead']:
                                 trial.query(role, dict(flag=9, id=0),
                                     NOW + attempt * rules['cooldown_seconds'], backend.activity_rules)
-                                assert role['activity']['trial'] is None
+                                assert role['activity']['trial_bosses'] == []
                                 break
-                    rows.append(dict(sample=label, boss=tid, name=trial.NAMES[tid], killed=boss['is_dead'],
+                    assert boss['train_times'] == attempt + 1
+                    if not boss['is_dead']:
+                        try:
+                            trial.battle(role, dict(des_type=8, des_id=tid, des_value=boss['boss_id']),
+                                         NOW + rules['daily_attempts']*rules['cooldown_seconds'], backend.activity_rules, backend.journey_rules)
+                        except formation.Rejected:
+                            pass
+                        else:
+                            raise AssertionError('Exhausted boss allowed an eleventh challenge')
+                        trial.prepare(role, NOW + 86400, backend.activity_rules)
+                        assert not role['activity']['trial_bosses']
+                    rows.append(dict(sample=label, tier=boss['tier'], boss=tid, name=trial.NAMES[tid], killed=boss['is_dead'],
                         attempts=attempt + 1, initial_hp=initial_hp, remaining_hp=boss['hp'],
                         damage=boss['damage'], last_result=replay['final_result']))
                 subset = [x for x in rows if x['sample'] == label]
@@ -67,10 +77,10 @@ def main():
         finally:
             backend.close()
     with (out / 'boss_stats.csv').open('w', newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=list(bosses[0]))
+        writer = csv.DictWriter(f, fieldnames=list(bosses[0]), lineterminator='\n')
         writer.writeheader()
         writer.writerows(bosses)
-    assert all(row['killed'] for row in rows), 'A sample cannot complete within the daily attempt limit'
+    # Strengthened tiers may exceed the starter formation; verify limits/expiry above.
     report = dict(passed=True, revision=rules['revision'], real_combat=True, disposable_save=True,
         boss_count=len(trial.POOL), runs=rows, original_sources=[
             'analysis/evidence/lua_named/lua/ui/shilianUI.lua.txt:137-168,328-435,1344-1550',
@@ -78,10 +88,10 @@ def main():
             'analysis/configs/newbie_content3.csv:16',
             'analysis/configs/cortege/cortege_base_0.csv',
             'analysis/configs/item_base.csv:1041,1042'],
-        limits='Fixed-seed progression samples, not a guarantee for every player formation or original server balance.',
+        limits='Fixed-seed progression samples, not a guarantee for every player formation or original server balance; bosses expire daily; a weak formation may not complete within ten attempts.',
         inferred=rules['provenance']['inferred'])
     (out / 'playthrough.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
-    print(f'{len(rows)} real battle/claim runs passed')
+    print(f'{len(rows)} real battle scenarios verified (claims checked on kills)')
 
 
 if __name__ == '__main__':

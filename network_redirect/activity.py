@@ -137,6 +137,10 @@ def prepare(role,now,r,peers=None):
     from . import activity_monday
     activity_monday.prepare(role,now)
     s=role.setdefault('activity',{})
+    from . import activity_land
+    if activity_land.weekly_due(role,now,r):
+        # Settle saved tower income before closing the old week's soul total.
+        activity_land.state(role,now,r)
     from . import activity_tangwang
     activity_tangwang.state(role,now,r['tangwang_rules'])
     if 'fish' in s.get('seasonal',{}):
@@ -457,6 +461,9 @@ def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     if mid==1051:
         from .activity_seasonal import use_food
         return use_food(role,req,r)
+    if mid==2998 and req['id']==249:
+        from .activity_seasonal import settle_batch
+        return settle_batch(role,req,now,r,parse)
     if mid in (1126,1333):
         from .activity_seasonal import settle as seasonal
         return seasonal(role,mid,req,now,r)

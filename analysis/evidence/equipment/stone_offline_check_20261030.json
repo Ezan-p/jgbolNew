@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-30",
+  "device_ui_test_performed": false,
+  "player_save_modified": false,
+  "packages": [
+    {
+      "apk": "金箍棒3.87-离线单机-arm32-v106.apk",
+      "apk_sha256": "228bb674fc7ea3bd6cad73895d6589d74ca5724210c9b99dbe8351ffd4a657d5",
+      "files": {
+        "network_redirect/equipment.py": {
+          "included": true,
+          "matches_workspace": true
+        },
+        "network_redirect/formation.py": {
+          "included": true,
+          "matches_workspace": true
+        },
+        "network_redirect/backend.py": {
+          "included": true,
+          "matches_workspace": true
+        },
+        "network_redirect/equipment_client.lua": {
+          "included": true,
+          "matches_workspace": true
+        },
+        "server_config/stone_rules.json": {
+          "included": true,
+          "matches_workspace": true
+        },
+        "analysis/configs/stone_cost_worth.csv": {
+          "included": true,
+          "matches_workspace": true
+        },
+        "analysis/configs/stone_reborn_cost_worth.csv": {
+          "included": true,
+          "matches_workspace": true
+        }
+      },
+      "equipment_adapter_in_offline_client": true,
+      "stone_rules": {
+        "schema_version": 1,
+        "mode": "inferred",
+        "min_role_level": 10,
+        "failure_compensation_percent": 5,
+        "source": "原客户端默认10级；用户授权推测：失败后累计增加5个百分点，成功清零，最多100%。固定材料、价值、银币及属性系数取原包CSV。",
+        "reborn_min_realm": 1
+      },
+      "test_exit_code": 0,
+      "test_log": "analysis/evidence/equipment/stone_release_tests_20261030.log"
+    },
+    {
+      "apk": "金箍棒ol测试版-v106.apk",
+      "apk_sha256": "07fd7ed429333501167921ea5279d0f6db95aacb40f856292d2e209007a320c6",
+      "files": {
+        "network_redirect/equipment.py": {
+          "included": true,
+          "matches_workspace": true
+        },
+        "network_redirect/formation.py": {
+          "included": true,
+          "matches_workspace": true
+        },
+        "network_redirect/backend.py": {
+          "included": true,
+          "matches_workspace": true
+        },
+        "network_redirect/equipment_client.lua": {
+          "included": true,
+          "matches_workspace": true
+        },
+        "server_config/stone_rules.json": {
+          "included": true,
+          "matches_workspace": true
+        },
+        "analysis/configs/stone_cost_worth.csv": {
+          "included": true,
+          "matches_workspace": true
+        },
+        "analysis/configs/stone_reborn_cost_worth.csv": {
+          "included": true,
+          "matches_workspace": true
+        }
+      },
+      "equipment_adapter_in_offline_client": true,
+      "stone_rules": {
+        "schema_version": 1,
+        "mode": "inferred",
+        "min_role_level": 10,
+        "failure_compensation_percent": 5,
+        "source": "原客户端默认10级；用户授权推测：失败后累计增加5个百分点，成功清零，最多100%。固定材料、价值、银币及属性系数取原包CSV。",
+        "reborn_min_realm": 1
+      },
+      "test_exit_code": 0,
+      "test_log": "analysis/evidence/equipment/stone_test_edition_tests_20261030.log"
+    }
+  ]
+}

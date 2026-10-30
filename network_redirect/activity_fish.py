@@ -27,15 +27,15 @@ def validate(r):
               and 10000 >= koi[0]['weight'] > koi[1]['weight'] > koi[2]['weight'] > 0, '锦鲤概率须随数量递减')
     a.require(isinstance(r.get('fish_shop_revision'),str) and bool(r['fish_shop_revision']), '东海商店版本缺失')
     shop = r.get('fish_shop')
-    a.require(isinstance(shop,list) and len(shop)==12 and all(isinstance(x,dict) for x in shop), '东海商店池无效')
+    a.require(isinstance(shop,list) and len(shop)==15 and all(isinstance(x,dict) for x in shop), '东海商店池无效')
     for row in shop:
         a.require(valid(row.get('reward')) and row.get('tier') in ('low','high'), '东海商品无效')
         a.require(type(row.get('cost')) is int and 0 < row['cost'] <= 1000000 and
                   type(row.get('limit')) is int and 0 < row['limit'] <= 100, '东海商品价格或限购无效')
         if row['tier']=='high':a.require(row['reward'][2]==5 and row['limit']==1, '高级商品固定五个、每日限兑一次')
-    a.require(len({x['reward'][1] for x in shop})==12, '东海商品编号不得重复')
+    a.require(len({x['reward'][1] for x in shop})==15, '东海商品编号不得重复')
     a.require({tuple(x['reward'][:2]) for x in shop if x['tier']=='low'} ==
-              {(5,t) for t in (1007,1343,1024,1042,1032,1031)}, '低级兑换池不完整')
+              {(5,t) for t in (1007,1343,1024,1042,1032,1031,1310,1311,1312)}, '低级兑换池不完整')
     a.require({tuple(x['reward'][:2]) for x in shop if x['tier']=='high'} ==
               {(10,t) for t in (5039,5041,5032)} | {(5,t) for t in (6002,6003,6004)}, '高级兑换池不完整')
 

@@ -7,6 +7,10 @@ import secrets
 from . import formation as f, summon
 
 RECIPES = {int(r['type_id']): r for r in summon.rows('skill_advaced_conf.csv')}
+# 大乘经21 is Rulai's exclusive skill (skill_name.csv), not a normal passive.
+CONVERTIBLE_SKILLS = frozenset(tid for tid, cfg in f.SKILLS.items()
+                             if tid != 21 and cfg['quality'] == '5'
+                             and cfg['use_mode(1-active，2-passive)'] == '2')
 
 
 @lru_cache(maxsize=1)
@@ -55,15 +59,13 @@ def insight(role, req):
 def convert(role, req):
     from .equipment_crafting import free, grant
     target = f.lookup(role, 'attachments', req['skill_id'])
-    cfg = f.SKILLS.get(target['type_id'], {})
-    f.require(target['attach_type'] == 6 and cfg.get('quality') == '5'
-              and cfg.get('use_mode(1-active，2-passive)') == '2', '只能转换五星被动法术')
+    f.require(target['attach_type'] == 6 and target['type_id'] in CONVERTIBLE_SKILLS,
+              '只能转换普通五星被动法术')
     free(target)
     state = req['state']
     f.require(state in (0, 4, 5, 6), '法术转换类型无效')
     field = 'effect_field(1-gongji，2-fangyu，3-magic，4-intensity，5-hp)'
-    choices = [tid for tid, c in f.SKILLS.items() if c['quality'] == '5'
-               and c['use_mode(1-active，2-passive)'] == '2' and tid != target['type_id']
+    choices = [tid for tid, c in f.SKILLS.items() if tid in CONVERTIBLE_SKILLS and tid != target['type_id']
                and (state == 0 or int(c[field]) == state - 3)]
     f.require(choices, '没有可转换的法术')
     f.require(not target.get('upgrade_level') or target['type_id'] in RECIPES, '参悟返还配方不存在')

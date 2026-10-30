@@ -29,12 +29,17 @@ def migrate_scores(s):
 
 
 def migrate_inverse(s,r):
-    """Restore inverse-tower unlocks from progress/history in older saves."""
+    """Apply normal-tower auto unlocks and restore older inverse progress."""
     unlocked=set()
     raw_unlocked=s.get('unlocked',[])
     for value in raw_unlocked if isinstance(raw_unlocked,(list,tuple,set)) else ():
         if type(value) is int and 1<=value<=r['land_boss_layers']:
             unlocked.add(value)
+    # Native land_tip5 promises automatic opening at unlock_layer. The local
+    # rule maps each inverse floor to the same cleared normal floor.
+    normal=s.get('boss_layer',0)
+    if type(normal) is int and normal>0:
+        unlocked.update(range(1,min(normal,r['land_boss_layers'])+1))
     # A cleared inverse layer could only have been reached after its unlock.
     # Older saves did not persist the separate unlock list, so derive it from
     # the authoritative progress/history fields.
@@ -58,8 +63,11 @@ def boss(s,r,hell=False,layer=None):
     used=counts.get(str(layer),0)
     if type(used) is not int:used=0
     remaining=max(0,r['land_hell_daily']-used) if hell else r['land_hell_daily']
+    opened=not hell or layer in s.get('unlocked',[])
     return dict(boss_layer=layer,type_id=enemy['type_id'],name=enemy['name'],fight_power=enemy['power'],cortege_count=len(enemy['units']),
-        need_soul=r['land_boss_soul']*layer,score=score(s,s['grid_count']),isweeken=False,is_open=not hell or layer in s.get('unlocked',[]),
+        need_soul=r['land_boss_soul']*layer,score=score(s,s['grid_count']),isweeken=False,is_open=opened,
+        # landUI L2410 requires this flag to render the paid unlock button.
+        unlock=hell and not opened and layer<=passed+1,
         unlock_layer=layer,unlock_soul=r['land_hell_unlock_soul'],can_fight_count=remaining,
         fight_count_limit=r['land_hell_daily'],cur_num=s['grid_count'])
 
@@ -110,7 +118,9 @@ def settle(role,s,op,d,now,r,jrules):
             reward_charm={k:{5:n} for k,n in gains.items()})]
     if op in (12,24):return [response(op,**query(s,r,op==24))]
     if op==26:
-        idx=d.get('index');a.require(type(idx)is int and 1<=idx<=min(s['boss_layer'],s['inv_boss_layer']+1) and idx not in s['unlocked'],'冥界首领尚未解锁或已解锁')
+        # Paid opening is the alternative to waiting for normal-tower progress;
+        # still require sequential inverse progression and reject duplicates.
+        idx=d.get('index');a.require(type(idx)is int and 1<=idx<=min(r['land_boss_layers'],s['inv_boss_layer']+1) and boss(s,r,True,idx)['unlock'],'冥界首领尚未解锁或已解锁')
         a.spend(s,'soul_count',r['land_hell_unlock_soul']);s['unlocked'].append(idx)
         return [response(26,index=idx)]
     if op==4 and d.get('des_type') in (3,4):

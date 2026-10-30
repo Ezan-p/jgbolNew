@@ -13,7 +13,15 @@ RULES_PATH = ROOT / 'server_config/summon_rules.json'
 
 def rows(name):
     with (ROOT / 'analysis/configs' / name).open(encoding='utf-8-sig', newline='') as source:
-        return list(csv.DictReader(source))
+        result = list(csv.DictReader(source))
+    if name in ('item_base.csv', 'item_name.csv'):
+        # Narrow hot-update additions; preserve the audited 3.87 baseline.
+        with (ROOT / 'analysis/configs/fate_rebuild' / name).open(encoding='utf-8-sig', newline='') as source:
+            additions = list(csv.DictReader(source))
+        key = 'type_id' if name == 'item_base.csv' else 'Ftype_id'
+        existing = {row[key] for row in result}
+        result.extend(row for row in additions if row[key] not in existing)
+    return result
 
 
 BASES = {int(r['type_id']): r for r in rows('cortege/cortege_base_0.csv')}
@@ -89,6 +97,9 @@ def rule_status(path=RULES_PATH):
 
 def client_source(rules):
     """Use the same validated prices for the UI, affordability check and debit."""
+    startup_source = "if not package or not package.loaded then return 'pending' end\n"
+    startup_source += Path(__file__).with_name('login_branding_client.lua').read_text(encoding='utf-8')
+    startup_source += "\nif type(package.loaded.ms)~='table' then return 'pending' end\n"
     prices = [rules['grades'][str(grade)]['gold_cost'] for grade in (1, 2, 3)]
     template = Path(__file__).with_name('summon_client.lua').read_text(encoding='utf-8')
     template = Path(__file__).with_name('opening_client.lua').read_text(encoding='utf-8') + '\n' + template
@@ -108,11 +119,20 @@ def client_source(rules):
     equipment_source += '\n' + Path(__file__).with_name('market_client.lua').read_text(encoding='utf-8')
     equipment_source += '\n' + Path(__file__).with_name('state_refresh_client.lua').read_text(encoding='utf-8')
     equipment_source += '\n' + Path(__file__).with_name('resource_item_client.lua').read_text(encoding='utf-8')
+    equipment_source += '\n' + Path(__file__).with_name('inventory_client.lua').read_text(encoding='utf-8')
     equipment_source += '\n' + Path(__file__).with_name('expbook_client.lua').read_text(encoding='utf-8')
     equipment_source += '\n' + Path(__file__).with_name('tian_shu_client.lua').read_text(encoding='utf-8')
     equipment_source += '\n' + Path(__file__).with_name('skill_client.lua').read_text(encoding='utf-8')
     equipment_source += '\n' + Path(__file__).with_name('soul_refresh_client.lua').read_text(encoding='utf-8')
     reborn_source = Path(__file__).with_name('reborn_client.lua').read_text(encoding='utf-8')
+    from . import fate_rebuild
+    fate_items = {int(r['type_id']): {k.split('(')[0]: int(v) if v.isdigit() else v for k,v in r.items()}
+                  for r in rows('fate_rebuild/item_base.csv')}
+    for row in rows('fate_rebuild/item_name.csv'):
+        fate_items[int(row['Ftype_id'])].update(row)
+    fate_items[1370]['desc'] = '开启可随机获得天魂石、命魂石或地魂石1个。'
+    fate_source = Path(__file__).with_name('fate_rebuild_client.lua').read_text(encoding='utf-8')
+    reborn_source += '\n' + fate_source.replace('__FATE_DEFAULTS__', lua(dict.fromkeys(fate_rebuild.ATTRS, 0))).replace('__FATE_ITEMS__', lua(fate_items))
     pray_source = Path(__file__).with_name('pray_client.lua').read_text(encoding='utf-8')
     pray_source = pray_source.replace('__PRAY_COSTS__', lua([int(r['spirit_coins']) for r in rows('pray_spirit_config.csv')]))
     rape_source = Path(__file__).with_name('rape_client.lua').read_text(encoding='utf-8')
@@ -150,7 +170,7 @@ def client_source(rules):
     battle_source = Path(__file__).with_name('battle_replay_client.lua').read_text(encoding='utf-8')
     feed_source = feed_source.replace('__FEED_REWARD_TIERS__', lua(feed_rules['feed_reward_tiers']))
     feed_source = feed_source.replace('__FEED_MAX_COUNT__', str(feed_rules['feed_max_count']))
-    return tangwang_source + '\n' + fish_source + '\n' + caishen_source + '\n' + battle_source + '\n' + trial_source + '\n' + nine_source + '\n' + guild_source + '\n' + visit_source + '\n' + feed_source + '\n' + pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + yuanshi_source + '\n' + rulai_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
+    return startup_source + tangwang_source + '\n' + fish_source + '\n' + caishen_source + '\n' + battle_source + '\n' + trial_source + '\n' + nine_source + '\n' + guild_source + '\n' + visit_source + '\n' + feed_source + '\n' + pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + yuanshi_source + '\n' + rulai_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
 
 
 def lua(value):

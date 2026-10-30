@@ -22,7 +22,7 @@ class PracticeTests(ActivityCase):
                 events = self.fight()
             self.ok(events)
             after = self.b.profile()
-            amount = self.b.activity_rules['train_increase'][stat]
+            amount = self.b.activity_rules['train_increase'][stat] * (before['rule_index'] + 1)
             self.assertEqual([d for e, d in events if e == 5],
                              [dict(addition_field=attr, addition_value=amount)])
             self.assertEqual(after['rule_index'], before['rule_index']+1)
@@ -103,6 +103,36 @@ class PracticeTests(ActivityCase):
         self.ok(self.fight()); self.assertEqual(self.b.profile()['rule_index'], 2)
         self.assertEqual(self.fight()[0][0], 55)
 
+    def test_progressive_rewards_retry_and_legacy_progress_after_restart(self):
+        r = self.b.profile()
+        r.update(level=99, rule_index=49, max_hp_plus=980, max_magic_plus=30,
+                 gongji_plus=15, fangyu_plus=15)
+        self.b.save(r)
+        self.b.close()
+        self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        before = self.b.profile()
+        self.assertEqual(before['max_hp_plus'], 980)  # No retroactive rewards.
+        with patch.object(practice.journey, 'battle', return_value=(0, [], [])):
+            self.ok(self.fight())
+        self.assertEqual(self.b.profile()['rule_index'], 49)
+        self.assertEqual(self.b.profile()['max_hp_plus'], 980)
+        with patch.object(practice, 'draw', return_value='hp'):
+            with patch.object(practice.journey, 'battle', return_value=(3, [], [])):
+                for stage, expected in ((50, 1000), (51, 1020)):
+                    events = self.fight()
+                    self.ok(events)
+                    self.assertEqual([d for e, d in events if e == 5],
+                                     [dict(addition_field=75, addition_value=expected)])
+                    after = self.b.profile()
+                    self.assertEqual(after['rule_index'], stage)
+                    self.assertEqual(after['max_hp_plus'] - before['max_hp_plus'], expected)
+                    self.assertEqual(after['max_magic_plus'], 30)
+                    self.assertEqual(after['gongji_plus'], 15)
+                    self.assertEqual(after['fangyu_plus'], 15)
+                    self.assertEqual(self.b.respond(self.packet, self.state), self.replies)
+                    self.assertEqual(self.b.profile(), after)
+                    before = after
+
     def test_invalid_targets_empty_formation_and_encode_failure_atomic(self):
         for kw in (dict(des_type=2), dict(des_id=5001), dict(des_value=1)):
             before = self.b.profile(); self.assertEqual(self.fight(**kw)[0][0], 55)
@@ -135,11 +165,21 @@ class PracticeTests(ActivityCase):
             c = summon.companion(r, tid); c.update(order=order, level=100)
             r['corteges'].append(c)
         self.b.save(r)
+        totals = {field: r[field] for field, _ in practice.FIELDS.values()}
         for stage in range(1, r['level']-3):
-            self.ok(self.fight())
+            events = self.fight()
+            self.ok(events)
             after = self.b.profile()
             self.assertEqual(after['rule_index'], stage)
             self.assertEqual(after['activity']['practice_last_result']['enemy_level'], stage)
+            reward = after['activity']['practice_last_result']['reward']
+            stat = reward['stat']
+            amount = {'hp': 20, 'magic': 10, 'gongji': 5, 'fangyu': 5}[stat] * stage
+            self.assertEqual(reward['addition_value'], amount)
+            self.assertEqual([d for e, d in events if e == 5],
+                             [dict(addition_field=practice.FIELDS[stat][1], addition_value=amount)])
+            totals[practice.FIELDS[stat][0]] += amount
+            self.assertEqual({field: after[field] for field in totals}, totals)
         self.assertEqual(self.fight()[0][0], 55)
 
 

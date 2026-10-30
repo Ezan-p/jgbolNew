@@ -304,11 +304,13 @@ def track(role, before, mid, req, now):
             if key.startswith('1:'):
                 delta = g.get('day_count', 0) - (oldg.get(key, {}).get('day_count', 0) if before.get('journey', {}).get('day') == role['journey'].get('day') else 0)
                 if delta > 0: daily_add(role, 446, delta, now, key)
-    for field, ident in (('energy_item_count', 423), ('strength_item_count', 447)):
-        if mid == 1051:
-            previous = before.get(field, 0) if before.get('journey', {}).get('day') == role.get('journey', {}).get('day') else 0
-            delta = role.get(field, 0) - previous
-            if delta > 0: daily_add(role, ident, delta, now)
+    if mid == 1051:
+        for tid, ident in ((1023, 423), (1022, 447)):
+            # Eating achievements follow actual inventory consumption, not the
+            # independent quick-purchase quota (including a fully used stack).
+            if req.get('item_type') == tid:
+                delta = amount(before, tid) - amount(role, tid)
+                if delta > 0: daily_add(role, ident, delta, now)
     refresh(role, now)
 
 

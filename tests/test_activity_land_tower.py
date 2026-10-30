@@ -18,7 +18,7 @@ class LandTowerTests(ActivityCase):
         hell=encounters.schedule(True)
         self.assertEqual(normal[0]['level'],3)
         self.assertEqual(hell[0]['level'],4)
-        self.assertEqual(normal[0]['power'],769)
+        self.assertEqual(normal[0]['power'],1538)
         self.assertGreater(hell[0]['power'],normal[0]['power'])
         self.assertGreater(normal[-1]['power'],normal[0]['power']*200)
         self.assertGreater(hell[-1]['power'],hell[0]['power']*300)
@@ -35,6 +35,30 @@ class LandTowerTests(ActivityCase):
                 for stat in formation.STATS:
                     self.assertGreaterEqual(current['units'][0][stat]*100,
                                             previous['units'][0][stat]*103)
+
+    def test_power_multiplier_scales_actual_units_once_on_all_floors(self):
+        configured=copy.deepcopy(encounters.rules())
+        boosted=[copy.deepcopy(encounters.schedule(hell)) for hell in (False,True)]
+        baseline=dict(configured,normal_stat_multiplier=1,hell_stat_multiplier=1)
+        try:
+            with patch.object(encounters,'rules',return_value=baseline):
+                encounters.schedule.cache_clear()
+                old=[copy.deepcopy(encounters.schedule(hell)) for hell in (False,True)]
+        finally:
+            encounters.schedule.cache_clear()
+        self.assertEqual((old[0][0]['power'],old[1][0]['power']),(769,817))
+        self.assertEqual((old[0][-1]['power'],old[1][-1]['power']),(476370,629284))
+        for mode,multiplier in enumerate((2,4)):
+            for before,after in zip(old[mode],boosted[mode]):
+                self.assertEqual(before['level'],after['level'])
+                self.assertEqual(len(before['units']),len(after['units']))
+                # Display power rounds each unit; the small remainder is expected.
+                self.assertLessEqual(abs(after['power']-before['power']*multiplier),
+                                     len(after['units'])*multiplier)
+                for a,b in zip(before['units'],after['units']):
+                    self.assertEqual(a['skills'],b['skills'])
+                    for stat in formation.STATS:self.assertEqual(b[stat],a[stat]*multiplier)
+                    self.assertEqual(b['max_hp'],b['hp'])
 
     def test_card_pool_has_all_eight_requested_reward_tiers(self):
         self.assertEqual(self.b.activity_rules['land_card_rewards'],[
@@ -138,7 +162,7 @@ class LandTowerTests(ActivityCase):
     def test_inverse_tower_migrates_legacy_progress_and_clamps_daily_count(self):
         self.ok(self.land(1))
         role=self.b.profile();s=role['activity']['land']
-        s.update(boss_layer=4,inv_boss_layer=2,soul_count=10000,
+        s.update(boss_layer=0,inv_boss_layer=2,soul_count=10000,
                  inv_history={'1':dict(score=3000,cur_num=1),
                               '2':dict(score=3000,cur_num=1)},
                  hell_counts={'1':99})
@@ -156,12 +180,81 @@ class LandTowerTests(ActivityCase):
         # exposed as zero and cannot be bypassed by submitting a fight.
         self.assertEqual(self.land(4,flag=1,des_type=4,des_id=1,cur_num=1)[0][0],55)
 
+    def test_inverse_tower_native_unlock_button_and_paid_early_entry(self):
+        self.ok(self.land(1));role=self.b.profile()
+        role['activity']['land']['soul_count']=1000;self.b.save(role)
+        row=self.land(24)[-1][1]['data']['boss_info']
+        self.assertFalse(row['is_open'])
+        self.assertTrue(row['unlock'])  # Native landUI L2410 selects the unlock button.
+        self.assertEqual(row['unlock_layer'],1)
+        before=self.b.profile()
+        self.assertEqual(self.land(4,flag=1,des_type=4,des_id=1,cur_num=1)[0][0],55)
+        self.assertEqual(self.b.profile(),before)
+        self.ok(self.land(26,index=row['boss_layer']))
+        current=self.b.profile()
+        self.assertEqual(current['activity']['land']['soul_count'],1000-row['unlock_soul'])
+        self.assertTrue(self.land(24)[-1][1]['data']['boss_info']['is_open'])
+        self.assertEqual(self.land(26,index=1)[0][0],55)
+        self.assertEqual(self.b.profile(),current)
+        self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.assertTrue(self.land(24)[-1][1]['data']['boss_info']['is_open'])
+        result=self.land(4,flag=1,des_type=4,des_id=1,cur_num=1)
+        self.ok(result);self.assertTrue(result[-1][1]['is_win'])
+        self.ok(self.land(25))
+        row=self.land(24)[-1][1]['data']['boss_info']
+        self.assertEqual(row['boss_layer'],2)
+        self.assertFalse(row['is_open']);self.assertTrue(row['unlock'])
+
+    def test_inverse_tower_unlock_rejects_invalid_layers_and_insufficient_soul(self):
+        self.ok(self.land(24));role=self.b.profile()
+        role['activity']['land']['soul_count']=1000;self.b.save(role)
+        before=self.b.profile()
+        for index in (0,-1,2,65,True,1.5,'1'):
+            self.assertEqual(self.land(26,index=index)[0][0],55)
+            self.assertEqual(self.b.profile(),before)
+        before['activity']['land']['soul_count']=0;self.b.save(before)
+        self.assertEqual(self.land(26,index=1)[0][0],55)
+        self.assertEqual(self.b.profile(),before)
+
+    def test_normal_tower_settlement_automatically_opens_inverse_without_charge(self):
+        self.ok(self.land(1));role=self.b.profile()
+        role['activity']['land']['soul_count']=1000;self.b.save(role)
+        result=self.land(4,flag=1,des_type=3,des_id=1,cur_num=1)
+        self.ok(result);self.assertTrue(result[-1][1]['is_win'])
+        self.assertFalse(self.land(24)[-1][1]['data']['boss_info']['is_open'])
+        self.ok(self.land(14,index=1))
+        before=self.b.profile()['activity']['land']['soul_count']
+        self.ok(self.land(15))
+        row=self.land(24)[-1][1]['data']['boss_info']
+        self.assertTrue(row['is_open'])
+        self.assertEqual(self.b.profile()['activity']['land']['soul_count'],before)
+        result=self.land(4,flag=1,des_type=4,des_id=1,cur_num=1)
+        self.ok(result);self.assertTrue(result[-1][1]['is_win'])
+
+    def test_inverse_tower_old_normal_progress_unlocks_on_query_and_restart(self):
+        self.ok(self.land(1));original=self.b.profile()
+        for progress in (0,1,16,32,64):
+            with self.subTest(progress=progress):
+                role=copy.deepcopy(original);s=role['activity']['land']
+                s.update(boss_layer=progress,inv_boss_layer=max(0,progress-1),soul_count=0)
+                s.pop('unlocked',None);self.b.save(role)
+                row=self.land(24)[-1][1]['data']['boss_info']
+                self.assertEqual(row['is_open'],progress>0)
+                saved=self.b.profile()['activity']['land']
+                self.assertEqual(saved['unlocked'],list(range(1,progress+1)))
+                self.assertEqual(saved['soul_count'],0)
+                self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+                self.ok(self.land(24))
+                self.assertEqual(self.b.profile()['activity']['land'],saved)
+
     def test_hell_64_shield_events_do_not_truncate_winning_battle(self):
         self.ok(self.land(1));r=self.b.profile();identity=r['role_id']
         r.update(copy.deepcopy(npc.catalog()['npc_v1_l99_t2_attack']['role']))
         r['role_id']=identity
         r['activity']['land'].update(boss_layer=64,inv_boss_layer=63,grid_count=8,
-                                    soul_count=10000,unlocked=[64])
+                                    soul_count=10000,unlocked=[64],
+                                    charms={str(i):dict(key=(i-1)%4+1,value=30,unlock=True,is_open=True)
+                                            for i in land.CHARMS})
         real_battle=journey.battle
         for seed in (1,3,7):
             with self.subTest(seed=seed):

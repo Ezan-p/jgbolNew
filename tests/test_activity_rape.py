@@ -38,7 +38,11 @@ class RapeTests(ActivityCase):
     def test_full_clear_exact_rewards_duplicate_and_sweep_cost(self):
         boards=self.board();before=self.b.profile()
         with patch('network_redirect.activity_rape.journey.battle',return_value=(1,[],[])):
-            self.ok(self.req(1072))
+            out=self.req(1072);self.ok(out)
+        results=next(d for e,d in out if e==114)
+        prizes=[v for k,v in results.items() if isinstance(k,int) and 'skill_type' in v]
+        self.assertEqual(len(prizes),3)
+        self.assertEqual(sum(v['skill_count'] for v in prizes),3)
         after=self.b.profile()
         self.assertEqual(after['energy'],before['energy']-9)
         self.assertEqual(after['gold_coin'],before['gold_coin']-9)
@@ -47,6 +51,67 @@ class RapeTests(ActivityCase):
         self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
         self.assertEqual(after,self.b.profile())
         self.assertIn(55,[e for e,d in self.req(1072)])
+
+    def test_sweep_quote_matches_actual_vip_and_energy_cost(self):
+        for vip in (0,4,5,10):
+            r=self.b.profile();r.update(vip_level=vip,energy=2)
+            r['activity']['rape_boards']=None;self.b.save(r)
+            data=next(d for e,d in self.req(1029,flag=1) if e==40)
+            before=self.b.profile()
+            with patch.object(rape.journey,'battle',return_value=(4,[],[])):
+                self.ok(self.req(1072))
+            after=self.b.profile()
+            self.assertEqual(data['sweep_gold_per_fight'],int(vip<5))
+            self.assertEqual(before['gold_coin']-after['gold_coin'],2*data['sweep_gold_per_fight'])
+            self.assertEqual(after['energy'],0)
+
+    def test_sweep_visual_order_identity_and_remaining_guard_actions(self):
+        self.board();r=self.b.profile();board=r['activity']['rape_boards'][2]
+        entries=list(board['form_list']['2'].items())
+        # Mixed legacy groups, non-monotonic insertion order, and a defeated
+        # visual slot must not shift any later sweep result to another avatar.
+        key,target=entries.pop();target['has_win']=True
+        board['form_list']['1']={key:target}
+        board['form_list']['2']=dict(reversed(entries))
+        for b in r['activity']['rape_boards'][:2]:
+            b['reward_claimed']=True
+            for v in b['form_list']['2'].values():v['has_win']=True
+        # Keep the legacy mixed-group fixture from triggering missing-slot repair.
+        board['form_type']=4
+        for index,v in enumerate(board['form_list']['2'].values(),1):v['index']=index
+        r['energy']=2;self.b.save(r)
+        # Original descending rand values are 6,5,4,3,2; native visual order
+        # is the reverse. Slot 1 (rand=2) is already won and must be retained.
+        expected=[(3,2,int(ident),slot) for slot,(ident,_) in enumerate(reversed(entries),2)]
+        with patch.object(rape.journey,'battle',side_effect=[(1,[],[]),(4,[],[])]):
+            out=self.req(1072);self.ok(out)
+        result=next(d for e,d in out if e==114)
+        for i,(idx,typ,ident,position) in enumerate(expected[:2],1):
+            self.assertEqual((result[i]['form_index'],result[i]['object_type'],result[i]['object_id'],result[i]['index']),
+                             (idx,typ,ident,position))
+            self.assertNotIn('skill_type',result[i])
+            self.assertNotIn('skill_count',result[i])
+        r=self.b.profile();r['energy']=10;self.b.save(r)
+        # A failed target and an unattempted target are both still actionable.
+        _,typ,ident,_=expected[1]
+        self.ok(self.req(1041,form_index=3,object_type=typ,object_id=ident))
+        _,typ,ident,_=expected[2]
+        with patch.object(rape.journey,'battle',return_value=(1,[],[])):
+            self.ok(self.req(1026,fight_type=3,des_value=3,des_type=typ,des_id=ident))
+
+    def test_straight_sweep_displays_only_actual_awards_after_replacement(self):
+        with patch.object(rape,'roll_forms',return_value=[1,2,3]):boards=self.board()
+        ident=next(iter(boards[2]['form_list']['2']))
+        self.ok(self.req(1041,form_index=3,object_type=2,object_id=int(ident)))
+        before=self.b.profile()
+        with patch.object(rape.journey,'battle',return_value=(1,[],[])):
+            out=self.req(1072);self.ok(out)
+        result=next(d for e,d in out if e==114)
+        awards=[v for k,v in result.items() if isinstance(k,int) and 'skill_count' in v]
+        self.assertEqual([v['skill_count'] for v in awards],[2,2,2])
+        added=[v for v in self.b.profile()['attachments'] if v['id'] not in {x['id'] for x in before['attachments']}]
+        self.assertEqual(len(added),sum(v['skill_count'] for v in awards))
+        self.assertTrue(all(v['has_win'] for b in self.b.profile()['activity']['rape_boards'] for rows in b['form_list'].values() for v in rows.values()))
 
     def test_refresh_changes_npc_invalidates_old_target_and_preserves_slot(self):
         b=self.board()[0];ident,old=next(iter(b['form_list']['2'].items()))
@@ -64,8 +129,17 @@ class RapeTests(ActivityCase):
         before=self.b.profile()
         self.assertIn(55,[e for e,d in self.fight(0,key,12,9999)]);self.assertEqual(before,self.b.profile())
         self.ok(self.req(1039,des_type=1,des_id=target['id']))
+        with patch('network_redirect.activity_rape.journey.battle',return_value=(4,[],[])):
+            lost=self.fight(0,key,12,target['skill_type']);self.ok(lost)
+        self.assertEqual(next(d for e,d in lost if e==77),
+                         dict(result=1,request_id=int(key),skill_type=target['skill_type']))
+        self.assertFalse(self.b.profile()['activity']['rape_revenge'][key]['has_win'])
+        self.assertEqual(len(self.b.profile()['attachments']),len(before['attachments']))
         with patch('network_redirect.activity_rape.journey.battle',return_value=(1,[],[])):
-            self.ok(self.fight(0,key,12,target['skill_type']))
+            won=self.fight(0,key,12,target['skill_type']);self.ok(won)
+        self.assertEqual(next(d for e,d in won if e==77),
+                         dict(result=0,request_id=int(key),skill_type=target['skill_type']))
+        self.assertLess([e for e,d in won].index(77),[e for e,d in won].index(44))
         after=self.b.profile();self.assertEqual(len(after['attachments']),len(before['attachments'])+1)
         self.assertIn(55,[e for e,d in self.fight(0,key,12,target['skill_type'])]);self.assertEqual(after,self.b.profile())
         self.ok(self.req(1060,request_id=int(key)))

@@ -62,6 +62,16 @@ class FormationTests(unittest.TestCase):
     def change(self, identity, order, flag=4):
         return self.ok(1024, flag=flag, count=1, change_info=[dict(id=identity, new_order=order)])
 
+    def test_migration_with_unsaved_battle_effects_preserves_keys_and_detects_changes(self):
+        role = self.backend.profile()
+        effects = {1: {'cur_action': 1, 'skill_type': 10}, 'fight_id': 7}
+        role.setdefault('activity', {})['rank_records'] = [dict(fight_events=copy.deepcopy(effects))]
+        self.assertFalse(formation.prepare(role, self.backend.formation_rules))
+        role['corteges'][0].pop('next_exp')
+        self.assertTrue(formation.prepare(role, self.backend.formation_rules))
+        self.assertFalse(formation.prepare(role, self.backend.formation_rules))
+        self.assertEqual(role['activity']['rank_records'][0]['fight_events'], effects)
+
     def test_original_replacement_updates_innate_and_keeps_slot_equipment(self):
         weapon = self.add_item(2001)
         self.ok(1037, flag=3, obj_type=5, src_id=weapon, src_order=0, des_order=1, des_equip_pos=1)

@@ -3,14 +3,34 @@ do
  local ms=package.loaded.ms
  local ui=ms and ms.d_destinyUI
  if not ui or not ms.d_data or not ms.d_time then return 'pending' end
- if ui._localPavilionRestore and ui._localPavilionVersion~=2 then ui._localPavilionRestore() end
+ if ui._localPavilionRestore and ui._localPavilionVersion~=3 then ui._localPavilionRestore() end
  if not ui._localPavilionRestore then
-  ui._localPavilionVersion=2
+  ui._localPavilionVersion=3
   local tables=__PAVILION_TABLES__
   local originalResult=ui.onGetResult
   local originalConfig=ms.d_data.callback_update_config
   local originalShow,originalGift,originalSend=ui.show,ui.showGift,ui.sendRequest
   local originalJoin=ui.canJoin
+  local originalPage=ui.showPageDeatail
+  local originalBag=ui.getGiftBagSprite
+  ui.getGiftBagSprite=function(index,...)
+   -- The active source assigns nitian to slot 2; our persistent catalog
+   -- appends it at 10. Its original artwork is g2, not nonexistent g10.
+   return originalBag(index==10 and 2 or index,...)
+  end
+  local pageCount=math.max(3,math.ceil(#(tables['csv_config/exchange_zone.csv'] or {})/3))
+  ui.showPageDeatail=function(page,...)
+   -- Native page_max serves BOTH page count and rows/page. Keep three rows
+   -- while rendering, then restore the four-page navigation limit.
+   ui.g_self.page_max=3
+   local ok,result=pcall(originalPage,page,...)
+   ui.g_self.page_max=pageCount
+   for _,btn in pairs(ui.g_destinyUI.page_btns or {}) do
+    if btn.setVisible then btn:setVisible(true) end
+   end
+   if not ok then error(result) end
+   return result
+  end
   local lastQuery=-100
   local function query()
    local now=ms.d_time.getTime()
@@ -129,6 +149,8 @@ do
    ui.onGetResult=originalResult;ms.d_data.callback_update_config=originalConfig
    ui.show=originalShow;ui.showGift=originalGift;ui.sendRequest=originalSend
    ui.canJoin=originalJoin
+   ui.showPageDeatail=originalPage
+   ui.getGiftBagSprite=originalBag
    ui._localPavilionRestore=nil
    ui._localPavilionVersion=nil
   end

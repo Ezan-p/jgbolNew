@@ -10,7 +10,9 @@ FILLINGS = (1135, 1136, 1137, 1138)
 
 
 def client_source(shared):
-    source = Path(__file__).with_name('moon_client.lua').read_text()
+    source = Path(__file__).with_name('moon_client.lua').read_text().replace(
+        '__SEASONAL_CRAFT_HELPER__', Path(__file__).with_name('seasonal_craft_client.lua').read_text())
+    source = source.replace('__CRAFT_DAILY_LIMIT__', str(shared['seasonal_craft_daily_limit']))
     return (source.replace('__MOON_ENABLED__', summon.lua(shared['seasonal_games']['moon']['enabled']))
             .replace('__MOON_BONUS_EVERY__', str(shared['seasonal_moon_bonus_every']))
             .replace('__MOON_BONUS_COUNT__', str(sum(p[2] for p in shared['seasonal_moon_bonus'] if p[:2] == [5, 1001]))))
@@ -23,7 +25,7 @@ def load_rules(path=ROOT/'server_config/moon_rules.json'):
     require(isinstance(r.get('revision'), str) and bool(r['revision']), '中秋配置版本缺失')
     require(r.get('filling_weights') == [10, 70, 20] and
             all(type(w) is int for w in r['filling_weights']), '中秋馅料须按0/1/2个的10/70/20权重掉落')
-    require(r.get('flour_counts') == [1, 2, 3] and r.get('flour_weights') == [1, 1, 1], '中秋面粉须等概率掉落1至3个')
+    require(r.get('flour_counts') == [2, 3, 4] and r.get('flour_weights') == [1, 1, 1], '面粉和粽叶须等概率掉落2至4个')
     require(set(r.get('pools', {})) == set(map(str, FOODS)), '四种月饼奖池缺失')
     for pool in r['pools'].values():
         groups = pool.get('groups')

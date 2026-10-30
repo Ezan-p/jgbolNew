@@ -175,7 +175,23 @@ def board(role, now, r, update=1):
     for b in boards:
         b.pop('reward_claimed',None);b.pop('version',None)
         b['form_list']={int(t):{int(k):{f:v for f,v in row.items() if f not in ('npc_id','power')} for k,row in rows.items()} for t,rows in b['form_list'].items()}
-    return dict(time=now,update_type=update,used_count=role['activity']['rape_refreshes'],free_count=max(0,role['rape_flush_limit']-role['activity']['rape_refreshes']),gold_cost=r['rape_refresh_gold'],rape_list=boards)
+    return dict(time=now,update_type=update,used_count=role['activity']['rape_refreshes'],free_count=max(0,role['rape_flush_limit']-role['activity']['rape_refreshes']),gold_cost=r['rape_refresh_gold'],sweep_gold_per_fight=sweep_gold_per_fight(role),rape_list=boards)
+
+
+def sweep_gold_per_fight(role):
+    return 0 if role.get('vip_level', 0) >= 5 else 1
+
+
+def sweep_targets(boards):
+    # Native flipCard sorts ALL guards (including defeated ones) by ascending
+    # rand. Dictionary order and per-group index are not visual positions.
+    for idx, b in enumerate(boards, 1):
+        guards = [(int(t), int(k), v) for t, rows in b['form_list'].items()
+                  for k, v in rows.items()]
+        guards.sort(key=lambda row: row[2]['rand'])
+        for position, (typ, ident, target) in enumerate(guards, 1):
+            if not target['has_win']:
+                yield idx, typ, ident, position
 
 
 def messages(role):
@@ -211,7 +227,9 @@ def battle(role, req, now, r, jrules):
         if win:
             journey.grant(role,(6,target['skill_type'],1,1))
             role['silver_coin']+=r['battle_silver']
-        events.append(summon.event(77,dict(result=0 if win else 1,request_id=int(req['des_id']))))
+        # Native showFightBackTink passes skill_type into the reward dialog.
+        # Missing it raises after the touch-blocking layer is already attached.
+        events.append(summon.event(77,dict(result=0 if win else 1,request_id=int(req['des_id']),skill_type=target['skill_type'])))
     else:
         passed=all(t['has_win'] for rows in b['form_list'].values() for t in rows.values());count=0
         if passed and not b['reward_claimed']:
@@ -261,13 +279,18 @@ def settle(role,mid,req,now,r,jrules,parse):
         npcs.remember(role,[new['npc_id']],rules())
         return [summon.event(40,dict(update_type=5,form_index=idx,old_type=req['object_type'],old_id=req['object_id'],new_type=req['object_type'],new_id=ident,new_show_type=new['show_type'],new_top_order=0,new_level=new['level'],new_name=new['name'],cortege_layer=new['cortege_layer']))]
     a.require(mid==1072 and (role['level']>=25 or role.get('vip_level',0)>=5),'渡劫扫荡需25级或VIP5')
-    pending=[(i,t,int(k),j) for i,b in enumerate(s['rape_boards'],1) for t,rows in b['form_list'].items() for j,(k,v) in enumerate(rows.items(),1) if not v['has_win']][:role['energy']]
-    a.require(bool(pending),'没有可扫荡的对手或精力不足');a.spend(role,'gold_coin',0 if role.get('vip_level',0)>=5 else len(pending));results={}
+    pending=list(sweep_targets(s['rape_boards']))[:role['energy']]
+    a.require(bool(pending),'没有可扫荡的对手或精力不足');a.spend(role,'gold_coin',sweep_gold_per_fight(role)*len(pending));results={}
     from .protocol import decode
     for idx,t,ident,j in pending:
         for packet in battle(role,dict(fight_type=3,des_value=idx,des_type=int(t),des_id=ident),now,r,jrules):
             m,_,d=decode(packet)
             if m==2998 and d['id']==41:
-                v=parse(d['data']);v['index']=j;results[len(results)+1]=v
+                v=parse(d['data']);v.update(index=j,object_type=int(t),object_id=ident)
+                # Lua treats zero as true. Native sweep UI interprets a present
+                # skill_count=0 as a prize and displays a phantom spell book.
+                if v['skill_count']<=0:
+                    v.pop('skill_count');v.pop('skill_type')
+                results[len(results)+1]=v
     results['pass_all_form']=all(b['reward_claimed'] for b in s['rape_boards'])
     return [messages(role),summon.event(114,results)]

@@ -23,11 +23,14 @@ def rules():
         formation.require(int(journey.NPCS[tid]['chushijineng']) in formation.SKILLS, '镇妖塔首领法术缺失')
     formation.require(all(type(r.get(k)) is int for k in (
         'normal_start_level', 'hell_start_level', 'normal_level_step',
-        'hell_level_step', 'stat_percent', 'min_floor_growth_percent')),
+        'hell_level_step', 'stat_percent', 'min_floor_growth_percent',
+        'normal_stat_multiplier', 'hell_stat_multiplier')),
         '镇妖塔成长配置必须为整数')
     formation.require(1 <= r['normal_start_level'] < r['hell_start_level'] <= 8
                       and 1 <= r['normal_level_step'] < r['hell_level_step'] <= 8
                       and 100 <= r['stat_percent'] <= 200
+                      and 1 <= r['normal_stat_multiplier'] <= 10
+                      and 1 <= r['hell_stat_multiplier'] <= 10
                       and 1 <= r['min_floor_growth_percent'] <= 10
                       and r['skill_level'] == 1 and r['guard_layer_step'] == 8, '镇妖塔成长配置无效')
     return r
@@ -54,7 +57,12 @@ def schedule(hell=False):
         lead['max_hp'] = lead['hp']; leaders.append(lead)
         count = min(8,1+(layer-1)//r['guard_layer_step'])
         army = copy.deepcopy(list(reversed(leaders[-count:])))
-        for order,unit in enumerate(army,1):unit['order'] = order
+        # Scale the finished army, never the leaders used by the growth guard:
+        # otherwise the requested multiplier would compound on every floor.
+        for order,unit in enumerate(army,1):
+            unit['order'] = order
+            for stat in formation.STATS:unit[stat] *= r[mode+'_stat_multiplier']
+            unit['max_hp'] = unit['hp']
         result.append(dict(layer=layer, name=('冥界·' if hell else '')+floor['name'],
                            type_id=floor['type_id'], units=army, level=level,
                            power=sum(combat_power.score_panel(u,weights) for u in army)))

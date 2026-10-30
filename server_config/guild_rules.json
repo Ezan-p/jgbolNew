@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "mode": "inferred",
-  "revision": "guild-pet-refinement-2026-10-27",
+  "revision": "guild-escort-compose-2026-10-30",
   "wars_enabled": false,
   "npc_recruit_daily": 4,
   "timezone_offset_hours": 8,
@@ -26,15 +26,17 @@
   "donate_limit": 100,
   "donate_money_rate": 10,
   "donate_contrib_rate": 1,
-  "store_flush_gold": 20,
+  "store_flush_gold": 100,
   "store_flush_limit": 5,
+  "store_count": 8,
+  "store_pool_version": 1,
   "store": [
     {
       "id": 1,
       "prize": [
         5,
         1001,
-        5,
+        20,
         1
       ],
       "cost": 20,
@@ -45,7 +47,7 @@
       "prize": [
         5,
         1022,
-        1,
+        5,
         1
       ],
       "cost": 50,
@@ -56,7 +58,7 @@
       "prize": [
         5,
         1023,
-        1,
+        5,
         1
       ],
       "cost": 50,
@@ -67,7 +69,7 @@
       "prize": [
         5,
         1006,
-        1,
+        5,
         1
       ],
       "cost": 100,
@@ -77,7 +79,18 @@
       "id": 5,
       "prize": [
         5,
-        1003,
+        1007,
+        5,
+        1
+      ],
+      "cost": 100,
+      "limit": 2
+    },
+    {
+      "id": 6,
+      "prize": [
+        12,
+        0,
         5,
         1
       ],
@@ -85,11 +98,99 @@
       "limit": 5
     },
     {
-      "id": 6,
+      "id": 7,
       "prize": [
-        12,
-        0,
-        5000,
+        5,
+        1034,
+        5,
+        1
+      ],
+      "cost": 20,
+      "limit": 2
+    },
+    {
+      "id": 8,
+      "prize": [
+        5,
+        1033,
+        5,
+        1
+      ],
+      "cost": 20,
+      "limit": 2
+    },
+    {
+      "id": 9,
+      "prize": [
+        5,
+        1032,
+        5,
+        1
+      ],
+      "cost": 20,
+      "limit": 2
+    },
+    {
+      "id": 10,
+      "prize": [
+        5,
+        1031,
+        5,
+        1
+      ],
+      "cost": 20,
+      "limit": 2
+    },
+    {
+      "id": 11,
+      "prize": [
+        5,
+        10000,
+        5,
+        1
+      ],
+      "cost": 20,
+      "limit": 5
+    },
+    {
+      "id": 12,
+      "prize": [
+        5,
+        1310,
+        5,
+        1
+      ],
+      "cost": 20,
+      "limit": 5
+    },
+    {
+      "id": 13,
+      "prize": [
+        5,
+        1311,
+        5,
+        1
+      ],
+      "cost": 20,
+      "limit": 5
+    },
+    {
+      "id": 14,
+      "prize": [
+        5,
+        1312,
+        5,
+        1
+      ],
+      "cost": 20,
+      "limit": 5
+    },
+    {
+      "id": 15,
+      "prize": [
+        5,
+        1015,
+        20,
         1
       ],
       "cost": 20,
@@ -204,14 +305,11 @@
   "escort_flush_limit": 5,
   "escort_free_flush": 1,
   "escort_flush_gold": 10,
-  "escort_compose_rewards": [
-    [
-      5,
-      1001,
-      5,
-      1
-    ]
-  ],
+  "escort_compose": {
+    "mode": "inferred",
+    "reason": "A：天地人残卷各1个；单次产物可立即使用，十连展示逐次奖励；原包定义四档取经经书袋。B：合成产出四档袋的映射与60/25/12/3概率；十连逐次抽袋并按同一开袋池直接结算。",
+    "bag_weights": {"1304": 60, "1305": 25, "1306": 12, "1307": 3}
+  },
   "search_card_points": 100,
   "tree_require_pop": 50,
   "member_growth": 3,

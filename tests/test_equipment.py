@@ -180,6 +180,30 @@ class EquipmentTests(unittest.TestCase):
             self.assertEqual(self.req(1052, equip_order=0, inbatch=True, equip_id=gear)[-1][0], 2)
         self.assertEqual(self.get(gear)['level'], 4)
 
+    def test_successive_enhancement_batches_stop_below_cap_and_can_continue(self):
+        gear = self.gear(main=1)
+        role = self.b.profile()
+        role['vip_level'] = 3
+        self.b.save(role)
+        for start in (1, 11):
+            before = self.b.profile()
+            with patch.object(summon, 'weighted_choice', return_value=1):
+                events = dict(self.req(1052, equip_order=0, inbatch=True, equip_id=gear))
+            self.assertNotIn(55, events)
+            steps = events[2]['upgrade_list']
+            self.assertEqual(len(steps), 10)
+            self.assertEqual(steps[1]['old_level'], start)
+            self.assertEqual(steps[10]['new_level'], start+10)
+            after = self.b.profile()
+            item = self.get(gear)
+            self.assertEqual(item['level'], start+10)
+            quality = int(f.ITEMS[item['type_id']]['quality'])
+            cost = sum(int(f.EQUIP_COST[lv][f'star{quality}_money']) for lv in range(start, start+10))
+            self.assertEqual(after['silver_coin'], before['silver_coin']-cost)
+            self.assertLess(item['level'], min(int(f.ITEMS[item['type_id']]['top_level']), after['level']*2))
+            self.assertEqual(self.b.respond(self.packet, {'authenticated': True}), self.replies)
+            self.assertEqual(self.b.profile(), after)
+
     def test_realm_level_and_currency_gates_are_atomic(self):
         stone = self.add(1090); mat = self.add(1091)
         role = self.b.profile(); role['silver_coin']=0; self.b.save(role)

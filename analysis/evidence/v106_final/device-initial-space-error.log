@@ -1,0 +1,20 @@
+/data/app/com.sygame.jingubang.p360-1/base.apk: 1 file pulled, 0 skipped. 20.3 MB/s (198495867 bytes in 9.328s)
+Backed up existing QA database; counts: {'accounts': 2, 'roles': 2}
+adb: error: failed to copy '/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v106-final/金箍棒3.87-离线单机-arm32-v106.apk' to '/data/local/tmp/金箍棒3.87-离线单机-arm32-v106.apk': remote No space left on device
+/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v106-final/金箍棒3.87-离线单机-arm32-v106.apk: 1 file pushed, 0 skipped. 21.5 MB/s (198499963 bytes in 8.825s)
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v106_final.py", line 57, in <module>
+    if __name__=='__main__':main()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v106_final.py", line 43, in main
+    verify.main(expected_version=106,install_baseline=False)
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v106_device.py", line 62, in main
+    install(APK)
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v106_device.py", line 33, in install
+    result = call('install', '--no-streaming', '-r', str(apk), timeout=300).decode()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v106_device.py", line 19, in call
+    return subprocess.check_output(ADB + list(args), timeout=timeout)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 424, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/sdk/platform-tools/adb', '-s', 'emulator-5572', 'install', '--no-streaming', '-r', '/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v106-final/金箍棒3.87-离线单机-arm32-v106.apk']' returned non-zero exit status 255.

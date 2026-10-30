@@ -78,15 +78,26 @@ def prepare(role,s,g,now,r):
 
 
 def store(s,r):
-    if not s.get('store_stock'):s['store_stock']=copy.deepcopy(r['store'])
+    if not s.get('store_stock') or s.get('store_pool_version')!=r['store_pool_version']:
+        # Migrate the old six-slot stock once, keeping today's spent quotas.
+        refresh_store(s,r)
+    # Keep saved slots and spent quotas while applying current offer limits.
+    limits={tuple(row['prize'][:2]):row['limit'] for row in r['store']}
+    for row in s['store_stock']:
+        key=tuple(row['prize'][:2])
+        if key in limits:row['limit']=limits[key]
     return s['store_stock']
 
 
 def refresh_store(s,r):
-    rows=copy.deepcopy(r['store']);shift=1+roll(s,len(rows)-1)
-    prizes=[row['prize'] for row in rows]
-    for i,row in enumerate(rows):row['prize']=prizes[(i+shift)%len(rows)]
+    pool=copy.deepcopy(r['store']);rows=[]
+    for slot in range(1,r['store_count']+1):
+        row=pool.pop(roll(s,len(pool)))
+        # Native purchase callbacks address contiguous display slots.
+        row['id']=slot
+        rows.append(row)
     s['store_stock']=rows
+    s['store_pool_version']=r['store_pool_version']
 
 
 def pets(a):
@@ -200,6 +211,12 @@ def validate_rules(r):
     slots=r.get('search_reward_slots')
     require(isinstance(slots,list) and len(slots)==len(r['search_rewards']) and all(type(n)is int and n>0 for n in slots) and sum(slots)==18,'寻宝奖励必须配置18格')
     require(set(r['west_config']['book_worth_config'])==set(map(str,range(1,6))),'取经品质配置不完整')
+    compose=r.get('escort_compose',{})
+    require(compose.get('mode')=='inferred' and bool(compose.get('reason')),'经书合成推测来源缺失')
+    weights=compose.get('bag_weights',{})
+    require(set(weights)=={'1304','1305','1306','1307'} and
+            all(type(v)is int and 0<v<=100 for v in weights.values()) and
+            sum(weights.values())==100,'经书袋概率必须覆盖四档且合计100%')
 
 
 def funds(g,amount,r):

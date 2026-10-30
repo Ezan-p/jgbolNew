@@ -1,5 +1,6 @@
 import copy
 import unittest
+from unittest.mock import patch
 from decimal import Decimal
 from tests import test_formation as helpers
 from pathlib import Path
@@ -118,6 +119,83 @@ class InsightTests(unittest.TestCase):
         payload = next(p for e,p in self.events(rows) if e == 89)
         self.assertNotEqual(payload['skill_type'], 22)
         self.assertEqual(payload['skill_level'], 7)
+
+    def test_conversion_pools_costs_and_effects_all_directions(self):
+        normal = {22, 23, 31, 32, 42, 43, 51, 52}
+        pools = {0: normal, 4: {42, 43}, 5: {22, 23}, 6: {31, 32}}
+        for tid in sorted(normal):
+            for state, pool in pools.items():
+                with self.subTest(tid=tid, state=state):
+                    target = self.spell(tid, 7)
+                    self.add_item(1095)
+                    role = self.backend.profile()
+                    role['gold_coin'] = 200
+                    f.lookup(role, 'attachments', target)['count'] = 3
+                    self.backend.save(role)
+                    before = self.backend.profile()
+                    def choose(candidates):
+                        self.assertEqual(set(candidates), pool - {tid})
+                        return min(candidates)
+                    with patch('network_redirect.skill_insight.secrets') as rng:
+                        rng.choice.side_effect = choose
+                        rows = self.ok(1212, skill_id=target, state=state)
+                        rng.choice.assert_called_once()
+                    payload = next(p for e, p in self.events(rows) if e == 89)
+                    after = self.backend.profile()
+                    item = f.lookup(after, 'attachments', payload['skill_id'])
+                    self.assertNotEqual(item['id'], target)
+                    self.assertFalse(any(i['id'] == target for i in after['attachments']))
+                    self.assertEqual((item['level'], item['count'], item['upgrade_level']), (7, 3, 0))
+                    self.assertEqual(item['effect_value'], f.skill_effect(item))
+                    self.assertEqual(after['gold_coin'], 0 if state else 200)
+                    token_count = lambda r: sum(i['count'] for i in r['attachments']
+                                               if i['attach_type'] == 5 and i['type_id'] == 1095)
+                    self.assertEqual(token_count(before) - token_count(after), 1)
+
+    def test_conversion_protected_and_special_targets_are_atomic(self):
+        self.add_item(1095, 10)
+        for changes in (dict(equip_order=1), dict(equip_order=9), dict(owner_id=99),
+                        dict(is_lock=1), dict(innate_owner_id=99), dict(protogenic=1)):
+            with self.subTest(changes=changes):
+                target = self.spell(22)
+                role = self.backend.profile()
+                f.lookup(role, 'attachments', target).update(changes)
+                self.backend.save(role)
+                self.rejected(1212, skill_id=target, state=0)
+        for tid in (21, 25, 206):
+            with self.subTest(tid=tid):
+                self.rejected(1212, skill_id=self.spell(tid), state=0)
+
+    def test_conversion_refunds_all_recipes_replay_and_restart(self):
+        for tid in si.RECIPES:
+            with self.subTest(tid=tid):
+                target = self.spell(tid, 10, upgrade_level=1)
+                self.add_item(1095)
+                before = self.backend.profile()
+                rows = self.ok(1212, skill_id=target, state=0)
+                payload = next(p for e, p in self.events(rows) if e == 89)
+                after = self.backend.profile()
+                old_ids = {i['id'] for i in before['attachments']}
+                refunds = [i for i in after['attachments'] if i['id'] not in old_ids
+                           and i['id'] != payload['skill_id']]
+                self.assertEqual(sorted((i['type_id'], i['level']) for i in refunds),
+                                 sorted((t, 1) for _, t, n, _ in si.materials(tid) for _ in range(n)))
+                converted = f.lookup(after, 'attachments', payload['skill_id'])
+                self.assertEqual((converted['level'], converted['upgrade_level']), (10, 0))
+                self.assertEqual(self.backend.respond(self.packet, self.state), self.replies)
+                self.assertEqual(self.backend.profile(), after)
+                fresh = Backend(Path(self.directory.name), 18770, lambda *a, **k: None)
+                try:
+                    self.assertEqual(fresh.profile(), after)
+                    # The response cache is in memory; after restart the old
+                    # target is gone, so retry must reject without a second debit.
+                    replies = fresh.respond(self.packet, self.state)
+                    from network_redirect.protocol import decode
+                    self.assertEqual(self.events([decode(p) for p in replies])[0][0], 55)
+                    self.assertEqual(fresh.profile(), after)
+                finally:
+                    fresh.close()
+                self.rejected(1212, skill_id=target, state=0)
 
     def test_cheer_insight_scales_hp_on_both_sides(self):
         for order in (1, 9):

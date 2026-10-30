@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-30",
+  "revision": "land-tower-power-2026-10-30-v4",
+  "passed": true,
+  "tower_multipliers": {
+    "normal": 2,
+    "hell": 4
+  },
+  "tower_floor_rows": 128,
+  "tower_unit_rows": 576,
+  "initial": {
+    "tests": 53,
+    "passed": 50,
+    "failed_test_cases": 3,
+    "failed_subtests_and_cases": 5
+  },
+  "retry": {
+    "tests": 3,
+    "passed": true,
+    "note": "Corrected first-floor rounding expectation; supplied 44 level-30 charms to isolated endgame flow fixtures after the requested difficulty increase. No mocked battle wins."
+  },
+  "shared_mail_and_protocol": {
+    "tests": 21,
+    "passed": true
+  },
+  "unique_tests": 74,
+  "weekly_mail_checks": [
+    "seven reward tiers with all inventory and gold deltas",
+    "bootstrap and reconnect",
+    "Monday heartbeat after other day markers advanced",
+    "Sunday tower soul counted in old week",
+    "read using serial zero",
+    "duplicate claim and replay",
+    "claim encoding failure rollback",
+    "late claim and restart persistence",
+    "no mail for unplayed weeks"
+  ],
+  "scope": "Temporary backend accounts and real protocol encoding; no live-account mutation or new native UI validation."
+}

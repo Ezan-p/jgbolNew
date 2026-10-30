@@ -57,11 +57,11 @@ def main():
         history = OUT/'initial_fixed_rules_audit.json'
         if not history.exists():
             history.write_bytes(old.read_bytes())
-    report = dict(date='2026-10-28', revision=rules['revision'], status='implemented_in_workspace',
+    report = dict(date='2026-10-31', revision=rules['revision'], status='implemented_in_workspace',
                   source='User images: contents and stone rates; local design: silver and other rates',
                   original_server_probabilities_verified=False, visible_ui_verified=False,
                   original_inputs=inputs, items=items,
-                  verification='tests/test_item_rewards.py; tests.log records executed regression suite')
+                  verification='tests/test_item_rewards.py; six_gifts_tests_20261031.log records executed regression suite')
     old.write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n')
     print(f'PASS: 7 original CSVs; {len(items)} fixed-plus-one pools; '
           f'{sum(len(x["bonus"]) for x in items.values())} concrete bonus outcomes; exact sums = 1.')

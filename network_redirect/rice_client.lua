@@ -2,13 +2,14 @@
 do
  local ms=package.loaded.ms
  local ui=ms and ms.d_ricePuddingUI
- if not ui or not ms.d_hz or not ms.d_u or not ms.d_commonLayerUI then return 'pending' end
+ if not ui or not ms.d_hz or not ms.d_u or not ms.d_commonLayerUI or not ms.d_data or not ms.d_data.createBatchUse or not ms.d_packageUI then return 'pending' end
  if not ui._localRiceRestore then
   local old={}
   for _,key in ipairs({'updateActivityStatus','canJoin','tickTime','create','cook','showNews','onGetResult'}) do old[key]=ui[key] end
   local hz=ms.d_hz.gethz
   local usedItem=ms.d_commonLayerUI.recvUsedItem
   local enabled=__RICE_ENABLED__
+__SEASONAL_CRAFT_HELPER__
   local originalEnd=ui.g_self.end_time
   local progress={rice_count=0,left_process=__RICE_BONUS_EVERY__}
   local labels={
@@ -29,6 +30,7 @@ do
    return usedItem(data,...)
   end
   ui.updateActivityStatus=function(data,...)
+   updateCraft(data)
    if data and data.local_permanent then enabled=data.local_enabled end
    if data and data.rice_count then progress=data end
    local result=old.updateActivityStatus(data,...)
@@ -37,14 +39,13 @@ do
    return result
   end
   ui.onGetResult=function(data,...)
+   updateCraft(data)
    if data and data.local_rice_progress then progress=data.local_rice_progress end
    return old.onGetResult(data,...)
   end
   ui.canJoin=function() return enabled end
-  ui.cook=function(...)
-   if not enabled then ms.d_info.show('粽叶飘香暂未开放');return end
-   ui.g_self.end_time=math.huge
-   return old.cook(...)
+  ui.cook=function(index)
+   return craftBatch(index,'rice',ui.g_ricePuddingUI)
   end
   ui.tickTime=function()
    local layer=ui.g_ricePuddingUI and ui.g_ricePuddingUI.main_layer

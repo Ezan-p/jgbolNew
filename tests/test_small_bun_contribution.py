@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from network_redirect import summon, qiankun_bags, guild
+from network_redirect import summon, qiankun_bags, guild, journey
 from network_redirect.backend import Backend, login_fields
 from network_redirect.protocol import encode, decode
 
@@ -219,7 +219,80 @@ class ConsumableTests(unittest.TestCase):
             self.use(tid, self.add(tid), item_count=0)
             self.assertEqual(self.events[21]['effect_value'], 10)
             self.assertEqual(self.b.profile()[key], before[key]+10)
-            self.assertEqual(self.b.profile()[key+'_item_count'], before[key+'_item_count']+1)
+            self.assertEqual(self.b.profile()[key+'_item_count'], before[key+'_item_count'])
+            self.assertEqual(self.b.profile()[key+'_item_time'], before[key+'_item_time'])
+
+    def test_inventory_use_preserves_purchase_price_quota_and_wire_counts(self):
+        for tid, key, attr in ((1022, 'strength', 55), (1023, 'energy', 57)):
+            ident = self.add(tid, 12)
+            self.req(1058, type_id=tid)
+            before = self.b.profile()
+            self.assertEqual(before[key+'_item_count'], 1)
+            self.use(tid, ident, item_count=12)
+            self.assertNotIn(55, self.events)
+            self.assertEqual(self.attrs()[attr], 1)
+            self.assertEqual(self.attrs()[attr+1], before[key+'_item_time'])
+            self.assertEqual(self.b.profile()['gold_coin'], before['gold_coin'])
+            # The second purchase still costs 20, regardless of inventory use.
+            self.req(1058, type_id=tid)
+            after = self.b.profile()
+            self.assertNotIn(55, self.events)
+            self.assertEqual(after[key+'_item_count'], 2)
+            self.assertEqual(after['gold_coin'], before['gold_coin']-20)
+            self.assertEqual(after[key], before[key]+130)
+            self.assertEqual(self.b.respond(self.packet, {'authenticated': True}), self.replies)
+            self.assertEqual(self.b.profile(), after)
+            self.req(1058, type_id=tid)
+            self.assertEqual(self.b.profile()['gold_coin'], after['gold_coin']-40)
+
+    def test_exhausted_purchase_quota_allows_inventory_and_resets_next_day(self):
+        for tid, key in ((1022, 'strength'), (1023, 'energy')):
+            ident = self.add(tid, 2)
+            r = self.b.profile()
+            journey.prepare(r, NOW, self.b.journey_rules)
+            r[key+'_item_count'] = r[key+'_item_limit']
+            r[key+'_item_time'] = NOW-60
+            self.b.save(r)
+            before = self.b.profile()
+            self.req(1058, type_id=tid)
+            self.assertIn(55, self.events)
+            self.assertEqual(self.b.profile(), before)
+            self.use(tid, ident)
+            self.assertNotIn(55, self.events)
+            self.assertEqual(self.b.profile()[key+'_item_count'], before[key+'_item_count'])
+            self.assertEqual(self.b.profile()[key+'_item_time'], NOW-60)
+            with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+                self.use(tid, ident)
+                self.assertNotIn(55, self.events)
+                self.assertEqual(self.b.profile()[key+'_item_count'], 0)
+                gold = self.b.profile()['gold_coin']
+                self.req(1058, type_id=tid)
+                self.assertNotIn(55, self.events)
+                self.assertEqual(self.b.profile()[key+'_item_count'], 1)
+                self.assertEqual(self.b.profile()['gold_coin'], gold-20)
+
+    def test_eating_achievements_use_inventory_delta_and_persist(self):
+        for tid, key, achievement in ((1022, 'strength', '447'), (1023, 'energy', '423')):
+            ident = self.add(tid, 10)
+            self.req(1058, type_id=tid)
+            self.assertNotIn(achievement+':all', self.b.profile()['achievements']['daily'].get('counts', {}))
+            self.use(tid, ident, item_count=9)
+            r = self.b.profile()
+            self.assertEqual(r['achievements']['daily']['counts'][achievement+':all'], 9)
+            self.assertEqual(r['achievements']['totals'][achievement], 9)
+            self.assertEqual(self.b.respond(self.packet, {'authenticated': True}), self.replies)
+            self.assertEqual(self.b.profile(), r)
+            self.use(tid, ident, item_count=2)
+            self.assertIn(55, self.events)
+            self.assertEqual(self.b.profile(), r)
+            self.use(tid, ident, item_count=0)
+            r = self.b.profile()
+            self.assertEqual(r['achievements']['totals'][achievement], 10)
+            self.assertEqual(r[key+'_item_count'], 1)
+        before = self.b.profile()
+        self.b.close()
+        self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        self.assertEqual(self.b.profile()['achievements'], before['achievements'])
 
     def test_resource_batches_inventory_effect_counts_and_replay(self):
         for tid, key, gain in ((1020, 'strength', 5), (1022, 'strength', 10), (1023, 'energy', 10)):
@@ -229,7 +302,8 @@ class ConsumableTests(unittest.TestCase):
             self.assertEqual(self.events[21], dict(result=1, type_id=tid, count=300, effect_value=300*gain))
             after = self.b.profile()
             self.assertEqual(after[key], before[key]+300*gain)
-            self.assertEqual(after[key+'_item_count'], before[key+'_item_count']+(0 if tid==1020 else 300))
+            self.assertEqual(after[key+'_item_count'], before[key+'_item_count'])
+            self.assertEqual(after[key+'_item_time'], before[key+'_item_time'])
             self.assertEqual(next(i['count'] for i in after['attachments'] if i['id']==ident), 1)
             self.assertEqual(self.b.respond(self.packet, {'authenticated': True}), self.replies)
             self.assertEqual(self.b.profile(), after)
@@ -250,7 +324,7 @@ class ConsumableTests(unittest.TestCase):
         for tid, key, attr in ((1022, 'strength', 55), (1023, 'energy', 57)):
             ident = self.add(tid, 3)
             r = self.b.profile()
-            r[key+'_item_count'] = 255
+            r[key+'_item_count'] = 258
             self.b.save(r)
             before = self.b.profile()[key]
             for _ in range(3):
@@ -264,7 +338,7 @@ class ConsumableTests(unittest.TestCase):
             self.assertIn(55, self.events)
             self.assertEqual(self.b.profile()[key], before+30)
             # Both login paths encode a bounded legacy snapshot and then the
-            # exact count; the persistent achievement counter remains intact.
+            # exact count; inventory use preserves even legacy inflated counts.
             for reconnect in (False, True):
                 rows = [decode(p) for p in self.b.bootstrap(reconnect=reconnect)]
                 login = next(d for m, _, d in rows if m == 1017)

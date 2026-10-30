@@ -400,8 +400,8 @@ def resource_item(role, req, now, rules, buy=False):
     key = 'energy' if tid == 1023 else 'strength'
     count_key, time_key = key + '_item_count', key + '_item_time'
     count = 1
-    # Small buns remain separate from the regular consumable daily counter.
-    # Inventory use is unlimited; the legacy quota only gates quick purchases.
+    # The legacy counter, timestamp and price tier track quick purchases only.
+    # Consuming existing inventory must not spend the purchase quota.
     if buy:
         require(role[count_key] < role[key + '_item_limit'], '今日快捷购买次数已达上限')
         index = role[count_key] + 1
@@ -422,8 +422,8 @@ def resource_item(role, req, now, rules, buy=False):
             role['attachments'].remove(item)
     gain = int(formation.ITEMS[tid][key + '_plus']) * count
     role[key] += gain
-    if tid != 1020:
-        role[count_key] += count
+    if buy:
+        role[count_key] += 1
         role[time_key] = now
     # [A] commonLayerUI.recvUsedItem formats effect_value for all three items.
     return [summon.event(21, dict(result=1, type_id=tid, count=count, effect_value=gain))]

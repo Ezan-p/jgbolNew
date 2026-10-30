@@ -12,6 +12,28 @@ RICE={int(x['index']):dict(source=[original_spec(v) for v in x['object_type'].sp
 MOON={original_spec(x['src_type'])[1]:dict(source=[original_spec(x['src_type']),original_spec(x['common_src_type'])],dest=original_spec(x['des_type'])) for x in summon.rows('compose_monthcake.csv')}
 NAMES={int(x['Ftype_id']):x['name'] for x in summon.rows('item_name.csv')}
 FOODS={1130,1131,1132,1133,1213,1214,1215,1216,1217}
+BATCH_EVENT = 249  # Local 2998 request; native recipe messages remain single-craft.
+
+
+def craft_status(s, name, now, r):
+    day = a.day(now, r)
+    return dict(local_craft_remaining=max(0, r['seasonal_craft_daily_limit']-s['counts'].get(f'{name}:{day}', 0)),
+                local_craft_reset_time=(day+1)*86400-r['timezone_offset_hours']*3600)
+
+
+def settle_batch(role, req, now, r, parse):
+    data = parse(req['data'])
+    a.require(data.get('activity') in ('moon', 'rice'), '合成活动无效')
+    a.require(type(data.get('count')) is int and 1 <= data['count'] <= 100, '合成数量须为1至100')
+    # Lua's serialized arrays are decoded as integer-keyed dictionaries.
+    if isinstance(data.get('material_list'), dict):
+        data['material_list'] = list(data['material_list'].values())
+    if data['activity']=='rice':
+        a.require(isinstance(data.get('material_list'),list) and
+                  all(isinstance(i,dict) and type(i.get('id')) in (int,float) for i in data['material_list']),
+                  '合成材料列表无效')
+    data['flag'] = 1
+    return settle(role, 1126 if data['activity']=='rice' else 1333, data, now, r)
 
 
 def travel_drop(role,now,r):
@@ -72,6 +94,7 @@ def status(role,now,r):
         cfg=r['seasonal_games'][name]
         supply(role,s,r,name,now)
         out[field]={start:cfg['start_time'] if cfg['enabled'] else 0,'end_time':cfg['end_time'] if cfg['enabled'] else 0}
+        out[field].update(craft_status(s,name,now,r))
     out['dragon_boat_info']['luck_list']=copy.deepcopy(s['rice_news'])
     from . import activity_rice
     out['dragon_boat_info'].update(local_permanent=True,local_enabled=r['seasonal_games']['rice']['enabled'],
@@ -94,6 +117,8 @@ def settle(role,mid,req,now,r):
     s=state(role)
     if mid==1333 and req['flag']==0:return [summon.event(178,moon_news(s,r))]
     a.require(mid!=1333 or req['flag']==1,'月饼操作无效')
+    n=req.get('count',1)
+    a.require(type(n)is int and 1<=n<=100,'合成数量须为1至100')
     table=RICE if name=='rice' else MOON;idx=req['compose_type'] if name=='rice' else req['src_type']
     a.require(type(idx)is int and idx in table,'合成配方无效');row=table[idx]
     if name=='rice':
@@ -101,25 +126,37 @@ def settle(role,mid,req,now,r):
         a.require(req['material_count']==len(row['source'])==len(ids) and len(set(ids))==len(ids),'合成材料数量无效')
         items=[next((i for i in role['attachments'] if i['id']==v and i['attach_type']==5),None) for v in ids]
         a.require(all(items) and sorted(i['type_id'] for i in items)==sorted(p[1] for p in row['source']),'合成材料不属于该配方')
-        a.require(all(not i.get('is_lock') and not i.get('owner_id') and not i.get('equip_pos') and not i.get('equip_order') and i['count']>=next(p[2] for p in row['source'] if p[1]==i['type_id']) for i in items),'所选合成材料不足或不可使用')
+        a.require(all(not i.get('is_lock') and not i.get('owner_id') and not i.get('equip_pos') and not i.get('equip_order') and i['count']>=n*next(p[2] for p in row['source'] if p[1]==i['type_id']) for i in items),'所选合成材料不足或不可使用')
     daykey=f'{name}:{a.day(now,r)}';count=s['counts'].get(daykey,0)
-    a.require(count<r['seasonal_craft_daily_limit'],'今日合成次数已满')
+    a.require(count+n<=r['seasonal_craft_daily_limit'],'今日剩余合成次数不足')
     if name=='rice':
-        for item in items:item['count']-=next(p[2] for p in row['source'] if p[1]==item['type_id'])
+        for item in items:item['count']-=n*next(p[2] for p in row['source'] if p[1]==item['type_id'])
         role['attachments']=[i for i in role['attachments'] if i not in items or i['count']>0]
     else:
-        for typ,tid,n,lv in row['source']:a.consume(role,tid,n)
-    reward=[copy.deepcopy(row['dest'])];s['counts'][daykey]=count+1
+        for typ,tid,needed,lv in row['source']:
+            a.require(sum(i['count'] for i in role['attachments'] if i['attach_type']==typ and i['type_id']==tid
+                          and not any(i.get(k) for k in ('is_lock','owner_id','equip_pos','equip_order')))>=needed*n,'合成材料不足或不可使用')
+        for typ,tid,needed,lv in row['source']:
+            remaining=needed*n
+            items=[i for i in role['attachments'] if i['attach_type']==typ and i['type_id']==tid and
+                   not any(i.get(k) for k in ('is_lock','owner_id','equip_pos','equip_order'))]
+            for item in items:
+                used=min(item['count'],remaining);item['count']-=used;remaining-=used
+            role['attachments']=[i for i in role['attachments'] if i not in items or i['count']>0]
+    reward=[copy.deepcopy(row['dest'])];reward[0][2]*=n;s['counts'][daykey]=count+n
+    total_key=name+'_count';step=r['seasonal_moon_bonus_every']
+    bonuses=(s[total_key]+n)//step-s[total_key]//step
+    s[total_key]+=n
+    if bonuses:
+        bonus=copy.deepcopy(r['seasonal_moon_bonus'])
+        for p in bonus:p[2]*=bonuses
+        reward.extend(bonus)
     # Bound historical counters while preserving season supplies.
     s['counts']={k:v for k,v in s['counts'].items() if int(k.split(':')[1])>=a.day(now,r)-1}
     if name=='rice':
         from . import activity_rice
-        s['rice_count']+=1
-        if s['rice_count']%r['seasonal_moon_bonus_every']==0:reward.extend(copy.deepcopy(r['seasonal_moon_bonus']))
         s['rice_news'].insert(0,dict(name=role['role_name'],data=[row['dest'][1]]));s['rice_news']=s['rice_news'][:5]
         return [summon.event(126,dict(result=0,attach_list=a.prizes(role,reward),luck_list=copy.deepcopy(s['rice_news']),
-                                     local_rice_progress=activity_rice.progress(s,r)))]
-    s['moon_count']+=1
-    if s['moon_count']%r['seasonal_moon_bonus_every']==0:reward.extend(copy.deepcopy(r['seasonal_moon_bonus']))
-    s['moon_news'].insert(0,f"{role['role_name']}合成了{NAMES[row['dest'][1]]}");s['moon_news']=s['moon_news'][:5]
-    return [summon.event(178,dict(flag=1,prize_list=a.prizes(role,reward))),summon.event(178,moon_news(s,r))]
+                                     local_rice_progress=activity_rice.progress(s,r),**craft_status(s,name,now,r)))]
+    s['moon_news'].insert(0,f"{role['role_name']}合成了{NAMES[row['dest'][1]]}×{n}");s['moon_news']=s['moon_news'][:5]
+    return [summon.event(178,dict(flag=1,prize_list=a.prizes(role,reward),**craft_status(s,name,now,r))),summon.event(178,moon_news(s,r))]

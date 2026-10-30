@@ -73,7 +73,7 @@ class ActivityTests(ActivityCase):
         r=self.b.profile();r['rule_index']=55;self.b.save(r)
         hp=self.b.profile()['corteges'][0]['hp']
         self.ok(self.req(1026,fight_type=4,des_type=1,des_id=0,des_value=0))
-        r=self.b.profile();self.assertEqual(r['rule_index'],56);self.assertEqual(r['corteges'][0]['hp'],hp+20)
+        r=self.b.profile();self.assertEqual(r['rule_index'],56);self.assertEqual(r['corteges'][0]['hp'],hp+1120)
         self.assertEqual(self.req(1026,fight_type=4,des_type=1)[0][0],55)
     def test_rank_fight_daily_score_and_exchange(self):
         self.ok(self.req(1021,flag=0));self.ok(self.req(1026,fight_type=2,des_type=2,des_value=99,des_id=930099))
@@ -158,13 +158,18 @@ class ActivityTests(ActivityCase):
             r=copy.deepcopy(self.b.activity_rules);r[key]=value;p=Path(self.tmp.name)/'bad.json';p.write_text(json.dumps(r))
             with self.assertRaises(formation.Rejected):activity.load_rules(p)
     def test_trial_kill_claim_restart_and_daily_limit(self):
+        from network_redirect import activity_trial
+        role=self.b.profile()
+        with patch.object(activity_trial.secrets,'randbelow',return_value=0):
+            activity_trial.encounter(role,NOW,self.b.activity_rules)
+        self.b.save(role)
         out=self.req(1064,flag=2);self.ok(out)
         boss=out[-1][1]['train_data']['boss_list'][1]
         self.assertEqual(self.req(1064,flag=9)[0][0],55)
         with patch('network_redirect.activity.journey.battle',return_value=(3,[dict(src_hp=1,des_hp=50000)],
                 [dict(is_src=True,damage_count=8,damage_list=[50000000,0,0,0,0,0,0,0])])):
             self.ok(self.req(1026,fight_type=11,des_type=8,des_id=boss['type_id']))
-        self.assertTrue(self.b.profile()['activity']['trial']['is_dead'])
+        self.assertTrue(self.b.profile()['activity']['trial_bosses'][0]['is_dead'])
         self.ok(self.req(1064,flag=9));before=self.b.profile()
         self.assertEqual(self.req(1064,flag=9)[0][0],55);self.assertEqual(before,self.b.profile())
     def test_query_lineup_and_rank_challenge_relation(self):
@@ -522,7 +527,8 @@ class LandTests(ActivityCase):
         repeat=self.land(4,flag=1,des_type=3,des_id=1,cur_num=1);self.ok(repeat)
         self.assertFalse(repeat[-1][1]['is_reward']);self.assertIsNone(self.b.profile()['activity']['land']['boss'])
         self.ok(self.land(13));self.assertEqual(self.land(13)[0][0],55)
-        self.ok(self.land(24));self.ok(self.land(26,index=1));self.ok(self.land(4,flag=1,des_type=4,des_id=1,cur_num=1));self.ok(self.land(25))
+        self.assertTrue(self.land(24)[-1][1]['data']['boss_info']['is_open'])
+        self.ok(self.land(4,flag=1,des_type=4,des_id=1,cur_num=1));self.ok(self.land(25))
         self.assertEqual(self.b.profile()['activity']['land']['inv_boss_layer'],1)
     def test_tower_capture_ticks_no_double_and_leave(self):
         when=NOW+8*3600
@@ -643,7 +649,7 @@ class SeasonalTests(ActivityCase):
         with patch('network_redirect.activity_tangwang.randbelow',return_value=99), patch('network_redirect.activity_moon.randbelow',side_effect=[0,10,0,0,0]*4), patch('network_redirect.activity_rice.randbelow',side_effect=[0,0,0,10,0]*4):
             for _ in range(4):self.assertEqual(len(travel_drop(r,NOW,a)),4)
         self.assertEqual(r['activity']['seasonal']['travel_wins'],4)
-        self.assertEqual(sum(i['count'] for i in r['attachments'] if i['type_id']==1208),4)
+        self.assertEqual(sum(i['count'] for i in r['attachments'] if i['type_id']==1208),8)
 
         for cfg in a['seasonal_games'].values():cfg['enabled']=False
         self.assertEqual(travel_drop(r,NOW,a),[])

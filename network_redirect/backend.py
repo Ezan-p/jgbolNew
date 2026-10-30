@@ -13,6 +13,7 @@ import time
 from .protocol import encode, decode
 from . import tian_shu, new_role_guide, progression, role_profile, achievements, spirit_array, npc_players, gift_codes, xianyuan_fruit
 from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily, guild, vip, xianling, welfare, recharge, cheer, monument, equipment
+from . import fate_rebuild
 
 
 # The client initializes these sections together in data.set_g_new_config.
@@ -268,11 +269,11 @@ class Backend:
         # Bootstrap follows this bounded legacy snapshot with full-precision attributes.
         for name in cheer.NAMES[8:]:
             login_snapshot[name + '_skill_level'] = min(255, login_snapshot[name + '_skill_level'])
-        # Unlimited inventory consumables can exceed the legacy one-byte counts.
+        # Older saves may contain inventory uses in these one-byte purchase counts.
         for key in ('strength_item_count', 'energy_item_count'):
             login_snapshot[key] = min(255, login_snapshot[key])
         replies = [encode(2998, dict(id=80, data=config)),
-                encode(1017, dict(login_snapshot, reconnect=reconnect))] + self.inventory()
+                encode(1017, dict(login_snapshot, reconnect=reconnect))] + fate_rebuild.sync(role) + self.inventory()
         role = self.profile()
         replies += self.power_attributes(role)
         replies += cheer.attributes(role)
@@ -592,7 +593,9 @@ class Backend:
             rank_state = role.get('activity', {})
             rank_changed = (rank_state.get('rank_day', -1) < activity.day(now, self.activity_rules)
                             or rank_state.get('rank_reward_version', 1) < 2)
-            if rank_changed:
+            from . import activity_land
+            land_week_changed = activity_land.weekly_due(role, now, self.activity_rules)
+            if rank_changed or land_week_changed:
                 activity.prepare(role, now, self.activity_rules, self.duty_peers())
             from . import activity_monday
             monday_start = role.get('activity', {}).get('monday', {}).get('start')
@@ -629,6 +632,9 @@ class Backend:
             if rank_changed:
                 from . import activity_rank
                 updates += activity.attributes(role) + [activity_rank.client_state(role)]
+                updates.append(welfare.mail_snapshot(role, now, self.welfare_rules))
+            elif land_week_changed:
+                updates.append(welfare.mail_snapshot(role, now, self.welfare_rules))
             if monday_changed:
                 updates.append(welfare.mail_snapshot(role, now, self.welfare_rules))
             if seasonal_before['attachments'] != role['attachments']:
@@ -714,6 +720,7 @@ class Backend:
         if mid in daily.HANDLED:
             return self.dailies(packet, mid, data)
         if (mid in activity.HANDLED or (mid == 1026 and data['fight_type'] in activity.FIGHTS)
+                or (mid == 2998 and data['id'] == 249)
                 or (mid == 1244 and data['fight_type'] in (2, 4))
                 or (mid == 1051 and data['item_type'] in (1243,1367,1368,1808,1036,1037,1324,1346,1021,1130,1131,1132,1133,1213,1214,1215,1216,1217))
                 or (mid == 1059 and data['flag'] == 3)
@@ -729,7 +736,7 @@ class Backend:
             # Event 1 opens/refreshes the requested UI after both lists arrive.
             return self.complete(data['serial_num'], self.inventory() + summon.soul_snapshots(self.profile()) + [
                 encode(2998, dict(id=1, data='{flag=%d}' % data['flag']))])
-        if mid in reborn.HANDLED:
+        if mid in reborn.HANDLED or mid == 1357:
             return self.rebirth(packet, mid, data)
         if mid in immortal.HANDLED and mid != 1074:
             return self.immortals(packet, mid, data)
@@ -1126,6 +1133,8 @@ class Backend:
             elif role.get('pavilion', {}).get('last_recycle') != before.get('pavilion', {}).get('last_recycle'):
                 replies += [activity_pavilion.update(role, now, self.duty_peers()),
                             welfare.mail_snapshot(role, now, self.welfare_rules)]
+            elif role.get('welfare', {}).get('mails', {}) != before.get('welfare', {}).get('mails', {}):
+                replies.append(welfare.mail_snapshot(role, now, self.welfare_rules))
             self.save(role)
             # Telemetry failure cannot turn a committed payment into a failed
             # payment receipt; the client must still receive its success data.
@@ -1195,7 +1204,8 @@ class Backend:
         try:
             role = self.profile()
             before = copy.deepcopy(role)
-            events = (reborn.settle(role, data, self.reborn_rules, login_fields) if mid == 1328 else
+            events = (fate_rebuild.settle(role, data, login_fields) if mid == 1357 else
+                      reborn.settle(role, data, self.reborn_rules, login_fields) if mid == 1328 else
                       reborn_stars.settle(role, mid, data, self.reborn_rules, login_fields))
             achievements.record_events(role, events, int(time.time()), login_fields)
             welfare.track(role,mid,data,events,int(time.time()),self.welfare_rules)
@@ -1205,7 +1215,19 @@ class Backend:
             attrs = [dict(type=t, value=role.get(k, 0)) for t, k in
                      ((7, 'silver_coin'), (8, 'gold_coin'), (30, 'role_combat_power'), (39, 'max_combat_power'),
                       (580, 'reborn_layer'), (581, 'maxlayer_reborn_count'))]
-            replies = self.companion_deltas(before, role) + self.item_deltas(before, role)
+            replies = ([] if mid == 1357 else self.companion_deltas(before, role)) + self.item_deltas(before, role)
+            if mid == 1357:
+                # Refresh the shared native objects before the 1032 notification
+                # invokes the active soul window's success callback.
+                replies += fate_rebuild.sync(role)
+                replies += self.inventory(role) if data['id'] in (4, 5) else []
+                changes = self.companion_deltas(before, role)
+                replies += changes
+                if not changes:
+                    cid = login_fields(data['data'])['cortege_id']
+                    c = formation.lookup(role, 'corteges', cid)
+                    replies.append(encode(1032, dict(id=cid, unit_type=4, attr_count=1,
+                        attr_list=[dict(type=391, value=c['fate_rebullding_state'])])))
             old_skills = {x['id']: x for x in before['attachments'] if x['attach_type'] == 6}
             for item in role['attachments']:
                 old = old_skills.get(item['id'])
@@ -1414,7 +1436,8 @@ class Backend:
             before = copy.deepcopy(role)
             events = activity.settle(role, mid, data, now, self.activity_rules,
                                      self.journey_rules, self.formation_rules, login_fields, self.duty_peers())
-            if (role.get('activity',{}).get('nine_sky',{}).get('last_recycle') !=
+            if (role.get('welfare', {}).get('mails', {}) != before.get('welfare', {}).get('mails', {}) or
+                role.get('activity',{}).get('nine_sky',{}).get('last_recycle') !=
                 before.get('activity',{}).get('nine_sky',{}).get('last_recycle') or
                 role.get('pavilion',{}).get('last_recycle') != before.get('pavilion',{}).get('last_recycle') or
                 any(role.get('activity',{}).get('seasonal',{}).get(name,{}).get('last_recycle') !=

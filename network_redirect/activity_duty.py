@@ -4,6 +4,7 @@ Ranking contains actual local-account results, never fabricated NPC scores.
 """
 import copy
 import hashlib
+from datetime import datetime, timezone
 from . import formation, journey, summon, achievements, role_profile, cheer, duty_balance, combat_power
 from . import battle_replay
 from .protocol import encode
@@ -187,7 +188,16 @@ def settle_ranks(role, peers, now, r):
         m['streak'] = ((m['streak']+1 if date == m['streak_day']+1 else 1) if amount else 0)
         m['streak_day'] = date
         if amount:
-            journey.grant(role, [11, 1, amount, 1])
+            from . import system_mail, welfare
+            # Delivery replaces its input role; merge only mail state so callers'
+            # activity/meta references remain valid throughout rollover.
+            delivery = copy.deepcopy(role)
+            date_label = datetime.fromtimestamp(date * 86400, timezone.utc).strftime('%Y-%m-%d')
+            _, mail = system_mail.deliver(delivery, f'duty-rank-{date}', '天命之战每日排行奖励',
+                f'{date_label}天命之战每日排行：{g}人组第{pos}名，奖励{amount}元宝，请领取附件。',
+                [[11, 1, amount, 1]], now, welfare.load_rules())
+            role['welfare'] = delivery['welfare']
+            m['settled'][str(date)]['mail_id'] = mail['mail_id']
             achievements.observe(role, 216, 1)
             achievements.observe(role, 217, int(pos == 1))
             for ident in range(431, 440):

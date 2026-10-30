@@ -24,11 +24,14 @@ def load_rules(path=ROOT/'server_config/guild_rules.json'):
         require(type(r.get(k)) is int and (0 if k=='wander_daily' else 1)<=r[k]<=1000000,'仙盟配置数值无效: '+k)
     require(r['max_level']<=99 and r['member_limit']<=100,'仙盟等级/人数配置越界')
     require(type(r.get('timezone_offset_hours')) is int and -12<=r['timezone_offset_hours']<=14,'仙盟时区无效')
-    require(len(r['store'])==6 and len({x['id'] for x in r['store']})==6,'仙盟商店需要六个唯一货位')
+    require(r.get('store_count')==8 and type(r.get('store_pool_version')) is int and r['store_pool_version']>0,'仙盟宝库货位或版本无效')
+    require(isinstance(r.get('store'),list) and len(r['store'])>=r['store_count'],'仙盟宝库候选不足')
+    require(len({x['id'] for x in r['store']})==len(r['store']),'仙盟宝库候选ID重复')
+    require(len({tuple(x['prize'][:2]) for x in r['store']})==len(r['store']),'仙盟宝库奖励重复')
     for row in r['store']:
         daily.validate_prize(row['prize'])
         require(all(type(row[k]) is int and 0<row[k]<=100000 for k in ('id','cost','limit')),'商店配置无效')
-    for key in ('tree_rewards','match_rewards','team_rewards','train_rewards','hunt_rewards','escort_compose_rewards'):
+    for key in ('tree_rewards','match_rewards','team_rewards','train_rewards','hunt_rewards'):
         require(isinstance(r.get(key),list) and r[key], '仙盟奖励配置缺失: '+key)
         for prize in r[key]:daily.validate_prize(prize)
     require(len(r['feast_gifts'])==2 and {v['type'] for v in r['feast_gifts']}=={1,2},'宴会礼物配置无效')

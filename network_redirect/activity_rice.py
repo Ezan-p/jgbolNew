@@ -8,7 +8,9 @@ FILLINGS = (1209, 1210, 1211, 1212)
 
 
 def client_source(shared):
-    source = Path(__file__).with_name('rice_client.lua').read_text()
+    source = Path(__file__).with_name('rice_client.lua').read_text().replace(
+        '__SEASONAL_CRAFT_HELPER__', Path(__file__).with_name('seasonal_craft_client.lua').read_text())
+    source = source.replace('__CRAFT_DAILY_LIMIT__', str(shared['seasonal_craft_daily_limit']))
     return (source.replace('__RICE_ENABLED__', summon.lua(shared['seasonal_games']['rice']['enabled']))
             .replace('__RICE_BONUS_EVERY__', str(shared['seasonal_moon_bonus_every']))
             .replace('__RICE_BONUS_COUNT__', str(sum(p[2] for p in shared['seasonal_moon_bonus'] if p[:2] == [5, 1001]))))

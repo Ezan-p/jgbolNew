@@ -145,13 +145,13 @@ def record_charge(role, amount, now):
         s['activation_day'] = s['day']
 
 
-def grant_yuanshi(role, count=1):
+def grant_yuanshi(role, count=1, *, duplicate_souls=40):
     """Honor the box's 2x level, including stats/innate spell via formation.prepare."""
     rewards = []
     for _ in range(count):
         if any(c['type'] == 5046 for c in role['corteges']):
-            # [B] Duplicate converts to a full synthesis cost, never another copy.
-            rewards.extend(a.prizes(role, [[10, 5046, 40, 1]]))
+            # Progress claims use the synthesis cost; bags supply level-based souls.
+            rewards.extend(a.prizes(role, [[10, 5046, duplicate_souls, 1]]))
         else:
             level = min(role['level'] * 2, max(lv for q, lv in f.EXPERIENCE if q == 5))
             c = summon.companion(role, 5046)
@@ -171,7 +171,8 @@ def use_bag(role, req):
     # Debit the selected stack, not a different same-type stack.
     item['count'] -= n
     role['attachments'] = [i for i in role['attachments'] if i is not item or i['count'] > 0]
-    return [summon.event(21, dict(result=1, type_id=1808, count=n, attach_list=grant_yuanshi(role, n)))]
+    rewards = grant_yuanshi(role, n, duplicate_souls=role['level'] * 2)
+    return [summon.event(21, dict(result=1, type_id=1808, count=n, attach_list=rewards))]
 
 
 def draw_wish(r):

@@ -47,6 +47,11 @@ def draw(rules):
     raise AssertionError('unreachable reward draw')
 
 
+def reward_amount(index, stat, rules):
+    """Scale each new award by the lifetime successful stage, starting at one."""
+    return rules['train_increase'][stat] * (index + 1)
+
+
 def battle(role, req, now, rules, jrules):
     r = load_rules()
     formation.require(role['level'] >= 5, '主角修炼需要角色5级')
@@ -65,7 +70,7 @@ def battle(role, req, now, rules, jrules):
     if 1 <= result <= 3:
         stat = draw(r)
         field, attr = FIELDS[stat]
-        value = rules['train_increase'][stat]
+        value = reward_amount(index, stat, rules)
         role['rule_index'] = index + 1
         role[field] += value
         reward = dict(stat=stat, addition_field=attr, addition_value=value)

@@ -319,7 +319,7 @@ class JourneyTests(unittest.TestCase):
         self.assertEqual(self.b.profile()['strength'], 10)
         self.req(1058, type_id=1022)
         r = self.b.profile()
-        self.assertEqual((r['strength'], r['gold_coin'], r['strength_item_count']), (20, 80, 2))
+        self.assertEqual((r['strength'], r['gold_coin'], r['strength_item_count']), (20, 80, 1))
         self.fixture(strength_item_count=10)
         self.req(1058, type_id=1022)
         self.assertEqual(self.events[0][0], 55)

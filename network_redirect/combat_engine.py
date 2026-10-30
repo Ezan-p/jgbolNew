@@ -254,10 +254,11 @@ class Battle:
             fallen.append(target)
         # Resurrection is not a new received-hit trigger.
         cfg = self.rulai(target)
-        if not was_dead and cfg and c.roll(self.policy['rulai_shield_probability']):
+        shield_bonus = target.get('fate_traits',{}).get('shield',[0,0])
+        if not was_dead and cfg and c.roll(self.policy['rulai_shield_probability']+shield_bonus[0]):
             weak = min(self.fielded(target['side']), key=lambda u: (F(u['hp'], u['max_hp']), u['order']))
             # shield_rate is interpreted as HP capacity percent; duration is until consumed.
-            capacity = int(F(weak['max_hp']) * int(cfg['shield_rate']) / 100)
+            capacity = int(F(weak['max_hp']) * (int(cfg['shield_rate'])+F(str(shield_bonus[1]))) / 100)
             if capacity > weak['shield']:
                 weak['shield'] = capacity
                 self.event(weak, 101200, capacity, index, field=0)
@@ -297,8 +298,21 @@ class Battle:
         # wire damage array never exceeds that target's starting HP.
         for target in fallen:
             self.revive(target, index)
+        # Fate death skills resolve once for this death before reserve deployment.
+        # Reactions use direct HP events and never recurse into another attack.
+        if kind == 'main':
+            for target in fallen:
+                self.fate_death(target, index)
         self.deploy(index)
         self.heal(actor, F(total) * c.effect(actor, 5)[0] / 100, 5, index)
+        if kind == 'main':
+            for target in targets:
+                rate=target.get('fate_traits',{}).get('reflect',[0])[0]
+                if rate and actor['hp']:
+                    loss=self.lose_hp(actor,F(row['damage_list'][target['order']-1])*F(str(rate))/100,target['side'],index)
+                    self.event(actor,101032,-loss,index)
+                    self.revive(actor,index)
+            self.deploy(index)
         for target, back_scale in reactions:
             if any(target is dead for dead in fallen):
                 continue
@@ -307,6 +321,10 @@ class Battle:
             return
         alive = self.targets(actor)
         if not alive:
+            return
+        spell_combo=actor.get('fate_traits',{}).get('spell_combo',[0,0])
+        if skill!=1 and spell_combo[0] and c.roll(spell_combo[0]):
+            self.attack(actor,self.targets(actor,skill),skill,level,spell_combo[1],kind='fate_combo')
             return
         chance, combo_scale = c.effect(actor, 7)
         if combo_scale and c.roll(chance):
@@ -317,6 +335,18 @@ class Battle:
             target = targets[0]
             if target['hp'] and target['hp'] * 100 < target['max_hp'] * threshold and c.roll(chance):
                 self.attack(actor, [target], kind='execute')
+
+    def fate_death(self, unit, index):
+        traits=unit.get('fate_traits',{})
+        spell=traits.get('death_spell')
+        heal=traits.get('death_heal')
+        if spell and c.roll(spell[0]):
+            for target in self.fielded(3-unit['side']):
+                loss=self.lose_hp(target,F(unit['magic'])*F(str(spell[1]))/100,unit['side'],index)
+                self.event(target,101162,-loss,index);self.revive(target,index)
+        if heal and c.roll(heal[0]):
+            for target in self.fielded(unit['side']):
+                self.heal(target,F(unit['magic'])*F(str(heal[1])),10,index)
 
     def healing_spell(self, actor, skill, level):
         """[B] Placeholder formula 6 heals living allies; CSV probability stays zero."""
@@ -344,6 +374,18 @@ class Battle:
         for unit in [u for side in (1, 2) for u in self.fielded(side)]:
             if not self.can_act():
                 return
+            traits=unit.get('fate_traits',{})
+            if self.round>=2 and traits:
+                defense=traits.get('round_defense',[0])[0]
+                if defense:
+                    unit['base_fangyu']=F(unit['entry_fangyu'])*(1+F(str(defense))*(self.round-1)/100)
+                    unit['fangyu']=unit['base_fangyu']*(1-unit['armor_break']/100)
+                rate=traits.get('round_heal',traits.get('ally_heal',[0]))[0]
+                if rate:
+                    target=min(self.fielded(unit['side']),key=lambda u:(F(u['hp'],u['max_hp']),u['order'])) if 'ally_heal' in traits else unit
+                    if target['hp']<target['max_hp']:
+                        _,fate_index=self.row(unit,[target],self_use=True)
+                        self.heal(target,F(target['max_hp'])*F(str(rate))/100,10,fate_index)
             poison = unit.get('poison')
             if poison and c.roll(c.effect(unit, 17)[0]):
                 unit.pop('poison')

@@ -43,9 +43,9 @@ class MoonTests(ActivityCase):
             self.assertEqual(counts,{0:10,1:70,2:20})
         for flour in range(3):
             with patch.object(moon,'randbelow',side_effect=[flour,0,10,79,80]):
-                self.assertEqual(moon.material_specs(r),[[5,1134,flour+1,1],[5,1136,1,1],[5,1137,1,1],[5,1138,2,1]])
+                self.assertEqual(moon.material_specs(r),[[5,1134,flour+2,1],[5,1136,1,1],[5,1137,1,1],[5,1138,2,1]])
         with patch.object(moon,'randbelow',side_effect=[2,99,99,99,99]):
-            self.assertEqual([p[2] for p in moon.material_specs(r)],[3,2,2,2,2])
+            self.assertEqual([p[2] for p in moon.material_specs(r)],[4,2,2,2,2])
 
     def test_all_candidates_credit_exact_quantity_via_wire(self):
         for tid,pool in moon.load_rules()['pools'].items():
@@ -150,7 +150,7 @@ class MoonTests(ActivityCase):
         before=self.count(1134)
         with patch.object(moon,'randbelow',side_effect=[0,0,0,0,0,1,10,10,10,10,2,80,80,80,80]) as rng:
             self.ok(self.req(1061,tollgate_type=1,tollgate_id=101,sweep_count=3))
-        self.assertEqual(rng.call_count,15);self.assertEqual(self.count(1134)-before,6)
+        self.assertEqual(rng.call_count,15);self.assertEqual(self.count(1134)-before,9)
         for tid in moon.FILLINGS:self.assertEqual(self.count(tid),3)
         before=self.count(1134)
         with patch('network_redirect.journey.battle',return_value=(4,[],[])),patch.object(moon,'randbelow',side_effect=AssertionError('lost draw')):
@@ -161,21 +161,21 @@ class MoonTests(ActivityCase):
         self.ok(self.req(1043,flag=0));self.ok(self.req(1043,plus_type=1,plus_index=1))
         with patch('network_redirect.journey.battle',return_value=(3,[],[])),patch.object(moon,'randbelow',side_effect=[2,0,10,80,99]):
             out=self.req(1026,fight_type=5,des_type=1,des_id=0,des_value=1);self.ok(out)
-        self.assertEqual(self.count(1134),3);self.assertIn(22,[e for e,_ in out])
+        self.assertEqual(self.count(1134),4);self.assertIn(22,[e for e,_ in out])
         before=self.b.profile()
         self.assertEqual(self.b.respond(self.packet,self.state),self.replies);self.assertEqual(before,self.b.profile())
         d=before['activity']['duty']
         if d['phase']=='prize':self.ok(self.req(1043,plus_type=3))
         with patch('network_redirect.journey.battle',return_value=(4,[],[])),patch.object(moon,'randbelow',side_effect=AssertionError('lost draw')):
             self.ok(self.req(1026,fight_type=5,des_type=1,des_id=0,des_value=2))
-        self.assertEqual(self.count(1134),3)
+        self.assertEqual(self.count(1134),4)
         with patch('network_redirect.journey.battle',return_value=(4,[],[])),patch.object(moon,'randbelow',side_effect=[0,10,10,10,10]):
             self.ok(self.req(1026,fight_type=6))
-        self.assertEqual(self.count(1134),4)
+        self.assertEqual(self.count(1134),6)
 
     def test_config_rejects_bad_probabilities_and_rewards(self):
         base=moon.load_rules();path=Path(self.tmp.name)/'bad-moon.json'
-        for kind in ('total','negative','missing','reward','duplicate','drop'):
+        for kind in ('total','negative','missing','reward','duplicate','drop','common_counts','common_weights'):
             r=copy.deepcopy(base);g=r['pools']['1130']['groups']
             if kind=='total':g[0]['weight']+=1
             if kind=='negative':g[0]['weight']=-1
@@ -183,6 +183,8 @@ class MoonTests(ActivityCase):
             if kind=='reward':g[0]['candidates'][0][1]=1134
             if kind=='duplicate':g[1]['candidates']=copy.deepcopy(g[0]['candidates'])
             if kind=='drop':r['filling_weights']=[20,70,10]
+            if kind=='common_counts':r['flour_counts']=[1,2,3]
+            if kind=='common_weights':r['flour_weights']=[1,2,1]
             path.write_text(json.dumps(r))
             with self.assertRaises(formation.Rejected):moon.load_rules(path)
 

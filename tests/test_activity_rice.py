@@ -73,17 +73,17 @@ class RiceTests(ActivityCase):
             self.assertEqual(counts,{0:10,1:70,2:20})
         for leaf in range(3):
             with patch.object(rice,'randbelow',side_effect=[leaf,0,10,79,80]):
-                self.assertEqual(rice.material_specs(shared),[[5,1208,leaf+1,1],[5,1210,1,1],[5,1211,1,1],[5,1212,2,1]])
+                self.assertEqual(rice.material_specs(shared),[[5,1208,leaf+2,1],[5,1210,1,1],[5,1211,1,1],[5,1212,2,1]])
         with patch.object(rice,'randbelow',side_effect=[2,80,80,80,80]) as rr,patch.object(moon,'randbelow',side_effect=[0,0,0,0,0]) as mr:
             specs=season.material_specs(shared)
         self.assertEqual((rr.call_count,mr.call_count),(5,5))
-        self.assertEqual(specs,[[5,1208,3,1]]+[[5,t,2,1] for t in rice.FILLINGS]+[[5,1134,1,1]])
+        self.assertEqual(specs,[[5,1208,4,1]]+[[5,t,2,1] for t in rice.FILLINGS]+[[5,1134,2,1]])
         shared['seasonal_games']['rice']['enabled']=False
         with patch.object(rice,'randbelow',side_effect=AssertionError('disabled roll')),patch.object(moon,'randbelow',side_effect=[1,10,10,10,10]):
             self.assertEqual([p[1] for p in season.material_specs(shared)],[1134,1135,1136,1137,1138])
         shared['seasonal_games']['rice']['enabled']=True;shared['seasonal_games']['moon']['enabled']=False
         with patch.object(moon,'randbelow',side_effect=AssertionError('disabled roll')),patch.object(rice,'randbelow',side_effect=[0,0,0,0,0]):
-            self.assertEqual(season.material_specs(shared),[[5,1208,1,1]])
+            self.assertEqual(season.material_specs(shared),[[5,1208,2,1]])
 
     def test_batch_one_hundred_independent_and_moon_opening_not_shared(self):
         ident=self.put(1216,100);mid=self.put(1133);before=self.b.profile()
@@ -190,7 +190,7 @@ class RiceTests(ActivityCase):
         with patch.object(rice,'randbelow',side_effect=[2,80,80,80,80]*3) as rr,patch.object(moon,'randbelow',side_effect=[0,0,0,0,0]*3) as mr:
             self.ok(self.req(1061,tollgate_type=1,tollgate_id=101,sweep_count=3))
         self.assertEqual((rr.call_count,mr.call_count),(15,15))
-        self.assertEqual(self.count(1208),9);self.assertEqual(self.count(1134),3)
+        self.assertEqual(self.count(1208),12);self.assertEqual(self.count(1134),6)
         self.assertEqual([self.count(t) for t in rice.FILLINGS],[6]*4)
         self.assertEqual([self.count(t) for t in moon.FILLINGS],[0]*4)
         before=self.b.profile()
@@ -202,15 +202,15 @@ class RiceTests(ActivityCase):
         self.ok(self.req(1043,flag=0));self.ok(self.req(1043,plus_type=1,plus_index=1))
         with patch('network_redirect.journey.battle',return_value=(3,[],[])),patch.object(rice,'randbelow',side_effect=[2,80,80,80,80]) as rr,patch.object(moon,'randbelow',side_effect=[0,0,0,0,0]) as mr:
             out=self.req(1026,fight_type=5,des_type=1,des_id=0,des_value=1);self.ok(out)
-        self.assertEqual((rr.call_count,mr.call_count),(5,5));self.assertEqual(self.count(1208),3)
-        self.assertEqual(self.count(1134),1);self.assertIn(22,[e for e,d in out])
+        self.assertEqual((rr.call_count,mr.call_count),(5,5));self.assertEqual(self.count(1208),4)
+        self.assertEqual(self.count(1134),2);self.assertIn(22,[e for e,d in out])
         before=self.b.profile();self.assertEqual(self.b.respond(self.packet,self.state),self.replies);self.assertEqual(before,self.b.profile())
         if before['activity']['duty']['phase']=='prize':self.ok(self.req(1043,plus_type=3))
         with patch('network_redirect.journey.battle',return_value=(4,[],[])),patch.object(rice,'randbelow',side_effect=AssertionError('lost drop')):
             self.ok(self.req(1026,fight_type=5,des_type=1,des_id=0,des_value=2))
         with patch('network_redirect.journey.battle',return_value=(4,[],[])),patch.object(rice,'randbelow',side_effect=[0,0,0,0,0]) as rr,patch.object(moon,'randbelow',side_effect=[2,80,80,80,80]) as mr:
             self.ok(self.req(1026,fight_type=6))
-        self.assertEqual((rr.call_count,mr.call_count),(5,5));self.assertEqual((self.count(1208),self.count(1134)),(4,4))
+        self.assertEqual((rr.call_count,mr.call_count),(5,5));self.assertEqual((self.count(1208),self.count(1134)),(6,6))
 
     def test_legacy_five_star_inventory_can_still_be_opened(self):
         ident=self.put(1217);before=self.count(1343)
