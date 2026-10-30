@@ -16,18 +16,20 @@ public final class LauncherActivity extends Activity {
     private ProgressBar progress;
     private boolean visible;
     private boolean launched;
-    private OpeningVideo opening;
     private final Runnable check = new Runnable() {
         @Override public void run() {
             if (isFinishing() || !visible || launched) return;
-            if (opening.isFinished()) OfflineRuntime.begin(getApplicationContext());
+            OfflineRuntime.begin(getApplicationContext());
             if (OfflineRuntime.error != null) {
                 progress.setVisibility(android.view.View.GONE);
                 detail.setText("启动未完成\n" + OfflineRuntime.error + "\n\n请关闭游戏后重试。存档保留在本机。");
-            } else if (OfflineRuntime.ready && opening.isFinished()) {
+            } else if (OfflineRuntime.ready) {
                 launched = true;
                 Intent game = new Intent();
                 game.setClassName(getPackageName(), "com.sygame.jingubang.uc.xiyoujilua");
+                // Reopening the app icon must resume the existing game/movie,
+                // rather than create a second GL Activity and restart the guide.
+                game.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(game);
                 finish();
             } else {
@@ -59,37 +61,24 @@ public final class LauncherActivity extends Activity {
         detail.setTextSize(16);
         detail.setGravity(Gravity.CENTER);
         layout.addView(detail);
-        opening = new OpeningVideo(this, layout, state);
-        setContentView(opening.getView());
+        setContentView(layout);
     }
 
     @Override protected void onResume() {
         super.onResume();
         visible = true;
-        opening.resume();
         handler.post(check);
     }
 
     @Override protected void onPause() {
         visible = false;
-        opening.pause();
         handler.removeCallbacks(check);
         super.onPause();
     }
 
     @Override protected void onDestroy() {
         handler.removeCallbacks(check);
-        opening.destroy();
         super.onDestroy();
     }
 
-    @Override protected void onSaveInstanceState(Bundle state) {
-        opening.save(state);
-        super.onSaveInstanceState(state);
-    }
-
-    @Override public void onBackPressed() {
-        if (!opening.isFinished()) opening.skip();
-        else super.onBackPressed();
-    }
 }

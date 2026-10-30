@@ -188,7 +188,7 @@ class GiftCodeTests(unittest.TestCase):
         with self.assertRaises(formation.Rejected): gift_codes.validate(rules)
 
     def test_requested_fixed_gifts_and_all_nineteen_souls(self):
-        rows = self.b.gift_code_rules['codes'][2:]
+        rows = self.b.gift_code_rules['codes'][2:27]
         self.assertEqual(len(rows), 25)
         expected = dict(zip(
             ['王母', '太乙天尊', '北海龙王', '菩提祖师', '镇元大仙', '荡魔天尊',
@@ -224,6 +224,58 @@ class GiftCodeTests(unittest.TestCase):
         self.b.close()
         self.b = self.backend()
         self.assertEqual(self.b.profile()['souls'], saved['souls'])
+
+    def test_all_24_tiered_gifts_exact_rewards_replay_and_persistence(self):
+        expected = {}
+        for tier, count in enumerate((5, 10, 20, 30, 50), 1):
+            expected[f'JGPOWER{tier}'] = [[5, 1022, count, 1]]
+        for tier in range(1, 6):
+            expected[f'JGCARD{tier}'] = [[5, 1152, tier, 1], [5, 1156, tier*5, 1]]
+        for tier, count in enumerate((500, 800, 1000, 1500, 2000), 1):
+            expected[f'JGYUAN{tier}'] = [[11, 0, count, 1]]
+        for prefix, ids in (('JGFEST', (1247, 1084, 1085, 1086, 1098, 1099, 1205)),
+                            ('JGMOON', (1130, 1131, 1132, 1133)),
+                            ('JGDUANWU', (1213, 1214, 1215, 1216))):
+            for tier, count in enumerate((1, 5, 10), 1):
+                expected[f'{prefix}{tier}'] = [[5, tid, count, 1] for tid in ids]
+        rows = self.b.gift_code_rules['codes'][27:]
+        self.assertEqual({row['code']: row['prizes'] for row in rows}, expected)
+        self.assertEqual(len(rows), 24)
+        self.assertEqual(len({row['group'] for row in self.b.gift_code_rules['codes']}), 51)
+        for row in rows:
+            code = row['code']
+            with self.subTest(code=code):
+                self.assertTrue(row['enabled'] and row['issued'])
+                self.assertEqual((row['starts_at'], row['expires_at'], row['max_uses']), (0, 0, 0))
+                before = self.b.profile()
+                result = self.request(code.lower())
+                self.assertEqual(result['result'], 1)
+                actual = [[p['object_type'], p['attach_type'], p['attach_count'], p['attach_level']]
+                          for p in result['attach_list'].values()]
+                self.assertEqual(actual, expected[code])
+                after = self.b.profile()
+                for kind, tid, count, _ in expected[code]:
+                    if kind == 11:
+                        self.assertEqual(after['gold_coin'] - before['gold_coin'], count)
+                    else:
+                        total = lambda r: sum(i['count'] for i in r['attachments']
+                                              if i['attach_type'] == 5 and i['type_id'] == tid)
+                        self.assertEqual(total(after) - total(before), count)
+                if code.startswith(('JGCARD', 'JGFEST', 'JGMOON', 'JGDUANWU')):
+                    self.assertEqual(after['gold_coin'], before['gold_coin'])
+                for key in ('vip', 'vip_level', 'recharge'):
+                    self.assertEqual(after.get(key), before.get(key))
+                ledger = self.b.db.execute('SELECT rewards FROM gift_code_claims WHERE code=?', (code,)).fetchone()
+                self.assertEqual(json.loads(ledger[0]), expected[code])
+                self.assertEqual(self.b.respond(self.packet, {'authenticated': True}), self.replies)
+                self.assertEqual(self.b.profile(), after)
+                self.reject(13, code=code)
+        self.assertEqual(len(self.claims()), 24)
+        inventory = self.b.profile()['attachments']
+        self.b.close(); self.b = self.backend()
+        self.assertEqual(self.b.profile()['attachments'], inventory)
+        for code in expected:
+            self.reject(13, code=code)
 
     def test_random_finished_equipment_snapshot_and_replay(self):
         before = self.b.profile()

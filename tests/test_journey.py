@@ -162,11 +162,44 @@ class JourneyTests(unittest.TestCase):
         r = self.b.profile()
         self.assertEqual(r['journey']['claimed_maps'], [1])
         self.assertEqual(sum(i['count'] for i in r['attachments'] if i['type_id'] == 1022), 1)
+        self.assertEqual([g['pass_map'] for m, _, d in self.decoded if m == 1023
+                          for g in d['map_list'] if g['map_id'] == 1], [2])
+        self.assertEqual(self.b.respond(self.packet, self.state), self.replies)
+        self.assertEqual(self.b.profile(), r)
         self.req(1201, flag=3, id=1)
         self.assertEqual(self.b.profile(), r)
         self.b.close()
         self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
         self.assertEqual(self.b.profile()['journey']['claimed_maps'], [1])
+        self.req(1018, flag=1)
+        self.assertEqual([g['pass_map'] for m, _, d in self.decoded if m == 1023
+                          for g in d['map_list'] if g['map_id'] == 1], [2])
+
+    def test_map_reward_wire_states_follow_full_three_star_progress(self):
+        self.clear_map(stars=2)
+        self.req(1018, flag=1)
+        self.assertEqual([g['pass_map'] for m, _, d in self.decoded if m == 1023
+                          for g in d['map_list'] if g['map_id'] == 1], [0])
+        self.req(1201, flag=3, id=1)
+        self.assertEqual(self.events[0][0], 55)
+        self.clear_map()
+        role = self.b.profile()
+        role['journey']['gates']['1:105']['pass_star'] = 2
+        self.b.save(role)
+        with patch('network_redirect.journey.battle', return_value=(3, [], [])):
+            self.fight(105)
+        self.assertEqual([d['pass_map'] for m, _, d in self.decoded if m == 1019], [1])
+        self.req(1018, flag=1)
+        states = {g['map_id']: g['pass_map'] for m, _, d in self.decoded if m == 1023
+                  for g in d['map_list']}
+        self.assertEqual(states[1], 1)
+        self.assertEqual(states[2], 0)
+        self.req(1201, flag=3, id=1)
+        with patch('network_redirect.journey.battle', return_value=(3, [], [])):
+            self.fight(105)
+        self.assertEqual([d['pass_map'] for m, _, d in self.decoded if m == 1019], [2])
+        self.assertEqual(sum(i['count'] for i in self.b.profile()['attachments']
+                             if i['type_id'] == 1022), 1)
 
     def test_first_win_extra_companion_experience_only_once(self):
         r = self.fixture(level=30, strength=60)

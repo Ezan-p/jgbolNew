@@ -91,6 +91,10 @@ def client_source(rules):
     """Use the same validated prices for the UI, affordability check and debit."""
     prices = [rules['grades'][str(grade)]['gold_cost'] for grade in (1, 2, 3)]
     template = Path(__file__).with_name('summon_client.lua').read_text(encoding='utf-8')
+    template = Path(__file__).with_name('opening_client.lua').read_text(encoding='utf-8') + '\n' + template
+    template = Path(__file__).with_name('journey_client.lua').read_text(encoding='utf-8') + '\n' + template
+    template = Path(__file__).with_name('profile_client.lua').read_text(encoding='utf-8') + '\n' + template
+    template = Path(__file__).with_name('daily_client.lua').read_text(encoding='utf-8') + '\n' + template
     template = Path(__file__).with_name('progression_client.lua').read_text(encoding='utf-8') + '\n' + template
     template = Path(__file__).with_name('activity_entry_client.lua').read_text(encoding='utf-8') + '\n' + template
     template = Path(__file__).with_name('party_client.lua').read_text(encoding='utf-8') + '\n' + template
@@ -242,7 +246,7 @@ def companion(role, type_id):
     base = BASES[type_id]
     stats = {name: int(base[column]) for name, column in
              dict(hp='base_max_hp', magic='base_max_magic', gongji='base_gongji', fangyu='base_fangyu').items()}
-    return dict(id=next_id(role), type=type_id, order=0, level=1,
+    return dict(id=next_id(role), type=type_id, order=0, level=1, level_culture_version=3,
                 next_exp=EXPERIENCE[int(base['quality'])], equiped_ext_skill_limit=1,
                 combat_power=sum(stats.values()), **stats)
 

@@ -15,7 +15,7 @@ def load_rules(path=ROOT / 'server_config/daily_rules.json'):
     require(isinstance(r.get('revision'), str) and bool(r['revision']), '日常配置版本缺失')
     require(type(r.get('timezone_offset_hours')) is int and -12 <= r['timezone_offset_hours'] <= 14, '日常时区无效')
     tasks = r.get('tasks', [])
-    require(isinstance(tasks, list) and [t.get('id') for t in tasks] == list(range(1, 10)), '日常任务必须包含原版九类来源')
+    require(isinstance(tasks, list) and [t.get('id') for t in tasks] == list(range(1, 12)), '日常任务必须包含原版九类及封神榜、吃包子来源')
     for t in tasks:
         require(isinstance(t.get('desc'), str) and 0 < len(t['desc']) <= 20, '日常描述无效')
         require(all(type(t.get(k)) is int and 0 < t[k] <= 10000 for k in ('points', 'limit')), '日常积分配置无效')
@@ -23,7 +23,7 @@ def load_rules(path=ROOT / 'server_config/daily_rules.json'):
     require(isinstance(boxes, list) and 1 <= len(boxes) <= 6, '日常宝箱数量无效')
     last = 0
     for b in boxes:
-        require(type(b.get('point')) is int and last < b['point'] <= 7 * sum(t['limit'] for t in tasks), '日常宝箱门槛无效')
+        require(type(b.get('point')) is int and last < b['point'] <= sum(t['limit'] for t in tasks), '日常宝箱门槛无效')
         last = b['point']
         require(isinstance(b.get('prizes'), list) and 1 <= len(b['prizes']) <= 12, '日常奖励列表无效')
         for p in b['prizes']: validate_prize(p)
@@ -51,27 +51,26 @@ def day(now, r):
 
 
 def week(now, r):
-    # [A] String2.plist/checkin_tink4: cumulative activity resets Monday 00:00.
+    # Shared by weekly guild/wealth features; daily activity no longer uses this.
     # Unix epoch Thursday; shifting three days aligns week buckets to Monday.
     return (day(now, r) + 3) // 7
 
 
 def prepare(role, now, r):
     s = role.setdefault('daily', dict(day=day(now, r), points={}, claimed=[], checkin_count=0, bonus_claimed=[]))
-    # Preserve already-earned points when upgrading the initial local schema.
-    s.setdefault('week', (s['day'] + 3) // 7)
-    s.setdefault('total', sum(s['points'].values()))
-    if s['week'] != week(now, r):
-        s.update(week=week(now, r), total=0, claimed=[])
     if s['day'] != day(now, r):
-        s.update(day=day(now, r), points={})
+        s.update(day=day(now, r), points={}, claimed=[])
+    # Migrate weekly saves using only today's earned points. Keep same-day
+    # claims to prevent a rules deployment from issuing a second set of prizes.
+    s.pop('week', None)
+    s['total'] = sum(s['points'].values())
     role.setdefault('checkin_time', 0)
     return s
 
 
 def record(role, kind, count, now, r):
     """Only called by authoritative settlements, never from a client progress field."""
-    require(type(count) is int and count >= 0 and kind in range(1, 10), '日常累计参数无效')
+    require(type(count) is int and count >= 0 and type(kind) is int and 1 <= kind <= len(r['tasks']), '日常累计参数无效')
     s = prepare(role, now, r); t = r['tasks'][kind - 1]; key = str(kind)
     previous = s['points'].get(key, 0)
     s['points'][key] = min(t['limit'], previous + count * t['points'])
@@ -88,11 +87,12 @@ def snapshot(role, now, r):
     total = s['total']
     boxes = [dict(point=b['point'], status=3 if i in s['claimed'] else 2 if total >= b['point'] else 1,
                   prize_list=[spec(p) for p in b['prizes']]) for i, b in enumerate(r['point_prizes'], 1)]
-    return dict(id=1, point=total, point_data=rows, point_prize=boxes)
+    return dict(id=1, point=total, point_data=rows, point_prize=boxes, local_day=s['day'])
 
 
 def hint(role, now, r):
-    return summon.event(198, dict(id=3, has_prize=any(b['status'] == 2 for b in snapshot(role, now, r)['point_prize'])))
+    return summon.event(198, dict(id=3, local_day=day(now, r),
+                                has_prize=any(b['status'] == 2 for b in snapshot(role, now, r)['point_prize'])))
 
 
 def client_config(r):
@@ -165,6 +165,10 @@ def track(role, before, mid, req, events, now, r, parse):
         gains[7] = max(0, land.get('travel_count', 0) - (prev.get('travel_count', 0) if prev.get('day') == land.get('day') else 0))
     if mid == 1030:
         gains[8] = sum(bool(v.get('claimed')) and not old.get('visits', {}).get(k, {}).get('claimed') for k, v in a.get('visits', {}).items())
+    if mid == 1026 and req['fight_type'] == 2:
+        gains[10] = max(0, a.get('rank_count', 0) - old.get('rank_count', 0))
+    if mid == 1040:
+        gains[11] = len(set(a.get('feed', {})) - set(old.get('feed', {})))
     for kind, count in gains.items():
         if count: record(role, kind, count, now, r)
     return [hint(role, now, r)] if any(gains.values()) else []

@@ -36,7 +36,8 @@ class ProfileTests(unittest.TestCase):
             self.assertEqual(self.event(out, 159)['role_info']['union_name'], '')
             title = next(d for m, d in out if m == 1077)
             self.assertTrue({1, 2, 3}.issubset({t['id'] for t in title['titles']}))
-            self.assertLess(next(i for i, x in enumerate(out) if x[0] == 1077), next(i for i, x in enumerate(out) if x[0] == 2998))
+            self.assertLess(next(i for i, x in enumerate(out) if x[0] == 1077),
+                            next(i for i, x in enumerate(out) if x[0] == 2998 and x[1]['id'] == 159))
             self.assertEqual(out[-1][0], 1106)
         self.event(self.request(1307, flag=0), 55)
 
@@ -67,17 +68,58 @@ class ProfileTests(unittest.TestCase):
         self.assertEqual(self.b.profile()['head_type'], 1)
         self.assertEqual(self.event(self.request(1069, head_type=201, flag=0), 99)['result'], 1)
         self.assertEqual(self.b.profile()['gold_coin'], 1000)
-        for head, flag in [(202, 0), (101, 1), (255, 1), (201, 1), (202, 2)]:
+        self.assertFalse(self.b.profile()['profile_head_free_used'])
+        # Initial selection is separate from the first free replacement.
+        self.assertEqual(self.event(self.request(1069, head_type=202, flag=0), 99)['result'], 1)
+        self.assertTrue(self.b.profile()['profile_head_free_used'])
+        self.assertEqual(self.b.profile()['gold_coin'], 1000)
+        for head, flag in [(203, 0), (101, 1), (255, 1), (202, 1), (203, 2)]:
             before = self.b.profile()
             self.assertNotEqual(self.event(self.request(1069, head_type=head, flag=flag), 99)['result'], 1)
             self.assertEqual(self.b.profile(), before)
-        out = self.request(1069, head_type=202, flag=1)
+        out = self.request(1069, head_type=203, flag=1)
         self.assertEqual(self.event(out, 99)['result'], 1)
         self.assertEqual(self.b.profile()['gold_coin'], 800)
         self.assertEqual(self.b.respond(self.packet, dict(authenticated=True)), self.replies)
         self.assertEqual(self.b.profile()['gold_coin'], 800)
         r = self.b.profile(); r['gold_coin'] = 199; self.b.save(r)
-        self.assertEqual(self.event(self.request(1069, head_type=203, flag=1), 99)['result'], 8)
+        self.assertEqual(self.event(self.request(1069, head_type=204, flag=1), 99)['result'], 8)
+
+    def test_existing_avatar_free_once_without_gold_and_persisted(self):
+        role = self.b.profile()
+        role.update(head_type=101, profile_head_changed=True, gold_coin=0)
+        role.pop('profile_head_free_used')
+        self.b.save(role)
+        cfg = login_fields(decode(self.b.bootstrap()[0])[2]['data'])
+        self.assertTrue(cfg['local_profile']['head_free_available'])
+        before = self.b.profile()
+        self.assertEqual(self.event(self.request(1069, head_type=101, flag=0), 99)['result'], 6)
+        self.assertEqual(self.b.profile(), before)
+        # Even an older client using flag=1 cannot accidentally charge the free change.
+        out = self.request(1069, head_type=201, flag=1)
+        self.assertEqual(self.event(out, 99)['result'], 1)
+        self.assertFalse(self.event(out, 80)['local_profile']['head_free_available'])
+        self.assertLess(next(i for i, (m, d) in enumerate(out) if m == 2998 and d['id'] == 80),
+                        next(i for i, (m, d) in enumerate(out) if m == 2998 and d['id'] == 99))
+        saved = self.b.profile()
+        self.assertEqual(saved['gold_coin'], 0)
+        self.assertEqual(self.b.respond(self.packet, dict(authenticated=True)), self.replies)
+        self.assertEqual(self.b.profile(), saved)
+        other = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        try:
+            self.assertFalse(p.client_state(other.profile())['head_free_available'])
+        finally:
+            other.close()
+        self.assertEqual(self.event(self.request(1069, head_type=202, flag=0), 99)['result'], 6)
+        self.assertEqual(self.event(self.request(1069, head_type=202, flag=1), 99)['result'], 8)
+        self.assertEqual(self.b.profile(), saved)
+
+    def test_free_avatar_encode_failure_keeps_entitlement(self):
+        role = self.b.profile(); role['head_type'] = 101; self.b.save(role)
+        before = self.b.profile()
+        with patch('network_redirect.role_profile.attributes', side_effect=ValueError('encode failed')):
+            self.event(self.request(1069, head_type=102, flag=0), 55)
+        self.assertEqual(self.b.profile(), before)
 
     def test_all_runes_level_boundaries(self):
         for tid, row in p.RUNES.items():

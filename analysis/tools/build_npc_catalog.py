@@ -86,9 +86,25 @@ def attach(role, kind, tid, **values):
 
 def budget(c):
     # Minimal reproducible history: level to each rebirth minimum, reset, relevel.
-    cycles = sum(int(reborn.LAYERS[n]['min_level']) - int(reborn.LAYERS[n]['reset_level'])
-                 for n in range(1, c.get('reborn_layer', 0) + 1))
-    earned = (c['level'] - 1 + cycles) * RULES['culture_per_level']
+    q = quality(c['type'])
+    if c.get('level_culture_version', 0) >= 2:
+        earned = f.level_culture_points(q, 1, c['level'])
+        earned += sum(f.level_culture_points(q, int(reborn.LAYERS[n]['reset_level']),
+                                           int(reborn.LAYERS[n]['min_level']))
+                      for n in range(1, c.get('reborn_layer', 0) + 1))
+    elif c.get('level_culture_version') == 1:
+        # Preserve snapshots generated under the previous evolve-table rule.
+        earned = sum(f.EVOLVE_POINTS[q, n] for n in range(2, c['level'] + 1))
+        earned += sum(f.EVOLVE_POINTS[q, level]
+                      for n in range(1, c.get('reborn_layer', 0) + 1)
+                      for level in range(int(reborn.LAYERS[n]['reset_level']) + 1,
+                                         int(reborn.LAYERS[n]['min_level']) + 1))
+    else:
+        # Frozen NPC snapshots keep their original budget and combat balance.
+        # Newly generated NPCs carry the version marker from summon.companion.
+        cycles = sum(int(reborn.LAYERS[n]['min_level']) - int(reborn.LAYERS[n]['reset_level'])
+                     for n in range(1, c.get('reborn_layer', 0) + 1))
+        earned = (c['level'] - 1 + cycles) * 5
     earned += sum(int(reborn.LAYERS[n]['ret_culture']) for n in range(1, c.get('reborn_layer', 0) + 1))
     earned += sum(f.EVOLVE_POINTS[quality(c['type']), n] for n in range(1, c.get('evolve_level', 0) + 1))
     return earned

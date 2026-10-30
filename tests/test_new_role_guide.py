@@ -41,6 +41,7 @@ class NewRoleGuideTests(unittest.TestCase):
         self.assertEqual(role['corteges'], [])
         self.step(1, name='新手行者', head_type=101)
         self.assertEqual(self.backend.profile()['guide_progress'], 2)
+        self.assertFalse(self.backend.profile()['profile_head_free_used'])
         self.step(2, name='1')
         for stage in range(3, 14):
             role = self.backend.profile()

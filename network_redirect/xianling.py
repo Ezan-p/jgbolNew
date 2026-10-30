@@ -13,7 +13,8 @@ def load_rules(path=ROOT/'server_config/xianling_rules.json'):
     f.require(r['monthly_thresholds']==[1,500,1500,3000],'仙灵月礼包门槛须与原版文案一致')
     f.require(len(r['monthly_prizes'])==4 and 1<=len(r['exchange'])<=255,'仙灵商品配置无效')
     f.require(len(r['daily_limits'])==11 and all(type(n)is int and 0<=n<=1000 for n in r['daily_limits']),'仙灵限购配置无效')
-    f.require(r['daily_price']==10 and r['box_cost']==30 and r['box_targets']==[5001,5004,5005], '仙灵原版价格检查或界魂箱规则不符')
+    f.require(r['daily_price']==10 and r['box_cost']==1 and r['box_batch_limit']==99
+              and r['box_targets']==[5001,5004,5005], '仙灵原版价格检查或界魂箱规则不符')
     for p in [r['daily_prize']]+[p for row in r['monthly_prizes'] for p in row]+[row['prize'] for row in r['exchange']]:
         f.require(isinstance(p,list) and len(p)==4 and all(type(n)is int for n in p),'仙灵奖励格式无效')
         typ,tid,n,lv=p
@@ -80,14 +81,18 @@ def consume(role,tid,n):
 def settle(role,mid,req,now,r):
     s=prepare(role,now)
     if mid==1051:
-        f.require(req['item_type']==1249 and req['item_count']==r['box_cost'] and req['des_type']==5 and req['des_id'] in r['box_targets'],'界魂箱兑换目标或数量无效')
+        # showBoxUseLayer(parent, 30) uses 30 as the Cocos z-order, not a cost.
+        # Original selector: 1..99 boxes; preview and payout are one-for-one.
+        n=req['item_count']
+        f.require(req['item_type']==1249 and type(n)is int and 1<=n<=r['box_batch_limit']
+                  and req['des_type']==5 and req['des_id'] in r['box_targets'],'界魂箱兑换目标或数量无效')
         item=f.lookup(role,'attachments',req['item_id'])
-        f.require(item['type_id']==1249 and item['attach_type']==5 and item.get('count',0)>=r['box_cost']
+        f.require(item['type_id']==1249 and item['attach_type']==5 and item.get('count',0)>=n
                   and not any(item.get(k) for k in ('is_lock','owner_id','equip_pos','equip_order')),'界魂箱实例无效或该叠数量不足')
-        item['count']-=r['box_cost']
+        item['count']-=n
         if not item['count']:role['attachments'].remove(item)
-        prize=journey.grant(role,[5,int(req['des_id']),1,1])
-        return [summon.event(21,dict(result=1,type_id=1249,count=r['box_cost'],attach_list=[prize]))]
+        prize=journey.grant(role,[5,int(req['des_id']),n//r['box_cost'],1])
+        return [summon.event(21,dict(result=1,type_id=1249,count=n,attach_list=[prize]))]
     op,index,n=req['flag'],req['index'],req['count']
     f.require(op in (1,2,3,4),'仙灵操作无效')
     if op==4:return [summon.event(185,snapshot(role,now,r))]

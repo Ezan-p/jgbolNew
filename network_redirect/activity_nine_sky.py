@@ -59,7 +59,7 @@ def load_rules(path=ROOT / 'server_config/nine_sky_rules.json'):
     f.require(len(low) == 9 and len(high) == 5 and
               [x['reward'] for x in low] == [[5, t, 1, 1] for t in (1022,1023,1041,1033,1006,1032,1024,1042,1007)] and
               {tuple(x['reward']) for x in high} == {(10,5027,5,1),(10,5036,5,1),(5,1031,5,1),(5,1249,50,1),(5,1243,1,1)}, '九重商会奖励池不完整')
-    f.require(low[0]['cost'] >= 50 and all(x['cost'] < y['cost'] for x,y in zip(low,low[1:])) and
+    f.require(all(x['cost'] < y['cost'] for x,y in zip(low,low[1:])) and
               all(x['limit'] == 1 for x in r['star_shop']), '九重商会定价须递增、每种每日限兑一份')
     return r
 

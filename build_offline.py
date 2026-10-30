@@ -91,8 +91,8 @@ def runtime_bundle():
     return output
 
 
-def build(output=None, version_code=103, reuse_decode=False):
-    output = Path(output or ROOT / 'build/金箍棒3.87-离线单机-arm32.apk').resolve()
+def build(output=None, version_code=105, reuse_decode=False):
+    output = Path(output or ROOT / f'build/金箍棒3.87-离线单机-arm32-v{version_code}.apk').resolve()
     WORK.mkdir(parents=True, exist_ok=True)
     output.parent.mkdir(parents=True, exist_ok=True)
     if not SIGNING_KEY.is_file():
@@ -138,13 +138,15 @@ def build(output=None, version_code=103, reuse_decode=False):
     meta = decoded / 'apktool.yml'
     text = meta.read_text()
     for name, value in [('minSdkVersion', '21'), ('targetSdkVersion', '22'),
-                        ('versionCode', str(version_code)), ('versionName', '3.87-offline.2-opening')]:
+                        ('versionCode', str(version_code)), ('versionName', '3.87-offline.5-new-role-opening')]:
         text, count = re.subn(r'(?m)^(  ' + name + r':).*$', r'\g<1> ' + value, text)
         if count != 1:
             raise RuntimeError('Missing APK metadata: ' + name)
     meta.write_text(text)
     from offline_android.patch_lifecycle import patch as patch_lifecycle
     patch_lifecycle(decoded)
+    from offline_android.patch_opening import patch as patch_opening
+    patch_opening(decoded)
     label = decoded / 'res/values/strings.xml'
     text = label.read_text()
     text = re.sub(r'(<string name="app_name">).*?(</string>)', r'\g<1>金箍棒·离线单机\2', text)
@@ -221,7 +223,7 @@ def build(output=None, version_code=103, reuse_decode=False):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path)
-    parser.add_argument('--version-code', type=int, default=103)
+    parser.add_argument('--version-code', type=int, default=105)
     parser.add_argument('--reuse-decode', action='store_true')
     args = parser.parse_args()
     build(args.output, args.version_code, args.reuse_decode)

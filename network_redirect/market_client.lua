@@ -23,6 +23,35 @@ do
  end
 end
 
+-- Buying a bun into inventory has its own shop quota. Native buyShopItem
+-- incorrectly gates it on strength_item_count (the quick-use counter).
+do
+ local ms=package.loaded.ms
+ local shop=ms and ms.d_shopUI
+ if shop and shop.buyShopItem and not shop._localMarketBunRestore then
+  local buy=shop.buyShopItem
+  shop.buyShopItem=function(goods,page,count)
+   local row=goods and goods.buyInfo
+   if (page~=1 and page~=2) or not row or row.type_id~=1022 then return buy(goods,page,count) end
+   count=count or 1
+   if type(count)~='number' or count~=math.floor(count) or count<1 or count>999 then return end
+   if page==1 and (count~=1 or (row.buy_limit_times or 0)<1) then
+    ms.d_info.show('今日特惠包子已售罄');return
+   end
+   local player=ms.d_mainUI.g_playerInfo
+   if (player.gold_coin or 0)<row.buy_price*count then
+    ms.d_summonUI.needGold(ms.d_mainUI.g_mainUI.main_layer);return
+   end
+   shop.g_buyAndUse=0
+   return ms.d_u.main_server_send_msg(ms.d_msg_def.gscl_msg_id.msg_buy_item_in_batch,
+    {first_send=0,page_id=page,index=row.index,type_id=row.type_id,count=count})
+  end
+  shop._localMarketBunRestore=function()
+   shop.buyShopItem=buy;shop._localMarketBunRestore=nil
+  end
+ end
+end
+
 -- Native getCurrentPrice returns the original price outside the opening window.
 -- Fixed-price pools carry an explicit quote, including in previews and sold-out UI.
 do

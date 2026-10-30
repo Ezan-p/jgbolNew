@@ -55,6 +55,10 @@ def prepare(role, rules=None, now=None):
     if role.get('head_type') not in HEADS:
         role['head_type'] = rules['initial_head']
     role.setdefault('profile_head_changed', role['head_type'] in HEADS)
+    # Legacy "changed" also meant the tutorial chose an initial portrait, so
+    # it cannot prove a free replacement was used. Grant that entitlement once
+    # to saves without the dedicated counter, then persist every successful use.
+    role.setdefault('profile_head_free_used', False)
     if role.get('cur_genius_type') not in RUNES:
         role['cur_genius_type'] = rules['initial_genius']
     titles = role.setdefault('profile_titles', {})
@@ -116,6 +120,10 @@ def attributes(role):
         attr_list=[dict(type=i, value=role[k]) for i, k in fields]))
 
 
+def client_state(role):
+    return dict(head_free_available=not role['profile_head_free_used'])
+
+
 def result(event, code, **data):
     return [summon.event(event, dict(result=code, **data))]
 
@@ -149,17 +157,20 @@ def settle(role, mid, req, now, rules, names=(), target=None):
         head, flag = req['head_type'], req['flag']
         if head not in HEADS or flag not in (0, 1):
             return result(99, 6)
-        if head == role['head_type'] and role['profile_head_changed']:
+        if head == role['head_type']:
             return result(99, 6)
-        if flag == 0:
-            if role['profile_head_changed']:
+        initial = role['head_type'] not in HEADS
+        free = initial or not role['profile_head_free_used']
+        if not free:
+            if flag == 0:
                 return result(99, 6)
-        else:
             if head // 100 != role['head_type'] // 100:
                 return result(99, 6)
             if role['gold_coin'] < rules['head_gold']:
                 return result(99, 8)
             f.debit_money(role, 'gold_coin', rules['head_gold'])
+        if free and not initial:
+            role['profile_head_free_used'] = True
         role.update(head_type=head, profile_head_changed=True)
         return result(99, 1)
     if mid == 1070:

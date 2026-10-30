@@ -9,6 +9,34 @@ from network_redirect.protocol import decode, encode
 
 
 class RankTests(ActivityCase):
+    def test_daily_points_for_challenges_caps_failures_replay_and_next_day(self):
+        def points(): return self.b.profile().get('daily', {}).get('points', {}).get('10', 0)
+        self.board(); self.assertEqual(points(), 0)
+        self.req(1026, fight_type=2, des_type=2, des_id=0, des_value=99)
+        self.assertEqual(points(), 0)
+        self.fight(99); self.assertEqual(points(), 10)
+        before = self.b.profile()
+        self.assertEqual(self.b.respond(self.packet, self.state), self.replies)
+        self.assertEqual(self.b.profile(), before)
+        # A valid losing challenge counts just like a win.
+        role = self.b.profile(); role['activity']['rank_order'] = 2
+        role['activity']['rank_slots'] = {}; self.b.save(role)
+        fight, _ = self.fight(1)
+        self.assertGreaterEqual(fight['final_result'], 4)
+        self.assertEqual(points(), 20)
+        self.fight(1); self.assertEqual(points(), 20)
+        self.req(1244, fight_type=2); self.assertEqual(points(), 20)
+        role = self.b.profile(); role['energy'] = 0; self.b.save(role)
+        self.req(1026, fight_type=2, des_type=2, des_id=930001, des_value=1)
+        self.assertEqual(points(), 20)
+        self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+            role = self.b.profile(); role['energy'] = 100; self.b.save(role)
+            # No board query before this first new-day settlement.
+            self.ok(self.req(1026, fight_type=2, des_type=2, des_id=930001, des_value=1))
+            self.assertEqual(points(), 10)
+            self.assertEqual(self.b.profile()['daily']['total'], 10)
+
     def board(self):
         self.ok(self.req(1021,flag=0))
         return next(d for m,_,d in self.decoded if m==1022)

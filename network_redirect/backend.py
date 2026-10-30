@@ -250,6 +250,7 @@ class Backend:
             config = config.replace('config_end=true', '[%d]=' % key + summon.lua(value) + ',config_end=true')
         config = config.replace('config_end=true', '[1]=' + summon.lua(vip.client_config(self.vip_rules)) + ',local_vip=' + summon.lua(vip.client_state(role)) + ',config_end=true')
         config = config.replace('config_end=true', 'local_recharge=' + summon.lua(recharge.client_state(role, int(time.time()), self.recharge_rules, self.welfare_rules)) + ',config_end=true')
+        config = config.replace('config_end=true', 'local_profile=' + summon.lua(role_profile.client_state(role)) + ',config_end=true')
         from . import activity_party
         config = config.replace('__PARTY_CONFIG__', summon.lua(activity_party.client_config(role,self.activity_rules)))
         config = config.replace('__IMMORTAL_CONFIG__', summon.lua(immortal.client_config(self.immortal_rules)))
@@ -314,7 +315,15 @@ class Backend:
             rows = role[key]
             for start in range(0, max(1, len(rows)), 128):
                 chunk = rows[start:start + 128]
+                if mid == 1034:
+                    # Legacy roster potential is uint16. Follow the complete
+                    # roster with int32 attributes to retain larger balances.
+                    chunk = [dict(c, culture_point=min(c.get('culture_point', 0), 65535)) for c in chunk]
                 replies.append(encode(mid, dict(first_send=start == 0, **{count: len(chunk), field: chunk})))
+            if mid == 1034:
+                replies += [encode(1032, dict(id=c['id'], unit_type=4, attr_count=1,
+                    attr_list=[dict(type=90, value=c['culture_point'])]))
+                    for c in rows if c.get('culture_point', 0) > 65535]
         return replies
 
     def formation(self, packet, mid, data):
@@ -886,8 +895,12 @@ class Backend:
             achievements.record_events(role, events, int(time.time()), login_fields)
             formation.recalculate(role, self.formation_rules)
             replies = self.item_deltas(before, role) + [role_profile.attributes(role)]
-            replies += self.panel_attributes(role) + self.power_attributes(role) + events
-            self.save(role)
+            replies += self.panel_attributes(role) + self.power_attributes(role)
+            replies += [summon.event(80, dict(local_profile=role_profile.client_state(role)))] + events
+            if role != before:
+                self.save(role)
+            else:
+                self.db.rollback()
             self.emit('game_profile_ok', message_id=mid, rules_revision=self.profile_rules['revision'])
         except (formation.Rejected, ValueError, KeyError, TypeError, OverflowError, struct.error) as error:
             self.db.rollback()

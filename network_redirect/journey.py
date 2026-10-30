@@ -159,6 +159,13 @@ def completed(role, kind, mid, stars=1):
                for gid, g in GATES[kind].items() if int(g['map_id']) == mid)
 
 
+def map_prize_state(role, mid):
+    # [A] subLevelUI:1944-1945: 0 = unavailable, 1 = claimable, >1 = claimed.
+    if mid in role['journey']['claimed_maps']:
+        return 2
+    return int(completed(role, 1, mid, 3))
+
+
 def unlocked(role, kind, gid):
     cfg = GATES.get(kind, {}).get(gid)
     if cfg is None:
@@ -181,7 +188,7 @@ def snapshots(role, reset=True):
     rows = [gate_row(role, kind, gid) for kind in (1, 2) for gid in GATES[kind] if unlocked(role, kind, gid)]
     replies = [encode(1020, dict(first_send=reset and i == 0, tollgate_count=len(rows[i:i+128]), tollgate_list=rows[i:i+128]))
                for i in range(0, len(rows), 128)]
-    maps = [dict(tollgate_type=1, map_id=mid, pass_map=int(mid in role['journey']['claimed_maps']))
+    maps = [dict(tollgate_type=1, map_id=mid, pass_map=map_prize_state(role, mid))
             for mid in MAPS[1]]
     return replies + [encode(1023, dict(map_count=len(maps), map_list=maps))]
 
@@ -194,7 +201,7 @@ def updates(role, old):
                 opened.append(gate_row(role, kind, gid))
             if unlocked(role, kind, gid) and progress(role, kind, gid) != progress(old, kind, gid):
                 row = gate_row(role, kind, gid)
-                row['pass_map'] = int(row['map_id'] in role['journey']['claimed_maps'])
+                row['pass_map'] = map_prize_state(role, row['map_id'])
                 packets.append(encode(1019, row))
     # 1019 also sets last_fight_npc and advances the next gate itself. Sending
     # 1019 for a newly opened zero-star gate makes the victory UI show that
@@ -344,7 +351,7 @@ def experience(role, cfg, win, rules, formation_rules, bonus_exp=0, now=None):
         while c['level'] < top and c['cur_exp'] >= formation.EXPERIENCE[quality, c['level']]:
             c['cur_exp'] -= formation.EXPERIENCE[quality, c['level']]
             c['level'] += 1
-            c['culture_point'] += formation_rules['culture_per_level']
+            c['culture_point'] += formation.level_culture_points(quality, c['level'] - 1, c['level'], formation_rules)
         if c['level'] >= top:
             c['cur_exp'] = 0
         c['next_exp'] = formation.EXPERIENCE.get((quality, c['level']), 0)
@@ -438,7 +445,8 @@ def settle(role, mid, req, now, rules, formation_rules, activity_rules=None):
         require(mapid not in role['journey']['claimed_maps'], '地图奖励已领取')
         prizes = drops(role, MAPS[1][mapid]['pass_map_prize'], True)
         role['journey']['claimed_maps'].append(mapid)
-        return [encode(1023, dict(map_count=1, map_list=[dict(tollgate_type=1, map_id=mapid, pass_map=1)])),
+        return [encode(1023, dict(map_count=1, map_list=[dict(tollgate_type=1, map_id=mapid,
+                                                           pass_map=map_prize_state(role, mapid))])),
                 summon.event(22, dict(prize_type=3, prize_list=prizes))]
     if mid == 1062:
         index = role['sweep_flush_count'] + 1

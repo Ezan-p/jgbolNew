@@ -26,7 +26,7 @@ def apply(baseline, patch, output):
             if meta['format'] != 'jgbol-apk-copy-v1':
                 raise ValueError('不支持的补丁格式')
             if sha256(baseline) != meta['base_sha256']:
-                raise ValueError('原 APK 与补丁不匹配：需要未修改的离线单机 v102 APK。')
+                raise ValueError('原 APK 与补丁不匹配：请使用补丁说明指定的原包，SHA256 必须一致。')
             output.parent.mkdir(parents=True, exist_ok=True)
             with baseline.open('rb') as source, tempfile.NamedTemporaryFile(
                     dir=output.parent, prefix='.opening-', suffix='.tmp', delete=False) as dest:

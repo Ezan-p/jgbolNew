@@ -57,7 +57,8 @@ class ExpbookTests(unittest.TestCase):
                 self.assertEqual(role['achievements']['totals']['117'], 1)
                 self.assertTrue(any(m == 1066 and any(a['id'] == 117 and a['times'] == 1
                                for a in data['achievements']) for m, _, data in out))
-                self.assertEqual(role['corteges'][0]['culture_point'], (role['corteges'][0]['level'] - 1) * 5)
+                self.assertEqual(role['corteges'][0]['culture_point'],
+                                 f.level_culture_points(5, 1, role['corteges'][0]['level']))
 
     def test_every_quality_uses_its_own_level_curve(self):
         baseline = self.configure()

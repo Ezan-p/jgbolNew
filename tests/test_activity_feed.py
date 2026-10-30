@@ -10,6 +10,29 @@ from network_redirect.backend import Backend
 
 
 class FeedTests(ActivityCase):
+    def test_daily_points_only_for_successful_participation_and_reset(self):
+        def points(): return self.b.profile().get('daily', {}).get('points', {}).get('11', 0)
+        self.data(); self.assertEqual(points(), 0)
+        with patch('network_redirect.backend.time.time', return_value=NOW-1):
+            self.assertEqual(self.data(30)['feed_result'], 3)
+            self.assertEqual(points(), 0)
+        self.req(1040, feed_count=201); self.assertEqual(points(), 0)
+        self.assertEqual(self.data(30)['feed_result'], 2)
+        self.assertEqual(points(), 10)
+        before = self.b.profile()
+        self.assertEqual(self.b.respond(self.packet, self.state), self.replies)
+        self.assertEqual(self.b.profile(), before)
+        self.assertEqual(self.data(30)['feed_result'], 4)
+        with patch('network_redirect.backend.time.time', return_value=NOW+6*3600):
+            self.assertEqual(self.data(30)['feed_result'], 2)
+            self.assertEqual(points(), 10)
+        self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+            # First action next day settles directly, with no prior panel query.
+            self.assertEqual(self.data(30)['feed_result'], 2)
+            self.assertEqual(points(), 10)
+            self.assertEqual(self.b.profile()['daily']['total'], 10)
+
     def data(self, count=0):
         events = self.req(1040, feed_count=count)
         self.ok(events)

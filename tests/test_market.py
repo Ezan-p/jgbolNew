@@ -54,8 +54,8 @@ class MarketTests(unittest.TestCase):
         cfg = login_fields(decode(packet)[2]['data'])
         self.assertEqual(cfg[23], self.backend.formation_rules['equipment_advance'])
         goods = cfg[10]
-        self.assertEqual(len(goods['cheap_item_list']), 7)
-        self.assertEqual(len(goods['rich_item_list']), 14)  # six original forge tokens restored
+        self.assertEqual(len(goods['cheap_item_list']), 8)
+        self.assertEqual(len(goods['rich_item_list']), 15)  # forge tokens and regular-price buns
         self.assertNotIn(9137, goods['rich_item_list'])
         self.assertEqual(len(goods['limit_item_list']), 0)
         for raw in market.CATALOG:
@@ -98,7 +98,7 @@ class MarketTests(unittest.TestCase):
         self.assertEqual(catalog['cheap_item_list'][15]['buy_price'], 100)
         for index, row in catalog['cheap_item_list'].items():
             if index != 15:
-                self.assertEqual(row['buy_limit_times'], 1)
+                self.assertEqual(row['buy_limit_times'], 10 if row['type_id'] == 1022 else 1)
         before = self.count(1024)
         for remaining in (1, 0):
             self.assertEqual(self.buy(page_id=1, index=15, type_id=1024)['result'], 1)
@@ -144,6 +144,62 @@ class MarketTests(unittest.TestCase):
         self.now += 86400
         catalog = self.request(first_send=1, page_id=1)[0][1]
         self.assertEqual(catalog['cheap_item_list'][15]['buy_limit_times'], 2)
+
+    def test_discount_buns_price_quota_replay_restart_and_midnight(self):
+        goods = self.request(first_send=1, page_id=1)[0][1]
+        index, bun = next((i, row) for i, row in goods['cheap_item_list'].items()
+                          if row['type_id'] == 1022)
+        self.assertEqual((bun['count'], bun['origin_price'], bun['buy_price'],
+                          bun['buy_limit_times'], bun['vip_level']), (1, 20, 5, 10, 0))
+        stock, gold = self.count(1022), self.backend.profile()['gold_coin']
+        for used in range(1, 11):
+            self.assertEqual(self.buy(page_id=1, index=index, type_id=1022)['result'], 1)
+            self.assertEqual(self.backend.respond(self.packet, self.state), self.replies)
+            self.assertEqual(self.count(1022), stock + used)
+            self.assertEqual(self.backend.profile()['gold_coin'], gold - 5 * used)
+        saved = self.backend.profile()
+        self.assertEqual(self.buy(page_id=1, index=index, type_id=1022)['result'], 7)
+        self.assertEqual(self.backend.profile(), saved)
+        self.backend.close()
+        self.backend = Backend(Path(self.tmp.name), 18770, lambda *a, **kw: None)
+        self.assertEqual(self.request(first_send=1)[0][1]['cheap_item_list'][index]['buy_limit_times'], 0)
+        midnight = market.day_start(self.now, self.rules) + 86400
+        self.now = midnight - 1
+        self.assertEqual(self.buy(page_id=1, index=index, type_id=1022)['result'], 7)
+        self.now = midnight
+        self.assertEqual(self.request(first_send=1)[0][1]['cheap_item_list'][index]['buy_limit_times'], 10)
+        self.assertEqual(self.buy(page_id=1, index=index, type_id=1022)['result'], 1)
+
+    def test_discount_buns_failed_purchase_keeps_balance_and_quota(self):
+        role = self.backend.profile(); role['gold_coin'] = 4; self.backend.save(role)
+        saved = self.backend.profile()
+        self.assertEqual(self.buy(page_id=1, index=24, type_id=1022)['result'], 6)
+        self.assertEqual(self.backend.profile(), saved)
+        self.assertEqual(self.request(first_send=1)[0][1]['cheap_item_list'][24]['buy_limit_times'], 10)
+
+    def test_regular_buns_batch_price_and_independent_discount_quota(self):
+        goods = self.request(first_send=1, page_id=2)[0][1]
+        row = goods['rich_item_list'][25]
+        self.assertEqual((row['type_id'], row['count'], row['buy_price'], row['money_type'],
+                          row['vip_level'], row['is_day_limit']), (1022, 1, 20, 11, 0, 0))
+        before, gold = self.count(1022), self.backend.profile()['gold_coin']
+        result = self.buy(page_id=2, index=25, type_id=1022, count=12)
+        self.assertEqual(result['result'], 1)
+        self.assertEqual(self.count(1022), before + 12)
+        self.assertEqual(self.backend.profile()['gold_coin'], gold - 240)
+        saved = self.backend.profile()
+        self.assertEqual(self.backend.respond(self.packet, self.state), self.replies)
+        self.assertEqual(self.backend.profile(), saved)
+        self.assertEqual(self.request(first_send=1)[0][1]['cheap_item_list'][24]['buy_limit_times'], 10)
+        self.assertEqual(self.buy(page_id=1, index=24, type_id=1022)['result'], 1)
+        self.assertEqual(self.buy(page_id=2, index=25, type_id=1022, count=3)['result'], 1)
+        self.assertEqual(self.count(1022), before + 16)
+        self.assertEqual(self.backend.profile()['gold_coin'], gold - 305)
+        self.assertEqual(self.request(first_send=1)[0][1]['cheap_item_list'][24]['buy_limit_times'], 9)
+        role = self.backend.profile(); role['gold_coin'] = 19; self.backend.save(role)
+        saved = self.backend.profile()
+        self.assertEqual(self.buy(page_id=2, index=25, type_id=1022)['result'], 6)
+        self.assertEqual(self.backend.profile(), saved)
 
     def test_bundle_grants_twenty_and_preserves_vip_gate(self):
         self.assertEqual(self.buy(page_id=1, index=8, type_id=1001)['result'], 5)

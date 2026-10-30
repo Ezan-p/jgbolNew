@@ -11,8 +11,9 @@ lines = ['''local ms=assert(package.loaded.ms)
 assert(ms.d_mainUI.g_playerInfo and ms.d_mainUI.g_mainUI.main_layer,'main scene required')
 assert(not profile_fixture_restore,'fixture already running')
 local saved={player=ms.d_mainUI.g_playerInfo,send=ms.d_u.main_server_send_msg,report=ms.MS_report_error,items=ms.d_packageUI.g_packageItemsInfo,
- honor=ms.d_honorUI.g_self,rune=ms.d_runeUI.g_self,need=ms.d_mainUI.g_need_change_head_type}
+ honor=ms.d_honorUI.g_self,rune=ms.d_runeUI.g_self,need=ms.d_mainUI.g_need_change_head_type,config=ms.d_data.g_new_config}
 ms.d_mainUI.g_playerInfo=ms.d_c.table_copy(saved.player)
+ms.d_data.g_new_config=ms.d_c.table_copy(saved.config)
 ms.d_honorUI.g_self=ms.d_c.table_copy(saved.honor)
 ms.d_runeUI.g_self=ms.d_c.table_copy(saved.rune)
 ms.d_u.main_server_send_msg=function() end
@@ -46,6 +47,7 @@ function profile_fixture_restore()
  ms.d_mainUI.g_playerInfo=saved.player;ms.d_packageUI.g_packageItemsInfo=saved.items
  ms.d_honorUI.g_self=saved.honor;ms.d_runeUI.g_self=saved.rune
  ms.d_mainUI.g_need_change_head_type=saved.need
+ ms.d_data.g_new_config=saved.config
  ms.d_u.main_server_send_msg=saved.send;ms.MS_report_error=saved.report
  profile_fixture_restore=nil;ms.d_mainUI.show()
 end
@@ -71,10 +73,11 @@ with tempfile.TemporaryDirectory() as tmp:
     request('title_wear', 1078, 'ms.d_honorUI.showChangeTitle(parent)', des_id=1, flag=3)
     request('profile_with_title', 1307, flag=2)
     request('talent', 1070, 'ms.d_runeUI.showChangeRuneFrame(parent,100)', type_id=502)
-    request('paid_avatar', 1069, 'ms.d_runeUI.showChangeUserHead(parent,100,9876,true)', head_type=102, flag=1)
+    request('free_avatar_change', 1069, 'ms.d_runeUI.showChangeUserHead(parent,100,9876,true)', head_type=102, flag=0)
+    request('paid_avatar', 1069, 'ms.d_runeUI.showChangeUserHead(parent,100,9876,true)', head_type=103, flag=1)
     request('rename', 1031, 'ms.d_commonLayerUI.showModityNameCard(nil,100)', new_name='齐天行者')
     request('profile_final', 1307, 'clear_overlays()', flag=2)
     b.close()
 lines.append("return 'profile fixture ready: '..#cases..' steps'")
 (ROOT/'.runtime/profile-fixture.lua').write_text('\n'.join(lines))
-print('Built 8 original UI profile cases')
+print('Built 9 original UI profile cases')

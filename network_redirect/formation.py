@@ -59,7 +59,7 @@ def load_rules(path=ROOT / 'server_config/formation_rules.json'):
     rules = json.loads(Path(path).read_text(encoding='utf-8'))
     if rules.get('schema_version') != 1 or rules.get('mode') != 'inferred':
         raise ValueError('阵容配置必须明确标记 inferred/schema_version=1')
-    for key in ('culture_per_level', 'skill_failure_compensation', 'equipment_batch_count'):
+    for key in ('skill_failure_compensation', 'equipment_batch_count'):
         if type(rules.get(key)) is not int or not 1 <= rules[key] <= 100:
             raise ValueError('阵容配置无效：' + key)
     for key in ('ordinary_points', 'intensive_points', 'peaches_per_attempt', 'gold_per_intensive'):
@@ -75,6 +75,13 @@ def load_rules(path=ROOT / 'server_config/formation_rules.json'):
         raise ValueError('培养属性配置无效')
     if any(v != 1 for v in rules['training']['stat_units'].values()):
         raise ValueError('原版培养预览要求每点对应一点属性')
+    culture = rules.get('level_culture', {})
+    rates = culture.get('points_by_quality', {})
+    if (culture.get('late_from_level') != 41 or set(rates) != {'1', '2', '3', '4', '5'}
+            or any(not isinstance(v, list) or len(v) != 2
+                   or any(type(n) is not int or n <= 0 for n in v) or v[1] < v[0]
+                   for v in rates.values())):
+        raise ValueError('升级潜力配置无效')
     advancement = rules.get('equipment_advance', {})
     if not (type(advancement.get('min_role_level')) is int and 1 <= advancement['min_role_level'] <= 200
             and type(advancement.get('pour_star_count')) is int and 1 <= advancement['pour_star_count'] <= 100
@@ -149,6 +156,65 @@ def advance_worth(item):
     return values[0], values[1], extra
 
 
+def level_culture_points(quality, old_level, new_level, rules=None):
+    """Ordinary level rewards: late rate starts on 40 -> 41, separate from evolution."""
+    config = (rules if rules is not None else load_rules())['level_culture']
+    early, late = config['points_by_quality'][str(quality)]
+    first = max(2, old_level + 1)
+    split = config['late_from_level']
+    return (max(0, min(new_level + 1, split) - first) * early
+            + max(0, new_level + 1 - max(first, split)) * late)
+
+
+def legacy_culture_budget(c, rules=None):
+    """Canonical legacy budget; rebirth cycles use the minimum required levels.
+
+    Pre-v3 saves lack a reward ledger (v2 also lost the original rule version).
+    This is an explicit reconstruction policy, not an exact historical replay.
+    """
+    from . import reborn
+    rules = rules if rules is not None else load_rules()
+    quality = int(BASES[c['type']]['quality'])
+    ordinary = level_culture_points(quality, 1, c['level'], rules)
+    cycles = sum(level_culture_points(quality, int(reborn.LAYERS[n]['reset_level']),
+                                     int(reborn.LAYERS[n]['min_level']), rules)
+                 for n in range(1, c.get('reborn_layer', 0) + 1))
+    evolution = sum(EVOLVE_POINTS[quality, n] for n in range(1, c.get('evolve_level', 0) + 1))
+    rebirth = sum(int(reborn.LAYERS[n]['ret_culture'])
+                  for n in range(1, c.get('reborn_layer', 0) + 1))
+    return dict(ordinary=ordinary, rebirth_cycles=cycles, evolution=evolution, rebirth=rebirth)
+
+
+def migrate_level_culture(c, rules=None):
+    """Normalize v0/v1/v2 once: debit available points, then proportional training."""
+    version = c.get('level_culture_version', 0)
+    if version >= 3:
+        return
+    components = legacy_culture_budget(c, rules)
+    budget = sum(components.values())
+    trained = [c.get(stat + '_plus', 0) for stat in STATS]
+    spent = sum(trained)
+    before = c.get('culture_point', 0)
+    audit = dict(previous_version=version, previous_available=before,
+                 previous_training=dict(zip(STATS, trained)), budget=components,
+                 total_adjustment=budget - before - spent)
+    if spent > budget:
+        # Largest remainder method keeps the exact integer budget and the
+        # original proportions; ties follow STATS for deterministic reloads.
+        retained = [points * budget // spent for points in trained]
+        remainder = budget - sum(retained)
+        order = sorted(range(len(STATS)), key=lambda i: (-(trained[i] * budget % spent), i))
+        for i in order[:remainder]:
+            retained[i] += 1
+        for stat, points in zip(STATS, retained):
+            c[stat + '_plus'] = points
+        c['culture_point'] = 0
+    else:
+        c['culture_point'] = budget - spent
+    c['level_culture_migration'] = audit
+    c['level_culture_version'] = 3
+
+
 def prepare(role, rules):
     """Idempotent migration: retain IDs, skill levels, resources and companion progress."""
     before = json.dumps(role, sort_keys=True)
@@ -166,6 +232,7 @@ def prepare(role, rules):
         if not base:
             continue  # Never rewrite an unknown historical companion.
         c.setdefault('culture_point', 0)
+        migrate_level_culture(c, rules)
         c.setdefault('cur_exp', 0)
         c['next_exp'] = EXPERIENCE.get((int(base['quality']), c['level']), 0)
         c.setdefault('cheer_order', 0)
@@ -494,7 +561,7 @@ def feed(role, req, rules):
         remaining -= cost
         c['cur_exp'] = 0
         c['level'] += 1
-        c['culture_point'] += rules['culture_per_level']
+        c['culture_point'] += level_culture_points(quality, c['level'] - 1, c['level'], rules)
     c['next_exp'] = EXPERIENCE.get((quality, c['level']), 0)
     return [(65, dict(flag=req['flag'], cortege_id=c['id'], experience=float(applied)))]
 
@@ -525,7 +592,7 @@ def impart(role, req, rules):
     while dst['level'] < 200 and dst['cur_exp'] >= EXPERIENCE[q2, dst['level']]:
         dst['cur_exp'] -= EXPERIENCE[q2, dst['level']]
         dst['level'] += 1
-        dst['culture_point'] += rules['culture_per_level']
+        dst['culture_point'] += level_culture_points(q2, dst['level'] - 1, dst['level'], rules)
     if dst['level'] == 200:
         dst['cur_exp'] = 0
     # [B] Reset the donor, retain its identity, formation and innate skill.

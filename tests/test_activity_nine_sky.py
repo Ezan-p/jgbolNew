@@ -97,13 +97,14 @@ class NineSkyTests(ActivityCase):
         self.result(self.call(3,buy_type=1,first_send=True))
         high_cost=s['shop'][5]['cost'];low_cost=s['shop'][0]['cost']
         d=self.result(self.call(4,buy_type=1,index=6,count=1,card_list={200:1}))
-        balance=1000-high_cost+200
-        self.assertEqual(d['stars'],balance);self.assertEqual(d['return_credits'],0)
+        balance=1000-max(0,high_cost-200)
+        high_credit=max(0,200-high_cost)
+        self.assertEqual(d['stars'],balance);self.assertEqual(d['return_credits'],high_credit)
         d=self.result(self.call(4,buy_type=1,index=1,count=1,card_list={500:1}))
         self.assertEqual((d['stars'],d['return_credits']),(balance,500-low_cost))
         self.result(self.call(3,buy_type=2,first_send=True))
         self.result(self.call(4,buy_type=2,index=1,count=1))
-        self.assertEqual(self.sky_state()['credits'],500-low_cost-20)
+        self.assertEqual(self.sky_state()['credits'],high_credit+500-low_cost-20)
         for args in [dict(buy_type=1,index=6,count=2,card_list={}),dict(buy_type=1,index=2,count=1,card_list={500:2}),
                      dict(buy_type=1,index=2,count=1,card_list={999:1}),dict(buy_type=2,index=1,count=0)]:
             before=self.b.profile();self.assertEqual(self.call(4,**args)[0][0],55);self.assertEqual(before,self.b.profile())
@@ -166,6 +167,105 @@ class NineSkyTests(ActivityCase):
             cfg=n.load_rules();cfg[key]=value
             path=Path(self.tmp.name)/'invalid.json';path.write_text(json.dumps(cfg))
             with self.assertRaises(n.f.Rejected):n.load_rules(path)
+
+    def test_free_week_route_distribution_supports_100_star_high_tier(self):
+        cfg = n.load_rules()
+        high = [row for row in cfg['star_shop'] if row['tier'] == 'high']
+        self.assertEqual(max(row['cost'] for row in high), 100)
+        # Enumerate the exact legal route distribution; exclude all random bonuses.
+        states = {(1, 0, 0): 1.0}
+        for _ in range(cfg['daily_free'] * cfg['period_days']):
+            following = {}
+            for (floor, y, old), probability in states.items():
+                s = dict(floor=floor, cur_point=dict(y=y), cur_map=old)
+                choices = []
+                with patch.object(n.secrets, 'choice', side_effect=lambda options:
+                                  choices.extend(options) or options[0]):
+                    n.choose_map(s)
+                for new in choices:
+                    advanced = y + n.ROADS[old, new].count('1')
+                    key = ((min(9, floor+1), 0, 0) if advanced == n.LEVELS[floor-1]
+                           else (floor, advanced, new))
+                    following[key] = following.get(key, 0) + probability/len(choices)
+            states = following
+        stars = lambda key: (sum(n.LEVELS[:key[0]-1]) + key[1]) * 5
+        expected = sum(stars(key)*p for key, p in states.items())
+        self.assertAlmostEqual(sum(states.values()), 1)
+        self.assertAlmostEqual(expected, 482.3864711014385)
+        self.assertGreaterEqual(expected, 4 * max(row['cost'] for row in high))
+        self.assertGreater(sum(p for key, p in states.items() if stars(key) >= 400), .999)
+        # Pricing targets normal returns, not an unconditional three-purchase floor.
+        self.assertEqual(min(map(stars, states)), 205)
+
+    def test_free_week_typical_routes_afford_three_high_rewards_without_bonuses(self):
+        cfg = n.load_rules()
+        high = [row for row in cfg['star_shop'] if row['tier'] == 'high']
+        self.assertEqual(max(row['cost'] for row in high), 100)
+        # Exercise real protocol travel, day resets and purchases with the
+        # middle eligible route each roll and the most expensive high item every day.
+        original_choose, original_refresh = n.choose_map, n.refresh_shop
+        def middle_route(s):
+            with patch.object(n.secrets, 'choice', side_effect=lambda options:
+                              sorted(options, key=lambda new: n.ROADS[s['cur_map'], new].count('1'))[len(options)//2]):
+                return original_choose(s)
+
+        def expensive_shop(s, r, today):
+            with patch.object(n.secrets, 'choice', side_effect=lambda options:
+                              max(options, key=lambda row: row['cost'])):
+                return original_refresh(s, r, today)
+
+        start = n.period(NOW, cfg)[1]
+        role = self.b.profile(); role['gold_coin'] = 0; self.b.save(role)
+        purchases = earned = 0
+        cfg.update(double_basis_points=0, treasure_basis_points=0, battle_basis_points=0)
+        with patch.object(n, 'load_rules', return_value=cfg), \
+             patch.object(n, 'choose_map', side_effect=middle_route), \
+             patch.object(n, 'refresh_shop', side_effect=expensive_shop):
+            for day in range(7):
+                with patch('network_redirect.backend.time.time', return_value=start + day * 86400 + 60):
+                    self.result(self.call())
+                    for _ in range(cfg['daily_free']):
+                        before = self.sky_state()['stars']
+                        self.result(self.call(2, count=1, index=0))
+                        earned += self.sky_state()['stars'] - before
+                    self.assertEqual(self.sky_state()['free_times'], 0)
+                    s = self.sky_state()
+                    if s['stars'] >= s['shop'][5]['cost']:
+                        self.result(self.call(4, buy_type=1, index=6, count=1, card_list={}))
+                        purchases += 1
+                        self.assertEqual(self.sky_state()['purchases']['1'][5], 1)
+                        self.assertEqual(self.call(4, buy_type=1, index=6, count=1, card_list={})[0][0], 55)
+            self.assertGreaterEqual(purchases, 3)
+            self.assertGreaterEqual(earned, 300)
+            self.assertEqual(self.sky_state()['rolls'], 35)
+            self.assertEqual(self.sky_state()['cards'], {})
+            self.assertEqual(self.b.profile()['gold_coin'], 0)
+
+    def test_old_high_prices_migrate_preserving_stock_and_reject_stale_buy(self):
+        cfg = n.load_rules()
+        high = [row for row in cfg['star_shop'] if row['tier'] == 'high']
+        self.result(self.call())
+        for row, old_cost in zip(high, (35, 40, 30, 35, 35)):
+            for used in (0, 1):
+                with self.subTest(item=row['reward'][1], used=used):
+                    role = self.b.profile(); s = role['activity']['nine_sky']
+                    s['shop'][5] = dict(copy.deepcopy(row), cost=old_cost)
+                    s['shop_revision'] = 'nine-sky-2026-10-29-free-week-prices'
+                    s['purchases']['1'][5] = used
+                    s['stars'] = 1000
+                    self.b.save(role)
+                    self.result(self.call(3, buy_type=1, first_send=True))
+                    updated = self.sky_state()
+                    self.assertEqual(updated['shop'][5], row)
+                    self.assertEqual(updated['purchases'], s['purchases'])
+                    self.assertEqual(updated['stars'], 1000)
+                    self.assertEqual(self.call(4, buy_type=1, index=6, count=1,
+                                              card_list={}, shop_revision=s['shop_revision'])[0][0], 55)
+                    if used:
+                        self.assertEqual(self.call(4, buy_type=1, index=6, count=1, card_list={})[0][0], 55)
+                    else:
+                        self.result(self.call(4, buy_type=1, index=6, count=1, card_list={}))
+                        self.assertEqual(self.sky_state()['stars'], 1000-row['cost'])
 
     def sky_state(self):
         return self.b.profile()['activity']['nine_sky']
@@ -400,14 +500,14 @@ class NineSkyTests(ActivityCase):
         cfg=n.load_rules();high=[x for x in cfg['star_shop'] if x['tier']=='high']
         self.assertEqual(len(high),5)
         bag=next(x for x in high if x['reward'][1]==1243)
-        self.assertEqual(bag,dict(tier='high',reward=[5,1243,1,1],cost=500,limit=1))
+        self.assertEqual(bag,dict(tier='high',reward=[5,1243,1,1],cost=90,limit=1))
         with patch.object(n.secrets,'choice',side_effect=lambda rows:rows[-1]):self.result(self.call())
         role=self.b.profile();s=role['activity']['nine_sky'];self.assertEqual(s['shop'][5],bag)
         s['stars']=1000;self.b.save(role)
         self.result(self.call(3,buy_type=1,first_send=True))
         before=self.b.profile()
         self.result(self.call(4,buy_type=1,index=6,count=1,card_list={}))
-        self.assertEqual(self.sky_state()['stars'],500)
+        self.assertEqual(self.sky_state()['stars'],910)
         role=self.b.profile();item=next(i for i in role['attachments'] if i['type_id']==1243)
         count=lambda r:sum(i['count'] for i in r['attachments'] if i['attach_type']==5 and i['type_id']==1001)
         peaches=count(role);souls=role.get('souls',{}).get('5027',0)
@@ -427,7 +527,7 @@ class NineSkyTests(ActivityCase):
 
     def test_soul_box_revision_migrates_without_reroll_or_quota_reset(self):
         cfg=n.load_rules();box=next(x for x in cfg['star_shop'] if x['reward'][1]==1249)
-        self.assertEqual((box['reward'],box['cost']),([5,1249,50,1],500))
+        self.assertEqual((box['reward'],box['cost']),([5,1249,50,1],80))
         self.result(self.call());role=self.b.profile();s=role['activity']['nine_sky']
         s['shop'][5]=dict(tier='high',reward=[5,1249,30,1],cost=900,limit=1)
         s['shop_revision']='nine-sky-2026-10-27-v2';s['stars']=1000
@@ -435,7 +535,7 @@ class NineSkyTests(ActivityCase):
         self.result(self.call(3,buy_type=1,first_send=True))
         self.assertEqual(self.sky_state()['shop'][:5],low);self.assertEqual(self.sky_state()['shop'][5],box)
         self.result(self.call(4,buy_type=1,index=6,count=1,card_list={}))
-        self.assertEqual(self.sky_state()['stars'],500)
+        self.assertEqual(self.sky_state()['stars'],920)
         self.assertEqual(sum(i['count'] for i in self.b.profile()['attachments'] if i['type_id']==1249),50)
         role=self.b.profile();role['activity']['nine_sky']['shop_revision']='old-again';self.b.save(role)
         self.result(self.call(3,buy_type=1,first_send=True))

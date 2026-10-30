@@ -48,6 +48,18 @@ def load_rules(path=RULES_PATH):
         require(int(type_id) in NAMES)
         for key, value in override.items():
             require(key in ('count', 'origin_price') and integer(value, 1, 1000000))
+    indices = {int(row['index']) for row in CATALOG}
+    for section in ('cheap_additions', 'rich_additions'):
+        for row in rules.get(section, []):
+            require(integer(row['index'], 1, 255) and row['index'] not in indices)
+            indices.add(row['index'])
+            require(row['type_id'] in NAMES and row['type_id'] in formation.ITEMS)
+            for key in ('count', 'origin_price', 'buy_price', 'order'):
+                require(integer(row[key], 1, 1000000))
+            require(integer(row['vip_level'], 0, 10))
+            if section == 'cheap_additions':
+                require(integer(row['daily_limit'], 1, 1000))
+            require(formation.ITEMS[row['type_id']]['can_stack'] == '1' or row['count'] == 1)
     return rules
 
 
@@ -151,6 +163,18 @@ def catalog(role, now, rules):
             begin_time=state['day'], end_time=state['day'] + 86400 - 1,
             buy_limit_times=max(0, daily_limit - state['purchases'].get(str(index), 0))
                             if page == 1 else 0, is_day_limit=1)
+    for page, section in ((1, 'cheap_additions'), (2, 'rich_additions')):
+        for extra in rules.get(section, []):
+            index = extra['index']
+            result[LISTS[page]][index] = dict(
+                index=index, object_type=5, type_id=extra['type_id'], count=extra['count'],
+                name=NAMES[extra['type_id']], buy_price=extra['buy_price'],
+                origin_price=extra['origin_price'], money_type=rules['money_type'],
+                vip_level=extra['vip_level'], order=extra['order'],
+                begin_time=state['day'] if page == 1 else 0,
+                end_time=state['day'] + 86400 - 1 if page == 1 else 0,
+                buy_limit_times=max(0, extra['daily_limit'] - state['purchases'].get(str(index), 0))
+                                if page == 1 else 0, is_day_limit=int(page == 1))
     from . import cheer
     result['rich_item_list'].update(cheer.market_goods(role))
     from . import equipment_crafting

@@ -118,8 +118,8 @@ class ProtocolTests(unittest.TestCase):
                 # Enabled Bagua must provide complete original-client config.
                 self.assertIs(config[14]['is_open'], True)
                 self.assertIsInstance(config[14]['cheer_level_limit'], dict)
-                self.assertEqual(len(config[10]['cheap_item_list']), 7)
-                self.assertEqual(len(config[10]['rich_item_list']), 14)
+                self.assertEqual(len(config[10]['cheap_item_list']), 8)
+                self.assertEqual(len(config[10]['rich_item_list']), 15)
                 self.assertNotIn(9137, config[10]['rich_item_list'])
                 self.assertEqual(config[10]['limit_item_list'], {})
                 self.assertEqual(len(config[10]['panic_buy_list']['activity_data']['sale_item']), 2)

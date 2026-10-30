@@ -14,9 +14,9 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.VideoView;
 
-/** Original bundled movie, once per process; no save files or network access. */
+/** Original bundled movie, invoked by the new-role guide; no save access. */
 final class OpeningVideo {
-    private static boolean seen;
+    private final Runnable completion;
     private final Activity activity;
     private final FrameLayout root;
     private final FrameLayout overlay;
@@ -37,15 +37,15 @@ final class OpeningVideo {
         }
     };
 
-    OpeningVideo(Activity owner, View loadingView, Bundle state) {
+    OpeningVideo(Activity owner, Runnable onCompletion) {
         activity = owner;
-        finished = seen || (state != null && state.getBoolean("opening.finished"));
-        position = state == null ? 0 : state.getInt("opening.position", 0);
+        completion = onCompletion;
         root = new FrameLayout(owner);
-        root.addView(loadingView, new FrameLayout.LayoutParams(-1, -1));
+        root.setClickable(true);
         overlay = new FrameLayout(owner);
         overlay.setBackgroundColor(Color.BLACK);
         video = new VideoView(owner);
+        video.setZOrderMediaOverlay(true);
         overlay.addView(video, new FrameLayout.LayoutParams(-1, -1, Gravity.CENTER));
         Button skip = new Button(owner);
         skip.setText("跳过动画 ›");
@@ -133,15 +133,16 @@ final class OpeningVideo {
     private void finish(String reason) {
         if (finished) return;
         finished = true;
-        seen = true;
         handler.removeCallbacks(watchdog);
         video.stopPlayback();
         root.removeView(overlay);
         activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         Log.i("JGBOpening", "finished " + reason);
+        completion.run();
     }
 
     void destroy() {
+        finished = true;
         handler.removeCallbacks(watchdog);
         video.stopPlayback();
     }

@@ -35,7 +35,7 @@ class DailyTests(unittest.TestCase):
         cfg = login_fields(decode(self.b.bootstrap()[0])[2]['data'])
         self.assertEqual(len(cfg[3]), 7); self.assertEqual(cfg[9][1]['day_index'], 3)
         out = self.req(id=1, data='{}')[-1][1]
-        self.assertEqual(out['point'], 0); self.assertEqual(len(out['point_data']), 9)
+        self.assertEqual(out['point'], 0); self.assertEqual(len(out['point_data']), 11)
         self.assertEqual([b['status'] for b in out['point_prize'].values()], [1]*5)
         self.assertEqual(self.req(1206, checkin_type=1)[-1][1]['checkin_data']['checkin_day_count'], 0)
 
@@ -59,7 +59,7 @@ class DailyTests(unittest.TestCase):
         with patch('network_redirect.backend.time.time', return_value=midnight-1):
             self.req(1206, checkin_type=3)
         with patch('network_redirect.backend.time.time', return_value=midnight):
-            self.assertEqual(self.req(id=1, data='{}')[-1][1]['point'], 10)
+            self.assertEqual(self.req(id=1, data='{}')[-1][1]['point'], 0)
             self.req(1206, checkin_type=3)
             self.assertEqual(self.role()['daily']['checkin_count'], 2)
             self.assertEqual(self.req(1206, checkin_type=2, day_index=3)[-1][1]['checkin_result'], 3)
@@ -81,17 +81,17 @@ class DailyTests(unittest.TestCase):
 
     def test_all_boxes_caps_preview_claims_and_reset(self):
         role = self.role()
-        for i in range(1,10): daily.record(role, i, 1000, NOW, self.b.daily_rules)
+        for i in range(1,12): daily.record(role, i, 1000, NOW, self.b.daily_rules)
         self.b.save(role)
         out = self.req(id=1, data='{}')[-1][1]
-        self.assertEqual(out['point'], 110)
+        self.assertEqual(out['point'], 150)
         for i in range(1,6):
             before = self.role(); out = self.req(id=2, data=summon.lua({'prize_id': i}))[-1][1]
             self.assertEqual(out['status'], 3); self.assertTrue(out['prize_list'])
             after = self.role(); self.assertNotEqual(before, after)
             self.assertEqual(self.req(id=2, data=summon.lua({'prize_id': i}))[-1][0],55)
             self.assertEqual(after, self.role())
-        self.assertEqual(self.req(id=1, data='{}')[-1][1]['point'],110)
+        self.assertEqual(self.req(id=1, data='{}')[-1][1]['point'],150)
         with patch('network_redirect.backend.time.time', return_value=NOW+7*86400):
             out = self.req(id=1, data='{}')[-1][1]
             self.assertEqual(out['point'],0)
@@ -106,14 +106,14 @@ class DailyTests(unittest.TestCase):
 
     def test_gold_cards_preview_grant_replay_and_restart(self):
         expected = [
-            [[12, 0, 5000, 1]],
-            [[5, 1022, 1, 1], [5, 1156, 1, 1]],
-            [[11, 0, 20, 1]],
-            [[5, 1023, 1, 1]],
-            [[11, 0, 50, 1], [5, 1152, 1, 1]],
+            [[12, 0, 5000, 1], [5, 1022, 1, 1]],
+            [[5, 1022, 3, 1], [5, 1156, 1, 1]],
+            [[11, 0, 100, 1], [5, 1156, 3, 1]],
+            [[5, 1023, 1, 1], [5, 1156, 6, 1]],
+            [[11, 0, 100, 1], [5, 1152, 1, 1]],
         ]
         role = self.role()
-        for kind in range(1, 10):
+        for kind in range(1, 12):
             daily.record(role, kind, 1000, NOW, self.b.daily_rules)
         self.b.save(role)
         preview = self.req(id=1, data='{}')[-1][1]['point_prize']
@@ -138,13 +138,13 @@ class DailyTests(unittest.TestCase):
             self.assertEqual(after, self.role())
         self.b.close()
         self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
-        for ident in (2, 5):
+        for ident in (2, 3, 4, 5):
             self.assertEqual(self.req(id=2, data=summon.lua({'prize_id': ident}))[-1][0], 55)
             self.assertEqual(after, self.role())
 
     def test_gold_card_claim_failure_rolls_back_all_prizes(self):
         role = self.role()
-        for kind in range(1, 10):
+        for kind in range(1, 12):
             daily.record(role, kind, 1000, NOW, self.b.daily_rules)
         self.b.save(role)
         grant = journey.grant
@@ -152,38 +152,38 @@ class DailyTests(unittest.TestCase):
             if prize[1] in (1152, 1156):
                 raise ValueError('injected card grant failure')
             return grant(role, prize)
-        for ident in (2, 5):
+        for ident in (2, 3, 4, 5):
             before = self.role()
             with patch('network_redirect.daily.journey.grant', side_effect=fail_card):
                 self.assertEqual(self.req(id=2, data=summon.lua({'prize_id': ident}))[-1][0], 55)
             self.assertEqual(before, self.role())
             self.assertEqual(self.req(id=2, data=summon.lua({'prize_id': ident}))[-1][1]['status'], 3)
 
-    def test_gold_card_boxes_daily_and_weekly_boundaries(self):
+    def test_gold_card_boxes_reset_at_every_midnight(self):
         r = self.b.daily_rules
         midnight = (daily.day(NOW, r) + 1) * 86400 - r['timezone_offset_hours'] * 3600
         monday = ((daily.week(NOW, r) + 1) * 7 - 3) * 86400 - r['timezone_offset_hours'] * 3600
         with patch('network_redirect.backend.time.time', return_value=midnight - 1):
             role = self.role()
-            for kind in range(1, 10):
+            for kind in range(1, 12):
                 daily.record(role, kind, 1000, midnight - 1, r)
             self.b.save(role)
-            for ident in (2, 5):
+            for ident in (2, 3, 4, 5):
                 self.req(id=2, data=summon.lua({'prize_id': ident}))
-        for now, total, status in ((midnight, 110, 3), (monday - 1, 110, 3), (monday, 0, 1)):
+        for now, total, status in ((midnight, 0, 1), (monday - 1, 0, 1), (monday, 0, 1)):
             with patch('network_redirect.backend.time.time', return_value=now):
                 out = self.req(id=1, data='{}')[-1][1]
                 self.assertEqual(out['point'], total)
                 self.assertTrue(all(row['cur_point'] == 0 for row in out['point_data'].values()))
-                for ident in (2, 5):
+                for ident in (2, 3, 4, 5):
                     self.assertEqual(out['point_prize'][ident]['status'], status)
                     self.assertEqual(self.req(id=2, data=summon.lua({'prize_id': ident}))[-1][0], 55)
         with patch('network_redirect.backend.time.time', return_value=monday):
             role = self.role()
-            for kind in range(1, 10):
+            for kind in range(1, 12):
                 daily.record(role, kind, 1000, monday, r)
             self.b.save(role)
-            for ident in (2, 5):
+            for ident in (2, 3, 4, 5):
                 self.assertEqual(self.req(id=2, data=summon.lua({'prize_id': ident}))[-1][1]['status'], 3)
 
     def test_encode_failure_rolls_back_rewards_and_flags(self):
@@ -259,42 +259,70 @@ class DailyTests(unittest.TestCase):
     def test_heartbeat_and_reconnect_restore_hint_without_opening_panel(self):
         role=self.role();daily.record(role,2,10,NOW,self.b.daily_rules);self.b.save(role)
         hints=[login_fields(d['data']) for m,_,d in map(decode,self.b.bootstrap()) if m==2998 and d['id']==198]
-        self.assertEqual(hints,[{'id':3,'has_prize':True}])
-        with patch('network_redirect.backend.time.time',return_value=NOW+7*86400):
+        self.assertEqual(hints,[{'id':3,'has_prize':True,'local_day':daily.day(NOW,self.b.daily_rules)}])
+        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
             packets=self.b.respond(encode(2999,{}),{'authenticated':True})
             hints=[login_fields(d['data']) for m,_,d in map(decode,packets) if m==2998 and d['id']==198]
-            self.assertEqual(hints,[{'id':3,'has_prize':False}])
+            self.assertEqual(hints,[{'id':3,'has_prize':False,'local_day':daily.day(NOW+86400,self.b.daily_rules)}])
 
     def test_config_validation(self):
         for change in [lambda r:r.update(mode='official'),lambda r:r['tasks'].pop(),
+                       lambda r:r['tasks'][-1].update(id=10),
                        lambda r:r['point_prizes'][0].update(point=0),
+                       lambda r:r['point_prizes'][-1].update(point=151),
                        lambda r:r['checkin'].pop(),lambda r:r['checkin_bonus'][0].update(prize=[5,999999,1,1])]:
             r=copy.deepcopy(self.b.daily_rules);change(r)
             path=Path(self.tmp.name)/'bad.json';path.write_text(json.dumps(r))
             with self.assertRaises(formation.Rejected):daily.load_rules(path)
 
-    def test_highest_box_reachable_without_deferred_union_tree(self):
+    def test_weekly_save_migration_preserves_today_and_lifetime_checkin(self):
+        role = self.role()
+        role['daily'] = dict(day=daily.day(NOW, self.b.daily_rules), week=1,
+                             points={'1': 10, '4': 10}, total=400, claimed=[1, 2],
+                             checkin_count=7, bonus_claimed=[3, 7])
+        role['checkin_time'] = NOW
+        self.b.save(role)
+        out = self.req(id=1, data='{}')[-1][1]
+        self.assertEqual(out['point'], 20)
+        self.assertEqual([out['point_prize'][i]['status'] for i in (1, 2)], [3, 3])
+        self.assertNotIn('week', self.role()['daily'])
+        self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        self.assertEqual(self.req(id=1, data='{}')[-1][1]['point'], 20)
+        with patch('network_redirect.backend.time.time', return_value=NOW+86400*3):
+            self.b.bootstrap()
+            state = self.role()['daily']
+            self.assertEqual((state['total'], state['points'], state['claimed']), (0, {}, []))
+            self.assertEqual((state['checkin_count'], state['bonus_claimed']), (7, [3, 7]))
+            self.assertEqual(self.role()['checkin_time'], NOW)
+            role = self.role(); daily.record(role, 4, 2, NOW+86400*3, self.b.daily_rules)
+            self.b.save(role)
+            self.assertEqual(self.req(id=2, data='{prize_id=1}')[-1][1]['status'], 3)
+
+    def test_highest_box_reachable_without_union_tree(self):
         role=self.role()
         for kind in range(1,9):daily.record(role,kind,1000,NOW,self.b.daily_rules)
         self.b.save(role)
         out=self.req(id=1,data='{}')[-1][1]
-        self.assertEqual(out['point'],105)
+        self.assertEqual(out['point'],115)
         self.assertEqual(out['point_data'][9]['cur_point'],0)
         self.assertEqual(self.req(id=2,data='{prize_id=5}')[-1][1]['status'],3)
 
-    def test_daily_limits_reset_but_weekly_total_and_claims_survive(self):
+    def test_daily_limits_total_and_claims_reset_together(self):
         role=self.role();daily.record(role,2,20,NOW,self.b.daily_rules);self.b.save(role)
         self.req(id=2,data='{prize_id=1}')
         with patch('network_redirect.backend.time.time',return_value=NOW+86400):
             out=self.req(id=1,data='{}')[-1][1]
-            self.assertEqual(out['point'],20)
+            self.assertEqual(out['point'],0)
             self.assertEqual(out['point_data'][2]['cur_point'],0)
-            self.assertEqual(out['point_prize'][1]['status'],3)
+            self.assertEqual(out['point_prize'][1]['status'],1)
             self.req(1206,checkin_type=3)
-            self.assertEqual(self.req(id=1,data='{}')[-1][1]['point'],30)
+            self.assertEqual(self.req(id=1,data='{}')[-1][1]['point'],10)
+            self.assertEqual(self.req(id=2,data='{prize_id=1}')[-1][0],55)
+            role=self.role();daily.record(role,2,5,NOW+86400,self.b.daily_rules);self.b.save(role)
+            self.assertEqual(self.req(id=2,data='{prize_id=1}')[-1][1]['status'],3)
             self.assertEqual(self.req(id=2,data='{prize_id=1}')[-1][0],55)
 
-    def test_exact_monday_midnight_resets_weekly_rewards(self):
+    def test_exact_monday_midnight_resets_daily_rewards(self):
         r=self.b.daily_rules
         monday=((daily.week(NOW,r)+1)*7-3)*86400-r['timezone_offset_hours']*3600
         self.assertEqual(daily.week(monday,r),daily.week(monday-1,r)+1)

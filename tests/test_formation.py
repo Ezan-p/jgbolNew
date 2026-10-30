@@ -344,7 +344,8 @@ class FormationTests(unittest.TestCase):
         after = self.backend.profile()['corteges'][0]
         total = sum(formation.EXPERIENCE[5, n] for n in range(1, after['level'])) + after['cur_exp']
         self.assertEqual(total, 1200)
-        self.assertEqual(after['culture_point'], before['culture_point'] + (after['level'] - 1) * 5)
+        self.assertEqual(after['culture_point'], before['culture_point'] +
+                         formation.level_culture_points(5, 1, after['level']))
         self.assertEqual(self.events(rows)[0][0], 65)
         self.rejected(1059, first_send=True, flag=1, cortege_id=self.ids[0], roll_count=1,
                       roll_list=[dict(type_id=1041, count=2)])

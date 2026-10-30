@@ -508,6 +508,16 @@ class DutyTests(ActivityCase):
         self.info(flag=1); self.info(flag=0)
         self.assertEqual(self.b.profile().get('daily'), after)
 
+    def test_daily_points_second_run_reaches_twenty(self):
+        self.start(); self.fight(4)
+        self.assertEqual(self.b.profile()['daily']['points']['4'], 10)
+        self.info(plus_type=4, plus_index=0)
+        self.info(plus_type=1, plus_index=1)
+        self.fight(4)
+        self.assertEqual(self.b.profile()['daily']['points']['4'], 20)
+        self.info(flag=1)
+        self.assertEqual(self.b.profile()['daily']['points']['4'], 20)
+
     def test_exchange_uses_saved_offer_not_client_index_as_stat(self):
         self.start(); self.fight(); self.fight(); self.fight(); self.info(plus_type=3)
         r = self.b.profile(); d = r['activity']['duty']; d['offers'] = [dict(star=9, field=177, value=15)]
