@@ -87,6 +87,15 @@ def main():
     vm = LuaRuntime()
     data = vm.eval(summon.lua(dict(initial=initial, other=other, delta=packets(role, new=1, previous=before))))
     checks['achievements'] = list(vm.execute((ROOT / 'tests/achievement_hotupdate_client_regression.lua').read_text(), a.client_patch(), data).values())
+    # Reuse the established Babel contract fixture against this APK's modules
+    # and Lua, keeping its evidence separate from earlier source-only checks.
+    fixture = ROOT / 'analysis/tools/verify_babel_client.py'
+    source = fixture.read_text().replace('sys.path.insert(0,str(ROOT))', 'sys.path.insert(0,str(PROGRAM))')
+    source = source.replace("source=(ROOT/'network_redirect/babel_client.lua')", "source=(PROGRAM/'network_redirect/babel_client.lua')")
+    source = source.replace("ROOT/'analysis/evidence/babel/client_patch_validation.json'", "ROOT/'analysis/evidence/v108/babel-client-validation.json'")
+    namespace = dict(__file__=str(fixture), PROGRAM=program)
+    exec(compile(source, str(fixture), 'exec'), namespace)
+    checks['babel'] = namespace['report']['checks']
     bundle = (program / 'offline_client.lua').read_text()
     LuaRuntime().execute('assert(loadstring(...))', bundle)
     assert "label('v108',0.75)" in bundle and "label('v107',0.75)" not in bundle

@@ -25,18 +25,23 @@ def main():
     device = read('device-validation.json')
     ui = read('startup-ui-validation.json')
     lua = read('lua-validation.json')
+    delta = read('v107-to-v108-delta.json')
     sha = digest(OUTPUT)
-    assert all(r['apk_sha256'] == sha for r in [build, payload, protocol, device, ui, lua])
+    assert all(r['apk_sha256'] == sha for r in [build, payload, protocol, device, ui, lua, delta])
+    assert delta['current_sources_match'] and delta['client_assets_unchanged'] and delta['removed'] == 0
     assert build['version_code'] == 108 and build['home_version_label'] == 'v108'
     assert payload['only_documented_additive_migration']
     assert payload['all_database_tables_equal_after_restart']
     assert payload['all_existing_database_values_preserved'] and payload['source_qa_save_unchanged']
-    assert protocol['passed'] and protocol['tests'] >= 400 and protocol['actual_packaged_modules'] >= 50
+    assert protocol['passed'] and protocol['tests'] >= 1040 and protocol['actual_packaged_modules'] >= 100
+    assert {'test_immortal_hotupdate', 'test_reborn_hotupdate', 'test_essence_hotupdate',
+            'test_babel_hotupdate', 'test_achievement_hotupdate'} <= set(protocol['suites'])
     assert device['replacement_install'] and device['version_code'] == 108
     assert device['save_byte_identical_after_install_start_and_stop'] and device['new_program_ready']
     assert ui['cold_start_native_branding_verified'] and ui['no_external_ui_patch'] and ui['no_lua_error']
     assert ui['save_hash_after_ui'] == device['baseline']['sha256']
     assert lua['checks']['bundle_compiles_and_home_version_is_v108']
+    assert all(lua['checks'][key] for key in ('essence', 'expbooks', 'achievements', 'babel', 'pavilion'))
     android = (EVIDENCE / 'android-tests.log').read_text()
     assert 'Ran 5 tests' in android and '\nOK\n' in android
     for name, path in collect_files().items():
