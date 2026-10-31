@@ -18,6 +18,7 @@ def main():
     records=[];serial=100000
     with tempfile.TemporaryDirectory() as tmp,patch('network_redirect.backend.time.time',return_value=NOW) as clock:
         b=Backend(Path(tmp),18770,lambda *a,**k:None)
+        role=b.profile();role['level']=30;b.save(role)
         def request(name,mid,expected=True,**data):
             nonlocal serial
             serial+=1;before=b.profile()
@@ -44,9 +45,9 @@ def main():
         mail_claims();call('查看全民奖励',1)
         for i in range(1,5):call('领取全民档位'+str(i),3,index=i)
         call('拒绝重复领奖',3,index=1,expected=False)
-        for index in range(1,10):
+        for index in sorted(p.SHOP):
             row=p.catalog(b.profile(),NOW,p.load_rules())['exchange_info'][index]
-            cards={'ten_card':2,'five_card':2} if index==3 else {}
+            cards={'ten_card':2,'five_card':2} if index==4 else {}
             call('兑换完整限额:'+p.SHOP[index][next(k for k in p.SHOP[index] if k.startswith('name'))],2,index,row['left_buy_count'],**cards)
             call('限额用尽拒绝',2,index,1,expected=False)
             if index==5:
@@ -55,8 +56,8 @@ def main():
                 call('中途重启继续',1)
         mail_claims();role=b.profile()
         stones=[x for x in role['attachments'] if x['type_id'] in (1090,1091,1092)]
-        assert sum(x['count'] for x in stones if x['type_id']==1090 and x['level']==9)==10
-        assert sum(x['count'] for x in stones if x['type_id']==1091 and x['level']==9)==10
+        assert sum(x['count'] for x in stones if x['type_id']==1090 and x['level']==9)==3
+        assert sum(x['count'] for x in stones if x['type_id']==1091 and x['level']==9)==3
         assert any(x['type_id']==1092 and x['level']==8 for x in stones)
         assert all(x['count']==1 for x in stones)
         assert role['achievements']['totals'].get('125',0)==0  # belongs to mondayUI/menu32
@@ -70,10 +71,10 @@ def main():
         assert b.profile()['pavilion']['bought']=={'9':1}
         assert all(b.profile()['welfare']['mails'][k]==v for k,v in old_mails.items())
         b.close()
-    report=dict(passed=True,date='2026-10-27',temporary_database=True,seeded_gold_cards=True,seeded_bricks=False,
-        requests=len(records),replayed_every_packet=True,all_nine_limits_exhausted=True,
-        stones=stones,steps=records,boundary='原版协议端到端流程；充值通过已有本地不扣款模拟；界面验证另见client_validation.log')
-    out=ROOT/'analysis/evidence/pavilion/playthrough.json';out.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
-    print(f'{len(records)} original-wire requests passed; 9 catalogs exhausted; restart and new season passed')
+    report=dict(passed=True,date='2026-10-31',temporary_database=True,seeded_gold_cards=True,seeded_bricks=False,
+        requests=len(records),replayed_every_packet=True,all_ten_limits_exhausted=True,
+        stones=stones,steps=records,boundary='原版协议端到端流程；充值通过背包金卡扣除模拟；界面验证另见client_validation.log')
+    out=ROOT/'analysis/evidence/pavilion/catalog_1263_playthrough.json';out.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+    print(f'{len(records)} original-wire requests passed; 10 catalogs exhausted; restart and new season passed')
 
 if __name__=='__main__':main()

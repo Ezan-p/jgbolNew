@@ -118,6 +118,33 @@ class GuildWarFeastTests(unittest.TestCase):
         row=next(v for v in self.req(18,query_type=15)[-1]['fortune_info'].values() if v['id']==1)
         self.assertEqual((row['normal_gift'],row['advanced_gift'],row['fortune']),(2,2,1120))
 
+    def test_native_present_dialog_prices_are_keyed_by_item_id(self):
+        # guildPartyUI L279/L280/L334 indexes PresentPrice with 1120/1121.
+        for active in (False, True):
+            if active: self.req(65,feast_type=1)
+            prices = self.feast()['send_gift']
+            self.assertEqual(set(prices), {1120,1121})
+            for cfg in self.b.guild_rules['feast_gifts']:
+                self.assertEqual(prices[cfg['item']], dict(cost_gold=cfg['gold'],contribute=cfg['contrib']))
+
+    def test_native_present_requests_use_item_ids_and_charge_matching_prices(self):
+        self.req(65,feast_type=1)
+        for cfg in self.b.guild_rules['feast_gifts']:
+            before = self.role()
+            out = self.req(67,gift_type=cfg['item'],count=2)[-1]
+            after = self.role()
+            self.assertEqual(before['gold_coin']-after['gold_coin'],cfg['gold']*2)
+            self.assertEqual(after['cur_union_contrib']-before['cur_union_contrib'],cfg['contrib']*2)
+            sent = [v for v in out['gift_data'].values() if v['sender_id']==after['role_id']]
+            self.assertEqual(sent[-1]['gift_type'],cfg['item'])
+            self.assertEqual(sent[-1]['count'],2)
+            self.now += 60
+            self.feast()
+        before = self.role()
+        for invalid in (1122,0,-1,True,'1120'):
+            self.req(67,ok=False,gift_type=invalid,count=2)
+            self.assertEqual(before,self.role())
+
     def test_nonvip_gift_rejected_without_spending(self):
         self.req(65,feast_type=1);role=self.role();role['vip_level']=0;self.b.save(role);before=self.role()
         self.req(67,ok=False,gift_type=1,count=2);self.assertEqual(before,self.role())

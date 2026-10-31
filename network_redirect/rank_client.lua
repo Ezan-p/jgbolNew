@@ -69,10 +69,35 @@ do
   ui.getCreditsRewards=function() return ms.d_info.show('排名日积分每日零点自动入账') end
   local oldCell,oldLabel=ui.createChargeCell,ui.update_label_state
   local oldClaim,oldClaimResult=ui.chargeButtonCallBack,ui.recvCreditsChargeMsg
+  local oldPromotion,oldTimeBit,oldPrizeBit=ui.is_promotion_prize,ui.get_promotion_time_bit,ui.get_promotion_prize_bit
+  local oldCheckCredits=ui.checkCreditsToCharge
+  -- Display positions are independent of persisted exchange/claim IDs.
+  ui.is_promotion_prize=function(index)
+   local row=ms.d_data.g_topScoreExchangeTable[index]
+   return row and row.promoteOrder>0 or false
+  end
+  ui.get_promotion_time_bit=function(index)
+   local row=ms.d_data.g_topScoreExchangeTable[index]
+   return row and row.promoteOrder>0 and oldTimeBit(row.exchangeIndex) or 0
+  end
+  ui.get_promotion_prize_bit=function(index)
+   local row=ms.d_data.g_topScoreExchangeTable[index]
+   return row and row.promoteOrder>0 and oldPrizeBit(row.exchangeIndex) or 0
+  end
+  ui.checkCreditsToCharge=function(index)
+   local row=ms.d_data.g_topScoreExchangeTable[index]
+   if row and row.costItem>0 then return ms.d_data.getItemCountByType(5,row.costItem)<row.costCount end
+   return oldCheckCredits(index)
+  end
   -- Native rankUI hardcodes peaches for every row except index 3. Keep its
   -- layout, but supply the real gold icon/name while constructing gold rows.
   ui.createChargeCell=function(index,y,row)
-   if row.object_type~=11 then return oldCell(index,y,row) end
+   if row.object_type~=11 and row.sub_type~=1343 then return oldCell(index,y,row) end
+   local gold=row.object_type==11
+   local function rewardSprite()
+    if gold then return CCSprite:create('v2/money_gold.png') end
+    return ms.d_data.getSingleSpriteFromPng('items/all_daoju3.png',8,8,47)
+   end
    local env=getfenv(oldCell)
    local spriteIndex,sprite
    for i=1,100 do
@@ -82,27 +107,38 @@ do
    end
    assert(spriteIndex,'rank reward sprite factory missing')
    local proxy=setmetatable({create=function(_,path,...)
-    if path=='v2/rankUI/peach.png' then path='v2/money_gold.png' end
+    if path=='v2/rankUI/peach.png' then return rewardSprite() end
     return sprite.create(sprite,path,...)
    end},{__index=sprite})
    local hz=setmetatable({gethz=function(key,...)
-    if key=='peachHZ' then return '元宝' end
+    if key=='peachHZ' or key=='peachHZZ' then return gold and '元宝' or '圣母蟠桃' end
     if key=='countHZ' then return '' end
     return ms.d_hz.gethz(key,...)
    end},{__index=ms.d_hz})
    local utilities=setmetatable({setProperties=function(parent,node,style,...)
-    if style.scaleH==0.6 and style.x==0.134 then
+    if (style.scaleH==0.6 and style.x==0.134) or (style.scaleH==0.81 and style.x==0.132) then
      local fitted={};for key,value in pairs(style) do fitted[key]=value end
-     fitted.scaleH=0.42 -- The ingot is wider than the original peach.
+     fitted.scaleH=gold and 0.42 or 0.81
      return ms.d_u.setProperties(parent,node,fitted,...)
     end
     return ms.d_u.setProperties(parent,node,style,...)
    end},{__index=ms.d_u})
-   setfenv(oldCell,setmetatable({d_ms=setmetatable({d_hz=hz,d_u=utilities},{__index=ms}),
-    showPeachIntro=function() ms.d_info.show('元宝：可用于游戏内购买与养成') end},
+   local data=setmetatable({getSingleSpriteFromPng=function(path,...)
+    if path=='items/all_daoju3.png' then return rewardSprite() end
+    return ms.d_data.getSingleSpriteFromPng(path,...)
+   end},{__index=ms.d_data})
+   local function intro()
+    if gold then ms.d_info.show('元宝：可用于游戏内购买与养成') else env.showPeachIntro2() end
+   end
+   setfenv(oldCell,setmetatable({d_ms=setmetatable({d_hz=hz,d_u=utilities,d_data=data},{__index=ms}),
+    showPeachIntro=intro,showPeachIntro2=intro},
     {__index=env,__newindex=env}))
    debug.setupvalue(oldCell,spriteIndex,proxy)
+   -- Native construction uses score==0 to choose a promotion button.
+   local actualScore=row.score
+   if row.costItem>0 then row.score=row.costCount end
    local ok,result=pcall(oldCell,index,y,row)
+   row.score=actualScore
    debug.setupvalue(oldCell,spriteIndex,sprite);setfenv(oldCell,env)
    if not ok then error(result,0) end
    return result
@@ -111,6 +147,15 @@ do
    return ui.get_promotion_time_bit(index)==1 and ui.get_promotion_prize_bit(index)~=1
   end
   ui.update_label_state=function(index)
+   local row=ms.d_data.g_topScoreExchangeTable[index]
+   local labels=ui.g_isInChangePage and ui.g_label_info and ui.g_label_info[index]
+   if row and row.costItem>0 and labels then
+    local enabled=not ui.checkCreditsToCharge(index)
+    labels.btn:setVisible(enabled);labels.btn:setEnabled(enabled)
+    labels.btn2:setVisible(not enabled);labels.btn2:setEnabled(false)
+    labels.text:setString('需蟠桃: '..row.costCount)
+    return
+   end
    oldLabel(index)
    local row=ms.d_data.g_topScoreExchangeTable[index]
    local labels=ui.g_isInChangePage and ui.g_label_info and ui.g_label_info[index]
@@ -141,8 +186,13 @@ do
   end
   ui.chargeButtonCallBack=function(index,...)
    local row=ms.d_data.g_topScoreExchangeTable[index]
-   if row and row.promoteOrder>0 and not canClaim(index) then return end
-   return oldClaim(index,...)
+   if not row then return end
+   if row.promoteOrder>0 then
+    if not canClaim(index) then return end
+   elseif ui.checkCreditsToCharge(index) then
+    return ms.d_info.show(row.costItem>0 and '蟠桃不足' or '积分不足')
+   end
+   return ms.d_u.main_server_send_msg(ms.d_msg_def.gscl_msg_id.msg_exchange_top_score,{exchange_type=row.exchangeIndex})
   end
   ui.recvCreditsChargeMsg=function(prizes)
    if not prizes or not next(prizes) then return end
@@ -293,6 +343,8 @@ do
    ui.getCreditsRewards=oldCredits
    ui.createChargeCell=oldCell;ui.update_label_state=oldLabel
    ui.chargeButtonCallBack=oldClaim;ui.recvCreditsChargeMsg=oldClaimResult
+   ui.is_promotion_prize=oldPromotion;ui.get_promotion_time_bit=oldTimeBit;ui.get_promotion_prize_bit=oldPrizeBit
+   ui.checkCreditsToCharge=oldCheckCredits
    ms.d_data.callback_update_config=oldConfig;ui.checkHadGetHighestRewards=oldCheck
    ui.createRankPage=oldPage;ui.flashRankUI=oldFlash
    ui.addLeftFrameUI=oldLeft;ms.d_fightrecordUI.menuClose=oldClose;ms.d_fightrecordUI.create=oldCreate

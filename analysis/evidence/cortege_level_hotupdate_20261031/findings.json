@@ -1,0 +1,74 @@
+{
+  "checked_date": "2026-10-31",
+  "source_manifest": "http://jgbupdate02.shangyoo.com/update/jgb/update_list.txt",
+  "verified_packages": 56,
+  "history": [
+    {
+      "resource_version": 1205,
+      "main_building_max": 20,
+      "base_level_cap": 200,
+      "main_building_level_bonus": 100,
+      "cortege_max_level": 300,
+      "experience_max_by_quality": {
+        "1": 300,
+        "2": 300,
+        "3": 300,
+        "4": 300,
+        "5": 300
+      }
+    },
+    {
+      "resource_version": 1217,
+      "main_building_max": 30,
+      "base_level_cap": 200,
+      "main_building_level_bonus": 200,
+      "cortege_max_level": 400,
+      "experience_max_by_quality": {
+        "1": 400,
+        "2": 400,
+        "3": 400,
+        "4": 400,
+        "5": 400
+      }
+    },
+    {
+      "resource_version": 1239,
+      "main_building_max": 50,
+      "base_level_cap": 200,
+      "main_building_level_bonus": 400,
+      "cortege_max_level": 600,
+      "experience_max_by_quality": {
+        "1": 600,
+        "2": 600,
+        "3": 600,
+        "4": 600,
+        "5": 600
+      }
+    },
+    {
+      "resource_version": 1263,
+      "main_building_max": 50,
+      "base_level_cap": 200,
+      "main_building_level_bonus": 400,
+      "cortege_max_level": 600,
+      "experience_max_by_quality": {
+        "1": 600,
+        "2": 600,
+        "3": 600,
+        "4": 600,
+        "5": 600
+      }
+    }
+  ],
+  "formula": "200 + main_building_config.coretege_limit_plus",
+  "client_evidence": {
+    "expbookUI": "Unchanged throughout 1205..1263. getMaxLimitLevel lines 801..808 numeric constant 200; level >=80 branch uses this limit; experience list length separately limits supported levels.",
+    "homeUI": "getMaxBuildLevel lines 207..209 returns length of building config; upgrade view lines 3115..3289 uses it, giving 50 for latest main building. hole_owner_config.max_building_level is a separate scale/challenge threshold, not this UI building cap."
+  },
+  "zip_member_timestamps": {
+    "1217": "2017-09-04 13:53:08",
+    "1239": "2018-01-02 09:50:36"
+  },
+  "scope": "Verified original package and all available public Android incremental updates through resource 1263. No live original-server level-up transaction tested; ZIP timestamps are not independently verified deployment dates.",
+  "game_rules_modified": false
+}

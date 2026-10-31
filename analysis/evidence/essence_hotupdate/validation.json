@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-31",
+  "passed": true,
+  "core": {
+    "modules": [
+      "tests.test_essence_hotupdate",
+      "tests.test_immortal",
+      "tests.test_fate_rebuild",
+      "tests.test_spirit_array",
+      "tests.test_combat",
+      "tests.test_combat_engine",
+      "tests.test_combat_essence_integrity"
+    ],
+    "tests": 102,
+    "passed": true,
+    "seconds": 25.569
+  },
+  "related": {
+    "modules": [
+      "tests.test_combat_power",
+      "tests.test_combat_loadout",
+      "tests.test_combat_lanes",
+      "tests.test_combat_round_limit",
+      "tests.test_combat_termination",
+      "tests.test_battle_replay",
+      "tests.test_journey",
+      "tests.test_nine_sky_battle",
+      "tests.test_guild_npc_combat",
+      "tests.test_reborn"
+    ],
+    "tests": 148,
+    "passed": true,
+    "seconds": 70.478,
+    "log": "related_tests.log"
+  },
+  "final_focused": {
+    "modules": [
+      "tests.test_essence_hotupdate"
+    ],
+    "tests": 14,
+    "passed": true,
+    "seconds": 1.024,
+    "log": "focused_tests.log"
+  },
+  "count_note": "Final focused run repeats the original 12 focused cases and adds two cases; counts are not additive.",
+  "lua51_checks": [
+    "fifth slot display and selection",
+    "four locks cost 1000",
+    "fifth slot can be protected",
+    "reject five locks",
+    "ordinary three locks cost 700",
+    "switch companion resets limit",
+    "idempotent install",
+    "restore original upvalue and callback"
+  ],
+  "full_production_lua_compiles": true,
+  "payload_verified": true,
+  "native_cocos_rendering_test": false,
+  "real_server_battle_comparison": false,
+  "player_save_modified": false,
+  "released_apk_modified": false,
+  "source_sha256": {
+    "network_redirect/immortal.py": "9da9019ee368ca13c6b6329e0111653555aff0aaeeea67720fc42ec7c25539f9",
+    "network_redirect/combat.py": "d59f221f6444325712de2168d2f98a6521a0dc8d6ff59689efc170668d1b30fe",
+    "network_redirect/combat_engine.py": "35b8427a63f2ec48fd518d123182f5180485d264afc08044f29c134e01f76f04",
+    "network_redirect/spirit_array.py": "4f4d43d8061ef22cb24eff9e5e5c1be096c11031329ee179899fa27a2a8d362d",
+    "network_redirect/summon.py": "207bb5e30aeb9d3b25340756d9e05236faaf7f587064f17c67e008a70c2c27c9",
+    "network_redirect/essence_hotupdate_client.lua": "28bf51e160a0e61396df3501af602e1eb9d56148bd6e5ad0277ff005a98db9ac",
+    "server_config/journey_rules.json": "14cb12b0cc1644b73073ffde5e87458df167f67ba43a5a1ac618398969f21a1b",
+    "tests/test_essence_hotupdate.py": "762177101d5baed294228a0ade55d4cc07782c97307ad35c9975322df8dea728",
+    "tests/essence_hotupdate_client_regression.lua": "da3cbadf43251b097c74cefb1bb5c238ee0dbd0fcba77b8614aae5e1c13ab439"
+  }
+}

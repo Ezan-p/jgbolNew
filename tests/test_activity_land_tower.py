@@ -1,10 +1,12 @@
 """Native portrait requests and the 64 distinct tower encounters."""
 import copy
+import json
 import random
 from unittest.mock import patch
 from tests.test_activity import ActivityCase, NOW
 from network_redirect import activity, activity_land as land, activity_land_encounters as encounters
 from network_redirect import activity_land_boss as boss, activity_land_npc as npc, formation, summon, journey
+from network_redirect import activity_land_rewards as land_rewards
 from network_redirect.backend import Backend, login_fields
 from network_redirect.protocol import MAX_PACKET, decode
 from pathlib import Path
@@ -60,13 +62,46 @@ class LandTowerTests(ActivityCase):
                     for stat in formation.STATS:self.assertEqual(b[stat],a[stat]*multiplier)
                     self.assertEqual(b['max_hp'],b['hp'])
 
-    def test_card_pool_has_all_eight_requested_reward_tiers(self):
-        self.assertEqual(self.b.activity_rules['land_card_rewards'],[
-            [12,0,10000,1],[12,0,30000,1],[11,0,20,1],
-            [5,1001,1,1],[5,1001,3,1],[5,10000,5,1],
-            [5,10000,10,1],[5,10001,1,1]])
+    def test_card_pool_has_every_yellow_and_purple_essence_and_fragment(self):
+        from network_redirect.immortal import ESSENCES
+        expected={tid for tid in ESSENCES if int(formation.ITEMS[tid]['quality']) in (4,5)}|{10001}
+        pool=self.b.activity_rules['land_card_rewards']
+        self.assertEqual({tuple(p) for p in pool},{(5,tid,1,1) for tid in expected})
+        self.assertEqual(len(pool),39)
 
-    def test_new_cards_are_unique_shuffled_and_persist_until_claimed(self):
+    def test_card_category_probabilities_and_every_essence_is_reachable(self):
+        rules=self.b.activity_rules
+        with patch.object(land_rewards.secrets,'SystemRandom') as factory:
+            rng=factory.return_value
+            rng.randrange.side_effect=range(100)
+            rng.choice.side_effect=lambda pool:pool[0]
+            drawn=land_rewards.draw_cards(rules,100)
+            self.assertEqual([sum(p[1] in ids for p in drawn) for ids in
+                              (land_rewards.CARD_POOLS['yellow'],{10001},land_rewards.CARD_POOLS['purple'])],
+                             [80,18,2])
+            for roll,quality in ((0,4),(98,5)):
+                pool=[p for p in rules['land_card_rewards'] if p[1]!=10001
+                      and int(formation.ITEMS[p[1]]['quality'])==quality]
+                rng.randrange.side_effect=None;rng.randrange.return_value=roll
+                for index,prize in enumerate(pool):
+                    rng.choice.side_effect=lambda choices:choices[index]
+                    self.assertEqual(land_rewards.draw_cards(rules,1),[prize])
+
+    def test_card_configuration_rejects_missing_essences_and_invalid_weights(self):
+        original=self.b.activity_rules
+        variants=[]
+        for weights in ({'yellow':80,'purple_fragment':18},
+                        {'yellow':80,'purple_fragment':18,'purple':3},
+                        {'yellow':80,'purple_fragment':20,'purple':0},
+                        {'yellow':True,'purple_fragment':97,'purple':2}):
+            variants.append(dict(original,land_card_weights=weights))
+        variants.append(dict(original,land_card_rewards=original['land_card_rewards'][1:]))
+        variants.append(dict(original,land_card_rewards=original['land_card_rewards']+[[5,1001,1,1]]))
+        for rules in variants:
+            path=Path(self.tmp.name)/'invalid-cards.json';path.write_text(json.dumps(rules))
+            with self.assertRaises(formation.Rejected):activity.load_rules(path)
+
+    def test_new_cards_are_weighted_and_persist_until_claimed(self):
         self.ok(self.land(1))
         pool=self.b.activity_rules['land_card_rewards']
         boards=[]
@@ -76,15 +111,13 @@ class LandTowerTests(ActivityCase):
             role=self.b.profile();s=role['activity']['land']
             s.update(soul_count=10000,unlocked=[1]);self.b.save(role)
             # Fix only the draw RNG; victory still uses the actual battle engine.
-            with patch.object(boss.secrets,'SystemRandom',return_value=random.Random(30 if hell else 41)):
+            with patch.object(land_rewards.secrets,'SystemRandom',return_value=random.Random(30 if hell else 41)):
                 out=self.land(4,flag=1,des_type=4 if hell else 3,des_id=1,cur_num=1)
             self.ok(out);self.assertTrue(out[-1][1]['is_win'])
             pending=self.b.profile()['activity']['land'][key]
             chosen=pending['rewards'];boards.append(chosen)
             self.assertEqual(len(chosen),count)
-            self.assertEqual(len({tuple(p) for p in chosen}),count)
             self.assertTrue(all(p in pool for p in chosen))
-            self.assertNotEqual(chosen,sorted(chosen,key=pool.index))
             self.ok(self.land(query))
             self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
             self.ok(self.land(query))
@@ -102,7 +135,7 @@ class LandTowerTests(ActivityCase):
                 for typ,field in ((11,'gold_coin'),(12,'silver_coin')):
                     gain=sum(p[2] for p in rewards if p[0]==typ)
                     self.assertEqual(current[field]-before[field],gain-(cost if typ==11 else 0))
-                for tid in (1001,10000,10001):
+                for tid in {p[1] for p in pool}|{1001,10000}:
                     inventory=lambda r:sum(p['count'] for p in r['attachments'] if p['attach_type']==5 and p['type_id']==tid)
                     self.assertEqual(inventory(current)-inventory(before),sum(p[2] for p in rewards if p[:2]==[5,tid]))
                 self.assertEqual(self.land(flip,index=index)[0][0],55)
@@ -115,7 +148,23 @@ class LandTowerTests(ActivityCase):
             self.ok(self.land(4,flag=1,des_type=4 if hell else 3,des_id=1,cur_num=1))
             self.assertIsNone(self.b.profile()['activity']['land'][key])
         self.assertNotEqual(boards[0][:3],boards[1])
-        self.assertEqual({tuple(p) for board in boards for p in board},{tuple(p) for p in pool})
+
+    def test_same_essence_can_repeat_and_purple_cards_reach_inventory(self):
+        self.ok(self.land(1));role=self.b.profile()
+        role['activity']['land'].update(soul_count=10000,unlocked=[1]);self.b.save(role)
+        for hell in (False,True):
+            key='hell' if hell else 'boss';count=3 if hell else 5
+            with patch.object(land_rewards.secrets,'SystemRandom') as factory:
+                factory.return_value.randrange.return_value=99
+                factory.return_value.choice.side_effect=lambda pool:pool[-1]
+                self.ok(self.land(4,flag=1,des_type=4 if hell else 3,des_id=1,cur_num=1))
+            pending=self.b.profile()['activity']['land'][key]
+            self.assertEqual(pending['rewards'],[[5,10219,1,1]]*count)
+            before=self.b.profile()
+            self.ok(self.land(23 if hell else 14,index=1))
+            inventory=lambda role:sum(p['count'] for p in role['attachments']
+                                      if p['attach_type']==5 and p['type_id']==10219)
+            self.assertEqual(inventory(self.b.profile())-inventory(before),1)
 
     def test_sweep_keeps_its_peaches_after_card_pool_change(self):
         self.ok(self.land(1));role=self.b.profile()
@@ -123,6 +172,25 @@ class LandTowerTests(ActivityCase):
         result=self.land(13);self.ok(result)
         self.assertEqual(result[-1][1]['sweep_list'],
                          {i:{1:activity.prize_spec([5,1001,10,1])} for i in range(1,4)})
+
+    def test_legacy_short_board_only_fills_missing_positions_once(self):
+        self.ok(self.land(1));role=self.b.profile()
+        old=[[12,0,10000,1],[11,0,20,1],[5,1001,1,1]]
+        claimed=[dict(position=1,attach_data=activity.prize_spec(old[0]))]
+        role['activity']['land']['boss']=dict(layer=1,cards=claimed,rewards=copy.deepcopy(old))
+        self.b.save(role)
+        with patch.object(land_rewards.secrets,'SystemRandom') as factory:
+            factory.return_value.randrange.return_value=80
+            factory.return_value.choice.side_effect=lambda pool:pool[0]
+            self.ok(self.land(12))
+        pending=self.b.profile()['activity']['land']['boss']
+        self.assertEqual(pending['cards'],claimed)
+        self.assertEqual(pending['rewards'],old+[[5,10001,1,1]]*2)
+        with patch.object(land,'draw_cards',side_effect=AssertionError('牌面不能重抽')):
+            self.ok(self.land(12))
+        role=self.b.profile();role['gold_coin']=0;self.b.save(role)
+        self.assertEqual(self.land(14,index=4)[0][0],55)
+        self.assertEqual(self.b.profile(),role)
 
     def test_legacy_three_card_hell_board_remains_claimable(self):
         self.ok(self.land(1));role=self.b.profile();s=role['activity']['land']

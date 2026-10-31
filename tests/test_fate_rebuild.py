@@ -39,9 +39,9 @@ class FateTests(ActivityCase):
 
     def test_package_box_activation_and_restart(self):
         self.stock(1141,75)
-        self.ok(self.req(1227,flag=2,index=10,count=3,five_card=0,ten_card=0))
+        self.ok(self.req(1227,flag=2,index=2,count=3,five_card=0,ten_card=0))
         self.assertEqual((self.count(1141),self.count(1370),self.count(1371)),(0,48,24))
-        role=self.b.profile();mail=next(m for k,m in role['welfare']['mails'].items() if k.startswith('pavilion-first-') and k.endswith('-10'))
+        role=self.b.profile();mail=next(m for k,m in role['welfare']['mails'].items() if k.startswith('pavilion-first-') and k.endswith('-2'))
         self.ok(self.req(1103,mail_id=mail['mail_id']));self.assertEqual(self.count(1375),1000)
         box=next(i for i in self.b.profile()['attachments'] if i['type_id']==1370)
         self.ok(self.req(1051,item_type=1370,item_id=box['id'],item_count=5,des_type=1,des_id=0))

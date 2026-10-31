@@ -14,6 +14,7 @@ DEFS = {v['id']: v['def'] for group in ('common_def', 'lscl_msg', 'gscl_msg')
         for v in TABLES[group].values()}
 # Active release_w 1263 common.msg_def; the base APK predates this request.
 DEFS[1357] = 'serial_num=I,id=B,data=s'
+DEFS[1359] = 'serial_num=I,star_id=d,des_type=B'
 FORMATS = {'I': 'I', 'i': 'i', 'W': 'H', 'w': 'h', 'B': 'B', 'b': 'B', 'l': '?', 'f': 'f', 'd': 'd'}
 HEADER = struct.Struct('<HII')
 MAX_PACKET = 32768

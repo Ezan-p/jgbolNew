@@ -1,0 +1,149 @@
+{
+  "date": "2026-10-31",
+  "passed": true,
+  "tables": [
+    {
+      "name": "cortege_evolution.csv",
+      "sha256": "a243bd1107c20db971ff645a141f62889984c75fd5d0e24929dbf8ca4879b293",
+      "original_match": true,
+      "shipped_client_match": true,
+      "rows": 499
+    },
+    {
+      "name": "cortege_evolve_config.csv",
+      "sha256": "1cca12ab12c5d66905b396c1df4301ebb8f27ccc2122b34314cef103125c6c0a",
+      "original_match": true,
+      "shipped_client_match": true,
+      "rows": 2499
+    },
+    {
+      "name": "cortege_devolve.csv",
+      "sha256": "8298f67b9d345d199c924eb762c2ef0630f307185e27e97223800fd478241220",
+      "original_match": true,
+      "shipped_client_match": true,
+      "rows": 499
+    },
+    {
+      "name": "cortege_experience.csv",
+      "sha256": "38954961b55298f6ee1f8706d6784128668e0c15ca5b740a522ea60c979318ac",
+      "original_match": true,
+      "shipped_client_match": true,
+      "rows": 3000
+    },
+    {
+      "name": "hole/main_building_config.csv",
+      "sha256": "093d038517fb3e435a91a8beec91f2eef7b7b828563c3b42d811b2d24a32137e",
+      "original_match": true,
+      "shipped_client_match": true,
+      "rows": 51
+    },
+    {
+      "name": "hole/garden_building_config.csv",
+      "sha256": "401bf0d54f91c79538e3965058a3cb5197f4851b7a320c6da147b34f491a0d44",
+      "original_match": true,
+      "shipped_client_match": true,
+      "rows": 51
+    },
+    {
+      "name": "hole/temple_config.csv",
+      "sha256": "41477616f6fa248f3bf2245c22cf813688118e2a88d4a1bf53a11e5f2d2e17ce",
+      "original_match": true,
+      "shipped_client_match": true,
+      "rows": 51
+    },
+    {
+      "name": "hole/upgrade_building_materials.csv",
+      "sha256": "4b2cc5b2fb7abd12b5c0f680ba0e2fea64957b57f876b48a90463bc19c2a6937",
+      "original_match": true,
+      "shipped_client_match": true,
+      "rows": 190
+    },
+    {
+      "name": "hole/garden_grid_config.csv",
+      "sha256": "1d8cbeb7f0f32e8ed3f23dcc57c3c21cd0c686179bd1c7deb4beb1e817e56088",
+      "original_match": true,
+      "shipped_client_match": true,
+      "rows": 30
+    },
+    {
+      "name": "hole/temple_level_plus.csv",
+      "sha256": "4500366d726e74e1bde4bca72336015ccc4e1e20b5a4497bdbde4b2adb6d2292",
+      "original_match": true,
+      "shipped_client_match": true,
+      "rows": 357
+    },
+    {
+      "name": "hole/temple_ext_prize.csv",
+      "sha256": "30cc9314b8d81a67747560ffc422e0ed598e5a8c4cffadd3533faaef12634d5f",
+      "original_match": true,
+      "shipped_client_match": true,
+      "rows": 1
+    }
+  ],
+  "tests": 212,
+  "failures": 0,
+  "errors": 0,
+  "suites": [
+    "test_immortal_hotupdate",
+    "test_growth_values",
+    "test_formation",
+    "test_level_culture",
+    "test_expbooks",
+    "test_reborn",
+    "test_journey",
+    "test_activity_home",
+    "test_activity",
+    "test_cortege_recycle"
+  ],
+  "payload_verified": true,
+  "temporary_payload_bundle_id": "74e1371576643abe3ee011e2883c2d8f9729f01da281d36390bc75885fde477e",
+  "client_resource_version": 1263,
+  "released_apk_sha256": "8a64adf4a37c95d801b95c217f168e0c24e023017bfd54e8b2ef6a88aa20e458",
+  "lua51_compile": true,
+  "expbook_adapter_checks": [
+    "installation is idempotent",
+    "forty templates and 400 million scrolls render forty rows",
+    "same-template stacks merge and locked or empty stacks are excluded",
+    "mixed quantities preserve exact experience and native wire grouping",
+    "large manual quantity does not expand requests",
+    "invalid quantity callbacks never select or send",
+    "clicking a selected row cancels its whole quantity",
+    "cancel one or all clears counts and previews",
+    "all-select stops before the under-80 efficiency threshold",
+    "all-select respects existing choices and exact-fit cap",
+    "all-select never spends an oversized scroll to cross the cap",
+    "switching to a near-cap target trims counts rather than whole stacks",
+    "full-level target selects nothing",
+    "rebuilding after use reflects current stock and resets selection",
+    "changing material pages clears the old full-experience state and preview",
+    "a stale picker cannot change a rebuilt list",
+    "a stale picker cannot change a different target or page",
+    "single remaining scroll uses one without a quantity dialog",
+    "legacy single-scroll fixtures still group by type ID",
+    "experience pills keep their own page and request flag",
+    "hotupdate level-600 selection uses the full curve and large experience",
+    "empty inventories display no rows and send no empty use request",
+    "restore returns all patched functions and allows reinstall"
+  ],
+  "native_ui_playthrough": false,
+  "limits": {
+    "ascension": 499,
+    "recycle": 499,
+    "experience": {
+      "1": 600,
+      "2": 600,
+      "3": 600,
+      "4": 600,
+      "5": 600
+    },
+    "buildings": {
+      "1": 50,
+      "2": 50,
+      "3": 50,
+      "4": 20,
+      "5": 20
+    }
+  },
+  "caveat": "A validates original client tables and contracts, not original server transactions. Existing v107 APK backend is unchanged.",
+  "lua_followup": "23 checks including added level-600 and large-experience selection regression; executed after the 212-test backend suite started."
+}

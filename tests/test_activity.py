@@ -28,6 +28,17 @@ class ActivityCase(unittest.TestCase):
         return [(d['id'],login_fields(d['data'])) for m,_,d in self.decoded if m==2998]
     def ok(self,events):self.assertNotIn(55,[e for e,_ in events],events)
 
+    def legacy_babel_floor(self):
+        """Persist an old fixed floor for coordinate-based compatibility cases."""
+        from network_redirect import activity_babel as babel
+        role = self.b.profile()
+        state = babel.state(role, NOW, self.b.activity_rules)
+        fixture = dict(cur_floor=11, floors={})
+        babel.generate(fixture)
+        state['floors']['1'] = fixture['floors']['11']
+        state['locale'] = dict(row=1, column=1)
+        self.b.save(role)
+
 class ActivityTests(ActivityCase):
     def test_boards_and_bootstrap_limits(self):
         for flag,e in ((0,47),(1,48)):
@@ -179,6 +190,7 @@ class ActivityTests(ActivityCase):
         out=self.req(1039,des_type=2,des_id=930099);self.ok(out)
         self.assertIn('owner_cheer_info',out[-1][1]);self.assertIn('type_id',out[-1][1]['cortege_list'][1])
     def test_babel_movement_rewards_persist_and_teleport_validation(self):
+        self.legacy_babel_floor()
         self.ok(self.req(1353,id=1,data='{}'))
         self.ok(self.req(1353,id=2,data='{target_pos={row=1,column=2}}'))
         self.ok(self.req(1353,id=2,data='{target_pos={row=1,column=3}}'))

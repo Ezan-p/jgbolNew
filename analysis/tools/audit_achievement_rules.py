@@ -25,6 +25,7 @@ AUTO.update(range(431,440))  # activity_duty consecutive ranked days.
 AUTO.add(445)  # activity_feed successful entry into the local champion position.
 AUTO.update((461,462,463,464,465,560,561,562))  # spirit_array activation/max skills.
 AUTO.update((119,139))  # Committed soul revival and guild treasure search deltas.
+AUTO.update(range(580,591))  # Hotupdate fate activation/per-companion soul milestones.
 AUTO &= set(a.OPEN)
 INDIRECTLY_BLOCKED = {401: [120,134]}
 CONFIRMED_TRIGGER_GAPS = set()
@@ -44,14 +45,17 @@ def audit():
     exported = ROOT/'analysis/configs/achievements_config.csv'
     normalize = lambda p: p.read_text(encoding='utf-8-sig').strip()
     assert normalize(original) == normalize(exported)
-    result = dict(audit_date='2026-10-27', timezone='Asia/Shanghai',
+    official = ROOT/'analysis/evidence/hotupdate_gap_20261031/official_csv/achievements_config.csv'
+    assert normalize(a.CATALOG_PATH) == normalize(official)
+    result = dict(audit_date='2026-10-31', timezone='Asia/Shanghai',
         scope='Manual code-source registry checked against original CSV; not gameplay completion coverage',
         catalogue_count=len(a.CATALOG), open_count=len(a.OPEN), closed_count=len(a.CATALOG)-len(a.OPEN),
         code_source_candidate_count=len(AUTO), no_natural_source_ids=sorted(set(a.OPEN)-AUTO),
         confirmed_trigger_gap_ids=sorted(CONFIRMED_TRIGGER_GAPS),
         indirectly_blocked_by_missing_first_achievements=INDIRECTLY_BLOCKED,
         configured_wars_enabled=json.loads((ROOT/'server_config/guild_rules.json').read_text())['wars_enabled'],
-        original_catalogue_matches=True, sha256=hashlib.sha256(exported.read_bytes()).hexdigest(),
+        original_catalogue_matches=True, active_hotupdate_catalogue_matches=True,
+        sha256=hashlib.sha256(a.CATALOG_PATH.read_bytes()).hexdigest(),
         coverage={str(i):coverage(i) for i in a.CATALOG})
     path=ROOT/'analysis/evidence/achievements/audit.json';path.parent.mkdir(parents=True,exist_ok=True)
     path.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')

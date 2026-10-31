@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "mode": "inferred",
-  "revision": "2026-10-26.1",
-  "reason": "用户提供四种乾坤袋表格；品质概率照表，类别权重及每次数量为离线版设计。",
+  "revision": "2026-10-31.2",
+  "reason": "用户提供四种乾坤袋表格；2026-10-31按用户要求在VIP高品质池加入四星武器、防具、法宝，并将VIP高品质概率从5%降至1%，减少的4%分配到低品质，低／中／高为69%／30%／1%；其他袋概率、类别权重及每次数量保持不变，批量无保底。",
   "bags": {
     "1034": {
       "name": "棉布乾坤袋",
@@ -422,7 +422,7 @@
       "min_vip": 1,
       "tiers": {
         "low": {
-          "weight": 65,
+          "weight": 69,
           "groups": [
             {
               "pool": "small_bun",
@@ -547,16 +547,26 @@
           ]
         },
         "high": {
-          "weight": 5,
+          "weight": 1,
           "groups": [
             {
+              "pool": "weapon_4",
+              "weight": 20,
+              "count": 1
+            },
+            {
               "pool": "weapon_5",
-              "weight": 35,
+              "weight": 15,
+              "count": 1
+            },
+            {
+              "pool": "armor_4",
+              "weight": 20,
               "count": 1
             },
             {
               "pool": "armor_5",
-              "weight": 30,
+              "weight": 10,
               "count": 1
             },
             {
@@ -565,8 +575,13 @@
               "count": 1
             },
             {
+              "pool": "treasure_4",
+              "weight": 3,
+              "count": 1
+            },
+            {
               "pool": "treasure_5",
-              "weight": 5,
+              "weight": 2,
               "count": 1
             },
             {

@@ -90,11 +90,13 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
             typ,tid,n,lv=p
             require(0<n<=1000000 and 1<=lv<=200 and ((typ in (11,12)) or (typ==5 and tid in formation.ITEMS)),'活动奖励无效')
     require(len(r['land_card_rewards'])>=5 and len({tuple(p) for p in r['land_card_rewards']})==len(r['land_card_rewards']),'猎魂翻牌奖池至少需要5档不同奖励')
+    from .activity_land_rewards import validate_cards
+    validate_cards(r)
     require(all(p[0]==11 and p[1]==0 and p[3]==1 for p in r['pray_rewards']),'神石祈福奖励必须为元宝')
     require(len(r['abyss_map_rewards'])==12 and r['abyss_map_remove_count']+r['abyss_map_paid_draws']<12,'宝图奖盘或次数无效')
     require(set(r.get('train_increase',{}))==set(formation.STATS) and all(type(v)is int and 0<v<=10000 for v in r['train_increase'].values()),'修炼属性配置无效')
     for name in ('undergo_shop','home_shop','abyss_shop'):
-        require(isinstance(r.get(name),list) and 1<=len(r[name])<=30,'活动商店配置无效')
+        require(isinstance(r.get(name),list) and 1<=len(r[name])<=(60 if name=='abyss_shop' else 30),'活动商店配置无效')
         for goods in r[name]:
             p=goods.get('reward')
             require(isinstance(p,list) and len(p)==4 and all(type(v)is int for v in p) and p[0]==5 and p[1] in formation.ITEMS and 1<=p[2]<=100000 and p[3]==1,'活动商品无效')
@@ -106,16 +108,37 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
             else:require(type(goods.get('cost'))is int and 0<goods['cost']<=1000000,'活动商品价格无效')
     require(type(r.get('undergo_shop_daily_count')) is int and r['undergo_shop_daily_count']==6, '幻境商店每日须抽取6种商品')
     require(isinstance(r.get('undergo_shop_revision'),str) and bool(r['undergo_shop_revision']), '幻境商店版本缺失')
-    expected_undergo = {1001:20,1343:1,1024:1,1002:1,1041:1,1034:1,1033:1,1032:1,1031:1,
-                        1249:3,1313:1,1320:1,1321:1,1322:1,1323:1,1310:5,1311:5,1312:5}
+    # Complete equipment material pool: three essences, three vessels, five crystals.
+    expected_undergo = {1310,1311,1312,1313,1314,1334,1320,1321,1322,1323,1335}
     require(len(r['undergo_shop'])==len(expected_undergo) and
-            {p['reward'][1]:p['reward'][2] for p in r['undergo_shop']}==expected_undergo,
-            '幻境商店商品池或单次兑换数量无效')
-    require(all(p['limit'] == (3 if p['cost'] >= 1000 else 5) for p in r['undergo_shop']),
-            '幻境商店每份1000仙晶及以上限兑3次，其余限兑5次')
+            {p['reward'][1] for p in r['undergo_shop']}==expected_undergo,
+            '幻境商店须包含全部11种精华、水晶和灵器材料，且不得重复')
+    require(all(p['limit'] == (1 if p['cost'] >= 3600 else 2 if p['cost'] >= 1800 else
+                              3 if p['cost'] >= 900 else 5) for p in r['undergo_shop']),
+            '幻境商店每份3600/1800/900仙晶及以上分别限兑1/2/3次，其余限兑5次')
     require(type(r.get('abyss_shop_daily_count')) is int and 1<=r['abyss_shop_daily_count']<=len(r['abyss_shop']), '九幽每日商品数量无效')
     require(isinstance(r.get('abyss_shop_revision'),str) and bool(r['abyss_shop_revision']), '九幽商店版本缺失')
     require(len({tuple(x['reward']) for x in r['abyss_shop']})==len(r['abyss_shop']), '九幽商店商品不得重复')
+    # Keep progression materials, excluding all normal/advanced essences.
+    def cost_ids(filename, prefix):
+        return {int(part.split('|')[1]) for row in summon.rows(filename)
+                for key,value in row.items() if key.startswith(prefix) for part in value.split('/')}
+    material_categories={
+        'reborn':cost_ids('cortege_reborn_layer.csv','consum_list') |
+                 (cost_ids('cortege_reborn_vein.csv','consume_list') & {10000}),
+        'apotheosis':cost_ids('equip_reborn_base.csv','cosume_item') |
+                     cost_ids('equip_reborn_advance.csv','consume_list')}
+    slots=r.get('abyss_shop_category_slots')
+    require(isinstance(slots,dict) and set(slots)==set(material_categories) and
+            all(type(n)is int and n==3 for n in slots.values()) and
+            sum(slots.values())==r['abyss_shop_daily_count'],'九幽商店神仙转生、装备封神材料必须各选3种')
+    for p in r['abyss_shop']:
+        require(isinstance(p.get('category'),str) and p['category'] in material_categories and
+                p['reward'][1] in material_categories[p['category']], '九幽商店仅允许转生与封神材料，不含普通或高级精魄')
+        require(type(p.get('weight'))is int and 1<=p['weight']<=10000,'九幽商店抽取权重无效')
+    for category, allowed in material_categories.items():
+        ids=[p['reward'][1] for p in r['abyss_shop'] if p['category']==category]
+        require(len(ids)==len(set(ids)) and set(ids)==allowed,'九幽商店材料缺失或重复')
     from . import abyss_balance
     abyss_balance.load_rules()
     from . import activity_fish
@@ -371,7 +394,7 @@ def battle(role,req,now,r,jrules,frules):
     if ft==6:
         for u in units[0]:u['gongji']=u['gongji']*(100+s['party_bonus']*10)//100
         hp=boss['cur_hp']
-        units[1][0].update(hp=hp,max_hp=activity_party.rules()['boss_hp'])
+        activity_party.prepare_boss(units[1][0],boss)
     result,lineup,actions=journey.battle(role,cfg,jrules,units=units);win=1<=result<=3
     events=[];s['fight_id']+=1;fid=s['fight_id']
     if ft==6:
@@ -390,6 +413,9 @@ def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     from . import feature_levels
     feature_levels.check(role, mid, req)
     s=prepare(role,now,r,peers)
+    if mid==1051 and req['item_type']==1363:
+        from . import activity_home
+        return activity_home.use_tianxian_token(role,req)
     if mid==1131:
         from . import progression
         return progression.settle(role,req,now)

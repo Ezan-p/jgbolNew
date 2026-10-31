@@ -127,7 +127,9 @@ class Battle:
                 for stat in ('gongji', 'fangyu', 'magic'):
                     u['entry_' + stat] = u[stat]
                 if u['hp'] > 0:
-                    extra = int(F(u['base_hp']) * c.effect(u, 13)[0] / 100)
+                    # [B] New "HP cap" wording uses the complete incoming panel.
+                    # base_hp stays unchanged for explicitly base-HP healing/poison.
+                    extra = int(F(u['max_hp']) * c.effect(u, 13)[0] / 100)
                     u['max_hp'] += extra
                     u['hp'] += extra
         self.deploy()
@@ -265,6 +267,20 @@ class Battle:
         return total, was_dead
 
     def attack(self, actor, targets, skill=1, level=1, scale=100, kind='main'):
+        # Party-only encounter rule: one boss AOE ends the whole challenge,
+        # including reserves and units with shields, survival or resurrection.
+        # The server adds this marker only to the party boss battle snapshot.
+        if (kind == 'main' and actor['side'] == 2 and actor.get('party_finisher_skill') == skill
+                and actor['hp'] > 0 and actor['order'] in self.active_orders[2] and self.can_act()):
+            opponents = self.alive(1)
+            if opponents:
+                row, index = self.row(actor, opponents, skill)
+                for target in opponents:
+                    row['damage_list'][target['order'] - 1] = target['hp']
+                    self.actions.damage_totals[2] += target['hp']
+                    self.shield_absorb(target, target['shield'], index)
+                    target['hp'] = 0
+            return
         targets = [u for u in targets if u['hp'] > 0 and u['order'] in self.active_orders[u['side']]]
         if not actor['hp'] or actor['order'] not in self.active_orders[actor['side']] or not targets or not self.can_act():
             return
@@ -288,8 +304,10 @@ class Battle:
                 chance, rate, *_ = c.effect(actor, 16)
                 if rate and c.roll(chance):
                     old = target.get('poison')
-                    if old is None or rate >= old['rate']:
-                        target['poison'] = dict(rate=rate, source_side=actor['side'], logic=self.logic(actor, 16) + 1)
+                    layers = [] if old is None else old.get('layers', [old])
+                    layers.append(dict(rate=rate, source_side=actor['side'], logic=self.logic(actor, 16) + 1,
+                                       remaining=self.policy['poison_duration_rounds']))
+                    target['poison'] = dict(layers=layers)
                 # Secondary actions never recurse into counter/combo/execute chains.
                 chance, scale_back = c.effect(target, 3)
                 if kind == 'main' and scale_back and c.roll(chance) and not c.roll(c.effect(actor, 4)[0]):
@@ -394,12 +412,29 @@ class Battle:
             if poison:
                 # Dedicated zero-damage action anchors pre-turn HP events, including lethal poison.
                 _, index = self.row(unit, [unit], self_use=True)
-                amount = min(self.policy['poison_max_damage'], int(F(unit['base_hp']) * poison['rate'] / 100))
-                loss = self.lose_hp(unit, amount, poison['source_side'], index)
-                self.event(unit, poison['logic'], -loss, index)
-                died = unit['hp'] == 0
-                self.revive(unit, index)
-                self.deploy(index)
+                # [A] Stackable, three rounds, 200000 single-hit cap.
+                # [B] Each layer ticks at three round starts with its own cap,
+                # in application order; cleanse removes all layers.
+                # Accept the old single-layer shape for injected/replay fixtures.
+                layers = poison.get('layers', [poison])
+                died = False
+                for layer in layers:
+                    amount = min(self.policy['poison_max_damage'], int(F(unit['base_hp']) * layer['rate'] / 100))
+                    loss = self.lose_hp(unit, amount, layer['source_side'], index)
+                    self.event(unit, layer['logic'], -loss, index)
+                    layer['remaining'] = layer.get('remaining', self.policy['poison_duration_rounds']) - 1
+                    if unit['hp'] == 0:
+                        died = True
+                        unit.pop('poison', None)
+                        self.revive(unit, index)
+                        self.deploy(index)
+                        break
+                if not died:
+                    remaining = [layer for layer in layers if layer['remaining'] > 0]
+                    if remaining:
+                        unit['poison'] = dict(layers=remaining)
+                    else:
+                        unit.pop('poison', None)
                 if died:
                     continue
             chance, rate = c.effect(unit, 10)

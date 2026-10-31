@@ -292,6 +292,24 @@ check('experience pills keep their own page and request flag',function()
  ui.sendEatExpbookRequest();same(sends[1].data.flag,2);same(sends[1].data.roll_count,1)
  same(sends[1].data.roll_list[1].type_id,2001);same(sends[1].data.roll_list[1].count,7)
 end)
+check('hotupdate level-600 selection uses the full curve and large experience',function()
+ for i=301,600 do curve[i]=100 end
+ local old599=curve[599]
+ curve[599]=6678867917 -- Original 1263 row; exceeds a 32-bit integer.
+ cap=600;character.level=599;character.cur_exp=0
+ ms.d_mainUI.g_playerInfo.level=80
+ fresh({item(1080,10000000)})
+ ui.selectAllExpBook()
+ same(ui.g_self.MAXLV,600)
+ same(find(1080).selectedCount,42)
+ same(ui.getTotalExp(),6552000000)
+ character.level=600
+ fresh({item(1080,10000000)})
+ ui.selectAllExpBook();same(ui.getTotalExp(),0)
+ curve[599]=old599
+ for i=301,600 do curve[i]=nil end
+ restoreSettings()
+end)
 check('empty inventories display no rows and send no empty use request',function()
  fresh({item(1041,0),item(1042,10,true)})
  same(#ui.g_self.expbook,0);same(ui.getTotalExp(),0)

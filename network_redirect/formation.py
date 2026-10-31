@@ -25,6 +25,8 @@ EXPERIENCE = {(int(r['quality']), int(r['level'])): int(r['experience'])
 EVOLVE_COST = {int(r['level']): int(r['count']) for r in summon.rows('cortege_evolution.csv')}
 EVOLVE_POINTS = {(int(r['cortege_quality']), int(r['level'])): int(r['culture_point'])
                  for r in summon.rows('cortege_evolve_config.csv')}
+DEVOLVE = {int(r['evolve_level']): r for r in summon.rows('cortege_devolve.csv')}
+EXPERIENCE_CAPS = {q: max(l for quality, l in EXPERIENCE if quality == q) for q in range(1, 6)}
 COMPOSE = {int(r['cortege_quality']): int(r['spirit_compose_count'])
            for r in summon.rows('cortege_quality.csv')}
 EQUIP_COST = {int(r['level']): r for r in summon.rows('equip_enhance_cost.csv')}
@@ -496,7 +498,7 @@ def evolve(role, req):
     require(not c.get('pending_training'), '请先处理待确认的培养结果')
     if req['flag'] == 1:
         level = c.get('evolve_level', 0)
-        cfg = next((r for r in summon.rows('cortege_devolve.csv') if int(r['evolve_level']) == level), None)
+        cfg = DEVOLVE.get(level)
         require(cfg and quality in (4, 5), '该神仙不能回收飞升')
         refund = next((int(k) for k, r in ITEMS.items() if int(r['main_type']) == 11
                        and int(r['quality']) == quality and int(r['sub_type']) == int(BASES[c['type']]['category'])), None)
@@ -525,6 +527,22 @@ def evolve(role, req):
     return [(50, dict(cortege_id=c['id'], evolve_level=level))]
 
 
+def companion_level_cap(role, quality):
+    """[A] expbookUI: base 200 + main-building bonus, and 3x role below 80.
+
+    Read the persisted building when present, so feeding/battles after reconnect
+    do not depend on visiting the home UI to refresh the cached bonus.
+    """
+    home = role.get('activity', {}).get('home')
+    if home is not None:
+        from .activity_home import BUILD
+        bonus = int(BUILD[1][home['build']['1']]['coretege_limit_plus'])
+    else:
+        bonus = role.get('cortege_limit_plus', 0)
+    top = min(EXPERIENCE_CAPS[quality], 200 + bonus)
+    return min(top, role['level'] * 3) if role['level'] < 80 else top
+
+
 def feed(role, req, rules):
     require(req['flag'] in (1, 2) and req['first_send'], '经验物品请求无效')
     require(req['flag'] != 2 or role['level'] >= 65, '角色65级开放经验丹')
@@ -532,9 +550,7 @@ def feed(role, req, rules):
     rolls = req['roll_list']
     require(rolls and len(rolls) == req['roll_count'] and len({r['type_id'] for r in rolls}) == len(rolls), '经验书列表无效')
     quality = int(BASES[c['type']]['quality'])
-    top = min(max(l for q, l in EXPERIENCE if q == quality), 200 + role.get('cortege_limit_plus', 0))
-    if role['level'] < 80:
-        top = min(top, role['level'] * 3)
+    top = companion_level_cap(role, quality)
     require(c['level'] < top, '神仙已达当前等级上限')
     gain = 0
     # [A] expbookUI groups by type_id, never by name, icon or instance level.

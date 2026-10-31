@@ -54,7 +54,7 @@ class MarketTests(unittest.TestCase):
         cfg = login_fields(decode(packet)[2]['data'])
         self.assertEqual(cfg[23], self.backend.formation_rules['equipment_advance'])
         goods = cfg[10]
-        self.assertEqual(len(goods['cheap_item_list']), 8)
+        self.assertEqual(len(goods['cheap_item_list']), 10)
         self.assertEqual(len(goods['rich_item_list']), 15)  # forge tokens and regular-price buns
         self.assertNotIn(9137, goods['rich_item_list'])
         self.assertEqual(len(goods['limit_item_list']), 0)
@@ -98,7 +98,7 @@ class MarketTests(unittest.TestCase):
         self.assertEqual(catalog['cheap_item_list'][15]['buy_price'], 100)
         for index, row in catalog['cheap_item_list'].items():
             if index != 15:
-                self.assertEqual(row['buy_limit_times'], 10 if row['type_id'] == 1022 else 1)
+                self.assertEqual(row['buy_limit_times'], {1022: 10, 1093: 2, 1023: 10}.get(row['type_id'], 1))
         before = self.count(1024)
         for remaining in (1, 0):
             self.assertEqual(self.buy(page_id=1, index=15, type_id=1024)['result'], 1)
@@ -169,6 +169,44 @@ class MarketTests(unittest.TestCase):
         self.now = midnight
         self.assertEqual(self.request(first_send=1)[0][1]['cheap_item_list'][index]['buy_limit_times'], 10)
         self.assertEqual(self.buy(page_id=1, index=index, type_id=1022)['result'], 1)
+
+    def test_discount_drill_and_elixir_purchase_limits_and_reset(self):
+        for index, type_id, origin, price, limit in ((26, 1093, 200, 100, 2), (27, 1023, 20, 10, 10)):
+            with self.subTest(type_id=type_id):
+                goods = self.request(first_send=1, page_id=1)[0][1]
+                row = goods['cheap_item_list'][index]
+                self.assertEqual((row['type_id'], row['count'], row['origin_price'], row['buy_price'],
+                                  row['buy_limit_times'], row['money_type'], row['vip_level'], row['is_day_limit']),
+                                 (type_id, 1, origin, price, limit, 11, 0, 1))
+                role = self.backend.profile()
+                role['gold_coin'] = price - 1
+                self.backend.save(role)
+                saved = self.backend.profile()
+                self.assertEqual(self.buy(page_id=1, index=index, type_id=type_id)['result'], 6)
+                self.assertEqual(self.backend.profile(), saved)
+                role['gold_coin'] = 10000
+                self.backend.save(role)
+                stock = self.count(type_id)
+                for used in range(1, limit + 1):
+                    result = self.buy(page_id=1, index=index, type_id=type_id)
+                    self.assertEqual(result['result'], 1)
+                    self.assertEqual(result['attach_list'], {1: market.attachment(type_id, 1)})
+                    self.assertEqual(self.backend.respond(self.packet, self.state), self.replies)
+                    self.assertEqual(self.count(type_id), stock + used)
+                    self.assertEqual(self.backend.profile()['gold_coin'], 10000 - price * used)
+                    self.assertEqual(self.request(first_send=1)[0][1]['cheap_item_list'][index]['buy_limit_times'], limit - used)
+                saved = self.backend.profile()
+                self.assertEqual(self.buy(page_id=1, index=index, type_id=type_id)['result'], 7)
+                self.assertEqual(self.backend.profile(), saved)
+                self.backend.close()
+                self.backend = Backend(Path(self.tmp.name), 18770, lambda *a, **kw: None)
+                self.assertEqual(self.request(first_send=1)[0][1]['cheap_item_list'][index]['buy_limit_times'], 0)
+                midnight = market.day_start(self.now, self.rules) + 86400
+                self.now = midnight - 1
+                self.assertEqual(self.buy(page_id=1, index=index, type_id=type_id)['result'], 7)
+                self.now = midnight
+                self.assertEqual(self.request(first_send=1)[0][1]['cheap_item_list'][index]['buy_limit_times'], limit)
+                self.assertEqual(self.buy(page_id=1, index=index, type_id=type_id)['result'], 1)
 
     def test_discount_buns_failed_purchase_keeps_balance_and_quota(self):
         role = self.backend.profile(); role['gold_coin'] = 4; self.backend.save(role)

@@ -19,7 +19,7 @@ def main():
         summon.add_item(role,1141,3000)
         def req(flag,index=0,count=0,ten_card=0,five_card=0):
             return login_fields(decode(p.settle(role,dict(flag=flag,index=index,count=count,ten_card=ten_card,five_card=five_card),now)[0])[2]['data'])
-        fixtures=dict(entry=req(1),status=p.status(role,now),exchange=req(2,3,2),gift=req(3,1))
+        fixtures=dict(entry=req(1),status=p.status(role,now),exchange=req(2,4,2),gift=req(3,1))
         fixtures['ascension'] = []
         for gold in (0, 10000, 30000):
             trial = b.profile(); trial['level']=99

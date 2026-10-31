@@ -92,7 +92,14 @@ def store(s,r):
 def refresh_store(s,r):
     pool=copy.deepcopy(r['store']);rows=[]
     for slot in range(1,r['store_count']+1):
-        row=pool.pop(roll(s,len(pool)))
+        # Weighted sampling without replacement; old configs remain uniform.
+        ticket=roll(s,sum(row.get('weight',1) for row in pool))
+        for index,candidate in enumerate(pool):
+            weight=candidate.get('weight',1)
+            if ticket<weight:
+                row=pool.pop(index)
+                break
+            ticket-=weight
         # Native purchase callbacks address contiguous display slots.
         row['id']=slot
         rows.append(row)

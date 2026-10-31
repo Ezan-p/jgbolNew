@@ -111,7 +111,7 @@ def main():
     lines += ['', '## 10. 审计附件与验证边界', '',
               '[机器可读全量概率](../analysis/evidence/qiankun_bag_pools/probabilities.json)记录每条路径的对象、ID、数量、精确概率与合并期望，并保存配置和原表SHA-256以便复核。此文件由实际配置生成，不是手写第二套奖池。', '',
               '专项测试穷举全部整数票验证品质／组概率质量，逐个验证所有候选的首尾路径；真实1051报文逐组检验奖励、数量、货币和实例，验证15次独立抽取、所选堆叠扣除、VIP门槛、非法目标／数量／状态、货币上限、编码／发奖失败回滚、请求重放及重启后的存档持久性。测试使用临时SQLite账号，不修改玩家实际存档。', '',
-              '精确区间与候选概率验证不依赖大样本恰好接近期望值；有限次真实随机结果允许统计波动，不保证每100袋恰好按65／30／5分配。客户端可见动画和全部物品图标仍需实际游戏目视验收。', '']
+              '精确区间与候选概率验证不依赖大样本恰好接近期望值；有限次真实随机结果允许统计波动，不保证每100袋恰好按配置的品质比例分配。客户端可见动画和全部物品图标仍需实际游戏目视验收。', '']
     paths=[q.PATH]+[ROOT/'analysis/configs'/n for n in ('item_base.csv','item_name.csv','skill_base.csv','skill_name.csv')]
     report=dict(revision=rules['revision'],official_server_probability=False,
                 inputs=[dict(path=str(p.relative_to(ROOT)),sha256=hashlib.sha256(p.read_bytes()).hexdigest()) for p in paths],

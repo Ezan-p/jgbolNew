@@ -53,7 +53,7 @@ Interceptor.attach(m.getExportByName('lua_pcall'),{onEnter(args){
     passed=len(checks)==24 and all(c['passed'] for c in checks)
     report=dict(passed=passed,checks=checks,raw=messages,live_account_resources_changed=False,
                 native_cocos=True,detached_layer=True,network_sends_captured=True)
-    path=ROOT/'analysis/evidence/pavilion/client_validation.json'
+    path=ROOT/'analysis/evidence/pavilion/catalog_1263_client_validation.json'
     path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print(f'{sum(c["passed"] for c in checks)}/{len(checks)} original Cocos checks passed')
     if not passed:raise SystemExit(1)

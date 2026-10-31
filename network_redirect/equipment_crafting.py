@@ -246,6 +246,11 @@ def material_transform(role, req):
     flag, times = req['flag'], req['num']
     f.require(flag in (1, 2, 3, 4, 5) and 1 <= times <= 255, '材料转换参数无效')
     items = selected(role, req['id_list'], req['count'])
+    if any(item['type_id'] == 1378 for item in items):
+        from . import reborn_stars
+        f.require(flag == 2 and len(items) == 1, '命星碎片合成参数无效')
+        held = sum(x['count'] for x in role['attachments'] if x['type_id'] in reborn_stars.STARS and not x.get('owner_id'))
+        f.require(held + times <= 200, '命星背包已满')
     from . import immortal
     if flag == 4:
         return immortal.transform(role, req)

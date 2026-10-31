@@ -16,7 +16,7 @@ class QiankunPoolTests(unittest.TestCase):
     def test_table_rates_and_full_original_equipment_skill_coverage(self):
         rules = q.load_rules()
         expected = {'1034': (65, 30, 5), '1033': (50, 40, 10),
-                    '1032': (40, 40, 20), '1031': (65, 30, 5)}
+                    '1032': (40, 40, 20), '1031': (69, 30, 1)}
         for tid, weights in expected.items():
             self.assertEqual(tuple(rules['bags'][tid]['tiers'][k]['weight'] for k in q.TIERS), weights)
             self.assertTrue(vip.handles(1051, dict(item_type=int(tid))))
@@ -145,6 +145,34 @@ class QiankunWireTests(unittest.TestCase):
             self.assertEqual(len(entries),5)
             self.assertEqual(len({x['id'] for x in entries}),5)
         self.assertEqual(sum(x['count'] for x in role['attachments'] if x['type_id']==6005),25)
+
+    def test_vip_batches_allow_no_high_tier_rewards(self):
+        # Exercise real quality/category selection through 1051, without
+        # mocking draw(): every batch size may miss high, even repeatedly.
+        for vip_level in (1, 10):
+            role = self.b.profile(); role['vip_level'] = vip_level; self.b.save(role)
+            for tier_roll, kind, target, amount in ((68, 5, 1020, 1), (98, 11, 1, 20)):
+                for count in (*range(1, 16), 15):
+                    with self.subTest(vip=vip_level, tier_roll=tier_roll, count=count):
+                        ident = self.add(1031, count=count)
+                        before = self.b.profile()
+                        with patch.object(summon.secrets, 'randbelow',
+                                          side_effect=[tier_roll, 0] * count) as rng:
+                            event = self.use(1031, ident, count)[-1]
+                        self.assertEqual(event[0], 21, event)
+                        self.assertEqual(rng.call_count, 2 * count)
+                        prizes = list(event[1]['attach_list'].values())
+                        self.assertEqual(prizes, [dict(object_type=kind, attach_type=target,
+                                                      attach_count=amount, attach_level=1)] * count)
+                        after = self.b.profile()
+                        self.assertFalse(any(x['id'] == ident for x in after['attachments']))
+                        if kind == 11:
+                            self.assertEqual(after['gold_coin'] - before['gold_coin'], amount * count)
+                        else:
+                            def total(profile):
+                                return sum(x['count'] for x in profile['attachments']
+                                           if x['attach_type'] == kind and x['type_id'] == target)
+                            self.assertEqual(total(after) - total(before), amount * count)
 
     def test_invalid_requests_do_not_consume_or_draw(self):
         for tid in q.BAGS:

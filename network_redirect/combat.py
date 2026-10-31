@@ -169,7 +169,9 @@ def validate_rules(rules):
     require(curve['high'] > curve['low'] and 0 <= curve['low_multiplier'] <= curve['high_multiplier'], '强度曲线范围无效')
     policy = rules.get('mechanics', {})
     require(policy.get('revision') == 'inferred-v2', '战斗事件配置版本无效')
-    for key, lo, hi in [('poison_max_damage', 1, 10000), ('rulai_shield_probability', 0, 100),
+    require(type(policy.get('poison_duration_rounds')) is int and policy['poison_duration_rounds'] == 3, '咒罚持续回合配置无效')
+    require(policy.get('poison_stack_policy') == 'independent_ticks', '咒罚叠层策略无效')
+    for key, lo, hi in [('poison_max_damage', 200000, 200000), ('rulai_shield_probability', 0, 100),
                         ('normal_revive_limit', 1, 1), ('advanced_revive_limit', 2, 2),
                         ('event_budget_bytes', 1000, 12000)]:
         require(type(policy.get(key)) is int and lo <= policy[key] <= hi, '战斗事件配置无效：' + key)
@@ -187,9 +189,11 @@ def validate_rules(rules):
 def begin_action(actor, round_no):
     """[B] War intent uses completed pairs of rounds; intimidation lasts one action."""
     base = actor.setdefault('base_gongji', actor['gongji'])
-    actor['gongji'] = max(0, F(base) * (1 + (round_no // 2) * effect(actor, 12)[0] / 100)
-                          * (1 + max(0,round_no-1)*F(str(actor.get('fate_traits',{}).get('round_attack',[0])[0]))/100)
-                          - F(base) * actor.pop('attack_reduction', 0) / 100)
+    attack = (F(base) * (1 + (round_no // 2) * effect(actor, 12)[0] / 100)
+              * (1 + max(0,round_no-1)*F(str(actor.get('fate_traits',{}).get('round_attack',[0])[0]))/100))
+    # [A] New wording reduces attack, no longer only base attack.
+    # [B] Apply once after round buffs; multiple intimidations keep the strongest.
+    actor['gongji'] = max(0, attack * (1 - F(actor.pop('attack_reduction', 0)) / 100))
 
 
 def after_hit(actor, target):

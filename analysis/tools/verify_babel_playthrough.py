@@ -1,6 +1,7 @@
 """60-floor real-combat wire playthrough on a disposable catalog army, no stat boosts."""
 import copy
 import json
+from collections import deque
 from pathlib import Path
 import sys
 import tempfile
@@ -40,21 +41,36 @@ def main():
             return request(2,target_pos=dict(row=row,column=col))
         request(1); request(3)
         # Explore the full first floor, including all keys/boxes, both tools,
-        # obstacles and all three colored guards; then use a short route.
-        path=((1,2),(1,3),(1,4),(1,5),(2,5),(1,5),(1,4),(1,3),(2,3),(2,4),
-              (1,4),(1,3),(1,2),(2,2),(3,2),(3,3),(3,4),(4,4),(4,3),(4,2),
-              (4,3),(4,4),(4,5),(4,6),(4,7),(5,7),(5,8))
-        short=((2,1),(3,1),(4,1),(5,1),(5,2),(5,3),(5,4),(5,5),(5,6),(4,6),(4,7),(5,7),(5,8))
+        # obstacles and all three colored guards. Find routes from saved maps,
+        # so the early random floors exercise the same protocol as fixed ones.
+        def route(typ):
+            s=backend.profile()['activity']['babel']; grid=s['floors'][str(s['cur_floor'])]
+            target=next(((r,c) for r,line in enumerate(grid,1) for c,cell in enumerate(line,1)
+                         if cell['elem_type']==typ),None)
+            if target is None:return []
+            start=(s['locale']['row'],s['locale']['column'])
+            pending=deque([(start,[])]); seen={start}
+            while pending:
+                (row,col),path=pending.popleft()
+                if (row,col)==target:return path
+                for r,c in ((row-1,col),(row+1,col),(row,col-1),(row,col+1)):
+                    if (1<=r<=5 and 1<=c<=8 and (r,c) not in seen and
+                            ((r,c)==target or grid[r-1][c-1]['elem_type'] not in (*babel.TOOLS,3))):
+                        seen.add((r,c)); pending.append(((r,c),path+[(r,c)]))
+            raise AssertionError(('unreachable',s['cur_floor'],typ))
         for floor in range(1,61):
             wins=0; actions=0
-            for row,col in path if floor==1 else short:
-                packets=move(row,col)
-                replay=next((d for mid,_,d in packets if mid==1027),None)
-                if replay:
-                    assert 1<=replay['final_result']<=3,(floor,replay['final_result'])
-                    assert replay['fight_type']==200
-                    assert all(len(x['damage_list'])==8 for x in replay['fight_result'])
-                    wins+=1; actions+=replay['fight_round']
+            targets=(20005,20006,20010,20011,20012,20013,20014,20015,
+                     20003,20004,20007,20008,20009,9,3) if floor==1 else (9,3)
+            for typ in targets:
+                for row,col in route(typ):
+                    packets=move(row,col)
+                    replay=next((d for mid,_,d in packets if mid==1027),None)
+                    if replay:
+                        assert 1<=replay['final_result']<=3,(floor,replay['final_result'])
+                        assert replay['fight_type']==200
+                        assert all(len(x['damage_list'])==8 for x in replay['fight_result'])
+                        wins+=1; actions+=replay['fight_round']
             s=backend.profile()['activity']['babel']
             assert s['cur_floor']==min(60,floor+1)
             trace.append(dict(floor=floor,wins=wins,actions=actions,life=s['life'],energy=s['energy'],
@@ -67,7 +83,7 @@ def main():
         s=backend.profile()['activity']['babel']; assert s['complete']
         before=s['coin_count']; move(5,7); move(5,8)
         assert backend.profile()['activity']['babel']['coin_count']==before
-        request(8); request(4,index=2,count=5); request(9); request(4,index=2,count=1)
+        request(8); request(4,index=2,count=1); request(9); request(4,index=2,count=1)
         request(7,floor=1); request(3)
         rank=npc.ranking(backend.profile(),backend.profile()['activity']['babel'],now,backend.activity_rules)
         assert rank['my_top']['order']==1
@@ -78,7 +94,7 @@ def main():
             packets=backend.respond(encode(1103,dict(serial_num=serial,mail_id=mail['mail_id'],flag=1)),session)
         assert backend.profile()['welfare']['mails'][mail['delivery_key']]['claimed']
         request(8)
-        result=dict(passed=True,date='2026-10-26',army=key,stat_boosts=False,seeded_consumables={'20019':10},
+        result=dict(passed=True,date='2026-10-31',army=key,stat_boosts=False,seeded_consumables={'20019':10},
                     seeded_gold=100000,floors=60,wins=sum(v['wins'] for v in trace),requests=serial-100000,
                     restart_at_floor=30,full_first_floor=True,terminal_repeat_safe=True,weekly_mail_claimed=True,
                     balance_claim=False,steps=trace)

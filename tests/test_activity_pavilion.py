@@ -1,6 +1,7 @@
 """Real 1227 packets, original catalog, local recharge/mail, limits and rollback."""
 from recharge_helpers import funded_order
 import copy
+import csv
 import json
 from pathlib import Path
 import tempfile
@@ -77,7 +78,7 @@ class PavilionTests(ActivityCase):
             self.assertEqual(d['exchange_info'][i]['left_buy_count'], int(row['max_buy_count']))
         self.assertFalse(d['had_prize'])
 
-    def test_all_nine_original_rewards_and_first_mail(self):
+    def test_all_catalog_rewards_and_first_mail(self):
         self.stock((1141, 3000))
         for index, row in p.SHOP.items():
             d = self.data(self.call(2, index=index, count=1))
@@ -93,30 +94,103 @@ class PavilionTests(ActivityCase):
         # Original level-9/8 stones must retain their CSV levels, not become piles of level-1 stones.
         self.assertTrue(any(i['type_id']==1090 and i['level']==9 for i in self.b.profile()['attachments']))
 
+    def test_final_catalog_matches_official_evidence(self):
+        evidence = Path(__file__).resolve().parents[1] / 'analysis/evidence/hotupdate_gap_20261031/official_csv/exchange_zone.csv'
+        with evidence.open(encoding='utf-8-sig') as source:
+            official = {int(row['index']): row for row in csv.DictReader(source)}
+        self.assertEqual({i: p.SHOP[i] for i in range(1, 10)}, official)
+        self.assertEqual(set(p.SHOP), set(range(1, 11)))
+
+    def test_gems_batch_limit_first_mail_and_period_reset(self):
+        self.stock((1141, 600))
+        self.data(self.call(2, index=10, count=3))
+        self.assertEqual(self.amount(1141), 150)
+        role = self.b.profile()
+        for tid in (1090, 1091):
+            gems = [i for i in role['attachments'] if i['type_id'] == tid]
+            self.assertEqual(len(gems), 3)
+            self.assertTrue(all(i['level'] == 9 and i['count'] == 1 for i in gems))
+        self.claim_mails()
+        self.assertEqual(self.amount(1092), 1)
+        self.assertEqual(self.data(self.call())['exchange_info'][10]['left_buy_count'], 0)
+        old = self.b.profile()
+        self.assertEqual(self.call(2, index=10, count=1)[0][0], 55)
+        self.assertEqual(self.b.profile(), old)
+        self.assertEqual(self.call(2, index=11, count=1)[0][0], 55)
+        with patch('network_redirect.backend.time.time', return_value=old['pavilion']['end']):
+            row = self.data(self.call())['exchange_info'][10]
+            self.assertEqual((row['left_buy_count'], row['state']), (3, 1))
+            self.stock((1141, 150))
+            self.data(self.call(2, index=10, count=1))
+            self.claim_mails()
+            self.assertEqual(self.amount(1092), 2)
+
+    def test_legacy_catalog_migrates_by_product_without_mail_collision(self):
+        self.stock((1141, 1000), (1142, 2))
+        role = self.b.profile()
+        state = role['pavilion']
+        state.pop('catalog_revision')
+        state.update(bought={'1': 1, '2': 1, '3': 2, '5': 1, '6': 2,
+                             '7': 1, '8': 8, '9': 2, '10': 3, '11': 1},
+                     charge_gold=1000, bricks_earned=140, claimed=[1])
+        # An old rebirth-package mail used slot 4; new home first gifts
+        # cannot collide with it. Preserve all pending attachments unchanged.
+        p.mail(role, f"pavilion-first-{state['start']}-{state['end']}-4",
+               '旧转生赠礼', [[5, 1329, 10, 1]], NOW)
+        old_mails = copy.deepcopy(role['welfare']['mails'])
+        self.b.save(role)
+        data = self.data(self.call())
+        migrated = self.b.profile()
+        self.assertEqual(migrated['pavilion']['bought'],
+                         {'1': 1, '3': 1, '6': 1, '7': 2, '8': 1, '10': 8, '9': 2, '2': 3})
+        self.assertEqual((data['exchange_info'][10]['left_buy_count'],
+                          data['exchange_info'][10]['state']), (0, 3))
+        self.assertEqual(data['exchange_info'][2]['left_buy_count'], 37)
+        self.assertEqual(data['exchange_info'][4]['state'], 1)
+        self.assertEqual((self.amount(1141), self.amount(1142)), (1000, 2))
+        self.assertEqual(migrated['pavilion']['charge_gold'], 1000)
+        self.assertEqual(migrated['pavilion']['bricks_earned'], 140)
+        self.assertEqual(migrated['pavilion']['claimed'], [1])
+        self.assertEqual(migrated['welfare']['mails'], old_mails)
+        self.data(self.call(2, index=4, count=2))
+        self.claim_mails()
+        self.assertEqual(self.amount(1363), 20)
+        self.data(self.call(2, index=2, count=1))
+        self.assertFalse(any(m['prizes'] == [[5, 1375, 1000, 1]]
+                             for m in self.b.profile()['welfare']['mails'].values()))
+        before = self.b.profile()
+        self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        self.data(self.call())
+        self.assertEqual(self.b.profile()['pavilion'], before['pavilion'])
+        with patch('network_redirect.backend.time.time', return_value=before['pavilion']['end']):
+            data = self.data(self.call())
+            self.assertEqual((data['exchange_info'][10]['left_buy_count'],
+                              data['exchange_info'][10]['state']), (3, 1))
+
     def test_discount_batch_one_card_per_gift_and_zero_floor(self):
         self.stock((1141, 200), (1142, 3), (1143, 3))
         before = self.amount(1141)
-        self.data(self.call(2, index=3, count=3, five_card=1, ten_card=2))
-        self.assertEqual(self.amount(1141), before - 35)
+        self.data(self.call(2, index=4, count=3, five_card=1, ten_card=2))
+        self.assertEqual(self.amount(1141), before - 65)
         self.assertEqual(self.amount(1142), 2); self.assertEqual(self.amount(1143), 1)
         self.data(self.call(2, index=9, count=1, ten_card=1))
-        self.assertEqual(self.amount(1141), before - 35)
+        self.assertEqual(self.amount(1141), before - 65)
         old = self.b.profile()
         self.assertEqual(self.call(2, index=9, count=1, five_card=2)[0][0], 55)
         self.assertEqual(old, self.b.profile())
 
     def test_limits_first_bonus_once_duplicate_and_changed_serial(self):
         self.stock((1141, 1000))
-        self.data(self.call(2, index=3, count=10))
+        self.data(self.call(2, index=4, count=10))
         packet, replies, before = self.packet, self.replies, self.b.profile()
         self.assertEqual(self.b.respond(packet, self.state), replies)
         self.assertEqual(before, self.b.profile())
-        bad = encode(1227, dict(serial_num=self.serial, flag=2, index=3, count=1))
+        bad = encode(1227, dict(serial_num=self.serial, flag=2, index=4, count=1))
         self.assertEqual(decode(self.b.respond(bad, self.state)[0])[2]['id'], 55)
-        self.data(self.call(2, index=3, count=5))
+        self.data(self.call(2, index=4, count=5))
         before = self.b.profile()
         self.assertEqual(len([k for k in before['welfare']['mails'] if k.startswith('pavilion-first-')]), 1)
-        self.assertEqual(self.call(2, index=3, count=1)[0][0], 55)
+        self.assertEqual(self.call(2, index=4, count=1)[0][0], 55)
         self.assertEqual(before, self.b.profile())
 
     def test_recharge_mail_base_bonus_claim_all_gifts_order_idempotence(self):
@@ -242,20 +316,20 @@ class PavilionTests(ActivityCase):
         self.assertEqual(role['pavilion']['bricks_earned'], 6151)
 
     def test_restart_fortnight_rollover_mail_persists_and_clock_rollback(self):
-        self.charge(); self.claim_mails(); self.data(self.call(2,index=2,count=1))
+        self.charge(); self.claim_mails(); self.data(self.call(2,index=3,count=1))
         self.data(self.call(3,index=1)); before=self.b.profile()
         self.b.close(); self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.assertEqual(self.b.profile(),before)
         end=before['pavilion']['end']
         with patch('network_redirect.backend.time.time',return_value=end):
             d=self.data(self.call())
-            self.assertEqual(d['exchange_info'][2]['left_buy_count'],1)
+            self.assertEqual(d['exchange_info'][3]['left_buy_count'],1)
             self.assertFalse(d['had_prize']); self.assertEqual(d['charge_money'],0)
             mails = self.b.profile()['welfare']['mails']
             self.assertTrue(all(mails[k] == v for k, v in before['welfare']['mails'].items()))
             refunds = [m for k, m in mails.items() if k.startswith('pavilion-recycle-')]
             self.assertEqual(len(refunds), 1)
-            self.assertEqual(refunds[0]['prizes'], [[5, 1001, 1200, 1]])
+            self.assertEqual(refunds[0]['prizes'], [[5, 1001, 1230, 1]])
             self.assertEqual(self.amount(1141), 0)
         before=self.b.profile(); self.assertEqual(self.call()[0][0],55)
         self.assertEqual(self.b.profile(),before)
@@ -302,7 +376,7 @@ class PavilionTests(ActivityCase):
             firsts = [k for k in self.b.profile()['welfare']['mails'] if k.startswith('pavilion-first-')]
             self.assertEqual(len(firsts), 2)
             self.assertEqual(len(self.refunds()), 1)
-            self.assertEqual(self.refunds()[0]['prizes'], [[5, 1001, 1050, 1]])
+            self.assertEqual(self.refunds()[0]['prizes'], [[5, 1001, 1100, 1]])
 
     def test_unclaimed_mixed_mail_and_locked_bricks_recycled_once_after_offline_gap(self):
         from network_redirect import system_mail

@@ -19,7 +19,7 @@ class GrowthValueTests(unittest.TestCase):
             base = {s: c[s] for s in f.STATS}
             gain = {s: int(Decimal(f.BASES[tid][g]) * 3) for s, g in zip(f.STATS, f.GROWTH_COLUMNS)}
             potential = c['culture_point']
-            for level in range(1, 300):
+            for level in range(1, 500):
                 with self.subTest(quality=quality, evolution=level):
                     f.evolve(role, dict(flag=0, cortege_id=c['id']))
                     f.recalculate(role, rules)

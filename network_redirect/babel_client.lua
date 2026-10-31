@@ -13,7 +13,7 @@ do
      textIndex,textOriginal=i,value
      debug.setupvalue(oldRank,i,function(key,...)
       if key=='tongtianta18' then return '离线NPC榜：同层按到达时间排名' end
-      if key=='tongtianta19' then return '周一结算，奖励由系统邮件领取' end
+      if key=='tongtianta19' then return '周四结算，周一重置；奖励由系统邮件领取' end
       return value(key,...)
      end)
      break
@@ -32,7 +32,7 @@ do
    end
    local result=oldResult(message,...)
    if message and message.id==2 and data and data.completed_now then
-    ms.d_info.show('已通关通天塔60层！本周可继续探索与兑换，周一结算榜奖。')
+    ms.d_info.show('已通关通天塔70层！本周可继续探索与兑换，周四结算、周一重置。')
    end
    return result
   end
@@ -40,6 +40,27 @@ do
    ui.onGetResult=oldResult
    if textIndex then debug.setupvalue(oldRank,textIndex,textOriginal) end
    ui._localBabelRestore=nil
+  end
+ end
+end
+
+-- The native secret map has no terminal banner. Keep its remaining cells
+-- explorable and explain that another three-floor run needs another ticket.
+do
+ local ms=package.loaded.ms
+ local ui=ms and ms.d_tongtiantaSecretUI
+ if ui and ui.onGetResult and not ui._localBabelSecretRestore then
+  local original=ui.onGetResult
+  ui.onGetResult=function(message,...)
+   local result=original(message,...)
+   if message and message.id==13 and message.data and message.data.completed_now then
+    ms.d_info.show('已完成通天秘境三层！可继续探索剩余格子，重新传送需消耗1张入场券。')
+   end
+   return result
+  end
+  ui._localBabelSecretRestore=function()
+   ui.onGetResult=original
+   ui._localBabelSecretRestore=nil
   end
  end
 end

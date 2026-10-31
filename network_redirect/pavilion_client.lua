@@ -3,9 +3,9 @@ do
  local ms=package.loaded.ms
  local ui=ms and ms.d_destinyUI
  if not ui or not ms.d_data or not ms.d_time then return 'pending' end
- if ui._localPavilionRestore and ui._localPavilionVersion~=3 then ui._localPavilionRestore() end
+ if ui._localPavilionRestore and ui._localPavilionVersion~=5 then ui._localPavilionRestore() end
  if not ui._localPavilionRestore then
-  ui._localPavilionVersion=3
+  ui._localPavilionVersion=5
   local tables=__PAVILION_TABLES__
   local originalResult=ui.onGetResult
   local originalConfig=ms.d_data.callback_update_config
@@ -14,9 +14,9 @@ do
   local originalPage=ui.showPageDeatail
   local originalBag=ui.getGiftBagSprite
   ui.getGiftBagSprite=function(index,...)
-   -- The active source assigns nitian to slot 2; our persistent catalog
-   -- appends it at 10. Its original artwork is g2, not nonexistent g10.
-   return originalBag(index==10 and 2 or index,...)
+   -- Slots 1-9 now match the final native catalog. The added gem package
+   -- reuses equipment artwork (its native package also contains a gem).
+   return originalBag(index==10 and 8 or index,...)
   end
   local pageCount=math.max(3,math.ceil(#(tables['csv_config/exchange_zone.csv'] or {})/3))
   ui.showPageDeatail=function(page,...)

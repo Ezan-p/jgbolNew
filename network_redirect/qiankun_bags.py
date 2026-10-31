@@ -99,6 +99,8 @@ def use(role, req):
     f.require(item['attach_type'] == 5 and item['type_id'] == tid and item.get('level', 1) == 1
               and item['count'] >= count and not any(item.get(k) for k in
               ('is_lock', 'owner_id', 'equip_pos', 'equip_order')), '乾坤袋不足、已锁定或不可使用')
+    # VIP batches use the same independent draws as single bags: no forced
+    # high-tier reward, including the last bag of a full 15-bag batch.
     specs = [draw(bag) for _ in range(count)]
     for kind, field in ((11, 'gold_coin'), (12, 'silver_coin')):
         f.require(role.get(field, 0) + sum(p[2] for p in specs if p[0] == kind)

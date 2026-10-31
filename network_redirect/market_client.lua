@@ -23,8 +23,8 @@ do
  end
 end
 
--- Buying a bun into inventory has its own shop quota. Native buyShopItem
--- incorrectly gates it on strength_item_count (the quick-use counter).
+-- Buying buns or elixirs into inventory has its own shop quota. Native
+-- buyShopItem incorrectly gates them on the corresponding quick-use counter.
 do
  local ms=package.loaded.ms
  local shop=ms and ms.d_shopUI
@@ -32,11 +32,11 @@ do
   local buy=shop.buyShopItem
   shop.buyShopItem=function(goods,page,count)
    local row=goods and goods.buyInfo
-   if (page~=1 and page~=2) or not row or row.type_id~=1022 then return buy(goods,page,count) end
+   if (page~=1 and page~=2) or not row or (row.type_id~=1022 and row.type_id~=1023) then return buy(goods,page,count) end
    count=count or 1
    if type(count)~='number' or count~=math.floor(count) or count<1 or count>999 then return end
    if page==1 and (count~=1 or (row.buy_limit_times or 0)<1) then
-    ms.d_info.show('今日特惠包子已售罄');return
+    ms.d_info.show(row.type_id==1022 and '今日特惠包子已售罄' or '今日特惠仙丹已售罄');return
    end
    local player=ms.d_mainUI.g_playerInfo
    if (player.gold_coin or 0)<row.buy_price*count then

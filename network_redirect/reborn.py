@@ -14,7 +14,7 @@ EQUIP = {int(next(iter(r.values()))): r for r in summon.rows('equip_reborn_base.
 CAST = {(int(r['equip_type']), int(r['level'])): r for r in summon.rows('equip_reborn_advance.csv')}
 FATES = summon.rows('equip_reborn_fate.csv')
 CHAIN = {int(next(iter(r.values()))): r['effect_list'] for r in summon.rows('equip_reborn_level_plus.csv')}
-HANDLED = {1328, 1332, 1337, 1338, 1339, 1340, 1341, 1342}
+HANDLED = {1328, 1332, 1337, 1338, 1339, 1340, 1341, 1342, 1359}
 STAT = {1: 'gongji', 2: 'fangyu', 3: 'hp', 4: 'magic'}
 # roleRebornUI L991/997/1004: DIVVN C=3 indexes numeric constant 9.
 FLOORS_PER_REGION = 9
@@ -68,7 +68,14 @@ def prepare(role, rules):
     for c in role['corteges']:
         for k in ('reborn_layer', 'reborn_vein_level'):
             c.setdefault(k, 0)
-        c.setdefault('reborn_plus_type', int(CORTS.get(c['type'], {}).get('plus_type', 1)))
+        default_plus = int(CORTS.get(c['type'], {}).get('plus_type', 1))
+        # [B] Old saves initialized unsupported companions to direction 1.
+        # Before the first rebirth no paid direction change is possible; use
+        # the original table default. Preserve every already-reborn choice.
+        if c['type'] in CORTS and c['reborn_layer'] == 0:
+            c['reborn_plus_type'] = default_plus
+        else:
+            c.setdefault('reborn_plus_type', default_plus)
     for item in role['attachments']:
         if item.get('reborn_bit') and item['type_id'] in f.ITEMS and int(f.ITEMS[item['type_id']]['main_type']) in EQUIP:
             item['cast_level'] = max(rules['equip_initial_cast_level'], item.get('cast_level', 0))

@@ -1,0 +1,12 @@
+======================================================================
+ERROR: test_new_cards_are_weighted_and_persist_until_claimed (tests.test_activity_land_tower.LandTowerTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_activity_land_tower.py", line 114, in test_new_cards_are_weighted_and_persist_until_claimed
+    with patch.object(rewards.secrets,'SystemRandom',return_value=random.Random(30 if hell else 41)):
+UnboundLocalError: local variable 'rewards' referenced before assignment
+
+----------------------------------------------------------------------
+Ran 110 tests in 145.585s
+
+FAILED (errors=1)

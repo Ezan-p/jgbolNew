@@ -43,15 +43,15 @@ for index=1,10 do check('purchase dialog '..index,function()
  ui.showBuyItem(root,index);ui.showDynamicBuyLayer();assert(ui.g_destinyUI.buyInfo.singlePrice==ui.g_csv.shop[index].goldon_count);ui.closeBuyItemLayer()
 end) end
 check('native coupon batch purchase request',function()
- ui.showBuyItem(root,3);local info=ui.g_destinyUI.buyInfo;info.count=3
+ ui.showBuyItem(root,4);local info=ui.g_destinyUI.buyInfo;info.count=3
  info.card_list[1].cur=2;info.card_list[2].cur=1;ui.showDynamicBuyLayer()
- assert(info.real_price==35,'price='..tostring(info.real_price));assert(buyButtons,'buy menu not captured');buyButtons[3].call_back()
- local req=sent[#sent];assert(req.mid==1227 and req.data.flag==2 and req.data.count==3 and req.data.index==3 and req.data.ten_card==2 and req.data.five_card==1)
+ assert(info.real_price==65,'price='..tostring(info.real_price));assert(buyButtons,'buy menu not captured');buyButtons[3].call_back()
+ local req=sent[#sent];assert(req.mid==1227 and req.data.flag==2 and req.data.count==3 and req.data.index==4 and req.data.ten_card==2 and req.data.five_card==1)
  ui.closeBuyItemLayer()
 end)
 check('exchange reward and limit callback',function()
- ui.showBuyItem(root,3);local old=ui.g_csv.shop[3].left_buy_count
- balance=2960;ui.onGetResult(FIXTURE.exchange);assert(ui.g_csv.shop[3].left_buy_count==old-2);assert(ui.g_self.money_info.count==2960)
+ ui.showBuyItem(root,4);local old=ui.g_csv.shop[4].left_buy_count
+ balance=2940;ui.onGetResult(FIXTURE.exchange);assert(ui.g_csv.shop[4].left_buy_count==old-2);assert(ui.g_self.money_info.count==2940)
 end)
 check('recharge overview and bonus table',function() ui.showRecharge();ui.showRechargePage(ui.g_destinyUI.recharge_layer,1) end)
 check('public gifts and claim callback',function()
@@ -59,7 +59,7 @@ check('public gifts and claim callback',function()
 end)
 check('live recharge and mail snapshot refresh',function()
  balance=0;ms.d_data.callback_update_config({local_pavilion={data=FIXTURE.entry,status=FIXTURE.status}})
- assert(ui.g_self.money_info.count==0);assert(ui.g_csv.shop[3].left_buy_count==15)
+ assert(ui.g_self.money_info.count==0);assert(ui.g_csv.shop[4].left_buy_count==15)
 end)
 for index,data in ipairs(FIXTURE.ascension) do
  check('ascension exhausted hint '..index,function()

@@ -267,7 +267,7 @@ class RankTests(ActivityCase):
 
 
     def test_exchange_prices_rewards_and_insufficient_score(self):
-        for index,cost,tid,count in ((1,5000,1001,10),(2,50000,1001,100),(3,500000,1343,10)):
+        for index,cost,tid,count in ((1,5000,1001,100),):
             r=self.b.profile();r['activity']['rank_score']=cost-1;self.b.save(r)
             before=self.b.profile();self.assertEqual(self.req(1203,exchange_type=index)[0][0],55)
             self.assertEqual(before,self.b.profile())
@@ -275,6 +275,43 @@ class RankTests(ActivityCase):
             owned=lambda r:sum(v['count'] for v in r['attachments'] if v['type_id']==tid and v['attach_type']==5)
             before=owned(r);self.ok(self.req(1203,exchange_type=index));after=self.b.profile()
             self.assertEqual(owned(after)-before,count);self.assertEqual(after['activity']['rank_score'],0)
+
+    def test_peach_exchange_inventory_failure_replay_and_restart(self):
+        owned=lambda r,tid:sum(v['count'] for v in r['attachments'] if v['type_id']==tid and v['attach_type']==5)
+        r=self.b.profile();r['activity']['rank_score']=0
+        r['attachments']=[v for v in r['attachments'] if v['type_id'] not in (1001,1343)]
+        summon.add_item(r,1001,999);self.b.save(r)
+        before=self.b.profile()
+        self.assertEqual(self.req(1203,exchange_type=3)[0][0],55)
+        self.assertEqual(self.b.profile(),before)
+        summon.add_item(r,1001,1);self.b.save(r)
+        events=self.req(1203,exchange_type=3);self.ok(events);after=self.b.profile()
+        self.assertEqual((owned(after,1001),owned(after,1343)),(0,1))
+        self.assertEqual(after['activity']['rank_score'],0)
+        self.assertEqual(next(d for e,d in events if e==36)[1]['attach_count'],1)
+        self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
+        self.assertEqual(self.b.profile(),after)
+        self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.assertEqual(self.b.profile(),after)
+        self.assertEqual(self.req(1203,exchange_type=3)[0][0],55)
+        self.assertEqual(self.b.profile(),after)
+
+    def test_only_two_exchanges_and_removed_offer_rejected(self):
+        self.assertEqual([v['index'] for v in rank.rules()['exchanges'] if not v['promote_order']],[1,3])
+        r=self.b.profile();r['activity']['rank_score']=1000000;self.b.save(r)
+        for index in (2,11,255):
+            before=self.b.profile()
+            self.assertEqual(self.req(1203,exchange_type=index)[0][0],55)
+            self.assertEqual(self.b.profile(),before)
+
+    def test_peach_exchange_cannot_consume_locked_or_equipped_items(self):
+        for field in ('is_lock','equip_pos','owner_id'):
+            r=self.b.profile();r['attachments']=[v for v in r['attachments'] if v['type_id']!=1001]
+            summon.add_item(r,1001,1000)
+            next(v for v in r['attachments'] if v['type_id']==1001)[field]=1
+            self.b.save(r);before=self.b.profile()
+            self.assertEqual(self.req(1203,exchange_type=3)[0][0],55)
+            self.assertEqual(self.b.profile(),before)
 
     def test_seven_promotion_thresholds_gold_and_duplicates(self):
         tiers=[(4,500,50),(5,100,100),(6,50,200),(7,30,300),(8,20,400),(9,10,1000),(10,1,2000)]

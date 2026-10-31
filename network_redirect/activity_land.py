@@ -3,7 +3,7 @@ import copy
 import secrets
 from . import activity as a, journey, summon, battle_replay
 from . import activity_land_npc as npc
-from .activity_land_rewards import gain, news, weekly
+from .activity_land_rewards import draw_cards, gain, news, weekly
 from .protocol import encode, decode
 
 
@@ -52,8 +52,8 @@ def state(role,now,r):
             t.update(owner_type=1,owner_name=role['role_name'],last_tick=now,expire=now+r['land_tower_duration'])
     for kind,count in (('boss',5),('hell',3)):
         pending=s[kind]
-        if pending:
-            while len(pending['rewards'])<count:pending['rewards'].append(copy.deepcopy(secrets.choice(r['land_card_rewards'])))
+        if pending and len(pending['rewards'])<count:
+            pending['rewards'].extend(draw_cards(r,count-len(pending['rewards'])))
     for i,row in CHARMS.items():
         if str(i) in s['charms'] and s['boss_layer']>=int(row['need_boss']):s['charms'][str(i)]['unlock']=True
         if int(row['auto_open']) and s['boss_layer']>=int(row['need_boss']):

@@ -722,7 +722,7 @@ class Backend:
         if (mid in activity.HANDLED or (mid == 1026 and data['fight_type'] in activity.FIGHTS)
                 or (mid == 2998 and data['id'] == 249)
                 or (mid == 1244 and data['fight_type'] in (2, 4))
-                or (mid == 1051 and data['item_type'] in (1243,1367,1368,1808,1036,1037,1324,1346,1021,1130,1131,1132,1133,1213,1214,1215,1216,1217))
+                or (mid == 1051 and data['item_type'] in (1243,1363,1367,1368,1808,1036,1037,1324,1346,1021,1130,1131,1132,1133,1213,1214,1215,1216,1217))
                 or (mid == 1059 and data['flag'] == 3)
                 or (mid == 1201 and data['flag'] in (1, 2))):
             return self.activities(packet, mid, data)
@@ -1235,7 +1235,7 @@ class Backend:
                     replies.append(encode(1032, dict(id=item['id'], unit_type=6, attr_count=1,
                                    attr_list=[dict(type=65, value=item.get('awaken', 0))])))
             # Preserve selected objects during repeated rebirth/upgrade callbacks.
-            if mid in (1332, 1337, 1338, 1339, 1341, 1342):
+            if mid in (1332, 1337, 1338, 1339, 1341, 1342, 1359):
                 replies += self.inventory(role)
             replies += [encode(1032, dict(id=role['role_id'], unit_type=1,
                          attr_count=len(attrs), attr_list=attrs))] + events

@@ -92,7 +92,8 @@ class ArrayTests(unittest.TestCase):
         before=v.copy();a.base_bonuses(r,c,v);a.final_bonuses(r,c,v);self.assertEqual(v,before)
         c['order']=1;a.base_bonuses(r,c,v);self.assertEqual(v['hp'],130)
         unit=dict(order=1,essences={13:(Decimal(9),),19:(Decimal(2),Decimal(4)),10:(Decimal(25),Decimal(14.5)),16:(Decimal(14),Decimal(5))})
-        a.attach_combat(r,[unit]);self.assertEqual(unit['essences'][13][0],16)
+        a.attach_combat(r,[unit]);self.assertEqual(unit['essences'][13][0],11)  # 1263: +2, formerly +7
+        self.assertEqual(unit['essences'][16],(Decimal('15.5'),Decimal(5)))  # trigger, not damage
         self.assertEqual(unit['essences'][19][0],Decimal('3.5'))
         self.assertEqual(unit['training_bonuses'][0],(6,1000))
         self.assertEqual(unit['reborn_traits']['survival'],5)

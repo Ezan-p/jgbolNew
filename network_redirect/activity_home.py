@@ -23,6 +23,24 @@ KEYS={1:'main_data',2:'garden_data',3:'temple_data',4:'train_data',5:'pet_data'}
 def response(op,data):return encode(1348,dict(id=op,data=summon.lua(dict(result=1,**data))))
 
 
+def use_tianxian_token(role,req):
+    # [A] packageUI:1971-1973 allows 1..15; item_name promises 5000 coins.
+    # Coins are inventory item 1361, not silver or gold role attributes.
+    count=req['item_count']
+    a.require(req['item_type']==1363 and type(count)is int and 1<=count<=15
+              and req['des_type']==1 and req['des_id'] in (0,role['role_id']),
+              '天仙令使用参数无效')
+    item=formation.lookup(role,'attachments',req['item_id'])
+    a.require(item['attach_type']==5 and item['type_id']==1363 and item['count']>=count
+              and not item.get('is_lock') and not item.get('owner_id') and not item.get('equip_pos'),
+              '天仙令不足或不可使用')
+    item['count']-=count
+    if not item['count']:role['attachments'].remove(item)
+    gain=5000*count
+    summon.add_item(role,1361,gain)
+    return [summon.event(21,dict(result=1,type_id=1363,count=count,effect_value=gain))]
+
+
 def cost(role,value,n=1):
     for token in filter(None,value.split('/')):
         p=list(map(int,token.split('|')))
@@ -101,7 +119,8 @@ def info(s,r):
 
 
 def shop_rows(r,page):
-    return [(i,row) for i,row in enumerate(r['home_shop'],1) if row.get('page',1)==page]
+    # Keep legacy purchase keys stable when goods are removed or reordered.
+    return [(row.get('purchase_key',i),row) for i,row in enumerate(r['home_shop'],1) if row.get('page',1)==page]
 
 
 def shop(s,r):
@@ -161,7 +180,10 @@ def settle(role,req,now,r,jrules,parse):
     if op==2:
         typ=d.get('building_type');a.require(type(typ)is int and typ in KEYS,'洞府建筑无效')
         level=s['build'][str(typ)]+1;row=UPGRADE.get((typ,level))
-        a.require(row is not None and level<=int(OWNER[s['level']]['max_building_level']),'建筑已达当前洞府上限')
+        # [A] homeUI caps each building by its own table; OWNER's threshold
+        # gates the scale challenge, not building upgrades. Preconditions below
+        # still enforce the original scale and prerequisite building levels.
+        a.require(row is not None and level in BUILD[typ],'建筑已达当前洞府上限')
         for token in filter(None,row['pre_conditions'].split('/')):
             pre,lv=map(int,token.split('|'))
             a.require((s['level'] if pre==0 else s['build'][str(pre)])>=lv,'前置建筑等级不足')

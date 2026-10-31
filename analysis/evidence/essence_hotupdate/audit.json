@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-31",
+  "official_server_available": false,
+  "tables": [
+    {
+      "name": "ext_skill.csv",
+      "sha256": "9549dd69e49c345e40428404d37421dc56b25a827f6878bb032cbcfafdf544e1",
+      "rows": 38,
+      "versions": [
+        1231,
+        1232,
+        1236
+      ],
+      "extracted_evidence_byte_match": true,
+      "original_sha256": "9549dd69e49c345e40428404d37421dc56b25a827f6878bb032cbcfafdf544e1",
+      "original_hash_verified": true,
+      "shipped_client_row_match": true,
+      "runtime_row_match": true,
+      "shipped_client_byte_match": true
+    },
+    {
+      "name": "ext_skill_lock_cost.csv",
+      "sha256": "fa345eee52a0623da36f1726952eff6ecff63082170fe43f5828f2a92e13183b",
+      "rows": 4,
+      "versions": [
+        1226
+      ],
+      "extracted_evidence_byte_match": true,
+      "original_sha256": "fa345eee52a0623da36f1726952eff6ecff63082170fe43f5828f2a92e13183b",
+      "original_hash_verified": true,
+      "shipped_client_row_match": true,
+      "runtime_row_match": true,
+      "shipped_client_byte_match": true
+    },
+    {
+      "name": "ling_effect.csv",
+      "sha256": "6811b10c58655aff430b507947c407c1541816895116bf8e76089c34f1bd3185",
+      "rows": 62,
+      "versions": [
+        1232,
+        1237
+      ],
+      "extracted_evidence_byte_match": true,
+      "original_sha256": "4b98a2d23827da67b9de89393599387f2d0feb828438c92865627540ef7ba544",
+      "original_hash_verified": true,
+      "shipped_client_row_match": true,
+      "runtime_row_match": true,
+      "shipped_client_byte_match": false
+    }
+  ],
+  "native_rendering_test": false,
+  "player_save_modified": false,
+  "released_apk_modified": false,
+  "native_lock_window": {
+    "sha256": "5dc091a2ff5597a1eb92cb4d2d781e84246ba528f7231f921f5f47646e4ca1d9",
+    "source": "v107 client release_w 1263",
+    "observed_static_max_jp": 4,
+    "correction": "set shared MAX_JP to 5 for unlocked extra slot; otherwise 4"
+  },
+  "mechanics": {
+    "revision": "inferred-v2",
+    "penetration_proc_bonus": {
+      "normal": 3,
+      "advanced": 6
+    },
+    "poison_max_damage": 200000,
+    "poison_duration_rounds": 3,
+    "poison_stack_policy": "independent_ticks",
+    "rulai_shield_probability": 25,
+    "normal_revive_limit": 1,
+    "advanced_revive_limit": 2,
+    "event_budget_bytes": 12000
+  },
+  "payload": {
+    "verified": true,
+    "bundle_id": "ad256b2e9001311183fadb330f0bc0ad74ccaa36e4786bef042649942eb806fe",
+    "temporary_only": true
+  },
+  "lua51_checks": [
+    "fifth slot display and selection",
+    "four locks cost 1000",
+    "fifth slot can be protected",
+    "reject five locks",
+    "ordinary three locks cost 700",
+    "switch companion resets limit",
+    "idempotent install",
+    "restore original upvalue and callback"
+  ],
+  "full_production_lua_compiles": true
+}

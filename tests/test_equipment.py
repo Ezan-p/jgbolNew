@@ -115,6 +115,12 @@ class EquipmentTests(unittest.TestCase):
             self.add(tid, level=11)
             self.assertEqual(self.stone(5, stone, pos=1)[-1][1]['result'], 1)
             self.assertEqual(self.get(gear)['stone1_level'], 12)
+            self.add(tid, level=12)
+            self.assertEqual(self.stone(5, stone, pos=1)[-1][1]['result'], 1)
+            self.assertEqual(self.get(gear)['stone1_level'], 13)
+            self.add(tid, level=13, count=2)
+            self.assertEqual(self.stone(5, stone, pos=1)[-1][1]['result'], 1)
+            self.assertEqual(self.get(gear)['stone1_level'], 14)
             self.assertEqual(self.stone(5, stone, pos=1)[-1][0], 55)
 
     def test_all_normal_stone_levels_and_prices(self):
@@ -141,7 +147,7 @@ class EquipmentTests(unittest.TestCase):
                 base = basic + growth * Decimal('1.12')
                 flat = {1:525,2:259,3:1260}[main]
                 advance_flat = {1:791,2:355,3:1646}[main]
-                for sl in range(1,13):
+                for sl in range(1,15):
                     item['stone1_level'] = sl
                     expected = int(base)+int(base*e.stone_rate(main,sl))+int(base*Decimal('1.05')+advance_flat)+int(base*Decimal('.5')+flat)
                     self.assertEqual(e.effect(item), expected, (tid, level, sl))
@@ -237,3 +243,86 @@ class EquipmentTests(unittest.TestCase):
         role=self.b.profile();again=copy.deepcopy(role)
         for _ in range(3):f.prepare(again,self.b.formation_rules)
         self.assertEqual(role,again)
+
+    def test_high_refine_cost_attributes_replay_and_restart(self):
+        def amount(role, tid, level):
+            return sum(i['count'] for i in role['attachments'] if i['type_id'] == tid and i['level'] == level)
+        for main in (1, 2, 3):
+            tid = 1089 + main
+            for old, material_count, cost, rate in ((12, 1, 15 if main == 3 else 9, Decimal('2.4') if main == 3 else Decimal(2)),
+                                                   (13, 2, 30 if main == 3 else 18, Decimal(6) if main == 3 else Decimal(5))):
+                for mounted in (False, True):
+                    with self.subTest(main=main, old=old, mounted=mounted):
+                        gear = self.gear(main, level=50, drill_count=1, equip_order=1 if mounted else 0, equip_pos=main)
+                        stone = self.add(tid, level=old, prob_compen=35)
+                        self.add(tid, level=old, count=material_count)
+                        if mounted:
+                            self.assertEqual(self.stone(2, gear, [stone], 1, 1)[-1][0], 83)
+                        before = self.b.profile()
+                        self.assertEqual(self.stone(5, stone, pos=1 if mounted else 0, order=1 if mounted else 0)[-1][0], 83)
+                        after = self.b.profile()
+                        self.assertEqual(amount(before, 1369, 1) - amount(after, 1369, 1), cost)
+                        self.assertEqual(amount(before, tid, old) - amount(after, tid, old), material_count + 1)
+                        self.assertEqual(after['silver_coin'], before['silver_coin'])
+                        self.assertEqual(after['gold_coin'], before['gold_coin'])
+                        self.assertEqual(self.get(stone)['level'], old + 1)
+                        self.assertEqual(self.get(stone)['prob_compen'], 0)
+                        self.assertEqual(e.stone_rate(main, old + 1), rate)
+                        self.assertEqual(self.b.respond(self.packet, {'authenticated': True}), self.replies)
+                        self.assertEqual(after, self.b.profile())
+                        if not mounted:
+                            self.assertEqual(self.stone(2, gear, [stone], 1)[-1][0], 83)
+                        self.assertEqual(self.get(gear)['stone1_level'], old + 1)
+                        self.assertEqual(self.get(gear)['effect_value'], int(e.base_effect(self.get(gear))) + int(e.base_effect(self.get(gear)) * rate))
+                        self.assertEqual(self.stone(4, gear, [stone], 1, 1 if mounted else 0)[-1][0], 83)
+                        self.assertEqual(self.get(stone)['level'], old + 1)
+        before = self.b.profile()
+        self.b.close()
+        self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **kw: None)
+        self.assertEqual(before, self.b.profile())
+
+    def test_high_refine_realm_and_material_protection_atomic(self):
+        for old in (12, 13):
+            stone = self.add(1090, level=old)
+            locked = self.add(1090, level=old, count=2, is_lock=1)
+            self.add(1091, level=old, count=3)
+            self.add(1090, level=old - 1, count=3)
+            before = self.b.profile()
+            self.assertEqual(self.stone(5, stone)[-1][0], 55)
+            self.assertEqual(before, self.b.profile())
+            role = self.b.profile()
+            f.lookup(role, 'attachments', locked)['is_lock'] = 0
+            role['reborn_layer'] = 3
+            self.b.save(role)
+            before = self.b.profile()
+            self.assertIn('四重境界', self.stone(5, stone)[-1][1]['op_string'])
+            self.assertEqual(before, self.b.profile())
+            role = self.b.profile(); role['reborn_layer'] = 4
+            for i in role['attachments']:
+                if i['type_id'] == 1369: i['is_lock'] = 1
+            self.b.save(role)
+            before = self.b.profile()
+            self.assertEqual(self.stone(5, stone)[-1][0], 55)
+            self.assertEqual(before, self.b.profile())
+
+    def test_high_refine_legacy_stack_and_terminal_level(self):
+        stone = self.add(1090, level=13, count=3)
+        self.assertEqual(self.stone(5, stone)[-1][0], 83)
+        self.assertEqual(self.get(stone)['level'], 14)
+        self.assertEqual(self.get(stone)['count'], 1)
+        before = self.b.profile()
+        self.assertIn('上限', self.stone(5, stone)[-1][1]['op_string'])
+        self.assertEqual(before, self.b.profile())
+        target = self.add(1090, level=12)
+        mat = self.add(1090, level=12)
+        before = self.b.profile()
+        self.assertIn('参数无效', self.stone(5, target, [mat])[-1][1]['op_string'])
+        self.assertEqual(before, self.b.profile())
+
+    def test_active_stone_table_matches_frozen_client(self):
+        import csv
+        original = Path(__file__).resolve().parents[1] / 'analysis/evidence/stone_level_mismatch/stone_reborn_cost_worth.csv'
+        with original.open(newline='') as source:
+            rows = {(int(r['stone_type']), int(r['level'])): r for r in csv.DictReader(source)}
+        self.assertEqual(e.STONE_REBORN, rows)
+        self.assertEqual(e.STONE_MAX_LEVEL, {1: 14, 2: 14, 3: 14})

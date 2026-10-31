@@ -11,13 +11,25 @@ ms.d_u.delay=function(layer,seconds,fn) callbacks[#callbacks+1]=fn end
 ms.d_data.callback_update_config=function() end
 ms.d_csv.open2=function() end
 ms.d_smithUI.getItemInfoByType=function() return {count=0} end
-ui.onGetResult=function() end
+ui.onGetResult=function(data)
+ if data.flag==1 then
+  local rows=ms.d_csv.open2('csv_config/exchange_zone.csv')
+  assert(#rows==10 and rows[10].name=='灵石礼包')
+  assert(tonumber(rows[10].goldon_count)==150 and tonumber(rows[10].max_buy_count)==3)
+  assert(rows[10].attach_list=='5|1090|9|1/5|1091|9|1')
+  assert(rows[10].gift_prize=='5|1092|8|1')
+ end
+end
 ui.updateActivityStatus=function(c) ui.g_self.config=c end
 ui.canJoin=function() return false end
 ui.sendRequest=function(flag) sent[#sent+1]=flag end
 ui.closeBuyItemLayer=function() ui.g_destinyUI.buy_layer=nil end
 ui.showMyMoney=function() end
-ui.showPageDeatail=function() end
+ui.getGiftBagSprite=function(index) assert(index<=9,'missing native artwork');return index end
+ui.showPageDeatail=function(page)
+ assert(ui.g_self.page_max==3,'native rows per page changed')
+ if page==4 then assert((page-1)*ui.g_self.page_max+1==10) end
+end
 ui.showRechargePage=function() end
 local function nativeTimer()
  local capturedEnd=ui.g_self.config.end_time
@@ -32,6 +44,10 @@ end
 ui.show=nativeTimer;ui.showGift=nativeTimer
 local rest,delay,create=ms.d_time.getRestTime,ms.d_u.delay,ms.d_u.createByStyles
 -- INSTALL_PATCH
+ui.onGetResult({flag=1,begin_time=1000,end_time=1000+14*86400})
+ui.showPageDeatail(4)
+assert(ui.g_self.page_max==4,'fourth page inaccessible')
+assert(ui.getGiftBagSprite(10)==8 and ui.getGiftBagSprite(2)==2)
 ui.show()
 assert(labels[#labels]=='刷新剩余：14天00:00:00')
 assert(ms.d_time.getRestTime==rest and ms.d_u.delay==delay and ms.d_u.createByStyles==create)

@@ -2,12 +2,14 @@
 import copy
 import hashlib
 import json
+from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
 from . import formation, summon, journey, achievements
 
 ROOT = Path(__file__).resolve().parents[1]
 require = formation.require
+BOSS_MAGIC_CAP = 2147483647
 
 
 @lru_cache(maxsize=1)
@@ -19,8 +21,14 @@ def rules():
     pool=r.get('boss_pool')
     require(isinstance(pool,list) and len(pool)==3 and {b.get('type') for b in pool}=={4020,5025,3015}, '蟠桃首领池无效')
     require(all(b['type'] in journey.NPCS and isinstance(b.get('name'),str) and b['name'] for b in pool), '蟠桃首领配置无效')
+    for boss in pool:
+        skill = formation.SKILLS.get(boss.get('aoe_skill'), {})
+        require(skill.get('use_mode(1-active，2-passive)') == '1'
+                and skill.get('effect_target(1-single，2-multi)') == '2'
+                and skill.get('formula') == '3' and int(skill.get('use_probability', 0)) > 0,
+                '蟠桃首领群攻技能无效')
     for key in ('daily_rewards',):
-        require([x['end'] for x in r[key]] == [1, 3, 10, 100], '蟠桃奖励名次无效')
+        require([x['end'] for x in r[key]] == [5, 10, 50], '蟠桃奖励名次无效')
         for row in r[key]:
             for p in row['prizes']:
                 require(len(p) == 4 and p[0] in (5, 11, 12) and (p[0] != 5 or p[1] in formation.ITEMS) and 0 < p[2] <= 100000, '蟠桃奖励无效')
@@ -74,6 +82,18 @@ def rewards(kind, rank):
     return copy.deepcopy(next((row['prizes'] for row in rules()[kind+'_rewards'] if 0 < rank <= row['end']),[]))
 
 
+def rank_mail(role, day, rank, specs, now):
+    from . import system_mail, welfare
+    # deliver replaces its role; preserve active callers' activity references.
+    delivery = copy.deepcopy(role)
+    date = datetime.fromtimestamp(day * 86400, timezone.utc).strftime('%Y-%m-%d')
+    _, mail = system_mail.deliver(delivery, f'party-rank-{day}', '大闹蟠桃会每日伤害排名奖励',
+        f'{date}大闹蟠桃会伤害排名第{rank}名，奖励请领取附件。',
+        specs, now, welfare.load_rules())
+    role['welfare'] = delivery['welfare']
+    return mail['mail_id']
+
+
 def finish_day(role, ar, now):
     p=role['activity']['party']
     if p['closed']: return
@@ -83,10 +103,11 @@ def finish_day(role, ar, now):
                       fight_count=p['count'],peach_count=p['peaches'],lucky_point=p['lucky'],felstar_info=star)
     if rank:
         specs=rewards('daily',rank)
+        if specs:
+            p['history']['mail_id'] = rank_mail(role,p['day'],rank,specs,now)
         if star['id']==role['role_id']:
-            specs += [[5,1001,50,1]]
+            p['daily_pending'].append([5,1001,50,1])
             achievements.add(role,320,1)
-        p['daily_pending'] += specs
         achievements.observe(role,218,int(rank<=100));achievements.observe(role,219,int(rank==1))
     p['closed']=True
 
@@ -107,7 +128,7 @@ def prepare(role, now, ar):
     if day>p['day'] or second>=ar['party_period'][1]:finish_day(role,ar,now)
     p['week']=week(day)
     if day>p['day']:p.update(day=day,count=0,damage=0,lucky=0,peaches=0,free=0,paid=0,bonus=0,closed=False)
-    # Daily awards are delivered on the next successful transaction; no expiry.
+    # Preserve the separate felstar bonus and any already-settled legacy awards.
     if p['daily_pending']:
         for spec in p['daily_pending']:journey.grant(role,spec)
         p['daily_pending']=[]
@@ -126,6 +147,13 @@ def info(role, ar):
         damage_list=rows,self_order=placement(role,rows),plus_value=s['party_bonus']*10,plus_count=s['party_bonus'],
         peach_count=p['peaches'],lucky_point=p['lucky'],fight_prize=[],boss_type=boss['type'],boss_level=ar['battle_level'],
         damage=0,total_damage=total,max_hp=hp,cur_hp=hp-total%hp,name=boss['name'],boss_wave=wave)
+
+
+def prepare_boss(unit, boss):
+    config = next(b for b in rules()['boss_pool'] if b['type'] == boss['boss_type'])
+    skill = config['aoe_skill']
+    unit.update(hp=boss['cur_hp'], max_hp=rules()['boss_hp'], magic=BOSS_MAGIC_CAP,
+                skills=[(skill, 1)], party_finisher_skill=skill)
 
 
 def record(role, damage, gain, ar):

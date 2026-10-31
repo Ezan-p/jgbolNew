@@ -1,5 +1,58 @@
 {
   "daily_npc_count": 20,
+  "daily_rewards": [
+    {
+      "end": 5,
+      "prizes": [
+        [
+          5,
+          1343,
+          100,
+          1
+        ]
+      ]
+    },
+    {
+      "end": 10,
+      "prizes": [
+        [
+          5,
+          1343,
+          50,
+          1
+        ]
+      ]
+    },
+    {
+      "end": 50,
+      "prizes": [
+        [
+          5,
+          1001,
+          200,
+          1
+        ]
+      ]
+    }
+  ],
+  "boss_pool": [
+    {
+      "type": 4020,
+      "name": "风伯",
+      "aoe_skill": 102
+    },
+    {
+      "type": 5025,
+      "name": "太上老君",
+      "aoe_skill": 101
+    },
+    {
+      "type": 3015,
+      "name": "福星",
+      "aoe_skill": 107
+    }
+  ],
+  "boss_magic": 2147483647,
   "official_server_available": false,
   "classification": {
     "A": [
@@ -16,7 +69,8 @@
       "每日20名NPC及静态随机伤害，仅用于排名",
       "1000万血同一首领循环补满，仅玩家扣血",
       "每10000伤害1蟠桃，单场最多100",
-      "每日榜自动入包，幸运排行和周奖停用",
+      "每日榜13点结算永久邮件：1—5名100圣母蟠桃，6—10名50圣母蟠桃，11—50名200蟠桃；幸运排行和周奖停用",
+      "首领法力2147483647，群攻触发击败全队（含替补）",
       "节日材料独立随机掉落"
     ]
   },
@@ -27,7 +81,19 @@
     },
     {
       "path": "network_redirect/activity_party.py",
-      "sha256": "f25daa0fc540ad51bfd0f0fc2e3c6a0a66128930e06d8b17da7f0fa323e1bc81"
+      "sha256": "747d7b6b93dbf73600c0b9f13ee03501a5a377dd4e0cb16cae599b46f57796c6"
+    },
+    {
+      "path": "network_redirect/activity.py",
+      "sha256": "b4e7a61244c3ecfcd741facebbff65b871ed02b299bf202f6c35f0c6043073e4"
+    },
+    {
+      "path": "network_redirect/combat_engine.py",
+      "sha256": "2e4dc761bd7cf187683022a5c517282e0e14ecbe2c0aff1b446cf4d0959430c9"
+    },
+    {
+      "path": "network_redirect/system_mail.py",
+      "sha256": "eb040b077daf42a69e58d952ea9726042d1f8f14daca7879091595cc673d1763"
     },
     {
       "path": "analysis/evidence/lua_named/lua/ui/worldBossUI.lua.txt",
@@ -43,11 +109,11 @@
     },
     {
       "path": "server_config/party_rules.json",
-      "sha256": "28c68d0313ef376c023e68470d5d5dcb58e2ab236dcd285437fce2f1ca09ee74"
+      "sha256": "5cdd9599da9dcd71b0c3be84f3ec3076394149bd2744d63966c4b4c4b48ccde4"
     },
     {
       "path": "server_config/activity_rules.json",
-      "sha256": "43e9647ea36a64749d5b2231662311021d521769107cee148b496f13f4b135a3"
+      "sha256": "842591c12c4cb1d4d864c391c3f9737f9505bf605dc9d6ca96403339963d3a0a"
     }
   ],
   "npcs": [

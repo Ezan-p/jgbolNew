@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-31",
+  "suites": [
+    {
+      "suite": "test_reborn_hotupdate.py",
+      "tests": 5,
+      "seconds": 42.427,
+      "result": "OK",
+      "log": "hotupdate_tests.log",
+      "command": ".runtime/venv/bin/python -m unittest discover -s tests -p 'test_reborn_hotupdate.py' -v"
+    },
+    {
+      "suite": "test_reborn.py",
+      "tests": 18,
+      "seconds": 13.975,
+      "result": "OK",
+      "log": "existing_tests.log",
+      "command": ".runtime/venv/bin/python -m unittest discover -s tests -p 'test_reborn.py' -v"
+    },
+    {
+      "suite": "test_fate_rebuild.py",
+      "tests": 10,
+      "seconds": 19.823,
+      "result": "OK",
+      "log": "fate_tests.log",
+      "command": ".runtime/venv/bin/python -m unittest discover -s tests -p 'test_fate_rebuild.py' -v"
+    },
+    {
+      "suite": "test_level_culture.py",
+      "tests": 15,
+      "seconds": 0.748,
+      "result": "OK",
+      "log": "culture_tests.log",
+      "command": ".runtime/venv/bin/python -m unittest discover -s tests -p 'test_level_culture.py' -v"
+    },
+    {
+      "suite": "test_immortal_hotupdate.py",
+      "tests": 11,
+      "seconds": 8.555,
+      "result": "OK",
+      "log": "immortal_tests.log",
+      "command": ".runtime/venv/bin/python -m unittest discover -s tests -p 'test_immortal_hotupdate.py' -v"
+    }
+  ],
+  "tests_passed": 59,
+  "new_companions": 11,
+  "wire_vein_operations": 891,
+  "wire_rebirth_operations": 99,
+  "temporary_databases_only": true,
+  "apk_rebuilt": false,
+  "native_ui_executed": false
+}

@@ -6,8 +6,12 @@ from pathlib import Path
 from . import feature_levels, formation as f, journey, summon
 
 ROOT = Path(__file__).resolve().parents[1]
-SHOP = {int(x['index']): x for x in summon.rows('exchange_zone.csv')}
-SHOP.update({int(x['index']): x for x in summon.rows('fate_rebuild/exchange_zone.csv')})
+# Complete catalog: official resource 1263 (last changed at 1262) + local gems.
+SHOP = {int(x['index']): x for x in summon.rows('pavilion/exchange_zone.csv')}
+CATALOG_REVISION = '1263-plus-gems-v1'
+# Preserve purchases by product identity, not the reused numeric slot.
+LEGACY_INDICES = {'1': '1', '2': '3', '4': '5', '5': '6', '6': '7',
+                  '7': '8', '8': '10', '9': '9', '10': '2'}
 GIFTS = {kind: {int(x['index']): x for x in summon.rows('gift_config.csv')
                 if int(x['gift_type']) == kind} for kind in (1, 2)}
 
@@ -20,7 +24,7 @@ def specs(value):
 
 def client_tables():
     # The running client's writable CSV cache can differ from the shipped APK.
-    # Pin only these two activity tables to the audited 3.87 source, stripping
+    # Use the official final catalog plus local gems, stripping
     # parenthetical CSV header comments just as native csv.open2 does.
     return {'csv_config/exchange_zone.csv': [
                 {k.split('(')[0]: v for k, v in SHOP[i].items()} for i in sorted(SHOP)],
@@ -57,7 +61,14 @@ def period(now, r):
 def prepare(role, now, r):
     start, end = period(now, r)
     s = role.setdefault('pavilion', dict(start=start, end=end, clock=now,
-                                        charge_gold=0, bricks_earned=0, bought={}, claimed=[]))
+                                        charge_gold=0, bricks_earned=0, bought={}, claimed=[],
+                                        catalog_revision=CATALOG_REVISION))
+    if s.get('catalog_revision') != CATALOG_REVISION:
+        old_bought = s.get('bought', {})
+        s['legacy_catalog_bought'] = dict(old_bought)
+        s['bought'] = {new: old_bought[old] for old, new in LEGACY_INDICES.items()
+                       if old in old_bought}
+        s['catalog_revision'] = CATALOG_REVISION
     # Keep the high-water clock: rewinding cannot resurrect an earlier season.
     # A legacy seven-day save migrates once, even when its start is identical
     # to (or later than) the new globally aligned fortnight's start.
@@ -133,7 +144,7 @@ def catalog(role, now, r, peers=None):
                 charge_money=s['charge_gold'] / r['gold_per_rmb'],
                 had_prize=any(g['state'] == 2 for g in gifts.values()), charge_info=gifts,
                 exchange_info={i: dict(state=3 if s['bought'].get(str(i), 0) else 1,
-                    left_buy_count=int(row['max_buy_count']) + (ex if i == 1 else 0) - s['bought'].get(str(i), 0),
+                    left_buy_count=max(0, int(row['max_buy_count']) + (ex if i == 1 else 0) - s['bought'].get(str(i), 0)),
                     # Native L509-511: "recharge need_charge more to raise
                     # the limit by plus_times". This is the next increment,
                     # not the number of increases already earned.
@@ -217,7 +228,7 @@ def settle(role, req, now, peers=None):
     s['bought'][str(index)] = bought + count
     notifications = []
     if bought == 0:
-        mail(role, f"pavilion-first-{s['start']}-{s['end']}-{index}", '天机阁首次兑换好礼',
+        mail(role, f"pavilion-first-{s['start']}-{s['end']}-{CATALOG_REVISION}-{index}", '天机阁首次兑换好礼',
              specs(row['gift_prize']), now)
         from . import welfare
         notifications.append(welfare.mail_snapshot(role, now, welfare.load_rules()))

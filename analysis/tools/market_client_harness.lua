@@ -9,7 +9,7 @@ local function check(ok,name)
     checks[#checks+1]=name
 end
 local ok,err=xpcall(function()
-    check(#shop.g_self.Goods[1]==8,'eight discounted rows including buns')
+    check(#shop.g_self.Goods[1]==10,'ten discounted rows including buns, drill and elixir')
     check(#shop.g_self.Goods[2]==15,'fifteen normal rows including forge tokens and buns')
     for page=1,2 do
         local previous=0

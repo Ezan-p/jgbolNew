@@ -1,0 +1,66 @@
+test_auth_reconnect_queries_and_expired_ticket (test_offline_backend.ProtocolTests) ... FAIL
+test_bootstrap_initializes_formation_and_innate_skill (test_offline_backend.ProtocolTests) ... FAIL
+test_ticket_replay_and_persistence (test_offline_backend.ProtocolTests) ... FAIL
+
+======================================================================
+FAIL: test_auth_reconnect_queries_and_expired_ticket (test_offline_backend.ProtocolTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_offline_backend.py", line 85, in test_auth_reconnect_queries_and_expired_ticket
+    self.assertEqual([decode(r)[0] for r in replies[:5]], [2996, 2998, 1017, 1034, 1035])
+AssertionError: Lists differ: [2996, 2998, 1017, 2998, 1034] != [2996, 2998, 1017, 1034, 1035]
+
+First differing element 3:
+2998
+1034
+
+- [2996, 2998, 1017, 2998, 1034]
+?                    ------
+
++ [2996, 2998, 1017, 1034, 1035]
+?                        ++++++
+
+
+======================================================================
+FAIL: test_bootstrap_initializes_formation_and_innate_skill (test_offline_backend.ProtocolTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_offline_backend.py", line 114, in test_bootstrap_initializes_formation_and_innate_skill
+    self.assertEqual([r[0] for r in replies[:4]], [2998, 1017, 1034, 1035])
+AssertionError: Lists differ: [2998, 1017, 2998, 1034] != [2998, 1017, 1034, 1035]
+
+First differing element 2:
+2998
+1034
+
+- [2998, 1017, 2998, 1034]
+?              ------
+
++ [2998, 1017, 1034, 1035]
+?                  ++++++
+
+
+======================================================================
+FAIL: test_ticket_replay_and_persistence (test_offline_backend.ProtocolTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_offline_backend.py", line 45, in test_ticket_replay_and_persistence
+    self.assertEqual([decode(r)[0] for r in replies[:5]], [1002, 2998, 1017, 1034, 1035])
+AssertionError: Lists differ: [1002, 2998, 1017, 2998, 1034] != [1002, 2998, 1017, 1034, 1035]
+
+First differing element 3:
+2998
+1034
+
+- [1002, 2998, 1017, 2998, 1034]
+?                    ------
+
++ [1002, 2998, 1017, 1034, 1035]
+?                        ++++++
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.536s
+
+FAILED (failures=3)
+All three assertions also fail with the baseline achievement implementation; files unchanged.

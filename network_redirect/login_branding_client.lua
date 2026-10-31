@@ -18,7 +18,7 @@ do
     panel:addChild(node)
    end
    label('离线版·非商业·仅供学习',0.80)
-   label('v106',0.75)
+   label('v108',0.75)
    label('开发者@Ezan',0.70)
    scene:addChild(panel,20000,tag)
   end

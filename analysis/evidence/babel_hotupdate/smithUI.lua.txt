@@ -1,0 +1,91 @@
+Original resource 1263; instruction excerpts around named references.
+...
+00115 [L571] KPRI     A=7 B=0 C=0 D=0 
+00116 [L571] MOV      A=8 B=0 C=1 D=1 
+00117 [L571] CALL     A=3 B=1 C=6 D=262 
+00118 [L573] UCLO     A=1 B=128 C=0 D=32768 target=119
+00119 [L576] UCLO     A=0 B=128 C=0 D=32768 target=120
+00120 [L576] RET0     A=0 B=0 C=1 D=1 
+00121 [L576] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto17 offset=0x3f09 source_lines=579-583 params=1
+UPVALUES []
+00001 [L580] TGETS    A=1 B=0 C=0 D=0 'result'
+00002 [L580] ISNEN    A=1 B=0 C=0 D=0 0
+00003 [L580] JMP      A=1 B=128 C=5 D=32773 target=9
+00004 [L581] GGET     A=1 B=0 C=1 D=1 'd_ms'
+00005 [L581] TGETS    A=1 B=1 C=2 D=258 'g_mxTransformUI'
+00006 [L581] TGETS    A=1 B=1 C=3 D=259 'OnGetResult'
+00007 [L581] MOV      A=2 B=0 C=0 D=0 
+00008 [L581] CALL     A=1 B=1 C=2 D=258 
+00009 [L583] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto18 offset=0x3f79 source_lines=585-656 params=1
+UPVALUES ['string', 'pairs', 'o_t', 'm_t_t']
+00001 [L586] GGET     A=1 B=0 C=0 D=0 'g_smithUI'
+00002 [L586] TGETS    A=1 B=1 C=1 D=257 'transInfo'
+00003 [L587] IST      A=0 B=0 C=1 D=1 
+00004 [L587] JMP      A=2 B=128 C=10 D=32778 target=15
+00005 [L588] GGET     A=2 B=0 C=2 D=2 'd_ms'
+00006 [L588] TGETS    A=2 B=2 C=3 D=515 'd_info'
+00007 [L588] TGETS    A=2 B=2 C=4 D=516 'show'
+...
+00186 [L649] TSETS    A=7 B=6 C=37 D=1573 'id'
+00187 [L649] TSETB    A=6 B=5 C=1 D=1281 
+00188 [L649] TSETS    A=5 B=4 C=36 D=1060 'id_list'
+00189 [L650] KSHORT   A=5 B=0 C=1 D=1 1
+00190 [L650] TSETS    A=5 B=4 C=39 D=1063 'count'
+00191 [L651] TSETS    A=0 B=4 C=40 D=1064 'num'
+00192 [L652] KSHORT   A=5 B=0 C=1 D=1 1
+00193 [L652] TSETS    A=5 B=4 C=41 D=1065 'des_type'
+00194 [L653] GGET     A=5 B=0 C=2 D=2 'd_ms'
+00195 [L653] TGETS    A=5 B=5 C=42 D=1322 'd_u'
+00196 [L653] TGETS    A=5 B=5 C=43 D=1323 'main_server_send_msg'
+00197 [L653] GGET     A=6 B=0 C=2 D=2 'd_ms'
+00198 [L653] TGETS    A=6 B=6 C=44 D=1580 'd_msg_def'
+00199 [L653] TGETS    A=6 B=6 C=45 D=1581 'gscl_msg_id'
+00200 [L653] TGETS    A=6 B=6 C=46 D=1582 'msg_material_transform'
+00201 [L653] MOV      A=7 B=0 C=4 D=4 
+00202 [L653] CALL     A=5 B=1 C=3 D=259 
+00203 [L656] RET0     A=0 B=0 C=1 D=1 
+
+FUNCTION proto19 offset=0x45ed source_lines=661-666 params=0
+UPVALUES ['itemInfo']
+00001 [L662] GGET     A=0 B=0 C=0 D=0 'closeChooseLayer'
+00002 [L662] CALL     A=0 B=1 C=1 D=257 
+00003 [L663] GGET     A=0 B=0 C=1 D=1 'g_smithUI'
+00004 [L663] GGET     A=1 B=0 C=3 D=3 'd_ms'
+00005 [L663] TGETS    A=1 B=1 C=4 D=260 'd_data'
+00006 [L663] TGETS    A=1 B=1 C=5 D=261 'g_convertTable'
+00007 [L663] UGET     A=2 B=0 C=0 D=0 itemInfo
+00008 [L663] TGETS    A=2 B=2 C=6 D=518 'type_id'
+...
+00108 [L180] GSET     A=46 B=0 C=79 D=79 'showConvertInfo'
+00109 [L418] FNEW     A=46 B=0 C=80 D=80 {'kind': 'proto', 'id': 8}
+00110 [L413] GSET     A=46 B=0 C=81 D=81 'closeChooseLayer'
+00111 [L473] FNEW     A=46 B=0 C=82 D=82 {'kind': 'proto', 'id': 10}
+00112 [L420] GSET     A=46 B=0 C=83 D=83 'showChooseLayer'
+00113 [L495] FNEW     A=46 B=0 C=84 D=84 {'kind': 'proto', 'id': 11}
+00114 [L475] GSET     A=46 B=0 C=85 D=85 'showMaterials'
+00115 [L526] FNEW     A=46 B=0 C=86 D=86 {'kind': 'proto', 'id': 12}
+00116 [L497] GSET     A=46 B=0 C=87 D=87 'getAvailableMaterials'
+00117 [L539] FNEW     A=46 B=0 C=88 D=88 {'kind': 'proto', 'id': 13}
+00118 [L528] GSET     A=46 B=0 C=89 D=89 'showTargetMaterialInfo'
+00119 [L576] FNEW     A=46 B=0 C=90 D=90 {'kind': 'proto', 'id': 16}
+00120 [L541] GSET     A=46 B=0 C=91 D=91 'onGetResult'
+00121 [L583] FNEW     A=46 B=0 C=92 D=92 {'kind': 'proto', 'id': 17}
+00122 [L579] GSET     A=46 B=0 C=93 D=93 'onGetFateStarResult'
+00123 [L656] FNEW     A=46 B=0 C=94 D=94 {'kind': 'proto', 'id': 18}
+00124 [L585] GSET     A=46 B=0 C=95 D=95 'pressConvert'
+00125 [L675] FNEW     A=46 B=0 C=96 D=96 {'kind': 'proto', 'id': 20}
+00126 [L658] GSET     A=46 B=0 C=97 D=97 'createMaterialCell'
+00127 [L700] FNEW     A=46 B=0 C=98 D=98 {'kind': 'proto', 'id': 24}
+00128 [L677] GSET     A=46 B=0 C=99 D=99 'getMaterialDataSource'
+00129 [L718] FNEW     A=46 B=0 C=100 D=100 {'kind': 'proto', 'id': 25}
+00130 [L702] GSET     A=46 B=0 C=101 D=101 'createCategoryCell'
+00131 [L739] FNEW     A=46 B=0 C=102 D=102 {'kind': 'proto', 'id': 29}
+00132 [L720] GSET     A=46 B=0 C=103 D=103 'getCategoryDataSource'
+00133 [L757] FNEW     A=46 B=0 C=104 D=104 {'kind': 'proto', 'id': 30}
+00134 [L741] GSET     A=46 B=0 C=105 D=105 'getMaterialCount'
+00135 [L781] FNEW     A=46 B=0 C=106 D=106 {'kind': 'proto', 'id': 31}
+00136 [L760] GSET     A=46 B=0 C=107 D=107 'getItemInfoByType'

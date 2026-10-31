@@ -102,7 +102,8 @@ def data(role, s, g, now, r):
     gifts = [dict(v, can_grab=int(active and allowed and v['begin_time'] <= now < v['end_time']
                                  and rid not in v['grabbed'] and v['count'] > 0)) for v in f['gifts']]
     return dict(feast_stat=0 if active else 54 if f['type'] else 53, feast_type=f['type'],
-                send_gift={v['type']: dict(cost_gold=v['gold'], contribute=v['contrib']) for v in r['feast_gifts']},
+                # Native showPresentLayer indexes prices by item ID, not tier.
+                send_gift={v['item']: dict(cost_gold=v['gold'], contribute=v['contrib']) for v in r['feast_gifts']},
                 max_grab_count=r['feast_grab_limit'], member_count=sum(m['rank'] != 6 for m in g['members'].values()),
                 feast_end_time=f['end'], gift_data=gifts,
                 can_rece_award=active and role['union_rank'] != 6 and rid not in f['claimed'] and a.get('claimed_week') != f['week'])
@@ -148,7 +149,12 @@ def settle(role, s, g, op, d, now, r):
             u.require(count >= 2, '每批至少赠送2个礼盒')
             u.require(a['sent']+count <= r['feast_gift_limit'], '今日赠礼数量已达上限')
             u.require(not any(v.get('sender_id') == role['role_id'] and v['count'] > 0 for v in f['gifts']), '上批礼盒尚未被抢完')
-            typ = u.positive(d, 'gift_type', 2); cfg = r['feast_gifts'][typ-1]
+            # Native sendPresentRequest sends 1120/1121. Keep the old offline
+            # tier IDs (1/2) compatible, but resolve both through the config.
+            gift_type = u.positive(d, 'gift_type')
+            cfg = next((v for v in r['feast_gifts'] if gift_type in (v['item'], v['type'])), None)
+            u.require(cfg is not None, '宴会礼盒类型无效')
+            typ = cfg['type']
             u.pay(role, 'gold_coin', cfg['gold']*count); a['sent'] += count; f['sent'] += count
             gain = u.contribution(role, cfg['contrib']*count)
             rowstats['contribute'] += gain; rowstats['fortune'] += cfg['contrib']*count

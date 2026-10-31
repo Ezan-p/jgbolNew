@@ -28,13 +28,14 @@ def rules():
 
 
 # Keep extracted original CSVs intact; UI and server share the configured rules.
-EXCHANGE = {v['index']: dict(score=v['score'], promote_order=v['promote_order'],
+EXCHANGE = {v['index']: dict(score=v['score'], promote_order=v['promote_order'], cost_item=v.get('cost_item'),
     **{'prize_list(object_type|sub_type|count/...)': '|'.join(map(str,v['prize']))})
     for v in rules()['exchanges']}
 
 
 def client_source():
-    exchange = [dict(score=v['score'], promoteOrder=v['promote_order'],
+    exchange = [dict(exchangeIndex=v['index'], score=v['score'], promoteOrder=v['promote_order'],
+        costItem=v.get('cost_item', [0, 0])[0], costCount=v.get('cost_item', [0, 0])[1],
         object_type=v['prize'][0], sub_type=v['prize'][1], count=v['prize'][2])
         for v in rules()['exchanges']]
     scores = [dict(upper=int(v['begin']), lower=int(v['end']), score=int(v['day_score'])) for v in SCORE]
@@ -288,6 +289,8 @@ def settle(role, mid, req, now, arules, jrules):
             claims = s.setdefault('rank_promotions',[])
             require(s.get('rank_reached_order',20001)<=promotion and req['exchange_type'] not in claims,'未达晋升名次或已领取')
             claims.append(req['exchange_type'])
+        if cfg.get('cost_item'):
+            a.consume(role, *cfg['cost_item'])
         s['rank_score'] -= cost
         specs = [[int(v) for v in x.split('|')]+[1] for x in cfg['prize_list(object_type|sub_type|count/...)'].split('/')]
         rewards = a.prizes(role,specs)

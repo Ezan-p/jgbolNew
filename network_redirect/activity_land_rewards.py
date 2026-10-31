@@ -1,6 +1,43 @@
-"""Bounded activity log and original prey_week_rank rewards, local weekly settlement."""
+"""Tower card draws, bounded activity log and local weekly settlement."""
+import copy
+import secrets
 from . import activity as a, summon, welfare
 from . import activity_land_npc as npc
+
+
+ESSENCE_POOLS = {
+    name: {int(row['id']) for row in summon.rows('ext_skill.csv')
+           if int(a.formation.ITEMS[int(row['id'])]['quality']) == quality}
+    for name, quality in (('yellow', 4), ('purple', 5))
+}
+CARD_POOLS = dict(ESSENCE_POOLS, purple_fragment={10001})
+
+
+def validate_cards(r):
+    expected = {(5, tid, 1, 1) for ids in CARD_POOLS.values() for tid in ids}
+    a.require({tuple(p) for p in r['land_card_rewards']} == expected,
+              '猎魂翻牌奖池须包含全部黄紫精魄及紫色精魄碎片，每份1个、1级')
+    weights = r.get('land_card_weights')
+    a.require(isinstance(weights, dict) and set(weights) == set(CARD_POOLS)
+              and all(type(v) is int and v > 0 for v in weights.values())
+              and sum(weights.values()) == 100, '猎魂翻牌分类概率须为正整数且合计100%')
+
+
+def draw_cards(r, count):
+    # Roll the category first, then an equal-chance essence within it. Each
+    # position is independent, so the rare category keeps its stated chance.
+    pools = {name: [p for p in r['land_card_rewards'] if p[1] in ids]
+             for name, ids in CARD_POOLS.items()}
+    rng = secrets.SystemRandom()
+    rewards = []
+    for _ in range(count):
+        roll = rng.randrange(100)
+        for name in ('yellow', 'purple_fragment', 'purple'):
+            roll -= r['land_card_weights'][name]
+            if roll < 0:
+                rewards.append(copy.deepcopy(rng.choice(pools[name])))
+                break
+    return rewards
 
 
 def news(s,now,body):

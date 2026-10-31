@@ -1,11 +1,74 @@
 """Original 1353 wire contract, recovery, local weeks, and exploitable boundaries."""
 import copy
+import random
+import unittest
+from collections import Counter, deque
 from pathlib import Path
 from unittest.mock import patch
 from tests.test_activity import ActivityCase, NOW
 from network_redirect import activity, activity_babel as babel, activity_babel_npc as npc, npc_players, summon
 from network_redirect.backend import Backend, login_fields
 from network_redirect.protocol import decode
+
+
+def route_to(grid, start, target):
+    """Walk only cleared cells, then interact with the requested destination."""
+    pending = deque([(start, [])])
+    seen = {start}
+    while pending:
+        (row, col), route = pending.popleft()
+        if (row, col) == target:
+            return route
+        for pos in ((row-1, col), (row+1, col), (row, col-1), (row, col+1)):
+            r, c = pos
+            if (1 <= r <= 5 and 1 <= c <= 8 and pos not in seen
+                    and (pos == target or grid[r-1][c-1]['elem_type'] == 0)):
+                seen.add(pos)
+                pending.append((pos, route + [pos]))
+    raise AssertionError(f'Unreachable target: {target}')
+
+
+class BabelMapTests(unittest.TestCase):
+    def test_random_maps_are_distinct_and_resource_solvable(self):
+        expected = Counter([0] * 25 + [3, 9, 20003, 20004, 20005, 20006,
+                           20007, 20008, 20009, 20010, 20011, 20012, 20013, 20014, 20015])
+        first_floors = set()
+        for seed in range(100):
+            state = dict(floors={})
+            signatures = set()
+            with patch.object(babel.secrets, 'SystemRandom', return_value=random.Random(seed)):
+                for floor in range(1, 11):
+                    state['cur_floor'] = floor
+                    babel.generate(state)
+                    grid = state['floors'][str(floor)]
+                    signature = tuple(c['elem_type'] for row in grid for c in row)
+                    self.assertEqual(Counter(signature), expected)
+                    self.assertNotIn(signature, signatures)
+                    signatures.add(signature)
+                    if floor == 1:
+                        first_floors.add(signature)
+                    self.assertEqual(grid[0][0]['elem_type'], 0)
+                    self.assertEqual(sum(c['visible'] for row in grid for c in row), 4)
+                    # Treat all locks as impassable, and assume guard victories.
+                    # Every free cell and every lock's approach must be reachable.
+                    walkable = copy.deepcopy(grid)
+                    for row in walkable:
+                        for cell in row:
+                            if cell['elem_type'] not in (*babel.TOOLS, 3):
+                                cell['elem_type'] = 0
+                    for row in range(1, 6):
+                        for col in range(1, 9):
+                            route_to(walkable, (1, 1), (row, col))
+        self.assertEqual(len(first_floors), 100)
+
+    def test_later_floors_keep_existing_layout(self):
+        for floor in (11, 60):
+            state = dict(cur_floor=floor, floors={})
+            babel.generate(state)
+            grid = state['floors'][str(floor)]
+            self.assertEqual(grid[0][1]['elem_type'], 20005)
+            self.assertEqual(grid[3][6]['elem_type'], 9)
+            self.assertEqual(grid[4][7]['elem_type'], 3)
 
 
 class BabelTests(ActivityCase):
@@ -32,6 +95,58 @@ class BabelTests(ActivityCase):
         before = self.b.profile()
         self.assertEqual(self.req(1353,id=op,data=summon.lua(data))[0][0],55)
         self.assertEqual(before,self.b.profile())
+
+    def visit_element(self, typ):
+        state = self.saved()
+        grid = state['floors'][str(state['cur_floor'])]
+        target = next((r, c) for r, row in enumerate(grid, 1)
+                      for c, cell in enumerate(row, 1) if cell['elem_type'] == typ)
+        start = (state['locale']['row'], state['locale']['column'])
+        # Other guards/tools can be crossed safely after their own interaction.
+        # Pickups and guards are handled first by the full-floor walk below.
+        pending = deque([(start, [])]); seen = {start}
+        while pending:
+            (row, col), path = pending.popleft()
+            if (row, col) == target:
+                for r, c in path:
+                    self.call(2, target_pos=dict(row=r, column=c))
+                return
+            for pos in ((row-1, col), (row+1, col), (row, col-1), (row, col+1)):
+                r, c = pos
+                if (1 <= r <= 5 and 1 <= c <= 8 and pos not in seen
+                        and (pos == target or grid[r-1][c-1]['elem_type'] not in (*babel.TOOLS, 3))):
+                    seen.add(pos); pending.append((pos, path + [pos]))
+        self.fail(f'Unreachable element {typ}')
+
+    def test_random_first_ten_floors_full_wire_playthrough(self):
+        self.call(); self.edit(energy=10000)
+        with patch('network_redirect.activity_babel.journey.battle', return_value=(3, [], [])):
+            for floor in range(1, 11):
+                for typ in (20005, 20006, 20010, 20011, 20012, 20013, 20014, 20015,
+                            20003, 20004, 20007, 20008, 20009, 9, 3):
+                    grid = self.saved()['floors'][str(floor)]
+                    if any(c['elem_type'] == typ for row in grid for c in row):
+                        self.visit_element(typ)
+                self.assertEqual(self.saved()['cur_floor'], floor + 1)
+                self.assertEqual(self.saved()['coin_count'], 500 * floor)
+        for typ in (20005, 20006, 20010, 20011, 20012):
+            self.assertEqual(babel.item_count(self.b.profile(), typ), 0)
+
+    def test_random_map_persists_and_only_regenerates_next_week(self):
+        self.call()
+        with patch('network_redirect.activity_babel.journey.battle', return_value=(3, [], [])):
+            self.visit_element(20005)
+        floors = self.saved()['floors']
+        self.call(); self.call(6); self.call(7, floor=1)
+        self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        self.call()
+        self.assertEqual(self.saved()['floors'], floors)
+        monday = npc.start(self.saved()['week'] + 1, self.b.activity_rules)
+        with patch('network_redirect.backend.time.time', return_value=monday), \
+                patch.object(babel, 'random_floor', wraps=babel.random_floor) as generate:
+            self.call(); self.call()
+            self.assertEqual(generate.call_count, 1)
+        self.assertTrue(any(c['elem_type'] == 20005 for row in self.saved()['floors']['1'] for c in row))
 
     def test_original_essences_overflow_and_natural_cap(self):
         self.call(); role = self.b.profile()
@@ -62,6 +177,7 @@ class BabelTests(ActivityCase):
             self.call(); self.assertEqual(self.saved()['energy'],100)
 
     def test_zero_life_allows_exploration_not_combat(self):
+        self.legacy_babel_floor()
         self.call(); self.edit(life=0)
         self.call(2,target_pos=dict(row=1,column=2))
         self.assertEqual(self.saved()['life'],0)
@@ -126,6 +242,7 @@ class BabelTests(ActivityCase):
         self.assertEqual(self.saved()['week'], npc.week(next_week, self.b.activity_rules))
 
     def test_tools_keys_loot_and_revisit_no_refill(self):
+        self.legacy_babel_floor()
         self.call()
         with patch('network_redirect.activity_babel.journey.battle',return_value=(3,[],[])):
             for row,col in ((1,2),(1,3),(1,4),(1,5),(2,5)):
@@ -142,6 +259,7 @@ class BabelTests(ActivityCase):
         self.assertEqual(babel.item_count(self.b.profile(),20005),0)
 
     def test_loss_keeps_guard_and_position_but_spends_resources(self):
+        self.legacy_babel_floor()
         self.call(); self.call(2,target_pos=dict(row=1,column=2)); before=self.saved()
         with patch('network_redirect.activity_babel.journey.battle',return_value=(4,[],[])):
             self.call(2,target_pos=dict(row=1,column=3))
@@ -152,9 +270,10 @@ class BabelTests(ActivityCase):
         self.assertTrue(any(m==2998 and d['id']==44 for m,_,d in self.decoded))
 
     def test_master_gate_and_terminal_once(self):
+        self.legacy_babel_floor()
         self.call(); self.edit(locale=dict(row=5,column=7))
         self.reject(2,target_pos=dict(row=5,column=8))
-        role=self.b.profile(); s=role['activity']['babel']; s['cur_floor']=60; s['history_floor']=60
+        role=self.b.profile(); s=role['activity']['babel']; s['cur_floor']=70; s['history_floor']=70
         babel.generate(s); s['locale']=dict(row=4,column=6); self.b.save(role)
         with patch('network_redirect.activity_babel.journey.battle',return_value=(3,[],[])):
             self.call(2,target_pos=dict(row=4,column=7))
@@ -162,11 +281,13 @@ class BabelTests(ActivityCase):
         self.assertTrue(self.saved()['complete']); before=self.saved()['coin_count']
         self.call(2,target_pos=dict(row=5,column=7)); self.call(2,target_pos=dict(row=5,column=8))
         self.assertEqual(self.saved()['coin_count'],before)
-        self.assertEqual(self.saved()['cur_floor'],60)
+        self.assertEqual(self.saved()['cur_floor'],70)
 
     def test_weekly_rank_mail_reset_preserves_items_and_claim_once(self):
         self.call(); role=self.b.profile(); s=role['activity']['babel']
         s.update(history_floor=60,participated=True,energy=300,life=5)
+        # Simulate a legacy participating save without a Thursday snapshot.
+        s.pop('frozen_week', None)
         summon.add_item(role,20012,3); summon.add_item(role,20000,100)
         self.b.save(role); before=self.saved(); monday=npc.start(before['week']+1,self.b.activity_rules)
         with patch('network_redirect.backend.time.time',return_value=monday):
@@ -187,6 +308,7 @@ class BabelTests(ActivityCase):
 
     def test_week_settles_on_login_prepare_without_entering_tower(self):
         self.call(); role=self.b.profile(); s=role['activity']['babel']; s['participated']=True
+        s.pop('frozen_week', None)
         monday=npc.start(s['week']+1,self.b.activity_rules)
         activity.prepare(role,monday,self.b.activity_rules)
         self.assertEqual(role['activity']['babel']['history_floor'],1)
@@ -203,6 +325,7 @@ class BabelTests(ActivityCase):
         self.assertEqual(rows,sorted(rows,key=lambda v:(-v['history_floor'],v['reached_at'],v['role_id'])))
 
     def test_legacy_currency_and_map_migration(self):
+        self.legacy_babel_floor()
         self.call(); role=self.b.profile(); s=role['activity']['babel']
         for k in ('coin_inventory','week','clock','energy_tick','opponents'): s.pop(k,None)
         s['coin_count']=120; s['floors']['1'][0][1]['elem_type']=0; self.b.save(role)
@@ -249,6 +372,7 @@ class BabelTests(ActivityCase):
         units[0]['hp']=1; self.assertEqual(npc.template(key),before)
 
     def test_real_catalog_fight_replay_and_fixed_opponent(self):
+        self.legacy_babel_floor()
         self.call(); role=self.b.profile(); ident=role['role_id']
         key=max(npc_players.catalog(),key=lambda k:npc_players.catalog()[k]['profile']['role_combat_power'])
         role.update(copy.deepcopy(npc_players.get(key)['role'])); role['role_id']=ident

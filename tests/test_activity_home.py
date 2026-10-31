@@ -119,15 +119,37 @@ class HomeTests(ActivityCase):
 
     def test_shop_refresh_keeps_daily_limits_and_rolls_over(self):
         self.prepared();shop=self.home(14)['shop_data']
-        self.assertEqual((len(shop[1]),len(shop[2])),(6,3))
+        self.assertEqual((len(shop[1]),len(shop[2])),(5,3))
+        self.assertNotIn(1363,[row['item']['attach_type'] for page in shop.values() for row in page.values()])
+        self.assertEqual(shop[1][2]['item']['attach_count'],100)
         self.home(15,shop_page=2,item_index=1,buy_count=10)
         self.rejected(15,shop_page=2,item_index=1,buy_count=1)
-        self.rejected(15,shop_page=1,item_index=7,buy_count=1)
+        self.rejected(15,shop_page=1,item_index=6,buy_count=1)
+        before=self.b.profile()
         self.home(15,shop_page=1,item_index=2,buy_count=10)
+        after=self.b.profile()
+        for tid,delta in ((1361,-1000),(1362,1000),(1363,0)):
+            count=lambda role:sum(p['count'] for p in role['attachments'] if p['type_id']==tid)
+            self.assertEqual(count(after)-count(before),delta)
         self.rejected(15,shop_page=1,item_index=2,buy_count=1)
         self.assertEqual(self.home(14,flush_flag=True)['shop_data'][1][2]['limit'],0)
         with patch('network_redirect.backend.time.time',return_value=NOW+86400):
             self.assertEqual(self.home(14)['shop_data'][1][2]['limit'],10)
+
+    def test_shop_removal_preserves_legacy_purchase_keys(self):
+        r=self.prepared()
+        purchases={'1':1,'2':2,'3':10,'4':3,'5':4,'6':5,'7':6,'8':7,'9':8}
+        r['activity']['home']['purchases']=purchases.copy();self.b.save(r)
+        self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        shop=self.home(14)['shop_data']
+        self.assertEqual([row['limit'] for row in shop[1].values()],[9,8,2,6,5])
+        self.assertEqual([row['limit'] for row in shop[2].values()],[4,3,2])
+        self.home(15,shop_page=1,item_index=3,buy_count=2)
+        self.home(15,shop_page=2,item_index=1,buy_count=4)
+        purchases.update({'4':5,'7':10})
+        self.assertEqual(self.b.profile()['activity']['home']['purchases'],purchases)
+        self.rejected(15,shop_page=1,item_index=3,buy_count=1)
+        self.rejected(15,shop_page=2,item_index=1,buy_count=1)
 
     def test_prayer_unlock_starter_pet_and_main_level_limit(self):
         self.prepared();self.rejected(11)

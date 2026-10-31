@@ -1,7 +1,7 @@
 """九幽 [A] original floor/drop/boss tables; [B] offline accumulation/economy."""
 import copy
 import csv
-import hashlib
+import random
 import secrets
 from . import activity as a, formation, journey, summon
 from . import battle_replay, abyss_balance
@@ -66,11 +66,11 @@ def _shop_id(product):
 
 
 def refresh_shop(s,role,r,today):
-    """Create one deterministic six-item offer list per role and local day.
+    """Select the configured weighted materials per category without replacement.
 
     The server persists the selected products so reconnects do not reshuffle the
-    list.  The revision is part of the key and also migrates old four-item
-    saves when the pool changes.
+    list. The revision is part of the key and migrates older shop saves when
+    the pool changes.
     """
     revision=r['abyss_shop_revision'];count=r['abyss_shop_daily_count']
     current=s.get('shop')
@@ -78,8 +78,17 @@ def refresh_shop(s,role,r,today):
             not isinstance(current,list) or len(current)!=count):
         role_id=role.get('role_id',role.get('id',0))
         seed=f'{revision}:{today}:{role_id}'
-        offers=sorted(r['abyss_shop'],key=lambda p: hashlib.sha256(
-            f'{seed}:{_shop_id(p)}'.encode()).digest())[:count]
+        offers=[]
+        for category, slots in r['abyss_shop_category_slots'].items():
+            rng=random.Random(f'{seed}:{category}')
+            pool=sorted((p for p in r['abyss_shop'] if p['category']==category),key=_shop_id)
+            for _ in range(slots):
+                roll=rng.randrange(sum(p['weight'] for p in pool))
+                for index, product in enumerate(pool):
+                    roll-=product['weight']
+                    if roll<0:
+                        offers.append(pool.pop(index))
+                        break
         s['shop']=copy.deepcopy(offers)
         s['shop_day']=today
         s['shop_revision']=revision

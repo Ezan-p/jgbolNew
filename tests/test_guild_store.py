@@ -1,8 +1,10 @@
 """Store clock regression: exercise real packets and daily stock settlement."""
 import copy
+from collections import Counter
+import json
 import unittest
 from unittest.mock import patch
-from network_redirect import daily, guild_offline
+from network_redirect import daily, guild, guild_offline
 from network_redirect.backend import Backend
 from pathlib import Path
 from network_redirect.protocol import decode
@@ -90,6 +92,46 @@ class GuildStoreTests(unittest.TestCase):
         first=self.ok(38)[-1][2]
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.assertEqual(self.ok(38)[-1][2],first)
+
+    def test_refresh_uses_exact_weights_without_replacement(self):
+        rules=self.b.guild_rules
+        weights={tuple(row['prize']):row['weight'] for row in rules['store']}
+        for prize,weight in weights.items():
+            self.assertEqual(weight,1 if prize[:2] in ((5,1007),(5,1031)) else 5)
+        first_counts=Counter()
+        original=copy.deepcopy(rules)
+        for ticket in range(sum(weights.values())):
+            state={}
+            with patch.object(guild_offline,'roll',side_effect=[ticket]+[0]*7) as rng:
+                guild_offline.refresh_store(state,rules)
+            stock=state['store_stock']
+            first_counts[tuple(stock[0]['prize'])]+=1
+            remaining=dict(weights)
+            self.assertEqual(len(stock),8)
+            for row,call in zip(stock,rng.call_args_list):
+                self.assertEqual(call.args[1],sum(remaining.values()))
+                remaining.pop(tuple(row['prize']))
+            with patch.object(guild_offline,'roll',side_effect=AssertionError('saved stock rerolled')):
+                self.assertEqual(guild_offline.store(state,rules),stock)
+        self.assertEqual(dict(first_counts),weights)
+        self.assertEqual(rules,original)
+
+    def test_invalid_refresh_weights_rejected_and_legacy_config_supported(self):
+        path=Path(self.tmp.name)/'guild_rules.json'
+        original=guild.load_rules()
+        for value in (0,-1,True,1.5,'1',100001):
+            rules=copy.deepcopy(original)
+            rules['store'][0]['weight']=value
+            path.write_text(json.dumps(rules))
+            with self.subTest(weight=value),self.assertRaises(guild.formation.Rejected):
+                guild.load_rules(path)
+        rules=copy.deepcopy(original)
+        for row in rules['store']:row.pop('weight')
+        path.write_text(json.dumps(rules))
+        guild.load_rules(path)
+        with patch.object(guild_offline,'roll',return_value=0) as rng:
+            state={};guild_offline.refresh_store(state,rules)
+        self.assertEqual([call.args[1] for call in rng.call_args_list],list(range(15,7,-1)))
 
     def test_legacy_stock_migrates_once_without_resetting_spent_quota(self):
         self.create()

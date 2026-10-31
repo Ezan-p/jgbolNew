@@ -167,7 +167,9 @@ def main():
                   medicine_fixture=dict(ordinary=ordinary, essence_candidates=available_essence,
                       caveat='Preloaded legal level-36 drugs; no player stat boost; no acquisition-time claim; server semantics, not native UI.'),
                   samples=samples, economy=dict(total_boss_crystals=sum(x['crystals'] for x in floors),
-                      max_daily_shop_spend=sum(sorted((p['cost']*p['limit'] for p in rules['abyss_shop']),reverse=True)[:6]),
+                      max_daily_shop_spend=sum(sum(sorted((p['cost']*p['limit'] for p in rules['abyss_shop']
+                          if p['category']==category),reverse=True)[:slots])
+                          for category,slots in rules['abyss_shop_category_slots'].items()),
                       max_daily_hang_crystals=86400//rules['abyss_tick_seconds']*rules['abyss_crystal_tick_cap'],
                       region_daily_hang_crystals=[288*x for x in abyss_balance.rules()['region_crystal_caps']]),
                   client_native_verified=False)

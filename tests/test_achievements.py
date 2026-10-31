@@ -63,12 +63,14 @@ class AchievementTests(unittest.TestCase):
         return [(m, d) for m, _, d in map(decode, self.replies)]
 
     def test_catalogue_and_wire_capacity(self):
-        self.assertEqual((len(a.CATALOG), len(a.OPEN)), (276, 247))
+        self.assertEqual((len(a.CATALOG), len(a.OPEN)), (287, 258))
         role = self.b.profile()
         out = list(map(decode, a.packets(role)))
         self.assertEqual(out[0][2]['attr_list'][0]['type'], 27)
-        self.assertEqual(out[1][2]['achievement_count'], 247)
-        self.assertEqual(len(out[1][2]['achievements']), 247)
+        chunks = [d for m, _, d in out if m == 1066]
+        self.assertEqual([d['achievement_count'] for d in chunks], [255, 3])
+        self.assertEqual(len({r['id'] for d in chunks for r in d['achievements']}), 258)
+        self.assertEqual(login_fields(out[1][2]['data'])['local_achievement_batch']['count'], 258)
 
     def test_native_menu_and_login_snapshot(self):
         out = [(m, d) for m, _, d in map(decode, self.b.bootstrap())]

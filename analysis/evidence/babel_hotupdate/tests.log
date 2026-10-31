@@ -1,0 +1,386 @@
+Executing <Task pending name='Task-1' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:102> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x11ae23880>()] created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/tasks.py:704> created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:118> took 0.268 seconds
+Executing <Task pending name='Task-4' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:102> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x11ae23730>()] created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/tasks.py:704> created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:118> took 0.150 seconds
+Executing <Task pending name='Task-7' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:102> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x129444580>()] created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/tasks.py:704> created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:118> took 0.169 seconds
+Executing <Task pending name='Task-10' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:102> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x1294447c0>()] created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/tasks.py:704> created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:118> took 0.181 seconds
+Executing <Task pending name='Task-13' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:102> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x1198ba700>()] created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/tasks.py:704> created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:118> took 0.152 seconds
+======================================================================
+ERROR: test_fate_rebuild (unittest.loader._FailedTest)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_fate_rebuild
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/loader.py", line 154, in loadTestsFromName
+    module = __import__(module_name)
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_fate_rebuild.py", line 6, in <module>
+    from test_activity import ActivityCase, NOW
+ModuleNotFoundError: No module named 'test_activity'
+
+
+======================================================================
+ERROR: test_fragmented_binary_ls_response (tests.test_offline_backend.TLSAndWireTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 62, in _callSetUp
+    self._callAsync(self.asyncSetUp)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 80, in _callAsync
+    return self._asyncioTestLoop.run_until_complete(fut)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 102, in _asyncioLoopRunner
+    ret = await awaitable
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_offline_backend.py", line 262, in asyncSetUp
+    await self.server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/server.py", line 61, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+======================================================================
+ERROR: test_large_tls_response (tests.test_offline_backend.TLSAndWireTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 62, in _callSetUp
+    self._callAsync(self.asyncSetUp)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 80, in _callAsync
+    return self._asyncioTestLoop.run_until_complete(fut)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 102, in _asyncioLoopRunner
+    ret = await awaitable
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_offline_backend.py", line 262, in asyncSetUp
+    await self.server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/server.py", line 61, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+======================================================================
+ERROR: test_unsupported_support_endpoint_is_json_error (tests.test_offline_backend.TLSAndWireTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 62, in _callSetUp
+    self._callAsync(self.asyncSetUp)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 80, in _callAsync
+    return self._asyncioTestLoop.run_until_complete(fut)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 102, in _asyncioLoopRunner
+    ret = await awaitable
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_offline_backend.py", line 262, in asyncSetUp
+    await self.server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/server.py", line 61, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+======================================================================
+ERROR: test_untrusted_certificate_rejected (tests.test_offline_backend.TLSAndWireTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 62, in _callSetUp
+    self._callAsync(self.asyncSetUp)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 80, in _callAsync
+    return self._asyncioTestLoop.run_until_complete(fut)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 102, in _asyncioLoopRunner
+    ret = await awaitable
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_offline_backend.py", line 262, in asyncSetUp
+    await self.server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/server.py", line 61, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+======================================================================
+ERROR: test_verified_tls_with_dynamic_sni (tests.test_offline_backend.TLSAndWireTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 62, in _callSetUp
+    self._callAsync(self.asyncSetUp)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 80, in _callAsync
+    return self._asyncioTestLoop.run_until_complete(fut)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 102, in _asyncioLoopRunner
+    ret = await awaitable
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_offline_backend.py", line 262, in asyncSetUp
+    await self.server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/server.py", line 61, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+======================================================================
+ERROR: test_cached_list_bytes_and_query_redaction (tests.test_network_redirect.LandingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 62, in _callSetUp
+    self._callAsync(self.asyncSetUp)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 80, in _callAsync
+    return self._asyncioTestLoop.run_until_complete(fut)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 102, in _asyncioLoopRunner
+    ret = await awaitable
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_network_redirect.py", line 12, in asyncSetUp
+    await self.server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/server.py", line 61, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+======================================================================
+ERROR: test_concurrent_connections_have_separate_complete_logs (tests.test_network_redirect.LandingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 62, in _callSetUp
+    self._callAsync(self.asyncSetUp)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 80, in _callAsync
+    return self._asyncioTestLoop.run_until_complete(fut)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 102, in _asyncioLoopRunner
+    ret = await awaitable
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_network_redirect.py", line 12, in asyncSetUp
+    await self.server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/server.py", line 61, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+======================================================================
+ERROR: test_fragmented_health (tests.test_network_redirect.LandingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 62, in _callSetUp
+    self._callAsync(self.asyncSetUp)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 80, in _callAsync
+    return self._asyncioTestLoop.run_until_complete(fut)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 102, in _asyncioLoopRunner
+    ret = await awaitable
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_network_redirect.py", line 12, in asyncSetUp
+    await self.server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/server.py", line 61, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+======================================================================
+ERROR: test_head_and_traversal (tests.test_network_redirect.LandingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 62, in _callSetUp
+    self._callAsync(self.asyncSetUp)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 80, in _callAsync
+    return self._asyncioTestLoop.run_until_complete(fut)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 102, in _asyncioLoopRunner
+    ret = await awaitable
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_network_redirect.py", line 12, in asyncSetUp
+    await self.server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/server.py", line 61, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+======================================================================
+ERROR: test_short_binary_and_shutdown (tests.test_network_redirect.LandingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 62, in _callSetUp
+    self._callAsync(self.asyncSetUp)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 80, in _callAsync
+    return self._asyncioTestLoop.run_until_complete(fut)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 102, in _asyncioLoopRunner
+    ret = await awaitable
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_network_redirect.py", line 12, in asyncSetUp
+    await self.server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/server.py", line 61, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+======================================================================
+ERROR: test_shutdown_closes_waiting_clients_and_records_reason (tests.test_network_redirect.LandingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 62, in _callSetUp
+    self._callAsync(self.asyncSetUp)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 80, in _callAsync
+    return self._asyncioTestLoop.run_until_complete(fut)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 102, in _asyncioLoopRunner
+    ret = await awaitable
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_network_redirect.py", line 12, in asyncSetUp
+    await self.server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/server.py", line 61, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+======================================================================
+ERROR: test_tls_reaches_local_without_downgrade (tests.test_network_redirect.LandingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 62, in _callSetUp
+    self._callAsync(self.asyncSetUp)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 80, in _callAsync
+    return self._asyncioTestLoop.run_until_complete(fut)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 102, in _asyncioLoopRunner
+    ret = await awaitable
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_network_redirect.py", line 12, in asyncSetUp
+    await self.server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/server.py", line 61, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+======================================================================
+ERROR: test_truncated_request_does_not_poison_listener (tests.test_network_redirect.LandingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 62, in _callSetUp
+    self._callAsync(self.asyncSetUp)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 80, in _callAsync
+    return self._asyncioTestLoop.run_until_complete(fut)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 102, in _asyncioLoopRunner
+    ret = await awaitable
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_network_redirect.py", line 12, in asyncSetUp
+    await self.server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/server.py", line 61, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+======================================================================
+ERROR: test_unknown_endpoint_not_fake_success (tests.test_network_redirect.LandingTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 62, in _callSetUp
+    self._callAsync(self.asyncSetUp)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 80, in _callAsync
+    return self._asyncioTestLoop.run_until_complete(fut)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py", line 102, in _asyncioLoopRunner
+    ret = await awaitable
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_network_redirect.py", line 12, in asyncSetUp
+    await self.server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/network_redirect/server.py", line 61, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+======================================================================
+FAIL: test_auth_reconnect_queries_and_expired_ticket (tests.test_offline_backend.ProtocolTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_offline_backend.py", line 85, in test_auth_reconnect_queries_and_expired_ticket
+    self.assertEqual([decode(r)[0] for r in replies[:5]], [2996, 2998, 1017, 1034, 1035])
+AssertionError: Lists differ: [2996, 2998, 1017, 2998, 1034] != [2996, 2998, 1017, 1034, 1035]
+
+First differing element 3:
+2998
+1034
+
+- [2996, 2998, 1017, 2998, 1034]
+?                    ------
+
++ [2996, 2998, 1017, 1034, 1035]
+?                        ++++++
+
+
+======================================================================
+FAIL: test_bootstrap_initializes_formation_and_innate_skill (tests.test_offline_backend.ProtocolTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_offline_backend.py", line 114, in test_bootstrap_initializes_formation_and_innate_skill
+    self.assertEqual([r[0] for r in replies[:4]], [2998, 1017, 1034, 1035])
+AssertionError: Lists differ: [2998, 1017, 2998, 1034] != [2998, 1017, 1034, 1035]
+
+First differing element 2:
+2998
+1034
+
+- [2998, 1017, 2998, 1034]
+?              ------
+
++ [2998, 1017, 1034, 1035]
+?                  ++++++
+
+
+======================================================================
+FAIL: test_ticket_replay_and_persistence (tests.test_offline_backend.ProtocolTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_offline_backend.py", line 45, in test_ticket_replay_and_persistence
+    self.assertEqual([decode(r)[0] for r in replies[:5]], [1002, 2998, 1017, 1034, 1035])
+AssertionError: Lists differ: [1002, 2998, 1017, 2998, 1034] != [1002, 2998, 1017, 1034, 1035]
+
+First differing element 3:
+2998
+1034
+
+- [1002, 2998, 1017, 2998, 1034]
+?                    ------
+
++ [1002, 2998, 1017, 1034, 1035]
+?                        ++++++
+
+
+----------------------------------------------------------------------
+Ran 199 tests in 223.559s
+
+FAILED (failures=3, errors=15)

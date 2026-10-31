@@ -9,10 +9,31 @@ from .protocol import encode
 
 ROOT = Path(__file__).resolve().parents[1]
 RULES_PATH = ROOT / 'server_config/summon_rules.json'
+# Original resource 1263 tables: ascension, rebirth and the level-600 path.
+# Keep the APK baseline intact for historical audits; no inferred extrapolation.
+IMMORTAL_HOTUPDATE_TABLES = frozenset({
+    'cortege_evolution.csv', 'cortege_evolve_config.csv',
+    'cortege_devolve.csv', 'cortege_experience.csv',
+    'cortege_reborn_config.csv',
+    *('hole/' + name + '.csv' for name in (
+        'main_building_config', 'garden_building_config', 'temple_config',
+        'upgrade_building_materials', 'garden_grid_config',
+        'temple_level_plus', 'temple_ext_prize')),
+})
+BABEL_HOTUPDATE_TABLES = frozenset({
+    'babel_tower_floor_prize.csv', 'babel_secret_tower_floor_prize.csv',
+    'tongtianta_score_awards.csv', 'fate_star_transform.csv', 'star_config.csv',
+})
+ESSENCE_HOTUPDATE_TABLES = frozenset({'ext_skill.csv', 'ext_skill_lock_cost.csv', 'ling_effect.csv'})
 
 
 def rows(name):
-    with (ROOT / 'analysis/configs' / name).open(encoding='utf-8-sig', newline='') as source:
+    relative = 'immortal_hotupdate/' + name if name in IMMORTAL_HOTUPDATE_TABLES else name
+    if name in BABEL_HOTUPDATE_TABLES:
+        relative = 'babel_hotupdate/' + name
+    if name in ESSENCE_HOTUPDATE_TABLES:
+        relative = 'essence_hotupdate/' + name
+    with (ROOT / 'analysis/configs' / relative).open(encoding='utf-8-sig', newline='') as source:
         result = list(csv.DictReader(source))
     if name in ('item_base.csv', 'item_name.csv'):
         # Narrow hot-update additions; preserve the audited 3.87 baseline.
@@ -21,6 +42,12 @@ def rows(name):
         key = 'type_id' if name == 'item_base.csv' else 'Ftype_id'
         existing = {row[key] for row in result}
         result.extend(row for row in additions if row[key] not in existing)
+    if name in ('item_base.csv', 'item_name.csv', 'material_transform.csv', 'material_transform_index.csv'):
+        with (ROOT / 'analysis/configs/babel_hotupdate' / name).open(encoding='utf-8-sig', newline='') as source:
+            additions = list(csv.DictReader(source))
+        key = {'item_base.csv': 'type_id', 'item_name.csv': 'Ftype_id'}.get(name, 'category')
+        replaced = {row[key] for row in additions}
+        result = [row for row in result if row[key] not in replaced] + additions
     return result
 
 
@@ -124,6 +151,8 @@ def client_source(rules):
     equipment_source += '\n' + Path(__file__).with_name('tian_shu_client.lua').read_text(encoding='utf-8')
     equipment_source += '\n' + Path(__file__).with_name('skill_client.lua').read_text(encoding='utf-8')
     equipment_source += '\n' + Path(__file__).with_name('soul_refresh_client.lua').read_text(encoding='utf-8')
+    from . import achievements
+    equipment_source += '\n' + achievements.client_patch()
     reborn_source = Path(__file__).with_name('reborn_client.lua').read_text(encoding='utf-8')
     from . import fate_rebuild
     fate_items = {int(r['type_id']): {k.split('(')[0]: int(v) if v.isdigit() else v for k,v in r.items()}
@@ -133,6 +162,7 @@ def client_source(rules):
     fate_items[1370]['desc'] = '开启可随机获得天魂石、命魂石或地魂石1个。'
     fate_source = Path(__file__).with_name('fate_rebuild_client.lua').read_text(encoding='utf-8')
     reborn_source += '\n' + fate_source.replace('__FATE_DEFAULTS__', lua(dict.fromkeys(fate_rebuild.ATTRS, 0))).replace('__FATE_ITEMS__', lua(fate_items))
+    reborn_source += '\n' + Path(__file__).with_name('essence_hotupdate_client.lua').read_text(encoding='utf-8')
     pray_source = Path(__file__).with_name('pray_client.lua').read_text(encoding='utf-8')
     pray_source = pray_source.replace('__PRAY_COSTS__', lua([int(r['spirit_coins']) for r in rows('pray_spirit_config.csv')]))
     rape_source = Path(__file__).with_name('rape_client.lua').read_text(encoding='utf-8')

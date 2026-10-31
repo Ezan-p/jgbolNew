@@ -57,7 +57,7 @@ def main():
         script.load();check("if rankClaimPreview then pcall(rankClaimPreview.restore);rankClaimPreview=nil end;if rank_fixture_restore then rank_fixture_restore() end;return 'clean'");check((ROOT/'.runtime/rank-fixture.lua').read_text())
         check('rankClaimData='+summon.lua(payload))
         report['render']=check('''local ms=package.loaded.ms;local ui=ms.d_rankUI
-ui.g_rankUI=nil;ui.g_isInRankPage=false
+ui.g_rankUI=nil;ui.g_isInRankPage=false;ui.g_isInChangePage=false
 function rankClaimApply(rows)
  for _,v in ipairs(rows) do
   if v.mid==1022 then ui.getDateFormServer(v.data)
@@ -68,10 +68,10 @@ function rankClaimApply(rows)
 end
 rankClaimApply(rankClaimData.initial);ms.d_activityUI.show();ui.showRankUI();ui.goToCreditsChargePage()
 local amounts={50,100,200,300,400,1000,2000}
-for index=4,10 do
+for index=3,9 do
  local node;for _,v in pairs(ui.g_chargeNode) do if v:getTag()==index then node=v end end
  local text=tolua.cast(assert(node):getChildren():objectAtIndex(3),'CCLabelTTF'):getString()
- assert(text:find('元宝: '..amounts[index-3],1,true),text);assert(not text:find('蟠桃',1,true),text)
+ assert(text:find('元宝: '..amounts[index-2],1,true),text);assert(not text:find('蟠桃',1,true),text)
  assert(ui.g_label_info[index].btn:isVisible() and ui.g_label_info[index].btn:isEnabled())
 end
 local root=CCLayer:create();root:retain();CCDirector:sharedDirector():getRunningScene():addChild(root,9999)
@@ -92,10 +92,10 @@ function rankClaimStep(index)
  local scene=CCDirector:sharedDirector():getRunningScene()
  if root:getParent()~=scene then root:removeFromParentAndCleanup(true);scene:addChild(root,9999) end
  local page=ui.g_rankUI.credits_layer;local before=rankClaimPreview.sends;local popups=rankClaimPreview.count
- ui.g_label_info[index].btn:activate();assert(rankClaimPreview.sends==before+1 and rankClaimPreview.request==index)
- rankClaimApply(rankClaimData.claims[index-3])
+ ui.g_label_info[index].btn:activate();assert(rankClaimPreview.sends==before+1 and rankClaimPreview.request==index+1)
+ rankClaimApply(rankClaimData.claims[index-2])
  assert(rankClaimPreview.count==popups+1 and root:getChildrenCount()>0)
- local p=rankClaimPreview.prizes[1];assert(p.object_type==11 and p.attach_count==amounts[index-3])
+ local p=rankClaimPreview.prizes[1];assert(p.object_type==11 and p.attach_count==amounts[index-2])
  assert(ui.g_isInChangePage and ui.g_rankUI.credits_layer==page and page:isVisible())
  local label=ui.g_label_info[index];assert(not label.btn:isVisible() and not label.btn:isEnabled())
  assert(label.btn2:isVisible() and not label.btn2:isEnabled())
@@ -104,28 +104,28 @@ function rankClaimStep(index)
  ui.chargeButtonCallBack(index);label.btn:activate();label.btn2:activate()
  assert(rankClaimPreview.sends==before+1,'duplicate claim sent')
  assert(rank_fixture_errors=='',rank_fixture_errors)
- return 'gold '..amounts[index-3]..': panel shown, disabled button says 已领取, page preserved'
+ return 'gold '..amounts[index-2]..': panel shown, disabled button says 已领取, page preserved'
 end
 local layer=ui.g_rankUI.credits_cells_layer
 for _,v in pairs(ui.g_chargeNode) do if v:getTag()==5 then layer.container:setPositionY(layer.scrollView:getContentSize().height-v:getPositionY()-v:getContentSize().height*.5) end end
 return 'all seven native rows show gold names and enabled claim buttons'
 ''')
-        shot('gold_claim_before.png')
-        report['claims']=[check('return rankClaimStep('+str(i)+')') for i in range(4,11)]
-        shot('gold_claim_panel.png')
+        shot('peach_exchange_gold_claim_before.png')
+        report['claims']=[check('return rankClaimStep('+str(i)+')') for i in range(3,10)]
+        shot('peach_exchange_gold_claim_panel.png')
         report['reopen']=check('''local ui=package.loaded.ms.d_rankUI
 rankClaimPreview.root:removeAllChildrenWithCleanup(true)
 ui.destroyCreditsLayer();ui.createCreditsChargePage()
-for i=4,10 do local row=ui.g_label_info[i];assert(not row.btn:isEnabled() and row.btn2:isVisible() and not row.btn2:isEnabled());assert(row.claimed_text:isVisible() and row.claimed_text:getString()=='已领取') end
+for i=3,9 do local row=ui.g_label_info[i];assert(not row.btn:isEnabled() and row.btn2:isVisible() and not row.btn2:isEnabled());assert(row.claimed_text:isVisible() and row.claimed_text:getString()=='已领取') end
 local layer=ui.g_rankUI.credits_cells_layer
 for _,v in pairs(ui.g_chargeNode) do if v:getTag()==5 then layer.container:setPositionY(layer.scrollView:getContentSize().height-v:getPositionY()-v:getContentSize().height*.5) end end
 return 'all seven remain disabled and show 已领取 after reopening'
 ''')
-        shot('gold_claim_after.png');report['passed']=True
+        shot('peach_exchange_gold_claim_after.png');report['passed']=True
     finally:
         try:report['restore']=check("if rankClaimPreview then rankClaimPreview.restore() end;if rank_fixture_restore then return rank_fixture_restore() end;return 'restored'")
         finally:script.unload();session.detach()
-        (output/'gold_claim_validation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+        (output/'peach_exchange_gold_claim_validation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print(json.dumps(report,ensure_ascii=False,indent=2))
 
 if __name__=='__main__':main()

@@ -13,6 +13,7 @@ EXP = {int(x['quality']): list(map(int, x['level1_up_exp'].split('|'))) for x in
 DECOMPOSE = {(int(x['quality']), int(x['level'])): x for x in summon.rows('star_decompose_config.csv')}
 ELEMENT_RELATIONS = summon.rows('star_element_relation.csv')
 AWAKEN = {int(next(iter(x.values()))): x for x in summon.rows('awaken_skill_conf.csv')}
+TRANSFORMS = {int(x['category']): x for x in summon.rows('fate_star_transform.csv')}
 
 
 def star(role, ident):
@@ -76,7 +77,7 @@ def divination(role, req, rules, parse, now=None):
         state['cur_pos'] = 1
     elif op == 5:
         f.require(state['star_list'], '没有可领取的命星')
-        f.require(sum(x['count'] for x in role['attachments'] if x['type_id'] in STARS and not x.get('owner_id')) + sum(x['attach_count'] for x in state['star_list']) <= 200, '命星背包已满')
+        f.require(sum(x['count'] for x in role['attachments'] if x['type_id'] in STARS and not x.get('owner_id')) + sum(x['attach_count'] for x in state['star_list'] if x['attach_type'] in STARS) <= 200, '命星背包已满')
         for p in state['star_list']:
             grant(role, p['attach_type'], p['attach_count'], p['attach_level'])
         state['star_list'] = []
@@ -92,6 +93,8 @@ def divination(role, req, rules, parse, now=None):
 
 
 def settle(role, mid, req, rules, parse):
+    if mid == 1359:
+        return transform(role, req)
     if mid == 1337:
         return divination(role, req, rules, parse)
     if mid in (1332, 1342):
@@ -148,6 +151,36 @@ def settle(role, mid, req, rules, parse):
     for p in returned:
         grant(role, p['attach_type'], p['attach_count'])
     return [summon.event(189, dict(result=1, prize_list=[r.prize(10300, dust)] + returned))]
+
+
+def transform(role, req):
+    """[A] 1263 UI selects an attribute subtype, not a guaranteed star ID.
+
+    [B] All eligible results have zero weights in the recovered table; use
+    equal probabilities within the chosen subtype, with no failure roll.
+    """
+    from . import equipment_crafting as craft
+    item = star(role, req['star_id'])
+    row = TRANSFORMS.get(item['type_id'])
+    f.require(row is not None and role['level'] >= int(row['min_role_level']), '该命星不可转换或等级不足38级')
+    f.require(item['level'] == 1 and item['count'] == 1 and not any(item.get(k) for k in
+        ('is_lock', 'owner_id', 'equip_pos', 'equip_order', 'ext_awaken_pos', 'ext_skill_pos')), '只能转换未锁定、未装备的1级命星')
+    # Protect invested dust: the native selector only checks level. Reject a
+    # partially fed level-one star rather than silently destroying its dust [B].
+    f.require(not item.get('prob_compen'), '请先处理已投入星尘的命星')
+    subtype = req['des_type']
+    targets = [x for x in craft.parts(row[craft.DEST])
+               if int(f.ITEMS[x[1]]['sub_type']) == subtype]
+    f.require(type(subtype) is int and bool(targets), '命星转换属性无效')
+    cost = 200 if int(f.ITEMS[item['type_id']]['quality']) == 5 else 0
+    craft.charge(role, craft.parts(row[craft.COST]))
+    f.debit_money(role, 'gold_coin', cost)
+    target = secrets.choice(targets)[1]
+    role['attachments'].remove(item)
+    grant(role, target)
+    # smithUI.onGetFateStarResult only forwards result == 0 to the native
+    # mxTransformUI callback (1263 L579-583).
+    return [summon.event(225, dict(result=0, new_star_type=target))]
 
 
 def awaken(role, mid, req, rules):

@@ -345,7 +345,7 @@ def experience(role, cfg, win, rules, formation_rules, bonus_exp=0, now=None):
         if not c.get('order'):
             continue
         quality = int(summon.BASES[c['type']]['quality'])
-        top = min(200, role['level'] * 3) if role['level'] < 80 else 200
+        top = formation.companion_level_cap(role, quality)
         applied = exp if c['level'] < top else 0
         c['cur_exp'] += applied
         while c['level'] < top and c['cur_exp'] >= formation.EXPERIENCE[quality, c['level']]:

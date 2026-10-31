@@ -40,4 +40,38 @@ sales.g_self.data=nil
 assert(sales.getCurrentPrice()==20)
 sales._localMarketPriceRestore()
 assert(sales.getCurrentPrice()==20)
+local nativeBuys,sends,shortGold,soldOut=0,0,0,0
+local nativeBuy=function() nativeBuys=nativeBuys+1 end
+shop.buyShopItem=nativeBuy
+ms.d_mainUI={g_playerInfo={gold_coin=10,strength_item_count=0,energy_item_count=0},g_mainUI={main_layer=scene}}
+ms.d_info={show=function() soldOut=soldOut+1 end}
+ms.d_summonUI={needGold=function() shortGold=shortGold+1 end}
+ms.d_msg_def={gscl_msg_id={msg_buy_item_in_batch=1057}}
+local expectedIndex
+ms.d_u={main_server_send_msg=function(mid,request)
+ assert(mid==1057 and request.index==expectedIndex and request.page_id==1 and request.count==1)
+ sends=sends+1
+end}
+assert(loadstring(source))()
+assert(loadstring(source))()
+for _,case in ipairs({{1022,24,5},{1023,27,10}}) do
+ local goods={buyInfo={type_id=case[1],index=case[2],buy_price=case[3],buy_limit_times=10}}
+ expectedIndex=case[2]
+ ms.d_mainUI.g_playerInfo.gold_coin=case[3]
+ local before=sends
+ shop.g_buyAndUse=1
+ shop.buyShopItem(goods,1)
+ assert(sends==before+1 and nativeBuys==0 and shop.g_buyAndUse==0)
+ goods.buyInfo.buy_limit_times=0;shop.buyShopItem(goods,1)
+ assert(sends==before+1)
+ goods.buyInfo.buy_limit_times=10;ms.d_mainUI.g_playerInfo.gold_coin=case[3]-1
+ shop.buyShopItem(goods,1)
+ assert(sends==before+1)
+end
+assert(shortGold==2 and soldOut==2)
+assert(ms.d_mainUI.g_playerInfo.strength_item_count==0 and ms.d_mainUI.g_playerInfo.energy_item_count==0)
+shop.buyShopItem({buyInfo={type_id=1093}},1)
+assert(nativeBuys==1)
+shop._localMarketBunRestore()
+assert(shop.buyShopItem==nativeBuy)
 return 'market client regression passed'

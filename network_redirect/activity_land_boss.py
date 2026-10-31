@@ -4,6 +4,7 @@ import secrets
 import math
 from . import activity as a, summon, activity_land_encounters as encounters
 from . import activity_land as land
+from .activity_land_rewards import draw_cards
 
 
 def score(s,n):
@@ -147,8 +148,7 @@ def settle(role,s,op,d,now,r,jrules):
                 s[history][str(layer)]=dict(score=newscore,cur_num=n)
         land.news(s,now,f"{'冥界' if hell else '普通'}首领第{layer}层：{'胜利' if win else '未获胜'}。")
         if reward:
-            # sample returns distinct pool entries in random position order.
-            rewards=secrets.SystemRandom().sample(r['land_card_rewards'],3 if hell else 5)
+            rewards=draw_cards(r,3 if hell else 5)
             s[key]=dict(layer=layer,cards=[],rewards=copy.deepcopy(rewards))
         return land.replay_response(4,s,r,replay,fight_type=4 if hell else 3,des_level=layer,is_win=win,is_reward=reward,
             return_soul=0,card_list=[],cost_gold_list=r['land_card_gold'])

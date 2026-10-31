@@ -46,6 +46,34 @@ do
   ui._localEquipmentRestore=function() ui.onGetResponse=original;ui._localEquipmentRestore=nil end
  end
 end
+-- release_w 1263 has level-14 recipes and showTilian supports level 13, but
+-- pressCast still rejects everything above 12. Keep all other native paths.
+do
+ local ms=package.loaded.ms
+ local ui=ms and ms.d_stoneCastUI
+ if ui and ui.pressCast and ui.showTilian and ui.initConfig and not ui._localStoneRefineRestore then
+  local original=ui.pressCast
+  ui.pressCast=function(parent,stone,zOrder)
+   if not stone or stone.level~=13 then return original(parent,stone,zOrder) end
+   ui.initConfig()
+   local cfg=stone.csvInfo or ms.d_data.getCertainInfo(ms.d_common_def.object_type.item,stone.type_id)
+   local recipes=ui.g_self.csv and cfg and ui.g_self.csv[cfg.sub_type]
+   if not recipes or not recipes[14] then return original(parent,stone,zOrder) end
+   local realm=ms.d_mainUI.g_playerInfo.reborn_layer or 0
+   local condition=ms.d_roleRebornUI.g_reborn_condition[realm]
+   if realm<4 or not condition or not condition.rights or not condition.rights.open_stone_sys then
+    return ms.d_info.show(ms.d_hz.gethz('asc30'))
+   end
+   ui.g_stoneCastUI.parent_layer=parent
+   ui.g_stoneCastUI.zOrder=zOrder or 100
+   ui.g_stoneCastUI.stone=stone
+   return ui.showTilian()
+  end
+  ui._localStoneRefineRestore=function()
+   ui.pressCast=original;ui._localStoneRefineRestore=nil
+  end
+ end
+end
 -- The shipped fragment result always labels its prize as object_type.item.
 -- Five-star passive fragments produce a skill; use the server's typed prize list.
 do

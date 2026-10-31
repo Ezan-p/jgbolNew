@@ -28,7 +28,7 @@ def load_rules(path=ROOT / 'server_config/immortal_rules.json'):
     r = json.loads(Path(path).read_text())
     f.require(r.get('schema_version') == 1 and r.get('mode') == 'inferred', '神仙配置须标记 inferred')
     f.require(type(r.get('adaptive_visible')) is bool, '神仙开关无效')
-    f.require(r.get('essence_slots') == 4, '原版铭刻界面支持4槽')
+    f.require(r.get('essence_slots') == 4, '普通精魄槽位上限须为4，逆天第五槽独立解锁')
     f.require(r.get('essence_replacement') == 'uniform_unlocked_destroy' and
               r.get('essence_upgrade') == 'deterministic_progress', '精魄结算模式无效')
     f.require(type(r.get('collection_material_count')) is int and 1 <= r['collection_material_count'] <= 100, '收集材料无效')
@@ -139,34 +139,42 @@ def engrave(role, req, rules, parse):
     slots = essence_slots(c)
     f.require(all(type(n) is int and n in slots for n in locks) and len(set(locks)) == len(locks), '锁定槽位无效')
     installed = [i for i in role['attachments'] if i['attach_type'] == 5 and i['type_id'] in ESSENCES and i.get('owner_id') == c['id']]
+    f.require(all(type(i.get('ext_skill_pos')) is int and i['ext_skill_pos'] in slots and i.get('count', 0) > 0 for i in installed), '已铭刻精魄槽位数据无效')
     f.require(all(i['type_id'] != src['type_id'] for i in installed), '不能重复铭刻同一种精魄')
     bypos = {i['ext_skill_pos']: i for i in installed}
-    f.require(set(locks) <= set(bypos) and len(locks) <= 3, '锁定槽位不存在或已全部锁定')
+    f.require(len(bypos) == len(installed), '已铭刻精魄槽位重复')
+    # [A] The fourth price tier protects four purple essences with slot 5 open.
+    # Keep the legacy three-lock path that can unlock the fourth ordinary slot.
+    max_locks = 4 if len(slots) == 5 else 3
+    f.require(set(locks) <= set(bypos) and len(locks) <= max_locks, '锁定槽位不存在或已全部锁定')
     f.require(all(int(f.ITEMS[bypos[p]['type_id']]['quality']) == 5 for p in locks), '只能锁定紫色精魄')
     # [A] Purple (type + 100) replaces its matching gold predecessor.
     predecessor = next((i for i in installed if i['type_id'] == src['type_id'] - 100), None)
+    limit = c['equiped_ext_skill_limit']
+    luck = c['next_ext_skill_luck_point']
     if predecessor:
         pos = predecessor['ext_skill_pos']
         f.require(pos not in locks, '同系旧精魄已锁定')
     else:
         free = [p for p in slots if p not in bypos]
-        candidates = [p for p in bypos if p not in locks]
+        candidates = [p for p in slots if p in bypos and p not in locks and not bypos[p].get('is_lock')]
         if free:
             pos = min(free)
         elif c['equiped_ext_skill_limit'] < 4 and (not candidates or secrets.randbelow(100) < min(100, rules['essence_unlock_base_percent'] + c['next_ext_skill_luck_point'])):
-            c['equiped_ext_skill_limit'] += 1
-            c['next_ext_skill_luck_point'] = 0
-            pos = c['equiped_ext_skill_limit']
+            limit += 1
+            luck = 0
+            pos = limit
         else:
             f.require(candidates, '没有可替换槽位')
             pos = secrets.choice(candidates)
             if c['equiped_ext_skill_limit'] < 4:
-                c['next_ext_skill_luck_point'] = min(100, c['next_ext_skill_luck_point'] + rules['essence_unlock_luck_step'])
+                luck = min(100, luck + rules['essence_unlock_luck_step'])
+    replaced = bypos.get(pos)
+    f.require(not replaced or not replaced.get('is_lock'), '被替换精魄已锁定')
     if locks:
         f.debit_money(role, 'gold_coin', LOCK_COST[len(locks)])
-    replaced = bypos.get(pos)
+    c['equiped_ext_skill_limit'], c['next_ext_skill_luck_point'] = limit, luck
     if replaced:
-        f.require(not replaced.get('is_lock'), '被替换精魄已锁定')
         role['attachments'].remove(replaced)
     # A bag stack becomes one independent engraved instance.
     if src['count'] > 1:

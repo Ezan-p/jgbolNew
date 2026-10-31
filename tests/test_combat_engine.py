@@ -87,15 +87,15 @@ class EngineTests(unittest.TestCase):
         target['poison'] = dict(rate=90, source_side=1, logic=101162)
         b.round = 2
         b.upkeep()
-        self.assertEqual(target['hp'], 990000)
-        self.assertEqual(e.total_damage(b.actions), 10000)
+        self.assertEqual(target['hp'], 800000)
+        self.assertEqual(e.total_damage(b.actions), 200000)
         self.assertTrue(b.actions[0]['self_use'])
         self.assertEqual(b.actions[0]['damage_list'][0], 0)
-        self.assertEqual(b.actions.events[0]['skill_result_list'][0]['field_plus'], -10000)
+        self.assertEqual(b.actions.events[0]['skill_result_list'][0]['field_plus'], -200000)
         target['essences'] = {17: (100,)}
         b.upkeep()
         self.assertNotIn('poison', target)
-        self.assertEqual(target['hp'], 990000)
+        self.assertEqual(target['hp'], 800000)
 
     def test_poison_death_has_valid_event_anchor_and_no_heal(self):
         b = self.battle(right=[unit(hp=5, essences={10: (100, 100)})])

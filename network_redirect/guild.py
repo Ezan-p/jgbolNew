@@ -31,6 +31,7 @@ def load_rules(path=ROOT/'server_config/guild_rules.json'):
     for row in r['store']:
         daily.validate_prize(row['prize'])
         require(all(type(row[k]) is int and 0<row[k]<=100000 for k in ('id','cost','limit')),'商店配置无效')
+        require(type(row.get('weight',1)) is int and 0<row.get('weight',1)<=100000,'仙盟宝库刷新权重无效')
     for key in ('tree_rewards','match_rewards','team_rewards','train_rewards','hunt_rewards'):
         require(isinstance(r.get(key),list) and r[key], '仙盟奖励配置缺失: '+key)
         for prize in r[key]:daily.validate_prize(prize)

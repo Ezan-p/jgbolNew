@@ -7,7 +7,9 @@ from . import formation as f, summon
 
 STONES = {1090: 1, 1091: 2, 1092: 3}
 STONE_VALUES = {(int(r['stone_type']), int(r['level'])): r for r in summon.rows('stone_cost_worth.csv')}
-STONE_REBORN = {(int(r['stone_type']), int(r['level'])): r for r in summon.rows('stone_reborn_cost_worth.csv')}
+# Active release_w 1263 includes levels 13/14; retain the base 3.87 CSV separately.
+STONE_REBORN = {(int(r['stone_type']), int(r['level'])): r for r in summon.rows('stone/stone_reborn_cost_worth.csv')}
+STONE_MAX_LEVEL = {kind: max(level for k, level in STONE_REBORN if k == kind) for kind in STONES.values()}
 
 
 def load_rules():
@@ -62,6 +64,12 @@ def split_one(role, item):
         rest = copy.deepcopy(item)
         rest.update(id=f.new_id(role), count=item['count'] - 1)
         role['attachments'].append(rest)
+        # Splitting a legacy stack is not another earned stone achievement.
+        observed = role.get('achievements', {}).get('observed', {})
+        for ident in (228 + STONES[item['type_id']], 480 + STONES[item['type_id']], 562 + STONES[item['type_id']]):
+            previous = observed.get(f"{ident}:{item['id']}")
+            if previous is not None:
+                observed[f"{ident}:{rest['id']}"] = previous
         item['count'] = 1
 
 
@@ -145,9 +153,12 @@ def settle(role, req):
             else:
                 target['prob_compen'] = min(100, target.get('prob_compen', 0) + rules['failure_compensation_percent'])
         else:
-            f.require(not ids and old in (10, 11), '灵石升华或提炼等级无效')
+            f.require(not ids, '灵石升华或提炼参数无效')
+            f.require(old >= 10, '10级灵石才可升华')
+            f.require(old < STONE_MAX_LEVEL[kind], '灵石已达到提炼上限')
+            f.require((kind, old + 1) in STONE_REBORN, '灵石提炼配置缺失')
             f.require(role.get('reborn_layer', 0) >= rules['reborn_min_realm'], '灵石升华需要主角境界')
-            f.require(old != 11 or role.get('reborn_layer', 0) >= 4, '灵石提炼需要主角四重境界')
+            f.require(old == 10 or role.get('reborn_layer', 0) >= 4, '灵石提炼需要主角四重境界')
             split_one(role, target)
             row = STONE_REBORN[kind, old + 1]
             for part in list(row.values())[2].split('/'):

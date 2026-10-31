@@ -1,13 +1,29 @@
-"""Original 3.87 achievement catalogue [A]; authoritative local settlement [B]."""
+"""Original hotupdate 1263 catalogue [A]; authoritative local settlement [B]."""
 import csv
 import json
 from pathlib import Path
 from .protocol import encode
 
 ROOT = Path(__file__).resolve().parents[1]
-with (ROOT / 'analysis/configs/achievements_config.csv').open(encoding='utf-8-sig', newline='') as source:
+CATALOG_PATH = ROOT / 'analysis/configs/achievement_hotupdate/achievements_config.csv'
+with CATALOG_PATH.open(encoding='utf-8-sig', newline='') as source:
     CATALOG = {int(r['id']): r for r in csv.DictReader(source)}
 OPEN = {i: r for i, r in CATALOG.items() if r['is_open(Y/N)'] == 'Y'}
+FATE_THRESHOLDS = dict(zip(range(581, 591), (30, 90, 150, 240, 300, 50, 100, 200, 300, 500)))
+
+
+def client_patch():
+    from .summon import lua
+    # Match data.getAchievementsCSVConfig's normalized fields, including sort.
+    changes = []
+    for order, (ident, row) in enumerate(CATALOG.items(), 1):
+        if ident not in (563, 564, 565) and ident < 580:
+            continue
+        changes.append(dict(id=ident, sort_id=order, category=int(row['category']),
+            name=row['name'], desc=row['desc'], plus_str='+' + row['plus_point'],
+            repeatable=row['repeatable(Y/N)'] == 'Y', is_open=row['is_open(Y/N)'] == 'Y',
+            full_progress=int(row['full_progress']), max_repeatable_times=int(row['max_repeatable_times'])))
+    return Path(__file__).with_name('achievements_client.lua').read_text().replace('__ACHIEVEMENT_ROWS__', lua(changes))
 
 
 def load_rules(path=ROOT / 'server_config/achievement_rules.json'):
@@ -83,14 +99,20 @@ def packets(role, new=0, previous=None):
         entries = [r for r in entries if r != old.get(r['id'])]
         if not entries and role.get('tao_point', 0) == previous.get('tao_point', 0):
             return []
-    # All open entries fit one packet; unlike self updates, the native other-role
-    # handler REPLACES its list on every 1066, so never split that list.
-    if len(entries) > 255:
-        raise ValueError('原版成就列表超过单包255条限制')
     attribute = encode(1032, dict(id=role['role_id'], unit_type=1, attr_count=1,
         attr_list=[dict(type=27, value=role.get('tao_point', 0))]))
-    return [attribute, encode(1066, dict(new=new, role_id=role['role_id'], tao_point=role.get('tao_point', 0),
-                              achievement_count=len(entries), achievements=entries))]
+    result = [attribute]
+    if len(entries) > 255:
+        from .summon import event
+        # [B] Keep the native byte count; the client adapter assembles a full
+        # list before invoking the native self/other handler exactly once.
+        result.append(event(80, dict(local_achievement_batch=dict(
+            role_id=role['role_id'], new=new, count=len(entries)))))
+    for start in range(0, max(1, len(entries)), 255):
+        chunk = entries[start:start+255]
+        result.append(encode(1066, dict(new=new, role_id=role['role_id'], tao_point=role.get('tao_point', 0),
+                                      achievement_count=len(chunk), achievements=chunk)))
+    return result
 
 
 def login(role, now):
@@ -114,8 +136,18 @@ def daily_add(role, ident, amount, now, source='all'):
 
 def refresh(role, now):
     """Recover only facts still provable from the saved role; no invented history."""
-    from . import formation as f, equipment, journey, reborn_stars
+    from . import formation as f, equipment, journey, reborn_stars, fate_rebuild
     s = state(role)
+    if s.get('stone_cap_revision', 0) < 2:
+        # The old total was capped at 200, but per-object observations survived.
+        # Recover that evidence once; later stack splits may inherit markers.
+        for ident in (563, 564, 565):
+            proven = sum(min(1, value) for key, value in s['observed'].items()
+                         if key.startswith(f'{ident}:') and value > 0)
+            total = s['totals'].get(str(ident), 0)
+            if proven > total:
+                s['totals'][str(ident)] = min(int(OPEN[ident]['max_repeatable_times']), proven)
+        s['stone_cap_revision'] = 2
     for index, array in enumerate(role.get('spirit_array', [])):
         if array['activated']:
             observe(role, (461,462,463,464,560,561)[index], 1)
@@ -156,6 +188,12 @@ def refresh(role, now):
         observe(role, 239, int(evolve >= 10), key)
         for ident, limit in ((247, 3), (248, 6), (249, 9)):
             observe(role, ident, int(reborn >= limit), key)
+        if c.get('fate_rebullding_state') == 1:
+            observe(role, 580, 1, key)
+            souls = sum(fate_rebuild.progress(c, p)[0] for p in range(1, 4))
+            spirits = sum(fate_rebuild.progress(c, p)[0] for p in range(4, 11))
+            for ident, limit in FATE_THRESHOLDS.items():
+                observe(role, ident, int((souls if ident <= 585 else spirits) >= limit), key)
     for item in role.get('attachments', []):
         key = str(item['id']); tid = item['type_id']; lv = item.get('level', 1)
         if tid in reborn_stars.STARS:
@@ -233,6 +271,15 @@ def track(role, before, mid, req, now):
             if x.get('upgrade_level', 0) > old.get('upgrade_level', 0) and mid == 1076: add(role, 459)
             if x.get('awaken', 0) and not old.get('awaken', 0): observe(role, 479, 1, str(x['id']))
         elif x.get('attach_type', 5) == 5:
+            # First 11->12 is recovered below by the existing per-item fact.
+            # Later successful refinements also mean "提炼一次"; ownership of
+            # an old level-14 stone alone does not prove those past operations.
+            if mid == 1054 and req.get('flag') == 5 and x['id'] == req.get('des_id'):
+                from .equipment import STONES
+                if x['type_id'] in STONES and x.get('level', 1) == old.get('level', 1) + 1:
+                    ident = 562 + STONES[x['type_id']]
+                    if old.get('level', 1) >= 12:
+                        add(role, ident)
             kind = int(f.ITEMS.get(x['type_id'], {}).get('main_type', 0))
             if kind in (1, 2, 3):
                 if x.get('star_level', 0) > old.get('star_level', 0): add(role, 254, x['star_level']-old.get('star_level', 0))

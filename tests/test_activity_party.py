@@ -39,7 +39,10 @@ class PartyTests(ActivityCase):
         with patch('network_redirect.backend.time.time',return_value=NOW+86400):
             h=dict(self.req(1049,query_type=2))[30];self.assertEqual(h['fight_count'],1)
             self.assertEqual(len(h['damage_list']),10);self.assertIn('id',h['felstar_info'])
-            self.assertGreater(self.b.profile()['gold_coin'],gold)
+            self.assertEqual(self.b.profile()['gold_coin'],gold)
+            mail=self.b.profile()['welfare']['mails'][f"party-rank-{before['activity']['party']['day']}"]
+            self.assertEqual(mail['prizes'],party.rewards('daily',h['self_order']))
+            self.assertFalse(mail['claimed'])
             snapshot=self.b.profile();self.ok(self.req(1049,query_type=2));self.assertEqual(snapshot,self.b.profile())
             self.assertEqual(snapshot['activity']['party_count'],0)
             self.ok(self.req(1049,query_type=5,flag=2))
@@ -205,3 +208,47 @@ class PartyTests(ActivityCase):
                 lineup=next(d for m,_,d in self.decoded if m==1028)
                 self.assertEqual(lineup['des_name'],expected['name'])
                 self.assertEqual([x['des_type'] for x in lineup['lineup'] if x['des_type']],[tid])
+                self.assertEqual(lineup['lineup'][0]['des_magic'],party.BOSS_MAGIC_CAP)
+
+    def test_all_bosses_one_aoe_defeats_full_team_and_preserves_damage(self):
+        from network_redirect import combat_engine, journey
+        from tests.test_combat_engine import unit
+        for boss in party.rules()['boss_pool']:
+            with self.subTest(boss=boss['type']):
+                ours=[unit(i,hp=2147483647,max_hp=2147483647,gongji=100,
+                           essences={8:(100,),19:(100,100)},
+                           reborn_traits=dict(survival=100,survival_count=10),
+                           fate_traits=dict(absorb=[100],reflect=[100],death_heal=[100,100]))
+                      for i in range(1,9)]
+                enemy=journey.fighters({'corteges':[]},dict(cortege_list=f"{boss['type']}|60"))[1][0]
+                party.prepare_boss(enemy,dict(boss_type=boss['type'],cur_hp=10000000))
+                battle=combat_engine.Battle({},(ours,[enemy]),journey.load_rules())
+                for target in battle.sides[0]:target['shield']=2147483647
+                with patch('network_redirect.combat.secrets.randbelow',return_value=0):
+                    result,lineup,actions=battle.run()
+                self.assertIn(result,(4,5,6))
+                attacks=[a for a in actions if not a['is_src']]
+                self.assertEqual(len(attacks),1)
+                self.assertEqual(attacks[0]['skill_type'],boss['aoe_skill'])
+                self.assertEqual(attacks[0]['damage_list'],[2147483647]*8)
+                self.assertEqual(actions.final_hp[1],dict.fromkeys(range(1,9),0))
+                self.assertGreater(actions.damage_totals[1],0)
+                self.assertLess(actions.damage_totals[1],10000000)
+                self.assertEqual(actions.damage_totals[2],2147483647*8)
+                self.assertEqual(lineup[0]['des_magic'],party.BOSS_MAGIC_CAP)
+                # Exercise the same signed-int wire fields used by actual fights.
+                from network_redirect.protocol import encode
+                decoded=decode(encode(1027,dict(fight_id=1,fight_type=6,final_result=result,
+                    fight_round=len(actions),fight_result=actions)))[2]
+                self.assertEqual(decoded['fight_result'][-1]['damage_list'],[2147483647]*8)
+
+    def test_finisher_is_not_in_other_encounters(self):
+        from network_redirect import combat_engine, journey
+        from tests.test_combat_engine import unit
+        for boss in party.rules()['boss_pool']:
+            enemies=journey.fighters({'corteges':[]},dict(cortege_list=f"{boss['type']}|60|{boss['aoe_skill']}"))[1]
+            self.assertNotIn('party_finisher_skill',enemies[0])
+            battle=combat_engine.Battle({},([unit(i) for i in range(1,9)],enemies),journey.load_rules())
+            actor=battle.sides[1][0]
+            battle.attack(actor,battle.targets(actor,boss['aoe_skill']),boss['aoe_skill'])
+            self.assertEqual(battle.actions[0]['damage_list'][4:],[0]*4)
