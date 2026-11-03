@@ -25,6 +25,12 @@ def rules():
 def catalog():
     data = json.loads(CATALOG_PATH.read_text())
     f.require(data['schema_version'] == 1, 'NPC资料库版本无效')
+    for relative in rules().get('additional_catalogs', []):
+        path = (ROOT / relative).resolve()
+        f.require(path.is_relative_to(ROOT / 'analysis/npc_design'), 'NPC资料路径无效')
+        extra = json.loads(path.read_text())
+        f.require(extra['schema_version'] == 1, 'NPC资料库版本无效')
+        data['players'].extend(extra['players'])
     result, identities, names = {}, set(), set()
     for entry in data['players']:
         p = entry['profile']
@@ -63,7 +69,8 @@ def handles(identity):
 def source_file(relative):
     path = (ROOT / relative).resolve()
     f.require(path.is_relative_to(ROOT / 'analysis/npc_design') and path.suffix == '.json', 'NPC阵容路径无效')
-    return {n['npc_id']: n for n in json.loads(path.read_text())['npcs']}
+    data = json.loads(path.read_text())
+    return {n['npc_id']: n for n in ([data] if 'role' in data else data['npcs'])}
 
 
 def decorate(npc):

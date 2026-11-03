@@ -40,6 +40,10 @@ class PayloadTests(unittest.TestCase):
         catalog = json.loads((ROOT / 'analysis/npc_design/players/catalog.json').read_text())
         for entry in catalog['players']:
             self.assertIn(entry['source_file'], files)
+        ladder = json.loads((ROOT / 'analysis/npc_design/rank_500/catalog.json').read_text())
+        self.assertIn('analysis/npc_design/rank_500/profiles.json', files)
+        for entry in ladder['npcs']:
+            self.assertIn(entry['source_file'], files)
 
     def test_packed_program_boots_in_isolation_and_has_no_player_data(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -61,6 +65,9 @@ assert 'luaparser.ast' in sys.modules
 assert not list(pathlib.Path(sys.argv[2], 'cache').iterdir())
 assert len(npc_players.catalog()) > 1700
 assert npc_players.get(next(iter(npc_players.catalog()))) is not None
+from network_redirect import activity_rank
+assert len(activity_rank.catalog()) == 500
+assert activity_rank.catalog()[930001]['role']['role_combat_power'] == 45077041
 import network_redirect.system_mail
 stop()
 assert pathlib.Path(sys.argv[2], 'save/game.sqlite3').is_file()

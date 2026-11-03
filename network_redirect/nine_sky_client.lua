@@ -2,12 +2,13 @@
 do
  local ms=package.loaded.ms
  local ui=ms and ms.d_towerUI
- if not ui or not ms.d_c or not ms.d_time then return 'pending' end
+ if not ui or not ms.d_c or not ms.d_time or not ms.d_fightUI then return 'pending' end
  if not ui._localNineSkyRestore then
   local old={}
   for _,key in ipairs({'onGetActResult','cancelSwallow','showFloorTitle','updateActivityStatus',
-   'canJoin','sendRequest','create','showShopLayer','showComplexBuyLayer','getShopItem'}) do old[key]=ui[key] end
-  local pending,meta,timerLayer=nil,nil,nil
+   'canJoin','sendRequest','create','showShopLayer','showComplexBuyLayer','getShopItem','showRandomPrize'}) do old[key]=ui[key] end
+  local pending,meta,timerLayer,activeBattle=nil,nil,nil,nil
+  local fight=ms.d_fightUI;local nativeFightEnd=fight.showFightEnd
   local shopVersions={};local lastRequest=-100;local installed=true
   local battleTag=91037
   local function main() return ui.g_towerUI and ui.g_towerUI.main_layer end
@@ -167,31 +168,83 @@ do
    ui.g_self.top_data=data.local_top
    if main() then ui.showDynamicInfo();ui.showTokenCount();ui.showTopPlayer() end
   end
-  local function battleResults(battles)
-   if not battles or #battles==0 or not main() then return end
-   local parent=main();parent:removeChildByTag(battleTag,true)
-   local layer=CCLayerColor:create(ccc4(18,29,44,245));parent:addChild(layer,100,battleTag)
+  -- Native movement pauses at showRandomPrize and resumes through its callback.
+  -- A private marker lets a battle use that same checkpoint, including rolls
+  -- which also contain treasure or a palace, without inventing a reward.
+  ui.showRandomPrize=function(items,callback)
+   local marker=items and items[1] and items[1].local_nine_sky_battle
+   if not marker then return old.showRandomPrize(items,callback) end
+   local parent=main();local holder=CCLayer:create()
+   local context={row=marker,parent=parent,holder=holder,callback=callback,treasure={},
+    sceneID=ms.d_loginUI and ms.d_loginUI.g_currentSence}
+   for i=2,#items do context.treasure[#context.treasure+1]=items[i] end
+   activeBattle=context
+   -- The caller first attaches the returned holder to the map. Start on the
+   -- next tick so leaving the scene cannot interrupt that native callback.
+   ms.d_u.delay(holder,0.05,function()
+    if activeBattle~=context or main()~=parent then return end
+    local director=CCDirector:sharedDirector()
+    local runScene=ms.d_u.runScene
+    ms.d_u.runScene=function(scene)
+     context.pushed=true;director:pushScene(scene)
+    end
+    ms.d_event_mgr.setSpecialFightType(2)
+    local ok,err=pcall(fight.actFight,ms.d_c.table_copy(marker.replay),2)
+    ms.d_u.runScene=runScene
+    if not ok then error(err) end
+   end)
+   return holder
+  end
+  fight.showFightEnd=function(...)
+   local context=activeBattle
+   if not context then return nativeFightEnd(...) end
+   if context.finished then return end
+   context.finished=true
+   local row=context.row
+   fight.g_fightUI.is_fight_end=true
+   fight.getSkipFightBtn():setVisible(false)
+   local parent=fight.g_fightUI.layerFightEnd
+   parent:removeAllChildrenWithCleanup(true)
+   local layer=CCLayerColor:create(ccc4(18,29,44,240));parent:addChild(layer,100,battleTag)
    ms.d_u.createSwallowTouchLayer(layer)
-   label(layer,1,'九重天 · 遭遇战结果',0.5,0.91,30)
-   label(layer,2,'按当前出战阵容自动结算；胜利奖励已入账',0.5,0.84,22)
-   for i,row in ipairs(battles) do
-    local rewards={}
-    for _,reward in ipairs(row.rewards or {}) do rewards[#rewards+1]=ui.getItemName(reward)..'×'..reward.attach_count end
-    local outcome=row.won and ('胜利  '..table.concat(rewards,'、')) or '未获胜  无奖励，可继续探索'
-    local text=string.format('%d重天 · %s：%s',row.floor,row.enemy_name or '守关敌人',outcome)
-    local node=label(layer,10+i,text,0.5,0.75-(i-1)*0.058,22)
-    local width=CCDirector:sharedDirector():getVisibleSize().width*0.90
-    if node:getContentSize().width>width then node:setScale(width/node:getContentSize().width) end
+   label(layer,1,row.won and '战斗胜利 · 获得奖励' or '战斗结束 · 未获胜',0.5,0.82,32)
+   label(layer,2,string.format('%d重天 · %s',row.floor,row.enemy_name or '守关敌人'),0.5,0.71,24)
+   for i,reward in ipairs(row.rewards or {}) do
+    local y=0.53-(i-1)*0.14
+    local icon=ui.getItemIcon(reward)
+    ms.d_u.setStyles(icon,{x=0.35,y=y,scale=0.10});layer:addChild(icon,3)
+    local title=label(layer,10+i,ui.getItemName(reward)..'×'..reward.attach_count,0.58,y,26)
+    local width=CCDirector:sharedDirector():getVisibleSize().width*0.50
+    if title:getContentSize().width>width then title:setScale(width/title:getContentSize().width) end
    end
+   if not row.won then label(layer,3,'本次未获得战利品，可以继续探索',0.5,0.50,24) end
+   label(layer,4,'关闭后继续前进',0.5,0.24,24)
+   local closed=false
    layer:addChild(ms.d_u.createMenu({x=0,y=0,{npic='v2/introUI/close1.png',spic='v2/introUI/close2.png',
-    x=0.95,y=0.93,scalexx=0.1,call_back=function() parent:removeChildByTag(battleTag,true) end}}),4)
+    x=0.92,y=0.88,scalexx=0.1,call_back=function()
+     if closed or activeBattle~=context then return end
+     closed=true;activeBattle=nil
+     ms.d_event_mgr.setSpecialFightType(0)
+     if ms.d_loginUI then ms.d_loginUI.g_currentSence=context.sceneID end
+     if main_server and main_server.change_speed then main_server.change_speed(1) end
+     if ms.d_music_mgr then ms.d_music_mgr.playUIMusic() end
+     if context.pushed then CCDirector:sharedDirector():popScene() end
+     -- Wait for the map to re-enter before continuing its Cocos actions.
+     ms.d_u.delay(context.parent,0.05,function()
+      if main()~=context.parent then return end
+      ms.d_u.remove(context.holder)
+      if #context.treasure>0 then
+       context.parent:addChild(old.showRandomPrize(context.treasure,context.callback),100)
+      elseif context.callback then context.callback() end
+     end)
+    end}}),4)
   end
   ui.cancelSwallow=function(...)
    local result=old.cancelSwallow(...)
    -- Native addSwallow also invokes cancelSwallow at intermediate floor changes.
-   if pending and ui.g_self.role_data.steps==pending.local_snapshot.steps then
+   if pending and not activeBattle and ui.g_self.role_data.steps==pending.local_snapshot.steps then
     local data=pending;pending=nil;sync(data);ui.showGameLayer()
-    battleResults(data.local_battles);ui._localNineSkyTick()
+    ui._localNineSkyTick()
    end
    return result
   end
@@ -228,8 +281,18 @@ do
      ui.showGameLayer()
     end
    end
+   if data.flag==2 then
+    data=ms.d_c.table_copy(data)
+    for _,event in ipairs(data.map_event_list or {}) do
+     local row=(data.local_battles or {})[event.local_battle_index]
+     if row and row.replay then
+      table.insert(event.meet_rand_list,1,{local_nine_sky_battle=row})
+     end
+    end
+    pending=data
+   end
    local result=old.onGetActResult(data,...)
-   if data.flag==2 then pending=data
+   if data.flag==2 then -- movement owns the snapshot until its final callback
    elseif pending and data.flag==5 then
     -- Palace purchases happen while walking is paused; preserve their new balances.
     for _,key in ipairs({'stars','credits','free_times'}) do
@@ -242,7 +305,8 @@ do
    return result
   end
   ui._localNineSkyRestore=function()
-   installed=false;timerLayer=nil;pending=nil
+   installed=false;timerLayer=nil;pending=nil;activeBattle=nil
+   fight.showFightEnd=nativeFightEnd
    for key,value in pairs(old) do ui[key]=value end
    ui._localNineSkyTick=nil;ui._localNineSkyRestore=nil
   end

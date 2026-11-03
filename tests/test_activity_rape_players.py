@@ -20,7 +20,7 @@ class RapePlayersTests(ActivityCase):
     def test_players_sources_identity_inspection_and_real_battle(self):
         catalog=npc.catalog()
         self.assertGreater(len(catalog),1500)
-        self.assertEqual({npc_players.catalog()[k]['version'] for k in catalog},{'v1','v2'})
+        self.assertEqual({npc_players.catalog()[k]['version'] for k in catalog},{'v1','v2','extreme_rank'})
         rows=self.board()
         for t in rows:
             p=npc_players.catalog()[t['npc_id']]['profile']

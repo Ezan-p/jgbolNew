@@ -56,9 +56,11 @@ def load_rules(path=ROOT / 'server_config/nine_sky_rules.json'):
         f.require(all(type(row.get('weight')) is int and 1 <= row['weight'] <= 10000 for row in r[name]), '九重天奖励权重缺失')
     low = [x for x in r['star_shop'] if x.get('tier') == 'low']
     high = [x for x in r['star_shop'] if x.get('tier') == 'high']
-    f.require(len(low) == 9 and len(high) == 5 and
+    f.require(len(r['star_shop']) == 15 and len(low) == 9 and len(high) == 6 and
               [x['reward'] for x in low] == [[5, t, 1, 1] for t in (1022,1023,1041,1033,1006,1032,1024,1042,1007)] and
-              {tuple(x['reward']) for x in high} == {(10,5027,5,1),(10,5036,5,1),(5,1031,5,1),(5,1249,50,1),(5,1243,1,1)}, '九重商会奖励池不完整')
+              {tuple(x['reward']) for x in high} == {(10,5027,5,1),(10,5036,5,1),(5,1031,5,1),(5,1249,50,1),(5,1243,1,1),(5,1246,1,1)}, '九重商会奖励池不完整')
+    f.require(all(type(x.get('listing_weight')) is int and 1 <= x['listing_weight'] <= 100 for x in high)
+              and sum(x['listing_weight'] for x in high) == 100, '九重商会高级池上架权重须为正整数且合计100')
     f.require(all(x['cost'] < y['cost'] for x,y in zip(low,low[1:])) and
               all(x['limit'] == 1 for x in r['star_shop']), '九重商会定价须递增、每种每日限兑一份')
     return r
@@ -98,14 +100,23 @@ def recycle(role, s, now, r):
     return dict(start=s['start'], stars=stars, peaches=peaches, mail_id=mail['mail_id'])
 
 
+def choose_high_shop(r):
+    """One daily high-tier offer; listing weights are percentages, totaling 100."""
+    high = [x for x in r['star_shop'] if x['tier'] == 'high']
+    pick = secrets.randbelow(sum(x['listing_weight'] for x in high))
+    for row in high:
+        if pick < row['listing_weight']:
+            return row
+        pick -= row['listing_weight']
+
+
 def refresh_shop(s, r, today):
     old = s.get('shop')
     if today > s.get('shop_day', -1) or old is None:
         low = [x for x in r['star_shop'] if x['tier'] == 'low']
-        high = [x for x in r['star_shop'] if x['tier'] == 'high']
         chosen = [low.pop(secrets.randbelow(len(low))) for _ in range(5)]
         chosen.sort(key=lambda row: row['cost'])
-        chosen.append(secrets.choice(high))
+        chosen.append(choose_high_shop(r))
         # Preserve matching quotas when upgrading the legacy fixed shop on the same day.
         legacy = {}
         if old is None and today == s['day']:
@@ -267,6 +278,8 @@ def roll(role, s, data, now, r):
             battles.append(record)
         event = dict(rand_map=new, forward=forward, is_star_double=double,
                      is_enter_next=entered, meet_rand_list=rewards)
+        if battles and battles[-1]['roll'] == s['rolls']:
+            event['local_battle_index'] = len(battles)
         if s['rolls'] % r['palace_every'] == 0:
             s['palace_count'] += 1
             index = s['palace_count']
@@ -360,7 +373,8 @@ def settle(role, req, now, parse, peers=None):
     result['local_snapshot'] = snapshot(s)
     result['local_cards'] = cards(s)
     result['local_top'] = top(role, s, peers)
-    return [summon.event(164, result)]
+    from .battle_replay import event_packets
+    return event_packets(164, result)
 
 
 def market_goods(now):

@@ -10,9 +10,98 @@ from network_redirect.protocol import decode, encode
 
 
 class RankTests(ActivityCase):
+    def test_old_100_seat_swaps_migrate_without_losing_any_opponent(self):
+        for origin in (1, 40, 100):
+            role = self.b.profile(); state = role['activity']
+            state.update(rank_version=1, rank_order=origin, rank_origin_order=origin, rank_slots={},
+                         rank_score=12345, rank_count=3, rank_promotions=[4, 5], rank_revenge=930020)
+            with patch.object(rank, 'rules', return_value=dict(rank.rules(), size=100)):
+                for target in (20, 99, 1, 50):
+                    rank.swap(state, target)
+                old = {i: rank.identity(state, i) for i in range(1, 101)}
+            rank.prepare(role, NOW, self.b.activity_rules)
+            self.assertEqual(old, {i: rank.identity(state, i) for i in range(1, 101)})
+            ids = [rank.identity(state, i) for i in range(1, 502) if i != state['rank_order']]
+            self.assertEqual(len(ids), len(set(ids)))
+            self.assertEqual(set(ids), set(rank.catalog()))
+            self.assertEqual((state['rank_score'], state['rank_count'], state['rank_promotions'], state['rank_revenge']),
+                             (12345, 3, [4, 5], 930020))
+            before = copy.deepcopy(state); rank.prepare(role, NOW, self.b.activity_rules)
+            self.assertEqual(state, before)
+
+    def reset_notice(self, events):
+        return [d for e, d in events if e == 80 and d.get('local_rank_reset_notice')]
+
+    def test_old_saves_reset_only_on_first_board_and_survive_restart(self):
+        for version in (None, 1, 2):
+            role = self.b.profile(); state = role['activity']
+            state.pop('rank_reset_version', None)
+            state.update(rank_order=1, rank_origin_order=100, rank_slots={'100': 930001},
+                         rank_score=12345, rank_count=3, rank_extra=6, rank_promotions=[4],
+                         rank_reached_order=1, rank_revenge=930020, rank_day_best=1,
+                         rank_previous_best=1, rank_defence_day=state['rank_day']-1)
+            if version is None:
+                state.pop('rank_version', None)
+            else:
+                state['rank_version'] = version
+            self.b.save(role)
+            # Background preparation and an invalid board query cannot consume the reset.
+            role = self.b.profile(); activity.prepare(role, NOW, self.b.activity_rules); self.b.save(role)
+            self.assertEqual(self.b.profile()['activity']['rank_order'], 1)
+            self.assertNotIn('rank_reset_version', self.b.profile()['activity'])
+            self.assertEqual(self.req(1021, flag=9)[0][0], 55)
+            self.assertNotIn('rank_reset_version', self.b.profile()['activity'])
+            events = self.req(1021, flag=0); self.ok(events)
+            self.assertEqual(len(self.reset_notice(events)), 1)
+            after = self.b.profile(); state = after['activity']
+            self.assertEqual((state['rank_order'], state['rank_origin_order'], state['rank_slots']), (501, 501, {}))
+            self.assertEqual((state['rank_day_best'], state['rank_previous_best']), (501, 0))
+            self.assertNotIn('rank_revenge', state)
+            self.assertEqual((state['rank_score'], state['rank_count'], state['rank_promotions'], state['rank_reached_order']),
+                             (12345, 3, [], 501))
+            self.assertEqual(after['top_order'], 501)
+            self.assertEqual(self.b.respond(self.packet, self.state), self.replies)
+            self.assertEqual(self.b.profile(), after)
+            self.assertEqual(set(rank.identity(state, n) for n in range(1, 501)), set(rank.catalog()))
+            # Actual progress after the reset must persist across subsequent openings and restart.
+            self.fight(500)
+            self.assertEqual(self.b.profile()['activity']['rank_order'], 500)
+            self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+            for flag in (0, 1):
+                events = self.req(1021, flag=flag); self.ok(events)
+                self.assertFalse(self.reset_notice(events))
+                self.assertEqual(self.b.profile()['activity']['rank_order'], 500)
+
+    def test_new_save_has_no_reset_notice(self):
+        self.assertEqual(self.b.profile()['activity']['rank_reset_version'], 1)
+        events = self.req(1021, flag=0); self.ok(events)
+        self.assertFalse(self.reset_notice(events))
+        self.fight(500); self.board()
+        self.assertEqual(self.b.profile()['activity']['rank_order'], 500)
+
+    def test_reset_encoding_failure_rolls_back_and_retries(self):
+        role = self.b.profile(); role['activity'].pop('rank_reset_version')
+        role['activity'].update(rank_order=40, rank_origin_order=40, rank_slots={})
+        self.b.save(role); before = self.b.profile()
+        with patch.object(rank, 'board', side_effect=ValueError('encoding failed')):
+            self.assertEqual(self.req(1021, flag=0)[0][0], 55)
+        self.assertEqual(self.b.profile(), before)
+        events = self.req(1021, flag=0); self.ok(events)
+        self.assertEqual(len(self.reset_notice(events)), 1)
+        self.assertEqual(self.b.profile()['activity']['rank_order'], 501)
+
+    def test_board_uint8_head_and_full_ascension_extension(self):
+        self.board()
+        row = next(v for v in next(d for m, _, d in self.decoded if m == 1022)['show_list'] if v['order'] == 1)
+        self.assertEqual(row['cortege_layer'], 255)
+        from network_redirect.backend import login_fields
+        state = next(login_fields(d['data'])['local_rank'] for m, _, d in self.decoded
+                     if m == 2998 and d['id'] == 80 and 'local_rank' in login_fields(d['data']))
+        self.assertEqual(state['cortege_layers'][930001], 499)
+
     def test_rank_44_skill_effects_settle_persist_and_replay_once(self):
         role = self.b.profile()
-        role['activity'].update(rank_order=45, rank_origin_order=100, rank_slots={})
+        role['activity'].update(rank_order=45, rank_origin_order=501, rank_slots={})
         # A matching NPC roster survives long enough to exercise real effects.
         npc = rank.catalog()[930044]['role']
         for key in ('corteges', 'attachments'):
@@ -38,9 +127,9 @@ class RankTests(ActivityCase):
     def test_daily_points_for_challenges_caps_failures_replay_and_next_day(self):
         def points(): return self.b.profile().get('daily', {}).get('points', {}).get('10', 0)
         self.board(); self.assertEqual(points(), 0)
-        self.req(1026, fight_type=2, des_type=2, des_id=0, des_value=99)
+        self.req(1026, fight_type=2, des_type=2, des_id=0, des_value=500)
         self.assertEqual(points(), 0)
-        self.fight(99); self.assertEqual(points(), 10)
+        self.fight(500); self.assertEqual(points(), 10)
         before = self.b.profile()
         self.assertEqual(self.b.respond(self.packet, self.state), self.replies)
         self.assertEqual(self.b.profile(), before)
@@ -76,7 +165,7 @@ class RankTests(ActivityCase):
 
     def test_catalog_fixed_monotonic_and_no_shared_mutation(self):
         rows=list(rank.catalog().values());powers=[v['role']['role_combat_power'] for v in rows]
-        self.assertEqual(powers,sorted(powers,reverse=True));self.assertEqual(len({v['npc_id'] for v in rows}),99)
+        self.assertEqual(powers,sorted(powers,reverse=True));self.assertEqual(len({v['npc_id'] for v in rows}),500)
         before=copy.deepcopy(rank.catalog());self.fight();self.assertEqual(rank.catalog(),before)
         ids=[v['id'] for v in self.board()['show_list']]
         r=self.b.profile();r['level']=99;self.b.save(r)
@@ -84,44 +173,41 @@ class RankTests(ActivityCase):
 
     def test_inspection_matches_full_fighting_roster_and_skills(self):
         self.board()
-        for ident in (930001,930002,930003,930004,930005,930050,930099):
+        for ident in (930001,930002,930003,930004,930005,930050,930500):
             out=self.req(1039,des_type=2,des_id=ident);self.ok(out)
             data=next(d for e,d in out if e==11);npc=rank.catalog()[ident]['role']
             chars=list(data['cortege_list'].values());expected=[c for c in npc['corteges'] if c['order']]
             self.assertEqual(len(chars),len(expected))
             self.assertEqual(sum(c['wuligongji_show'] for c in chars),sum(c['gongji'] for c in expected))
-            self.assertTrue(data['equip_list']);self.assertTrue(data['skill_list'])
+            if any(i.get('equip_pos') and 1 <= i.get('equip_order', 0) <= 8 and i['attach_type'] == 5
+                   and int(formation.ITEMS[i['type_id']]['main_type']) in (1, 2, 3) for i in npc['attachments']):
+                self.assertTrue(data['equip_list'])
+            if any(i.get('equip_pos') and i['attach_type'] == 6 for i in npc['attachments']):
+                self.assertTrue(data['skill_list'])
             self.assertTrue(all(len(p)<=32768 for p in self.replies))
 
-    def test_elites_stronger_with_remaining_ladder_and_sources_unchanged(self):
-        from network_redirect import npc_players
-        from analysis.tools import build_npc_catalog as design
-        current = rank.catalog()
-        original_rules = copy.deepcopy(rank.rules())
-        original_rules.pop('elite_npcs')
-        with patch.object(rank, 'rules', return_value=original_rules):
-            original = rank.catalog.__wrapped__()
-        self.assertEqual({k:v for k,v in current.items() if k > 930005},
-                         {k:v for k,v in original.items() if k > 930005})
-        for ident in range(930001,930006):
-            npc = current[ident]
-            self.assertGreater(npc['role']['role_combat_power'], original[ident]['role']['role_combat_power'])
-            design.validate(copy.deepcopy(npc))
-        source = npc_players.get('npc_v1_l99_t1_attack')['role']
-        self.assertEqual({c['evolve_level'] for c in source['corteges'] if c['order']}, {49})
-        self.assertEqual({c['evolve_level'] for c in current[930001]['role']['corteges'] if c['order']}, {99})
+    def test_extreme_top_100_unique_and_normal_level_coverage(self):
+        from analysis.tools.build_rank_500 import select, signature
+        selected = select()
+        actual = list(rank.catalog().values())
+        self.assertEqual([n['npc_id'] for _, n in selected], [n['npc_id'] for n in actual])
+        self.assertEqual(len({signature(n) for n in actual[:100]}), 100)
+        self.assertTrue(all(n['tier'].startswith('E') for n in actual[:100]))
+        self.assertEqual({n['role']['level'] for n in actual[100:]}, set(range(1, 100)))
+        self.assertEqual({n['tier'] for n in actual[100:]}, {'T1','T2','T3','T4','T5'})
+        self.assertEqual({c['evolve_level'] for c in actual[0]['role']['corteges'] if c['order']}, {499})
 
     def test_win_rewards_five_cards_one_actual_award(self):
-        before=self.b.profile();fight,events=self.fight(99);after=self.b.profile()
-        self.assertIn(fight['final_result'],(1,2,3));self.assertEqual(after['activity']['rank_order'],99)
+        before=self.b.profile();fight,events=self.fight(500);after=self.b.profile()
+        self.assertIn(fight['final_result'],(1,2,3));self.assertEqual(after['activity']['rank_order'],500)
         self.assertEqual(after['energy'],before['energy']-1)
-        self.assertEqual(after['activity']['rank_score'],rank.score(99))
+        self.assertEqual(after['activity']['rank_score'],rank.score(500))
         cards=next(d for e,d in events if e==33);self.assertEqual(len(cards),5)
         chosen=[c for c in cards.values() if c['flag']];self.assertEqual(len(chosen),1)
         tid=chosen[0]['attach_type'];count=lambda r:sum(i['count'] for i in r['attachments'] if i['type_id']==tid and i['attach_type']==5)
-        self.assertEqual(count(after)-count(before),chosen[0]['attach_count'])
+        self.assertEqual(count(after)-count(before),chosen[0]['attach_count']+(50 if tid==1001 else 0))
         self.assertEqual(after['silver_coin']-before['silver_coin'],self.b.activity_rules['battle_silver'])
-        self.assertEqual(rank.identity(after['activity'],100),930099)
+        self.assertEqual(rank.identity(after['activity'],501),930500)
 
     def test_repeat_packet_and_restart_no_duplicate_rewards(self):
         self.fight();before=self.b.profile()
@@ -130,8 +216,8 @@ class RankTests(ActivityCase):
         self.assertEqual(before,self.b.profile());events=self.req(1244,fight_type=2);self.ok(events);self.assertEqual(before,self.b.profile())
         self.assertIn(152,[e for e,d in events]);self.assertNotIn(44,[e for e,d in events])
         meta=next(d['local_rank_records'] for e,d in events if e==80 and 'local_rank_records' in d)
-        self.assertEqual(meta[1]['label'],'攻胜·'+rank.catalog()[930099]['role']['role_name'])
-        self.assertEqual(meta[1]['power'],rank.catalog()[930099]['role']['role_combat_power'])
+        self.assertEqual(meta[1]['label'],'攻胜·'+rank.catalog()[930500]['role']['role_name'])
+        self.assertEqual(meta[1]['power'],rank.catalog()[930500]['role']['role_combat_power'])
         self.assertTrue(any(e==80 and d.get('local_rank_show_records') for e,d in events))
 
     def test_loss_no_prize_or_promotion(self):
@@ -196,20 +282,20 @@ class RankTests(ActivityCase):
         with patch('network_redirect.backend.time.time',return_value=NOW-86400):self.board()
         self.assertEqual(self.b.profile()['activity']['rank_score'],base)
         with patch('network_redirect.backend.time.time',return_value=NOW+40*86400):self.board()
-        self.assertEqual(self.b.profile()['activity']['rank_score'],base+7*rank.score(100,'day_score'))
+        self.assertEqual(self.b.profile()['activity']['rank_score'],base+7*rank.score(501,'day_score'))
 
     def test_previous_day_best_claim_and_historical_promotions(self):
-        self.fight(99);self.assertEqual(self.req(1201,flag=2)[0][0],55)
+        self.fight(500);self.assertEqual(self.req(1201,flag=2)[0][0],55)
         with patch('network_redirect.backend.time.time',return_value=NOW+86400):
             self.board();r=self.b.profile()
-            self.assertEqual(r['activity']['rank_score'],rank.score(99)+rank.score(99,'day_score'))
-            self.assertEqual(r['activity']['rank_previous_best'],99)
+            self.assertEqual(r['activity']['rank_score'],rank.score(500)+rank.score(500,'day_score'))
+            self.assertEqual(r['activity']['rank_previous_best'],500)
             self.assertEqual(self.req(1201,flag=2)[0][0],55);self.assertEqual(r,self.b.profile())
-            self.ok(self.req(1203,exchange_type=5));self.assertEqual(self.req(1203,exchange_type=5)[0][0],55)
+            self.ok(self.req(1203,exchange_type=4));self.assertEqual(self.req(1203,exchange_type=4)[0][0],55)
         self.assertEqual(self.req(1203,exchange_type=10)[0][0],55)
 
     def test_defence_once_daily_and_revenge_uses_same_npc(self):
-        self.fight(99)
+        self.fight(500)
         with patch('network_redirect.backend.time.time',return_value=NOW+86400):
             self.board();r=self.b.profile();n=len(r['activity']['rank_records']);self.board()
             self.assertEqual(len(self.b.profile()['activity']['rank_records']),n)
@@ -241,10 +327,10 @@ class RankTests(ActivityCase):
 
     def test_invalid_and_exhausted_are_atomic(self):
         self.board();before=self.b.profile()
-        for d in [dict(des_type=2,des_value=1,des_id=930001),dict(des_type=1,des_value=99,des_id=930099),dict(des_type=2,des_value=99,des_id=10099)]:
+        for d in [dict(des_type=2,des_value=1,des_id=930001),dict(des_type=1,des_value=500,des_id=930500),dict(des_type=2,des_value=500,des_id=10099)]:
             self.assertEqual(self.req(1026,fight_type=2,**d)[0][0],55);self.assertEqual(before,self.b.profile())
         r=self.b.profile();r['energy']=0;self.b.save(r);before=self.b.profile()
-        self.assertEqual(self.req(1026,fight_type=2,des_type=2,des_value=99,des_id=930099)[0][0],55);self.assertEqual(before,self.b.profile())
+        self.assertEqual(self.req(1026,fight_type=2,des_type=2,des_value=500,des_id=930500)[0][0],55);self.assertEqual(before,self.b.profile())
 
     def test_top_rank_has_targets_and_loss_swaps_positions(self):
         r=self.b.profile();s=r['activity'];s.update(rank_order=1,rank_origin_order=1,rank_slots={},rank_reached_order=1);self.b.save(r)
@@ -256,9 +342,9 @@ class RankTests(ActivityCase):
     def test_ladder_permutation_and_migration_preserve_balances(self):
         r=self.b.profile();s=r['activity'];s.update(rank_order=40,rank_score=54321,rank_count=3,rank_promotions=[4,5]);s.pop('rank_version');self.b.save(r)
         self.board();s=self.b.profile()['activity'];self.assertEqual(s['rank_score'],54321);self.assertEqual(s['rank_count'],3)
-        for target in (20,1,2,50,99,100,1):
+        for target in (20,1,2,50,100,500,501,1):
             rank.swap(s,target)
-            ids=[rank.identity(s,o) for o in range(1,101) if o!=s['rank_order']]
+            ids=[rank.identity(s,o) for o in range(1,502) if o!=s['rank_order']]
             self.assertEqual(set(ids),set(rank.catalog()));self.assertEqual(len(ids),len(set(ids)))
 
     def test_all_inspection_packets_fit_protocol(self):
@@ -299,7 +385,7 @@ class RankTests(ActivityCase):
     def test_only_two_exchanges_and_removed_offer_rejected(self):
         self.assertEqual([v['index'] for v in rank.rules()['exchanges'] if not v['promote_order']],[1,3])
         r=self.b.profile();r['activity']['rank_score']=1000000;self.b.save(r)
-        for index in (2,11,255):
+        for index in (2,14,255):
             before=self.b.profile()
             self.assertEqual(self.req(1203,exchange_type=index)[0][0],55)
             self.assertEqual(self.b.profile(),before)
@@ -313,8 +399,8 @@ class RankTests(ActivityCase):
             self.assertEqual(self.req(1203,exchange_type=3)[0][0],55)
             self.assertEqual(self.b.profile(),before)
 
-    def test_seven_promotion_thresholds_gold_and_duplicates(self):
-        tiers=[(4,500,50),(5,100,100),(6,50,200),(7,30,300),(8,20,400),(9,10,1000),(10,1,2000)]
+    def test_ten_promotion_thresholds_gold_and_duplicates(self):
+        tiers=[(4,500,100),(11,400,200),(12,300,300),(13,200,500),(5,100,800),(6,50,1000),(7,30,1500),(8,20,2000),(9,10,5000),(10,1,10000)]
         self.assertEqual([v['promote_order'] for v in rank.rules()['exchanges'] if v['promote_order']],[v[1] for v in tiers])
         for index,order,gold in tiers:
             r=self.b.profile();r['activity']['rank_reached_order']=order+1;self.b.save(r)

@@ -52,7 +52,7 @@ def main():
                         'slot2: advanced summon1006x3 -> VIP bag1031x3',
                         'slot3: super summon1007x1 -> five-star passive fragments6005x5',
                         'slot4: soul pill1024x5 -> five-star treasure fragments6004x5',
-                        'retain slot order; slot1 weight1000 (10%), slot6 weight2200 (22%); other weights unchanged; fragment count is5 per win'],
+                        'retain slot order and reward counts; slot1 weight400 (4%), slot2 weight2200 (22%), slot6 weight2400 (24%); raise slot5 to weight2200 (22%) as requested, reducing slots3/4 by5 percentage points each to weight1300 (13%)/1000 (10%); bag weights unchanged'],
         inferred_config=r.load_rules())
     (out/'official_audit.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print(f'Verified {len(sources)} original assets and {len(strings)} strings')

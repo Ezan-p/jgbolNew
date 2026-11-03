@@ -81,11 +81,35 @@ class FishTests(ActivityCase):
         cfg=self.b.activity_rules
         for tier,position in (('low',0),('high',4)):
             candidates=[x for x in cfg['fish_shop'] if x['tier']==tier]
+            ticket=0
             for idx,row in enumerate(candidates):
                 role=copy.deepcopy(self.b.profile());role['activity']['seasonal'].pop('fish')
-                rolls=[0]*5;rolls[position]=idx
+                rolls=[0]*5;rolls[position]=idx if tier=='low' else ticket
                 with patch.object(fish,'randbelow',side_effect=rolls):s=fish.state(role,NOW,cfg)
                 self.assertEqual(s['shop'][position],row)
+                ticket+=row.get('weight',1)
+
+    def test_high_shop_weighted_selection_exhaustive(self):
+        cfg=self.b.activity_rules
+        expected={5039:15,5041:15,5032:15,6002:15,6003:15,6004:15,5034:5,1246:5}
+        counts=dict.fromkeys(expected,0)
+        for ticket in range(100):
+            role=copy.deepcopy(self.b.profile());role['activity']['seasonal'].pop('fish',None)
+            with patch.object(fish,'randbelow',side_effect=[0,0,0,0,ticket]):
+                row=fish.state(role,NOW,cfg)['shop'][4]
+            counts[row['reward'][1]]+=1
+        self.assertEqual(counts,expected)
+
+    def test_high_shop_rejects_invalid_weight_and_quantity(self):
+        for tid in (5034,1246):
+            for key,value in [('weight',None),('weight',0),('weight',-1),('weight',True),
+                              ('weight',1.5),('weight',10001),('limit',2),('quantity',2)]:
+                with self.subTest(tid=tid,key=key,value=value):
+                    cfg=copy.deepcopy(self.b.activity_rules)
+                    row=next(x for x in cfg['fish_shop'] if x['reward'][1]==tid)
+                    if key=='quantity':row['reward'][2]=value
+                    else:row[key]=value
+                    with self.assertRaises(formation.Rejected):fish.validate(cfg)
 
     def test_batch_exchange_limit_and_atomic_rejections(self):
         with patch.object(fish,'randbelow',return_value=0):self.status()
@@ -103,17 +127,27 @@ class FishTests(ActivityCase):
         self.assertEqual(self.req(1208,count=10,type_id=0)[0][0],55);self.assertEqual(before,self.b.profile())
 
     def test_all_high_goods_granted_once(self):
-        for idx in range(6):
+        high=[x for x in self.b.activity_rules['fish_shop'] if x['tier']=='high']
+        ticket=0
+        for idx,expected in enumerate(high):
             with patch('network_redirect.backend.time.time',return_value=NOW+idx*86400), \
-                 patch.object(fish,'randbelow',side_effect=[0,0,0,0,idx]):self.status()
+                 patch.object(fish,'randbelow',side_effect=[0,0,0,0,ticket]):self.status()
             self.rich();row=self.fishing()['shop'][4];typ,tid,n,_=row['reward'];before=self.b.profile()
+            self.assertEqual(row,expected)
+            self.assertEqual(n,1 if tid==1246 else 5)
+            self.assertEqual(self.req(1208,count=2,type_id=tid)[0][0],55)
+            self.assertEqual(self.b.profile(),before)
             self.ok(self.req(1208,count=1,type_id=tid))
             after=self.b.profile()
             self.assertEqual(row['cost'],20)
             self.assertEqual(sum(i['count'] for i in before['attachments'] if i['type_id']==1027)-self.count(1027),20)
-            if typ==10:self.assertEqual(after['souls'].get(str(tid),0)-before.get('souls',{}).get(str(tid),0),5)
-            else:self.assertEqual(sum(i['count'] for i in after['attachments'] if i['type_id']==tid)-sum(i['count'] for i in before['attachments'] if i['type_id']==tid),5)
+            if typ==10:self.assertEqual(after['souls'].get(str(tid),0)-before.get('souls',{}).get(str(tid),0),n)
+            else:self.assertEqual(sum(i['count'] for i in after['attachments'] if i['type_id']==tid)-sum(i['count'] for i in before['attachments'] if i['type_id']==tid),n)
+            self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
+            self.assertEqual(self.b.profile(),after)
             self.assertEqual(self.req(1208,count=1,type_id=tid)[0][0],55)
+            self.assertEqual(self.b.profile(),after)
+            ticket+=row['weight']
 
     def test_daily_boundary_and_stale_exchange(self):
         data=self.status();self.rich();row=self.fishing()['shop'][0]

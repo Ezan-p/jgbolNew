@@ -145,7 +145,7 @@ class InsightTests(unittest.TestCase):
                     item = f.lookup(after, 'attachments', payload['skill_id'])
                     self.assertNotEqual(item['id'], target)
                     self.assertFalse(any(i['id'] == target for i in after['attachments']))
-                    self.assertEqual((item['level'], item['count'], item['upgrade_level']), (7, 3, 0))
+                    self.assertEqual((item['level'], item['count'], item['upgrade_level']), (7, 0, 0))
                     self.assertEqual(item['effect_value'], f.skill_effect(item))
                     self.assertEqual(after['gold_coin'], 0 if state else 200)
                     token_count = lambda r: sum(i['count'] for i in r['attachments']

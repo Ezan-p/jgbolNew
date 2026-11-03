@@ -133,8 +133,8 @@ return 'render capture installed' ''')
         capture('list.png')
         check('original upgrade window rebinds a copied formation selection',f'skillTest.selected=skillTest.item({target});skillTest.detached=ms.d_c.table_copy(skillTest.selected);ms.d_skillUpgradeUI.show({{from_btn=4,skill_info=skillTest.detached,parent_layer=ui.g_packageUI.board_layer,isNeedUpdate=false}});assert(ms.d_skillUpgradeUI.g_self.params.skill_info==skillTest.selected,"copied selection not rebound")')
         for n,code in enumerate(stages):
-            expected=((1,1),(2,0),(3,0))[n]
-            check(('failure compensation rendered immediately','success level and power rendered immediately','consecutive success renders level 3 and power 207')[n], 'local apply=skillTest.apply;'+code+f';assert(skillTest.item({target})==skillTest.selected,"identity");assert(skillTest.selected.level=={expected[0]},"level="..skillTest.selected.level);assert(skillTest.selected.count=={expected[1]},"count="..skillTest.selected.count);assert(ms.d_skillUpgradeUI.g_self.params.skill_info==skillTest.selected,"params identity");skillTest.label("{expected[0]}");skillTest.label("{145+31*(expected[0]-1)}")')
+            expected=((1,0),(2,0),(3,0))[n]
+            check(('failure retains level and zero compensation','success level and power rendered immediately','consecutive success renders level 3 and power 207')[n], 'local apply=skillTest.apply;'+code+f';assert(skillTest.item({target})==skillTest.selected,"identity");assert(skillTest.selected.level=={expected[0]},"level="..skillTest.selected.level);assert(skillTest.selected.count=={expected[1]},"count="..skillTest.selected.count);assert(ms.d_skillUpgradeUI.g_self.params.skill_info==skillTest.selected,"params identity");skillTest.label("{expected[0]}");skillTest.label("{145+31*(expected[0]-1)}")')
         capture('upgrade.png')
         report['passed']=True
     except Exception as e:

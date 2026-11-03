@@ -91,6 +91,77 @@ class TangwangTests(ActivityCase):
         self.assertEqual(reply,self.replies);self.assertEqual(before,self.b.profile())
         self.assertEqual(self.exchange(ids)[0][0],55);self.assertEqual(before,self.b.profile())
 
+    def test_batch_draws_independently_merges_rewards_and_caches_replay(self):
+        self.status();ids=self.put(tw.COMBINATIONS[0]*3)
+        before=self.b.profile();pool=self.b.activity_rules['tangwang_rules']['pools'][0]['rewards']
+        tickets=[0,0,99]
+        with patch.object(tw,'randbelow',side_effect=tickets) as rng:
+            out=self.exchange(ids)
+        self.ok(out);self.assertEqual(rng.call_count,3)
+        data=next(d for e,d in out if e==90)
+        self.assertEqual(data['exchange_count'],3)
+        self.assertEqual(data['pool_counts'],{1:3,2:0,3:0,4:0})
+        self.assertEqual(data['pool_index'],1)
+        first=copy.deepcopy(pool[0]['reward']);first[2]*=2
+        self.assertEqual(list(data['prize_list'].values()),[activity.prize_spec(first),activity.prize_spec(pool[-1]['reward'])])
+        self.assertEqual(self.count(1094),sum(c['count'] for c in before['attachments'] if tw.is_card(c))-12)
+        self.assertEqual(self.twstate()['exchanges'],[3,0,0,0])
+        after=self.b.profile();self.assertEqual(self.b.respond(self.packet,self.state_auth()),self.replies)
+        self.assertEqual(after,self.b.profile())
+        self.assertEqual(self.exchange(ids)[0][0],55);self.assertEqual(after,self.b.profile())
+
+    def test_batch_all_pools_and_maximum_packet(self):
+        self.status()
+        ids=self.put(sum(tw.COMBINATIONS,[])+[1,1,1,1])
+        with patch.object(tw,'randbelow',return_value=0):out=self.exchange(ids)
+        self.ok(out);data=next(d for e,d in out if e==90)
+        self.assertEqual(data['pool_index'],0);self.assertEqual(self.twstate()['exchanges'],[1]*4)
+        ids=self.put(tw.COMBINATIONS[0]*tw.MAX_BATCH)
+        with patch.object(tw,'randbelow',return_value=0) as rng:out=self.exchange(ids)
+        self.ok(out);self.assertEqual(rng.call_count,63)
+        self.assertEqual(next(d['exchange_count'] for e,d in out if e==90),63)
+        self.assertEqual(self.twstate()['exchanges'],[64,1,1,1])
+
+    def test_batch_invalid_last_group_rejected_before_draw_or_consumption(self):
+        self.status();ids=self.put(tw.COMBINATIONS[0]*2)
+        baseline=self.b.profile()
+        for chosen in ([],ids[:5],ids[:7],ids[:-1]+[ids[0]],ids[:-1]+[99999999]):
+            with patch.object(tw,'randbelow',side_effect=AssertionError('invalid batch drew reward')):
+                self.assertEqual(self.exchange(chosen)[0][0],55)
+            self.assertEqual(baseline,self.b.profile())
+        for key,value in [('is_lock',1),('owner_id',1),('equip_pos',1),('equip_order',1),('count',0),('level',9),('type_id',1001)]:
+            role=copy.deepcopy(baseline);next(c for c in role['attachments'] if c['id']==ids[-1])[key]=value
+            self.b.save(role);before=self.b.profile()
+            with patch.object(tw,'randbelow',side_effect=AssertionError('invalid batch drew reward')):
+                self.assertEqual(self.exchange(ids)[0][0],55)
+            self.assertEqual(before,self.b.profile())
+        role=copy.deepcopy(baseline)
+        with self.assertRaises(formation.Rejected):
+            tw.settle(role,dict(count=256,card_list=[dict(id=i) for i in range(256)]),NOW,self.b.activity_rules)
+        self.assertEqual(role,baseline)
+
+    def test_batch_reward_failure_and_week_boundary_are_atomic(self):
+        status=self.status();ids=self.put(tw.COMBINATIONS[0]*2);before=self.b.profile()
+        with patch.object(activity,'prizes',side_effect=formation.Rejected('grant failed')):
+            self.assertEqual(self.exchange(ids)[0][0],55)
+        self.assertEqual(before,self.b.profile())
+        with patch('network_redirect.backend.time.time',return_value=status['next_weekly_refresh']):
+            before=self.b.profile()
+            self.assertEqual(self.exchange(ids)[0][0],55)
+            self.assertEqual(before,self.b.profile())
+
+    def test_batch_stack_consumes_one_per_distinct_instance_and_disabled_rejects(self):
+        self.status();ids=self.put(tw.COMBINATIONS[1]*2)
+        role=self.b.profile()
+        for c in role['attachments']:
+            if c['id'] in ids:c['count']=3
+        self.b.save(role)
+        self.ok(self.exchange(ids))
+        self.assertTrue(all(c['count']==2 for c in self.cards() if c['id'] in ids))
+        self.b.activity_rules['seasonal_games']['spring_cards']['enabled']=False
+        before=self.b.profile();self.assertEqual(self.exchange(ids)[0][0],55)
+        self.assertEqual(before,self.b.profile())
+
     def state_auth(self):return {'authenticated':True}
 
     def test_bad_selection_lock_owner_and_type_all_atomic(self):

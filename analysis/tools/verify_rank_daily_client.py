@@ -41,15 +41,15 @@ local ok,err=pcall(function() ms.d_rankUI.requestCrossRankFromRank();ms.d_rankUI
 ms.d_u.main_server_send_msg=send;ms.d_info.show=info;assert(ok,err);assert(count==3)
 return 'all cross tournament entries blocked without requests'""")
         report['exchanges']=check("""local ms=package.loaded.ms;local ui=ms.d_rankUI;local rows=ms.d_data.g_topScoreExchangeTable
-assert(#rows==9 and rows[1].score==5000 and rows[1].count==100)
+assert(#rows==12 and rows[1].score==5000 and rows[1].count==100)
 assert(rows[2].score==0 and rows[2].sub_type==1343 and rows[2].count==1)
 assert(rows[2].costItem==1001 and rows[2].costCount==1000 and rows[2].exchangeIndex==3)
-local tiers={{500,50},{100,100},{50,200},{30,300},{20,400},{10,1000},{1,2000}}
+local tiers={{500,100},{400,200},{300,300},{200,500},{100,800},{50,1000},{30,1500},{20,2000},{10,5000},{1,10000}}
 for i,t in ipairs(tiers) do local row=rows[i+2];assert(row.promoteOrder==t[1] and row.object_type==11 and row.count==t[2]) end
 ui.goToCreditsChargePage();assert(rank_fixture_errors=='',rank_fixture_errors)
-assert(#ui.g_label_info==9)
+assert(#ui.g_label_info==12)
 assert(ui.g_label_info[2].text:getString()=='需蟠桃: 1000')
-local names={'蟠桃: 100','圣母蟠桃: 1','元宝: 50'}
+local names={'蟠桃: 100','圣母蟠桃: 1','元宝: 100'}
 for _,node in pairs(ui.g_chargeNode) do
  local i=node:getTag()
  if names[i] then
@@ -75,7 +75,7 @@ assert(ok,err);ui.update_label_state(2)
 ms.d_data.callback_update_config({local_rank={score=7777,previous_best=20,pending_score=0,current_order=100}})
 assert(ui.g_rankInfo.self_score==7777)
 assert(not ui.g_rankUI.show_labels.top_day_rewards_button:isVisible())
-return 'all 9 exchange and promotion cells rendered'""")
+return 'all 12 exchange and promotion cells rendered'""")
         shot=subprocess.run([str(config['adb_path']),'-s',config['serial'],'exec-out','screencap','-p'],env=device_environment(config),capture_output=True,timeout=15,check=True)
         (output/'peach_exchange_native.png').write_bytes(shot.stdout)
         report['passed']=True

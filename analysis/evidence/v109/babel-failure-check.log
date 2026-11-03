@@ -1,0 +1,18 @@
+test_real_catalog_fight_replay_and_fixed_opponent (test_activity_babel.BabelTests) ... FAIL
+
+======================================================================
+FAIL: test_real_catalog_fight_replay_and_fixed_opponent (test_activity_babel.BabelTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_activity_babel.py", line 491, in test_real_catalog_fight_replay_and_fixed_opponent
+    self.call(2,target_pos=dict(row=1,column=2)); self.call(2,target_pos=dict(row=1,column=3))
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_activity_babel.py", line 132, in call
+    out = self.req(1353, id=op, data=summon.lua(data)); self.ok(out)
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_activity.py", line 29, in ok
+    def ok(self,events):self.assertNotIn(55,[e for e,_ in events],events)
+AssertionError: 55 unexpectedly found in [55] : [(55, {'op_string': '道具不足'})]
+
+----------------------------------------------------------------------
+Ran 1 test in 1.934s
+
+FAILED (failures=1)

@@ -1,9 +1,45 @@
 """Real wire-level offline 渡劫 lifecycle and NPC consistency checks."""
 import copy
+import unittest
+from collections import Counter
+from fractions import Fraction
 from unittest.mock import patch
 from tests.test_activity import ActivityCase, NOW
 from network_redirect import activity_rape as rape, activity_rape_npc as npcs, activity_rank
 from network_redirect.protocol import decode
+
+
+class RapeRewardTests(unittest.TestCase):
+    def test_normal_pool_exact_probabilities_and_passive_reduction(self):
+        counts=Counter(rape.reward_pool())
+        groups=Counter()
+        for ident,weight in counts.items():
+            skill=rape.formation.SKILLS[ident]
+            groups[(skill['quality'],skill['use_mode(1-active，2-passive)'])]+=weight
+        total=sum(counts.values())
+        expected={('2','1'):700, ('3','1'):1000, ('3','2'):1200,
+                  ('4','1'):700, ('4','2'):350, ('5','1'):110, ('5','2'):8}
+        self.assertEqual({k:Fraction(v,total) for k,v in groups.items()},
+                         {k:Fraction(v,4068) for k,v in expected.items()})
+        self.assertLess(Fraction(groups['5','2'],total),Fraction(8,414)/9)
+        for mode,size in (('1',11),('2',8)):
+            pool=rape.reward_pool(mode)
+            self.assertEqual(len(pool),size)
+            self.assertEqual(len(set(pool)),size)
+            self.assertTrue(all(rape.formation.SKILLS[k]['quality']=='5' and
+                                rape.formation.SKILLS[k]['use_mode(1-active，2-passive)']==mode for k in pool))
+            self.assertEqual({counts[k] for k in pool},{100 if mode=='1' else 10})
+
+    def test_triple_type_probability_exhausts_all_random_outcomes(self):
+        modes=Counter()
+        for roll in range(100):
+            with patch.object(rape.secrets,'randbelow',return_value=roll) as rng:
+                ident=rape.draw_reward(triple=True)
+            rng.assert_called_once_with(100)
+            skill=rape.formation.SKILLS[ident]
+            self.assertEqual(skill['quality'],'5')
+            modes[skill['use_mode(1-active，2-passive)']]+=1
+        self.assertEqual(modes,{'1':95,'2':5})
 
 
 class RapeTests(ActivityCase):
@@ -258,6 +294,7 @@ class RapeTests(ActivityCase):
         r=self.b.profile();before=len(r['attachments'])
         with patch.object(rape,'roll_forms',return_value=[6,6,6]):boards=self.board()
         self.assertEqual([len(b['form_list']['2']) for b in boards],[6,6,6])
+        self.assertTrue(all(rape.formation.SKILLS[b['skill_type']]['quality']=='5' for b in boards))
         self.assertEqual(len(self.b.profile()['attachments']),before)
         with patch.object(rape.journey,'battle',return_value=(1,[],[])):
             out=self.req(1072);self.ok(out)
@@ -265,8 +302,43 @@ class RapeTests(ActivityCase):
         self.assertEqual(len([k for k in results if isinstance(k,int)]),18)
         self.assertTrue(results['pass_all_form'])
         self.assertEqual(len(self.b.profile()['attachments']),before+3)
+        self.assertEqual(Counter(v['skill_type'] for k,v in results.items() if isinstance(k,int) and 'skill_type' in v),
+                         Counter(b['skill_type'] for b in boards))
         for b in boards:
             self.assertEqual([t['index'] for t in b['form_list']['2'].values()],list(range(1,7)))
+
+    def test_all_triples_and_refresh_routes_award_preview_and_persist(self):
+        for face in range(1,7):
+            with self.subTest(face=face):
+                role=self.b.profile();role['activity']['rape_boards']=None;self.b.save(role)
+                with patch.object(rape,'roll_forms',return_value=[face]*3):
+                    boards=self.board()
+                    for flag in (2,3,4):
+                        if flag==4:
+                            with patch.object(rape.journey,'battle',return_value=(1,[],[])):
+                                self.ok(self.req(1072))
+                        self.ok(self.req(1029,flag=flag))
+                        boards=self.b.profile()['activity']['rape_boards']
+                        self.assertTrue(all(rape.formation.SKILLS[b['skill_type']]['quality']=='5' for b in boards))
+                before=self.b.profile()
+                self.assertEqual(self.board(),boards)
+                self.assertEqual(self.b.profile(),before)
+                with patch.object(rape.journey,'battle',return_value=(1,[],[])):
+                    for ident in boards[0]['form_list']['2']:
+                        out=self.fight(1,ident);self.ok(out)
+                prize=next(d for e,d in out if e==41)
+                self.assertEqual((prize['skill_type'],prize['skill_count']),(boards[0]['skill_type'],1))
+                role=self.b.profile();role['energy']=100;role['activity']['rape_refreshes']=0;self.b.save(role)
+
+    def test_missing_column_uses_actual_surviving_dice_for_reward(self):
+        with patch.object(rape,'roll_forms',return_value=[2,2,2]):
+            original=self.board()
+        role=self.b.profile();role['activity']['rape_boards'].pop();self.b.save(role)
+        with patch.object(rape,'roll_forms',return_value=[1,3,2]):
+            repaired=self.board()
+        self.assertEqual(repaired[:2],original[:2])
+        self.assertEqual([b['form_type'] for b in repaired],[2,2,2])
+        self.assertEqual(rape.formation.SKILLS[repaired[2]['skill_type']]['quality'],'5')
 
     def test_paid_and_continue_refresh_count_daily_but_next_day_query_does_not(self):
         self.board();self.ok(self.req(1029,flag=3))

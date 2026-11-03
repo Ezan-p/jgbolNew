@@ -22,6 +22,7 @@ def load_rules(path=RULES):
               (1152, 1156, 50, 5, 10), '金卡面值配置无效')
     for k in ('max_cards_per_order', 'month_days', 'month_daily_gold', 'month_renew_below_days'):
         f.require(type(r[k]) is int and 0 < r[k] <= 10000, '金卡配置数值无效')
+    f.require(type(r.get('daozun_rmb')) is int and 1 <= r['daozun_rmb'] <= 50, '道尊金卡推测面值无效')
     seen = set()
     for p in r['products']:
         f.require(type(p['id']) is int and p['id'] not in seen and p['kind'] in ('gold', 'month', 'fund'), '充值商品无效')
@@ -55,7 +56,7 @@ def handles(mid, req):
             mid == 1051 and req['item_type'] in (1150, 1151, 1152, 1156))
 
 
-def record(role, principal, now, vr, wr, *, double=True):
+def record(role, principal, now, vr, wr, *, double=True, source_item=None):
     """Single authoritative fan-out; bonuses and daily rewards never call this."""
     from . import activity_pavilion, activity_yuanshi, activity_rulai
     role['charge_gold'] = role.get('charge_gold', 0) + principal
@@ -67,6 +68,10 @@ def record(role, principal, now, vr, wr, *, double=True):
     activity_pavilion.record_charge(role, principal, now)
     activity_yuanshi.record_charge(role, principal, now)
     activity_rulai.record_charge(role, principal, now)
+    from . import activity_dream
+    activity_dream.record_charge(role, principal, now)
+    from . import activity_save_monkey
+    activity_save_monkey.record_charge(role, principal, now, source_item=source_item)
 
 
 def settle(role, mid, req, now, r, vr, wr, parse):
@@ -98,14 +103,14 @@ def settle(role, mid, req, now, r, vr, wr, parse):
     state = role.setdefault('recharge', dict(orders={}, last_order_id='', last_time=0))
     if mid == 1051:
         tid, n = req['item_type'], req['item_count']
-        f.require(tid in (1152, 1156), '该金卡面值尚未确认，请使用大传世金卡或小传世金卡')
+        f.require(tid in (1151, 1152, 1156), '该金卡面值尚未确认，请使用大传世金卡或小传世金卡')
         f.require(type(n) is int and 1 <= n <= 15 and req['des_type'] == 1 and req['des_id'] in (0, role['role_id']), '金卡使用参数无效')
         # Native item-use packets have no order ID. Persist their full fingerprint
         # to prevent reconnect/restart replay from charging a second time.
         order = bag_order or 'bag-' + str(req['serial_num'])
         fingerprint = {k: req[k] for k in ('item_id', 'item_type', 'item_count', 'des_type', 'des_id')}
-        large, small = (n, 0) if tid == 1152 else (0, n)
-        p = dict(id=0, kind='card', rmb=large * r['large_rmb'] + small * r['small_rmb'], bonus=0)
+        large, small = (n, 0) if tid == 1152 else (0, n) if tid == 1156 else (0, 0)
+        p = dict(id=0, kind='card', rmb=n*r['daozun_rmb'] if tid==1151 else large * r['large_rmb'] + small * r['small_rmb'], bonus=0)
         p['gold'] = p['rmb'] * r['gold_per_rmb']
     else:
         f.require(mid == 1111 and req['event_id'] == 251, '免费模拟充值已移除，请从充值入口选择金卡支付')
@@ -132,6 +137,8 @@ def settle(role, mid, req, now, r, vr, wr, parse):
         f.require(role.get('month_card_time', 0) - now < r['month_renew_below_days'] * 86400, '月卡剩余时间较长，请稍后续期')
     # Validate both pools before either is consumed.
     f.require(count(role, 1152) >= large and count(role, 1156) >= small, '可用金卡不足，请检查背包数量或锁定状态')
+    if mid == 1051 and tid == 1151:
+        consume(role, 1151, n, req['item_id'])
     consume(role, 1152, large, req['item_id'] if mid == 1051 else None)
     consume(role, 1156, small, req['item_id'] if mid == 1051 else None)
     role['gold_coin'] += p['gold'] + p['bonus']
@@ -143,12 +150,12 @@ def settle(role, mid, req, now, r, vr, wr, parse):
     # Excess card value is not returned or credited; benefits use the product price.
     principal = p['rmb'] * r['gold_per_rmb']
     was_first = not role.get('first_charge') and p['kind'] in ('gold', 'card')
-    record(role, principal, now, vr, wr, double=p['kind'] in ('gold', 'card'))
+    record(role, principal, now, vr, wr, double=p['kind'] in ('gold', 'card'), source_item=tid if mid==1051 else None)
     # The pavilion mail hook replaces nested dictionaries: reacquire after fan-out.
     state = role['recharge']
     state['orders'][order] = dict(request=fingerprint, product_id=p['id'], kind=p['kind'], rmb=p['rmb'],
                                 principal=principal, gold=p['gold'], bonus=p['bonus'], first_bonus=principal if was_first else 0,
-                                large_count=large, small_count=small, settled_at=now)
+                                large_count=large, small_count=small, source_item=tid if mid==1051 else None, settled_at=now)
     state.update(last_order_id=order, last_time=now)
     events = [summon.event(55, dict(op_string=f"金卡充值成功，计入充值{p['rmb']}元"))]
     if mid == 1051:
@@ -159,7 +166,7 @@ def settle(role, mid, req, now, r, vr, wr, parse):
 
 def client_state(role, now, r, wr):
     return dict(products=r['products'], large_count=count(role, 1152), small_count=count(role, 1156),
-                large_rmb=r['large_rmb'], small_rmb=r['small_rmb'],
+                large_rmb=r['large_rmb'], small_rmb=r['small_rmb'], daozun_rmb=r['daozun_rmb'],
                 last_order_id=role.get('recharge', {}).get('last_order_id', ''),
                 month=dict(rmb=50, daily_gold=r['month_daily_gold'], expires_at=role.get('month_card_time', 0),
                            last_claim_at=role.get('month_card_record', 0)),

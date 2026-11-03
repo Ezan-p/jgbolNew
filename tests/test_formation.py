@@ -190,7 +190,7 @@ class FormationTests(unittest.TestCase):
         role = self.backend.profile()
         item = formation.lookup(role, 'attachments', target)
         self.assertEqual(item['level'], 1)
-        self.assertEqual(item['count'], 1)
+        self.assertEqual(item['count'], 0)
         self.assertNotIn(material, [i['id'] for i in role['attachments']])
         material = self.add_item(212, count=0, attach_type=6)
         with patch('network_redirect.formation.secrets.randbelow', return_value=0):

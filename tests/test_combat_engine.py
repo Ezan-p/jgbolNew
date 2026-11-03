@@ -29,6 +29,13 @@ class EngineTests(unittest.TestCase):
         b = self.battle([unit(1), unit(9)], [unit(1), unit(2)], slots=9)
         self.assertEqual(b.schedule(), ((1, 1), (2, 1), (1, 9), (2, 2)))
 
+    def test_fate_spell_combo_accepts_float_from_trait_parser(self):
+        actor = unit(skills=[(202, 1)], fate_traits={'spell_combo': [100.0, 37.5]})
+        b = self.battle([actor], [unit(hp=100000, max_hp=100000)])
+        b.attack(b.sides[0][0], [b.sides[1][0]], 202, 1)
+        self.assertEqual(len(b.actions), 2)
+        self.assertGreater(sum(b.actions[1]['damage_list']), 0)
+
     def test_counter_never_recurses_and_parry_blocks(self):
         b = self.battle([unit(essences={3: (100, 50)})], [unit(essences={3: (100, 50)})])
         b.round = 1

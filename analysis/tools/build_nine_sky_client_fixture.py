@@ -20,7 +20,8 @@ def main():
                 data.update(shop_day=snapshot['shop_day'],shop_revision=snapshot['shop_revision'])
             return login_fields(decode(n.settle(role,dict(id=op,data=summon.lua(data)),now,login_fields)[0])[2]['data'])
         f=dict(now=now,status=n.status(now),entry=req(1))
-        f['single']=req(2,count=1,index=0)
+        with patch.object(n, 'load_rules', return_value=dict(n.load_rules(), battle_basis_points=0)):
+            f['single']=req(2,count=1,index=0)
         f['after_single']=req(1)
         cfg=n.load_rules();cfg['treasure_basis_points']=10000;cfg['double_basis_points']=10000;cfg['battle_basis_points']=0
         rewards=[row['reward'] for row in cfg['treasure_pool']]

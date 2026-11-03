@@ -79,7 +79,7 @@ class RulaiTests(ActivityCase):
         # flaky random sample or just the configured weight values.
         with patch.object(r.secrets, 'randbelow', side_effect=range(offset)):
             counts = Counter(r.draw(cfg) for _ in range(offset))
-        self.assertEqual(counts, dict(enumerate([1000, 2000, 1800, 1500, 1000, 2200, 400, 100], 1)))
+        self.assertEqual(counts, dict(enumerate([400, 2200, 1300, 1000, 2200, 2400, 400, 100], 1)))
 
     def test_replacement_rewards_can_be_used_and_fragments_composed(self):
         self.charge(4)

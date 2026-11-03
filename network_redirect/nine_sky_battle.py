@@ -7,8 +7,9 @@ import copy
 from functools import lru_cache
 import secrets
 
-from . import combat_power, formation, journey, npc_players
+from . import battle_replay, combat_power, formation, journey, npc_players
 from .combat_loadout import player_units
+from .protocol import decode, encode
 
 
 @lru_cache(maxsize=1)
@@ -82,7 +83,7 @@ def encounter(role, s, r, floor=None):
     key = choose(s, target)
     army, power = enemies(key, floor, r)
     ours = player_units(role)
-    result, _, actions = journey.battle(role, {}, journey.load_rules(), units=(ours, army))
+    result, lineup, actions = journey.battle(role, {}, journey.load_rules(), units=(ours, army))
     win = 1 <= result <= 3
     profile = catalog()[key]['profile']
     record = dict(floor=floor, npc_id=key, name=profile['role_name'],
@@ -93,4 +94,15 @@ def encounter(role, s, r, floor=None):
     s['battle_count'] = s.get('battle_count', 0) + 1
     s['battle_wins'] = s.get('battle_wins', 0) + int(win)
     s['last_battle'] = copy.deepcopy(record)
+    # Keep only the small summary in the save. The roll response carries the
+    # complete authoritative battle for playback at its own movement event.
+    fid = 370000000 + s['battle_count']
+    record['replay'] = dict(
+        line_up_msg=decode(encode(1028, dict(
+            fight_id=fid, first_hand=1, des_name=profile['role_name'],
+            lineup_count=len(lineup), lineup=lineup)))[2],
+        fight_result_msg=battle_replay.result_message(dict(
+            fight_id=fid, fight_type=2, final_result=result,
+            fight_result=actions)),
+        fight_events=journey.combat_engine.event_data(actions, fid))
     return record, reward(r) if win else None

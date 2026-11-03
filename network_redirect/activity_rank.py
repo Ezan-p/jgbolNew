@@ -24,6 +24,16 @@ def rules():
     for row in r['cards']:
         require(len(row) == 5 and all(type(x) is int and x >= 0 for x in row), '封神榜奖池无效')
         require(row[0] == 5 and row[1] in formation.ITEMS and row[2] > 0 and row[3] == 1 and row[4] > 0, '封神榜奖励无效')
+    next_order = 1
+    for bonus in r['challenge_bonuses']:
+        require(type(bonus['begin']) is int and type(bonus['end']) is int
+                and bonus['begin'] == next_order <= bonus['end'] < r['size'], '封神榜胜利奖励名次区间无效')
+        prize = bonus['prize']
+        require(len(prize) == 4 and all(type(v) is int for v in prize)
+                and prize[0] == 5 and prize[1] in formation.ITEMS and prize[2] > 0 and prize[3] == 1,
+                '封神榜胜利奖励无效')
+        next_order = bonus['end'] + 1
+    require(next_order == r['size'], '封神榜胜利奖励须覆盖全部初始NPC名次')
     return r
 
 
@@ -45,36 +55,22 @@ def client_source():
 
 @lru_cache(maxsize=1)
 def catalog():
-    data = json.loads((ROOT/'analysis/npc_design/v1/catalog.json').read_text())
-    candidates = []
-    for npc in data['npcs']:
-        if npc['role']['level'] < 5 or npc['battle_validation']['status'] == 'replay_limit_observed':
-            continue
-        from . import npc_players
-        npc = npc_players.decorate(npc)
+    from . import npc_players
+    data = json.loads((ROOT / rules()['ladder_catalog']).read_text())
+    rows = data['npcs']
+    require(len(rows) == rules()['size'] - 1 == data['npc_count'], '封神榜NPC库数量无效')
+    # Load each source once, even when power ordering interleaves level files.
+    sources = {path: npc_players.source_file(path) for path in {n['source_file'] for n in rows}}
+    ladder = {}
+    for order, row in enumerate(rows, 1):
+        require(row['order'] == order and row['scene_id'] == 930000+order, '封神榜席位无效')
+        npc = npc_players.decorate(sources[row['source_file']][row['npc_id']])
         combat_power.recalculate(npc['role'], formation.load_rules())
-        candidates.append(npc)
-    require(len(candidates) >= rules()['size'] - 1, '封神榜NPC库数量不足')
-    candidates.sort(key=lambda n: (-n['role']['role_combat_power'], n['npc_id']))
-    # Equally spaced absolute-power samples: permanent opponents, no player scaling.
-    size = rules()['size']
-    ladder = {930000+i: candidates[(i-1)*(len(candidates)-1)//(size-2)] for i in range(1, size)}
-    # Keep permanent scene IDs (and saved swaps) intact; only replace five templates.
-    elite_keys = rules().get('elite_npcs', [])
-    if elite_keys:
-        require(len(elite_keys) == 5 and len(set(elite_keys)) == 5, '封神榜前五配置无效')
-        elites = npc_players.source_file(rules()['elite_catalog'])
-        for order, key in enumerate(elite_keys, 1):
-            require(key in elites, '封神榜前五模板不存在')
-            npc = npc_players.decorate(elites[key])
-            require(npc['battle_validation']['status'] != 'replay_limit_observed', '封神榜前五模板回放风险')
-            combat_power.recalculate(npc['role'], formation.load_rules())
-            require(npc['role']['role_combat_power'] > ladder[930000+order]['role']['role_combat_power'],
-                    '封神榜前五战力须高于原模板')
-            ladder[930000+order] = npc
-        powers = [n['role']['role_combat_power'] for n in ladder.values()]
-        require(powers == sorted(powers, reverse=True), '封神榜战力顺序无效')
-        require(len({n['npc_id'] for n in ladder.values()}) == len(ladder), '封神榜模板重复')
+        require(npc['role']['role_combat_power'] == row['power'], '封神榜战力明细已过期，请重建')
+        ladder[row['scene_id']] = npc
+    powers = [n['role']['role_combat_power'] for n in ladder.values()]
+    require(powers == sorted(powers, reverse=True), '封神榜战力顺序无效')
+    require(len({n['npc_id'] for n in ladder.values()}) == len(ladder), '封神榜模板重复')
     return ladder
 
 
@@ -82,7 +78,13 @@ def score(order, column='score'):
     return next(int(v[column]) for v in SCORE if int(v['begin']) <= order <= int(v['end']))
 
 
+def promotion_reset_pending(s):
+    return s.get('rank_reset_version', 0) < 1 or s.get('rank_promotion_reset_version', 0) < 1
+
+
 def masks(s):
+    if promotion_reset_pending(s):
+        return 0, 0
     eligible = sum(1 << (i-2) for i,v in EXCHANGE.items() if int(v['promote_order']) and s.get('rank_reached_order', 20001) <= int(v['promote_order']))
     claimed = sum(1 << (i-2) for i in s.get('rank_promotions', []) if i in EXCHANGE and int(EXCHANGE[i]['promote_order']))
     return eligible, claimed
@@ -90,12 +92,20 @@ def masks(s):
 
 def prepare(role, now, arules):
     s = role['activity']; r = rules(); day = (now+arules['timezone_offset_hours']*3600)//86400
+    legacy_ladder = s.get('rank_version', 1) < 2 and s['rank_order'] <= 100
     if 'rank_version' not in s:
         order = max(1, min(r['size'], s['rank_order']))
         # Preserve old rank, currency, claims and daily usage on migration.
-        s.update(rank_version=1, rank_order=order, rank_clock=now, rank_day=day,
+        s.update(rank_version=2, rank_order=order, rank_clock=now, rank_day=day,
                  rank_day_best=order, rank_previous_best=0, rank_pending_score=0,
                  rank_extra=0, rank_origin_order=order, rank_slots={}, rank_records=[], rank_defence_day=day)
+    if legacy_ladder:
+        # The former terminal seat 100 held the origin NPC after a climb.
+        # Materialize that old fallback before adding seats 100..500.
+        if s['rank_order'] != 100:
+            s['rank_slots'].setdefault('100', 930000+s.get('rank_origin_order', 100))
+        s['rank_slots']['501'] = 930100
+    s['rank_version'] = 2
     if s.get('rank_reward_version', 1) < 2:
         # Preserve claims by rank threshold, never by the newly reordered row ID.
         old_to_new = {6: 4, 7: 5, 8: 9, 9: 10}
@@ -165,14 +175,23 @@ def board(role):
             row.update(top_relation=3 if row['id'] == s.get('rank_revenge') else 2 if order in orders else 1)
             rows.append(row)
     eligible, claimed = masks(s)
+    # Original top-list head field is uint8; full ascension travels in event 80.
+    for row in rows:
+        row['cortege_layer'] = min(255, row.get('cortege_layer', 0))
     return encode(1022, dict(need_update=True, self_order=s['rank_order'], self_score=s['rank_score'], promote_time=eligible,
                             promote_prize=claimed, fight_count=max(0, role['top_fight_limit']+s['rank_extra']-s['rank_count']), show_count=len(rows), show_list=rows))
 
 
 def client_state(role):
     s = role['activity']
+    layers = {}
+    for order in challenge_orders(s) | set(range(1, 11)):
+        target = role if order == s['rank_order'] else catalog()[identity(s, order)]['role']
+        ident = role['role_id'] if order == s['rank_order'] else identity(s, order)
+        layers[ident] = next((c.get('evolve_level', 0) for c in target['corteges'] if c.get('order') == 1), 0)
     return summon.event(80, dict(local_rank=dict(previous_best=s['rank_previous_best'], pending_score=s['rank_pending_score'],
         current_order=s['rank_order'], score=s['rank_score'],
+        cortege_layers=layers,
         promote_time=masks(s)[0], promote_prize=masks(s)[1])))
 
 
@@ -203,7 +222,7 @@ def simulate(role, order, now, jrules, defence=False):
     s['rank_day_best'] = min(s['rank_day_best'], s['rank_order'])
     replay = dict(fight_id=fid, time=now, name=target['name'], src_name=role['role_name'], vip_level=role.get('vip_level',0), tao_point=role.get('tao_point',0),
                   role_combat_power=role.get('role_combat_power',0), target_id=target['id'], target_power=target['combat_power'], defence=defence,
-                  old_order=old, new_order=s['rank_order'], stop_reason=getattr(actions,'stop_reason','elimination'),
+                  old_order=old, new_order=s['rank_order'], target_order=order, stop_reason=getattr(actions,'stop_reason','elimination'),
                   fight_events=journey.combat_engine.event_data(actions,fid),
                   line_up_msg=decode(encode(1028,dict(fight_id=fid,first_hand=1,des_name=target['name'],lineup_count=len(lineup),lineup=lineup)))[2],
                   fight_result_msg=battle_replay.result_message(dict(fight_id=fid,fight_type=2,final_result=result,fight_round=len(actions),fight_result=actions)))
@@ -224,6 +243,7 @@ def battle(role, req, now, arules, jrules):
     from . import activity as a
     s = role['activity']; target = req['des_value']
     require(role['level'] >= 6, '封神榜需6级')
+    require(not promotion_reset_pending(s), '玩法已更新，请先打开封神榜完成重置')
     require(target in challenge_orders(s) and req['des_type'] == 2 and req['des_id'] == identity(s,target), '封神榜对手已变化，请刷新')
     require(s['rank_count'] < role['top_fight_limit']+s['rank_extra'], '今日封神榜次数已用完')
     require(any(c.get('order') for c in role['corteges']), '请先上阵神仙')
@@ -232,7 +252,7 @@ def battle(role, req, now, arules, jrules):
     from . import progression, formation
     xp = int(formation.LEVELS[role['level']]['energy_win_exp' if win else 'energy_lose_exp'])
     progression.add_exp(role, xp, now)
-    rewards = []
+    rewards = []; bonus_rewards = []
     if win:
         gain = score(s['rank_order']); s['rank_score'] = min(16777215, s['rank_score']+gain)
         cards = rules()['cards']; roll = secrets.randbelow(sum(v[4] for v in cards)); chosen = cards[-1]
@@ -240,10 +260,16 @@ def battle(role, req, now, arules, jrules):
             if roll < card[4]: chosen = card; break
             roll -= card[4]
         journey.grant(role,chosen[:4]); role['silver_coin'] += arules['battle_silver']
+        # Use the opponent's rank before the fight, not our rank after swapping.
+        bonus_rewards = a.prizes(role, [v['prize'] for v in rules()['challenge_bonuses']
+                                       if v['begin'] <= target <= v['end']])
+        replay['challenge_bonus'] = copy.deepcopy(bonus_rewards)
         # Original rankUI flips exactly five cards; flag marks the ONE award.
         rewards = [dict(a.prize_spec(v[:4]),flag=i==0) for i,v in enumerate([chosen]+[cards[(cards.index(chosen)+i)%len(cards)] for i in range(1,5)])]
     prepare(role,now,arules)
-    return replay_packets(replay)+[summon.event(45,dict(fight_id=replay['fight_id'],obj_type=1,exp_plus=xp)),client_state(role),board(role)]+([summon.event(33,rewards)] if win else [])+[summon.event(44,dict(fight_id=replay['fight_id'],fight_type=2))]
+    return replay_packets(replay)+[summon.event(45,dict(fight_id=replay['fight_id'],obj_type=1,exp_plus=xp)),client_state(role),board(role),
+        summon.event(80, dict(local_rank_battle_bonus=dict(fight_id=replay['fight_id'], target_order=target, prizes=bonus_rewards)))
+        ]+([summon.event(33,rewards)] if win else [])+[summon.event(44,dict(fight_id=replay['fight_id'],fight_type=2))]
 
 
 def settle(role, mid, req, now, arules, jrules):
@@ -251,14 +277,34 @@ def settle(role, mid, req, now, arules, jrules):
     s = role['activity']; require(role['level'] >= 6, '封神榜需6级')
     if mid == 1021:
         require(req['flag'] in (0,1), '封神榜查询无效')
+        reset = s.get('rank_reset_version', 0) < 1
+        reset_promotions = promotion_reset_pending(s)
+        if reset:
+            # Apply only on the first valid board visit, then persist atomically
+            # with its response. Keep currency and daily usage.
+            s.update(rank_reset_version=1, rank_order=rules()['size'],
+                     rank_origin_order=rules()['size'], rank_slots={},
+                     rank_day_best=rules()['size'], rank_previous_best=0,
+                     rank_defence_day=s['rank_day'])
+            s.pop('rank_revenge', None)
+        if reset_promotions:
+            # Also repair saves which already performed the first rank-only reset.
+            # A fresh victory must establish eligibility; inherited best ranks
+            # and claim flags must not unlock this cycle's promotion rewards.
+            s.update(rank_promotion_reset_version=1, rank_reached_order=rules()['size'],
+                     rank_promotions=[], rank_reward_version=2)
         # One local defensive encounter on the first visit of a new day, never
         # replay every missed day or charge stamina for an offline NPC attack.
-        if s['rank_defence_day'] < s['rank_day']:
+        if not reset_promotions and s['rank_defence_day'] < s['rank_day']:
             s['rank_defence_day'] = s['rank_day']
             if s['rank_order'] < rules()['size'] and s.get('rank_reached_order'):
                 simulate(role, min(rules()['size'],s['rank_order']+1),now,jrules,True)
         prepare(role,now,arules)
-        return [client_state(role),board(role)]
+        if reset_promotions:
+            s['rank_defence_day'] = s['rank_day']
+        return [client_state(role),board(role)] + (
+            [summon.event(80, dict(local_rank_reset_notice=True))] if reset else
+            [summon.event(80, dict(local_rank_promotion_reset_notice=True))] if reset_promotions else [])
     if mid == 1026: return battle(role,req,now,arules,jrules)
     if mid == 1244:
         from .monument import record_packets
@@ -286,6 +332,7 @@ def settle(role, mid, req, now, arules, jrules):
         cost, promotion = int(cfg['score']), int(cfg['promote_order'])
         require(s['rank_score'] >= cost,'积分不足')
         if promotion:
+            require(not promotion_reset_pending(s), '玩法已更新，请先打开封神榜完成重置')
             claims = s.setdefault('rank_promotions',[])
             require(s.get('rank_reached_order',20001)<=promotion and req['exchange_type'] not in claims,'未达晋升名次或已领取')
             claims.append(req['exchange_type'])

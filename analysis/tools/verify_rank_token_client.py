@@ -11,5 +11,7 @@ from network_redirect import summon, activity_rank as rank
 vm = LuaRuntime()
 print(vm.execute((ROOT / 'tests/rank_token_client_regression.lua').read_text(),
                  rank.client_source()))
+print(LuaRuntime().execute((ROOT / 'tests/rank_500_client_regression.lua').read_text(),
+                          rank.client_source()))
 vm.execute('assert(loadstring(...))', summon.client_source(summon.load_rules()))
 print('Full client injection compiles in Lua 5.1')

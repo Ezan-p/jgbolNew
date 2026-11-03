@@ -47,9 +47,13 @@ def main():
         assert evaluate(source) == 'preview ready'
         report['countdown'] = evaluate("local u=package.loaded.ms.d_cardUI;local n=tolua.cast(u.g_cardUI.main_layer:getChildByTag(u.g_self.timeLabelTag),'CCLabelTTF');local p=n:getPositionLua();local c=n:getColor();return table.concat({n:getString(),n:getZOrder(),n:getScale(),p.x,p.y,n:getContentSize().width,n:getContentSize().height,c.r,c.g,c.b,tostring(n:isVisible())},' / ')")
         assert '天' in report['countdown'] and '小时' in report['countdown'] and '周刷新' not in report['countdown'], report['countdown']
-        capture('main.png')
+        capture('batch_main.png')
         evaluate('tangwangPreview.intro();return "intro"')
-        capture('intro.png')
+        capture('batch_intro.png')
+        evaluate('tangwangPreview.batch();return "batch"')
+        capture('batch_picker.png')
+        evaluate('tangwangPreview.confirm();return "confirm"')
+        capture('batch_confirm.png')
         report['passed'] = True
     finally:
         try:
@@ -58,7 +62,7 @@ def main():
         finally:
             script.unload()
             session.detach()
-        (destination / 'style_preview.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
+        (destination / 'batch_style_preview.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
 

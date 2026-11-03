@@ -67,11 +67,11 @@ class EquipmentTests(unittest.TestCase):
         self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **kw: None)
         self.assertEqual(expected, self.b.profile())
 
-    def test_failure_compensation_replay_and_success_reset(self):
+    def test_failure_has_no_compensation_replay_and_success(self):
         stone = self.add(1090); mat = self.add(1091)
         with patch.object(e.secrets, 'randbelow', return_value=999999):
             self.assertEqual(self.stone(3, stone, [mat])[-1][1]['result'], 6)
-        self.assertEqual(self.get(stone)['prob_compen'], 5)
+        self.assertEqual(self.get(stone)['prob_compen'], 0)
         role = self.b.profile()
         self.assertEqual(self.b.respond(self.packet, {'authenticated': True}), self.replies)
         self.assertEqual(role, self.b.profile())

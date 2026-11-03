@@ -3,7 +3,7 @@ local saved,checks,sent,errors,scenes,buttons={},{},{},{},{},{}
 local function preserve(t)
  local old={};for k,v in pairs(t) do old[k]=v end;saved[#saved+1]={t=t,old=old}
 end
-for _,t in ipairs({ui,ms.d_activityUI,ms.d_u,ms.d_info,ms.d_data,ms.d_time,ms.d_loginUI,ms.d_commonLayerUI,ms.d_answerUI,ms.d_mainUI,ms.d_lineupUI}) do preserve(t) end
+for _,t in ipairs({ui,ms.d_fightUI,ms.d_activityUI,ms.d_u,ms.d_info,ms.d_data,ms.d_time,ms.d_loginUI,ms.d_commonLayerUI,ms.d_answerUI,ms.d_mainUI,ms.d_lineupUI}) do preserve(t) end
 local report=ms.MS_report_error;ms.MS_report_error=function(e) errors[#errors+1]=tostring(e) end
 if ui._localNineSkyRestore then ui._localNineSkyRestore() end
 ui.g_self=ms.d_c.table_copy(ui.g_self);ui.g_self.Help1=true;ui.g_towerUI={}
@@ -156,17 +156,27 @@ check('local midnight blocks stale purchase and removes card picker',function()
  assert(ui.g_self.role_data.shop_day==FIXTURE.daily_big.local_snapshot.shop_day)
  FIXTURE.now=savedNow
 end)
-check('local battle results wait for complete movement',function()
+check('native battle reward panel and no end-of-batch summary',function()
  response(FIXTURE.after_single)
  local data=ms.d_c.table_copy(FIXTURE.ten)
- data.local_battles={{floor=2,enemy_name='本地天将',won=true,rewards={{object_type=1,attach_type=-1,attach_level=100,attach_count=1}}},
-  {floor=3,enemy_name='本地守军',won=false,rewards={}}}
+ data.local_battles={{floor=2,enemy_name='本地天将',won=true,replay={},rewards={{object_type=1,attach_type=-1,attach_level=100,attach_count=1}}}}
+ data.map_event_list[1].local_battle_index=1
  response(data)
- assert(not ui.g_towerUI.main_layer:getChildByTag(91037))
+ local rewards={{local_nine_sky_battle=data.local_battles[1]}}
+ local holder=ui.showRandomPrize(rewards,function() end)
+ ui.g_towerUI.main_layer:addChild(holder)
+ local frame=ms.d_fightUI.g_fightUI
+ ms.d_fightUI.g_fightUI={layerFightEnd=CCLayer:create()}
+ local skip=ms.d_fightUI.getSkipFightBtn
+ ms.d_fightUI.getSkipFightBtn=function() return CCNode:create() end
+ ms.d_fightUI.showFightEnd()
+ local panel=ms.d_fightUI.g_fightUI.layerFightEnd:getChildByTag(91037);assert(panel)
+ assert(tolua.cast(panel:getChildByTag(1),'CCLabelTTF'):getString():find('获得奖励'))
+ assert(tolua.cast(panel:getChildByTag(11),'CCLabelTTF'):getString():find('天星卡'))
+ buttons['v2/introUI/close1.png']()
+ ms.d_fightUI.getSkipFightBtn=skip;ms.d_fightUI.g_fightUI=frame
  ui.g_self.role_data=ms.d_c.table_copy(data.local_snapshot);ui.cancelSwallow()
- local result=ui.g_towerUI.main_layer:getChildByTag(91037);assert(result)
- assert(tolua.cast(result:getChildByTag(11),'CCLabelTTF'):getString():find('胜利'))
- assert(tolua.cast(result:getChildByTag(12),'CCLabelTTF'):getString():find('未获胜'))
+ assert(not ui.g_towerUI.main_layer:getChildByTag(91037))
 end)
 check('local permanent entry survives exact week boundary',function()
  local savedNow=FIXTURE.now;FIXTURE.now=FIXTURE.entry.local_snapshot.next_weekly_refresh

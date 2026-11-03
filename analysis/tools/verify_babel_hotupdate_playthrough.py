@@ -60,7 +60,9 @@ def main():
                 if (row,col)==target:return path
                 for r,c in ((row-1,col),(row+1,col),(row,col-1),(row,col+1)):
                     if (1<=r<=5 and 1<=c<=8 and (r,c) not in seen and
-                            ((r,c)==target or grid[r-1][c-1]['elem_type'] not in (*babel.TOOLS,3))):
+                            ((r,c)==target or (grid[r-1][c-1]['elem_type']==0
+                             if not active_secret and s['cur_floor']>=11
+                             else grid[r-1][c-1]['elem_type'] not in (*babel.TOOLS,3)))):
                         seen.add((r,c)); pending.append(((r,c),path+[(r,c)]))
             raise AssertionError(('unreachable',s['cur_floor'],typ))
         for floor in range(1,babel.MAX_FLOOR+1):
@@ -69,6 +71,9 @@ def main():
                      20003,20004,20007,20008,20009,9,3) if floor==1 else (9,3)
             for typ in targets:
                 for row,col in route(typ):
+                    if floor==babel.MAX_FLOOR and typ==3:
+                        terminal_previous=copy.deepcopy(backend.profile()['activity']['babel']['locale'])
+                        terminal=dict(row=row,column=col)
                     packets=move(row,col)
                     replay=next((d for mid,_,d in packets if mid==1027),None)
                     if replay:
@@ -86,7 +91,7 @@ def main():
                 backend=Backend(Path(tmp),18770,lambda *a,**k:None)
                 assert snapshot==backend.profile()
         s=backend.profile()['activity']['babel']; assert s['complete']
-        before=s['coin_count']; move(5,7); move(5,8)
+        before=s['coin_count']; move(terminal_previous['row'],terminal_previous['column']); move(terminal['row'],terminal['column'])
         assert backend.profile()['activity']['babel']['coin_count']==before
         # Paid native group entrances and all three floors, with real guards.
         normal_before=copy.deepcopy(backend.profile()['activity']['babel'])
@@ -125,12 +130,12 @@ def main():
             packets=backend.respond(encode(1103,dict(serial_num=serial,mail_id=mail['mail_id'],flag=1)),session)
         assert backend.profile()['welfare']['mails'][mail['delivery_key']]['claimed']
         request(8)
-        result=dict(passed=True,date='2026-10-31',army=key,stat_boosts=False,seeded_consumables={'20019':10},
+        result=dict(passed=True,date='2026-11-02',army=key,stat_boosts=False,seeded_consumables={'20019':10},
                     seeded_gold=100000,floors=babel.MAX_FLOOR,secret_floors=secret_trace,seeded_secret_tickets=5,wins=sum(v['wins'] for v in trace),requests=serial-100000,
                     restart_at_floor=30,full_first_floor=True,terminal_repeat_safe=True,weekly_mail_claimed=True,
                     balance_claim=False,steps=trace)
         backend.close()
-    out=ROOT/'analysis/evidence/babel_hotupdate'; out.mkdir(parents=True,exist_ok=True)
+    out=ROOT/'analysis/evidence/babel_layouts_20261102'; out.mkdir(parents=True,exist_ok=True)
     (out/'playthrough.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
     print(json.dumps({k:v for k,v in result.items() if k!='steps'},ensure_ascii=False))
 

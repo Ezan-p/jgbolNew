@@ -58,10 +58,16 @@ class BabelHotupdateTests(ActivityCase):
         for row in s['floors'][str(floor)]:
             for cell in row:
                 if cell['elem_type']==9:cell['elem_type']=0
-        s['locale']=dict(row=5,column=7);self.b.save(role)
-        return self.call(13 if secret else 2,target_pos=dict(row=5,column=8))
+        row,col=next((r,c) for r,line in enumerate(s['floors'][str(floor)],1)
+                     for c,cell in enumerate(line,1) if cell['elem_type']==3)
+        self.last_stair=dict(row=row,column=col)
+        self.before_stair=dict(row=row-1 if row>1 else row+1,column=col)
+        s['floors'][str(floor)][self.before_stair['row']-1][col-1]['elem_type']=0
+        s['locale']=self.before_stair.copy();self.b.save(role)
+        return self.call(13 if secret else 2,target_pos=self.last_stair)
 
     def test_old_completed_60_save_opens_61_without_refilling_loot(self):
+        self.legacy_babel_floor(60)
         self.seed_tower(60,max_floor=60,complete=True)
         role=self.b.profile();s=role['activity']['babel'];s['floors']['60'][4][7]['elem_type']=0
         s['floors']['60'][0][1]['elem_type']=0;self.b.save(role)
@@ -78,8 +84,8 @@ class BabelHotupdateTests(ActivityCase):
         result=self.stair(70)
         self.assertTrue(result[0]['data']['completed_now'])
         before=self.b.profile()['attachments']
-        self.call(2,target_pos=dict(row=5,column=7))
-        result=self.call(2,target_pos=dict(row=5,column=8))
+        self.call(2,target_pos=self.before_stair)
+        result=self.call(2,target_pos=self.last_stair)
         self.assertFalse(result[0]['data']['completed_now'])
         self.assertEqual(before,self.b.profile()['attachments'])
         self.assertEqual(self.saved()['cur_floor'],70)

@@ -32,6 +32,10 @@ class DamageTests(unittest.TestCase):
         self.target.update(fangyu=0, hp=7)
         self.assertEqual(self.hit(), 7)
 
+    def test_fractional_fate_combo_scale_preserves_single_floor(self):
+        self.assertEqual(combat.damage(self.actor, self.target, 1, 1, self.rules, 37.5), 1875)
+        self.assertEqual(combat.damage(self.actor, self.target, 1, 1, self.rules, 50.0), 2500)
+
     def test_normal_effects_do_not_affect_spells(self):
         self.actor['extras'] = {10111: 50}
         self.target['extras'] = {10106: 30, 10108: 30}

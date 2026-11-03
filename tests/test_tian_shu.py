@@ -187,7 +187,7 @@ class TianShuGameplayTests(ActivityCase):
 
     def test_rank_and_rape_requests_drive_real_book_state(self):
         self.ok(self.req(1021, flag=0))
-        self.ok(self.req(1026, fight_type=2, des_type=2, des_value=99, des_id=930099))
+        self.ok(self.req(1026, fight_type=2, des_type=2, des_value=500, des_id=930500))
         self.assertTrue(ts.has(self.b.profile(), 'task_progress', 4))
         with patch('network_redirect.activity_rape.roll_forms', return_value=[1,3,5]):
             self.ok(self.req(1029, flag=1))

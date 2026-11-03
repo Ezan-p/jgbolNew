@@ -54,6 +54,10 @@ def collect_files(root=ROOT):
         add(relative)
 
     catalog = json.loads((root / 'analysis/npc_design/players/catalog.json').read_text())
+    profile_rules = json.loads((root / 'server_config/npc_player_rules.json').read_text())
+    for relative in profile_rules.get('additional_catalogs', []):
+        add(relative)
+        catalog['players'].extend(json.loads((root / relative).read_text())['players'])
     for entry in catalog['players']:
         relative = Path(entry['source_file'])
         if not relative.is_relative_to('analysis/npc_design') or relative.suffix != '.json':

@@ -61,14 +61,61 @@ class BabelMapTests(unittest.TestCase):
                             route_to(walkable, (1, 1), (row, col))
         self.assertEqual(len(first_floors), 100)
 
-    def test_later_floors_keep_existing_layout(self):
-        for floor in (11, 60):
+    def test_secret_floors_keep_existing_layout(self):
+        for floor in (1001, 1015):
             state = dict(cur_floor=floor, floors={})
             babel.generate(state)
             grid = state['floors'][str(floor)]
             self.assertEqual(grid[0][1]['elem_type'], 20005)
             self.assertEqual(grid[3][6]['elem_type'], 9)
             self.assertEqual(grid[4][7]['elem_type'], 3)
+
+    def test_late_maps_unique_solvable_and_boss_only_route_bounded(self):
+        expected = Counter([0] * 25 + [3, 9, 20003, 20004, 20005, 20006,
+                           20007, 20008, 20009, 20010, 20011, 20012, 20013, 20014, 20015])
+        for seed in range(100):
+            signatures = set()
+            with patch.object(babel.secrets, 'SystemRandom', return_value=random.Random(seed)):
+                for floor in range(11, 71):
+                    # No prior maps: uniqueness must not depend on intact loot
+                    # or generation order, including teleport/legacy saves.
+                    state = dict(cur_floor=floor, floors={})
+                    babel.generate(state)
+                    grid = state['floors'][str(floor)]
+                    signature = tuple(c['elem_type'] for row in grid for c in row)
+                    self.assertEqual(Counter(signature), expected)
+                    self.assertNotIn(signature, signatures)
+                    signatures.add(signature)
+                    self.assertEqual([grid[r][c]['elem_type'] for r,c in ((0,0),(0,1),(1,0))], [0]*3)
+                    self.assertEqual(sum(c['visible'] for row in grid for c in row), 4)
+                    boss = next((r,c) for r,line in enumerate(grid,1) for c,cell in enumerate(line,1)
+                                if cell['elem_type'] == 9)
+                    stairs = next((r,c) for r,line in enumerate(grid,1) for c,cell in enumerate(line,1)
+                                  if cell['elem_type'] == 3)
+                    path = route_to(grid, (1,1), boss) + route_to(grid, boss, stairs)
+                    minimum = 7 + (floor-11)//20
+                    self.assertTrue(minimum <= len(path) <= minimum+2, (seed, floor, path))
+                    self.assertEqual(abs(boss[0]-stairs[0])+abs(boss[1]-stairs[1]), 1)
+                    # Assuming victories, all keys/tools are accessible without
+                    # spending any consumables; every lock can be approached.
+                    walkable = copy.deepcopy(grid)
+                    for row in walkable:
+                        for cell in row:
+                            if cell['elem_type'] not in (*babel.TOOLS, 3):
+                                cell['elem_type'] = 0
+                    for row in range(1,6):
+                        for col in range(1,9):
+                            route_to(walkable, (1,1), (row,col))
+
+    def test_same_random_stream_still_produces_sixty_distinct_late_maps(self):
+        signatures = set()
+        for floor in reversed(range(11,71)):
+            with patch.object(babel.secrets, 'SystemRandom', return_value=random.Random(0)):
+                state = dict(cur_floor=floor, floors={})
+                babel.generate(state)
+            signature = tuple(c['elem_type'] for row in state['floors'][str(floor)] for c in row)
+            self.assertNotIn(signature, signatures)
+            signatures.add(signature)
 
 
 class BabelTests(ActivityCase):
@@ -148,6 +195,67 @@ class BabelTests(ActivityCase):
             self.assertEqual(generate.call_count, 1)
         self.assertTrue(any(c['elem_type'] == 20005 for row in self.saved()['floors']['1'] for c in row))
 
+    def test_late_floors_full_wire_loot_budget_and_terminal_once(self):
+        self.call(); self.edit(cur_floor=11, history_floor=11, energy=10000)
+        self.call()
+        with patch('network_redirect.activity_babel.journey.battle', return_value=(3, [], [])):
+            for floor in range(11,71):
+                self.edit(life=100)
+                for typ in (20005,20006,20010,20011,20012,20013,20014,20015,
+                            20003,20004,20007,20008,20009,9,3):
+                    grid = self.saved()['floors'][str(floor)]
+                    if any(c['elem_type'] == typ for row in grid for c in row):
+                        if typ == 3 and floor == 70:
+                            terminal = next((r,c) for r,line in enumerate(grid,1)
+                                            for c,cell in enumerate(line,1) if cell['elem_type'] == 3)
+                        self.visit_element(typ)
+                self.assertEqual(self.saved()['cur_floor'], min(floor+1,70))
+                self.assertEqual(self.saved()['coin_count'], 500*(floor-10) + (50 if floor == 70 else 0))
+                for typ in (20005,20006,20010,20011,20012):
+                    self.assertEqual(babel.item_count(self.b.profile(),typ), 0)
+        self.assertTrue(self.saved()['complete'])
+        before = self.b.profile()['attachments']
+        row,col = terminal
+        neighbor = (row-1,col) if row > 1 else (row+1,col)
+        self.call(2,target_pos=dict(zip(('row','column'),neighbor)))
+        self.call(2,target_pos=dict(row=row,column=col))
+        self.assertEqual(self.b.profile()['attachments'], before)
+
+    def test_late_map_saved_loot_survives_queries_teleport_restart_and_old_layout(self):
+        for legacy in (False, True):
+            with self.subTest(legacy=legacy):
+                if legacy:
+                    self.legacy_babel_floor(40)
+                else:
+                    self.call(); self.edit(cur_floor=40, history_floor=40, energy=10000)
+                self.call()
+                with patch('network_redirect.activity_babel.journey.battle', return_value=(3, [], [])):
+                    self.visit_element(20005)
+                self.call(7, floor=40)
+                floors = self.saved()['floors']
+                self.call(); self.call(6); self.call(7,floor=40)
+                self.b.close(); self.b = Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+                self.call()
+                self.assertEqual(self.saved()['floors'], floors)
+                self.assertFalse(any(c['elem_type'] == 20005 for row in floors['40'] for c in row))
+
+    def test_floor_reward_entry_probabilities_and_coin_budget(self):
+        self.call()
+        for floor, count in ((11,9),(16,7),(21,9),(26,10),(31,8),(36,8),
+                             (41,9),(46,10),(51,9),(56,8),(61,7),(66,7)):
+            role = self.b.profile(); s = role['activity']['babel']; s['cur_floor'] = floor
+            before = babel.item_count(role,20000)
+            with patch.object(babel.secrets,'choice',side_effect=lambda entries: entries[0]) as draw:
+                rewards = babel.floor_reward(role,s,self.b.activity_rules)
+            entries = draw.call_args.args[0]
+            self.assertEqual(len(entries), count)
+            self.assertEqual(babel.item_count(role,20000)-before, 50)
+            self.assertEqual(rewards[-1]['attach_count'], 50)
+            if floor == 31:
+                self.assertEqual(entries.count([5,10001,1,1]), 2)  # 2/8, not 1/7
+            if floor == 11:
+                self.assertEqual(sum(p[1] == 1092 for p in entries), 2)  # quantities 4/5 kept separate
+
     def test_original_essences_overflow_and_natural_cap(self):
         self.call(); role = self.b.profile()
         for tid in range(20016,20020): summon.add_item(role,tid,2)
@@ -170,8 +278,8 @@ class BabelTests(ActivityCase):
             self.call(); self.assertEqual(self.saved()['energy'],21)
             self.call(); self.assertEqual(self.saved()['energy'],21)
         with patch('network_redirect.backend.time.time',return_value=NOW+43200):
-            self.call(); s=self.saved(); self.assertEqual((s['life'],s['energy'],s['refresh_times']),(100,44,0))
-            self.assertEqual(s['purchases'], {str(index):2})
+            self.call(); s=self.saved(); self.assertEqual((s['life'],s['energy'],s['refresh_times']),(100,44,1))
+            self.assertEqual(s['purchases'], {})
         self.call(); self.assertEqual(self.saved()['energy'],44)
         with patch('network_redirect.backend.time.time',return_value=NOW+3*86400):
             self.call(); self.assertEqual(self.saved()['energy'],100)
@@ -205,6 +313,75 @@ class BabelTests(ActivityCase):
         return tuple((item['reward'][1]['attach_type'], item['reward'][1]['attach_count'],
                       item['need_coin'], item['limit']) for item in data['my_shop'].values())
 
+    def test_paid_refresh_does_not_block_daily_reset_after_restart(self):
+        self.call()
+        role = self.b.profile(); summon.add_item(role, 20000, 2000); self.b.save(role)
+        midnight = (activity.day(NOW, self.b.activity_rules) + 1) * 86400 - self.b.activity_rules['timezone_offset_hours'] * 3600
+        with patch('network_redirect.backend.time.time', return_value=midnight - 1):
+            first = self.call(8)[0]
+            paid = self.call(9)[0]
+            packet, replies = self.packet, self.replies
+            self.assertEqual(paid['coin_count'], first['coin_count'] - 200)
+            self.assertEqual(paid['refresh_times'], 0)
+            self.assertNotEqual(self.shop_signature(first), self.shop_signature(paid))
+            before = self.b.profile()
+            self.assertEqual(self.b.respond(packet, self.state), replies)
+            self.assertEqual(self.b.profile(), before)
+            self.call(4, index=1, count=1)
+            before = self.saved()
+            self.reject(9)
+            self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+            self.call(8)
+            self.assertEqual(self.saved(), before)
+
+        with patch('network_redirect.backend.time.time', return_value=midnight):
+            reset = self.call(8)[0]
+            self.assertEqual(reset['refresh_times'], 1)
+            self.assertEqual(reset['coin_count'], before['coin_count'])
+            self.assertEqual(list(reset['my_exchange'].values()), [0] * 6)
+            self.assertNotEqual(self.shop_signature(paid), self.shop_signature(reset))
+            self.assertEqual(self.saved()['week'], before['week'])
+            self.assertEqual(self.saved()['floors'], before['floors'])
+            self.assertEqual(reset, self.call(8)[0])
+            paid_again = self.call(9)[0]
+            self.assertEqual(paid_again['refresh_times'], 0)
+            self.assertEqual(paid_again['coin_count'], reset['coin_count'] - 200)
+        # Clock rollback must not grant another automatic or paid refresh.
+        self.assertEqual(paid_again, self.call(8)[0])
+        self.reject(9)
+
+    def test_legacy_shop_migrates_without_refilling_same_day(self):
+        self.call()
+        role = self.b.profile(); s = role['activity']['babel']
+        s.pop('shop_day', None)
+        s.update(refresh_times=0, purchases={'1': 1})
+        self.b.save(role)
+        before = self.call(8)[0]
+        self.assertEqual(before['refresh_times'], 0)
+        self.assertEqual(before['my_exchange'][1], 1)
+        # Also cover a legacy save first loaded on a later day.
+        role = self.b.profile(); role['activity']['babel'].pop('shop_day', None); self.b.save(role)
+        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+            after = self.call(8)[0]
+        self.assertEqual(after['refresh_times'], 1)
+        self.assertEqual(list(after['my_exchange'].values()), [0] * 6)
+        self.assertNotEqual(self.shop_signature(before), self.shop_signature(after))
+
+    def test_shop_daily_reset_runs_once_when_login_skips_days_and_week(self):
+        self.call(); self.edit(refresh_times=0, purchases={'1': 1})
+        later = npc.start(self.saved()['week'] + 2, self.b.activity_rules)
+        with patch.object(babel, 'random_shop_goods', wraps=babel.random_shop_goods) as draw:
+            role = self.b.profile()
+            activity.prepare(role, later, self.b.activity_rules)
+            self.b.save(role)
+            with patch('network_redirect.backend.time.time', return_value=later):
+                reset = self.call(8)[0]
+                self.assertEqual(reset, self.call(8)[0])
+            self.assertEqual(draw.call_count, 1)
+        self.assertEqual(reset['refresh_times'], 1)
+        self.assertEqual(list(reset['my_exchange'].values()), [0] * 6)
+        self.assertEqual(self.saved()['shop_day'], activity.day(later, self.b.activity_rules))
+
     def assert_shop_subset(self, data):
         self.assertEqual(len(data['my_shop']), 6)
         ids = []
@@ -226,8 +403,8 @@ class BabelTests(ActivityCase):
         self.call(4, index=1, count=1)
         self.assertEqual(self.saved()['purchases'].get('1'), 1)
 
-        # Reopening the local backend must retain the same weekly selection and
-        # purchase counters; random selection is performed only at the week boundary.
+        # Reopening the local backend on the same day retains the selection and
+        # purchase counters. A later week also crosses the daily boundary.
         snapshot = self.b.profile(); self.b.close()
         self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
         self.assertEqual(snapshot, self.b.profile())
@@ -274,12 +451,15 @@ class BabelTests(ActivityCase):
         self.call(); self.edit(locale=dict(row=5,column=7))
         self.reject(2,target_pos=dict(row=5,column=8))
         role=self.b.profile(); s=role['activity']['babel']; s['cur_floor']=70; s['history_floor']=70
-        babel.generate(s); s['locale']=dict(row=4,column=6); self.b.save(role)
+        babel.generate(s); self.b.save(role)
         with patch('network_redirect.activity_babel.journey.battle',return_value=(3,[],[])):
-            self.call(2,target_pos=dict(row=4,column=7))
-        self.call(2,target_pos=dict(row=5,column=7)); self.call(2,target_pos=dict(row=5,column=8))
+            self.visit_element(9)
+        grid=self.saved()['floors']['70']
+        terminal=next((r,c) for r,line in enumerate(grid,1) for c,cell in enumerate(line,1) if cell['elem_type']==3)
+        previous=self.saved()['locale']
+        self.visit_element(3)
         self.assertTrue(self.saved()['complete']); before=self.saved()['coin_count']
-        self.call(2,target_pos=dict(row=5,column=7)); self.call(2,target_pos=dict(row=5,column=8))
+        self.call(2,target_pos=previous); self.call(2,target_pos=dict(zip(('row','column'),terminal)))
         self.assertEqual(self.saved()['coin_count'],before)
         self.assertEqual(self.saved()['cur_floor'],70)
 
@@ -374,11 +554,16 @@ class BabelTests(ActivityCase):
     def test_real_catalog_fight_replay_and_fixed_opponent(self):
         self.legacy_babel_floor()
         self.call(); role=self.b.profile(); ident=role['role_id']
+        activity_state=copy.deepcopy(role['activity'])
         key=max(npc_players.catalog(),key=lambda k:npc_players.catalog()[k]['profile']['role_combat_power'])
         role.update(copy.deepcopy(npc_players.get(key)['role'])); role['role_id']=ident
+        # Expanded NPC profiles carry their own activity data; preserve this
+        # test's legacy map instead of replacing it with a new random floor.
+        role['activity']=activity_state
         self.b.save(role)
         self.call(2,target_pos=dict(row=1,column=2)); self.call(2,target_pos=dict(row=1,column=3))
-        fight=next(d for m,_,d in self.decoded if m==1027)
+        from test_battle_replay import decoded_packets
+        fight=next(d for m,_,d in decoded_packets(self.replies) if m==1027)
         self.assertIn(fight['final_result'],(1,2,3)); self.assertEqual(fight['fight_type'],200)
         self.assertGreater(fight['fight_round'],0)
         self.assertTrue(all(len(x['damage_list'])==8 for x in fight['fight_result']))

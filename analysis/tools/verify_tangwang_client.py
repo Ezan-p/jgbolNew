@@ -50,10 +50,10 @@ Interceptor.attach(m.getExportByName('lua_pcall'),{onEnter(args){
                 name,sep,rest=line.partition(':')
                 if sep and rest.startswith(('true:','false:')):
                     ok,_,error=rest.partition(':');checks.append(dict(name=name,passed=ok=='true',error=error))
-    passed=len(checks)==15 and all(c['passed'] for c in checks)
+    passed=len(checks)==23 and all(c['passed'] for c in checks)
     report=dict(passed=passed,checks=checks,raw=messages,live_account_resources_changed=False,
                 native_cocos=True,detached_layer=True,network_sends_captured=True)
-    path=ROOT/'analysis/evidence/tangwang/client_validation.json'
+    path=ROOT/'analysis/evidence/tangwang/batch_client_validation.json'
     path.parent.mkdir(parents=True,exist_ok=True)
     path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print(f'{sum(c["passed"] for c in checks)}/{len(checks)} original Cocos checks passed')

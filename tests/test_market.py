@@ -55,7 +55,8 @@ class MarketTests(unittest.TestCase):
         self.assertEqual(cfg[23], self.backend.formation_rules['equipment_advance'])
         goods = cfg[10]
         self.assertEqual(len(goods['cheap_item_list']), 10)
-        self.assertEqual(len(goods['rich_item_list']), 15)  # forge tokens and regular-price buns
+        self.assertEqual(len(goods['rich_item_list']), 14)  # includes forge tokens
+        self.assertNotIn(1022, [row['type_id'] for row in goods['rich_item_list'].values()])
         self.assertNotIn(9137, goods['rich_item_list'])
         self.assertEqual(len(goods['limit_item_list']), 0)
         for raw in market.CATALOG:
@@ -215,29 +216,20 @@ class MarketTests(unittest.TestCase):
         self.assertEqual(self.backend.profile(), saved)
         self.assertEqual(self.request(first_send=1)[0][1]['cheap_item_list'][24]['buy_limit_times'], 10)
 
-    def test_regular_buns_batch_price_and_independent_discount_quota(self):
+    def test_regular_buns_removed_and_discount_buns_still_available(self):
         goods = self.request(first_send=1, page_id=2)[0][1]
-        row = goods['rich_item_list'][25]
-        self.assertEqual((row['type_id'], row['count'], row['buy_price'], row['money_type'],
-                          row['vip_level'], row['is_day_limit']), (1022, 1, 20, 11, 0, 0))
+        self.assertNotIn(25, goods['rich_item_list'])
+        self.assertNotIn(1022, [row['type_id'] for row in goods['rich_item_list'].values()])
         before, gold = self.count(1022), self.backend.profile()['gold_coin']
-        result = self.buy(page_id=2, index=25, type_id=1022, count=12)
-        self.assertEqual(result['result'], 1)
-        self.assertEqual(self.count(1022), before + 12)
-        self.assertEqual(self.backend.profile()['gold_coin'], gold - 240)
         saved = self.backend.profile()
-        self.assertEqual(self.backend.respond(self.packet, self.state), self.replies)
-        self.assertEqual(self.backend.profile(), saved)
+        for count in (1, 12):
+            self.assertEqual(self.buy(page_id=2, index=25, type_id=1022, count=count)['result'], 2)
+            self.assertEqual(self.backend.profile(), saved)
         self.assertEqual(self.request(first_send=1)[0][1]['cheap_item_list'][24]['buy_limit_times'], 10)
         self.assertEqual(self.buy(page_id=1, index=24, type_id=1022)['result'], 1)
-        self.assertEqual(self.buy(page_id=2, index=25, type_id=1022, count=3)['result'], 1)
-        self.assertEqual(self.count(1022), before + 16)
-        self.assertEqual(self.backend.profile()['gold_coin'], gold - 305)
+        self.assertEqual(self.count(1022), before + 1)
+        self.assertEqual(self.backend.profile()['gold_coin'], gold - 5)
         self.assertEqual(self.request(first_send=1)[0][1]['cheap_item_list'][24]['buy_limit_times'], 9)
-        role = self.backend.profile(); role['gold_coin'] = 19; self.backend.save(role)
-        saved = self.backend.profile()
-        self.assertEqual(self.buy(page_id=2, index=25, type_id=1022)['result'], 6)
-        self.assertEqual(self.backend.profile(), saved)
 
     def test_bundle_grants_twenty_and_preserves_vip_gate(self):
         self.assertEqual(self.buy(page_id=1, index=8, type_id=1001)['result'], 5)

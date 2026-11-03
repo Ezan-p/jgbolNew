@@ -87,6 +87,30 @@ class FateTests(ActivityCase):
         role=self.b.profile();before=copy.deepcopy(role);formation.recalculate(role,self.b.formation_rules)
         self.assertEqual(role,before)
 
+    def test_zero_pity_spell_is_one_material_and_protected_instances_stay(self):
+        self.activate()
+        role = self.b.profile()
+        protected = []
+        for field in ('is_lock', 'owner_id', 'equip_order', 'innate_owner_id', 'awaken', 'upgrade_level'):
+            item = dict(id=formation.new_id(role), attach_type=6, type_id=25,
+                        level=1, count=0, **{field: 999})
+            role['attachments'].append(item)
+            protected.append(item['id'])
+        usable = formation.new_id(role)
+        role['attachments'].append(dict(id=usable, attach_type=6, type_id=25, level=1, count=0))
+        self.b.save(role)
+        self.ok(self.fate(0, soul_part=8, material_list={25: 1}))
+        remaining = {i['id'] for i in self.b.profile()['attachments']}
+        self.assertNotIn(usable, remaining)
+        self.assertTrue(set(protected) <= remaining)
+
+    def test_spell_pity_does_not_multiply_material_instances(self):
+        role = dict(attachments=[dict(id=1, attach_type=6, type_id=25, level=1, count=99)])
+        before = copy.deepcopy(role)
+        with self.assertRaises(formation.Rejected):
+            fr.consume_node(role, {}, 8, '2|25|2', {25: 2})
+        self.assertEqual(role, before)
+
     def test_invalid_forged_costs_limits_and_equipped_skill_protection(self):
         self.activate()
         for kw in ({'soul_part':1,'material_list':{1375:1}}, {'soul_part':11,'material_list':{1375:30}},

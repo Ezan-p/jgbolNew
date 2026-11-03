@@ -222,6 +222,16 @@ do
   local oldRankData=ui.getDateFormServer
   local recordMeta={}
   local state={pending_score=0,previous_best=0}
+  local pendingBonus,lastBonusFight
+  local oldRewardsClose=ui.closeRewardsPage
+  ui.closeRewardsPage=function(...)
+   local result=oldRewardsClose(...)
+   local prizes=pendingBonus;pendingBonus=nil
+   if prizes and next(prizes) then
+    ms.d_commonLayerUI.showPrizeResLayer(CCDirector:sharedDirector():getRunningScene(),prizes)
+   end
+   return result
+  end
   local fromRank=false
   local replayFromRank=false
   local awaitingBoard=false
@@ -232,11 +242,26 @@ do
    ui.requestRankData()
   end
   ui.getDateFormServer=function(data)
+   for _,row in pairs(data and data.show_list or {}) do
+    local layer=state.cortege_layers and state.cortege_layers[row.id]
+    if layer then row.cortege_layer=layer end
+   end
    oldRankData(data)
    if awaitingBoard then awaitingBoard=false;ui.showRankUI() end
   end
   ms.d_data.callback_update_config=function(data)
    oldConfig(data)
+   if data and data.local_rank_reset_notice then
+    ms.d_info.show('玩法更新，排名重置')
+   elseif data and data.local_rank_promotion_reset_notice then
+    ms.d_info.show('玩法更新，晋升奖励进度重置')
+   end
+   if data and data.local_rank_battle_bonus then
+    local bonus=data.local_rank_battle_bonus
+    if bonus.fight_id~=lastBonusFight then
+     lastBonusFight=bonus.fight_id;pendingBonus=bonus.prizes
+    end
+   end
    if data and data.local_rank then
     state=data.local_rank
     if ui.g_rankInfo then
@@ -343,6 +368,7 @@ do
    ui.getCreditsRewards=oldCredits
    ui.createChargeCell=oldCell;ui.update_label_state=oldLabel
    ui.chargeButtonCallBack=oldClaim;ui.recvCreditsChargeMsg=oldClaimResult
+   ui.closeRewardsPage=oldRewardsClose
    ui.is_promotion_prize=oldPromotion;ui.get_promotion_time_bit=oldTimeBit;ui.get_promotion_prize_bit=oldPrizeBit
    ui.checkCreditsToCharge=oldCheckCredits
    ms.d_data.callback_update_config=oldConfig;ui.checkHadGetHighestRewards=oldCheck

@@ -13,7 +13,7 @@ from .protocol import encode
 ROOT = Path(__file__).resolve().parents[1]
 require = formation.require
 ENUMS = json.loads((ROOT/'analysis/evidence/activity_enums.json').read_text())
-HANDLED = {1131, 1219, 1243, 1309, 1351, 1226, 1227, 1060, 1330, 1334, 1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1303, 1329, 1333, 1348, 1349, 1350, 1353}
+HANDLED = {1346, 1325, 1131, 1219, 1243, 1309, 1351, 1226, 1227, 1060, 1330, 1334, 1021, 1029, 1030, 1039, 1040, 1041, 1043, 1049, 1064, 1072, 1085, 1126, 1202, 1203, 1205, 1208, 1210, 1211, 1213, 1302, 1303, 1329, 1333, 1348, 1349, 1350, 1353}
 FIGHTS = {2, 3, 4, 5, 6, 10, 11, 12}
 EXCHANGE = {int(r['index']):r for r in summon.rows('top_score_exchange.csv')}
 RANK_SCORE = summon.rows('top_score.csv')
@@ -50,6 +50,10 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     activity_monday.load_rules()
     from . import activity_yuanshi
     activity_yuanshi.load_rules()
+    from . import activity_dream
+    activity_dream.load_rules()
+    from . import activity_save_monkey
+    activity_save_monkey.load_rules()
     from . import activity_rulai
     activity_rulai.load_rules()
     from . import activity_nine_sky
@@ -178,6 +182,10 @@ def prepare(role,now,r,peers=None):
     if 'yuanshi' in s:
         from . import activity_yuanshi, welfare
         activity_yuanshi.state(role,now,activity_yuanshi.load_rules())
+    if 'rank_order' not in s:
+        # New accounts already start at the new ladder's last seat.
+        s['rank_reset_version'] = 1
+        s['rank_promotion_reset_version'] = 1
     s.setdefault('rank_order',r['rank_initial_order']);s.setdefault('rank_score',0)
     s.setdefault('fight_id',100000);s.setdefault('duty_best',0)
     s.setdefault('duty_runs',0);s.setdefault('duty',None)
@@ -252,10 +260,13 @@ def statuses(role,now,r,flag,peers=None):
         from . import activity_nine_sky
         from . import activity_pavilion, activity_hunt
         from . import activity_yuanshi, welfare
+        from . import activity_dream, activity_save_monkey
         from .activity_seasonal import status as seasonal_status
         return summon.event(47,dict(visit_list=visit_list(role,r),feed_data=feed_data(role,r),
                                    pavilion_data=activity_pavilion.status(role,now,peers),
                                    hunt_data=activity_hunt.status(role,now,r),
+                                   dream_data=activity_dream.status(role,now),
+                                   local_save_monkey=activity_save_monkey.status(now,role=role),
                                    nine_sky_data=activity_nine_sky.status(now),
                                    yuanshi_info=activity_yuanshi.client_config(now),
                                    spring_info=welfare.spring_info(role,now,welfare.load_rules()),
@@ -413,6 +424,12 @@ def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     from . import feature_levels
     feature_levels.check(role, mid, req)
     s=prepare(role,now,r,peers)
+    if mid==1346:
+        from . import activity_save_monkey
+        return activity_save_monkey.settle(role,req,now,parse)
+    if mid==1325:
+        from . import activity_dream
+        return activity_dream.settle(role,req,now,parse)
     if mid==1051 and req['item_type']==1363:
         from . import activity_home
         return activity_home.use_tianxian_token(role,req)

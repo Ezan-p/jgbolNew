@@ -14,7 +14,7 @@ class LandPlayersTests(ActivityCase):
 
     def test_players_catalog_both_versions_and_unique_encounters(self):
         keys=set(npc.catalog())
-        self.assertEqual({npc_players.catalog()[k]['version'] for k in keys},{'v1','v2'})
+        self.assertEqual({npc_players.catalog()[k]['version'] for k in keys},{'v1','v2','extreme_rank'})
         self.ok(self.land(3));s=self.b.profile()['activity']['land']
         self.assertEqual(len(s['travel']),len({m['npc_id'] for m in s['travel']}))
         for m in s['travel']:

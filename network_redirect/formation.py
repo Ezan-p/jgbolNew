@@ -62,7 +62,7 @@ def load_rules(path=ROOT / 'server_config/formation_rules.json'):
     rules = json.loads(Path(path).read_text(encoding='utf-8'))
     if rules.get('schema_version') != 1 or rules.get('mode') != 'inferred':
         raise ValueError('阵容配置必须明确标记 inferred/schema_version=1')
-    for key in ('skill_failure_compensation', 'equipment_batch_count'):
+    for key in ('equipment_batch_count',):
         if type(rules.get(key)) is not int or not 1 <= rules[key] <= 100:
             raise ValueError('阵容配置无效：' + key)
     for key in ('ordinary_points', 'intensive_points', 'peaches_per_attempt', 'gold_per_intensive'):
@@ -261,6 +261,12 @@ def prepare(role, rules):
         item.update(innate_owner_id=c['id'], owner_id=c['id'], equip_order=c.get('order', 0) or (c.get('cheer_order', 0) + 8 if c.get('cheer_order') else 0), equip_pos=1)
         item['effect_value'] = skill_effect(item)
     for item in role['attachments']:
+        # Keep legacy wire fields, but retire only spell/stone upgrade pity.
+        # Other objects use prob_compen for unrelated progress.
+        if item.get('attach_type') == 6:
+            item['count'] = 0
+        elif item.get('attach_type') == 5 and item.get('type_id') in (1090, 1091, 1092):
+            item['prob_compen'] = 0
         if item.get('attach_type') == 6 and item.get('type_id') in SKILLS:
             refresh_skill(item)
         if item.get('attach_type') == 5 and int(ITEMS.get(item.get('type_id'), {}).get('main_type', 0)) in (1, 2, 3):
@@ -403,11 +409,11 @@ def enhance_skill(role, req, rules, parse):
         require(material['level'] in SKILL_WORTH, '材料法术等级无效')
         worth += Decimal(SKILL_WORTH[material['level']]['quality_worth%d' % quality].strip())
     cost = Decimal(SKILL_COST[old]['quality%d_cost' % int(cfg['quality'])])
-    rate = min(100, floor(worth * 100 / cost) + item.get('count', 0))
+    rate = min(100, floor(worth * 100 / cost))
     success = secrets.randbelow(100) < rate
     role['attachments'] = [i for i in role['attachments'] if i['id'] not in ids]
     item['level'] += int(success)
-    item['count'] = 0 if success else min(100, item.get('count', 0) + rules['skill_failure_compensation'])
+    item['count'] = 0
     item['effect_value'] = skill_effect(item)
     return [(2, dict(obj_type=6, obj_id=item['id'], old_level=old, new_level=item['level']))]
 

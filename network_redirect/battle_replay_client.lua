@@ -7,6 +7,8 @@ do
   local event,fight=ms.d_event_mgr,ms.d_fightUI
   local undo,fragments,cache,cacheOrder={},{},{},{}
   local battleEvents,battleResults,battleOrder={},{},{}
+  local essenceByAction={}
+  local endingVisualWait=0
   local nativeLoad=table.loadstring
   local function replace(t,key,fn)
    local old=t[key];t[key]=fn;undo[#undo+1]=function() t[key]=old end
@@ -88,7 +90,7 @@ do
      return
     end
     battleEvents[data.fight_id]=copy(data)
-    data=copy(data);data.opening_passives=nil
+    data=copy(data);data.opening_passives=nil;data.essence_visuals=nil
    end
    return nativeEvents(data,...)
   end
@@ -152,11 +154,98 @@ do
    end
   end
 
+  -- Pure visual notices use original name plates/CCBI assets. Do not call
+  -- native strong-assault/passive handlers: those also mutate damage or HP.
+  local ext=ms.d_skillExt
+  if ext and ext.showSkillExt and ext.showOnceCCbiEffect and ext.showNameOnly then
+   local nativeExt=ext.showSkillExt
+   local art={
+    [2]={'pojia001.ccbi',2.5},[4]={'fashufanghu.ccbi',2},
+    [6]={'gedang001.ccbi',3},[8]={'fashufanghu001.ccbi',3},
+    [9]={'fashuchuantou001.ccbi',3},[12]={'zhanyi001.ccbi',3},
+    [13]={'zhiliao001.ccbi',2.5},[18]={'zhufu001.ccbi',4}
+   }
+   local function clearIcons(v,family)
+    for _,row in ipairs(v.skill_result_list or {}) do
+     local char=ext.getTarget(v,row)
+     if char and char.removeCcbiBuff then
+      char:removeCcbiBuff(101000+family*10+1)
+      char:removeCcbiBuff(102000+family*10+1)
+     end
+    end
+   end
+   replace(ext,'showSkillExt',function(value,...)
+    if not value.offline_essence_visual then
+     -- Native showZhufu expects a passive attackInfo, but runtime blessing
+     -- increments arrive as HP events. Keep field=9999 and consume it once.
+     if value.logic_type%1000==181 and not value.attackInfo then
+      ext.set_fight_delay_time(1.6,1)
+      if fight.g_fightUI.iAttackStep and fight.g_fightUI.iAttackStep>#(fight.g_fightUI.lastAttackInfos or {}) then
+       endingVisualWait=math.max(endingVisualWait,1.6)
+      end
+      -- The entrant's strength name can occupy the first 0.7 seconds.
+      return ext.showOnceCCbiEffect(value,'zhufu001.ccbi',0.8,false,4)
+     end
+     return nativeExt(value,...)
+    end
+    local v=copy(value)
+    local code=v.logic_type%1000
+    local family=math.floor(code/10)
+    -- Authoritative HP deltas are separate events. Strip all attribute fields
+    -- even if a future producer accidentally puts a value in a visual notice.
+    for _,row in ipairs(v.skill_result_list or {}) do
+     for key in pairs(row) do if key~='des_order' then row[key]=nil end end
+     row.field=0;row.field_plus=0
+    end
+    if code==13 or code==163 then return clearIcons(v,family) end
+    if code==171 then clearIcons(v,16) end
+    if code==11 or code==161 then
+     clearIcons(v,family)
+     for _,row in ipairs(v.skill_result_list) do
+      local char=ext.getTarget(v,row)
+      if char and char.hp>0 then char:addCcbiBuff(v.logic_type) end
+     end
+    end
+    -- Native 012 is disabled and 141 has no dispatcher; both have the same
+    -- original family name plate. 142 is the original lucky-dodge name code.
+    if code~=142 then v.logic_type=math.floor(v.logic_type/10)*10+1 end
+    local resource=art[family]
+    if resource and v.visual_detail~='assault_bonus' then
+     return ext.showOnceCCbiEffect(v,resource[1],0,false,resource[2])
+    end
+    return ext.showNameOnly(v,0)
+   end)
+   if fight.showFightEvents then
+    local nativeFightEvents=fight.showFightEvents
+    replace(fight,'showFightEvents',function(...)
+     local count=nativeFightEvents(...) or 0
+     local notices=essenceByAction[fight.g_fightUI.iAttackStep] or {}
+     -- Preserve application/removal order; stagger names from the same caster.
+     -- The last-action+1 hook also runs before the result screen.
+     local offsets={};local orderedDelay=0
+     for _,notice in ipairs(notices) do
+      local v=copy(notice);local key=v.who_use..':'..v.src_order
+      local delay=math.max(orderedDelay,offsets[key] or 0)
+      orderedDelay=delay+0.05
+      offsets[key]=delay+0.7
+      ms.d_u.delay(fight.g_fightUI.layerFrontground,delay,function() ext.showSkillExt(v) end)
+      ext.set_fight_delay_time(delay+0.8,0)
+      if fight.g_fightUI.iAttackStep>#(fight.g_fightUI.lastAttackInfos or {}) then
+       endingVisualWait=math.max(endingVisualWait,delay+0.8)
+      end
+     end
+     return count+#notices
+    end)
+   end
+  end
+
   local nativeFight=fight.actFight
   replace(fight,'actFight',function(replay,...)
    local ok,value=pcall(function() return hydrate(copy(replay)) end)
    if not ok then return end -- fail() has already released the wait mask and explained the error.
    replay=value
+   essenceByAction={}
+   endingVisualWait=0
    if type(replay)=='table' then
     replay.fight_result_msg=completeResult(replay.fight_result_msg)
     local fid=replay.line_up_msg and replay.line_up_msg.fight_id
@@ -168,6 +257,8 @@ do
      -- on actual entry, including reserves. Their values already exist in the
      -- authoritative lineup; zero-damage display rows never grant them twice.
      local opening=effects.opening_passives;effects.opening_passives=nil
+     local visuals=effects.essence_visuals;effects.essence_visuals=nil
+     local offset=type(opening)=='table' and #opening or 0
      local result=replay.fight_result_msg
      if type(opening)=='table' and #opening>0 and result and type(result.fight_result)=='table' then
       local actions={}
@@ -178,6 +269,27 @@ do
       -- timing uses iAttackStepNoBuff. Shift only the copied visual events.
       for _,effect in pairs(effects) do
        if type(effect)=='table' and type(effect.cur_action)=='number' then effect.cur_action=effect.cur_action+#opening end
+      end
+     end
+     if type(visuals)=='table' then
+      if not (ext and ext.showNameOnly and fight.showFightEvents) then
+       return fail('精魄特效尚未加载，请重新打开战报')
+      end
+      for _,notice in ipairs(visuals) do
+       local step=math.max(1,(notice.cur_action or 0)+(notice.after_action and 1 or 0))+offset
+       essenceByAction[step]=essenceByAction[step] or {}
+       essenceByAction[step][#essenceByAction[step]+1]=copy(notice)
+      end
+     end
+     -- Runtime blessing is caused by the death/deployment at cur_action.
+     -- Native events run BEFORE that action, so display/apply the increment
+     -- at the next step, after the reserve has actually entered the scene.
+     for _,effect in pairs(effects) do
+      if type(effect)=='table' and type(effect.logic_type)=='number'
+       and effect.logic_type%1000==181 and not effect.attackInfo then
+       for _,row in ipairs(effect.skill_result_list or {}) do
+        if row.field==9999 then effect.cur_action=effect.cur_action+1;break end
+       end
       end
      end
      replay.fight_events=effects
@@ -193,6 +305,10 @@ do
 
   local nativeEnd=fight.showFightEnd
   replace(fight,'showFightEnd',function(...)
+   if endingVisualWait>0 then
+    local delay,args=endingVisualWait,{...};endingVisualWait=0
+    return ms.d_u.delay(fight.g_fightUI.layerFrontground,delay,function() fight.showFightEnd(unpack(args)) end)
+   end
    if fight.g_fightUI.last_final_result~=0 then return nativeEnd(...) end
    -- getLastFightRet clamps 0 to 1 (the native "险胜" sprite). Keep the
    -- authoritative result at zero: getLastFightStar and return/reward paths

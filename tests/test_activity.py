@@ -28,14 +28,20 @@ class ActivityCase(unittest.TestCase):
         return [(d['id'],login_fields(d['data'])) for m,_,d in self.decoded if m==2998]
     def ok(self,events):self.assertNotIn(55,[e for e,_ in events],events)
 
-    def legacy_babel_floor(self):
+    def legacy_babel_floor(self, floor=1):
         """Persist an old fixed floor for coordinate-based compatibility cases."""
         from network_redirect import activity_babel as babel
         role = self.b.profile()
         state = babel.state(role, NOW, self.b.activity_rules)
-        fixture = dict(cur_floor=11, floors={})
-        babel.generate(fixture)
-        state['floors']['1'] = fixture['floors']['11']
+        grid = [[dict(elem_type=0, visible=False) for _ in range(8)] for _ in range(5)]
+        for row, col, typ in ((1,2,20005), (1,3,20012), (1,4,20009), (1,5,20006),
+                             (2,2,20003), (2,3,20011), (2,4,20008), (2,5,20004),
+                             (3,2,20010), (3,3,20007), (3,4,20015), (4,2,20014),
+                             (4,3,20013), (4,7,9), (5,8,3)):
+            grid[row-1][col-1]['elem_type'] = typ
+        state['floors'][str(floor)] = grid
+        state['cur_floor'] = floor
+        state['history_floor'] = max(floor, state['history_floor'])
         state['locale'] = dict(row=1, column=1)
         self.b.save(role)
 
@@ -87,13 +93,13 @@ class ActivityTests(ActivityCase):
         r=self.b.profile();self.assertEqual(r['rule_index'],56);self.assertEqual(r['corteges'][0]['hp'],hp+1120)
         self.assertEqual(self.req(1026,fight_type=4,des_type=1)[0][0],55)
     def test_rank_fight_daily_score_and_exchange(self):
-        self.ok(self.req(1021,flag=0));self.ok(self.req(1026,fight_type=2,des_type=2,des_value=99,des_id=930099))
-        r=self.b.profile();self.assertEqual(r['activity']['rank_order'],99)
+        self.ok(self.req(1021,flag=0));self.ok(self.req(1026,fight_type=2,des_type=2,des_value=500,des_id=930500))
+        r=self.b.profile();self.assertEqual(r['activity']['rank_order'],500)
         self.assertEqual(self.req(1201,flag=2)[0][0],55)
         with patch('network_redirect.backend.time.time',return_value=NOW+86400):
             self.ok(self.req(1021,flag=0));self.assertEqual(self.req(1201,flag=2)[0][0],55)
-        self.ok(self.req(1203,exchange_type=5));before=self.b.profile()
-        self.assertEqual(self.req(1203,exchange_type=5)[0][0],55);self.assertEqual(before,self.b.profile())
+        self.ok(self.req(1203,exchange_type=4));before=self.b.profile()
+        self.assertEqual(self.req(1203,exchange_type=4)[0][0],55);self.assertEqual(before,self.b.profile())
     def test_rank_rejects_forged_target_and_insufficient_energy(self):
         before=self.b.profile();self.assertEqual(self.req(1026,fight_type=2,des_type=2,des_value=1,des_id=77)[0][0],55)
         self.assertEqual(before,self.b.profile())

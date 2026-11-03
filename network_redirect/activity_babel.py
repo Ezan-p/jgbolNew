@@ -1,6 +1,7 @@
 """通天塔：原客户端1353/event203与恢复规则 [A]，缺失地图/平衡 [B]."""
 import copy
 import secrets
+from itertools import permutations
 from . import activity as a, journey, summon, activity_babel_npc as npc
 from . import battle_replay
 from .protocol import encode
@@ -12,6 +13,10 @@ STAGES = {int(x['stage_index']): [list(map(int, p.split('|'))) for p in x['prize
 MAX_FLOOR = max(int(row['floor_r']) for row in FLOORS)
 GUARDS = (7, 8, 9, 20010, 20011, 20012, 20013, 20014, 20015)
 TOOLS = {20003: 20005, 20004: 20006, 20007: 20010, 20008: 20011, 20009: 20012}
+# Sixty distinct relative orders across the six optional guards. Encoding the
+# floor in their row-major order guarantees different intact layouts even if
+# stairs repeat, earlier maps are cleared, or floors are generated out of order.
+LATE_GUARD_ORDERS = tuple(permutations((20010, 20011, 20012, 20013, 20014, 20015)))[::12]
 # The client always renders six slots.  The original product table is absent
 # from the offline package, so this pool is the explicit local design supplied
 # for the offline activity.  A player's six slots are sampled without
@@ -31,20 +36,36 @@ def response(op, data):
 
 
 def random_floor(s):
-    """[B] Random early floor, with every tool and key reachable before use."""
+    """[B] Solvable random maps; floors 11..70 have a budgeted boss-only route."""
     rng = secrets.SystemRandom()
     cells = {(row, col) for row in range(5) for col in range(8)}
     # Keep a small safe entrance. Distinct stairs guarantee ten distinct maps,
     # even after loot on earlier floors has been collected.
     entrance = {(0, 0), (0, 1), (1, 0)}
-    old_stairs = {(row, col) for floor in range(1, 11)
-                  for row, line in enumerate(s['floors'].get(str(floor), []))
-                  for col, cell in enumerate(line) if cell['elem_type'] == 3}
-    stairs = rng.choice(sorted(pos for pos in cells - old_stairs
-                               if sum(pos) >= 6))
+    late = 11 <= s['cur_floor'] <= 70
+    route = set()
+    if late:
+        # 11..30: 7..9 moves; 31..50: 8..10; 51..70: 9..11.
+        minimum = 7 + (s['cur_floor'] - 11) // 20
+        stairs = rng.choice(sorted(pos for pos in cells
+                                   if minimum <= sum(pos) <= minimum + 2))
+        steps = [(1, 0)] * stairs[0] + [(0, 1)] * stairs[1]
+        rng.shuffle(steps)
+        row = col = 0
+        route.add((row, col))
+        for dr, dc in steps:
+            boss = (row, col)
+            row, col = row + dr, col + dc
+            route.add((row, col))
+    else:
+        old_stairs = {(row, col) for floor in range(1, 11)
+                      for row, line in enumerate(s['floors'].get(str(floor), []))
+                      for col, cell in enumerate(line) if cell['elem_type'] == 3}
+        stairs = rng.choice(sorted(pos for pos in cells - old_stairs
+                                   if sum(pos) >= 6))
     blocked = {stairs}
     positions = [(stairs, 3)]
-    candidates = sorted(cells - entrance - blocked)
+    candidates = sorted(cells - entrance - blocked - route)
     rng.shuffle(candidates)
     for typ in TOOLS:
         for pos in candidates:
@@ -72,9 +93,18 @@ def random_floor(s):
             break
         else:
             raise RuntimeError('Cannot place Babel floor obstacles')
-    # Preserve the original quantities and combat/reward balance.
-    occupants = (20005, 20006, 20010, 20011, 20012, 20013, 20014, 20015, 9)
-    positions.extend(zip(rng.sample(sorted(cells - entrance - blocked), len(occupants)), occupants))
+    # Preserve all quantities: 3 chests, 3 key guards, 3 optional guards,
+    # 1 boss, and one tool for each obstacle. No bonus rolls from map RNG.
+    if late:
+        positions.append((boss, 9))
+        available = cells - entrance - blocked - route
+        tools = rng.sample(sorted(available), 2)
+        positions.extend(zip(tools, (20005, 20006)))
+        guards = sorted(rng.sample(sorted(available - set(tools)), 6))
+        positions.extend(zip(guards, LATE_GUARD_ORDERS[s['cur_floor'] - 11]))
+    else:
+        occupants = (20005, 20006, 20010, 20011, 20012, 20013, 20014, 20015, 9)
+        positions.extend(zip(rng.sample(sorted(cells - entrance - blocked), len(occupants)), occupants))
     grid = [[dict(elem_type=0, visible=False) for _ in range(8)] for _ in range(5)]
     for (row, col), typ in positions:
         grid[row][col]['elem_type'] = typ
@@ -82,9 +112,9 @@ def random_floor(s):
 
 
 def generate(s):
-    # [B] Randomize only newly created early floors; never refill saved loot.
+    # [B] Randomize newly created normal floors; never refill saved loot.
     key = str(s['cur_floor'])
-    if key not in s['floors'] and 1 <= s['cur_floor'] <= 10:
+    if key not in s['floors'] and 1 <= s['cur_floor'] <= MAX_FLOOR:
         s['floors'][key] = random_floor(s)
     elif key not in s['floors']:
         grid = [[dict(elem_type=0, visible=False) for _ in range(8)] for _ in range(5)]
@@ -205,14 +235,20 @@ def state(role, now, r):
     npc.rollover(role, s, now, r)
     npc.settle_week(role, s, now, r)
     week_changed = s['week'] != previous_week
-    if (week_changed or type(s.get('shop_week')) is not int or
+    today = a.day(now, r)
+    # The automatic reset has its own date, independent of paid refresh quota.
+    # Legacy saves inherit the last daily check so same-day purchases survive,
+    # while loading them on a later day immediately replenishes the shop.
+    if type(s.get('shop_day')) is not int:
+        s['shop_day'] = s['day']
+    day_changed = s['shop_day'] < today
+    if (day_changed or week_changed or type(s.get('shop_week')) is not int or
             s.get('shop_week') != s['week'] or not valid_shop_goods(s.get('shop_goods'))):
         old_goods = s.get('shop_goods') if valid_shop_goods(s.get('shop_goods')) else None
         s['shop_week'] = s['week']
-        s['shop_goods'] = random_shop_goods(old_goods if week_changed else None)
+        s['shop_day'] = today
+        s['shop_goods'] = random_shop_goods(old_goods)
         s['purchases'] = {}
-        s['refresh_times'] = 1
-    elif type(s.get('refresh_times')) is not int or not 0 <= s['refresh_times'] <= 1:
         s['refresh_times'] = 1
     # Limit values belong to the persisted catalog.  This also migrates old
     # purchase counters after the six slots have changed.
@@ -222,9 +258,8 @@ def state(role, now, r):
         for value in [s['purchases'].get(str(i), 0)]
         if type(value) is int and value > 0
     }
-    if s['day'] < a.day(now, r):
-        # Life is daily; the shop catalog and its limits are weekly.
-        s.update(day=a.day(now,r), life=s['max_life'])
+    if s['day'] < today:
+        s.update(day=today, life=s['max_life'])
     # [A] Half-hour recovery; [B] one point each tick, cap 100. Above-cap
     # consumable energy is preserved, and full-cap ticks are not banked.
     tick = now // 1800

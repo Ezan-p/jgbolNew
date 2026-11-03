@@ -35,6 +35,34 @@ local nativeEnd=function()
  return 'end'
 end
 fight.showFightEnd=nativeEnd;package.loaded.ms=ms
+local visualCalls,scheduled={},{}
+local character={hp=100,hp_max=100,buffs={}}
+function character:addCcbiBuff(code) self.buffs[code]=true end
+function character:removeCcbiBuff(code) self.buffs[code]=nil end
+local function display(v,resource)
+ visualCalls[#visualCalls+1]={code=v.logic_type,resource=resource,rows=v.skill_result_list}
+ for _,row in ipairs(v.skill_result_list or {}) do
+  if row.field==65 then character.hp=character.hp+row.field_plus end
+  if row.field==9999 then character.hp=character.hp+(row.hp_add or 0);character.hp_max=character.hp_max+(row.hp_max_add or 0) end
+ end
+end
+ms.d_skillExt={showSkillExt=function(v) display(v,'native') end,
+ showNameOnly=function(v) display(v,'name') end,
+ showOnceCCbiEffect=function(v,resource) display(v,resource) end,
+ getTarget=function() return character end,
+ set_fight_delay_time=function(before,after)
+  fight.fight_step_begin_delay=math.max(fight.fight_step_begin_delay or 0,before)
+ end}
+local originalExt=ms.d_skillExt.showSkillExt
+fight.showFightEvents=function() return 0 end
+ms.d_u.delay=function(layer,delay,fn) scheduled[#scheduled+1]={delay=delay,fn=fn,sequence=#scheduled+1} end
+local function flush()
+ while #scheduled>0 do
+  local batch=scheduled;scheduled={}
+  table.sort(batch,function(a,b) return a.delay==b.delay and a.sequence<b.sequence or a.delay<b.delay end)
+  for _,task in ipairs(batch) do task.fn() end
+ end
+end
 assert(loadstring(source))()
 local function chunks(kind,key,value,fid)
  local raw=encode(value);local at=math.floor(#raw/2)
@@ -132,6 +160,77 @@ check('live_passives_are_kept_out_of_native_event_iteration',function()
  assert(#played[#played].data.fight_result_msg.fight_result==2)
  assert(played[#played].events[1].cur_action==2)
 end)
+check('visual_metadata_is_not_iterated_as_a_native_event_and_replay_does_not_duplicate_it',function()
+ local data={fight_id=840,opening_passives={{skill_type=22}},essence_visuals={
+  {cur_action=0,logic_type=102131,who_use=1,src_order=1,des_order=1,self_use=true,offline_essence_visual=true,
+   skill_result_list={{field=71,field_plus=500,des_order=1}}},
+  {cur_action=1,after_action=true,logic_type=102161,who_use=1,src_order=1,des_order=1,self_use=true,offline_essence_visual=true,
+   skill_result_list={{field=65,field_plus=-90,des_order=1}}}}}
+ local raw=encode(data)
+ ms.d_event_mgr.callback_fight_extra_logic(data)
+ assert(not received[#received].essence_visuals and not received[#received].opening_passives)
+ for attempt=1,2 do
+  fight.actFight({line_up_msg={fight_id=840},fight_result_msg={fight_result={{cur_round=1},{cur_round=1}}}},28)
+  fight.g_fightUI.lastAttackInfos=played[#played].data.fight_result_msg.fight_result
+  local start=#visualCalls
+  fight.g_fightUI.iAttackStep=2;fight.showFightEvents();flush()
+  assert(#visualCalls==start+1 and visualCalls[#visualCalls].resource=='zhiliao001.ccbi')
+  fight.g_fightUI.iAttackStep=3;fight.showFightEvents();flush()
+  assert(#visualCalls==start+2 and character.buffs[102161])
+  assert(character.hp==100 and character.hp_max==100,'display changed authoritative HP')
+ end
+ assert(encode(data)==raw)
+end)
+check('all_38_name_and_effect_routes_are_display_only_including_lucky_and_intimidation_fallbacks',function()
+ for _,tier in ipairs({101000,102000}) do
+  for family=1,19 do
+   local v={logic_type=tier+family*10+1,who_use=1,src_order=1,des_order=1,self_use=true,offline_essence_visual=true,
+    skill_result_list={{field=9999,field_plus=50,hp_add=50,hp_max_add=50,des_order=1}}}
+   ms.d_skillExt.showSkillExt(v)
+   assert(visualCalls[#visualCalls].code==v.logic_type)
+   assert(character.hp==100 and character.hp_max==100)
+  end
+ end
+ ms.d_skillExt.showSkillExt({logic_type=102012,who_use=1,src_order=1,offline_essence_visual=true,skill_result_list={}})
+ assert(visualCalls[#visualCalls].code==102011)
+ ms.d_skillExt.showSkillExt({logic_type=102142,who_use=1,src_order=1,offline_essence_visual=true,skill_result_list={}})
+ assert(visualCalls[#visualCalls].code==102142)
+end)
+check('cleanse_expiry_and_intimidation_consumption_remove_both_tier_icons',function()
+ for _,code in ipairs({101013,102013,101163,102163,101171,102171}) do
+  character.buffs={[101011]=true,[102011]=true,[101161]=true,[102161]=true}
+  ms.d_skillExt.showSkillExt({logic_type=code,who_use=1,src_order=1,offline_essence_visual=true,
+   skill_result_list={{des_order=1}}})
+  local family=code%1000==13 and 1 or 16
+  assert(not character.buffs[101000+family*10+1] and not character.buffs[102000+family*10+1])
+ end
+end)
+check('runtime_blessing_uses_native_art_and_applies_increment_exactly_once',function()
+ ms.d_skillExt.showSkillExt({logic_type=102181,who_use=1,src_order=1,des_order=2,self_use=true,
+  skill_result_list={{field=9999,field_plus=10,hp_add=20,hp_max_add=20,des_order=2}}})
+ assert(visualCalls[#visualCalls].resource=='zhufu001.ccbi')
+ assert(character.hp==120 and character.hp_max==120)
+ local source={fight_id=849,opening_passives={{skill_type=22}},[1]={cur_action=2,logic_type=102181,
+  who_use=1,src_order=5,skill_result_list={{field=9999,hp_add=20,hp_max_add=20}}}}
+ local replay={line_up_msg={fight_id=849},fight_result_msg={fight_result={{},{},{}}},fight_events=source}
+ for i=1,2 do
+  fight.actFight(replay,28)
+  assert(played[#played].events[1].cur_action==4,'blessing must follow death and passive prefix')
+  assert(source[1].cur_action==2,'replaying shifted original blessing')
+ end
+end)
+check('terminal_visuals_finish_before_result_and_new_fights_clear_pending_notices',function()
+ local notices={}
+ for i=1,4 do notices[i]={cur_action=1,after_action=true,logic_type=101000+i*10+1,who_use=1,src_order=1,
+  offline_essence_visual=true,skill_result_list={{des_order=1}}} end
+ fight.actFight({line_up_msg={fight_id=850},fight_result_msg={fight_result={{cur_round=1}}},
+  fight_events={fight_id=850,essence_visuals=notices}},28)
+ fight.g_fightUI.lastAttackInfos={{}};fight.g_fightUI.iAttackStep=2
+ local count=#drawn;fight.showFightEvents();fight.showFightEnd()
+ assert(#drawn==count);flush();assert(#drawn>count)
+ fight.actFight({line_up_msg={fight_id=851},fight_result_msg={fight_result={{cur_round=1}}},fight_events={fight_id=851}},28)
+ local count=#visualCalls;fight.showFightEvents();flush();assert(#visualCalls==count)
+end)
 check('long_result_preload_is_restored_before_both_native_protocol_handlers',function()
  for _,id in ipairs({1027,1140}) do
   local data={fight_id=id,fight_type=28,final_result=0,fight_round=540,fight_result={}}
@@ -179,5 +278,6 @@ check('unload_restores_original_functions',function()
  assert(not ms._localBattleReplayRestore and table.loadstring==loadData)
  assert(fight.actFight==nativeFight and fight.showFightEnd==nativeEnd and ms.d_event_mgr.callback_fight_extra_logic==nativeEvents)
  assert(ms.d_event_mgr.g_msg_fun[1027]==nativeResult and ms.d_event_mgr.g_msg_fun[1140]==nativeResult)
+ assert(ms.d_skillExt.showSkillExt==originalExt)
 end)
 return table.concat(checks,'\n')

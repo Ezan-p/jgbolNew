@@ -34,6 +34,42 @@ do
  end
 end
 
+-- Native showChallengeSuccess looks up every reward as an item (L2393).
+-- Silver has attach_type=0, so it throws before installing the close touch
+-- handler (L2407). Give the delayed renderer its own currency-aware helpers;
+-- nested Lua 5.1 closures retain this environment after the outer call returns.
+do
+ local ms=package.loaded.ms
+ local ui=ms and ms.d_abyssUI
+ if ui and ui.showChallengeSuccess and not ui._localAbyssSuccessRestore then
+  local original=ui.showChallengeSuccess
+  ui.showChallengeSuccess=function(...)
+   local rewardType
+   local data=setmetatable({
+    getCertainSmallSprite=function(typ,...)
+     rewardType=typ
+     return ms.d_data.getCertainSmallSprite(typ,...)
+    end,
+    getItemName=function(tid,...)
+     if rewardType==12 then return '银币' end
+     if rewardType==11 then return '元宝' end
+     return ms.d_data.getItemName(tid,...)
+    end
+   },{__index=ms.d_data})
+   local env=getfenv(original)
+   local proxy=setmetatable({d_data=data},{__index=ms})
+   setfenv(original,setmetatable({d_ms=proxy},{__index=env,__newindex=env}))
+   local ok,result=pcall(original,...)
+   setfenv(original,env)
+   if not ok then error(result,0) end
+   return result
+  end
+  ui._localAbyssSuccessRestore=function()
+   ui.showChallengeSuccess=original;ui._localAbyssSuccessRestore=nil
+  end
+ end
+end
+
 -- The native random-event redraw creates a fresh empty button upvalue when
 -- reusing its existing layer. A thief response then indexes btns[2] (nil).
 do

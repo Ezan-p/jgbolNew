@@ -27,17 +27,20 @@ def validate(r):
               and 10000 >= koi[0]['weight'] > koi[1]['weight'] > koi[2]['weight'] > 0, '锦鲤概率须随数量递减')
     a.require(isinstance(r.get('fish_shop_revision'),str) and bool(r['fish_shop_revision']), '东海商店版本缺失')
     shop = r.get('fish_shop')
-    a.require(isinstance(shop,list) and len(shop)==15 and all(isinstance(x,dict) for x in shop), '东海商店池无效')
+    a.require(isinstance(shop,list) and len(shop)==17 and all(isinstance(x,dict) for x in shop), '东海商店池无效')
     for row in shop:
         a.require(valid(row.get('reward')) and row.get('tier') in ('low','high'), '东海商品无效')
         a.require(type(row.get('cost')) is int and 0 < row['cost'] <= 1000000 and
                   type(row.get('limit')) is int and 0 < row['limit'] <= 100, '东海商品价格或限购无效')
-        if row['tier']=='high':a.require(row['reward'][2]==5 and row['limit']==1, '高级商品固定五个、每日限兑一次')
-    a.require(len({x['reward'][1] for x in shop})==15, '东海商品编号不得重复')
+        if row['tier']=='high':
+            quantity = 1 if row['reward'][:2] == [5,1246] else 5
+            a.require(row['reward'][2]==quantity and row['limit']==1, '高级商品数量无效或非每日限兑一次')
+            a.require(type(row.get('weight')) is int and 0 < row['weight'] <= 10000, '高级商品上架权重无效')
+    a.require(len({x['reward'][1] for x in shop})==17, '东海商品编号不得重复')
     a.require({tuple(x['reward'][:2]) for x in shop if x['tier']=='low'} ==
               {(5,t) for t in (1007,1343,1024,1042,1032,1031,1310,1311,1312)}, '低级兑换池不完整')
     a.require({tuple(x['reward'][:2]) for x in shop if x['tier']=='high'} ==
-              {(10,t) for t in (5039,5041,5032)} | {(5,t) for t in (6002,6003,6004)}, '高级兑换池不完整')
+              {(10,t) for t in (5039,5041,5032,5034)} | {(5,t) for t in (6002,6003,6004,1246)}, '高级兑换池不完整')
 
 
 def draw(values, weights):
@@ -92,7 +95,7 @@ def state(role, now, r):
         high = [x for x in r['fish_shop'] if x['tier']=='high']
         selected=[]
         for _ in range(4):selected.append(low.pop(randbelow(len(low))))
-        selected.append(high[randbelow(len(high))])
+        selected.append(draw(high, [x['weight'] for x in high]))
         s.update(day=today, purchases={}, shop=copy.deepcopy(selected))
     if s.get('shop_revision') != r['fish_shop_revision']:
         # Update offers in place: retain today's selection and already-used quotas.

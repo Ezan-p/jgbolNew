@@ -31,6 +31,8 @@ def rows(name):
     relative = 'immortal_hotupdate/' + name if name in IMMORTAL_HOTUPDATE_TABLES else name
     if name in BABEL_HOTUPDATE_TABLES:
         relative = 'babel_hotupdate/' + name
+    if name == 'dream_prize_config.csv':
+        relative = 'dream_hotupdate/' + name
     if name in ESSENCE_HOTUPDATE_TABLES:
         relative = 'essence_hotupdate/' + name
     with (ROOT / 'analysis/configs' / relative).open(encoding='utf-8-sig', newline='') as source:
@@ -200,7 +202,11 @@ def client_source(rules):
     battle_source = Path(__file__).with_name('battle_replay_client.lua').read_text(encoding='utf-8')
     feed_source = feed_source.replace('__FEED_REWARD_TIERS__', lua(feed_rules['feed_reward_tiers']))
     feed_source = feed_source.replace('__FEED_MAX_COUNT__', str(feed_rules['feed_max_count']))
-    return startup_source + tangwang_source + '\n' + fish_source + '\n' + caishen_source + '\n' + battle_source + '\n' + trial_source + '\n' + nine_source + '\n' + guild_source + '\n' + visit_source + '\n' + feed_source + '\n' + pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + yuanshi_source + '\n' + rulai_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
+    dream_source = Path(__file__).with_name('dream_client.lua').read_text(encoding='utf-8')
+    from . import activity_save_monkey
+    monkey_source = Path(__file__).with_name('save_monkey_client.lua').read_text(encoding='utf-8')
+    monkey_source = monkey_source.replace('__SAVE_MONKEY_ENABLED__', lua(activity_save_monkey.load_rules()['enabled']))
+    return startup_source + monkey_source + '\n' + dream_source + '\n' + tangwang_source + '\n' + fish_source + '\n' + caishen_source + '\n' + battle_source + '\n' + trial_source + '\n' + nine_source + '\n' + guild_source + '\n' + visit_source + '\n' + feed_source + '\n' + pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + yuanshi_source + '\n' + rulai_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
 
 
 def lua(value):

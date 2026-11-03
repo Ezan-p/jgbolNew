@@ -1,4 +1,4 @@
-"""Verify all seven gold promotions and native claim panels with disposable saves."""
+"""Verify all ten gold promotions and native claim panels with disposable saves."""
 import json
 import runpy
 import subprocess
@@ -26,7 +26,7 @@ def packets():
             activity.prepare(r,NOW,b.activity_rules);r['activity'].update(rank_reached_order=1,rank_promotions=[])
             b.save(r)
             result={'initial':[dict(mid=decode(p)[0],data=decode(p)[2]) for p in (rank.client_state(r),rank.board(r))],'claims':[]}
-            for i in range(4,11):
+            for i in (v['index'] for v in rank.rules()['exchanges'] if v['promote_order']):
                 response=b.respond(encode(1203,dict(serial_num=200000+i,exchange_type=i)),{'authenticated':True})
                 decoded=[decode(p) for p in response]
                 assert not any(m==2998 and d['id']==55 for m,_,d in decoded)
@@ -67,8 +67,8 @@ function rankClaimApply(rows)
  assert(rank_fixture_errors=='',rank_fixture_errors)
 end
 rankClaimApply(rankClaimData.initial);ms.d_activityUI.show();ui.showRankUI();ui.goToCreditsChargePage()
-local amounts={50,100,200,300,400,1000,2000}
-for index=3,9 do
+local amounts={100,200,300,500,800,1000,1500,2000,5000,10000}
+for index=3,12 do
  local node;for _,v in pairs(ui.g_chargeNode) do if v:getTag()==index then node=v end end
  local text=tolua.cast(assert(node):getChildren():objectAtIndex(3),'CCLabelTTF'):getString()
  assert(text:find('元宝: '..amounts[index-2],1,true),text);assert(not text:find('蟠桃',1,true),text)
@@ -92,7 +92,7 @@ function rankClaimStep(index)
  local scene=CCDirector:sharedDirector():getRunningScene()
  if root:getParent()~=scene then root:removeFromParentAndCleanup(true);scene:addChild(root,9999) end
  local page=ui.g_rankUI.credits_layer;local before=rankClaimPreview.sends;local popups=rankClaimPreview.count
- ui.g_label_info[index].btn:activate();assert(rankClaimPreview.sends==before+1 and rankClaimPreview.request==index+1)
+ ui.g_label_info[index].btn:activate();assert(rankClaimPreview.sends==before+1 and rankClaimPreview.request==ms.d_data.g_topScoreExchangeTable[index].exchangeIndex)
  rankClaimApply(rankClaimData.claims[index-2])
  assert(rankClaimPreview.count==popups+1 and root:getChildrenCount()>0)
  local p=rankClaimPreview.prizes[1];assert(p.object_type==11 and p.attach_count==amounts[index-2])
@@ -108,18 +108,18 @@ function rankClaimStep(index)
 end
 local layer=ui.g_rankUI.credits_cells_layer
 for _,v in pairs(ui.g_chargeNode) do if v:getTag()==5 then layer.container:setPositionY(layer.scrollView:getContentSize().height-v:getPositionY()-v:getContentSize().height*.5) end end
-return 'all seven native rows show gold names and enabled claim buttons'
+return 'all ten native rows show gold names and enabled claim buttons'
 ''')
         shot('peach_exchange_gold_claim_before.png')
-        report['claims']=[check('return rankClaimStep('+str(i)+')') for i in range(3,10)]
+        report['claims']=[check('return rankClaimStep('+str(i)+')') for i in range(3,13)]
         shot('peach_exchange_gold_claim_panel.png')
         report['reopen']=check('''local ui=package.loaded.ms.d_rankUI
 rankClaimPreview.root:removeAllChildrenWithCleanup(true)
 ui.destroyCreditsLayer();ui.createCreditsChargePage()
-for i=3,9 do local row=ui.g_label_info[i];assert(not row.btn:isEnabled() and row.btn2:isVisible() and not row.btn2:isEnabled());assert(row.claimed_text:isVisible() and row.claimed_text:getString()=='已领取') end
+for i=3,12 do local row=ui.g_label_info[i];assert(not row.btn:isEnabled() and row.btn2:isVisible() and not row.btn2:isEnabled());assert(row.claimed_text:isVisible() and row.claimed_text:getString()=='已领取') end
 local layer=ui.g_rankUI.credits_cells_layer
 for _,v in pairs(ui.g_chargeNode) do if v:getTag()==5 then layer.container:setPositionY(layer.scrollView:getContentSize().height-v:getPositionY()-v:getContentSize().height*.5) end end
-return 'all seven remain disabled and show 已领取 after reopening'
+return 'all ten remain disabled and show 已领取 after reopening'
 ''')
         shot('peach_exchange_gold_claim_after.png');report['passed']=True
     finally:

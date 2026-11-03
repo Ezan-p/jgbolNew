@@ -14,6 +14,8 @@ def rules():
     a.require(r['mode']=='inferred' and len(r['power_percent'])==3 and all(type(v)is int and 1<=v<=150 for v in r['power_percent']), '渡劫匹配配置无效')
     a.require(r.get('guards_from_dice') is True and 1<=r['straight_skill_count']<=10 and r['triple_auto_pass'] is False, '渡劫奖盘配置无效')
     a.require(1<=r['revenge_lifetime']<=86400 and set(r['skill_quality_weights'])==set('12345') and all(type(v)is int and 1<=v<=100 for v in r['skill_quality_weights'].values()), '渡劫奖池配置无效')
+    a.require(type(r.get('five_star_passive_weight_percent')) is int and 1<=r['five_star_passive_weight_percent']<100
+              and type(r.get('triple_passive_percent')) is int and 1<=r['triple_passive_percent']<50, '渡劫五星法术概率配置无效')
     a.require(all(type(r.get(k)) is int and 1<=r[k]<=100 for k in ('match_candidates','match_tolerance_percent'))
               and type(r.get('recent_npc_limit')) is int and 1<=r['recent_npc_limit']<=512, '渡劫NPC随机池配置无效')
     return r
@@ -43,11 +45,33 @@ def next_id(s):
     return s['rape_sequence']
 
 
-@lru_cache(maxsize=1)
-def reward_pool():
-    return [int(row['type_id']) for row in summon.rows('skill_name.csv')
-            if '渡劫' in row.get('product_desc','') and int(row['type_id']) in formation.SKILLS
-            for _ in range(rules()['skill_quality_weights'][str(formation.SKILLS[int(row['type_id'])]['quality'])])]
+@lru_cache(maxsize=3)
+def reward_pool(five_star_mode=None):
+    """Normal weighted pool, or an equal-weight five-star active/passive pool."""
+    pool=[]
+    r=rules()
+    for row in summon.rows('skill_name.csv'):
+        ident=int(row['type_id'])
+        if '渡劫' not in row.get('product_desc','') or ident not in formation.SKILLS:
+            continue
+        skill=formation.SKILLS[ident]
+        quality=str(skill['quality'])
+        mode=skill['use_mode(1-active，2-passive)']
+        if five_star_mode is not None:
+            if quality=='5' and mode==five_star_mode:
+                pool.append(ident)
+        else:
+            scale=r['five_star_passive_weight_percent'] if quality=='5' and mode=='2' else 100
+            pool.extend([ident]*(r['skill_quality_weights'][quality]*scale))
+    a.require(bool(pool), '渡劫法术奖池为空')
+    return pool
+
+
+def draw_reward(triple=False):
+    if triple:
+        mode='2' if secrets.randbelow(100)<rules()['triple_passive_percent'] else '1'
+        return secrets.choice(reward_pool(mode))
+    return secrets.choice(reward_pool())
 
 
 def ensure(role, now, r):
@@ -61,13 +85,13 @@ def ensure(role, now, r):
     if boards is None:
         dice = roll_forms()
         straight = dice[1]-dice[0] == dice[2]-dice[1] and abs(dice[1]-dice[0]) == 1
-        pool = reward_pool() or r['rape_skills']
+        triple = dice[0] == dice[1] == dice[2]
         boards=[];used=[]
         for i in range(3):
             rows={}
             for j in range(dice[i]):
                 target=opponent(role,j,used=used);used.append(target['npc_id']);target.update(index=j+1,rand=6-j);rows[str(next_id(s))]=target
-            boards.append(dict(version=2,form_type=dice[i],skill_type=secrets.choice(pool),skill_count=rules()['straight_skill_count'] if straight else 1,
+            boards.append(dict(version=2,form_type=dice[i],skill_type=draw_reward(triple),skill_count=rules()['straight_skill_count'] if straight else 1,
                                reward_claimed=False,form_list={'1':{},'2':rows}))
         s['rape_boards']=boards
         npcs.remember(role,used,rules())
@@ -81,9 +105,12 @@ def ensure(role, now, r):
         s['rape_boards'] = boards
     if len(boards) < 3:
         dice = roll_forms()
+        for i,b in enumerate(boards):
+            if isinstance(b,dict) and type(b.get('form_type')) is int and 1<=b['form_type']<=6:
+                dice[i]=b['form_type']
         straight = dice[1]-dice[0] == dice[2]-dice[1] and abs(dice[1]-dice[0]) == 1
         skill_count = rules()['straight_skill_count'] if straight else 1
-        pool = reward_pool() or r['rape_skills']
+        triple = dice[0] == dice[1] == dice[2]
         used = [t['npc_id'] for b in boards if isinstance(b, dict)
                 for rows in (b.get('form_list') or {}).values() if isinstance(rows, dict)
                 for t in rows.values() if isinstance(t, dict) and t.get('npc_id')]
@@ -95,7 +122,7 @@ def ensure(role, now, r):
                 used.append(target['npc_id'])
                 target.update(index=j + 1, rand=6 - j)
                 rows[str(next_id(s))] = target
-            boards.append(dict(version=2, form_type=count, skill_type=secrets.choice(pool),
+            boards.append(dict(version=2, form_type=count, skill_type=draw_reward(triple),
                                skill_count=skill_count, reward_claimed=False,
                                form_list={'1': {}, '2': rows}))
         npcs.remember(role, used, rules())

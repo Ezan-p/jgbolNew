@@ -19,9 +19,11 @@ def main():
         def req(tid,count=1):return login_fields(decode(fish.settle(role,dict(type_id=tid,count=count),now,r)[0])[2]['data'])
         f=dict(now=now,status=status,single=req(0),ten=req(0,10),exchange=req(1007))
         f['shops']=[]
-        for idx in range(6):
+        ticket=0
+        for row in (x for x in r['fish_shop'] if x['tier']=='high'):
             role['activity']['seasonal']['fish'].pop('shop')
-            with patch.object(fish,'randbelow',side_effect=[0,0,0,0,idx]):f['shops'].append(fish.status(role,now,r))
+            with patch.object(fish,'randbelow',side_effect=[0,0,0,0,ticket]):f['shops'].append(fish.status(role,now,r))
+            ticket+=row['weight']
         f['tomorrow']=fish.status(role,status['search_gold_data']['next_daily_refresh'],r)
         f['next_week']=fish.status(role,status['search_gold_data']['next_weekly_refresh'],r)
         b.close()

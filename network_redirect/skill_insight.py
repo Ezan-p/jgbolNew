@@ -75,7 +75,7 @@ def convert(role, req):
     refunds = [(kind, tid, 1, count) for kind, tid, count, level in materials(target['type_id'])] if target.get('upgrade_level') else []
     old_id = target['id']
     role['attachments'].remove(target)
-    target.update(id=f.new_id(role), type_id=secrets.choice(choices), upgrade_level=0, equip_order=0, equip_pos=0)
+    target.update(id=f.new_id(role), type_id=secrets.choice(choices), count=0, upgrade_level=0, equip_order=0, equip_pos=0)
     role['attachments'].append(target)
     prizes = grant(role, refunds)
     return [(89, dict(result=0, skill_id=target['id'], old_skill_id=old_id,

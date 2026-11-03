@@ -238,10 +238,17 @@ class GiftCodeTests(unittest.TestCase):
                             ('JGDUANWU', (1213, 1214, 1215, 1216))):
             for tier, count in enumerate((1, 5, 10), 1):
                 expected[f'{prefix}{tier}'] = [[5, tid, count, 1] for tid in ids]
-        rows = self.b.gift_code_rules['codes'][27:]
+        rows = self.b.gift_code_rules['codes'][27:51]
+        # Code rotation preserves the original entitlement group and rewards.
+        codes_by_group = {row['group']: row['code'] for row in rows}
+        expected = {codes_by_group[f'gift-{code.lower()}-v1']: prizes
+                    for code, prizes in expected.items()}
         self.assertEqual({row['code']: row['prizes'] for row in rows}, expected)
         self.assertEqual(len(rows), 24)
-        self.assertEqual(len({row['group'] for row in self.b.gift_code_rules['codes']}), 51)
+        self.assertEqual(len({row['group'] for row in self.b.gift_code_rules['codes']}), 67)
+        self.assert_gifts_redemption(rows, expected)
+
+    def assert_gifts_redemption(self, rows, expected):
         for row in rows:
             code = row['code']
             with self.subTest(code=code):
@@ -261,7 +268,7 @@ class GiftCodeTests(unittest.TestCase):
                         total = lambda r: sum(i['count'] for i in r['attachments']
                                               if i['attach_type'] == 5 and i['type_id'] == tid)
                         self.assertEqual(total(after) - total(before), count)
-                if code.startswith(('JGCARD', 'JGFEST', 'JGMOON', 'JGDUANWU')):
+                if all(prize[0] == 5 for prize in expected[code]):
                     self.assertEqual(after['gold_coin'], before['gold_coin'])
                 for key in ('vip', 'vip_level', 'recharge'):
                     self.assertEqual(after.get(key), before.get(key))
@@ -270,12 +277,80 @@ class GiftCodeTests(unittest.TestCase):
                 self.assertEqual(self.b.respond(self.packet, {'authenticated': True}), self.replies)
                 self.assertEqual(self.b.profile(), after)
                 self.reject(13, code=code)
-        self.assertEqual(len(self.claims()), 24)
+        self.assertEqual(len(self.claims()), len(rows))
         inventory = self.b.profile()['attachments']
         self.b.close(); self.b = self.backend()
         self.assertEqual(self.b.profile()['attachments'], inventory)
         for code in expected:
             self.reject(13, code=code)
+
+    def test_new_16_material_and_gold_packs_exact_rewards(self):
+        bases = {
+            'immortal-level': [(1042, 200), (1001, 1000)],
+            'immortal-evolve': [(1246, 40)],
+            'equipment-advance': [(1310, 3000), (1311, 3000), (1312, 3000),
+                                  (1313, 200), (1314, 100), (1320, 100),
+                                  (1321, 150), (1322, 150), (1323, 100)],
+            'home-material': [(1362, 500), (1361, 5000), (1364, 20), (1363, 10)],
+        }
+        expected_groups = {}
+        for family, items in bases.items():
+            for tier, factor in enumerate((1, 3, 5), 1):
+                expected_groups[f'gift-{family}-{tier}-v1'] = [
+                    [5, tid, count * factor, 1] for tid, count in items]
+        for amount in (100, 500, 1000, 2000):
+            expected_groups[f'gift-gold-new-{amount}-v1'] = [[5, 1152, amount // 50, 1]]
+        rows = self.b.gift_code_rules['codes'][51:]
+        self.assertEqual(len(rows), 16)
+        self.assertEqual({row['group']: row['prizes'] for row in rows}, expected_groups)
+        for row in rows:
+            if row['group'].startswith('gift-gold-new-'):
+                amount = int(row['name'].split('·')[1].removesuffix('元档'))
+                self.assertEqual(row['prizes'][0][2] * self.b.recharge_rules['large_rmb'], amount)
+        self.assert_gifts_redemption(rows, {row['code']: expected_groups[row['group']] for row in rows})
+
+    def test_random_codes_unique_stable_and_documented(self):
+        rules = self.b.gift_code_rules
+        self.assertEqual(len(rules['codes']), 67)
+        randomized = [row for row in rules['codes']
+                      if row['group'].startswith(('gift-jgcard', 'gift-jgfest'))]
+        randomized += rules['codes'][51:]
+        self.assertEqual(len(randomized), 24)
+        self.assertEqual(len({row['code'] for row in rules['codes']}), 67)
+        for row in randomized:
+            self.assertRegex(row['code'], r'\A(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{12}\Z')
+        self.assertEqual(gift_codes.load_rules(), rules)
+        doc = (Path(__file__).resolve().parents[1] / 'docs/兑换码礼包模块实现说明.md').read_text()
+        for row in rules['codes']:
+            self.assertIn(f"`{row['code']}`", doc)
+
+    def test_rotated_codes_reject_old_codes_and_preserve_old_claims(self):
+        rows = [row for row in self.b.gift_code_rules['codes']
+                if row['group'].startswith(('gift-jgcard', 'gift-jgfest'))]
+        new_codes = []
+        for row in rows:
+            new_code = row['code']
+            old_code = row['group'].removeprefix('gift-').removesuffix('-v1').upper()
+            self.reject(2, code=old_code)
+            # Simulate a real redemption on the previous issuance configuration.
+            row['code'] = old_code
+            self.assertEqual(self.request(old_code)['result'], 1)
+            row['code'] = new_code
+            new_codes.append(new_code)
+        before = self.b.profile()
+        claims = self.claims()
+        self.b.close()
+        self.b = self.backend()
+        for code in new_codes:
+            self.reject(12, code=code)
+        self.assertEqual(self.b.profile(), before)
+        self.assertEqual(self.claims(), claims)
+        other = self.backend('unclaimed-player')
+        try:
+            for code in new_codes:
+                self.assertEqual(self.request(code, backend=other)['result'], 1)
+        finally:
+            other.close()
 
     def test_random_finished_equipment_snapshot_and_replay(self):
         before = self.b.profile()

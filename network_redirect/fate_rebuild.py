@@ -120,8 +120,10 @@ def consume_node(role,c,part,raw,supplied):
     if mode == 2:
         selected = []
         for tid,n in supplied.items():
+            # Spell count is the legacy upgrade-pity field, not stack quantity.
+            # A zero-pity spell is still one usable instance after normalization.
             candidates = sorted((i for i in role['attachments'] if i['attach_type']==6 and i['type_id']==tid
-                and i.get('count',1)>0 and i.get('level',1)==1 and not any(i.get(k) for k in
+                and i.get('level',1)==1 and not any(i.get(k) for k in
                 ('is_lock','owner_id','equip_order','innate_owner_id','awaken','upgrade_level'))),key=lambda i:i['id'])
             f.require(len(candidates)>=n, '可用的1级未装备被动法术不足')
             selected.extend(candidates[:n])

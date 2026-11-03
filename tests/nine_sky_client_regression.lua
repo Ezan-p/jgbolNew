@@ -8,14 +8,20 @@ local function node()
  function n:addChild(child,z,tag) child.parent=self;child.tag=tag;self.children[#self.children+1]=child end
  function n:getChildByTag(tag) for _,child in ipairs(self.children) do if child.tag==tag then return child end end end
  function n:removeChildByTag(tag) for i=#self.children,1,-1 do if self.children[i].tag==tag then self.children[i].parent=nil;table.remove(self.children,i) end end end
+ function n:removeAllChildrenWithCleanup() self.children={} end
  function n:getParent() return self.parent end
  function n:getContentSize() return {width=300,height=30} end
  function n:setScale(v) self.scale=v end
  return n
 end
+CCLayer={create=function() return node() end}
 CCLayerColor={create=function() return node() end}
 CCDirector={sharedDirector=function() return {getVisibleSize=function() return {width=960,height=640} end} end}
 function ccc4(...) return {...} end
+local pushes,pops=0,0
+local director={getVisibleSize=function() return {width=960,height=640} end,
+ pushScene=function() pushes=pushes+1 end,popScene=function() pops=pops+1 end}
+CCDirector.sharedDirector=function() return director end
 local now=1000;local sent,notices,delays,styles={},{},{},{}
 local root=node()
 local ms={d_c={table_copy=copy},d_u={},d_time={},d_hz={},d_info={}}
@@ -26,8 +32,16 @@ ms.d_info.show=function(text) notices[#notices+1]=text end
 ms.d_u.createByStyle=function(style) styles[#styles+1]=copy(style);local n=node();n.text=style.string;return n end
 ms.d_u.getRealScale=function() return 0.8,0.8 end
 ms.d_u.delay=function(layer,seconds,callback) delays[#delays+1]={layer=layer,callback=callback} end
-ms.d_u.createMenu=function() return node() end
+ms.d_u.createMenu=function(styles) local n=node();n.styles=styles;return n end
+ms.d_u.remove=function(n) n.parent=nil end
+ms.d_u.setStyles=function() end
 ms.d_u.createSwallowTouchLayer=function() end
+local played={};local special=0
+ms.d_event_mgr={setSpecialFightType=function(v) special=v end}
+ms.d_fightUI={g_fightUI={layerFightEnd=node()},showFightEnd=function() return 'other fight' end,
+ getSkipFightBtn=function() return {setVisible=function() end} end,
+ actFight=function(replay,kind) played[#played+1]=replay;ms.d_u.runScene(node()) end}
+local prizes={}
 local ui={g_self={Tags={Shop=1,Buy=2,Time=5},shop_data={},role_shop_data={}},g_towerUI={}}
 ms.d_towerUI=ui;package.loaded.ms=ms
 ui.updateActivityStatus=function(d) ui.g_self.begin_time=d.begin_time;ui.g_self.end_time=d.end_time end
@@ -37,6 +51,8 @@ ui.getTowerFloor=function(steps) return steps>99999 and 10 or 1 end
 ui.processCardList=function(cards) return copy(cards) end
 ui.showDynamicInfo=function() end;ui.showTokenCount=function() end;ui.showTopPlayer=function() end
 ui.showFloorTitle=function() end;ui.showGameLayer=function() end;ui.cancelSwallow=function() end
+ui.getItemIcon=function() return node() end
+ui.showRandomPrize=function(items,callback) prizes[#prizes+1]={items=items,callback=callback};return node() end
 ui.getItemName=function(reward) return reward.object_type==1 and '100天星卡' or 'VIP乾坤袋' end
 ui.create=function()
  ui.g_towerUI.bw=0.8;ui.g_towerUI.bh=0.3
@@ -59,6 +75,7 @@ ui.onGetActResult=function(d)
   assert(not d.tina_shop,'entry must not replay a palace encounter')
   ui.g_self.role_data=copy(d.role_sky_data or d.local_snapshot)
   ui.g_towerUI.main_layer=node();root:addChild(ui.g_towerUI.main_layer);ui.create()
+ elseif d.flag==2 then ui.received=d
  elseif d.flag==3 then
   ui.g_self.shop_data[d.shop_type]=d.shop_data;ui.g_self.role_shop_data[d.shop_type]={0,0}
   ui.showShopLayer(d.shop_type)
@@ -131,17 +148,48 @@ check('exact Monday remains open and blocks old-week movement',function()
 end)
 check('moving batch owns coordinates and defers refresh until final callback',function()
  local after=copy(s);after.steps=40;after.stars=250;after.free_times=6
- local battle={floor=2,enemy_name='天将',won=true,rewards={{object_type=1,attach_count=1}}}
- response(2,after,{local_battles={battle,{floor=3,enemy_name='守军',won=false,rewards={}}}})
+ response(2,after)
  ui.g_self.role_data.steps=10;ui.cancelSwallow()
  assert(ui.g_self.role_data.steps==10 and not ui.g_towerUI.main_layer:getChildByTag(91037))
  now=2101;local count=#sent;ui._localNineSkyTick();assert(#sent==count)
  ui.g_self.role_data.steps=40;ui.cancelSwallow()
  assert(ui.g_self.role_data.stars==250 and ui.g_self.role_data.free_times==6)
- local panel=ui.g_towerUI.main_layer:getChildByTag(91037);assert(panel)
- assert(panel:getChildByTag(11).text:find('胜利') and panel:getChildByTag(11).text:find('100天星卡'))
- assert(panel:getChildByTag(12).text:find('未获胜'))
+ assert(not ui.g_towerUI.main_layer:getChildByTag(91037))
  assert(sent[#sent].op==1)
+end)
+check('encounters play in place then reward confirmation resumes treasure and walking once',function()
+ now=2200;s=snapshot(2300,3000);response(1,s)
+ for _,hasTreasure in ipairs({true,false}) do
+ for _,won in ipairs({true,false}) do
+  local battle={floor=2,enemy_name='天将',won=won,replay={id=won and 1 or 2},
+   rewards=won and {{object_type=1,attach_count=1}} or {}}
+  local after=copy(s);after.steps=10
+  local packet=response(2,after,{map_event_list={{local_battle_index=1,meet_rand_list=hasTreasure and {{object_type=5,attach_count=1}} or {}}},local_battles={battle}})
+  assert(#packet.map_event_list[1].meet_rand_list==(hasTreasure and 1 or 0),'packet must remain immutable')
+  local resumed=0;local beforePrizes=#prizes
+  local items=ui.received.map_event_list[1].meet_rand_list
+  local holder=ui.showRandomPrize(items,function() resumed=resumed+1 end)
+  ui.g_towerUI.main_layer:addChild(holder)
+  delays[#delays].callback()
+  assert(#played==pushes and special==2 and resumed==0 and #prizes==beforePrizes)
+  local count=#sent;now=2301;ui._localNineSkyTick();assert(#sent==count)
+  ms.d_fightUI.showFightEnd()
+  local panel=ms.d_fightUI.g_fightUI.layerFightEnd:getChildByTag(91037)
+  assert(panel:getChildByTag(1).text:find(won and '获得奖励' or '未获胜'))
+  assert((panel:getChildByTag(11)~=nil)==won)
+  assert(resumed==0)
+  local menu=panel.children[#panel.children];local close=menu.styles[1].call_back
+  close();close();assert(pops==pushes and resumed==0 and special==0)
+  delays[#delays].callback()
+  if hasTreasure then
+   assert(#prizes==beforePrizes+1 and resumed==0);prizes[#prizes].callback()
+  else assert(#prizes==beforePrizes) end
+  assert(resumed==1)
+  ui.g_self.role_data.steps=10;ui.cancelSwallow();assert(ui.g_self.role_data.steps==10)
+  assert(ms.d_fightUI.showFightEnd()=='other fight')
+  now=2200;response(1,s)
+ end
+ end
 end)
 check('palace balances during paused movement survive final snapshot',function()
  now=2200;s=snapshot(2300,3000);s.shop_day=4;response(1,s)

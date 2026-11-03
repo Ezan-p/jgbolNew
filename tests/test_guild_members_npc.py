@@ -34,7 +34,7 @@ class GuildNpcMemberTests(unittest.TestCase):
             entry = npc_players.catalog()[npc_players.resolve(m['id'])]
             self.assertEqual((m['name'], m['head_type'], m['level'], m['combat_power']),
                              tuple(entry['profile'][key] for key in ('role_name', 'head_type', 'level', 'role_combat_power')))
-            self.assertLessEqual(abs(m['level'] - 30), 2)
+            self.assertLessEqual(abs(m['level'] - self.role()['level']), 2)
 
     def test_created_leader_receives_four_real_applications_and_can_fill_team(self):
         out = self.create()

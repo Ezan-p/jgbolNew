@@ -68,10 +68,12 @@ check('native eight reward preview with silver',function()
  assert(count==8 and ui.g_FishRushUI.main_layer:getChildByTag(91027))
  close();ms.d_u.createMenu=menu;assert(not ui.g_FishRushUI.main_layer:getChildByTag(91027))
 end)
-for idx=1,6 do check('native high shop '..idx,function()
+for idx=1,#FIXTURE.shops do check('native high shop '..idx,function()
  update(FIXTURE.shops[idx])
  if ui.g_FishRushUI.child_layer then ui.g_FishRushUI.child_layer:removeFromParentAndCleanup(true);ui.g_FishRushUI.child_layer=nil end
- ui.onPressCommit(1);assert(#ui.g_self.goods_infos==5);assert(ui.g_self.goods_infos[5].attach_count==5)
+ ui.onPressCommit(1);assert(#ui.g_self.goods_infos==5)
+ local high=ui.g_self.goods_infos[5]
+ assert(high.attach_count==(high.type_id==1246 and 1 or 5))
 end) end
 check('native batch exchange callback and authoritative remaining',function()
  update(FIXTURE.status);ui.onGetFishRushResult(ms.d_c.table_copy(FIXTURE.exchange))

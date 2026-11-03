@@ -17,6 +17,8 @@ ACTIVITY_LEVELS = {
     # Separate explicit check in activityUI.pressBtn, lines 1378–1381.
     'tongtianta': 36,
 }
+# Original manual evidence; separate from getRequireLevel's fixed constants.
+MANUAL_ACTIVITY_LEVELS = {'dream': 18}  # 1263 newbie_content9.csv
 # User-requested local policy; keep separate from the original-asset audit.
 LOCAL_ACTIVITY_LEVELS = {
     'monday': 15, 'fishrush': 20, 'twoyears': 20, 'rulaitable': 20,
@@ -33,15 +35,16 @@ NAMES = {
     'equip_asc': '装备封神', 'buff': '新手每日礼包',
     'monday': '天工制物阁', 'fishrush': '东海寻宝', 'twoyears': '元始祈愿',
     'rulaitable': '如来大转盘', 'tower': '九重天', 'destiny': '天机阁',
-    'forge': '装备兑换',
+    'forge': '装备兑换', 'dream': '梦境',
 }
 LEVELS = dict(ACTIVITY_LEVELS, undergo_play=50, pet=50, exp_pill=65,
               exp_drug=70, equip_asc=70, buff=3)
 LEVELS.update(LOCAL_ACTIVITY_LEVELS)
+LEVELS.update(MANUAL_ACTIVITY_LEVELS)
 
 # Shared messages are intentionally resolved below, not assigned wholesale.
 MESSAGES = {
-    1021: 'fengshenbang', 1203: 'fengshenbang',
+    1325: 'dream', 1021: 'fengshenbang', 1203: 'fengshenbang',
     1029: 'dujie', 1041: 'dujie', 1060: 'dujie', 1072: 'dujie',
     1043: 'tianmingzhizhan', 1085: 'qifu', 1086: 'cortegeRecycle',
     1226: 'soulHunt', 1302: 'land',

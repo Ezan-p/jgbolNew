@@ -61,7 +61,8 @@ class CheerTests(unittest.TestCase):
         self.assertIs(cfg[14]['is_open'], True)
         self.assertEqual(cfg[14]['is_open_ni'], 2)
         self.assertIsInstance(cfg[14]['cost_item_count'], int)
-        self.assertEqual(list(cfg[14]['cheer_level_limit'].values()), [40] * 8 + [60] * 8)
+        self.assertEqual(list(cfg[14]['cheer_level_limit'].values()),
+                         [40, 40, 42, 44, 46, 48, 50, 52] + [60] * 8)
         self.assertTrue(cfg[31][4]['rights']['open_cheer_skill'])
 
     def test_all_sixteen_positions_and_level_cap(self):
@@ -70,6 +71,8 @@ class CheerTests(unittest.TestCase):
             self.req(3, order, fail=True)
         role = self.b.profile(); role['level'] = 40; self.b.save(role)
         for order, name in enumerate(cheer.NAMES, 1):
+            if 3 <= order <= 8:
+                role = self.b.profile(); role['level'] = 40 + (order - 2) * 2; self.b.save(role)
             if order == 9:
                 for level in (40, 59):
                     role = self.b.profile(); role['level'] = level; self.b.save(role)
@@ -80,6 +83,83 @@ class CheerTests(unittest.TestCase):
             self.req(3, order, fail=True)
             self.assertEqual(self.b.profile()['cheer_' + name + '_level'], 10)
         self.assertEqual(self.b.profile()['cheer_count'], 16)
+
+    def test_first_two_positions_auto_unlock_at_40_without_materials(self):
+        role = self.b.profile()
+        role['level'] = 39
+        role['cheer_heaven_level'] = role['cheer_earth_level'] = 0
+        role['attachments'] = [i for i in role['attachments'] if i['type_id'] not in (1016, 1017)]
+        self.b.save(role)
+        self.assertEqual(self.b.profile()['cheer_count'], 0)
+        self.req(8, 1, fail=True)
+        self.req(8, 2, fail=True)
+        role = self.b.profile()
+        before_items = copy.deepcopy(role['attachments'])
+        role['level'] = 40
+        self.b.save(role)
+        role = self.b.profile()
+        self.assertEqual([role['cheer_' + n + '_level'] for n in cheer.NAMES], [1, 1] + [0] * 14)
+        self.assertEqual(role['attachments'], before_items)
+        for order in range(3, 9):
+            self.req(8, order, fail=True)
+        other = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        try:
+            self.assertEqual(other.profile()['cheer_count'], 2)
+            self.assertEqual(other.profile()['attachments'], before_items)
+        finally:
+            other.close()
+
+    def test_positive_unlock_level_boundaries_cost_replay_and_reconnect(self):
+        def token_counts(role):
+            return {tid: sum(i['count'] for i in role['attachments'] if i['type_id'] == tid)
+                    for tid in (1016, 1017)}
+
+        for order, required_level in enumerate((42, 44, 46, 48, 50, 52), 3):
+            with self.subTest(order=order, required_level=required_level):
+                key = 'cheer_' + cheer.NAMES[order - 1] + '_level'
+                role = self.b.profile()
+                role['level'] = required_level - 1
+                self.b.save(role)
+                self.req(8, order, fail=True)  # Even with enough tokens, reject early.
+                role = self.b.profile()
+                role['level'] = required_level
+                self.b.save(role)
+                role = self.b.profile()
+                self.assertEqual(role[key], 0)  # Level alone must not unlock paid slots.
+                before = token_counts(role)
+                tid = 1016 if order == 3 else 1017
+                self.req(8, order)
+                after = self.b.profile()
+                self.assertEqual(after[key], 1)
+                expected = dict(before)
+                expected[tid] -= 1
+                self.assertEqual(token_counts(after), expected)
+                self.assertEqual(self.b.respond(self.packet, {'authenticated': True}), self.replies)
+                self.assertEqual(self.b.profile(), after)
+                self.req(8, order, fail=True)  # New requests cannot pay twice either.
+        other = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        try:
+            role = other.profile()
+            self.assertEqual([role['cheer_' + n + '_level'] for n in cheer.NAMES], [1] * 8 + [0] * 8)
+            self.assertEqual(token_counts(role), expected)
+        finally:
+            other.close()
+
+    def test_paid_positive_positions_stay_locked_without_tokens(self):
+        role = self.b.profile()
+        role['attachments'] = [i for i in role['attachments'] if i['type_id'] not in (1016, 1017)]
+        self.b.save(role)
+        self.assertEqual(self.b.profile()['cheer_count'], 2)
+        for order in range(3, 9):
+            with self.subTest(order=order):
+                # Earlier slots have been opened so this exercises missing materials.
+                self.req(8, order, fail=True)
+                role = self.b.profile()
+                summon.add_item(role, 1016 if order == 3 else 1017, 1)
+                self.b.save(role)
+                self.req(8, order)
+                self.assertFalse(any(i['type_id'] in (1016, 1017) and i['count'] > 0
+                                     for i in self.b.profile()['attachments']))
 
     def test_explicit_target_switch_and_remove(self):
         self.req(8)

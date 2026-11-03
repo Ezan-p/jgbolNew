@@ -16,12 +16,15 @@ class Actions(list):
         self.stop_reason = 'elimination'
         self.rounds = 0
         self.opening_passives = []
+        self.essence_visuals = []
 
 
 def event_data(actions, fight_id):
     data = dict({i: e for i, e in enumerate(getattr(actions, 'events', []), 1)}, fight_id=fight_id)
     if getattr(actions, 'opening_passives', None):
         data['opening_passives'] = copy.deepcopy(actions.opening_passives)
+    if getattr(actions, 'essence_visuals', None):
+        data['essence_visuals'] = copy.deepcopy(actions.essence_visuals)
     return data
 
 
@@ -57,6 +60,9 @@ class Battle:
         self.round = 0
         self.event_bytes = 0
         self.active_orders = {1: set(), 2: set()}
+        self._visual_keys = set()
+        self._war_visual_rounds = {}
+        self._intimidation_icons = {}
         for side_no, side in enumerate(self.sides, 1):
             side.sort(key=lambda u: u['order'])
             for u in side:
@@ -100,6 +106,8 @@ class Battle:
                         entrants.append(unit)
         # Only an actually deployed unit can bless an actually deployed ally.
         for unit in entrants:
+            if c.effect(unit, 13)[0]:
+                self.visual(unit, 13, index=index or 0, after=index is not None)
             chance, rate, *_ = c.effect(unit, 18)
             choices = self.fielded(unit['side'])
             if rate and choices and c.roll(chance):
@@ -118,6 +126,10 @@ class Battle:
                 if index is not None:
                     self.event(target, self.logic(unit, 18), rate, index, field=9999,
                                hp_add=extra, hp_max_add=extra)
+                    # This event already carries the real HP-cap increment.
+                    self.actions.events[-1]['src_order'] = unit['order']
+                else:
+                    self.visual(unit, 18, target, index=0)
 
     def entry(self):
         # Self-only max HP is part of the initial roster snapshot, including reserves.
@@ -173,6 +185,39 @@ class Battle:
     def logic(self, unit, kind):
         return unit.get('essence_ids', {}).get(kind, 10100 + kind) * 10 + 1
 
+    def visual(self, unit, kind, target=None, *, index=None, variant=1, after=False,
+               detail='', logic=None):
+        """Display metadata only: no rolls, HP changes, extra turns or damage.
+
+        [B] Deduplicate identical notices within an action/phase; war intent
+        announces each newly reached pair of rounds once per combatant.
+        """
+        target = unit if target is None else target
+        index = len(self.actions) if index is None else index
+        identity = unit['side'], unit['order']
+        code = logic if logic is not None else self.logic(unit, kind) + variant - 1
+        if kind == 1 and variant == 3:
+            previous = self._intimidation_icons.pop(identity, None)
+            if previous is None:
+                return
+            code = previous + 2
+        if kind == 1 and variant == 1:
+            self._intimidation_icons[target['side'], target['order']] = code
+        if kind == 12:
+            pairs = self.round // 2
+            if pairs <= self._war_visual_rounds.get(identity, 0):
+                return
+            self._war_visual_rounds[identity] = pairs
+        key = (index, after, unit['side'], unit['order'], target['side'], target['order'], code, detail)
+        if key in self._visual_keys:
+            return
+        self._visual_keys.add(key)
+        self.actions.essence_visuals.append(dict(cur_action=index, after_action=after,
+            logic_type=code, who_use=unit['side'], src_order=unit['order'],
+            des_order=target['order'], self_use=unit['side'] == target['side'], speak='',
+            offline_essence_visual=True, visual_detail=detail,
+            skill_result_list=[dict(field=0, field_plus=0, des_order=target['order'])]))
+
     def event(self, unit, logic, delta, index, field=65, **properties):
         if not delta:
             return
@@ -189,18 +234,26 @@ class Battle:
         self.actions.append(row)
         return row, len(self.actions)
 
-    def heal(self, unit, amount, kind, index):
+    def heal(self, unit, amount, kind, index, *, essence=False):
         if unit['hp'] <= 0:
             return
         gain = min(max(0, int(amount)), unit['max_hp'] - unit['hp'])
         unit['hp'] += gain
         self.event(unit, self.logic(unit, kind), gain, index)
+        if gain and kind == 10 and essence:
+            self.visual(unit, 10, index=index, detail='name_only')
+            if c.effect(unit, 14)[0]:
+                self.visual(unit, 14, index=index, detail='healing_bonus')
 
     def revive(self, unit, index):
         if unit['hp']:
             return
         # Death clears temporary negative states whether or not resurrection succeeds.
-        unit.pop('poison', None)
+        poison = unit.pop('poison', None)
+        if poison:
+            self.visual(unit, 16, index=index, variant=3, after=True,
+                        logic=poison.get('layers', [poison])[-1]['logic'] + 1)
+        self.visual(unit, 1, index=index, variant=3, after=True)
         unit.pop('attack_reduction', None)
         unit['armor_break'] = unit['shield'] = 0
         unit['fangyu'] = unit['base_fangyu']
@@ -284,9 +337,12 @@ class Battle:
         targets = [u for u in targets if u['hp'] > 0 and u['order'] in self.active_orders[u['side']]]
         if not actor['hp'] or actor['order'] not in self.active_orders[actor['side']] or not targets or not self.can_act():
             return
-        c.begin_action(actor, self.round)
         generation = actor['revive_count']
         row, index = self.row(actor, targets, skill)
+        notify = lambda unit, family, target=None, **kw: self.visual(unit, family, target, index=index, **kw)
+        c.begin_action(actor, self.round, notify=notify)
+        if kind in ('counter', 'combo', 'execute'):
+            notify(actor, {'counter': 3, 'combo': 7, 'execute': 15}[kind])
         reactions = []
         fallen = []
         total = 0
@@ -294,10 +350,11 @@ class Battle:
             if not target['hp']:
                 continue
             if kind == 'execute' and c.roll(c.effect(target, 14)[1]):
+                notify(target, 14, variant=2)
                 continue
             # Debuffs precede damage; strongest armor break refreshes without stacking.
-            c.after_hit(actor, target)
-            raw = c.damage(actor, target, skill, level, self.rules, scale, settle=False)
+            c.after_hit(actor, target, notify=notify)
+            raw = c.damage(actor, target, skill, level, self.rules, scale, settle=False, notify=notify)
             loss, died = self.receive(target, raw, actor, row, index, fallen)
             total += loss
             if not died and target['hp']:
@@ -308,10 +365,14 @@ class Battle:
                     layers.append(dict(rate=rate, source_side=actor['side'], logic=self.logic(actor, 16) + 1,
                                        remaining=self.policy['poison_duration_rounds']))
                     target['poison'] = dict(layers=layers)
+                    notify(actor, 16, target, after=True)
                 # Secondary actions never recurse into counter/combo/execute chains.
                 chance, scale_back = c.effect(target, 3)
-                if kind == 'main' and scale_back and c.roll(chance) and not c.roll(c.effect(actor, 4)[0]):
-                    reactions.append((target, scale_back))
+                if kind == 'main' and scale_back and c.roll(chance):
+                    if c.roll(c.effect(actor, 4)[0]):
+                        notify(actor, 4)
+                    else:
+                        reactions.append((target, scale_back))
         # Resolve every target's damage before any resurrection, so one action's
         # wire damage array never exceeds that target's starting HP.
         for target in fallen:
@@ -408,6 +469,8 @@ class Battle:
             if poison and c.roll(c.effect(unit, 17)[0]):
                 unit.pop('poison')
                 poison = None
+                # Tie cleanse to the next existing action, without adding a turn.
+                self.visual(unit, 17, index=len(self.actions)+1)
             index = None
             if poison:
                 # Dedicated zero-damage action anchors pre-turn HP events, including lethal poison.
@@ -425,7 +488,6 @@ class Battle:
                     layer['remaining'] = layer.get('remaining', self.policy['poison_duration_rounds']) - 1
                     if unit['hp'] == 0:
                         died = True
-                        unit.pop('poison', None)
                         self.revive(unit, index)
                         self.deploy(index)
                         break
@@ -435,6 +497,8 @@ class Battle:
                         unit['poison'] = dict(layers=remaining)
                     else:
                         unit.pop('poison', None)
+                        self.visual(unit, 16, variant=3, index=index, after=True,
+                                    logic=layers[-1]['logic']+1)
                 if died:
                     continue
             chance, rate = c.effect(unit, 10)
@@ -444,7 +508,7 @@ class Battle:
                 if index is None:
                     _, index = self.row(unit, [unit], self_use=True)
                 amount = F(unit['base_hp']) * rate / 100 * (1 + c.effect(unit, 14)[0] / 100)
-                self.heal(unit, amount, 10, index)
+                self.heal(unit, amount, 10, index, essence=True)
 
     def run(self):
         while self.round < MAX_ROUNDS and all(self.alive(s) for s in (1, 2)) and self.can_act():
@@ -457,7 +521,8 @@ class Battle:
                     break
                 actor = next((u for u in self.fielded(side) if self.position(u) == position), None)
                 if actor:
-                    sk, lv = c.select_skill(actor, self.rules)
+                    sk, lv = c.select_skill(actor, self.rules,
+                        notify=lambda unit, family: self.visual(unit, family, index=len(self.actions)+1))
                     if int(formation.SKILLS[sk]['formula']) == 6:
                         self.healing_spell(actor, sk, lv)
                     else:

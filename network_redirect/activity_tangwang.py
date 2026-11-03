@@ -7,6 +7,7 @@ from . import activity as a, formation, summon
 from . import activity_seasonal as se
 
 COMBINATIONS = [[1, 2, 3, 4], [1, 2, 5, 6], [7, 8, 1, 2]]
+MAX_BATCH = 63  # Native 1213 has a byte-sized array, at most 255 card IDs.
 LEGACY_LEVELS = {1: 1, 2: 2, 3: 7, 4: 8, 5: 3, 6: 4, 7: 5, 8: 6, 9: 1, 10: 2}
 
 
@@ -129,6 +130,7 @@ def payload(s, r, enabled):
         card_combination=copy.deepcopy(COMBINATIONS), letters=r['letters'],
         letter_weights=r['letter_weights'], daily_cards=r['daily_cards'],
         travel_drop_percent=r['travel_drop_percent'], pools=r['pools'],
+        max_batch=MAX_BATCH,
         week=s['week'], weekly_cards=s['weekly_cards'], exchanges=copy.deepcopy(s['exchanges']))
 
 
@@ -148,19 +150,32 @@ def settle(role, req, now, shared):
     r = shared['tangwang_rules']
     s = state(role, now, r)
     ids = [x['id'] for x in req['card_list']]
-    a.require(req['count'] == len(ids) == 4 and len(set(ids)) == 4, '请选择四枚不同的金牌')
+    a.require(req['count'] == len(ids) and 4 <= len(ids) <= MAX_BATCH*4 and len(ids)%4 == 0,
+              '每组需要四枚金牌，单次最多兑换63组')
+    a.require(len(set(ids)) == len(ids), '请选择不同的金牌，不可重复使用同一枚金牌')
     cards = [formation.lookup(role, 'attachments', i) for i in ids]
     a.require(all(is_card(c) and c['count'] > 0 and 1 <= c['level'] <= 8 and
                   not c.get('is_lock') and not c.get('owner_id') and not c.get('equip_pos')
                   and not c.get('equip_order') for c in cards), '金牌无效、已锁定或被占用')
-    letters = [c['level'] for c in cards]
-    index = COMBINATIONS.index(letters) if letters in COMBINATIONS else 3
-    rows = r['pools'][index]['rewards']
-    reward = draw([x['reward'] for x in rows], [x['weight'] for x in rows])
+    rewards, pool_counts = {}, [0, 0, 0, 0]
+    for offset in range(0, len(cards), 4):
+        letters = [c['level'] for c in cards[offset:offset+4]]
+        index = COMBINATIONS.index(letters) if letters in COMBINATIONS else 3
+        rows = r['pools'][index]['rewards']
+        reward = draw([x['reward'] for x in rows], [x['weight'] for x in rows])
+        key = (reward[0], reward[1], reward[3])
+        if key not in rewards:
+            rewards[key] = reward
+        else:
+            rewards[key][2] += reward[2]
+        pool_counts[index] += 1
     for c in cards:
         c['count'] -= 1
         if not c['count']:
             role['attachments'].remove(c)
-    s['exchanges'][index] += 1
-    return [summon.event(90, dict(prize_list=a.prizes(role, [reward]),
-        local_tangwang=payload(s, r, True), pool_index=index+1))]
+    for index, count in enumerate(pool_counts):
+        s['exchanges'][index] += count
+    indices = [i+1 for i, count in enumerate(pool_counts) if count]
+    return [summon.event(90, dict(prize_list=a.prizes(role, list(rewards.values())),
+        local_tangwang=payload(s, r, True), pool_index=indices[0] if len(indices)==1 else 0,
+        exchange_count=len(cards)//4, pool_counts=pool_counts))]

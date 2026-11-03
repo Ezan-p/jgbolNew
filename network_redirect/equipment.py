@@ -15,7 +15,6 @@ STONE_MAX_LEVEL = {kind: max(level for k, level in STONE_REBORN if k == kind) fo
 def load_rules():
     r = json.loads((f.ROOT / 'server_config/stone_rules.json').read_text())
     f.require(r['mode'] == 'inferred' and r['schema_version'] == 1, '灵石配置来源无效')
-    f.require(type(r['failure_compensation_percent']) is int and 1 <= r['failure_compensation_percent'] <= 100, '灵石补偿配置无效')
     f.require(type(r['min_role_level']) is int and r['min_role_level'] in f.LEVELS, '灵石等级配置无效')
     f.require(type(r['reborn_min_realm']) is int and 1 <= r['reborn_min_realm'] <= 4, '灵石升华境界配置无效')
     return r
@@ -141,17 +140,14 @@ def settle(role, req):
                 worth += Decimal(STONE_VALUES[STONES[i['type_id']], i['level']]['worth'])
                 materials.append(i)
             row = STONE_VALUES[kind, old]
-            probability = min(Decimal(100), worth * 100 / Decimal(row['cost']) + target.get('prob_compen', 0))
+            probability = min(Decimal(100), worth * 100 / Decimal(row['cost']))
             split_one(role, target)
             f.debit_money(role, 'silver_coin', int(row['silver_cost']))
             for i in materials:
                 i['count'] -= 1
             role['attachments'] = [i for i in role['attachments'] if i['attach_type'] != 5 or i['count'] > 0]
             success = secrets.randbelow(1000000) < probability * 10000
-            if success:
-                target.update(level=old + 1, prob_compen=0)
-            else:
-                target['prob_compen'] = min(100, target.get('prob_compen', 0) + rules['failure_compensation_percent'])
+            target.update(level=old + int(success), prob_compen=0)
         else:
             f.require(not ids, '灵石升华或提炼参数无效')
             f.require(old >= 10, '10级灵石才可升华')

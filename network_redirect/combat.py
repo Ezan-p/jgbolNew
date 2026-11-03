@@ -77,7 +77,7 @@ def target_count(skill_id, rules):
     return min(configured, rules['multi_target_limit'])
 
 
-def select_skill(actor, rules=None):
+def select_skill(actor, rules=None, *, notify=None):
     for tid, level in actor['skills']:
         skill = formation.SKILLS[tid]
         if tid != 1 and int(skill['use_mode(1-active，2-passive)']) == 1:
@@ -89,11 +89,13 @@ def select_skill(actor, rules=None):
                 tier = 'advanced' if actor.get('essence_ids', {}).get(9, 10109) >= 10200 else 'normal'
                 bonus = rules['mechanics']['penetration_proc_bonus'][tier]
             if roll(min(100, probability + bonus + actor.get('fate_penetration_proc',0))):
+                if notify and bonus:
+                    notify(actor, 9)
                 return tid, level
     return 1, 1
 
 
-def damage(actor, target, skill_id, level, rules, scale=100, *, settle=True):
+def damage(actor, target, skill_id, level, rules, scale=100, *, settle=True, notify=None):
     normal = skill_id == 1 or int(formation.SKILLS[skill_id]['formula']) == 1
     attack = F(actor['gongji'])
     power = attack if normal else attack * F(str(rules['spell_attack_ratio'])) + F(actor['magic']) * F(str(rules['spell_magic_ratio']))
@@ -112,15 +114,23 @@ def damage(actor, target, skill_id, level, rules, scale=100, *, settle=True):
     if normal:
         chance, bonus = effect(actor, 11)
         if bonus and roll(chance):
+            if notify:
+                notify(actor, 11, target)
             intimidation = effect(target, 1)
+            if notify and len(intimidation) > 2 and intimidation[2]:
+                notify(target, 1, variant=2)
             bonus *= 1 - (intimidation[2] / 100 if len(intimidation) > 2 else 0)
             parry = effect(actor, 4)
             if effect(target, 3)[1] and len(parry) > 1:
                 bonus *= 1 + parry[1] / 100
+                if notify and parry[1]:
+                    notify(actor, 4, detail='assault_bonus')
             raw *= 1 + bonus / 100
         chance, reduction = effect(target, 6)
         if reduction and roll(chance):
             raw *= 1 - reduction / 100
+            if notify:
+                notify(target, 6)
     else:
         skill = formation.SKILLS[skill_id]
         intensity = F(skill['intensity']) + F(skill['upgrade_plus']) * (level - 1)
@@ -133,6 +143,10 @@ def damage(actor, target, skill_id, level, rules, scale=100, *, settle=True):
         resist = min(F(1), max(0, effect(target, 8)[0] / 100))
         pierce = min(F(1), max(0, effect(actor, 9)[0] / 100))
         raw *= 1 - resist * (1 - pierce)
+        if notify and resist:
+            notify(target, 8)
+            if pierce:
+                notify(actor, 9)
     if normal:
         # Physical training modifies damage, not the attack/defense stats [A].
         raw = max(0, raw * (1 + attack_rate / 100) * max(0, 1 - guard_rate / 100)
@@ -152,7 +166,7 @@ def damage(actor, target, skill_id, level, rules, scale=100, *, settle=True):
     raw += F(target.get('max_hp',target['hp']))*F(str(fate.get('target_hp_damage',[0])[0]))/100
     if not settle:
         defend = dict(defend, survival_count=0)
-    return reborn_stars.combat_hit(max(0, raw * F(scale, 100)), target['hp'] if settle else 2147483647, normal,
+    return reborn_stars.combat_hit(max(0, raw * F(str(scale)) / 100), target['hp'] if settle else 2147483647, normal,
         actor.get('reborn_traits', {}), defend)
 
 
@@ -186,7 +200,7 @@ def validate_rules(rules):
         and type(v) is int and 1 <= v <= 9 for k, v in limits.items()), '技能目标上限配置无效')
 
 
-def begin_action(actor, round_no):
+def begin_action(actor, round_no, *, notify=None):
     """[B] War intent uses completed pairs of rounds; intimidation lasts one action."""
     base = actor.setdefault('base_gongji', actor['gongji'])
     attack = (F(base) * (1 + (round_no // 2) * effect(actor, 12)[0] / 100)
@@ -194,15 +208,23 @@ def begin_action(actor, round_no):
     # [A] New wording reduces attack, no longer only base attack.
     # [B] Apply once after round buffs; multiple intimidations keep the strongest.
     actor['gongji'] = max(0, attack * (1 - F(actor.pop('attack_reduction', 0)) / 100))
+    if notify:
+        if round_no >= 2 and effect(actor, 12)[0]:
+            notify(actor, 12)
+        notify(actor, 1, variant=3)  # Only emitted if a displayed debuff exists.
 
 
-def after_hit(actor, target):
+def after_hit(actor, target, *, notify=None):
     """[B] Apply pre-hit debuffs; strongest armor break refreshes without stacking."""
     intimidate = effect(actor, 1)
     if len(intimidate) > 1 and roll(intimidate[0]):
         target['attack_reduction'] = max(target.get('attack_reduction', 0), intimidate[1])
+        if notify and intimidate[1]:
+            notify(actor, 1, target)
     chance, reduction = effect(actor, 2)
     if reduction and roll(chance):
         base = target.setdefault('base_fangyu', target['fangyu'])
         target['armor_break'] = max(target.get('armor_break', 0), reduction)
         target['fangyu'] = max(0, F(base) * (1 - target['armor_break'] / 100))
+        if notify:
+            notify(actor, 2, target)

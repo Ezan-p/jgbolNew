@@ -588,6 +588,8 @@ class Backend:
         if mid == 2999:
             role = self.profile()
             seasonal_before = {'attachments': copy.deepcopy(role['attachments'])}
+            # Shared activity.prepare may settle Tangwang before its own heartbeat hook.
+            tw_before = copy.deepcopy(role.get('activity',{}).get('seasonal',{}).get('tangwang'))
             nine_before = copy.deepcopy(role.get('activity', {}).get('nine_sky', {}).get('last_recycle'))
             now = int(time.time())
             rank_state = role.get('activity', {})
@@ -613,7 +615,6 @@ class Backend:
             rulai_period = activity_rulai.period(now, activity_rulai.load_rules())[0]
             rulai_rollover = rulai_state.get('start') != rulai_period
             from . import activity_tangwang
-            tw_before = copy.deepcopy(role.get('activity',{}).get('seasonal',{}).get('tangwang'))
             tw_state = activity_tangwang.state(role,now,self.activity_rules['tangwang_rules'])
             journey.prepare(role, now, self.journey_rules)
             daily.prepare(role, now, self.daily_rules)

@@ -42,7 +42,8 @@ class ProtocolTests(unittest.TestCase):
             login = encode(1001, {k: ticket[k] for k in ('auth_key', 'seed', 'account')})
             state = {}
             replies = backend.respond(login, state)
-            self.assertEqual([decode(r)[0] for r in replies[:5]], [1002, 2998, 1017, 1034, 1035])
+            self.assertEqual([decode(r)[0] for r in replies[:6]], [1002, 2998, 1017, 2998, 1034, 1035])
+            self.assertIn('local_fate_rebuild', login_fields(decode(replies[3])[2]['data']))
             self.assertIn(1046, [decode(r)[0] for r in replies])
             self.assertTrue(state['authenticated'])
             self.assertEqual(decode(backend.respond(login, {})[0])[2]['result'], 1)
@@ -82,10 +83,11 @@ class ProtocolTests(unittest.TestCase):
                 reconnect = encode(1016, dict(account='local-player', random_key=backend.random_key))
                 replies = backend.respond(reconnect, state)
                 self.assertTrue(state['authenticated'])
-                self.assertEqual([decode(r)[0] for r in replies[:5]], [2996, 2998, 1017, 1034, 1035])
+                self.assertEqual([decode(r)[0] for r in replies[:6]], [2996, 2998, 1017, 2998, 1034, 1035])
+                self.assertIn('local_fate_rebuild', login_fields(decode(replies[3])[2]['data']))
                 self.assertTrue(decode(replies[2])[2]['reconnect'])
                 self.assertEqual(decode(replies[2])[2]['cortege_count'], 2)
-                self.assertEqual(decode(replies[3])[2]['cortege_count'], 1)
+                self.assertEqual(decode(replies[4])[2]['cortege_count'], 1)
                 next_server_serial = 200001
                 for mid, values, ids in [(1018, {'serial_num': 123}, [1020, 1023, 1032, 1106]),
                                          (1094, {'serial_num': 124, 'flag': 1}, [1095, 1106]),
@@ -111,25 +113,27 @@ class ProtocolTests(unittest.TestCase):
             backend = Backend(Path(directory), 18770, lambda *a, **k: None)
             try:
                 replies = [decode(r) for r in backend.bootstrap()]
-                self.assertEqual([r[0] for r in replies[:4]], [2998, 1017, 1034, 1035])
+                self.assertEqual([r[0] for r in replies[:5]], [2998, 1017, 2998, 1034, 1035])
+                self.assertIn('local_fate_rebuild', login_fields(replies[2][2]['data']))
                 self.assertEqual(replies[0][2]['id'], 80)
                 config = login_fields(replies[0][2]['data'])
                 self.assertIs(config['config_end'], True)
                 # Enabled Bagua must provide complete original-client config.
                 self.assertIs(config[14]['is_open'], True)
                 self.assertIsInstance(config[14]['cheer_level_limit'], dict)
-                self.assertEqual(len(config[10]['cheap_item_list']), 8)
-                self.assertEqual(len(config[10]['rich_item_list']), 15)
+                # Existing discount stock includes the added drill and elixir.
+                self.assertEqual(len(config[10]['cheap_item_list']), 10)
+                self.assertEqual(len(config[10]['rich_item_list']), 14)
                 self.assertNotIn(9137, config[10]['rich_item_list'])
                 self.assertEqual(config[10]['limit_item_list'], {})
                 self.assertEqual(len(config[10]['panic_buy_list']['activity_data']['sale_item']), 2)
                 self.assertEqual(replies[1][2]['cortege_count'], 2)
-                self.assertEqual(replies[2][2]['cortege_count'], 1)
-                self.assertEqual(replies[2][2]['cortege_list'][0]['order'], 1)
-                self.assertTrue(replies[3][2]['first_send'])
-                self.assertEqual(replies[3][2]['attach_count'], 1)
-                self.assertEqual(replies[3][2]['attach_list'][0]['type_id'], 209)
-                self.assertEqual(replies[3][2]['attach_list'][0]['protogenic'], 1)
+                self.assertEqual(replies[3][2]['cortege_count'], 1)
+                self.assertEqual(replies[3][2]['cortege_list'][0]['order'], 1)
+                self.assertTrue(replies[4][2]['first_send'])
+                self.assertEqual(replies[4][2]['attach_count'], 1)
+                self.assertEqual(replies[4][2]['attach_list'][0]['type_id'], 209)
+                self.assertEqual(replies[4][2]['attach_list'][0]['protogenic'], 1)
             finally:
                 backend.close()
 

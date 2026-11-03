@@ -1,0 +1,17 @@
+.F....................
+======================================================================
+FAIL: test_all_ten_soul_paths_real_costs_stats_and_potential (tests.test_fate_rebuild.FateTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_fate_rebuild.py", line 80, in test_all_ten_soul_paths_real_costs_stats_and_potential
+    for _ in range(fr.star_count(part)): self.node(part)
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_fate_rebuild.py", line 37, in node
+    self.ok(self.fate(0,soul_part=part,material_list=materials))
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_activity.py", line 29, in ok
+    def ok(self,events):self.assertNotIn(55,[e for e,_ in events],events)
+AssertionError: 55 unexpectedly found in [55] : [(55, {'op_string': '可用的1级未装备被动法术不足'})]
+
+----------------------------------------------------------------------
+Ran 22 tests in 30.375s
+
+FAILED (failures=1)

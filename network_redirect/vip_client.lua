@@ -68,15 +68,19 @@ do
         local function cardText()
             local items=ms.d_packageUI and ms.d_packageUI.g_itemAttrTable
             if not items then return end
-            for tid,rmb in pairs({[1152]=50,[1156]=5}) do
+            for tid,rmb in pairs({[1152]=50,[1156]=5,[1151]=state().daozun_rmb}) do
                 local row=items[tid]
                 if row then
                     if not cardDescriptions[tid] then
                         cardDescriptions[tid]={row=row,name=row.name,description=row.description,introduction=row.introduction}
                     end
-                    row.name=tid==1152 and '大传世金卡' or '小传世金卡'
+                    row.name=tid==1152 and '大传世金卡' or tid==1151 and '道尊金卡' or '小传世金卡'
                     row.description='面值'..rmb..'元，可在充值界面抵扣或在背包使用，计入VIP及充值活动。'
                     row.introduction='等同于充值'..rmb..'元'
+                    if tid==1151 then
+                        row.description='离线面值'..rmb..'元，可在背包使用；不计入十万猴急充值额度。'
+                        row.introduction='背包兑换元宝，不累计十万猴急充值'
+                    end
                 end
             end
         end
@@ -437,7 +441,7 @@ do
         -- Growth-fund UI emits prebuy directly, without passing common.recharge.
         ms.d_u.main_server_send_msg = function(mid,data,...)
             local ids=ms.d_msg_def.gscl_msg_id
-            if mid==ids.msg_use_item and data and (data.item_type==1152 or data.item_type==1156) then
+            if mid==ids.msg_use_item and data and (data.item_type==1151 or data.item_type==1152 or data.item_type==1156) then
                 local key=table.concat({data.item_id,data.item_type,data.item_count,data.des_type,data.des_id},':')
                 if not pendingCardUse or pendingCardUse.key~=key then
                     orderSequence=orderSequence+1

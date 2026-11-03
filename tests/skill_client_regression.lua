@@ -40,11 +40,11 @@ upgrade.show({skill_info=detached})
 assert(upgrade.g_self.params.skill_info==first)
 ui.getDateFormServer({first_send=true,more=true,attach_list={}})
 ui.getDateFormServer({first_send=false,attach_list={{id=1,attach_type=6,type_id=22,level=2,count=5,protogenic=0,effect_value=120}}})
-assert(ui.g_packageItemsInfo[1]==first and first.level==2 and first.count==5)
+assert(ui.g_packageItemsInfo[1]==first and first.level==2 and first.count==0)
 -- Also repair a window which was already open before the adapter was installed.
 upgrade.g_self.params.skill_info=detached
 upgrade.showServerRet({obj_id=1,old_level=1,new_level=2})
-assert(upgrade.rendered.level==2 and upgrade.rendered.effect==120 and upgrade.rendered.count==5)
+assert(upgrade.rendered.level==2 and upgrade.rendered.effect==120 and upgrade.rendered.count==0)
 assert(upgrade.g_self.old_level==1 and upgrade.g_self.new_level==2)
 assert(detached.level==2 and detached.effect_value==120)
 ui.getDateFormServer({first_send=true,attach_list={{id=1,attach_type=6,type_id=22,level=3,count=0,protogenic=0,effect_value=140}}})
@@ -53,7 +53,7 @@ upgrade.showServerRet({obj_id=1,old_level=2,new_level=3})
 assert(upgrade.rendered.level==3 and upgrade.rendered.effect==140 and upgrade.rendered.count==0)
 ui.getDateFormServer({first_send=true,attach_list={{id=1,attach_type=6,type_id=22,level=3,count=1,protogenic=0,effect_value=140}}})
 upgrade.showServerRet({obj_id=1,old_level=3,new_level=3})
-assert(upgrade.rendered.level==3 and upgrade.rendered.count==1)
+assert(upgrade.rendered.level==3 and upgrade.rendered.count==0)
 ui.getDateFormServer({first_send=true,attach_list={}})
 assert(#ui.g_packageItemsInfo==0)
 ui.getDateFormServer({first_send=false,attach_list={{id=1,attach_type=6,type_id=23,level=3,count=0,protogenic=0}}})
@@ -64,4 +64,4 @@ ui.g_isInPackage=true
 ui.g_packageUI={board_layer={removeChildByTag=function() error('released Cocos node') end}}
 ui._localSkillRestore();assert(ui.getDateFormServer==original)
 assert(upgrade.show==originalUpgradeShow and upgrade.showServerRet==originalUpgradeResult)
-return {'category does not delete innate entries','chunked snapshot keeps selected object','copied formation selection binds to live spell','already open result uses current level and power','consecutive growth refreshes level and compensation','failure refreshes compensation without another level','consumed books disappear','conversion does not retain wrong type cache','adapter restores original functions'}
+return {'category does not delete innate entries','chunked snapshot keeps selected object','copied formation selection binds to live spell','already open result uses current level and power','consecutive growth refreshes level with zero legacy count','failure keeps legacy compensation zero','consumed books disappear','conversion does not retain wrong type cache','adapter restores original functions'}

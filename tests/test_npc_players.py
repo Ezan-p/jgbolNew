@@ -28,10 +28,10 @@ class NpcPlayerTests(unittest.TestCase):
 
     def test_all_identities_legal_unique_and_bound_to_both_versions(self):
         entries=list(npc.catalog().values())
-        self.assertEqual(len(entries),1725)
+        self.assertEqual(len(entries),1825)
         self.assertEqual(sum(e['version']=='v1' for e in entries),240)
-        self.assertEqual(len({e['profile']['role_id'] for e in entries}),1725)
-        self.assertEqual(len({e['profile']['role_name'] for e in entries}),1725)
+        self.assertEqual(len({e['profile']['role_id'] for e in entries}),1825)
+        self.assertEqual(len({e['profile']['role_name'] for e in entries}),1825)
         self.assertEqual({e['profile']['head_type'] for e in entries},role_profile.HEADS)
         for entry in entries:
             p=entry['profile']

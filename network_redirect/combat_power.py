@@ -169,7 +169,10 @@ RATE_CHANNELS = {'genius', 'fam', 'prey', 'goss', 'special_attack'}
 
 
 def add_channels(role, c, values):
-    for owner in (role, c):
+    # Shared sources belong to the fighting formation, including substitutes.
+    # Personal sources remain valid in the bag and in either Bagua formation.
+    owners = (role, c) if 1 <= c.get('order', 0) <= 8 else (c,)
+    for owner in owners:
         sources = owner.get('combat_sources', {})
         for name, source in sources.items():
             if name not in FLAT_CHANNELS | RATE_CHANNELS:
@@ -279,19 +282,34 @@ def recalculate(role, rules, now=None):
         record(trace, 'fates_and_advance', values)
         pending[c['id']] = values
         reports[str(c['id'])] = trace
+    # The native UI previews support using the integer companion panel. Build
+    # that same personal-only panel before resolving any targets, so decimals,
+    # explicit personal sources and clamping cannot make the preview diverge.
+    # Keep target bases unchanged for the separate Bagua passive-skill formula.
+    cheer_bases = pending.copy()
+    for c in role['corteges']:
+        if c['id'] in pending and not 1 <= c.get('order', 0) <= 8:
+            values = {s: Decimal(floor(pending[c['id']][s])) for s in STATS}
+            if policy['explicit_channels']:
+                add_channels(role, c, values)
+            cheer_bases[c['id']] = {s: Decimal(bounded(values[s])) for s in STATS}
     # Two passes: support never reads last settlement's panel or other support output.
     for c in role['corteges']:
         if c['id'] not in pending:
             continue
         values = pending[c['id']].copy()
         trace = reports[str(c['id'])]
+        in_formation = 1 <= c.get('order', 0) <= 8
         for s in STATS:
             values[s] = Decimal(floor(values[s]))
-            values[s] += role.get('collection_bonuses', {}).get(s, 0)
-            values[s] += role.get({'hp':'max_hp_plus','magic':'max_magic_plus'}.get(s,s+'_plus'), 0)
-        values['hp'] += role.get('hole_hp_plus', 0)
+            if in_formation:
+                values[s] += role.get('collection_bonuses', {}).get(s, 0)
+                values[s] += role.get({'hp':'max_hp_plus','magic':'max_magic_plus'}.get(s,s+'_plus'), 0)
+        # [A] newbie_content17 row 18 explicitly excludes Bagua from home HP.
+        if in_formation:
+            values['hp'] += role.get('hole_hp_plus', 0)
         record(trace, 'collection_role_and_home', values)
-        if policy['title']:
+        if policy['title'] and in_formation:
             add_title(role, values, now)
         record(trace, 'title', values)
         # [A] newbie_content17 rows 11–14 describe damage modifiers, not panel
@@ -301,8 +319,8 @@ def recalculate(role, rules, now=None):
         if policy['pet']:
             add_pet(role, c, values)
         record(trace, 'pet', values)
-        if policy['cheer'] and 1 <= c.get('order', 0) <= 8:
-            add_cheer(role, c, values, pending)
+        if policy['cheer'] and in_formation:
+            add_cheer(role, c, values, cheer_bases)
         record(trace, 'cheer', values)
         if policy['explicit_channels']:
             add_channels(role, c, values)

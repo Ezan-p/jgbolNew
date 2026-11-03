@@ -34,6 +34,14 @@ class NineSkyBattleTests(unittest.TestCase):
                 companion[name] = stat
         return role
 
+    def test_production_enemy_power_is_tripled(self):
+        from network_redirect.activity_nine_sky import load_rules
+        rules = load_rules()
+        self.assertEqual(rules['battle_floor_power'], [v*3 for v in RULES['battle_floor_power']])
+        for floor, target in enumerate(rules['battle_floor_power'], 1):
+            _, power = battle.enemies(self.key, floor, rules)
+            self.assertLess(abs(power-target), target//100+32)
+
     def test_all_weekly_opponents_are_used_before_any_repeat(self):
         state = {}
         # Choosing alone exercises the complete rotation without expensive
