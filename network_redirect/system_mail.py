@@ -1,4 +1,5 @@
 """Local operator mail delivery. Original client events 13/14/15, permanent rewards."""
+from . import game_clock
 import argparse
 import copy
 import fcntl
@@ -62,7 +63,7 @@ def deliver(role, key, title, body, prizes, now, rules, mail_id=None):
 
 
 def issue(database, account, payload, *, write=False, now=None):
-    now = int(time.time()) if now is None else now
+    now = int(game_clock.now()) if now is None else now
     database = Path(database)
     with sqlite3.connect(database, timeout=30) as db:
         db.execute('BEGIN IMMEDIATE' if write else 'BEGIN')

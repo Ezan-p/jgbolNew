@@ -36,7 +36,7 @@ class PartyTests(ActivityCase):
 
     def test_daily_history_felstar_and_no_double_award(self):
         self.fight();before=self.b.profile();gold=before['gold_coin']
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             h=dict(self.req(1049,query_type=2))[30];self.assertEqual(h['fight_count'],1)
             self.assertEqual(len(h['damage_list']),10);self.assertIn('id',h['felstar_info'])
             self.assertEqual(self.b.profile()['gold_coin'],gold)
@@ -48,7 +48,7 @@ class PartyTests(ActivityCase):
             self.ok(self.req(1049,query_type=5,flag=2))
             self.assertEqual(self.req(1049,query_type=5,flag=2)[0][0],55)
             self.assertEqual(self.b.profile()['activity']['party']['history']['top_list'][1]['liked_times'],1)
-        with patch('network_redirect.backend.time.time',return_value=NOW):
+        with patch('network_redirect.game_clock.now',return_value=NOW):
             self.ok(self.req(1049,query_type=1))
             self.assertEqual(self.req(1049,query_type=5,flag=2)[0][0],55)
 
@@ -58,7 +58,7 @@ class PartyTests(ActivityCase):
         p.update(pending=[[5,1001,1000,1]],week_lucky=100,week_history={'self_order':1})
         self.b.save(r)
         for days in (0,2,50):
-            with patch('network_redirect.backend.time.time',return_value=NOW+days*86400):
+            with patch('network_redirect.game_clock.now',return_value=NOW+days*86400):
                 for mid,args in ((1049,dict(query_type=3)),(1201,dict(flag=1))):
                     out=self.req(mid,**args)
                     self.assertEqual(out[0][0],55)
@@ -100,7 +100,7 @@ class PartyTests(ActivityCase):
 
     def test_restricted_period_level_and_no_lineup(self):
         self.b.activity_rules['party_period']=[39600,46800]
-        with patch('network_redirect.backend.time.time',return_value=NOW+7200):
+        with patch('network_redirect.game_clock.now',return_value=NOW+7200):
             self.assertEqual(self.req(1026,fight_type=6)[0][0],55)
             self.assertEqual(self.req(1202,flag=1)[0][0],55)
         r=self.b.profile();r['level']=12;self.b.save(r)
@@ -115,7 +115,7 @@ class PartyTests(ActivityCase):
         self.b.save(r);self.ok(self.req(1049,query_type=1));p=self.b.profile()['activity']['party']
         self.assertEqual((p['count'],p['damage'],p['week_lucky']),(2,1234,0))
         before=self.b.profile()
-        with patch('network_redirect.backend.time.time',return_value=NOW-86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW-86400):
             self.assertEqual(self.req(1026,fight_type=6)[0][0],55)
         self.assertEqual(before,self.b.profile())
 
@@ -151,7 +151,7 @@ class PartyTests(ActivityCase):
     def test_query_on_backwards_clock_cannot_restore_chances(self):
         self.fight();self.ok(self.req(1202,flag=1))
         before=self.b.profile()['activity']['party']
-        with patch('network_redirect.backend.time.time',return_value=NOW-86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW-86400):
             self.ok(self.req(1049,query_type=1))
             self.assertEqual(self.req(1202,flag=1)[0][0],55)
         after=self.b.profile()['activity']
@@ -172,11 +172,11 @@ class PartyTests(ActivityCase):
         self.assertEqual(self.b.activity_rules['party_period'],[39600,46800])
         r=self.b.profile();r['activity']['party']['clock']=NOW-3601;self.b.save(r)
         for timestamp,allowed in ((NOW-3601,False),(NOW-3600,True),(NOW+3599,True),(NOW+3600,False)):
-            with patch('network_redirect.backend.time.time',return_value=timestamp):
+            with patch('network_redirect.game_clock.now',return_value=timestamp):
                 result=self.req(1026,fight_type=6)
                 if allowed:self.ok(result)
                 else:self.assertEqual(result[0][0],55)
-        with patch('network_redirect.backend.time.time',return_value=NOW+3600):
+        with patch('network_redirect.game_clock.now',return_value=NOW+3600):
             h=dict(self.req(1049,query_type=2))[30]
             self.assertEqual(h['fight_count'],2)
             self.assertTrue(self.b.profile()['activity']['party']['closed'])
@@ -198,7 +198,7 @@ class PartyTests(ActivityCase):
         self.assertEqual(set(seen),{4020,5025,3015})
         for tid,r in seen.items():
             timestamp=NOW+(r['activity']['party']['day']-start)*86400
-            with patch('network_redirect.backend.time.time',return_value=timestamp):
+            with patch('network_redirect.game_clock.now',return_value=timestamp):
                 self.b.save(r)
                 expected=party.info(self.b.profile(),self.b.activity_rules)
                 self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)

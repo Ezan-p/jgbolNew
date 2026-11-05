@@ -18,7 +18,7 @@ class GuildWarFeastTests(unittest.TestCase):
         self.b.guild_rules['wars_enabled']=True  # Isolated legacy tournament coverage only.
         self.addCleanup(lambda:self.b.close());self.serial=1000
         self.now=NOW
-        clock=patch('network_redirect.backend.time.time',side_effect=lambda:self.now)
+        clock=patch('network_redirect.game_clock.now',side_effect=lambda:self.now)
         clock.start();self.addCleanup(clock.stop)
         role=self.b.profile();role.update(level=40,gold_coin=100000,silver_coin=100000,vip_level=1);self.b.save(role)
         self.req(1,union_name='演武测试盟')

@@ -94,7 +94,7 @@ class NineSkyTests(ActivityCase):
         self.assertEqual(self.sky_state()['shop'][5],fruit)
         self.assertEqual(self.sky_state()['purchases']['1'][5],1)
         midnight=(state['shop_day']+1)*86400-8*3600
-        with patch('network_redirect.backend.time.time',return_value=midnight), \
+        with patch('network_redirect.game_clock.now',return_value=midnight), \
              patch.object(n.secrets,'randbelow',side_effect=lambda size:size-1):
             self.result(self.call())
         self.assertEqual(self.sky_state()['shop'][5],fruit)
@@ -215,16 +215,16 @@ class NineSkyTests(ActivityCase):
 
     def test_day_season_restart_clock_and_disabled(self):
         self.result(self.call(2,count=1,index=0));before=self.b.profile()
-        with patch('network_redirect.backend.time.time',return_value=NOW-1):
+        with patch('network_redirect.game_clock.now',return_value=NOW-1):
             self.assertEqual(self.call(2,count=1,index=0)[0][0],55)
         self.assertEqual(before,self.b.profile())
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.assertEqual(before,self.b.profile())
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             d=self.result(self.call())['role_sky_data'];self.assertEqual(d['free_times'],5+before['activity']['nine_sky'].get('bonus_dice',0))
             self.assertEqual(d['steps'],before['activity']['nine_sky']['steps'])
         end=self.sky_state()['end']
-        with patch('network_redirect.backend.time.time',return_value=end+1):
+        with patch('network_redirect.game_clock.now',return_value=end+1):
             d=self.result(self.call())['role_sky_data'];self.assertEqual(d['steps'],0)
         cfg=n.load_rules();cfg['enabled']=False
         with patch.object(n,'load_rules',return_value=cfg):self.assertEqual(self.call()[0][0],55)
@@ -300,7 +300,7 @@ class NineSkyTests(ActivityCase):
              patch.object(n, 'choose_map', side_effect=middle_route), \
              patch.object(n, 'refresh_shop', side_effect=expensive_shop):
             for day in range(7):
-                with patch('network_redirect.backend.time.time', return_value=start + day * 86400 + 60):
+                with patch('network_redirect.game_clock.now', return_value=start + day * 86400 + 60):
                     self.result(self.call())
                     for _ in range(cfg['daily_free']):
                         before = self.sky_state()['stars']
@@ -410,7 +410,7 @@ class NineSkyTests(ActivityCase):
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.assertEqual(self.sky_state(),saved)
         midnight=(s['shop_day']+1)*86400-8*3600
-        with patch('network_redirect.backend.time.time',return_value=midnight):
+        with patch('network_redirect.game_clock.now',return_value=midnight):
             d=self.result(self.call(3,buy_type=1,first_send=True))
             self.assertEqual(self.sky_state()['purchases'],{'1':[0]*6,'2':[0]*2})
             self.assertEqual(d['local_snapshot']['shop_day'],s['shop_day']+1)
@@ -423,7 +423,7 @@ class NineSkyTests(ActivityCase):
         self.result(self.call());old=self.sky_state()
         role=self.b.profile();role['activity']['nine_sky']['stars']=10000;self.b.save(role)
         midnight=(old['shop_day']+1)*86400-8*3600
-        with patch('network_redirect.backend.time.time',return_value=midnight):
+        with patch('network_redirect.game_clock.now',return_value=midnight):
             self.result(self.call())
             before=self.b.profile()
             events=self.call(4,buy_type=1,index=1,count=1,card_list={},shop_day=old['shop_day'])
@@ -440,7 +440,7 @@ class NineSkyTests(ActivityCase):
         end=s['end'];self.b.save(role)
         peach=lambda r:sum(i['count'] for i in r['attachments'] if i['attach_type']==5 and i['type_id']==1001)
         previous=peach(role)
-        with patch('network_redirect.backend.time.time',return_value=end):
+        with patch('network_redirect.game_clock.now',return_value=end):
             events=self.call();self.result(events)
             self.assertIn(13,[e for e,_ in events])
             fresh=self.sky_state()
@@ -462,7 +462,7 @@ class NineSkyTests(ActivityCase):
     def test_offline_multiple_weeks_and_restart_do_not_duplicate_mail(self):
         self.result(self.call());role=self.b.profile();s=role['activity']['nine_sky']
         s['stars']=100;self.b.save(role);future=s['end']+21*86400
-        with patch('network_redirect.backend.time.time',return_value=future):
+        with patch('network_redirect.game_clock.now',return_value=future):
             self.b.snapshot()
             fresh=self.sky_state()
             self.assertEqual((fresh['stars'],fresh['free_times']),(0,5))
@@ -471,14 +471,14 @@ class NineSkyTests(ActivityCase):
             self.assertEqual(len([k for k in mails if k.startswith('nine-sky-recycle-')]),1)
             self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
             self.result(self.call());self.assertEqual(self.b.profile()['welfare']['mails'],mails)
-            with patch('network_redirect.backend.time.time',return_value=future+7*86400):
+            with patch('network_redirect.game_clock.now',return_value=future+7*86400):
                 self.result(self.call())
                 self.assertEqual(self.b.profile()['welfare']['mails'],mails)
 
     def test_heartbeat_rollover_announces_mail_without_inventory_change(self):
         self.result(self.call());role=self.b.profile();s=role['activity']['nine_sky']
         s['stars']=2;self.b.save(role)
-        with patch('network_redirect.backend.time.time',return_value=s['end']):
+        with patch('network_redirect.game_clock.now',return_value=s['end']):
             replies=self.b.respond(encode(2999,dict(time=0,random_key=0,delay_time=0)),self.state)
         events=[d['id'] for mid,_,d in map(decode,replies) if mid==2998]
         self.assertIn(13,events)
@@ -489,14 +489,14 @@ class NineSkyTests(ActivityCase):
     def test_week_mail_and_reset_rollback_together_on_encoding_failure(self):
         self.result(self.call());role=self.b.profile();s=role['activity']['nine_sky']
         s['stars']=200;self.b.save(role)
-        with patch('network_redirect.backend.time.time',return_value=s['end']), \
+        with patch('network_redirect.game_clock.now',return_value=s['end']), \
              patch('network_redirect.backend.activity.attributes',side_effect=ValueError('encode failed')):
             # Profile reads persist elapsed resource recovery before settlement.
             # Compare against that baseline, so this tests activity rollback.
             role = self.b.profile()
             self.assertEqual(self.call()[0][0],55)
             self.assertEqual(self.b.profile(),role)
-        with patch('network_redirect.backend.time.time',return_value=s['end']):self.result(self.call())
+        with patch('network_redirect.game_clock.now',return_value=s['end']):self.result(self.call())
         self.assertEqual(self.sky_state()['last_recycle']['peaches'],100)
 
     def test_treasure_weight_boundaries_and_shop_candidate_coverage(self):

@@ -17,7 +17,7 @@ class GuildSocialNpcTests(unittest.TestCase):
         self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
         self.b.guild_rules['wars_enabled']=True  # Isolated legacy tournament coverage only.
         self.addCleanup(lambda: self.b.close())
-        self.clock = patch('network_redirect.backend.time.time', return_value=NOW)
+        self.clock = patch('network_redirect.game_clock.now', return_value=NOW)
         self.clock.start(); self.addCleanup(self.clock.stop)
         self.serial = 1000
         role = self.b.profile(); role.update(level=30, gold_coin=100000, silver_coin=100000)
@@ -68,7 +68,7 @@ class GuildSocialNpcTests(unittest.TestCase):
         self.assertEqual(self.req(69, flag=3, road_type=1)[-1]['book_list'], targets)
         self.req(69, flag=10, des_id=target['id'])
         self.req(69, flag=6, road_type=1, book_level=1, des_id=0)
-        with patch('network_redirect.backend.time.time', return_value=NOW+1801), patch('network_redirect.guild_offline.roll', return_value=0):
+        with patch('network_redirect.game_clock.now', return_value=NOW+1801), patch('network_redirect.guild_offline.roll', return_value=0):
             raid = self.req(69, flag=12)[-1]['berob_info'][1]
             self.assertEqual(raid['rob_id'], target['id'])
             self.req(69, flag=14, des_id=raid['rob_id'])
@@ -100,7 +100,7 @@ class GuildSocialNpcTests(unittest.TestCase):
         self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
         self.b.guild_rules['wars_enabled']=True  # Isolated legacy tournament coverage only.
         self.assertEqual(first, self.req(18, query_type=13)[-1]['des_member_list'])
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             self.req(18, query_type=13)
         self.assertNotEqual(saved, self.b.profile()['guild']['match']['npc_roster'])
 
@@ -168,7 +168,7 @@ class GuildSocialNpcTests(unittest.TestCase):
     def test_expired_blacklist_target_can_be_chased_without_changing_npc(self):
         ident=self.blacklist_target()
         original=npc_players.resolve(ident)
-        with patch('network_redirect.backend.time.time',return_value=NOW+3601):
+        with patch('network_redirect.game_clock.now',return_value=NOW+3601):
             row=self.req(69,flag=13)[-1]['union_black_info'][1]
             self.assertFalse(row['noChase'])
             target=self.b.profile()['guild']['escort']['chase_targets'][str(ident)]
@@ -176,7 +176,7 @@ class GuildSocialNpcTests(unittest.TestCase):
             self.assertEqual(target['id'],ident)
             self.req(69,flag=10,des_id=ident)
             self.assertEqual(self.b.profile()['guild']['escort']['rob_counts'][str(ident)],1)
-        with patch('network_redirect.backend.time.time',return_value=NOW+7202):
+        with patch('network_redirect.game_clock.now',return_value=NOW+7202):
             self.req(69,flag=13)
             target=self.b.profile()['guild']['escort']['chase_targets'][str(ident)]
             self.assertEqual((target['id'],target['npc_id'],target['be_grab_times']),(ident,original,1))
@@ -185,7 +185,7 @@ class GuildSocialNpcTests(unittest.TestCase):
         ident=self.blacklist_target(quality=5)
         self.req(69,flag=10,des_id=ident)
         self.assertTrue(self.req(69,flag=13)[-1]['union_black_info'][1]['noChase'])
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             row=self.req(69,flag=13)[-1]['union_black_info'][1]
             self.assertEqual(row['id'],ident)
             self.assertEqual(row['be_grab_times'],0)
@@ -198,9 +198,9 @@ class GuildSocialNpcTests(unittest.TestCase):
         self.b.guild_rules['escort_rob_daily']=10
         ident=self.blacklist_target(quality=2)
         for index in range(3):
-            with patch('network_redirect.backend.time.time',return_value=NOW+3601*index):
+            with patch('network_redirect.game_clock.now',return_value=NOW+3601*index):
                 self.req(69,flag=10,des_id=ident)
-        with patch('network_redirect.backend.time.time',return_value=NOW+10803):
+        with patch('network_redirect.game_clock.now',return_value=NOW+10803):
             row=self.req(69,flag=13)[-1]['union_black_info'][1]
             self.assertTrue(row['noChase']);self.assertEqual(row['be_grab_times'],3)
             self.req(69,flag=3,road_type=1)

@@ -145,7 +145,7 @@ class RankTests(ActivityCase):
         self.req(1026, fight_type=2, des_type=2, des_id=930001, des_value=1)
         self.assertEqual(points(), 20)
         self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             role = self.b.profile(); role['energy'] = 100; self.b.save(role)
             # No board query before this first new-day settlement.
             self.ok(self.req(1026, fight_type=2, des_type=2, des_id=930001, des_value=1))
@@ -231,11 +231,11 @@ class RankTests(ActivityCase):
         r=self.b.profile();summon.add_item(r,1021,102);r['activity']['rank_count']=r['top_fight_limit'];self.b.save(r)
         self.assertEqual(self.board()['fight_count'],0)
         self.ok(self.req(1051,item_type=1021,item_count=2,des_type=1))
-        self.assertEqual(self.board()['fight_count'],6)
         self.assertTrue(any(a['type']==134 and a['value']==6 for m,_,d in self.decoded if m==1032 for a in d['attr_list']))
+        self.assertEqual(self.board()['fight_count'],6)
         before=self.b.profile();self.assertEqual(self.req(1051,item_type=1021,item_count=100,des_type=1)[0][0],55);self.assertEqual(before,self.b.profile())
         self.assertEqual(self.req(1051,item_type=1021,item_count=1,item_id=999999,des_type=1)[0][0],55)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.assertEqual(self.board()['fight_count'],self.b.profile()['top_fight_limit'])
             self.assertEqual(self.b.profile()['activity']['rank_extra'],0)
 
@@ -275,18 +275,18 @@ class RankTests(ActivityCase):
 
     def test_daily_score_offline_cap_and_clock_rollback(self):
         self.board();base=self.b.profile()['activity']['rank_score']
-        with patch('network_redirect.backend.time.time',return_value=NOW+1799):self.board()
+        with patch('network_redirect.game_clock.now',return_value=NOW+1799):self.board()
         self.assertEqual(self.b.profile()['activity']['rank_score'],base)
-        with patch('network_redirect.backend.time.time',return_value=NOW+1800):self.board();self.board()
+        with patch('network_redirect.game_clock.now',return_value=NOW+1800):self.board();self.board()
         self.assertEqual(self.b.profile()['activity']['rank_score'],base)
-        with patch('network_redirect.backend.time.time',return_value=NOW-86400):self.board()
+        with patch('network_redirect.game_clock.now',return_value=NOW-86400):self.board()
         self.assertEqual(self.b.profile()['activity']['rank_score'],base)
-        with patch('network_redirect.backend.time.time',return_value=NOW+40*86400):self.board()
+        with patch('network_redirect.game_clock.now',return_value=NOW+40*86400):self.board()
         self.assertEqual(self.b.profile()['activity']['rank_score'],base+7*rank.score(501,'day_score'))
 
     def test_previous_day_best_claim_and_historical_promotions(self):
         self.fight(500);self.assertEqual(self.req(1201,flag=2)[0][0],55)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.board();r=self.b.profile()
             self.assertEqual(r['activity']['rank_score'],rank.score(500)+rank.score(500,'day_score'))
             self.assertEqual(r['activity']['rank_previous_best'],500)
@@ -296,7 +296,7 @@ class RankTests(ActivityCase):
 
     def test_defence_once_daily_and_revenge_uses_same_npc(self):
         self.fight(500)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.board();r=self.b.profile();n=len(r['activity']['rank_records']);self.board()
             self.assertEqual(len(self.b.profile()['activity']['rank_records']),n)
             self.assertEqual(self.b.profile()['energy'],r['energy'])
@@ -304,7 +304,7 @@ class RankTests(ActivityCase):
 
     def test_defensive_loss_produces_revenge_without_charging(self):
         r=self.b.profile();s=r['activity'];s.update(rank_order=1,rank_origin_order=1,rank_slots={},rank_reached_order=1);self.b.save(r)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             rows=self.board()['show_list'];after=self.b.profile();state=after['activity']
             self.assertEqual(state['rank_order'],2)
             self.assertEqual(state['rank_revenge'],930002)
@@ -428,17 +428,17 @@ class RankTests(ActivityCase):
     def test_midnight_best_rank_daily_cap_restart_and_clock_rollback(self):
         r=self.b.profile();s=r['activity'];s.update(rank_day_best=20,rank_reached_order=20)
         self.b.save(r);midnight=(s['rank_day']+1)*86400-8*3600
-        with patch('network_redirect.backend.time.time',return_value=midnight-1):self.board()
+        with patch('network_redirect.game_clock.now',return_value=midnight-1):self.board()
         self.assertEqual(self.b.profile()['activity']['rank_score'],0)
-        with patch('network_redirect.backend.time.time',return_value=midnight):
+        with patch('network_redirect.game_clock.now',return_value=midnight):
             self.board();before=self.b.profile();self.assertEqual(before['activity']['rank_score'],rank.score(20,'day_score'))
             self.board();self.assertEqual(before,self.b.profile())
             self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
             self.board();self.assertEqual(before,self.b.profile())
-        with patch('network_redirect.backend.time.time',return_value=midnight-10):self.board()
+        with patch('network_redirect.game_clock.now',return_value=midnight-10):self.board()
         self.assertEqual(self.b.profile()['activity']['rank_score'],rank.score(20,'day_score'))
         r=self.b.profile();r['activity']['rank_score']=16777214;self.b.save(r)
-        with patch('network_redirect.backend.time.time',return_value=midnight+86400):self.board()
+        with patch('network_redirect.game_clock.now',return_value=midnight+86400):self.board()
         self.assertEqual(self.b.profile()['activity']['rank_score'],16777215)
 
     def test_cross_rank_disabled_and_no_mutation(self):
@@ -453,7 +453,7 @@ class RankTests(ActivityCase):
         r=self.b.profile();s=r['activity'];s.update(rank_day_best=30,rank_count=3,rank_extra=6)
         self.b.save(r);midnight=(s['rank_day']+1)*86400-8*3600
         heartbeat=encode(2999,{})
-        with patch('network_redirect.backend.time.time',return_value=midnight):
+        with patch('network_redirect.game_clock.now',return_value=midnight):
             packets=self.b.respond(heartbeat,self.state);decoded=[decode(p) for p in packets]
             after=self.b.profile();self.assertEqual(after['activity']['rank_score'],rank.score(30,'day_score'))
             self.assertEqual(after['activity']['rank_count'],0);self.assertEqual(after['activity']['rank_extra'],0)

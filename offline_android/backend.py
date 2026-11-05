@@ -76,13 +76,21 @@ class Runtime:
     def emit(self, kind, **fields):
         # Bound disk usage and never persist credentials or complete protocol data.
         if kind not in ('offline_ready', 'offline_error', 'offline_stopped',
-                        'http_request', 'local_connection_end', 'game_response'):
+                        'http_request', 'local_connection_end', 'game_response', 'game_request_timing',
+                        'game_request_failed', 'game_replay_unavailable'):
             return
         log = self.files_dir / 'logs/backend.jsonl'
         try:
             if log.exists() and log.stat().st_size > 512 * 1024:
                 log.replace(log.with_suffix('.previous.jsonl'))
-            allowed = ('message', 'path', 'status', 'message_id', 'bytes', 'reason')
+            allowed = ('message', 'path', 'status', 'message_id', 'bytes', 'reason',
+                       'connection_id', 'request_id', 'serial_num', 'event_id', 'error_type',
+                       'request_bytes', 'response_count', 'response_bytes',
+                       'total_ms', 'receive_ms', 'respond_ms', 'backend_ms',
+                       'save_ms', 'write_ms', 'drain_ms', 'achievement_parse_ms',
+                       'achievement_packets', 'achievement_parsed', 'achievement_skipped',
+                       'save_serialize_ms', 'save_commit_ms', 'save_unchanged', 'save_writes',
+                       'recalculate_ms', 'recalculate_calls', 'recalculate_skipped')
             record = dict(time=time.time(), kind=kind,
                           **{key: fields[key] for key in allowed if key in fields})
             with log.open('a', encoding='utf-8') as stream:
@@ -95,6 +103,10 @@ class Runtime:
         # All SQLite connections stay on this same thread for their full lifetime.
         from network_redirect.accounts import Accounts
         from network_redirect.backend import Backend, login_fields
+        from network_redirect import game_clock
+        if ((self.files_dir / 'clock_boot_id').exists() or hasattr(sys, 'getandroidapilevel')
+                or 'ANDROID_ROOT' in os.environ):
+            game_clock.configure_android(self.files_dir)
         from network_redirect.server import LandingServer
         import network_redirect
         actual_root = Path(network_redirect.__file__).resolve().parents[1]

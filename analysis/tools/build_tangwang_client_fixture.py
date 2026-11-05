@@ -11,7 +11,7 @@ from network_redirect.protocol import decode
 
 def main():
     now=1792814400
-    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time',return_value=now):
+    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.game_clock.now',return_value=now):
         b=Backend(Path(tmp),18770,lambda *a,**k:None);role=b.profile();r=b.activity_rules
         activity.prepare(role,now,r)
         with patch.object(tw,'randbelow',side_effect=[0,20,40,52]):status=tw.status(role,now,r)

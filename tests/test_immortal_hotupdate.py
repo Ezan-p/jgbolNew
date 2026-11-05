@@ -135,7 +135,7 @@ class HotupdateWire(unittest.TestCase):
         self.addCleanup(lambda: self.b.close())
         self.serial = 100000
         self.state = {'authenticated': True}
-        clock = patch('network_redirect.backend.time.time', return_value=1793419200)
+        clock = patch('network_redirect.game_clock.now', return_value=1793419200)
         clock.start(); self.addCleanup(clock.stop)
         role = self.b.profile()
         role['level'] = 99

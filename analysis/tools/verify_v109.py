@@ -100,7 +100,7 @@ def main():
     from unittest.mock import patch
     from network_redirect.backend import Backend, login_fields
     from network_redirect.protocol import encode, decode
-    with tempfile.TemporaryDirectory() as temp, patch('network_redirect.backend.time.time', return_value=1792814400):
+    with tempfile.TemporaryDirectory() as temp, patch('network_redirect.game_clock.now', return_value=1792814400):
         backend = Backend(Path(temp), 18770, lambda *a, **kw: None)
         try:
             packets = backend.respond(encode(1346, dict(serial_num=90000, id=1, data='{}')), {'authenticated': True})

@@ -33,7 +33,7 @@ class LandWeekMailTests(ActivityCase):
 
     def test_bootstrap_settles_without_entering_land_and_reconnect_does_not_repeat(self):
         before=self.seed()
-        with patch('network_redirect.backend.time.time',return_value=self.monday):
+        with patch('network_redirect.game_clock.now',return_value=self.monday):
             self.assert_announced(self.events(self.b.bootstrap()))
             mails=self.mails();self.assertEqual(len(mails),1)
             mail=mails[f'land-week-{self.week}']
@@ -48,13 +48,13 @@ class LandWeekMailTests(ActivityCase):
     def test_heartbeat_boundary_and_last_sunday_tower_income(self):
         self.seed(0)
         sunday=self.monday-600
-        with patch('network_redirect.backend.time.time',return_value=sunday):
+        with patch('network_redirect.game_clock.now',return_value=sunday):
             self.ok(self.req(1302,id=1,data='{}'))
             self.ok(self.req(1302,id=4,data=summon.lua(dict(flag=1,des_type=2,des_id=14))))
-        with patch('network_redirect.backend.time.time',return_value=self.monday-1):
+        with patch('network_redirect.game_clock.now',return_value=self.monday-1):
             self.b.respond(encode(2999,{}),self.state)
             self.assertFalse(self.mails())
-        with patch('network_redirect.backend.time.time',return_value=self.monday+600):
+        with patch('network_redirect.game_clock.now',return_value=self.monday+600):
             # Other activities may already have advanced their daily marker.
             role=self.b.profile();role['activity']['rank_day']=activity.day(self.monday,self.b.activity_rules)
             role['activity']['rank_reward_version']=2
@@ -74,7 +74,7 @@ class LandWeekMailTests(ActivityCase):
         tiers=((1,1200,50,12,500),(3,900,38,9,350),(6,750,32,8,250),
                (10,600,25,6,200),(20,400,20,4,100),(50,200,15,2,80),(61,100,10,0,50))
         for rank,stone,chest,shard,gold in tiers:
-            with self.subTest(rank=rank), patch('network_redirect.backend.time.time',return_value=self.monday):
+            with self.subTest(rank=rank), patch('network_redirect.game_clock.now',return_value=self.monday):
                 self.b.save(copy.deepcopy(original))
                 with patch.object(npc,'ranking',return_value=([],dict(order=rank))):
                     events=self.req(1302,id=1,data='{}');self.ok(events);self.assert_announced(events)
@@ -99,14 +99,14 @@ class LandWeekMailTests(ActivityCase):
 
     def test_claim_failure_rolls_back_and_late_claim_survives_restart(self):
         self.seed()
-        with patch('network_redirect.backend.time.time',return_value=self.monday):
+        with patch('network_redirect.game_clock.now',return_value=self.monday):
             self.ok(self.req(1302,id=1,data='{}'))
             mail=next(iter(self.mails().values()));before=self.b.profile()
             with patch('network_redirect.backend.welfare_attributes',side_effect=ValueError('encoding')):
                 self.assertEqual(self.req(1103,mail_id=mail['mail_id'],flag=1)[0][0],55)
             self.assertEqual(self.b.profile(),before)
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
-        with patch('network_redirect.backend.time.time',return_value=self.monday+365*86400):
+        with patch('network_redirect.game_clock.now',return_value=self.monday+365*86400):
             self.ok(self.req(1103,mail_id=mail['mail_id'],flag=1))
             self.assertEqual(self.b.profile()['gold_coin'],before['gold_coin']+500)
             self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
@@ -115,11 +115,11 @@ class LandWeekMailTests(ActivityCase):
 
     def test_unplayed_weeks_are_not_rewarded_and_spending_does_not_reduce_rank(self):
         role=self.seed(0)
-        with patch('network_redirect.backend.time.time',return_value=self.monday):
+        with patch('network_redirect.game_clock.now',return_value=self.monday):
             self.b.bootstrap();self.assertFalse(self.mails())
         s=role['activity']['land'];rewards.gain(s,999999)
         activity.spend(s,'soul_count',s['soul_count']);self.b.save(role)
-        with patch('network_redirect.backend.time.time',return_value=self.monday+28*86400):
+        with patch('network_redirect.game_clock.now',return_value=self.monday+28*86400):
             self.b.bootstrap()
             self.assertEqual(set(self.mails()),{f'land-week-{self.week}'})
             self.assertEqual(self.b.profile()['activity']['land']['last_week_result']['rank'],1)

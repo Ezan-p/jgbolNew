@@ -18,7 +18,7 @@ class YuanshiTests(ActivityCase):
     def setUp(self):
         super().setUp()
         self.clock.stop()
-        self.clock = patch("network_redirect.backend.time.time", return_value=NOW)
+        self.clock = patch("network_redirect.game_clock.now", return_value=NOW)
         self.clock.start(); self.addCleanup(self.clock.stop)
 
     def call(self, flag=0, index=0):
@@ -101,7 +101,7 @@ class YuanshiTests(ActivityCase):
         self.data(self.call(2)); self.charge(2)
         r = self.b.profile(); summon.add_item(r, 1807, 3); self.b.save(r)
         future = self.ys()['end'] + 28 * 86400
-        with patch('network_redirect.backend.time.time', return_value=future):
+        with patch('network_redirect.game_clock.now', return_value=future):
             self.b.bootstrap()
             self.assertEqual(self.amount(1807), 0)
             self.assertEqual((self.ys()['progress'], self.ys()['gift_counts'], self.ys()['offering_stock']), (0, [], 0))
@@ -111,10 +111,10 @@ class YuanshiTests(ActivityCase):
 
     def test_charge_at_rollover_starts_first_tier_and_cannot_claim_old_tiers(self):
         self.charge(2); self.data(self.call(1, 1))
-        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 86400):
             self.charge(2)
         end = self.ys()['end']
-        with patch('network_redirect.backend.time.time', return_value=end):
+        with patch('network_redirect.game_clock.now', return_value=end):
             self.charge(1)
             self.assertEqual(self.ys()['charge_gold'], 100)
             self.assertEqual(self.ys()['gift_counts'], [1])
@@ -211,7 +211,7 @@ class YuanshiTests(ActivityCase):
 
     def test_daily_misses_carry_stock_and_purchase(self):
         self.data(self.call())
-        with patch('network_redirect.backend.time.time', return_value=NOW + 3 * 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 3 * 86400):
             d = self.data(self.call(3)); self.assertEqual(d['shop_config'][1]['buy_times'], 3)
             self.data(self.call(2)); self.assertEqual(self.ys()['free'], 0)
             gold = self.b.profile()['gold_coin']
@@ -220,7 +220,7 @@ class YuanshiTests(ActivityCase):
             self.assertEqual(gold - self.b.profile()['gold_coin'], 300)
             self.assertEqual(self.amount(1807), 3)
             self.assertEqual(self.call(4, 1)[0][0], 55)
-        with patch('network_redirect.backend.time.time', return_value=NOW + 4 * 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 4 * 86400):
             self.assertEqual(self.data(self.call(3))['shop_config'][1]['buy_times'], 0)
             self.assertEqual(self.ys()['free'], 1)
 
@@ -228,21 +228,21 @@ class YuanshiTests(ActivityCase):
         start, _ = y.period(NOW, y.load_rules())
         # New isolated enrollment near the start of a season.
         for i in range(10):
-            with patch('network_redirect.backend.time.time', return_value=start + 3600 + i * 86400):
+            with patch('network_redirect.game_clock.now', return_value=start + 3600 + i * 86400):
                 self.data(self.call(2))
-        with patch('network_redirect.backend.time.time', return_value=start + 3600 + 9 * 86400):
+        with patch('network_redirect.game_clock.now', return_value=start + 3600 + 9 * 86400):
             self.data(self.call(2)); self.assertTrue(self.ys()['claimed'])
         self.assertEqual(self.ys()['wishes'], 10)
 
     def test_recharge_five_tiers_one_per_day_and_accumulated_claims(self):
         start, _ = y.period(NOW, y.load_rules())
         for day in range(5):
-            with patch('network_redirect.backend.time.time', return_value=start + 3600 + day * 86400):
+            with patch('network_redirect.game_clock.now', return_value=start + 3600 + day * 86400):
                 # 50 RMB in gold cards unlocks any next tier; never two on one day.
                 self.charge(2); self.charge(2)
                 d = self.data(self.call()); self.assertEqual(len(d['gift_list']), day + 1)
                 self.assertEqual(list(d['gift_list'].values()), list(range(day + 1, 0, -1)))
-        with patch('network_redirect.backend.time.time', return_value=start + 3600 + 4 * 86400):
+        with patch('network_redirect.game_clock.now', return_value=start + 3600 + 4 * 86400):
             before = self.amount(1807); self.data(self.call(1, 1))
             self.assertEqual(self.amount(1807) - before, 5)
             self.assertEqual(self.call(1, 1)[0][0], 55)
@@ -251,13 +251,13 @@ class YuanshiTests(ActivityCase):
 
     def test_threshold_and_any_recharge_reopens_previous_gift(self):
         self.charge(1); self.data(self.call(1, 1))
-        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 86400):
             self.charge(1); self.assertEqual(list(self.data(self.call())['gift_list'].values()), [1])
             self.charge(1); self.assertEqual(len(self.ys()['activated']), 1)
             self.charge(1); self.assertEqual(list(self.data(self.call())['gift_list'].values()), [1, 1])
             self.charge(2); self.assertEqual(len(self.ys()['activated']), 2)
         before = self.b.profile()
-        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 86400):
             self.charge(1, 'unique-charge-order')
             after = self.b.profile(); self.charge(1, 'unique-charge-order')
             self.assertEqual(after, self.b.profile())
@@ -351,11 +351,11 @@ class YuanshiTests(ActivityCase):
 
     def test_clock_rollback_season_reset_and_disabled(self):
         self.data(self.call(2)); before = self.b.profile()
-        with patch('network_redirect.backend.time.time', return_value=NOW - 1):
+        with patch('network_redirect.game_clock.now', return_value=NOW - 1):
             self.assertEqual(self.call(2)[0][0], 55)
         self.assertEqual(before, self.b.profile())
         end = self.ys()['end']
-        with patch('network_redirect.backend.time.time', return_value=end):
+        with patch('network_redirect.game_clock.now', return_value=end):
             d = self.data(self.call()); self.assertEqual((d['cur_progress'], d['free_times']), (0, 1))
         cfg = y.load_rules(); cfg['enabled'] = False
         with patch.object(y, 'load_rules', return_value=cfg):

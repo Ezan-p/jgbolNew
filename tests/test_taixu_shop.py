@@ -66,11 +66,11 @@ class TaixuShopTests(TaixuCase):
     def test_midnight_stale_views_cannot_buy_replacement(self):
         first = self.query(); self.fund(); old = self.b.profile()['activity']['undergo']['shop_token']
         midnight = ((NOW + 8*3600)//86400 + 1)*86400 - 8*3600
-        with patch('network_redirect.backend.time.time', return_value=midnight-1):
+        with patch('network_redirect.game_clock.now', return_value=midnight-1):
             self.ok(self.call(5, dict(index=1, count=first[1]['buy_times'], shop_token=old)))
             self.assertEqual(self.query()[1]['buy_times'], 0)
         before = self.b.profile()
-        with patch('network_redirect.backend.time.time', return_value=midnight):
+        with patch('network_redirect.game_clock.now', return_value=midnight):
             for data in (dict(index=1, count=1), dict(index=1, count=1, shop_token=old)):
                 self.assertEqual(self.call(5, data)[0][0], 55)
                 self.assertEqual(self.b.profile()['attachments'], before['attachments'])

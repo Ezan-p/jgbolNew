@@ -3,11 +3,11 @@
 The breakdown is derived output only. Never use cached panel/source attributes as
 inputs. Battle triggers and temporary scenario effects stay in combat_engine.
 """
+from . import game_clock
 from decimal import Decimal, ROUND_FLOOR, ROUND_HALF_UP
 import json
 from pathlib import Path
 import copy
-import time
 from . import summon
 
 STATS = ('hp', 'gongji', 'fangyu', 'magic')
@@ -209,7 +209,7 @@ def recalculate(role, rules, now=None):
     BASES, SKILLS, ITEMS, FATES = f.BASES, f.SKILLS, f.ITEMS, f.FATES
     BASE_COLUMNS, GROWTH_COLUMNS = f.BASE_COLUMNS, f.GROWTH_COLUMNS
     equip_effect, skill_effect, advance_worth = f.equip_effect, f.skill_effect, f.advance_worth
-    now = int(time.time()) if now is None else now
+    now = int(game_clock.now()) if now is None else now
     policy = dict(DEFAULT_POLICY, **rules.get('combat_power', {}))
     reports = {}
     pending = {}

@@ -16,7 +16,7 @@ class ConsumableTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        clock = patch('network_redirect.backend.time.time', return_value=NOW)
+        clock = patch('network_redirect.game_clock.now', return_value=NOW)
         clock.start()
         self.addCleanup(clock.stop)
         self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
@@ -261,7 +261,7 @@ class ConsumableTests(unittest.TestCase):
             self.assertNotIn(55, self.events)
             self.assertEqual(self.b.profile()[key+'_item_count'], before[key+'_item_count'])
             self.assertEqual(self.b.profile()[key+'_item_time'], NOW-60)
-            with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+            with patch('network_redirect.game_clock.now', return_value=NOW+86400):
                 self.use(tid, ident)
                 self.assertNotIn(55, self.events)
                 self.assertEqual(self.b.profile()[key+'_item_count'], 0)

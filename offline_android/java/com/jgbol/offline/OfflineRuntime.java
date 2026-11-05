@@ -31,6 +31,7 @@ public final class OfflineRuntime {
                     InputStream metadata = context.getAssets().open("offline/build.properties");
                     try { meta.load(metadata); } finally { metadata.close(); }
                     File files = context.getFilesDir();
+                    writeBootIdentity(context, files);
                     File program = extract(context, files, "program", meta.getProperty("program_sha256"));
                     File python = extract(context, files, "runtime", meta.getProperty("runtime_sha256"));
                     installClientOverlay(context, program, meta.getProperty("program_sha256"));
@@ -84,6 +85,34 @@ public final class OfflineRuntime {
             copy(source, output);
             return output.toString("UTF-8");
         } finally { source.close(); }
+    }
+
+    private static void writeBootIdentity(Context context, File files) throws IOException {
+        String identity = null;
+        try {
+            // Reflection keeps the shell compilable with the preserved old SDK.
+            Class<?> global = Class.forName("android.provider.Settings$Global");
+            int count = ((Integer) global.getMethod("getInt", android.content.ContentResolver.class,
+                    String.class).invoke(null, context.getContentResolver(), "boot_count")).intValue();
+            Class<?> secure = Class.forName("android.provider.Settings$Secure");
+            String device = (String) secure.getMethod("getString", android.content.ContentResolver.class,
+                    String.class).invoke(null, context.getContentResolver(), "android_id");
+            if (count >= 0 && device != null && !device.isEmpty()) {
+                identity = "device:" + device + ":count:" + count;
+            }
+        } catch (Exception unavailable) { /* Older Android or restricted provider. */ }
+        if (identity == null) {
+            try {
+                String kernel = read(new FileInputStream("/proc/sys/kernel/random/boot_id")).trim();
+                if (!kernel.isEmpty()) identity = "kernel:" + kernel;
+            } catch (IOException unavailable) { /* Conservatively discard process-offline gaps. */ }
+        }
+        if (identity == null) identity = "process:" + java.util.UUID.randomUUID().toString();
+        FileOutputStream output = new FileOutputStream(new File(files, "clock_boot_id"));
+        try {
+            output.write(identity.getBytes("UTF-8"));
+            output.getFD().sync();
+        } finally { output.close(); }
     }
 
     private static void copy(InputStream source, OutputStream output) throws IOException {

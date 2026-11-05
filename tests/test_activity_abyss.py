@@ -31,7 +31,7 @@ class AbyssTests(ActivityCase):
         self.ok(self.req(1039,des_type=2,des_id=ids[0]))
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.assertEqual(self.call(7,top_type=1),rank)
-        with patch('network_redirect.backend.time.time',return_value=NOW+3*86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+3*86400):
             advanced=self.call(7,top_type=1)
         self.assertGreater(advanced['top_data'][1]['layer'],rank['top_data'][1]['layer'])
         self.assertEqual(original,npc_players.catalog())
@@ -46,7 +46,7 @@ class AbyssTests(ActivityCase):
             with patch.object(abyss.secrets,'randbelow',side_effect=[roll,0]):
                 s=abyss.state(trial,NOW+300,r)
             self.assertEqual(s['bag'][0]['attach_type'],tid)
-        with patch('network_redirect.backend.time.time',return_value=NOW+4*86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+4*86400):
             self.call(10);s=self.b.profile()['activity']['abyss']
             self.assertLessEqual(len(s['bag']),4)
             self.assertEqual(sum(x['attach_count'] for x in s['bag']),576)
@@ -56,13 +56,13 @@ class AbyssTests(ActivityCase):
             self.call(10);self.assertEqual(s,self.b.profile()['activity']['abyss'])
 
     def test_double_expiry_partial_purchase_and_daily_statistics(self):
-        with patch('network_redirect.backend.time.time',return_value=NOW+150):self.call(14,buy_hour=1)
-        with patch('network_redirect.backend.time.time',return_value=NOW+3600):
+        with patch('network_redirect.game_clock.now',return_value=NOW+150):self.call(14,buy_hour=1)
+        with patch('network_redirect.game_clock.now',return_value=NOW+3600):
             self.call(9);s=self.b.profile()['activity']['abyss']
             r=self.b.activity_rules
             gain=abyss_balance.crystal_tick(self.b.profile(),s,r)
             self.assertEqual(s['crystals'],23*gain)  # no retroactive double first tick
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             stats=self.call(9)['day_record']
             midnight=((NOW+8*3600)//86400+1)*86400-8*3600
             expected=(NOW+86400-midnight)//300+1
@@ -76,7 +76,7 @@ class AbyssTests(ActivityCase):
         self.assertEqual(len(first_rows),self.b.activity_rules['abyss_shop_daily_count'])
         self.assertEqual(len({(x['object_type'],x['attach_type'],x['attach_count'],x['attach_level']) for x in first_rows}),6)
         self.assertEqual(first,self.call(13))
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             second=self.call(13)
         self.assertNotEqual(first['shop_day'],second['shop_day'])
         second_rows=list(second['shop_list'].values())
@@ -113,7 +113,7 @@ class AbyssTests(ActivityCase):
         self.assertEqual(before,self.b.profile())
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.assertEqual(self.call(16)['specter_info']['fight_boss_times'],5)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             result=self.call(6)  # Direct click from yesterday's exhausted panel.
             self.assertEqual(result['specter_info']['fight_boss_times'],1)
             self.assertEqual(self.b.profile()['activity']['abyss']['pills'],{'1':1501})
@@ -139,7 +139,7 @@ class AbyssTests(ActivityCase):
     def test_rank_mail_cross_day_exactly_once_and_complete_state(self):
         role=self.b.profile();s=role['activity']['abyss'];s.update(boss=81,complete=True,boss_count=5)
         self.b.save(role);self.assertEqual(self.call(7,top_type=1)['my_top']['order'],1)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.call(1);role=self.b.profile();s=role['activity']['abyss']
             self.assertEqual(s['boss_count'],0)
             mails=[m for k,m in role['welfare']['mails'].items() if k.startswith('abyss-rank-')]
@@ -154,7 +154,7 @@ class AbyssTests(ActivityCase):
             self.assertEqual(before,self.b.profile())
 
     def test_news_poll_drain_and_event_badge(self):
-        with patch('network_redirect.backend.time.time',return_value=NOW+3600):
+        with patch('network_redirect.game_clock.now',return_value=NOW+3600):
             packet=self.call(15)
             self.assertTrue(packet['new_list']);self.assertEqual(packet['specter_info']['event_count'],1)
             self.assertTrue(any(n['tip_type']==4 for n in packet['new_list'].values()))
@@ -164,7 +164,7 @@ class AbyssTests(ActivityCase):
     def test_expired_map_quick_mark_and_invalid_requests_atomic(self):
         role=self.b.profile();role['month_card_time']=NOW+100;summon.add_item(role,1431,1);self.b.save(role)
         self.call(3,op_type=1,type_id=1431);self.call(3,op_type=5,type_id=1431)
-        with patch('network_redirect.backend.time.time',return_value=NOW+101):
+        with patch('network_redirect.game_clock.now',return_value=NOW+101):
             self.assertFalse(self.call(3,op_type=1,type_id=1431)['event_data']['mark_flag'])
             before=self.b.profile()
             for op,data in ((7,dict(top_type=99)),(2,dict(des_area=81)),(14,dict(buy_hour=-1)),(17,dict(index=True,type_id=1501))):

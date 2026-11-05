@@ -90,7 +90,7 @@ class RecoveryBackendTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.clock = patch('network_redirect.backend.time.time', return_value=NOW).start()
+        self.clock = patch('network_redirect.game_clock.now', return_value=NOW).start()
         self.addCleanup(patch.stopall)
         self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
         self.addCleanup(lambda: self.b.close())

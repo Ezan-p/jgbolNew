@@ -94,12 +94,12 @@ class BabelHotupdateTests(ActivityCase):
         self.call();role=self.b.profile();s=role['activity']['babel']
         # Start in the next participation week, before its Thursday cutoff.
         monday=npc.start(s['week']+1,self.b.activity_rules)
-        with patch('network_redirect.backend.time.time',return_value=monday):
+        with patch('network_redirect.game_clock.now',return_value=monday):
             self.call();self.seed_tower(70)
         cutoff=monday+3*86400
-        with patch('network_redirect.backend.time.time',return_value=cutoff-1):
+        with patch('network_redirect.game_clock.now',return_value=cutoff-1):
             self.call();self.assertFalse(any(k.startswith('babel-stage-') for k in self.b.profile()['welfare'].get('mails',{})))
-        with patch('network_redirect.backend.time.time',return_value=cutoff):
+        with patch('network_redirect.game_clock.now',return_value=cutoff):
             self.call();role=self.b.profile();s=role['activity']['babel'];week=s['week']
             mails=role['welfare']['mails']
             for stage in (20,40,60,70):
@@ -112,9 +112,9 @@ class BabelHotupdateTests(ActivityCase):
             count=b.item_count(self.b.profile(),20000)
             self.req(1103,mail_id=mail['mail_id'],flag=1)
             self.assertEqual(count,b.item_count(self.b.profile(),20000))
-        with patch('network_redirect.backend.time.time',return_value=cutoff+86400):
+        with patch('network_redirect.game_clock.now',return_value=cutoff+86400):
             self.call();self.assertEqual(self.saved()['frozen_top'],frozen)
-        with patch('network_redirect.backend.time.time',return_value=monday+7*86400):
+        with patch('network_redirect.game_clock.now',return_value=monday+7*86400):
             self.call();self.assertEqual(self.saved()['history_floor'],1)
             self.assertEqual(self.saved()['last_top'],frozen)
             self.assertEqual(len([k for k in self.b.profile()['welfare']['mails'] if k.startswith('babel-stage-')]),4)
@@ -124,7 +124,7 @@ class BabelHotupdateTests(ActivityCase):
         self.call()
         self.assertEqual(self.saved()['frozen_mine']['history_floor'],1)
         monday=npc.start(self.saved()['week']+1,self.b.activity_rules)
-        with patch('network_redirect.backend.time.time',return_value=monday):self.call()
+        with patch('network_redirect.game_clock.now',return_value=monday):self.call()
         self.assertFalse(any(k.startswith('babel-stage-') for k in self.b.profile()['welfare'].get('mails',{})))
 
     def test_secret_ticket_entry_query_restart_and_invalid_requests(self):

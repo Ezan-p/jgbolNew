@@ -121,7 +121,7 @@ end
  def request(name,op,**d):
   global serial
   serial+=1
-  with patch('network_redirect.backend.time.time',return_value=fixture_now):replies=b.respond(encode(1301,dict(serial_num=serial,id=op,data=summon.lua(d))),dict(authenticated=True))
+  with patch('network_redirect.game_clock.now',return_value=fixture_now):replies=b.respond(encode(1301,dict(serial_num=serial,id=op,data=summon.lua(d))),dict(authenticated=True))
   lines.append('step('+summon.lua(name)+',function() guild_fixture_now='+str(fixture_now))
   capture=name in ('applications','leader_mute_list')
   if capture:lines.append("withOverride(CCMenuItemImage,'registerScriptTapHandler',function(item,fn) nativeTaps[debug.getinfo(fn,'S').linedefined]=fn end,function()")

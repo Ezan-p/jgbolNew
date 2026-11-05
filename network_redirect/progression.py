@@ -1,6 +1,6 @@
 """Role progression: original CSV/protocol [A], configurable missing balance [B]."""
+from . import game_clock
 import json
-import time
 from pathlib import Path
 
 from . import formation, summon
@@ -67,7 +67,7 @@ def day(now, r):
 
 def prepare(role, now=None, r=None):
     r = r or load_rules()
-    now = int(time.time()) if now is None else now
+    now = int(game_clock.now()) if now is None else now
     level = role['level']
     formation.require(type(level) is int and level in formation.LEVELS, '主角等级无效')
     role.setdefault('cur_exp', 0)
@@ -109,7 +109,7 @@ def add_exp(role, amount, now=None, r=None):
 def strength_bonus(role, consumed, now=None, r=None):
     """Return eligible points and percent; count each attempted point, including losses."""
     r = r or load_rules()
-    now = int(time.time()) if now is None else now
+    now = int(game_clock.now()) if now is None else now
     s = prepare(role, now, r)
     eligible = 0
     if (0 <= day(now, r) - s['start_day'] < r['newbie_days']

@@ -423,6 +423,11 @@ def battle(role,req,now,r,jrules,frules):
 def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     from . import feature_levels
     feature_levels.check(role, mid, req)
+    # Babel state() owns migration, daily recovery and weekly settlement.
+    # Do not prepare unrelated activities or peer boards for each map step.
+    if mid == 1353:
+        from . import activity_babel
+        return activity_babel.settle(role,req,now,r,jrules,parse)
     s=prepare(role,now,r,peers)
     if mid==1346:
         from . import activity_save_monkey
@@ -528,9 +533,6 @@ def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     if mid==1349:
         from . import activity_undergo
         return activity_undergo.settle(role,req,now,r,jrules,frules,parse)
-    if mid==1353:
-        from . import activity_babel
-        return activity_babel.settle(role,req,now,r,jrules,parse)
     if mid==1205:
         from . import activity_rulai
         return [activity_rulai.sync(role,now), statuses(role,now,r,req['flag'],peers)]

@@ -117,7 +117,7 @@ class PavilionTests(ActivityCase):
         self.assertEqual(self.call(2, index=10, count=1)[0][0], 55)
         self.assertEqual(self.b.profile(), old)
         self.assertEqual(self.call(2, index=11, count=1)[0][0], 55)
-        with patch('network_redirect.backend.time.time', return_value=old['pavilion']['end']):
+        with patch('network_redirect.game_clock.now', return_value=old['pavilion']['end']):
             row = self.data(self.call())['exchange_info'][10]
             self.assertEqual((row['left_buy_count'], row['state']), (3, 1))
             self.stock((1141, 150))
@@ -162,7 +162,7 @@ class PavilionTests(ActivityCase):
         self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
         self.data(self.call())
         self.assertEqual(self.b.profile()['pavilion'], before['pavilion'])
-        with patch('network_redirect.backend.time.time', return_value=before['pavilion']['end']):
+        with patch('network_redirect.game_clock.now', return_value=before['pavilion']['end']):
             data = self.data(self.call())
             self.assertEqual((data['exchange_info'][10]['left_buy_count'],
                               data['exchange_info'][10]['state']), (3, 1))
@@ -321,7 +321,7 @@ class PavilionTests(ActivityCase):
         self.b.close(); self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.assertEqual(self.b.profile(),before)
         end=before['pavilion']['end']
-        with patch('network_redirect.backend.time.time',return_value=end):
+        with patch('network_redirect.game_clock.now',return_value=end):
             d=self.data(self.call())
             self.assertEqual(d['exchange_info'][3]['left_buy_count'],1)
             self.assertFalse(d['had_prize']); self.assertEqual(d['charge_money'],0)
@@ -343,7 +343,7 @@ class PavilionTests(ActivityCase):
         self.data(self.call(3,index=4))
         self.assertEqual(self.b.profile()['pavilion']['charge_gold'],0)
         end=self.b.profile()['pavilion']['end']
-        with patch('network_redirect.backend.time.time',return_value=end):
+        with patch('network_redirect.game_clock.now',return_value=end):
             self.assertFalse(self.data(self.call())['had_prize'])
 
     def refunds(self):
@@ -356,9 +356,9 @@ class PavilionTests(ActivityCase):
         for i in range(1, 5): self.data(self.call(3, index=i))
         old = self.b.profile(); end = old['pavilion']['end']
         self.assertEqual(end - old['pavilion']['start'], 14 * 86400)
-        with patch('network_redirect.backend.time.time', return_value=end - 1):
+        with patch('network_redirect.game_clock.now', return_value=end - 1):
             self.assertEqual(self.data(self.call())['charge_money'], 1000)
-        with patch('network_redirect.backend.time.time', return_value=end):
+        with patch('network_redirect.game_clock.now', return_value=end):
             d = self.data(self.call())
             self.assertEqual((d['begin_time'], d['end_time']), (end, end + 14 * 86400))
             self.assertEqual(d['charge_money'], 0)
@@ -387,7 +387,7 @@ class PavilionTests(ActivityCase):
         system_mail.deliver(role, key='mixed-bricks', title='混合附件', body='测试',
                             prizes=[[5, 1141, 3, 1], [5, 1001, 4, 1]], now=NOW, rules=self.b.welfare_rules)
         self.b.save(role)
-        with patch('network_redirect.backend.time.time', return_value=role['pavilion']['end'] + 42 * 86400):
+        with patch('network_redirect.game_clock.now', return_value=role['pavilion']['end'] + 42 * 86400):
             self.data(self.call())
             refund = self.refunds()[0]
             self.assertEqual(refund['prizes'], [[5, 1001, 1360, 1]])
@@ -408,7 +408,7 @@ class PavilionTests(ActivityCase):
         self.charge()
         role = self.b.profile()
         m = next(m for k, m in role['welfare']['mails'].items() if k.startswith('pavilion-charge-'))
-        with patch('network_redirect.backend.time.time', return_value=role['pavilion']['end']):
+        with patch('network_redirect.game_clock.now', return_value=role['pavilion']['end']):
             self.ok(self.req(1103, mail_id=m['mail_id']))
             self.assertEqual(self.amount(1141), 0)
             self.assertEqual(self.b.profile()['pavilion']['charge_gold'], 0)
@@ -418,13 +418,13 @@ class PavilionTests(ActivityCase):
         self.charge()
         role = self.b.profile(); end = role['pavilion']['end']
         m = next(m for k, m in role['welfare']['mails'].items() if k.startswith('pavilion-charge-'))
-        with patch('network_redirect.backend.time.time', return_value=end):
+        with patch('network_redirect.game_clock.now', return_value=end):
             events = self.req(1102, mail_id=m['mail_id'], flag=0)
             self.ok(events)
             self.assertEqual(next(d for e, d in events if e == 14)['attach_count'], 0)
             self.assertEqual(len(self.refunds()), 1)
             self.stock((1141, 9))
-        with patch('network_redirect.backend.time.time', return_value=end + 14 * 86400):
+        with patch('network_redirect.game_clock.now', return_value=end + 14 * 86400):
             replies = self.b.respond(encode(2999, {}), self.state)
             self.assertEqual(decode(replies[0])[0], 2999)
             self.assertEqual(self.amount(1141), 0)
@@ -434,7 +434,7 @@ class PavilionTests(ActivityCase):
     def test_recharge_at_boundary_settles_old_mail_before_new_principal(self):
         self.charge('period-old')
         end = self.b.profile()['pavilion']['end']
-        with patch('network_redirect.backend.time.time', return_value=end):
+        with patch('network_redirect.game_clock.now', return_value=end):
             self.charge('period-new')
             self.assertEqual(self.b.profile()['pavilion']['charge_gold'], 10000)
             self.assertEqual(self.b.profile()['pavilion']['bricks_earned'], 1350)
@@ -463,7 +463,7 @@ class PavilionTests(ActivityCase):
     def test_rollover_mail_and_encoding_failure_leave_no_partial_conversion(self):
         self.charge(); self.stock((1141, 10))
         old = self.b.profile()
-        with patch('network_redirect.backend.time.time', return_value=old['pavilion']['end']):
+        with patch('network_redirect.game_clock.now', return_value=old['pavilion']['end']):
             old = self.b.profile()  # Unrelated achievement daily migration precedes the transaction.
             with patch.object(p, 'mail', side_effect=formation.Rejected('mail failed')):
                 self.assertEqual(self.call()[0][0], 55)
@@ -476,7 +476,7 @@ class PavilionTests(ActivityCase):
 
     def test_empty_rollover_does_not_send_empty_refund(self):
         role = self.b.profile()
-        with patch('network_redirect.backend.time.time', return_value=role['pavilion']['end']):
+        with patch('network_redirect.game_clock.now', return_value=role['pavilion']['end']):
             self.data(self.call())
             self.assertFalse(self.refunds())
 

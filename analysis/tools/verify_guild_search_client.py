@@ -23,7 +23,7 @@ from verify_guild_client import LUA_EVALUATOR
 
 
 def fixtures():
-    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time',return_value=1792728000):
+    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.game_clock.now',return_value=1792728000):
         b=Backend(Path(tmp),18790,lambda *a,**k:None)
         try:
             role=b.profile();role.update(level=50,gold_coin=100000);b.save(role)

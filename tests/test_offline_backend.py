@@ -324,5 +324,13 @@ class TLSAndWireTests(unittest.IsolatedAsyncioTestCase):
         response = header + await reader.readexactly(size - 10)
         self.assertEqual(decode(response)[0], 3002)
         self.assertEqual(decode(response)[2]['server_ip'], '127.0.0.1')
+        timing = next(e for e in self.events if e['kind'] == 'game_request_timing')
+        self.assertEqual(timing['status'], 'ok')
+        self.assertEqual(timing['response_count'], 1)
+        self.assertEqual(timing['request_bytes'], len(packet))
+        self.assertGreaterEqual(timing['total_ms'], timing['respond_ms'])
+        self.assertGreaterEqual(timing['receive_ms'], 0)
+        self.assertTrue(any(e.get('request_id') == timing['request_id']
+                            for e in self.events if e['kind'] == 'game_response'))
         writer.close()
         await writer.wait_closed()

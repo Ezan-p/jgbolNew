@@ -24,17 +24,17 @@ class ActivityUnlockRewardTests(ActivityCase):
 
     def test_fish_daily_gifts_start_on_unlock_without_backfill(self):
         for offset in (0, 86400, 2 * 86400):
-            with patch('network_redirect.backend.time.time', return_value=NOW + offset):
+            with patch('network_redirect.game_clock.now', return_value=NOW + offset):
                 self.b.bootstrap()
                 self.ok(self.req(1205, flag=0))
                 self.ok(self.req(1205, flag=0))
                 self.assertEqual(self.count(1026), 0)
                 self.assertEqual(self.b.profile()['activity']['seasonal']['fish']['gift_day'], -1)
-        with patch('network_redirect.backend.time.time', return_value=NOW + 2 * 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 2 * 86400):
             self.set_level(20)
             self.ok(self.req(1205, flag=0)); self.ok(self.req(1205, flag=0))
             self.assertEqual(self.count(1026), self.b.activity_rules['fish_daily_nets'])
-        with patch('network_redirect.backend.time.time', return_value=NOW + 3 * 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 3 * 86400):
             self.ok(self.req(1205, flag=0))
             self.assertEqual(self.count(1026), 2 * self.b.activity_rules['fish_daily_nets'])
 
@@ -83,7 +83,7 @@ class ActivityUnlockRewardTests(ActivityCase):
     def test_free_attempts_and_yuanshi_shop_do_not_accrue_before_unlock(self):
         self.charge(102, 'locked-before-days-pass')
         for offset in (0, 2 * 86400):
-            with patch('network_redirect.backend.time.time', return_value=NOW + offset):
+            with patch('network_redirect.game_clock.now', return_value=NOW + offset):
                 self.ok(self.req(1205, flag=0))
                 for mid, args in ((1309, dict(id=1, data='{}')),
                                   (1334, dict(flag=0, index=0)),
@@ -93,7 +93,7 @@ class ActivityUnlockRewardTests(ActivityCase):
                     self.assertEqual(self.b.profile(), before)
                 self.assertNotIn('nine_sky', self.b.profile()['activity'])
                 self.assertNotIn('yuanshi', self.b.profile()['activity'])
-        with patch('network_redirect.backend.time.time', return_value=NOW + 2 * 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 2 * 86400):
             self.set_level(20)
             self.ok(self.req(1309, id=1, data='{}'))
             self.ok(self.req(1334, flag=0, index=0))

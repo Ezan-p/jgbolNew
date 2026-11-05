@@ -22,7 +22,7 @@ class FeatureLevelTests(unittest.TestCase):
         self.b = Backend(Path(directory.name), 18770, lambda *a, **k: None)
         self.addCleanup(self.b.close)
         self.serial = 10000
-        clock = patch('network_redirect.backend.time.time', return_value=NOW)
+        clock = patch('network_redirect.game_clock.now', return_value=NOW)
         clock.start()
         self.addCleanup(clock.stop)
 

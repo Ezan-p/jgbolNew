@@ -37,13 +37,13 @@ def main():
             serial+=1
             payload=dict(id=op,data=summon.lua(data)) if mid==1329 else data
             packet=encode(mid,dict(serial_num=serial,**payload))
-            with patch('network_redirect.backend.time.time',return_value=now):raw=b.respond(packet,dict(authenticated=True))
+            with patch('network_redirect.game_clock.now',return_value=now):raw=b.respond(packet,dict(authenticated=True))
             decoded=list(map(decode,raw))
             events=[(d['id'],login_fields(d['data'])) for mid,_,d in decoded if mid==2998]
             assert not any(i==55 for i,d in events),(mid,op,data,events)
             # Exact retransmission must not spend resources or grant rewards twice.
             before=b.profile()
-            with patch('network_redirect.backend.time.time',return_value=now):again=b.respond(packet,dict(authenticated=True))
+            with patch('network_redirect.game_clock.now',return_value=now):again=b.respond(packet,dict(authenticated=True))
             assert again==raw and b.profile()==before
             return next((d for i,d in events if i==173 and d['flag']==op),None),decoded
         def count(tid):

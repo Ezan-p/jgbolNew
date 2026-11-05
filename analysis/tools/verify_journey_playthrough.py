@@ -19,7 +19,7 @@ def main():
     trace = []
     session = dict(authenticated=True)
     key = max(npc_players.catalog(), key=lambda k: npc_players.catalog()[k]['profile']['role_combat_power'])
-    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time', return_value=now) as clock:
+    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.game_clock.now', return_value=now) as clock:
         backend = Backend(Path(tmp), 18770, lambda *a, **k: None)
         role = backend.profile()
         identity = role['role_id']

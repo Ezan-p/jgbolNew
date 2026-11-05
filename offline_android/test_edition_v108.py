@@ -166,7 +166,8 @@ def initialize(backend, now):
         # a partial starter or lose the one-time migration marker.
         directory = Path(backend.db.execute('PRAGMA database_list').fetchone()[2]).parent
         with tempfile.TemporaryDirectory(prefix='seed108-', dir=directory) as tmp:
-            scratch = Backend(Path(tmp), backend.port, lambda *a, **k: None, account=ACCOUNT)
+            scratch = Backend(Path(tmp), backend.port, lambda *a, **k: None, account=ACCOUNT,
+                              clock=backend.clock)
             try:
                 role = build_role(scratch, now)
                 grant(role)
@@ -181,7 +182,7 @@ def initialize(backend, now):
 
 
 def fixed_accounts_class():
-    import time
+    from network_redirect import game_clock
     from network_redirect.accounts import Accounts
     from network_redirect.backend import Backend
     from network_redirect.protocol import encode
@@ -204,7 +205,8 @@ def fixed_accounts_class():
         def __init__(self, directory, port, emit):
             super().__init__(directory, port, emit)
             fixed = TestBackend(directory, port, emit, account=ACCOUNT)
-            initialize(fixed, int(time.time()))
+            with game_clock.scope(fixed.clock) as now:
+                initialize(fixed, now)
             self.backends[ACCOUNT] = fixed
 
         def authenticate(self, data, remembered=''):

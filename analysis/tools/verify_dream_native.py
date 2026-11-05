@@ -17,7 +17,7 @@ from observability.collector import processes
 
 def fixture():
     now=1793620800
-    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time',return_value=now):
+    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.game_clock.now',return_value=now):
         b=Backend(Path(tmp),18770,lambda *a,**k:None)
         try:
             role=b.profile();role['level']=60

@@ -192,7 +192,7 @@ class RapeTests(ActivityCase):
         self.board();r=self.b.profile();r.update(gold_coin=0,energy=0);self.b.save(r);before=self.b.profile()
         self.assertIn(55,[e for e,d in self.req(1029,flag=3)]);self.assertEqual(before,self.b.profile())
         self.assertIn(55,[e for e,d in self.req(1072)]);self.assertEqual(before,self.b.profile())
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.board();self.assertEqual(self.b.profile()['activity']['rape_refreshes'],0)
         for level in (8,25,60,99):
             r['level']=level
@@ -215,7 +215,7 @@ class RapeTests(ActivityCase):
         with patch('network_redirect.activity_rape.journey.battle',return_value=(4,[],[])):
             self.ok(self.fight(1,ident))
         key,target=next(iter(self.b.profile()['activity']['rape_revenge'].items()))
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.board();before=self.b.profile()
             self.assertIn(55,[e for e,d in self.fight(0,key,12,target['skill_type'])]);self.assertEqual(before,self.b.profile())
         r=self.b.profile();r.update(level=7,vip_level=5);self.b.save(r);before=self.b.profile()
@@ -348,7 +348,7 @@ class RapeTests(ActivityCase):
         with patch.object(rape.journey,'battle',return_value=(1,[],[])):self.ok(self.req(1072))
         self.ok(self.req(1029,flag=4))
         self.assertEqual(self.b.profile()['daily']['points']['3'],10)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.board()
             self.assertEqual(self.b.profile()['daily']['points'].get('3',0),0)
             self.assertEqual(self.b.profile()['activity']['rape_total_refreshes'],0)

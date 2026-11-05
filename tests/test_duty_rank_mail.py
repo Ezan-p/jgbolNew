@@ -34,7 +34,7 @@ class DutyRankMailTests(ActivityCase):
     def test_activity_rollover_announces_mail_without_crediting_gold(self):
         today = self.seed()
         before = self.b.profile()['gold_coin']
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             events = self.req(1049, query_type=4)
             self.ok(events); self.assert_announced(events)
             mail = self.mails()[f'duty-rank-{today}']
@@ -51,7 +51,7 @@ class DutyRankMailTests(ActivityCase):
 
     def test_heartbeat_announces_even_if_daily_hint_already_rolled_over(self):
         self.seed()
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             role = self.b.profile(); daily.prepare(role, NOW+86400, self.b.daily_rules); self.b.save(role)
             packets = self.b.respond(encode(2999, {}), self.state)
             self.assert_announced(self.events(packets))
@@ -62,7 +62,7 @@ class DutyRankMailTests(ActivityCase):
     def test_bootstrap_delivers_all_played_days_and_reconnect_keeps_mail_ids(self):
         today = duty.day(NOW, self.b.activity_rules)
         self.seed([today-4, today-2, today])
-        with patch('network_redirect.backend.time.time', return_value=NOW+7*86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+7*86400):
             self.assert_announced(self.events(self.b.bootstrap()))
             before = self.mails()
             self.assertEqual(set(before), {f'duty-rank-{d}' for d in (today-4, today-2, today)})
@@ -73,11 +73,11 @@ class DutyRankMailTests(ActivityCase):
 
     def test_native_read_claim_persist_replay_and_late_claim(self):
         self.seed()
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             self.ok(self.req(1043, flag=1))
         mail = next(iter(self.mails().values()))
         self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
-        with patch('network_redirect.backend.time.time', return_value=NOW+365*86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+365*86400):
             packets = self.b.respond(encode(1102, dict(serial_num=0, mail_id=mail['mail_id'], flag=0)), self.state)
             content = next(data for event, data in self.events(packets) if event == 14)
             self.assertEqual(content['attach_count'], 1)
@@ -97,7 +97,7 @@ class DutyRankMailTests(ActivityCase):
 
     def test_claim_encoder_failure_keeps_attachment_claimable(self):
         self.seed()
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             self.ok(self.req(1043, flag=1))
             mail = next(iter(self.mails().values()))
             before = self.b.profile()['gold_coin']
@@ -114,14 +114,14 @@ class DutyRankMailTests(ActivityCase):
         role['activity']['duty_meta']['settled'][str(today)] = dict(group=8, rank=1, gold=700)
         role['gold_coin'] += 700
         self.b.save(role)
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             self.ok(self.req(1043, flag=1))
         self.assertFalse(self.mails())
         self.assertEqual(self.b.profile()['gold_coin'], role['gold_coin'])
 
     def test_later_anniversary_mail_does_not_shadow_duty_attachment(self):
         self.seed()
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             self.ok(self.req(1043, flag=1))
             role = self.b.profile(); state = role['welfare']
             mail = next(iter(self.mails().values()))
@@ -148,6 +148,6 @@ class DutyRankMailTests(ActivityCase):
         self.assertEqual(role['activity']['duty_meta']['settled'][str(today)]['rank'], 21)
         self.assertFalse(any(k.startswith('duty-rank-') for k in role.get('welfare', {}).get('mails', {})))
         self.b.save(role)
-        with patch('network_redirect.backend.time.time', return_value=NOW+3*86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+3*86400):
             self.ok(self.req(1043, flag=1))
         self.assertFalse(self.mails())

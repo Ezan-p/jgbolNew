@@ -309,6 +309,11 @@ def shop(s):
                 my_exchange=[s['purchases'].get(str(i),0) for i in range(1,7)])
 
 
+def floor_reward_weight(spec, secret=False):
+    # [B] Normal tower: fruit weight 1 vs 7 per other entry (56–60: 2%).
+    return 1 if secret or spec[:2] == [5, 1246] else 7
+
+
 def floor_reward(role, s, r):
     secret = s.get('secret', False)
     pool = next(x for x in (SECRET_FLOORS if secret else FLOORS)
@@ -321,6 +326,8 @@ def floor_reward(role, s, r):
         if len(spec) == 3:
             spec.append(1)
         specs.append(spec)
+    if not secret and any(spec[:2] == [5, 1246] for spec in specs):
+        specs = [spec for spec in specs for _ in range(floor_reward_weight(spec))]
     reward = a.prizes(role, [secrets.choice(specs)])
     if secret:
         return reward

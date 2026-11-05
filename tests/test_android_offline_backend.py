@@ -46,6 +46,8 @@ class PayloadTests(unittest.TestCase):
             self.assertIn(entry['source_file'], files)
 
     def test_packed_program_boots_in_isolation_and_has_no_player_data(self):
+        from network_redirect import activity_rank
+        expected_power = activity_rank.catalog()[930001]['role']['role_combat_power']
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             archive = root / 'payload.zip'
@@ -67,12 +69,13 @@ assert len(npc_players.catalog()) > 1700
 assert npc_players.get(next(iter(npc_players.catalog()))) is not None
 from network_redirect import activity_rank
 assert len(activity_rank.catalog()) == 500
-assert activity_rank.catalog()[930001]['role']['role_combat_power'] == 45077041
+assert activity_rank.catalog()[930001]['role']['role_combat_power'] == int(sys.argv[3])
 import network_redirect.system_mail
 stop()
 assert pathlib.Path(sys.argv[2], 'save/game.sqlite3').is_file()
+assert pathlib.Path(sys.argv[2], 'save/clock.sqlite3').is_file()
 '''
-            result = subprocess.run([sys.executable, '-I', '-c', script, str(program), str(root / 'files')],
+            result = subprocess.run([sys.executable, '-I', '-c', script, str(program), str(root / 'files'), str(expected_power)],
                                     cwd=tmp, capture_output=True, text=True, timeout=60)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertFalse(list(program.rglob('*.sqlite3')))

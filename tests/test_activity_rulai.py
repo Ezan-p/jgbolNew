@@ -197,13 +197,13 @@ class RulaiTests(ActivityCase):
 
     def test_cross_day_season_reset_disabled_bags_and_clock_rollback(self):
         self.charge(4);self.result(self.call(2));before=self.b.profile()
-        with patch('network_redirect.backend.time.time',return_value=NOW-1):
+        with patch('network_redirect.game_clock.now',return_value=NOW-1):
             self.assertEqual(self.call(1)[0][0],55)
         self.assertEqual(before,self.b.profile())
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.assertEqual(self.result(self.call())['pack_data']['cur_count'],16)
         end=self.b.profile()['activity']['rulai']['end']
-        with patch('network_redirect.backend.time.time',return_value=end+1):
+        with patch('network_redirect.game_clock.now',return_value=end+1):
             d=self.result(self.call())['pack_data'];self.assertEqual((d['cur_count'],d['order_pay']),(0,0))
             self.assertEqual(d['ext_info']['prize_flag'],1)
         role=self.b.profile();bag=next(i for i in role['attachments'] if i['type_id']==1368)
@@ -235,7 +235,7 @@ class RulaiTests(ActivityCase):
         try:
             self.assertEqual(r.state(other.profile(),NOW,r.load_rules())['charge_gold'],0)
         finally:other.close()
-        with patch('network_redirect.backend.time.time',return_value=end+1):
+        with patch('network_redirect.game_clock.now',return_value=end+1):
             packets=self.b.respond(encode(2999,{}),self.state)
             updates=[login_fields(d['data']) for mid,_,d in map(decode,packets) if mid==2998 and d['id']==80]
             current=next(d['local_rulai'] for d in updates if 'local_rulai' in d)

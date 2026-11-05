@@ -206,7 +206,7 @@ class LandTowerTests(ActivityCase):
 
     def test_tower_detail_preserves_tower_id_for_attack_request(self):
         when=NOW+8*3600
-        with patch('network_redirect.backend.time.time',return_value=when):
+        with patch('network_redirect.game_clock.now',return_value=when):
             self.ok(self.land(1))
             detail=self.land(11,tower_id=14)[-1][1]['tower_info']
             self.assertEqual(detail['tower_id'],14)

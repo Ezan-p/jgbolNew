@@ -95,7 +95,7 @@ class HomeTests(ActivityCase):
         self.assertEqual(len(board['rank_data']),11)
         before=self.b.profile();s=before['activity']['home']
         expected=next(row['order'] for row in w.rank(before,s,NOW,self.b.activity_rules,final=True) if not row['is_npc'])
-        with patch('network_redirect.backend.time.time',return_value=NOW+8*86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+8*86400):
             self.assertEqual(self.home(24,flag=1)['all_activity'][68]['role_exp'],0)
             mails=[m for key,m in self.b.profile()['welfare']['mails'].items() if key.startswith('home-race-')]
             self.assertEqual(len(mails),1);self.assertEqual(mails[0]['prizes'][0][2],w.rules()['race_gold'][expected-1])
@@ -105,7 +105,7 @@ class HomeTests(ActivityCase):
             gold=self.b.profile()['gold_coin']
             self.req(1102,mail_id=mails[0]['mail_id'],flag=1)
             self.assertEqual(self.b.profile()['gold_coin'],gold)
-        with patch('network_redirect.backend.time.time',return_value=NOW+30*86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+30*86400):
             self.home(1)
             self.assertEqual(len([k for k in self.b.profile()['welfare']['mails'] if k.startswith('home-race-')]),1)
 
@@ -113,7 +113,7 @@ class HomeTests(ActivityCase):
         r=self.prepared();r['activity']['home']['build']['4']=1;self.b.save(r)
         self.rejected(20,train_type=1,consume_type=3,use_count=1000)
         self.home(20,train_type=1,consume_type=1,use_count=10)
-        with patch('network_redirect.backend.time.time',return_value=NOW-86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW-86400):
             self.rejected(20,train_type=1,consume_type=1,use_count=1)
         self.assertEqual(self.b.profile()['activity']['home']['welfare']['race_exp'],2000)
 
@@ -133,7 +133,7 @@ class HomeTests(ActivityCase):
             self.assertEqual(count(after)-count(before),delta)
         self.rejected(15,shop_page=1,item_index=2,buy_count=1)
         self.assertEqual(self.home(14,flush_flag=True)['shop_data'][1][2]['limit'],0)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.assertEqual(self.home(14)['shop_data'][1][2]['limit'],10)
 
     def test_shop_removal_preserves_legacy_purchase_keys(self):

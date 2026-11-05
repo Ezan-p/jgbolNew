@@ -1,7 +1,7 @@
 """Original wakeUI/CSV contracts; configurable local server decisions [B]."""
+from . import game_clock
 from fractions import Fraction
 import secrets
-import time
 from decimal import Decimal
 from . import formation as f, summon, reborn as r
 
@@ -34,7 +34,7 @@ def grant(role, t, n=1, level=1):
 
 def divination(role, req, rules, parse, now=None):
     f.require(role['level'] >= rules['divination_min_level'], '占星尚未开放')
-    now = time.time() if now is None else now
+    now = game_clock.now() if now is None else now
     day = int((now + 8 * 3600) // 86400)
     from . import vip
     free_limit = vip.limit(role, vip.DIVINATION, rules['daily_divinations'])

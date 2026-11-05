@@ -75,7 +75,7 @@ end
  start=monument.client_config(int(time.time()),b.monument_rules)['begin_fight_time']
  for label,offset in (('king_phase',21*3600),('paid_phase',23*3600+1)):
   at=start+offset
-  with patch('network_redirect.backend.time.time',return_value=at):
+  with patch('network_redirect.game_clock.now',return_value=at):
    request(label,1232,'ms.d_time.getTime=function() return '+str(at)+' end')
  lines.append("step('restore_time',function() ms.d_time.getTime=saved.time end)")
 

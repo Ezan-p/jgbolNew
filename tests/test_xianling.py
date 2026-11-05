@@ -16,7 +16,7 @@ class XianlingTests(unittest.TestCase):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         self.b=Backend(Path(self.tmp.name),18790,lambda *a,**k:None);self.addCleanup(lambda:self.b.close())
         self.serial=1000
-        c=patch('network_redirect.backend.time.time',return_value=NOW);c.start();self.addCleanup(c.stop)
+        c=patch('network_redirect.game_clock.now',return_value=NOW);c.start();self.addCleanup(c.stop)
     def req(self,flag=4,index=0,count=0,mid=1336,**kw):
         self.serial+=1
         self.packet=encode(mid,dict(serial_num=self.serial,flag=flag,index=index,count=count,**kw))
@@ -52,7 +52,7 @@ class XianlingTests(unittest.TestCase):
         self.assertEqual(self.req(3,1,1)[-1][0],55)
         self.charge();self.assertEqual(next(d for event,d in self.req() if event==185)['canbuy_count'],1)
         self.req(3,1,1);self.assertEqual(self.req(3,1,1)[-1][0],55)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.assertEqual(next(d for event,d in self.req() if event==185)['canbuy_count'],2)
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):self.assertEqual(next(d for event,d in self.req() if event==185)['canbuy_count'],2)
     def test_monthly_charge_claim_all_and_restart(self):
         self.charge(product=4)
         d=next(d for event,d in self.req() if event==185);self.assertEqual(d['month_charge'],5000);self.assertEqual(list(d['take_list'].values()),[2]*4)
@@ -66,8 +66,8 @@ class XianlingTests(unittest.TestCase):
     def test_month_boundaries_and_replayed_old_order(self):
         self.charge(product=4);self.req(2,1,1)
         nov=int(datetime(2026,11,1,tzinfo=timezone(timedelta(hours=8))).timestamp())
-        with patch('network_redirect.backend.time.time',return_value=nov-1):self.assertEqual(next(d for event,d in self.req() if event==185)['month_charge'],5000)
-        with patch('network_redirect.backend.time.time',return_value=nov):
+        with patch('network_redirect.game_clock.now',return_value=nov-1):self.assertEqual(next(d for event,d in self.req() if event==185)['month_charge'],5000)
+        with patch('network_redirect.game_clock.now',return_value=nov):
             self.charge(product=4);d=next(d for event,d in self.req() if event==185);self.assertEqual(d['month_charge'],0);self.assertEqual(list(d['take_list'].values()),[1]*4)
             self.charge('nov-order-01');self.assertEqual(next(d for event,d in self.req() if event==185)['month_charge'],100)
             self.req(2,1,1);self.assertEqual(self.item(1140),40)

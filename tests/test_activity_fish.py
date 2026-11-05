@@ -130,7 +130,7 @@ class FishTests(ActivityCase):
         high=[x for x in self.b.activity_rules['fish_shop'] if x['tier']=='high']
         ticket=0
         for idx,expected in enumerate(high):
-            with patch('network_redirect.backend.time.time',return_value=NOW+idx*86400), \
+            with patch('network_redirect.game_clock.now',return_value=NOW+idx*86400), \
                  patch.object(fish,'randbelow',side_effect=[0,0,0,0,ticket]):self.status()
             self.rich();row=self.fishing()['shop'][4];typ,tid,n,_=row['reward'];before=self.b.profile()
             self.assertEqual(row,expected)
@@ -153,9 +153,9 @@ class FishTests(ActivityCase):
         data=self.status();self.rich();row=self.fishing()['shop'][0]
         self.ok(self.req(1208,count=1,type_id=row['reward'][1]));old=self.fishing()
         deadline=data['next_daily_refresh']
-        with patch('network_redirect.backend.time.time',return_value=deadline-1):self.status()
+        with patch('network_redirect.game_clock.now',return_value=deadline-1):self.status()
         self.assertEqual(old,self.fishing())
-        with patch('network_redirect.backend.time.time',return_value=deadline):
+        with patch('network_redirect.game_clock.now',return_value=deadline):
             before=self.b.profile()
             self.assertEqual(self.req(1208,count=1,type_id=row['reward'][1])[0][0],55)
             self.assertEqual(before,self.b.profile())
@@ -170,17 +170,17 @@ class FishTests(ActivityCase):
         self.ok(self.req(1208,count=10,type_id=0))
         self.ok(self.req(1208,count=1,type_id=self.fishing()['shop'][0]['reward'][1]))
         deadline=data['next_weekly_refresh'];old=self.fishing()
-        with patch('network_redirect.backend.time.time',return_value=deadline-1):self.status()
+        with patch('network_redirect.game_clock.now',return_value=deadline-1):self.status()
         self.assertEqual(self.fishing()['weekly_casts'],10)
         before=self.count(1027);nets=self.count(1026)
-        with patch('network_redirect.backend.time.time',return_value=deadline):
+        with patch('network_redirect.game_clock.now',return_value=deadline):
             new=self.status();self.assertEqual(new['weekly_casts'],0)
             self.assertEqual(new['weekly_koi'],0);self.assertEqual(new['weekly_exchanges'],0)
             self.assertEqual(self.fishing()['news'],[]);self.assertEqual(self.count(1027),0)
             mails=self.recycle_mails();self.assertEqual(len(mails),1)
             self.assertEqual(mails[0]['prizes'],[[5,1001,before,1]])
             self.assertEqual(self.count(1026),nets+3)
-        with patch('network_redirect.backend.time.time',return_value=deadline+28*86400):self.status()
+        with patch('network_redirect.game_clock.now',return_value=deadline+28*86400):self.status()
         self.assertEqual(self.count(1026),nets+6)  # Missed days do not accumulate gifts.
         self.assertGreater(self.fishing()['week'],old['week'])
         self.assertEqual(len(self.recycle_mails()),1)
@@ -205,7 +205,7 @@ class FishTests(ActivityCase):
         expected={1007:(1,5,3),1343:(1,5,1),1024:(1,5,3),1042:(1,5,1),
                   1032:(1,3,3),1031:(1,5,1),1310:(5,5,10),1311:(5,5,10),1312:(5,5,10)}
         for idx,(tid,(quantity,cost,limit)) in enumerate(expected.items()):
-            with patch('network_redirect.backend.time.time',return_value=NOW+idx*86400), patch.object(fish,'randbelow',side_effect=[idx,0,0,0,0]):
+            with patch('network_redirect.game_clock.now',return_value=NOW+idx*86400), patch.object(fish,'randbelow',side_effect=[idx,0,0,0,0]):
                 data=self.status()
             row=data['exchange_data'][1]
             self.assertEqual((row['type_id'],row['attach_count'],row['cost_fish_count'],row['count']),(tid,quantity,cost,limit))
@@ -253,7 +253,7 @@ class FishTests(ActivityCase):
         for count,extra in [(7,{}),(5,{'is_lock':1}),(3,{'owner_id':99})]:
             role['attachments'].append(dict(id=formation.new_id(role),attach_type=5,type_id=1027,level=1,count=count,**extra))
         self.b.save(role);peaches=self.count(1001);deadline=data['next_weekly_refresh']
-        with patch('network_redirect.backend.time.time',return_value=deadline):
+        with patch('network_redirect.game_clock.now',return_value=deadline):
             events=self.req(1205,flag=0);self.ok(events)
             self.assertIn(13,[e for e,d in events])
             self.assertEqual(self.count(1027),0);self.assertEqual(self.count(1001),peaches)
@@ -269,17 +269,17 @@ class FishTests(ActivityCase):
             self.assertEqual(self.count(1001),peaches+15)
             self.assertEqual(self.req(1103,mail_id=mail['mail_id'])[0][0],55)
         self.status();self.assertEqual(len(self.recycle_mails()),1)
-        with patch('network_redirect.backend.time.time',return_value=deadline+28*86400):self.status()
+        with patch('network_redirect.game_clock.now',return_value=deadline+28*86400):self.status()
         self.assertEqual(len(self.recycle_mails()),1);self.assertEqual(self.count(1001),peaches+15)
 
     def test_weekly_direct_draw_clears_old_only_and_failed_mail_is_atomic(self):
         data=self.status();self.rich();before=self.b.profile();deadline=data['next_weekly_refresh']
-        with patch('network_redirect.backend.time.time',return_value=deadline), patch('network_redirect.system_mail.deliver',side_effect=formation.Rejected('邮件失败')):
+        with patch('network_redirect.game_clock.now',return_value=deadline), patch('network_redirect.system_mail.deliver',side_effect=formation.Rejected('邮件失败')):
             self.assertEqual(self.req(1208,count=10,type_id=0)[0][0],55)
             after=self.b.profile()
             for key in ('attachments','gold_coin','activity','welfare'):
                 self.assertEqual(after.get(key),before.get(key))
-        with patch('network_redirect.backend.time.time',return_value=deadline), patch.object(fish,'randbelow',return_value=0):
+        with patch('network_redirect.game_clock.now',return_value=deadline), patch.object(fish,'randbelow',return_value=0):
             self.ok(self.req(1208,count=10,type_id=0))
             self.assertEqual(self.count(1027),20)
             self.assertEqual(self.recycle_mails()[0]['prizes'],[[5,1001,10000,1]])
@@ -289,7 +289,7 @@ class FishTests(ActivityCase):
 
     def test_weekly_heartbeat_recycles_without_open_panel(self):
         data=self.status();self.rich()
-        with patch('network_redirect.backend.time.time',return_value=data['next_weekly_refresh']):
+        with patch('network_redirect.game_clock.now',return_value=data['next_weekly_refresh']):
             responses=self.b.respond(encode(2999,{}),self.state)
             events=[login_fields(d['data']) for m,_,d in map(decode,responses) if m==2998 and d['id']==13]
             self.assertTrue(events)
@@ -310,7 +310,7 @@ class FishTests(ActivityCase):
     def test_login_snapshot_recycles_even_when_activity_disabled(self):
         data=self.status();self.rich()
         self.b.activity_rules['seasonal_games']['fish']['enabled']=False
-        with patch('network_redirect.backend.time.time',return_value=data['next_weekly_refresh']):
+        with patch('network_redirect.game_clock.now',return_value=data['next_weekly_refresh']):
             snapshot=self.b.snapshot()
             self.assertFalse(any(i['type_id']==1027 for i in snapshot['attachments']))
             self.assertEqual(len(self.recycle_mails()),1)

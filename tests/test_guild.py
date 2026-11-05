@@ -15,7 +15,7 @@ class GuildTests(unittest.TestCase):
         # This legacy suite exercises settlements independent of weekday; the
         # default original calendar/gates are covered by test_guild_npc_combat.
         self.b.guild_rules.update(pet_role_level=0,pet_union_level=0,wander_daily=3,train_weekend_only=False,lucky_weekend_only=False,hunt_weekend_open=True)
-        self.clock=patch('network_redirect.backend.time.time',return_value=NOW);self.clock.start();self.addCleanup(self.clock.stop)
+        self.clock=patch('network_redirect.game_clock.now',return_value=NOW);self.clock.start();self.addCleanup(self.clock.stop)
         self.serial=1000
         r=self.b.profile();r.update(level=36,gold_coin=100000,silver_coin=100000);summon.add_item(r,1338,100);self.b.save(r)
     def req(self,op,**d):
@@ -219,7 +219,7 @@ class GuildTests(unittest.TestCase):
         self.assertEqual(before,self.role())
     def test_cross_day(self):
         self.create();self.req(36,count=100)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.req(36,count=100)
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):self.req(36,count=100)
         self.assertEqual(self.role()['union_contrib'],200)
 
     def ok(self,op,**d):
@@ -245,7 +245,7 @@ class GuildTests(unittest.TestCase):
         self.ok(91,two_type=2,index=1,buy_count=1)
         self.assertEqual(self.role()['guild']['instances']['reputation'],40)
         self.ok(92,two_type=2,query_type=1);self.assertEqual(self.req(92,two_type=2)[-1][1],55)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.ok(84,task_index=1,task_type=1,pay_type=1)
         self.assertEqual(self.role()['guild']['instances']['tasks'],[1])
     def test_wander_capture_and_enclosure(self):
@@ -263,7 +263,7 @@ class GuildTests(unittest.TestCase):
         self.create();self.ok(69,flag=3,road_type=1);self.ok(69,flag=4,road_type=1);self.ok(69,flag=5,road_type=1)
         self.ok(69,flag=6,road_type=1,book_level=2,des_id=0)
         r=self.role();self.assertEqual(self.req(69,flag=11)[-1][1],55);self.assertEqual(r,self.role())
-        with patch('network_redirect.backend.time.time',return_value=NOW+3601),patch('network_redirect.guild_offline.roll',return_value=99):self.ok(69,flag=11)
+        with patch('network_redirect.game_clock.now',return_value=NOW+3601),patch('network_redirect.guild_offline.roll',return_value=99):self.ok(69,flag=11)
         r=self.role();self.assertEqual(r['cur_union_contrib'],20)
         self.assertEqual(self.req(69,flag=11)[-1][1],55);self.assertEqual(r,self.role())
     def battle(self,ft,**d):
@@ -287,7 +287,7 @@ class GuildTests(unittest.TestCase):
         self.ok(84,task_index=1,task_type=2,pay_type=1)
     def test_tree_guard(self):
         self.create();self.ok(36,count=50);self.ok(14)
-        with patch('network_redirect.backend.time.time',return_value=NOW+3601):self.battle(13)
+        with patch('network_redirect.game_clock.now',return_value=NOW+3601):self.battle(13)
     def test_original_cost_enum(self):
         self.assertEqual(guild.missions(self.b.guild_rules)[0]['cost_type'],4)
 
@@ -296,7 +296,7 @@ class GuildTests(unittest.TestCase):
         after=self.role();self.assertEqual(after['strength']-before['strength'],50)
         self.assertEqual(sum(i['count'] for i in after['attachments'] if i['attach_type']==5 and i['type_id']==1029)-sum(i['count'] for i in before['attachments'] if i['attach_type']==5 and i['type_id']==1029),3)
         self.assertEqual(after['train_tree_rate'],3)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86401):self.ok(34)
+        with patch('network_redirect.game_clock.now',return_value=NOW+86401):self.ok(34)
         self.assertEqual(self.role()['train_tree_rate'],0)
     def test_cross_battle_shop_and_prize(self):
         self.create();self.ok(58,query_type=32);self.ok(58,query_type=28,des_id=90001)
@@ -384,7 +384,7 @@ class GuildTests(unittest.TestCase):
         self.assertEqual(before['gold_coin']-after['gold_coin'],10-gold_reward)
         self.assertEqual(len({x['index'] for x in after['guild']['instances']['board']}),5)
         self.assertEqual(self.req(43,flag=6)[-1][1],55);self.assertEqual(after,self.role())
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.ok(43,flag=1)
             r=self.role();r['guild']['instances']['layer']=1;self.b.save(r)
             r=self.role();r['gold_coin']=0;self.b.save(r);before=self.role()
@@ -405,7 +405,7 @@ class GuildTests(unittest.TestCase):
         row=next(v for v in self.role()['guild']['unions']['2']['feast']['stats'].values() if v['id']==1)
         self.assertEqual((row['fortune'],row['contribute'],row['advanced_gift']),(105,100,2))
         self.assertEqual(self.role()['monument_wealth']['current']['advanced_gift'],2)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86401):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86401):
             data=next(d['feast_data'] for m,i,d in self.ok(18,query_type=14) if m==1301 and i==18)
             self.assertFalse(data['can_rece_award']);self.assertFalse(data['gift_data'][1]['can_grab'])
             self.assertTrue(any('群英会已经结束' in s for s in self.role()['guild']['unions']['2']['events']))
@@ -442,9 +442,9 @@ class GuildTests(unittest.TestCase):
         self.ok(4,union_id=1);self.ok(84,task_index=1,task_type=1);self.ok(92,two_type=2)
         self.ok(3);self.ok(4,union_id=1)
         self.assertEqual(self.req(92,two_type=2)[-1][1],55)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.ok(83);self.assertEqual(self.req(92,two_type=2)[-1][1],55)
-        with patch('network_redirect.backend.time.time',return_value=NOW+7*86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+7*86400):
             self.ok(83);self.assertEqual(self.role()['guild']['instances']['week_score'],0)
             self.assertEqual(self.req(92,two_type=2)[-1][1],55)
 
@@ -487,7 +487,7 @@ class GuildTests(unittest.TestCase):
         self.assertEqual(self.role()['guild']['escort']['credits'],1)
         self.ok(69,flag=6,road_type=1,book_level=1,des_id=leader)
         self.assertTrue(self.role()['guild']['escort']['active']['book']['had_protector'])
-        with patch('network_redirect.backend.time.time',return_value=NOW+1801),patch('network_redirect.guild_offline.roll',return_value=0):
+        with patch('network_redirect.game_clock.now',return_value=NOW+1801),patch('network_redirect.guild_offline.roll',return_value=0):
             out=self.ok(69,flag=12)[-1][2];row=out['berob_info'][1]
             from network_redirect import npc_players
             self.assertIsNotNone(npc_players.resolve(row['rob_id']));self.assertEqual(row['rob_contrib'],2)
@@ -506,7 +506,7 @@ class GuildTests(unittest.TestCase):
         self.b.guild_rules['npc_auto_accept']=False
         out=self.ok(4,union_id=1);self.assertTrue(any(i==82 and d.get('event_id')==7 for m,i,d in out))
         self.assertEqual(self.role()['union_id'],0)
-        with patch('network_redirect.backend.time.time',return_value=NOW+4):
+        with patch('network_redirect.game_clock.now',return_value=NOW+4):
             out=self.ok(18,query_type=1)
             self.assertEqual(self.role()['union_id'],1)
             self.assertTrue(any(i==82 and d.get('event_id')==8 for m,i,d in out))

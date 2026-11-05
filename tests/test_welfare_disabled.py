@@ -25,7 +25,7 @@ class DisabledWelfareTests(unittest.TestCase):
 
     def request(self, mid, **values):
         self.serial += 1
-        with patch('network_redirect.backend.time.time', return_value=NOW):
+        with patch('network_redirect.game_clock.now', return_value=NOW):
             packets = self.backend.respond(encode(mid, dict(serial_num=self.serial, **values)),
                                            dict(authenticated=True))
         return [(data['id'], login_fields(data['data']))

@@ -57,7 +57,7 @@ end
 ''']
 lines.append('local function installRankPatch()\n'+rank.client_source()+'\nend\ninstallRankPatch()\nrank_fixture_reinstall=installRankPatch')
 lines.append((ROOT/'network_redirect/monument_client.lua').read_text())
-with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time',return_value=NOW):
+with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.game_clock.now',return_value=NOW):
  b=Backend(Path(tmp),18770,lambda *a,**k:None);r=b.profile();r.update(level=60,energy=100,gold_coin=10000,silver_coin=10000)
  for c in r['corteges']:c['level']=100
  activity.prepare(r,NOW,b.activity_rules)
@@ -88,7 +88,7 @@ with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.
  request('records',1244,'ms.d_rankUI._localRankOpenRecords()',fight_type=2)
  lines.append("step('replay_record',function() ms.d_fightrecordUI.play_fightRecord(1) end)")
  lines.append("step('return_after_replay',function() assert(ms.d_fightUI.g_fightUI.is_fight_end,'replay still running');ms.d_fightUI.menuHome_private() end)")
- with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+ with patch('network_redirect.game_clock.now',return_value=NOW+86400):
   request('new_day_board',1021,'ms.d_activityUI.show(3);ms.d_time.getTime=function() return '+str(NOW+86400)+' end',flag=0)
   request('daily_auto_credit_no_duplicate',1021,flag=0)
  b.close()

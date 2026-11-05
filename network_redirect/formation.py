@@ -3,12 +3,14 @@
 All mutations operate on a detached role. Backend serializes every response before
 committing; validation failures therefore cannot partially debit an inventory.
 """
+from . import game_clock
 from decimal import Decimal, ROUND_FLOOR
 import copy
 import csv
 import json
 from pathlib import Path
 import secrets
+from .request_timing import recalculation_cache, count, phase
 
 from . import summon
 
@@ -279,7 +281,20 @@ def prepare(role, rules):
 
 def recalculate(role, rules):
     from . import combat_power
-    combat_power.recalculate(role, rules)
+    cache = recalculation_cache.get()
+    now = int(game_clock.now())
+    # Compare the entire post-calculation state, not an incomplete list of
+    # combat inputs. Any mutation or second boundary invalidates reuse.
+    if (cache is not None and cache.get('role_id') == id(role)
+            and cache.get('now') == now and cache.get('rules') == rules
+            and cache.get('role') == role):
+        count('recalculate_skipped')
+        return
+    with phase('recalculate'):
+        combat_power.recalculate(role, rules, now=now)
+    count('recalculate_calls')
+    if cache is not None:
+        cache.update(role_id=id(role), now=now, rules=copy.deepcopy(rules), role=copy.deepcopy(role))
 
 
 def change_order(role, req):

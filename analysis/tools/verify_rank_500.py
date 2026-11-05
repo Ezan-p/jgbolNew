@@ -19,7 +19,7 @@ OUT = ROOT / 'analysis/evidence/rank/rank_500_validation.json'
 
 def main():
     rows = []
-    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time', return_value=NOW):
+    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.game_clock.now', return_value=NOW):
         b = Backend(Path(tmp), 18770, lambda *a, **k: None)
         try:
             base = b.profile(); base.update(level=60, energy=100)

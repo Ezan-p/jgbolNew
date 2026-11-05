@@ -22,7 +22,7 @@ class RebornHotupdateTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        clock = patch('network_redirect.backend.time.time', return_value=1793419200)
+        clock = patch('network_redirect.game_clock.now', return_value=1793419200)
         clock.start(); self.addCleanup(clock.stop)
         self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
         self.addCleanup(lambda: self.b.close())

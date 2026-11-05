@@ -90,7 +90,7 @@ class UndergoCompleteTests(TaixuCase):
     def test_midnight_only_resets_current_map_and_fatigue(self):
         self.save_undergo(gate=401, challenge=305, used={'1': 4}, count=10, started=NOW-1000,
                           challenge_passed=list(range(101,110)), purchases={'1': 20}, claims=[1])
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             self.ok(self.call(1))
         s=self.b.profile()['activity']['undergo']
         self.assertEqual((s['gate'],s['challenge'],s['started']), (401,301,NOW-1000))
@@ -104,7 +104,7 @@ class UndergoCompleteTests(TaixuCase):
         before=self.b.profile()
         self.b.close(); self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.assertEqual(self.b.profile(),before)
-        with patch('network_redirect.backend.time.time', return_value=NOW-1):
+        with patch('network_redirect.game_clock.now', return_value=NOW-1):
             self.assertEqual(self.call(1)[0][0],55)
         self.assertEqual(self.b.profile(),before)
 
@@ -130,7 +130,7 @@ class UndergoCompleteTests(TaixuCase):
         self.ok(self.fight(2,909));s=self.b.profile()['activity']['undergo']
         self.assertEqual(s['challenge'],u.END);self.assertEqual(len(u.day_prize(s)),9)
         self.assertEqual(self.fight(2,909)[0][0],55)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.ok(self.call(1))
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):self.ok(self.call(1))
         self.assertEqual(self.b.profile()['activity']['undergo']['challenge'],u.END)
 
     def test_shop_bounds_rollover_and_insufficient_balance(self):
@@ -140,7 +140,7 @@ class UndergoCompleteTests(TaixuCase):
         limit = self.b.profile()['activity']['undergo']['shop'][0]['limit']
         self.ok(self.call(5,dict(index=1,count=limit)))
         self.assertEqual(self.call(5,dict(index=1,count=1))[0][0],55)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.assertEqual(self.call(5,dict(index=1,count=1))[0][0],55)
             self.ok(self.call(3));self.ok(self.call(5,dict(index=1,count=1)))
 
@@ -335,9 +335,9 @@ class ArenaTests(TaixuCase):
         events=self.call(2,mid=1350);self.ok(events)
         self.assertNotIn('local_prizes',next(d for e,d in events if e==199))
         self.assertFalse(any(e==33 for e,d in events))
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.ok(self.call(1,mid=1350))
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):self.ok(self.call(1,mid=1350))
         self.assertTrue(self.b.profile()['activity']['arena']['settled'])
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400*7):self.ok(self.call(1,mid=1350))
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400*7):self.ok(self.call(1,mid=1350))
         new=self.b.profile()['activity']['arena'];self.assertEqual(new['stage'],1);self.assertFalse(new['settled'])
 
     @patch('network_redirect.activity_arena.journey.battle',return_value=(4,[],[]))
@@ -369,7 +369,7 @@ class ArenaTests(TaixuCase):
             self.assertEqual(self.call(7,data,mid=1350)[0][0],55);self.assertEqual(before,self.b.profile())
         for data in (dict(des_id=999),dict(des_order=100),dict(fight_type=3),dict(bet_fight=1)):
             self.assertEqual(self.arena_fight(**data)[0][0],55);self.assertEqual(before,self.b.profile())
-        with patch('network_redirect.backend.time.time',return_value=NOW-1):self.assertEqual(self.call(1,mid=1350)[0][0],55)
+        with patch('network_redirect.game_clock.now',return_value=NOW-1):self.assertEqual(self.call(1,mid=1350)[0][0],55)
         self.assertEqual(before,self.b.profile())
 
     def test_encode_failure_and_request_replay(self):
@@ -382,7 +382,7 @@ class ArenaTests(TaixuCase):
 
     def test_unfinished_season_persists_across_midnight(self):
         s=self.arena_enter();roster=copy.deepcopy(s['competitors'])
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.ok(self.call(1,mid=1350))
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):self.ok(self.call(1,mid=1350))
         after=self.b.profile()['activity']['arena'];self.assertEqual(after['competitors'],roster);self.assertEqual(after['day'],s['day'])
 
     @patch('network_redirect.activity_arena.journey.battle',return_value=(1,[],[]))
@@ -407,11 +407,11 @@ class ArenaTests(TaixuCase):
         self.arena_enter();self.ok(self.arena_fight());self.ok(self.call(7,dict(stage=1),mid=1350))
         role=self.b.profile();old=role['activity']['arena'];rec=old['records'][-1]
         boundary=(old['week_start_day']+7)*86400-self.b.activity_rules['timezone_offset_hours']*3600
-        with patch('network_redirect.backend.time.time',return_value=boundary-1):
+        with patch('network_redirect.game_clock.now',return_value=boundary-1):
             self.ok(self.call(1,mid=1350))
         self.assertEqual(self.b.profile()['activity']['arena']['stage'],2)
         before=self.b.profile()
-        with patch('network_redirect.backend.time.time',return_value=boundary):
+        with patch('network_redirect.game_clock.now',return_value=boundary):
             events=self.req(1244,fight_type=4,log_time=rec['log_time'],src_id=rec['src_id'],match_type=rec['match_type'])
             self.ok(events)
         self.assertEqual(next(d for e,d in events if e==199)['id'],1)
@@ -423,7 +423,7 @@ class ArenaTests(TaixuCase):
         self.assertEqual(after['attachments'],before['attachments'])
         self.assertEqual(after['gold_coin'],before['gold_coin'])
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
-        with patch('network_redirect.backend.time.time',return_value=boundary+1):
+        with patch('network_redirect.game_clock.now',return_value=boundary+1):
             self.ok(self.call(1,mid=1350))
         self.assertEqual(self.b.profile()['activity']['arena']['week_start_day'],fresh['week_start_day'])
 
@@ -435,7 +435,7 @@ class ArenaTests(TaixuCase):
             s.update(stage=1 if operation=='fight' else 5,stage_fights=1,paid=3)
             self.b.save(role);before=self.b.profile();calls=battle.call_count
             boundary=(s['week_start_day']+7)*86400-8*3600
-            with patch('network_redirect.backend.time.time',return_value=boundary):
+            with patch('network_redirect.game_clock.now',return_value=boundary):
                 events=self.arena_fight() if operation=='fight' else self.call(7,dict(stage=5),mid=1350)
                 self.ok(events)
             self.assertEqual(next(d for e,d in events if e==199)['id'],1)

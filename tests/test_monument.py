@@ -12,7 +12,7 @@ class MonumentTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None);self.addCleanup(lambda:self.b.close())
-        self.clock=patch('network_redirect.backend.time.time',return_value=NOW);self.clock.start();self.addCleanup(self.clock.stop)
+        self.clock=patch('network_redirect.game_clock.now',return_value=NOW);self.clock.start();self.addCleanup(self.clock.stop)
         r=self.b.profile();r.update(level=30,gold_coin=10000,silver_coin=10000);self.b.save(r);self.serial=1000
     def request(self,mid,**d):
         self.serial+=1;self.packet=encode(mid,dict(serial_num=self.serial,**d))
@@ -63,7 +63,7 @@ class MonumentTests(unittest.TestCase):
         initial=self.event(self.ok(1128),130)['champion_list'][5]
         r=self.b.profile();monument_wealth.record(r,NOW,advanced_gift=1000);self.b.save(r)
         self.assertEqual(self.event(self.ok(1128),130)['champion_list'][5],initial)
-        with patch('network_redirect.backend.time.time',return_value=NOW+7*86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+7*86400):
             champion=self.event(self.ok(1128),130)['champion_list'][5]
             out=self.ok(1301,id=18,data=summon.lua(dict(query_type=15)))
             data=next(login_fields(d['data']) for m,d in out if m==1301)

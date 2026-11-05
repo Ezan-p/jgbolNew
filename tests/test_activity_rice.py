@@ -170,7 +170,7 @@ class RiceTests(ActivityCase):
         r=self.b.profile();season.state(r)['counts'][f'rice:{activity.day(NOW,self.b.activity_rules)}']=100;self.b.save(r);before=self.b.profile()
         self.assertEqual(self.craft()[0][0],55);self.assertEqual(before,self.b.profile())
         self.ok(self.req(1333,flag=1,src_type=1135))
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.ok(self.craft())
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):self.ok(self.craft())
         self.assertEqual(self.b.profile()['activity']['seasonal']['rice_count'],11)
 
     def test_recipe_ids_consumed_exactly_and_bad_sources_rejected(self):

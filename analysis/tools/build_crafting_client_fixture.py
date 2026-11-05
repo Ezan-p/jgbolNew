@@ -60,7 +60,7 @@ if ms.d_forgeUI._localExchangeRestore then ms.d_forgeUI._localExchangeRestore() 
  request('forge_query_and_page',1055,flag=0,check="assert(ms.d_forgeUI.canJoin());assert(not ms.d_forgeUI.isNeedUpdateList())")
  request('appointed_compose_callback',1053,compose_type=2,equip_type=2001,equip_quality=5,material_quality=4,material_count=5,material_list=[dict(id=i) for i in forge_ids])
  step('exchange_page','ms.d_forgeUI.ForgeTypeBtnPressed(3);ms.d_forgeUI.targetChanged(1)')
- with patch.object(c.time, 'time', return_value=b.profile()['equipment_forge']['week_start'] + c.WEEK):
+ with patch.object(c.game_clock, 'now', return_value=b.profile()['equipment_forge']['week_start'] + c.WEEK):
   request('exchange_compose_callback',1053,compose_type=3,equip_type=6001,equip_quality=4,material_quality=4,material_count=5,material_list=[dict(id=i) for i in exchange_ids])
  step('fragment_page','ms.d_equipPieceUI.show(parent(),6002)')
  request('fragment_compose_callback',1053,compose_type=1,equip_type=2,equip_quality=5,material_quality=5,material_count=1,material_list=[dict(id=fragment)],check='assert(item(%d).count==40)'%fragment)

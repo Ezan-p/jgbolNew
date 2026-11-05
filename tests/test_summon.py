@@ -20,7 +20,7 @@ class SummonTests(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
-        self.clock = patch('network_redirect.backend.time.time', return_value=NOW)
+        self.clock = patch('network_redirect.game_clock.now', return_value=NOW)
         self.clock.start()
         self.addCleanup(self.clock.stop)
         self.events = []
@@ -217,8 +217,10 @@ class SummonTests(unittest.TestCase):
         before=self.backend.profile()
         with patch('network_redirect.summon.choose_reward',return_value=(5004,None)), patch(
                 'network_redirect.summon.news_snapshot',side_effect=ValueError('bad news')):
-            with self.assertRaises(ValueError):
-                self.draw(2,3,10)
+            replies = self.draw(2,3,10)
+        self.assertIn('请求处理异常', self.result(replies,55)['op_string'])
+        self.assertEqual(decode(replies[-1])[2]['req_serial_num'], self.serial)
+        self.assertEqual(self.backend.respond(self.packet,self.state), replies)
         self.assertEqual(self.backend.profile(),before)
 
     def test_daily_limit_and_midnight_reset_preserve_cooldowns(self):
@@ -227,7 +229,7 @@ class SummonTests(unittest.TestCase):
         role['summon']['ready_at']['1']=NOW-1
         self.backend.save(role)
         self.reject_unchanged()
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.assertEqual(self.result(self.draw())['count'],1)
 
     def test_pity_across_payment_and_ten_draws(self):
@@ -366,7 +368,7 @@ class SummonTests(unittest.TestCase):
         before=self.backend.profile()
         self.backend.close()
         self.backend=Backend(Path(self.directory.name),18770,lambda *a,**k:None)
-        with patch('network_redirect.backend.time.time',return_value=NOW+123):
+        with patch('network_redirect.game_clock.now',return_value=NOW+123):
             snapshot=self.backend.snapshot()
         self.assertEqual(snapshot['super_time'],259200-123)
         self.assertEqual(snapshot['super_first_pick_time'],NOW)

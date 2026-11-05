@@ -36,9 +36,9 @@ class PartyRankMailTests(ActivityCase):
 
     def test_close_mail_announced_and_claimed_once_after_restart(self):
         day=self.seed();before=self.peaches(1343)
-        with patch('network_redirect.backend.time.time',return_value=NOW+3599):
+        with patch('network_redirect.game_clock.now',return_value=NOW+3599):
             self.ok(self.req(1049,query_type=1));self.assertFalse(self.mails())
-        with patch('network_redirect.backend.time.time',return_value=NOW+3600):
+        with patch('network_redirect.game_clock.now',return_value=NOW+3600):
             events=self.req(1049,query_type=2);self.ok(events)
             mail=self.mails()[f'party-rank-{day}']
             self.assertTrue(any(e==13 and mail['mail_id'] in data.values() for e,data in events))
@@ -49,7 +49,7 @@ class PartyRankMailTests(ActivityCase):
             self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
             self.ok(self.req(1049,query_type=2));self.assertEqual(len(self.mails()),1)
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
-        with patch('network_redirect.backend.time.time',return_value=NOW+365*86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+365*86400):
             content=dict(self.req(1102,mail_id=mail['mail_id'],flag=0))[14]
             self.assertEqual(content['attach_list'][1]['attach_type'],1343)
             self.assertEqual(content['attach_list'][1]['attach_count'],100)
@@ -63,7 +63,7 @@ class PartyRankMailTests(ActivityCase):
     def test_heartbeat_cross_day_and_backwards_clock_do_not_repeat(self):
         self.seed()
         for elapsed in (86400,2*86400,0):
-            with patch('network_redirect.backend.time.time',return_value=NOW+elapsed):
+            with patch('network_redirect.game_clock.now',return_value=NOW+elapsed):
                 packets=self.b.respond(encode(2999,{}),self.state)
                 self.assertEqual(len(self.mails()),1)
                 if elapsed==86400:
@@ -71,17 +71,17 @@ class PartyRankMailTests(ActivityCase):
                     self.assertIn(13,[e for e,_ in events])
 
     def test_bootstrap_settles_missed_day_and_no_unplayed_mail(self):
-        with patch('network_redirect.backend.time.time',return_value=NOW+3600):
+        with patch('network_redirect.game_clock.now',return_value=NOW+3600):
             self.b.bootstrap();self.assertFalse(self.mails())
         role=self.b.profile();role['activity']['party'].update(closed=False,count=1,damage=100000000)
         self.b.save(role)
-        with patch('network_redirect.backend.time.time',return_value=NOW+7*86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+7*86400):
             self.b.bootstrap();self.assertEqual(len(self.mails()),1)
             self.b.bootstrap(reconnect=True);self.assertEqual(len(self.mails()),1)
 
     def test_failed_delivery_rolls_back_and_retries(self):
         self.seed()
-        with patch('network_redirect.backend.time.time',return_value=NOW+3600):
+        with patch('network_redirect.game_clock.now',return_value=NOW+3600):
             before=self.b.profile()
             with patch('network_redirect.system_mail.deliver',side_effect=ValueError('mail encoding')):
                 self.assertEqual(self.req(1049,query_type=2)[0][0],55)
@@ -90,7 +90,7 @@ class PartyRankMailTests(ActivityCase):
 
     def test_failed_claim_keeps_mail_claimable(self):
         self.seed()
-        with patch('network_redirect.backend.time.time',return_value=NOW+3600):
+        with patch('network_redirect.game_clock.now',return_value=NOW+3600):
             self.ok(self.req(1049,query_type=2));mail=next(iter(self.mails().values()))
             before=self.peaches(1343)
             with patch('network_redirect.backend.welfare_attributes',side_effect=ValueError('encoding')):
@@ -104,7 +104,7 @@ class PartyRankMailTests(ActivityCase):
         self.seed();role=self.b.profile();before=self.peaches(1343)
         role['activity']['party'].update(closed=True,daily_pending=[[5,1343,7,1]])
         self.b.save(role)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.ok(self.req(1049,query_type=2))
             self.assertFalse(self.mails());self.assertEqual(self.peaches(1343),before+7)
             self.ok(self.req(1049,query_type=2));self.assertEqual(self.peaches(1343),before+7)

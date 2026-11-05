@@ -16,7 +16,7 @@ NOW=1792987200
 
 def main():
     records=[];serial=100000
-    with tempfile.TemporaryDirectory() as tmp,patch('network_redirect.backend.time.time',return_value=NOW) as clock:
+    with tempfile.TemporaryDirectory() as tmp,patch('network_redirect.game_clock.now',return_value=NOW) as clock:
         b=Backend(Path(tmp),18770,lambda *a,**k:None)
         role=b.profile();role['level']=30;b.save(role)
         def request(name,mid,expected=True,**data):

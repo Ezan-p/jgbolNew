@@ -107,7 +107,7 @@ class AbyssShopTests(ActivityCase):
         self.assertEqual(purchased['shop_list'][1]['buy_times'],first['shop_list'][1]['buy_times']-1)
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.assertEqual(purchased,self.call(13))
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             today=self.call(13)
             self.assertEqual(today['shop_day'],first['shop_day']+1)
             self.assertEqual(self.b.profile()['activity']['abyss']['purchases'],{})

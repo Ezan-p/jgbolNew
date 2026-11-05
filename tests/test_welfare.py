@@ -17,7 +17,7 @@ class WelfareTests(unittest.TestCase):
  def tearDown(self):self.b.close();self.tmp.cleanup()
  def req(self,mid=1127,**kw):
   self.serial+=1
-  with patch('network_redirect.backend.time.time',return_value=NOW):
+  with patch('network_redirect.game_clock.now',return_value=NOW):
    packets=self.b.respond(encode(mid,dict(serial_num=self.serial,**kw)),dict(authenticated=True))
   return [(m,login_fields(d['data']) if m==2998 else d) for m,_,d in map(decode,packets)]
  def claim(self,a,i=0):return self.req(act_type=a,index=i,flag=2)
@@ -95,7 +95,7 @@ class WelfareTests(unittest.TestCase):
      self.assertFalse(welfare.catalog(role,NOW+400*86400,self.b.welfare_rules)[7]['can_take'])
  def test_growth_replay_restart_and_legacy_claim(self):
   self.ready();packet=encode(1127,dict(serial_num=500,act_type=7,index=0,flag=2));auth=dict(authenticated=True)
-  with patch('network_redirect.backend.time.time',return_value=NOW):
+  with patch('network_redirect.game_clock.now',return_value=NOW):
    first=self.b.respond(packet,auth);saved=self.b.profile()
    self.assertEqual(first,self.b.respond(packet,auth));self.assertEqual(saved,self.b.profile())
   self.b.close();self.b=Backend(Path(self.tmp.name),1,lambda *a,**k:None)
@@ -116,7 +116,7 @@ class WelfareTests(unittest.TestCase):
   self.assertTrue(self.error(self.claim(32,1)));self.assertEqual(before,self.b.profile())
  def test_replay_restart_persistent_claim(self):
   self.ready();pkt=encode(1127,dict(serial_num=20,act_type=16,index=0,flag=2));auth=dict(authenticated=True)
-  with patch('network_redirect.backend.time.time',return_value=NOW):
+  with patch('network_redirect.game_clock.now',return_value=NOW):
    result=self.b.respond(pkt,auth);role=self.b.profile();self.assertEqual(result,self.b.respond(pkt,auth));self.assertEqual(role,self.b.profile())
   self.b.close();self.b=Backend(Path(self.tmp.name),1,lambda *a,**k:None)
   self.assertTrue(self.error(self.claim(16)))

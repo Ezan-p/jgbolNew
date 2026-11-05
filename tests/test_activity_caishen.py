@@ -61,7 +61,7 @@ class CaishenTests(ActivityCase):
         self.status();r=self.b.activity_rules;ticket=0
         for idx,p in enumerate(r['spring_pool']):
             now=NOW+idx*86400
-            with patch('network_redirect.backend.time.time',return_value=now):
+            with patch('network_redirect.game_clock.now',return_value=now):
                 self.status();before=self.b.profile()
                 with patch.object(cs,'randbelow',side_effect=[(0,60,90)[idx%3],ticket]):out=self.req(1210,flag=1)
             self.ok(out);prizes=next(d['prize_list'] for e,d in out if e==88)
@@ -88,7 +88,7 @@ class CaishenTests(ActivityCase):
         r=self.b.activity_rules
         for idx,row in enumerate(r['spring_shop']):
             now=NOW+idx*86400
-            with patch('network_redirect.backend.time.time',return_value=now):
+            with patch('network_redirect.game_clock.now',return_value=now):
                 with patch.object(cs,'randbelow',side_effect=[idx if idx<8 else 0,0,0,0,max(0,idx-8)]):data=self.status()
                 self.rich();before=self.b.profile();typ,tid,n,_=row['reward']
                 goods=next(x for x in data['prize_list'].values() if x['attach_type']==tid)
@@ -123,9 +123,9 @@ class CaishenTests(ActivityCase):
         self.rich();ident=data['prize_list'][1]['prize_id']
         self.ok(self.req(1210,flag=1));self.ok(self.req(1211,prize_id=ident,count=1))
         boundary=data['next_daily_refresh']
-        with patch('network_redirect.backend.time.time',return_value=boundary-1):
+        with patch('network_redirect.game_clock.now',return_value=boundary-1):
             self.assertTrue(self.status()['visited_today']);self.assertEqual(self.req(1210,flag=1)[0][0],55)
-        with patch('network_redirect.backend.time.time',return_value=boundary):
+        with patch('network_redirect.game_clock.now',return_value=boundary):
             before=self.b.profile();self.assertEqual(self.req(1211,prize_id=ident,count=1)[0][0],55);self.assertEqual(before,self.b.profile())
             with patch.object(cs,'randbelow',return_value=0):fresh=self.status()
             self.assertFalse(fresh['visited_today']);self.assertEqual(self.saved()['purchases'],{})
@@ -140,8 +140,8 @@ class CaishenTests(ActivityCase):
         for n,extra in [(100,{}),(6,{'is_lock':1}),(1,{'owner_id':99})]:
             role['attachments'].append(dict(id=formation.new_id(role),attach_type=5,type_id=1028,count=n,level=1,**extra))
         self.b.save(role);peaches=self.count(1001);deadline=data['next_weekly_refresh']
-        with patch('network_redirect.backend.time.time',return_value=deadline-1):self.status();self.assertEqual(self.count(1028),107)
-        with patch('network_redirect.backend.time.time',return_value=deadline):
+        with patch('network_redirect.game_clock.now',return_value=deadline-1):self.status();self.assertEqual(self.count(1028),107)
+        with patch('network_redirect.game_clock.now',return_value=deadline):
             out=self.req(1205,flag=0);self.ok(out);self.assertIn(13,[e for e,d in out])
             self.assertEqual(self.count(1028),0);self.assertEqual(self.count(1001),peaches)
             mail=self.mails()[0];self.assertEqual(mail['prizes'],[[5,1001,54,1]])
@@ -151,29 +151,29 @@ class CaishenTests(ActivityCase):
             self.ok(self.req(1102,mail_id=mail['mail_id'],flag=0));self.ok(self.req(1103,mail_id=mail['mail_id']))
             self.assertEqual(self.count(1001),peaches+54);self.assertEqual(self.req(1103,mail_id=mail['mail_id'])[0][0],55)
         self.status();self.assertEqual(len(self.mails()),1)
-        with patch('network_redirect.backend.time.time',return_value=deadline+28*86400):self.status()
+        with patch('network_redirect.game_clock.now',return_value=deadline+28*86400):self.status()
         self.assertEqual(len(self.mails()),1);self.assertEqual(self.count(1028),0)
 
     def test_week_direct_visit_recycles_before_new_reward_and_mail_failure_rolls_back(self):
         data=self.status();self.rich(102);before=self.b.profile();boundary=data['next_weekly_refresh']
-        with patch('network_redirect.backend.time.time',return_value=boundary),patch('network_redirect.system_mail.deliver',side_effect=formation.Rejected('mail failure')):
+        with patch('network_redirect.game_clock.now',return_value=boundary),patch('network_redirect.system_mail.deliver',side_effect=formation.Rejected('mail failure')):
             self.assertEqual(self.req(1210,flag=1)[0][0],55)
             after=self.b.profile()
             for key in ('activity','attachments','welfare','gold_coin','silver_coin'):self.assertEqual(before.get(key),after.get(key))
-        with patch('network_redirect.backend.time.time',return_value=boundary),patch.object(cs,'randbelow',return_value=0):
+        with patch('network_redirect.game_clock.now',return_value=boundary),patch.object(cs,'randbelow',return_value=0):
             self.ok(self.req(1210,flag=1));self.assertEqual(self.count(1028),100)
             self.assertEqual(self.mails()[0]['prizes'],[[5,1001,51,1]])
             self.assertEqual(self.saved()['weekly_visits'],1)
 
     def test_heartbeat_rollover_and_rollback_watermark(self):
         data=self.status();self.rich(1)
-        with patch('network_redirect.backend.time.time',return_value=data['next_weekly_refresh']):
+        with patch('network_redirect.game_clock.now',return_value=data['next_weekly_refresh']):
             out=self.b.respond(encode(2999,{}),self.state)
             self.assertIn(13,[d['id'] for m,_,d in map(decode,out) if m==2998])
         self.assertEqual(self.count(1028),0);self.assertEqual(self.mails()[0]['prizes'],[[5,1001,1,1]])
         self.status();self.assertGreater(self.saved()['day'],data['shop_day'])
         self.ok(self.req(1210,flag=1));stable=self.saved()
-        with patch('network_redirect.backend.time.time',return_value=data['next_weekly_refresh']):
+        with patch('network_redirect.game_clock.now',return_value=data['next_weekly_refresh']):
             self.status();self.assertEqual(self.req(1210,flag=1)[0][0],55)
         self.assertEqual(self.saved(),stable);self.assertEqual(len(self.mails()),1)
 
@@ -187,7 +187,7 @@ class CaishenTests(ActivityCase):
         self.b.activity_rules['seasonal_games']['spring_money']['enabled']=False
         self.assertFalse(self.status()['local_enabled']);before=self.b.profile()
         self.assertEqual(self.req(1210,flag=1)[0][0],55);self.assertEqual(before,self.b.profile())
-        with patch('network_redirect.backend.time.time',return_value=data['next_weekly_refresh']):self.b.snapshot()
+        with patch('network_redirect.game_clock.now',return_value=data['next_weekly_refresh']):self.b.snapshot()
         self.assertEqual(self.count(1028),0);self.assertEqual(len(self.mails()),1)
 
     def test_old_save_migration_retains_cards_visit_and_relevant_quota(self):
@@ -202,12 +202,12 @@ class CaishenTests(ActivityCase):
         self.assertEqual(before['activity']['seasonal']['spring']['cards_given'],self.saved()['cards_given'])
         self.assertEqual(self.req(1210,flag=1)[0][0],55)
         self.rich(200)
-        with patch('network_redirect.backend.time.time',return_value=NOW+7*86400):self.status()
+        with patch('network_redirect.game_clock.now',return_value=NOW+7*86400):self.status()
         self.assertEqual(len(self.mails()),1);self.assertEqual(self.mails()[0]['prizes'],[[5,1001,100,1]])
 
     def test_first_use_and_offline_multiweek_single_settlement(self):
         self.rich(200);self.status();self.assertEqual(self.mails(),[])
-        with patch('network_redirect.backend.time.time',return_value=NOW+35*86400):self.status()
+        with patch('network_redirect.game_clock.now',return_value=NOW+35*86400):self.status()
         self.assertEqual(len(self.mails()),1);self.assertEqual(self.saved()['weekly_visits'],0)
         self.assertEqual(self.mails()[0]['prizes'],[[5,1001,100,1]])
 

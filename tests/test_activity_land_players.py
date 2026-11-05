@@ -33,12 +33,12 @@ class LandPlayersTests(ActivityCase):
         self.b.save(r);self.ok(self.land(1));s=self.b.profile()['activity']['land']
         self.assertEqual(keys,s['companions']);self.assertEqual(members,s['team']['members'])
         r=self.b.profile();r['level']=99;self.b.save(r)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.ok(self.land(1));self.assertEqual(keys,self.b.profile()['activity']['land']['companions'])
 
     def test_clock_rollback_rejects_without_resetting_quotas(self):
         self.ok(self.land(22));before=self.b.profile()
-        with patch('network_redirect.backend.time.time',return_value=NOW-86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW-86400):
             self.assertEqual(self.land(3)[0][0],55)
             # profile() may expire unrelated time-limited titles; land and resources remain intact.
             after=self.b.profile()
@@ -104,12 +104,12 @@ class LandPlayersTests(ActivityCase):
         s['boss_layer']=60;s['week_soul']=999999;self.b.save(r);self.ok(self.land(1))
         titles=copy.deepcopy(self.b.profile()['profile_titles'])
         self.assertTrue(all(str(i) in titles for i in range(120,125)))
-        with patch('network_redirect.backend.time.time',return_value=NOW+2*86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+2*86400):
             self.ok(self.land(1));r=self.b.profile()
             self.assertEqual(r['profile_titles']['120'],titles['120'])
             self.assertIn('128',r['profile_titles'])
             end=r['profile_titles']['128']['endtime']
-        with patch('network_redirect.backend.time.time',return_value=end+1):
+        with patch('network_redirect.game_clock.now',return_value=end+1):
             self.ok(self.land(1));r=self.b.profile()
             self.assertFalse(role_profile.available(r['profile_titles']['128'],end+1))
             self.assertEqual(r['profile_titles']['120'],titles['120'])
@@ -117,9 +117,9 @@ class LandPlayersTests(ActivityCase):
     def test_sunday_tower_income_settles_into_previous_week_once(self):
         self.ok(self.land(1));s=self.b.profile()['activity']['land'];r=self.b.activity_rules
         monday=((s['week']+1)*7+4)*86400-r['timezone_offset_hours']*3600
-        with patch('network_redirect.backend.time.time',return_value=monday-600):
+        with patch('network_redirect.game_clock.now',return_value=monday-600):
             self.ok(self.land(16,tower_id=14))
-        with patch('network_redirect.backend.time.time',return_value=monday+600):
+        with patch('network_redirect.game_clock.now',return_value=monday+600):
             self.ok(self.land(1));s=self.b.profile()['activity']['land']
             self.assertEqual(s['last_week_result']['soul'],100)
             self.assertEqual(s['week_soul'],0);self.assertEqual(s['soul_count'],100)

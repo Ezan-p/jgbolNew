@@ -106,17 +106,17 @@ class HuntTests(ActivityCase):
         self.setup_hunt(soul=5000,energy=0,shots=7,refreshes=2)
         self.data(self.call(6,index=1,count=1))
         midnight=(h.day(NOW,self.b.activity_rules)+1)*86400-28800
-        with patch('network_redirect.backend.time.time',return_value=midnight):
+        with patch('network_redirect.game_clock.now',return_value=midnight):
             self.data(self.call());s=self.hunt();self.assertEqual(s['energy'],400);self.assertEqual(s['shots'],0)
             self.assertEqual(s['refreshes'],0);self.assertEqual(s['bought'],{'1':1})
-        with patch('network_redirect.backend.time.time',return_value=midnight+21600):
+        with patch('network_redirect.game_clock.now',return_value=midnight+21600):
             self.data(self.call(5));self.assertEqual(self.hunt()['bought'],{})
-        with patch('network_redirect.backend.time.time',return_value=midnight+10*86400):
+        with patch('network_redirect.game_clock.now',return_value=midnight+10*86400):
             self.data(self.call());self.assertEqual(self.hunt()['energy'],1000)
 
     def test_daily_original_mail_reward_once_and_claim(self):
         self.setup_hunt(day_score=100000)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.data(self.call());self.data(self.call())
             mails=[m for k,m in self.b.profile()['welfare']['mails'].items() if k.startswith('hunt-day-')]
             self.assertEqual(len(mails),1);self.assertEqual(mails[0]['prizes'],h.rewards('day',1))
@@ -127,7 +127,7 @@ class HuntTests(ActivityCase):
     def test_weekly_original_reward_title_claim_and_history(self):
         self.setup_hunt(week_score=100000,day_score=100000)
         monday=((self.hunt()['week']+1)*7+4)*86400-28800
-        with patch('network_redirect.backend.time.time',return_value=monday):
+        with patch('network_redirect.game_clock.now',return_value=monday):
             d=self.data(self.call(10));self.assertTrue(d['had_prize']);self.assertFalse(d['had_got_prize'])
             self.assertEqual(d['my_order']['order'],1);title=self.b.profile()['profile_titles']['133']
             self.assertEqual(title['begintime'],monday);self.assertEqual(title['endtime'],monday+604800)
@@ -138,7 +138,7 @@ class HuntTests(ActivityCase):
 
     def test_long_absence_no_phantom_awards_and_unclaimed_mail(self):
         self.setup_hunt(week_score=100000,day_score=100000)
-        with patch('network_redirect.backend.time.time',return_value=NOW+30*86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+30*86400):
             self.data(self.call())
             mails=[m for k,m in self.b.profile()['welfare']['mails'].items() if k.startswith('hunt-')]
             self.assertEqual(len(mails),2);self.assertFalse(self.data(self.call(10))['had_prize'])
@@ -164,7 +164,7 @@ class HuntTests(ActivityCase):
 
     def test_clock_rollback_and_bad_config(self):
         self.setup_hunt();before=self.b.profile()
-        with patch('network_redirect.backend.time.time',return_value=NOW-1):self.assertEqual(self.call(2,count=1,index=90)[0][0],55)
+        with patch('network_redirect.game_clock.now',return_value=NOW-1):self.assertEqual(self.call(2,count=1,index=90)[0][0],55)
         self.assertEqual(before,self.b.profile())
         for key,value in [('mode','official'),('daily_shots',0),('energy_exchange_rate',0),('capture_radius',100)]:
             r=h.load_rules();r[key]=value;p=Path(self.tmp.name)/'bad.json';p.write_text(json.dumps(r))

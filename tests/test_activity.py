@@ -15,7 +15,7 @@ class ActivityCase(unittest.TestCase):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.addCleanup(lambda:self.b.close());self.serial=100000;self.state={'authenticated':True}
-        self.clock=patch('network_redirect.backend.time.time',return_value=NOW);self.clock.start();self.addCleanup(self.clock.stop)
+        self.clock=patch('network_redirect.game_clock.now',return_value=NOW);self.clock.start();self.addCleanup(self.clock.stop)
         r=self.b.profile();r.update(level=60,gold_coin=100000,silver_coin=100000,energy=100)
         for c in r['corteges']:c.update(level=100)
         activity.prepare(r,NOW,self.b.activity_rules);self.b.save(r)
@@ -56,12 +56,12 @@ class ActivityTests(ActivityCase):
         self.assertEqual(self.req(1040,feed_count=30)[-1][1]['feed_result'],2)
         before=self.b.profile();self.assertEqual(self.req(1040,feed_count=30)[-1][1]['feed_result'],4)
         self.assertEqual(before,self.b.profile())
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.assertEqual(self.req(1040,feed_count=30)[-1][1]['feed_result'],2)
     def test_feed_invalid_count_and_closed_time(self):
         before=self.b.profile();self.assertEqual(self.req(1040,feed_count=201)[0][0],55)
         self.assertEqual(before,self.b.profile())
-        with patch('network_redirect.backend.time.time',return_value=NOW+3*3600):
+        with patch('network_redirect.game_clock.now',return_value=NOW+3*3600):
             self.assertEqual(self.req(1040,feed_count=1)[-1][1]['feed_result'],3)
     def test_all_three_visits_two_phase_and_duplicate(self):
         self.ok(self.req(1030,visit_index=0,op_type=0))
@@ -96,7 +96,7 @@ class ActivityTests(ActivityCase):
         self.ok(self.req(1021,flag=0));self.ok(self.req(1026,fight_type=2,des_type=2,des_value=500,des_id=930500))
         r=self.b.profile();self.assertEqual(r['activity']['rank_order'],500)
         self.assertEqual(self.req(1201,flag=2)[0][0],55)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.ok(self.req(1021,flag=0));self.assertEqual(self.req(1201,flag=2)[0][0],55)
         self.ok(self.req(1203,exchange_type=4));before=self.b.profile()
         self.assertEqual(self.req(1203,exchange_type=4)[0][0],55);self.assertEqual(before,self.b.profile())
@@ -134,7 +134,7 @@ class ActivityTests(ActivityCase):
         self.ok(self.req(1049,query_type=1));self.ok(self.req(1202,flag=1));self.ok(self.req(1026,fight_type=6))
         self.assertEqual(self.req(1201,flag=1)[0][0],55)  # weekly prize, not immediate daily participation
         self.b.activity_rules['party_period']=[39600,46800]
-        with patch('network_redirect.backend.time.time',return_value=NOW+7200):self.assertEqual(self.req(1026,fight_type=6)[0][0],55)
+        with patch('network_redirect.game_clock.now',return_value=NOW+7200):self.assertEqual(self.req(1026,fight_type=6)[0][0],55)
     def test_convert_first_free_and_monthcard_extra(self):
         r=self.b.profile();r['vip_level']=3;tid=next(iter(activity.CONVERT))
         if not any(c['type']==tid for c in r['corteges']):r['corteges'].append(summon.companion(r,tid))
@@ -285,7 +285,7 @@ class HomeAbyssTests(ActivityCase):
         self.assertEqual(self.b.profile()['silver_coin'],silver+20000)
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.ok(self.req(1348,id=23,data='{friend_id=900001}'));self.assertEqual(self.b.profile()['silver_coin'],silver+20000)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.ok(self.req(1348,id=7,data='{friend_id=900001,plant_grid=1}'))
         self.assertEqual(self.b.profile()['silver_coin'],silver+30000)
 
@@ -300,7 +300,7 @@ class HomeAbyssTests(ActivityCase):
         data=next(login_fields(d['data']) for m,_,d in self.decoded if m==1348)
         self.assertIn('药田照料测试',data['message_data'][1])
         self.ok(self.req(1348,id=18,data='{clean=true}'));self.assertFalse(self.b.profile()['activity']['home']['new_event'])
-        with patch('network_redirect.backend.time.time',return_value=NOW+23*3600):
+        with patch('network_redirect.game_clock.now',return_value=NOW+23*3600):
             self.ok(self.req(1348,id=10,data='{plant_grid=1}'))
             data=next(login_fields(d['data']) for m,_,d in self.decoded if m==1348)
             self.assertEqual(data['base_worth'],800);self.assertEqual(data['friend_plus'],5)
@@ -359,7 +359,7 @@ class HomeAbyssTests(ActivityCase):
 
     def test_abyss_random_queue_cap_give_up_and_four_guesses(self):
         r=self.b.profile();r['level']=80;self.b.save(r);self.ok(self.req(1329,id=1,data='{}'))
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.ok(self.req(1329,id=1,data='{}'));self.assertEqual(len(self.b.profile()['activity']['abyss']['events']),5)
         from network_redirect.activity_abyss_random import create
         r=self.b.profile();s=r['activity']['abyss'];e=create(1,self.b.activity_rules);e['answer']=99;s['events']=[e];self.b.save(r)
@@ -387,11 +387,11 @@ class HomeAbyssTests(ActivityCase):
         grid=next(login_fields(d['data'])['grid_info'] for mid,_,d in self.decoded if mid==1348)
         self.assertEqual(grid['start_time'],NOW);self.assertEqual(grid['total_plus_times'],5)
         event=grid['event_info'][1];self.assertGreater(event['end_time'],event['start_time'])
-        with patch('network_redirect.backend.time.time',return_value=event['start_time']):
+        with patch('network_redirect.game_clock.now',return_value=event['start_time']):
             self.ok(self.req(1348,id=4,data='{plant_grid=1,event_index=1}'))
             before=self.b.profile();self.assertEqual(self.req(1348,id=4,data='{plant_grid=1,event_index=1}')[0][0],55)
             self.assertEqual(before,self.b.profile())
-        with patch('network_redirect.backend.time.time',return_value=grid['gain_time']+1):
+        with patch('network_redirect.game_clock.now',return_value=grid['gain_time']+1):
             self.ok(self.req(1348,id=10,data='{plant_grid=1}'))
             reward=next(login_fields(d['data'])['prize_list'][1] for mid,_,d in self.decoded if mid==1348)
             self.assertEqual(reward['attach_count'],800)
@@ -402,13 +402,13 @@ class HomeAbyssTests(ActivityCase):
         self.ok(self.req(1348,id=8,data='{hour=1}'))
         before=self.b.profile();self.assertEqual(self.req(1348,id=8,data='{hour=48}')[0][0],55);self.assertEqual(before,self.b.profile())
         self.ok(self.req(1348,id=3,data='{plant_grid=1,seed_type=1}'))
-        with patch('network_redirect.backend.time.time',return_value=NOW+23*3600):
+        with patch('network_redirect.game_clock.now',return_value=NOW+23*3600):
             self.ok(self.req(1348,id=10,data='{plant_grid=1}'))
             reward=next(login_fields(d['data'])['prize_list'][1] for mid,_,d in self.decoded if mid==1348)
             self.assertEqual(reward['attach_count'],720)
             self.ok(self.req(1348,id=8,data='{hour=24}'))
             self.ok(self.req(1348,id=3,data='{plant_grid=1,seed_type=1}'))
-        with patch('network_redirect.backend.time.time',return_value=NOW+46*3600):
+        with patch('network_redirect.game_clock.now',return_value=NOW+46*3600):
             self.ok(self.req(1348,id=10,data='{plant_grid=1}'))
             reward=next(login_fields(d['data'])['prize_list'][1] for mid,_,d in self.decoded if mid==1348)
             self.assertEqual(reward['attach_count'],800)
@@ -420,7 +420,7 @@ class HomeAbyssTests(ActivityCase):
         self.ok(self.req(1348,id=2,data='{building_type=2}'))
         self.ok(self.req(1348,id=3,data='{plant_grid=1,seed_type=1}'))
         before=self.b.profile();self.assertEqual(self.req(1348,id=10,data='{plant_grid=1}')[0][0],55);self.assertEqual(before,self.b.profile())
-        with patch('network_redirect.backend.time.time',return_value=NOW+23*3600):
+        with patch('network_redirect.game_clock.now',return_value=NOW+23*3600):
             self.ok(self.req(1348,id=10,data='{plant_grid=1}'))
             before=self.b.profile();self.assertEqual(self.req(1348,id=10,data='{plant_grid=1}')[0][0],55);self.assertEqual(before,self.b.profile())
     def test_home_pray_and_forged_build_atomic(self):
@@ -433,7 +433,7 @@ class HomeAbyssTests(ActivityCase):
         r=self.b.profile();r['level']=80;self.b.save(r)
         self.ok(self.req(1329,id=1,data='{}'));before=self.b.profile()
         self.assertEqual(self.req(1329,id=2,data='{des_area=81}')[0][0],55);self.assertEqual(before,self.b.profile())
-        with patch('network_redirect.backend.time.time',return_value=NOW+300):
+        with patch('network_redirect.game_clock.now',return_value=NOW+300):
             self.ok(self.req(1329,id=10,data='{}'));s=self.b.profile()['activity']['abyss'];self.assertEqual(len(s['bag']),1)
             self.ok(self.req(1329,id=10,data='{}'));self.assertEqual(self.b.profile()['activity']['abyss'],s)
             self.ok(self.req(1329,id=5,data='{}'));before=self.b.profile()
@@ -550,11 +550,11 @@ class LandTests(ActivityCase):
         self.assertEqual(self.b.profile()['activity']['land']['inv_boss_layer'],1)
     def test_tower_capture_ticks_no_double_and_leave(self):
         when=NOW+8*3600
-        with patch('network_redirect.backend.time.time',return_value=when):
+        with patch('network_redirect.game_clock.now',return_value=when):
             self.ok(self.land(1));self.ok(self.req(1303,id=1,op_type=1,data='{}'))
             self.ok(self.land(11,tower_id=11));self.ok(self.land(4,flag=1,des_type=2,des_id=11))
             self.assertEqual(self.b.profile()['activity']['land']['tower_id'],11)
-        with patch('network_redirect.backend.time.time',return_value=when+600):
+        with patch('network_redirect.game_clock.now',return_value=when+600):
             self.ok(self.land(1));self.assertEqual(self.b.profile()['activity']['land']['soul_count'],100)
             self.ok(self.land(1));self.assertEqual(self.b.profile()['activity']['land']['soul_count'],100)
             self.ok(self.land(5,tower_id=11));self.assertEqual(self.b.profile()['activity']['land']['tower_id'],0)
@@ -565,15 +565,15 @@ class LandTests(ActivityCase):
         r=self.b.profile();s=r['activity']['land'];s.update(boss_layer=16,soul_count=10000,travel_count=30);self.b.save(r)
         self.ok(self.land(2,des_level=2));self.ok(self.land(9,grid_count=3))
         self.assertEqual(self.land(3)[0][0],55)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.ok(self.land(3))
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):self.ok(self.land(3))
 
     def test_public_tower_auto_and_cross_day_income(self):
         when=NOW+11*3600+50*60
-        with patch('network_redirect.backend.time.time',return_value=when):
+        with patch('network_redirect.game_clock.now',return_value=when):
             self.ok(self.land(1));self.ok(self.land(21,auto_tower=1))
             self.assertEqual(self.b.profile()['activity']['land']['tower_id'],14)
             self.ok(self.land(21,auto_tower=0))
-        with patch('network_redirect.backend.time.time',return_value=when+1200):
+        with patch('network_redirect.game_clock.now',return_value=when+1200):
             self.ok(self.land(1));s=self.b.profile()['activity']['land']
             self.assertEqual(s['soul_count'],100);self.assertEqual(s['tower_id'],0)
 
@@ -684,7 +684,7 @@ class SpringTests(ActivityCase):
         gain=self.req(1211,prize_id=ident,count=1);self.ok(gain)
         self.assertEqual(next(d for e,d in gain if e==87)['attach_count'],row['reward'][2])
         before=self.b.profile();self.assertEqual(self.req(1211,prize_id=ident,count=1)[0][0],55);self.assertEqual(before,self.b.profile())
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.ok(self.req(1210,flag=1))
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):self.ok(self.req(1210,flag=1))
         self.assertEqual(self.b.profile()['activity']['seasonal']['spring']['purchases'],{})
     def test_card_combinations_duplicate_and_inventory(self):
         from network_redirect.activity_tangwang import COMBINATIONS, card

@@ -47,7 +47,7 @@ def fixture():
                 assert len(events)==1;results.append(events[0])
             next_now=query['equip_compose']['weekly_reset_at']
             next_query=dict(c.compose_list(b.profile(),c.load_rules(),next_now),show=True)
-            with patch.object(c.time,'time',return_value=next_now):
+            with patch.object(c.game_clock,'now',return_value=next_now):
                 packets=b.respond(encode(1053,dict(serial_num=200001,compose_type=3,equip_type=6001,equip_quality=4,
                     material_quality=4,material_count=5,material_list=[dict(id=i) for i in ids[5:10]])),{'authenticated':True})
             next_result=next(login_fields(d['data']) for m,_,d in map(decode,packets) if m==2998 and d['id']==6)

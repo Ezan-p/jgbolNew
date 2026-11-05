@@ -155,6 +155,8 @@ def client_source(rules):
     equipment_source += '\n' + Path(__file__).with_name('soul_refresh_client.lua').read_text(encoding='utf-8')
     from . import achievements
     equipment_source += '\n' + achievements.client_patch()
+    equipment_source += '\n' + Path(__file__).with_name('request_timing_client.lua').read_text(encoding='utf-8')
+    equipment_source += '\n' + Path(__file__).with_name('request_wait_client.lua').read_text(encoding='utf-8')
     reborn_source = Path(__file__).with_name('reborn_client.lua').read_text(encoding='utf-8')
     from . import fate_rebuild
     fate_items = {int(r['type_id']): {k.split('(')[0]: int(v) if v.isdigit() else v for k,v in r.items()}

@@ -67,13 +67,13 @@ class DutyTests(ActivityCase):
         with patch.object(balance, 'choose_enemy_set', return_value=1):
             self.start()
         self.pass_stages(3)
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             self.info(plus_type=5, plus_index=1)
             self.assertEqual(self.b.profile()['activity']['duty']['enemy_set'], 1)
         # A legacy current run has no set id: it must retain original set zero.
         r = self.b.profile(); r['activity']['duty'].pop('enemy_set')
         self.b.save(r)
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             self.info(flag=1)
         self.assertEqual(self.b.profile()['activity']['duty']['enemy_set'], 0)
 
@@ -234,7 +234,7 @@ class DutyTests(ActivityCase):
 
     def test_yesterday_resume_and_first_day_does_not_consume_query(self):
         self.start(); self.pass_stages(15)
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             for _ in range(2):
                 d = self.info(flag=1)
                 self.assertEqual(d['result'], 12); self.assertEqual(d['fight_count'], 3)
@@ -246,7 +246,7 @@ class DutyTests(ActivityCase):
 
     def test_yesterday_restart_option(self):
         self.start(); self.pass_stages(9)
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             d = self.info(plus_type=5, plus_index=0)
             self.assertEqual(d['result'], 1); self.assertEqual(d['cur_round'], 0)
 
@@ -254,7 +254,7 @@ class DutyTests(ActivityCase):
         self.start(); self.fight(); self.fight(); self.fight()
         r = self.b.profile(); gold = r['gold_coin']; silver = r['silver_coin']
         g = r['activity']['duty']['group']
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             self.info(flag=1); self.info(flag=1)
             r = self.b.profile()
             self.assertEqual(r['silver_coin'], silver+3000)
@@ -269,7 +269,7 @@ class DutyTests(ActivityCase):
 
     def test_backward_time_does_not_reset_or_grant(self):
         self.start(); before = self.b.profile()
-        with patch('network_redirect.backend.time.time', return_value=NOW-86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW-86400):
             self.assertEqual(self.req(1043, flag=0)[0][0], 55)
         self.assertEqual(self.b.profile()['activity'], before['activity'])
 
@@ -378,7 +378,7 @@ class DutyTests(ActivityCase):
         self.info(plus_type=4, plus_index=0)
         self.assertEqual(self.preview()['cortege_list'][1]['gongji'], base)
         self.info(plus_type=1, plus_index=3)
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             self.assertEqual(self.preview()['cortege_list'][1]['gongji'], base)
 
     def test_peer_preview_uses_its_own_run_and_ignores_stale_day(self):
@@ -413,23 +413,23 @@ class DutyTests(ActivityCase):
 
     def test_two_day_streak_and_gap_break(self):
         self.start(); self.pass_stages(3)
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             self.info(plus_type=5, plus_index=0); self.info(plus_type=1, plus_index=3)
             self.pass_stages(3)
-        with patch('network_redirect.backend.time.time', return_value=NOW+2*86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+2*86400):
             self.info(flag=1)
             self.assertEqual(self.b.profile()['activity']['duty_meta']['streak'], 2)
             self.assertEqual(achievements.state(self.b.profile())['totals']['431'], 2)
-        with patch('network_redirect.backend.time.time', return_value=NOW+4*86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+4*86400):
             self.start(); self.pass_stages(3)
-        with patch('network_redirect.backend.time.time', return_value=NOW+5*86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+5*86400):
             self.info(flag=1)
             self.assertEqual(self.b.profile()['activity']['duty_meta']['streak'], 1)
 
     def test_no_participation_no_rank_no_reward(self):
         before = self.b.profile()['gold_coin']
         for offset in (0, 86400, 7*86400):
-            with patch('network_redirect.backend.time.time', return_value=NOW+offset):
+            with patch('network_redirect.game_clock.now', return_value=NOW+offset):
                 self.assertEqual(self.info(flag=1)['expect_order'], 0)
                 self.assertEqual(self.b.profile()['gold_coin'], before)
 
@@ -478,7 +478,7 @@ class DutyTests(ActivityCase):
         self.b.save(peer, 'peer')
         old_peer = self.b.profile('peer'); before = self.b.profile()['gold_coin']
         g = peer['activity']['duty']['group']
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             self.info(flag=1)
             self.assertEqual(self.b.profile()['gold_coin'], before)
             mail = self.b.profile()['welfare']['mails']['duty-rank-'+key]
@@ -491,7 +491,7 @@ class DutyTests(ActivityCase):
 
     def test_late_settlement_title_does_not_restart_expiry(self):
         self.start(); self.pass_stages(3)
-        with patch('network_redirect.backend.time.time', return_value=NOW+7*86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+7*86400):
             self.info(flag=1)
             title = self.b.profile()['profile_titles']['113']
             self.assertLess(title['endtime'], NOW+7*86400)
@@ -502,7 +502,7 @@ class DutyTests(ActivityCase):
     def test_rank_settlement_encoding_failure_rolls_back(self):
         self.start(); self.pass_stages(3)
         before = self.b.profile()
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             with patch('network_redirect.backend.activity.attributes', side_effect=ValueError('encoding')):
                 self.assertEqual(self.req(1043, flag=1)[0][0], 55)
         self.assertEqual(self.b.profile()['activity'], before['activity'])
@@ -608,7 +608,7 @@ class DutyTests(ActivityCase):
         self.fight()
         before = self.b.profile()['gold_coin']
         g = self.b.profile()['activity']['duty']['group']
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             self.info(flag=1); self.info(flag=1)
             self.assertEqual(self.b.profile()['gold_coin'], before+20)
             mail = next(m for k, m in self.b.profile()['welfare']['mails'].items() if k.startswith('duty-rank-'))

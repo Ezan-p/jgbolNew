@@ -27,7 +27,7 @@ class SystemMailTests(unittest.TestCase):
     def request(self,mid,mail_id,now=NOW):
         self.serial+=1
         packet=encode(mid,dict(serial_num=self.serial,mail_id=mail_id,flag=1))
-        with patch('network_redirect.backend.time.time',return_value=now):
+        with patch('network_redirect.game_clock.now',return_value=now):
             replies=self.b.respond(packet,dict(authenticated=True))
         events=[login_fields(d['data']) for m,_,d in map(decode,replies) if m==2998]
         return packet,replies,events
@@ -60,6 +60,10 @@ class SystemMailTests(unittest.TestCase):
             self.assertTrue(any(e.get('mail_id')==mail['mail_id'] and 'mail_body' in e for e in events))
             self.assertEqual(self.b.last_welfare_serial,0)
             self.assertFalse(any(decode(p)[0] in (1034,1035) for p in replies))
+        # Positive read requests participate in the shared session sequence,
+        # while leaving the welfare mutation watermark untouched.
+        self.assertEqual(self.b.last_request_serial,99999)
+        self.serial=99999
         _,_,events=self.request(1103,mail['mail_id'])
         self.assertFalse(any('op_string' in e for e in events))
 

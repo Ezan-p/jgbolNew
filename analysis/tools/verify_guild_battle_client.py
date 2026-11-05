@@ -21,7 +21,7 @@ from verify_guild_client import LUA_EVALUATOR
 
 
 def fixture():
-    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time', return_value=1792814400):
+    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.game_clock.now', return_value=1792814400):
         backend = Backend(Path(tmp), 18790, lambda *a, **kw: None)
         try:
             role = backend.profile()

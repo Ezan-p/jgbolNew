@@ -84,7 +84,7 @@ def main():
         def request(op, **data):
             nonlocal serial
             serial += 1
-            with patch('network_redirect.backend.time.time', return_value=NOW):
+            with patch('network_redirect.game_clock.now', return_value=NOW):
                 raw = b.respond(encode(1329, dict(serial_num=serial, id=op, data=summon.lua(data))),
                                 dict(authenticated=True))
             return [(d['id'], login_fields(d['data'])) for mid, _, d in map(decode, raw) if mid == 2998]

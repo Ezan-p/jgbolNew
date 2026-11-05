@@ -18,7 +18,7 @@ class MondayTests(ActivityCase):
         super().setUp()
         # ActivityCase stores the patcher rather than its mock.
         self.clock.stop()
-        self.timer = patch('network_redirect.backend.time.time', return_value=SUNDAY)
+        self.timer = patch('network_redirect.game_clock.now', return_value=SUNDAY)
         self.time = self.timer.start(); self.addCleanup(self.timer.stop)
 
     def call(self, flag=1, level=0, op_type=0):

@@ -53,7 +53,7 @@ def response_rows(replies):
 def run_case(item_type):
     emitted = []
     with tempfile.TemporaryDirectory(prefix='jgbol-item-audit-') as tmp, \
-            patch('network_redirect.backend.time.time', return_value=NOW):
+            patch('network_redirect.game_clock.now', return_value=NOW):
         backend = Backend(Path(tmp), 18770, lambda event, **data: emitted.append(dict(event=event, **data)))
         try:
             role = backend.profile()

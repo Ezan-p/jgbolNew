@@ -15,7 +15,7 @@ from network_redirect.protocol import encode, decode
 
 def main():
     now = int(time.time())
-    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time', return_value=now):
+    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.game_clock.now', return_value=now):
         b = Backend(Path(tmp), 18770, lambda *a, **k: None)
         role = b.profile()
         role['level'] = 20

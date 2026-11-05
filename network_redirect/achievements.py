@@ -1,4 +1,5 @@
 """Original hotupdate 1263 catalogue [A]; authoritative local settlement [B]."""
+from .request_timing import phase, count as timing_count
 import csv
 import json
 from pathlib import Path
@@ -386,11 +387,16 @@ def simulate(role, ident, amount, receipt, now):
     return True
 
 
+ACHIEVEMENT_EVENTS = {2998: frozenset({23, 41, 43, 77, 112, 114, 116}),
+                      1301: frozenset({40, 69})}
+
+
 def record_events(role, events, now, parse):
     """Consume already validated server results, never client-supplied award claims."""
     from .protocol import decode
     from . import formation as f
     for packet in events:
+        timing_count("achievement_packets")
         mid, _, data = decode(packet)
         if mid == 1027 and data.get('fight_type') == 20:
             if 1 <= data.get('final_result', 0) <= 3: add(role, 456)
@@ -398,10 +404,13 @@ def record_events(role, events, now, parse):
                 totals = state(role)['totals']; totals['456'] = totals.get('456', 0) // 5 * 5
         if mid not in (2998, 1301): continue
         event = data['id']
-        # Battle effects and long-replay preloads have no achievement facts.
-        # Their authoritative outcome still arrives in the 1027 notification.
-        if mid == 2998 and event == 121: continue
-        d = parse(data['data'])
+        # Filter by protocol AND event before parsing potentially large Lua tables.
+        if event not in ACHIEVEMENT_EVENTS[mid]:
+            timing_count("achievement_skipped")
+            continue
+        timing_count("achievement_parsed")
+        with phase("achievement_parse"):
+            d = parse(data['data'])
         if not isinstance(d, dict): continue
         if mid == 1301:
             if d.get('result', 1) != 1: continue

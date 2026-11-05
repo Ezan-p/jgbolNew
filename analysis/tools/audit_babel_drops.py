@@ -91,6 +91,9 @@ def main():
         for row in source:
             specs = [list(map(int, value.split('|'))) for value in row['daoju'].split('/')]
             normalized = [spec if len(spec) == 4 else spec + [1] for spec in specs]
+            weights = [babel.floor_reward_weight(spec, secret) for spec in normalized]
+            weighted = [spec for spec, weight in zip(normalized, weights) for _ in range(weight)]
+            draw_pool = weighted if not secret and any(spec[:2] == [5, 1246] for spec in normalized) else normalized
             counts = Counter(map(tuple, normalized))
             entries = []
             for spec in specs:
@@ -99,11 +102,11 @@ def main():
                 assert items[tid] == original_items[tid], tid
                 entries.append(dict(raw='|'.join(map(str, spec)), item_id=tid, name=names[tid],
                                     count=count, level=spec[3] if len(spec) == 4 else 1,
-                                    local_entry_probability=str(Fraction(1, len(specs)))))
+                                    local_entry_probability=str(Fraction(babel.floor_reward_weight(spec, secret), sum(weights)))))
             group = dict(secret=secret, floor_l=int(row['floor_l']), floor_r=int(row['floor_r']),
                          entries=entries, entry_count=len(specs),
                          duplicate_specs=[dict(spec=list(spec), occurrences=n,
-                                               local_probability=str(Fraction(n, len(specs))))
+                                               local_probability=str(Fraction(n * babel.floor_reward_weight(list(spec), secret), sum(weights))))
                                           for spec, n in counts.items() if n > 1])
             groups.append(group)
             for floor in range(group['floor_l'], group['floor_r'] + 1):
@@ -112,7 +115,7 @@ def main():
                     role = dict(attachments=[], summon={})
                     state = dict(cur_floor=floor, secret=secret, coin_count=0)
                     def choose(pool):
-                        assert pool == normalized, (floor, pool)
+                        assert pool == draw_pool, (floor, pool)
                         return selected
                     with patch.object(babel.secrets, 'choice', side_effect=choose):
                         reward = babel.floor_reward(role, state, rules)

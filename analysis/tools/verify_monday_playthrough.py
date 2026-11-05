@@ -14,7 +14,7 @@ from network_redirect.protocol import encode, decode
 def main():
     start=1792987200-6*86400 # Tuesday before 2026-10-26
     steps=[]; tasks=set(); bought=set(); serial=200000
-    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time',return_value=start) as clock:
+    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.game_clock.now',return_value=start) as clock:
         b=Backend(Path(tmp),18770,lambda *a,**k:None)
         role=b.profile();role.update(level=60,vip_level=1,gold_coin=100000,silver_coin=1000000,strength=1000,energy=1000)
         for c in role['corteges']:c.update(level=100,culture_point=1000)

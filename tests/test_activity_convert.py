@@ -137,7 +137,7 @@ class ConvertTests(ActivityCase):
         self.assertEqual(self.b.profile(), before)
         status = self.req(1205, flag=1)
         self.assertEqual(next(d for e, d in status if e == 48)['last_convert_type'], self.source)
-        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 86400):
             r = self.b.profile(); r['attachments'] = [i for i in r['attachments'] if i['type_id'] != 1024]; self.b.save(r)
             self.ok(self.fight())
             after = self.b.profile()

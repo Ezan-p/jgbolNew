@@ -54,9 +54,9 @@ class GuildStoreTests(unittest.TestCase):
         self.ok(40,item_id=row['id'],buy_count=row['buy_times'])
         before=self.role();deadline=before['union_store_flush_time']
         self.assertEqual(self.ok(38)[-1][2]['item_list'][row['id']]['buy_times'],0)
-        with patch('network_redirect.backend.time.time',return_value=deadline-1):
+        with patch('network_redirect.game_clock.now',return_value=deadline-1):
             self.assertEqual(self.ok(38)[-1][2]['item_list'][row['id']]['buy_times'],0)
-        with patch('network_redirect.backend.time.time',return_value=deadline):
+        with patch('network_redirect.game_clock.now',return_value=deadline):
             data=next(d for mid,op,d in self.ok(38) if mid==1301 and op==38);after=self.role()
             self.assertEqual(after['guild']['purchases'],{})
             for item in after['guild']['store_stock']:

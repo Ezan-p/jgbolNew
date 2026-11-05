@@ -31,7 +31,7 @@ class MarketTests(unittest.TestCase):
     def request(self, mid=1057, **data):
         self.serial += 1
         self.packet = encode(mid, dict(serial_num=self.serial, **data))
-        with patch('network_redirect.backend.time.time', return_value=self.now):
+        with patch('network_redirect.game_clock.now', return_value=self.now):
             self.replies = self.backend.respond(self.packet, self.state)
         rows = [decode(p) for p in self.replies]
         if mid != 1242:
@@ -49,7 +49,7 @@ class MarketTests(unittest.TestCase):
                    if i['attach_type'] == 5 and i['type_id'] == type_id)
 
     def test_bootstrap_and_query_have_original_permanent_catalog(self):
-        with patch('network_redirect.backend.time.time', return_value=self.now):
+        with patch('network_redirect.game_clock.now', return_value=self.now):
             packet = self.backend.bootstrap()[0]
         cfg = login_fields(decode(packet)[2]['data'])
         self.assertEqual(cfg[23], self.backend.formation_rules['equipment_advance'])
@@ -271,7 +271,7 @@ class MarketTests(unittest.TestCase):
         self.buy(page_id=1, index=10)
         self.backend.close()
         self.backend = Backend(Path(self.tmp.name), 18770, lambda *a, **kw: None)
-        with patch('network_redirect.backend.time.time', return_value=self.now):
+        with patch('network_redirect.game_clock.now', return_value=self.now):
             cfg = login_fields(decode(self.backend.bootstrap(reconnect=True)[0])[2]['data'])
         self.assertEqual(cfg[10]['cheap_item_list'][10]['buy_limit_times'], 0)
 
@@ -415,7 +415,7 @@ class MarketTests(unittest.TestCase):
         self.assertEqual(preview_time, market.sale_time(self.now, self.rules))
         # Profile reads also recover energy; compare at the same simulated time
         # so normal recovery is not mistaken for a rejected market mutation.
-        with patch('network_redirect.backend.time.time', return_value=self.now):
+        with patch('network_redirect.game_clock.now', return_value=self.now):
             before = self.backend.profile()
             self.assertEqual(self.request(1241, buy_index=1)[0][1]['result'], 4)
             self.assertEqual(self.backend.profile(), before)

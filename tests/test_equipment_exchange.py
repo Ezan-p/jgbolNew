@@ -21,7 +21,7 @@ class ExchangeTests(unittest.TestCase):
 
     def test_exchange_level_30_preserves_materials_below_threshold(self):
         self.add(1008, count=2)
-        with patch.object(c.time, 'time', return_value=1793016000) as clock:
+        with patch.object(c.game_clock, 'now', return_value=1793016000) as clock:
             for op, target in ((2, 2001), (3, 6001)):
                 ids = self.materials()
                 role = self.b.profile(); role['level'] = 29; self.b.save(role)
@@ -40,7 +40,7 @@ class ExchangeTests(unittest.TestCase):
 
     def test_weekly_transactions_four_targets_replay_and_reconnect(self):
         now = 1793016000  # 2026-10-26, within the first fixture week.
-        with patch.object(c.time, 'time', return_value=now) as clock:
+        with patch.object(c.game_clock, 'now', return_value=now) as clock:
             for week, tid in enumerate((6001, 6002, 6003, 6004)):
                 clock.return_value = now + week*c.WEEK
                 ids = self.materials()
@@ -64,7 +64,7 @@ class ExchangeTests(unittest.TestCase):
             self.assertEqual(snapshot['weekly_remaining'], 0)
 
     def test_shared_limit_both_directions_and_same_equipment_next_week(self):
-        with patch.object(c.time, 'time', return_value=1793016000) as clock:
+        with patch.object(c.game_clock, 'now', return_value=1793016000) as clock:
             self.add(1008,count=5)
             for op, target in ((2,2001),(3,6001),(2,2001)):
                 ids=self.materials()
@@ -81,7 +81,7 @@ class ExchangeTests(unittest.TestCase):
     def test_monday_boundary_offline_and_clock_rollback(self):
         from datetime import datetime, timezone
         monday=int(datetime(2026,10,25,16,tzinfo=timezone.utc).timestamp())
-        with patch.object(c.time,'time',return_value=monday-1) as clock:
+        with patch.object(c.game_clock,'now',return_value=monday-1) as clock:
             self.add(1008,count=3);ids=self.materials()
             self.assertEqual(self.compose(ids[0],2,2001,ids)[-1][0],6)
             prior=self.req(1055,flag=1)[-1][1]['equip_compose']

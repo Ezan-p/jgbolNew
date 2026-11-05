@@ -13,7 +13,7 @@ class FeedTests(ActivityCase):
     def test_daily_points_only_for_successful_participation_and_reset(self):
         def points(): return self.b.profile().get('daily', {}).get('points', {}).get('11', 0)
         self.data(); self.assertEqual(points(), 0)
-        with patch('network_redirect.backend.time.time', return_value=NOW-1):
+        with patch('network_redirect.game_clock.now', return_value=NOW-1):
             self.assertEqual(self.data(30)['feed_result'], 3)
             self.assertEqual(points(), 0)
         self.req(1040, feed_count=201); self.assertEqual(points(), 0)
@@ -23,11 +23,11 @@ class FeedTests(ActivityCase):
         self.assertEqual(self.b.respond(self.packet, self.state), self.replies)
         self.assertEqual(self.b.profile(), before)
         self.assertEqual(self.data(30)['feed_result'], 4)
-        with patch('network_redirect.backend.time.time', return_value=NOW+6*3600):
+        with patch('network_redirect.game_clock.now', return_value=NOW+6*3600):
             self.assertEqual(self.data(30)['feed_result'], 2)
             self.assertEqual(points(), 10)
         self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             # First action next day settles directly, with no prior panel query.
             self.assertEqual(self.data(30)['feed_result'], 2)
             self.assertEqual(points(), 10)
@@ -74,7 +74,7 @@ class FeedTests(ActivityCase):
 
     def test_second_run_and_new_day(self):
         self.data(60)
-        with patch('network_redirect.backend.time.time', return_value=NOW+6*3600):
+        with patch('network_redirect.game_clock.now', return_value=NOW+6*3600):
             before = self.b.profile()['strength']
             d = self.data(10)
             self.assertEqual(d['strength'], 20)
@@ -82,7 +82,7 @@ class FeedTests(ActivityCase):
             self.assertEqual(d['feed_data']['feed_count'], 60)
             self.assertEqual(self.b.profile()['strength'], before + 20)
             self.assertEqual(self.data()['strength'], 60)
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             d = self.data()
             self.assertEqual(d['feed_data']['feed_count'], 0)
             self.assertEqual(d['feed_champion']['count'], 0)
@@ -92,7 +92,7 @@ class FeedTests(ActivityCase):
     def test_closed_boundaries_do_not_consume_or_award(self):
         self.data()
         for offset in (-1,2*3600,6*3600-1,8*3600):
-            with patch('network_redirect.backend.time.time', return_value=NOW+offset):
+            with patch('network_redirect.game_clock.now', return_value=NOW+offset):
                 before = self.b.profile()
                 self.assertEqual(self.data(30)['feed_result'], 3)
                 after = self.b.profile()
@@ -119,7 +119,7 @@ class FeedTests(ActivityCase):
         with patch.object(self.b, 'duty_peers', return_value=[peer]):
             self.assertEqual(self.data(30)['feed_champion']['name'], '先完成玩家')
             self.assertEqual(self.b.profile()['achievements']['totals'].get('445', 0), 0)
-            with patch('network_redirect.backend.time.time', return_value=NOW+21600):
+            with patch('network_redirect.game_clock.now', return_value=NOW+21600):
                 self.assertEqual(self.data(40)['feed_champion']['name'],role['role_name'])
                 self.assertEqual(self.b.profile()['achievements']['totals']['445'], 1)
 

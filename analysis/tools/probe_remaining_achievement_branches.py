@@ -26,7 +26,7 @@ OUTPUT = ROOT / 'analysis/evidence/server_integration/achievement_branch_probes_
 def run():
     probes = []
     with tempfile.TemporaryDirectory(prefix='achievement-branch-audit-') as temp:
-        with patch('network_redirect.backend.time.time', return_value=NOW):
+        with patch('network_redirect.game_clock.now', return_value=NOW):
             backend = Backend(Path(temp), 18770, lambda *args, **kwargs: None)
             try:
                 serial = 10000

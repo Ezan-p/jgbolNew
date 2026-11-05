@@ -189,7 +189,7 @@ class BabelTests(ActivityCase):
         self.call()
         self.assertEqual(self.saved()['floors'], floors)
         monday = npc.start(self.saved()['week'] + 1, self.b.activity_rules)
-        with patch('network_redirect.backend.time.time', return_value=monday), \
+        with patch('network_redirect.game_clock.now', return_value=monday), \
                 patch.object(babel, 'random_floor', wraps=babel.random_floor) as generate:
             self.call(); self.call()
             self.assertEqual(generate.call_count, 1)
@@ -242,7 +242,7 @@ class BabelTests(ActivityCase):
     def test_floor_reward_entry_probabilities_and_coin_budget(self):
         self.call()
         for floor, count in ((11,9),(16,7),(21,9),(26,10),(31,8),(36,8),
-                             (41,9),(46,10),(51,9),(56,8),(61,7),(66,7)):
+                             (41,9),(46,10),(51,9),(56,50),(61,7),(66,7)):
             role = self.b.profile(); s = role['activity']['babel']; s['cur_floor'] = floor
             before = babel.item_count(role,20000)
             with patch.object(babel.secrets,'choice',side_effect=lambda entries: entries[0]) as draw:
@@ -251,6 +251,9 @@ class BabelTests(ActivityCase):
             self.assertEqual(len(entries), count)
             self.assertEqual(babel.item_count(role,20000)-before, 50)
             self.assertEqual(rewards[-1]['attach_count'], 50)
+            if floor == 56:
+                self.assertEqual(entries.count([5,1246,1,1]), 1)  # 1/50 = 2%
+                self.assertEqual(sorted(Counter(map(tuple, entries)).values()), [1] + [7] * 7)
             if floor == 31:
                 self.assertEqual(entries.count([5,10001,1,1]), 2)  # 2/8, not 1/7
             if floor == 11:
@@ -263,7 +266,7 @@ class BabelTests(ActivityCase):
         for tid,n in ((20016,10),(20017,25),(20018,80),(20019,200)):
             old=self.saved()['energy']; self.call(10,item_type=tid,count=1)
             self.assertEqual(self.saved()['energy'],old+n)
-        with patch('network_redirect.backend.time.time',return_value=NOW+1800):
+        with patch('network_redirect.game_clock.now',return_value=NOW+1800):
             self.call(); self.assertEqual(self.saved()['energy'],415)
         self.reject(10,item_type=20019,count=2)
 
@@ -272,16 +275,16 @@ class BabelTests(ActivityCase):
         limits = shop['my_shop']
         index = next(i for i in range(1, 7) if limits[i]['limit'] >= 2)
         self.edit(energy=20,life=10,refresh_times=0,purchases={str(index):2})
-        with patch('network_redirect.backend.time.time',return_value=NOW+1799):
+        with patch('network_redirect.game_clock.now',return_value=NOW+1799):
             self.call(); self.assertEqual(self.saved()['energy'],20)
-        with patch('network_redirect.backend.time.time',return_value=NOW+1800):
+        with patch('network_redirect.game_clock.now',return_value=NOW+1800):
             self.call(); self.assertEqual(self.saved()['energy'],21)
             self.call(); self.assertEqual(self.saved()['energy'],21)
-        with patch('network_redirect.backend.time.time',return_value=NOW+43200):
+        with patch('network_redirect.game_clock.now',return_value=NOW+43200):
             self.call(); s=self.saved(); self.assertEqual((s['life'],s['energy'],s['refresh_times']),(100,44,1))
             self.assertEqual(s['purchases'], {})
         self.call(); self.assertEqual(self.saved()['energy'],44)
-        with patch('network_redirect.backend.time.time',return_value=NOW+3*86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+3*86400):
             self.call(); self.assertEqual(self.saved()['energy'],100)
 
     def test_zero_life_allows_exploration_not_combat(self):
@@ -317,7 +320,7 @@ class BabelTests(ActivityCase):
         self.call()
         role = self.b.profile(); summon.add_item(role, 20000, 2000); self.b.save(role)
         midnight = (activity.day(NOW, self.b.activity_rules) + 1) * 86400 - self.b.activity_rules['timezone_offset_hours'] * 3600
-        with patch('network_redirect.backend.time.time', return_value=midnight - 1):
+        with patch('network_redirect.game_clock.now', return_value=midnight - 1):
             first = self.call(8)[0]
             paid = self.call(9)[0]
             packet, replies = self.packet, self.replies
@@ -334,7 +337,7 @@ class BabelTests(ActivityCase):
             self.call(8)
             self.assertEqual(self.saved(), before)
 
-        with patch('network_redirect.backend.time.time', return_value=midnight):
+        with patch('network_redirect.game_clock.now', return_value=midnight):
             reset = self.call(8)[0]
             self.assertEqual(reset['refresh_times'], 1)
             self.assertEqual(reset['coin_count'], before['coin_count'])
@@ -361,7 +364,7 @@ class BabelTests(ActivityCase):
         self.assertEqual(before['my_exchange'][1], 1)
         # Also cover a legacy save first loaded on a later day.
         role = self.b.profile(); role['activity']['babel'].pop('shop_day', None); self.b.save(role)
-        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 86400):
             after = self.call(8)[0]
         self.assertEqual(after['refresh_times'], 1)
         self.assertEqual(list(after['my_exchange'].values()), [0] * 6)
@@ -374,7 +377,7 @@ class BabelTests(ActivityCase):
             role = self.b.profile()
             activity.prepare(role, later, self.b.activity_rules)
             self.b.save(role)
-            with patch('network_redirect.backend.time.time', return_value=later):
+            with patch('network_redirect.game_clock.now', return_value=later):
                 reset = self.call(8)[0]
                 self.assertEqual(reset, self.call(8)[0])
             self.assertEqual(draw.call_count, 1)
@@ -412,7 +415,7 @@ class BabelTests(ActivityCase):
         self.assertEqual(self.shop_signature(first), self.shop_signature(reopened))
 
         next_week = npc.start(before['week'] + 1, self.b.activity_rules)
-        with patch('network_redirect.backend.time.time', return_value=next_week):
+        with patch('network_redirect.game_clock.now', return_value=next_week):
             refreshed = self.call(8)[0]
         self.assert_shop_subset(refreshed)
         self.assertEqual(list(refreshed['my_exchange'].values()), [0] * len(refreshed['my_shop']))
@@ -470,7 +473,7 @@ class BabelTests(ActivityCase):
         s.pop('frozen_week', None)
         summon.add_item(role,20012,3); summon.add_item(role,20000,100)
         self.b.save(role); before=self.saved(); monday=npc.start(before['week']+1,self.b.activity_rules)
-        with patch('network_redirect.backend.time.time',return_value=monday):
+        with patch('network_redirect.game_clock.now',return_value=monday):
             self.call(); s=self.saved()
             self.assertEqual((s['cur_floor'],s['history_floor'],s['life'],s['energy']),(1,1,100,300))
             self.assertEqual(s['last_my_top']['order'],1)
@@ -482,7 +485,7 @@ class BabelTests(ActivityCase):
             self.req(1103,mail_id=mails[0]['mail_id'],flag=1)
             self.assertEqual(babel.item_count(self.b.profile(),20000),2100)
             self.call(8); self.assertEqual(self.saved()['coin_count'],2100)
-        with patch('network_redirect.backend.time.time',return_value=monday+4*604800):
+        with patch('network_redirect.game_clock.now',return_value=monday+4*604800):
             self.call()
             self.assertEqual(len([k for k in self.b.profile()['welfare']['mails'] if k.startswith('babel-rank-')]),1)
 

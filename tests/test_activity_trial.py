@@ -125,7 +125,7 @@ class TrialTests(ActivityCase):
         before = self.b.profile()
         self.assertEqual(self.fight()[0][0], 55)
         self.assertEqual(before, self.b.profile())
-        with patch('network_redirect.backend.time.time', return_value=NOW + 60), self.fake_battle(200):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 60), self.fake_battle(200):
             self.ok(self.fight())
         self.assertEqual(self.b.profile()['activity']['trial_bosses'][0]['hp'], hp - 300)
 
@@ -143,9 +143,9 @@ class TrialTests(ActivityCase):
         self.enter()
         second = self.seed()
         for i in range(10):
-            with patch('network_redirect.backend.time.time', return_value=NOW + i * 60), self.fake_battle(1):
+            with patch('network_redirect.game_clock.now', return_value=NOW + i * 60), self.fake_battle(1):
                 self.ok(self.fight())
-        with patch('network_redirect.backend.time.time', return_value=NOW + 600):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 600):
             before = self.b.profile()
             self.assertEqual(self.fight()[0][0], 55)
             self.assertEqual(before, self.b.profile())
@@ -155,7 +155,7 @@ class TrialTests(ActivityCase):
                 self.ok(self.fight(des_id=second['type_id'], des_value=second['boss_id']))
             self.assertEqual([b['train_times'] for b in self.b.profile()['activity']['trial_bosses']], [10,1])
         midnight = (activity.day(NOW, self.b.activity_rules) + 1) * 86400 - 8 * 3600
-        with patch('network_redirect.backend.time.time', return_value=midnight):
+        with patch('network_redirect.game_clock.now', return_value=midnight):
             data = self.enter()
             self.assertTrue(data['no_boss'])
             self.assertEqual(data['train_times'], 0)
@@ -191,9 +191,9 @@ class TrialTests(ActivityCase):
         self.b.save(role)
         inventory = copy.deepcopy(role['attachments'])
         midnight = (activity.day(NOW, self.b.activity_rules) + 1) * 86400 - 8 * 3600
-        with patch('network_redirect.backend.time.time', return_value=midnight-1):
+        with patch('network_redirect.game_clock.now', return_value=midnight-1):
             self.assertTrue(self.enter()['boss_list'][1]['is_dead'])
-        with patch('network_redirect.backend.time.time', return_value=midnight):
+        with patch('network_redirect.game_clock.now', return_value=midnight):
             self.assertEqual(self.req(1064, flag=9, id=old['boss_id'])[0][0], 55)
             data = self.enter()
             self.assertTrue(data['no_boss'])
@@ -204,13 +204,13 @@ class TrialTests(ActivityCase):
             self.assertEqual(new['day'], old['day']+1)
             self.assertGreater(new['boss_id'], old['boss_id'])
             self.assertEqual(self.req(1064, flag=9, id=old['boss_id'])[0][0], 55)
-            with patch('network_redirect.backend.time.time', return_value=NOW):
+            with patch('network_redirect.game_clock.now', return_value=NOW):
                 self.assertEqual(self.req(1064, flag=9, id=old['boss_id'])[0][0], 55)
 
     def test_clock_rollback_rejected(self):
         self.enter()
         before = self.b.profile()
-        with patch('network_redirect.backend.time.time', return_value=NOW - 1):
+        with patch('network_redirect.game_clock.now', return_value=NOW - 1):
             self.assertEqual(self.fight()[0][0], 55)
         self.assertEqual(before, self.b.profile())
 
@@ -343,7 +343,7 @@ class TrialTests(ActivityCase):
         with patch.object(trial.secrets, 'choice', return_value=second['type_id']):
             new = self.seed()
         self.assertNotEqual(new['boss_id'], second['boss_id'])
-        with patch('network_redirect.backend.time.time', return_value=NOW + 60):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 60):
             self.assertEqual(self.req(1026, fight_type=11, des_type=8, des_id=second['type_id'], des_value=second['boss_id'])[0][0], 55)
 
     def test_live_v2_migration_preserves_snapshot(self):

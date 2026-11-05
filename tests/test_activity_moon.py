@@ -208,4 +208,4 @@ class MoonTests(ActivityCase):
         self.put(1134,30);self.put(1135,30);r=self.b.profile()
         season.state(r)['counts'][f'moon:{activity.day(NOW,self.b.activity_rules)}']=100;self.b.save(r);before=self.b.profile()
         self.assertEqual(self.req(1333,flag=1,src_type=1135)[0][0],55);self.assertEqual(before,self.b.profile())
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.ok(self.req(1333,flag=1,src_type=1135))
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):self.ok(self.req(1333,flag=1,src_type=1135))

@@ -34,7 +34,7 @@ class VisitTests(ActivityCase):
     def test_scratch_every_quality_matches_granted_spell(self):
         for day, q in enumerate(range(2, 6)):
             tid = v.SKILLS[q][0]
-            with patch('network_redirect.backend.time.time', return_value=NOW+day*86400), patch.object(v, 'draw_shou', return_value=[6, tid, 1, 1]):
+            with patch('network_redirect.game_clock.now', return_value=NOW+day*86400), patch.object(v, 'draw_shou', return_value=[6, tid, 1, 1]):
                 before = self.b.profile()
                 data = self.call(3)
                 info = data['visit_list'][3]['prize_info']
@@ -97,7 +97,7 @@ class VisitTests(ActivityCase):
 
     def test_lu_amount_and_four_achievements_only_on_claim(self):
         for day, (dice, rate, ident) in enumerate([([6,6,6],16,323),([3,1,2],3,324),([4,4,4],8,325),([1,1,1],10,326)]):
-            with patch('network_redirect.backend.time.time', return_value=NOW+day*86400):
+            with patch('network_redirect.game_clock.now', return_value=NOW+day*86400):
                 before = self.b.profile()['silver_coin']
                 with patch.object(v.secrets, 'randbelow', side_effect=[x-1 for x in dice]):
                     data = self.call(2)
@@ -172,10 +172,10 @@ class VisitTests(ActivityCase):
 
     def test_rollover_and_clock_rollback(self):
         for index in (1,2,3): self.call(index);self.call(index,2)
-        with patch('network_redirect.backend.time.time',return_value=NOW-86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW-86400):
             self.call()
             self.assertTrue(all(row['claimed'] for row in self.b.profile()['activity']['visits'].values()))
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             data=self.call()
             self.assertFalse(any(row['has_visit'] for row in data['visit_list'].values()))
             self.call(3);self.call(3,2)
@@ -207,10 +207,10 @@ class VisitTests(ActivityCase):
 
     def test_midnight_expires_pending_without_grant(self):
         midnight=(NOW+8*3600)//86400*86400-8*3600+86400
-        with patch('network_redirect.backend.time.time',return_value=midnight-1):
+        with patch('network_redirect.game_clock.now',return_value=midnight-1):
             self.call(3)
         before=self.b.profile()['attachments']
-        with patch('network_redirect.backend.time.time',return_value=midnight):
+        with patch('network_redirect.game_clock.now',return_value=midnight):
             self.assertEqual(self.req(1030,visit_index=3,op_type=2)[0][0],55)
             self.call()
             self.assertEqual(self.b.profile()['activity']['visits'],{})

@@ -92,7 +92,7 @@ class PracticeTests(ActivityCase):
         self.assertEqual(saved['max_hp_plus'], 80)
         self.assertEqual(saved['max_magic_plus'], 30)
         self.assertEqual(self.fight()[0][0], 55)
-        with patch('network_redirect.backend.time.time', return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW+86400):
             self.ok(self.req(1205, flag=1))
             self.assertEqual(self.fight()[0][0], 55)
             self.assertEqual(self.b.profile()['rule_index'], 1)

@@ -20,7 +20,7 @@ def fixture():
     now = 1792987200
     def packets(replies):
         return [dict(mid=mid, data=data) for mid, _, data in map(decode, replies) if mid in (1019, 1020, 1023)]
-    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time', return_value=now):
+    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.game_clock.now', return_value=now):
         b = Backend(Path(tmp), 18770, lambda *a, **k: None)
         role = b.profile()
         initial = packets(journey.snapshots(role))

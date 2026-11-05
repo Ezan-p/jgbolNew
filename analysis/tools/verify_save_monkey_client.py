@@ -18,7 +18,7 @@ from lupa.lua51 import LuaRuntime
 
 def main():
     now=1792814400
-    with tempfile.TemporaryDirectory() as temp, patch('network_redirect.backend.time.time',return_value=now):
+    with tempfile.TemporaryDirectory() as temp, patch('network_redirect.game_clock.now',return_value=now):
         b=Backend(Path(temp),18770,lambda *a,**k:None)
         try:
             replies=b.respond(encode(1346,dict(serial_num=90000,id=1,data='{}')),{'authenticated':True})

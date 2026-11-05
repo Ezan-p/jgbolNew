@@ -14,7 +14,7 @@ from network_redirect.protocol import encode,decode
 def main():
     start=1792944000  # Monday 2026-10-26 00:00 UTC+8
     requests=shots=clears=traps=earned=0;days=[];clock=start+3600
-    with tempfile.TemporaryDirectory() as tmp,patch('network_redirect.backend.time.time',side_effect=lambda:clock):
+    with tempfile.TemporaryDirectory() as tmp,patch('network_redirect.game_clock.now',side_effect=lambda:clock):
         b=Backend(Path(tmp),18770,lambda *a,**k:None);role=b.profile();role['level']=60;b.save(role)
         def req(flag,count=0,index=0):
             nonlocal requests

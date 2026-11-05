@@ -25,7 +25,7 @@ class PermanentWelfareTests(unittest.TestCase):
     def request(self, mid=1127, **values):
         self.serial += 1
         packet = encode(mid, dict(serial_num=self.serial, **values))
-        with patch('network_redirect.backend.time.time', return_value=self.now):
+        with patch('network_redirect.game_clock.now', return_value=self.now):
             replies = self.backend.respond(packet, dict(authenticated=True))
         return [(data['id'], login_fields(data['data']))
                 for kind, _, data in map(decode, replies) if kind == 2998]
@@ -73,7 +73,7 @@ class PermanentWelfareTests(unittest.TestCase):
         for now in (NOW+86400, NOW+1000*86400):
             self.now = now
             for activity, index in rewards:
-                with self.subTest(now=now, activity=activity, index=index), patch('network_redirect.backend.time.time', return_value=now):
+                with self.subTest(now=now, activity=activity, index=index), patch('network_redirect.game_clock.now', return_value=now):
                     before = self.backend.profile()
                     self.assertTrue(any(event == 55 for event, _ in self.claim(activity, index)))
                     self.assertEqual(before, self.backend.profile())
@@ -113,7 +113,7 @@ class PermanentWelfareTests(unittest.TestCase):
     def test_same_packet_replay_does_not_double_exchange(self):
         self.ready()
         packet = encode(1127, dict(serial_num=900, act_type=32, index=1, flag=2))
-        with patch('network_redirect.backend.time.time', return_value=NOW):
+        with patch('network_redirect.game_clock.now', return_value=NOW):
             replies = self.backend.respond(packet, dict(authenticated=True))
             before = copy.deepcopy(self.backend.profile())
             self.assertEqual(replies, self.backend.respond(packet, dict(authenticated=True)))

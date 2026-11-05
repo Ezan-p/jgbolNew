@@ -18,7 +18,7 @@ class GuildAccessTests(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
         self.addCleanup(self.b.close)
-        clock = patch('network_redirect.backend.time.time', return_value=NOW)
+        clock = patch('network_redirect.game_clock.now', return_value=NOW)
         clock.start(); self.addCleanup(clock.stop)
         self.serial = 24000
         role = self.b.profile()

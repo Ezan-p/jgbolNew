@@ -18,7 +18,7 @@ class ProgressionTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.clock = patch('network_redirect.backend.time.time', return_value=NOW)
+        self.clock = patch('network_redirect.game_clock.now', return_value=NOW)
         self.clock.start()
         self.addCleanup(self.clock.stop)
         self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **kw: None)
@@ -218,10 +218,10 @@ class ProgressionTests(unittest.TestCase):
         self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **kw: None)
         self.assertIn(55, [e for e, d in self.req(flag=2)])
         self.assertEqual(self.b.profile(), after)
-        with patch('network_redirect.backend.time.time', return_value=NOW + 2 * 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 2 * 86400):
             self.assertIn(140, [e for e, d in self.req(flag=2)])
             self.assertEqual(len(self.b.profile()['progression']['claimed_days']), 2)
-        with patch('network_redirect.backend.time.time', return_value=NOW + 7 * 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 7 * 86400):
             self.assertIn(55, [e for e, d in self.req(flag=2)])
             self.assertEqual(progression.info(self.b.profile(), NOW + 7 * 86400)['buff_type'], 0)
 

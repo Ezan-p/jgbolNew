@@ -18,7 +18,7 @@ class JourneyTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.time = patch('network_redirect.backend.time.time', return_value=NOW)
+        self.time = patch('network_redirect.game_clock.now', return_value=NOW)
         self.time.start()
         self.addCleanup(self.time.stop)
         self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
@@ -464,7 +464,7 @@ class JourneyTests(unittest.TestCase):
         role['journey']['gates']['1:101']['day_count'] = 99
         role['journey']['gates']['2:101'] = dict(pass_star=3, day_count=3, flush_count=1)
         self.b.save(role)
-        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 86400):
             self.req(1018, flag=2)
         attrs = {a['type']: a['value'] for mid, _, data in self.decoded if mid == 1032 for a in data['attr_list']}
         self.assertEqual((attrs[513], attrs[101]), (0, 30))
@@ -474,7 +474,7 @@ class JourneyTests(unittest.TestCase):
 
     def test_heartbeat_rollover_refreshes_gate_cache_once(self):
         self.fight()
-        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 86400):
             packets = self.b.respond(encode(2999, {}), self.state)
             second = self.b.respond(encode(2999, {}), self.state)
         rows = [g for mid, _, data in map(decode, packets) if mid == 1020 for g in data['tollgate_list']]
@@ -488,7 +488,7 @@ class JourneyTests(unittest.TestCase):
         role = self.b.profile()
         role['journey']['gates']['1:102']['day_count'] = 99
         self.b.save(role)
-        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 86400):
             self.fight()
         rows = [g for mid, _, data in self.decoded if mid == 1020 for g in data['tollgate_list']]
         self.assertEqual(next(g['day_count'] for g in rows if g['tollgate_type'] == 1 and g['tollgate_id'] == 102), 0)

@@ -18,7 +18,7 @@ class GuildNpcCombatTests(unittest.TestCase):
         self.backend=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.backend.guild_rules['wars_enabled']=True  # Isolated legacy tournament coverage only.
         self.addCleanup(self.backend.close)
-        clock=patch('network_redirect.backend.time.time',return_value=NOW)
+        clock=patch('network_redirect.game_clock.now',return_value=NOW)
         clock.start();self.addCleanup(clock.stop)
         self.serial=17000
         self.backend.guild_rules.update(pet_role_level=0,pet_union_level=0,wander_daily=3,train_weekend_only=False,lucky_weekend_only=False,hunt_weekend_open=True)
@@ -191,7 +191,7 @@ class GuildNpcCombatTests(unittest.TestCase):
         active=self.request(79)[-1][2]
         self.assertEqual(active['rest_time'],NOW+self.backend.guild_rules['train_seconds'])
         expired=active['rest_time']+1
-        with patch('network_redirect.backend.time.time',return_value=expired):
+        with patch('network_redirect.game_clock.now',return_value=expired):
             result=self.request(79)[-1][2]
             self.assertEqual(result['result'],53)
             self.assertGreater(result['last_time'],expired)
@@ -227,10 +227,10 @@ class GuildNpcCombatTests(unittest.TestCase):
         saturday=friday+86400
         self.backend.guild_rules.update(train_weekend_only=True,lucky_weekend_only=True,hunt_weekend_open=False)
         self.request(1,union_name='原版试炼门槛')
-        with patch('network_redirect.backend.time.time',return_value=friday):
+        with patch('network_redirect.game_clock.now',return_value=friday):
             self.assertEqual(self.request(79)[-1][2]['result'],53)
             self.assertGreater(self.request(83)[-1][2]['free_task_times'],0)
-        with patch('network_redirect.backend.time.time',return_value=saturday):
+        with patch('network_redirect.game_clock.now',return_value=saturday):
             self.assertEqual(self.request(79)[-1][2]['result'],41)
             self.assertEqual(self.request(83)[-1][2]['union_task'],{})
             self.seed_residents()
@@ -256,11 +256,11 @@ class GuildNpcCombatTests(unittest.TestCase):
         from datetime import datetime, timezone
         friday=int(datetime(2026,10,23,4,tzinfo=timezone.utc).timestamp())
         self.backend.guild_rules.update(train_weekend_only=True,lucky_weekend_only=True,hunt_weekend_open=False)
-        with patch('network_redirect.backend.time.time',return_value=friday):
+        with patch('network_redirect.game_clock.now',return_value=friday):
             self.request(1,union_name='周末校验盟');self.seed_residents()
             self.rejected(80);self.rejected(89);self.rejected(92,two_type=2)
             self.request(84,task_index=1,task_type=1,pay_type=1)
-        with patch('network_redirect.backend.time.time',return_value=friday+86400):
+        with patch('network_redirect.game_clock.now',return_value=friday+86400):
             self.request(83)
             self.rejected(84,task_index=1,task_type=1,pay_type=1)
 

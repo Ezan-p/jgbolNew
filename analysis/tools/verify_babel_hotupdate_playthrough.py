@@ -28,7 +28,7 @@ def main():
         def request(op,**data):
             nonlocal serial
             serial+=1
-            with patch('network_redirect.backend.time.time',return_value=now):
+            with patch('network_redirect.game_clock.now',return_value=now):
                 packets=backend.respond(encode(1353,dict(serial_num=serial,id=op,data=summon.lua(data))),session)
             decoded=list(map(decode,packets))
             events=[(d['id'],login_fields(d['data'])) for mid,_,d in decoded if mid==2998]
@@ -126,7 +126,7 @@ def main():
         now=npc.start(s['week']+1,backend.activity_rules); request(1); request(3)
         role=backend.profile(); mail=next(v for k,v in role['welfare']['mails'].items() if k.startswith('babel-rank-'))
         serial+=1
-        with patch('network_redirect.backend.time.time',return_value=now):
+        with patch('network_redirect.game_clock.now',return_value=now):
             packets=backend.respond(encode(1103,dict(serial_num=serial,mail_id=mail['mail_id'],flag=1)),session)
         assert backend.profile()['welfare']['mails'][mail['delivery_key']]['claimed']
         request(8)

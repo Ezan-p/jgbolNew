@@ -42,7 +42,7 @@ class TangwangTests(ActivityCase):
         self.status();self.assertEqual(len(self.cards()),4)
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         with patch.object(tw,'randbelow',side_effect=AssertionError('rerolled')):self.status()
-        with patch('network_redirect.backend.time.time',return_value=status['next_daily_refresh']):self.status()
+        with patch('network_redirect.game_clock.now',return_value=status['next_daily_refresh']):self.status()
         self.assertEqual(len(self.cards()),8);self.status();self.assertEqual(len(self.cards()),8)
 
     def test_every_letter_and_reward_ticket_exact_weights(self):
@@ -145,7 +145,7 @@ class TangwangTests(ActivityCase):
         with patch.object(activity,'prizes',side_effect=formation.Rejected('grant failed')):
             self.assertEqual(self.exchange(ids)[0][0],55)
         self.assertEqual(before,self.b.profile())
-        with patch('network_redirect.backend.time.time',return_value=status['next_weekly_refresh']):
+        with patch('network_redirect.game_clock.now',return_value=status['next_weekly_refresh']):
             before=self.b.profile()
             self.assertEqual(self.exchange(ids)[0][0],55)
             self.assertEqual(before,self.b.profile())
@@ -204,9 +204,9 @@ class TangwangTests(ActivityCase):
             if tw.is_card(c):c['is_lock']=1
         role['activity']['seasonal']['tangwang']['exchanges']=[3,2,1,4]
         self.b.save(role);peaches=self.count(1001);deadline=status['next_weekly_refresh']
-        with patch('network_redirect.backend.time.time',return_value=deadline-1):self.status()
+        with patch('network_redirect.game_clock.now',return_value=deadline-1):self.status()
         count=self.count(1094)
-        with patch('network_redirect.backend.time.time',return_value=deadline):
+        with patch('network_redirect.game_clock.now',return_value=deadline):
             self.status();self.assertEqual(self.count(1094),4)
             self.assertEqual(self.twstate()['exchanges'],[0]*4)
             self.assertEqual(self.twstate()['weekly_cards'],4)
@@ -221,14 +221,14 @@ class TangwangTests(ActivityCase):
 
     def test_offline_many_weeks_only_recycles_actual_cards_once(self):
         status=self.status();count=self.count(1094)
-        with patch('network_redirect.backend.time.time',return_value=status['next_weekly_refresh']+28*86400):
+        with patch('network_redirect.game_clock.now',return_value=status['next_weekly_refresh']+28*86400):
             self.status();self.status()
         self.assertEqual(len(self.mails()),1);self.assertEqual(self.mails()[0]['prizes'],[[5,1001,count,1]])
         self.assertEqual(self.count(1094),4)
 
     def test_heartbeat_without_panel_recycles_no_gift_and_refreshes_ui(self):
         status=self.status();deadline=status['next_weekly_refresh']
-        with patch('network_redirect.backend.time.time',return_value=deadline):
+        with patch('network_redirect.game_clock.now',return_value=deadline):
             replies=self.b.respond(encode(2999,dict(time=deadline)),self.state_auth())
             decoded=list(map(decode,replies))
             events=[(d['id'],login_fields(d['data'])) for m,_,d in decoded if m==2998]
@@ -255,7 +255,7 @@ class TangwangTests(ActivityCase):
 
     def test_daily_gift_after_heartbeat_snapshot(self):
         status=self.status();deadline=status['next_daily_refresh']
-        with patch('network_redirect.backend.time.time',return_value=deadline):
+        with patch('network_redirect.game_clock.now',return_value=deadline):
             self.b.respond(encode(2999,dict(time=deadline)),self.state_auth())
             self.assertEqual(self.count(1094),4)
             r=self.b.activity_rules['tangwang_rules']
@@ -265,7 +265,7 @@ class TangwangTests(ActivityCase):
 
     def test_expired_ids_rejected_and_failed_mail_atomic_retry(self):
         status=self.status();ids=self.put([1,2,3,4]);baseline=self.b.profile()
-        with patch('network_redirect.backend.time.time',return_value=status['next_weekly_refresh']):
+        with patch('network_redirect.game_clock.now',return_value=status['next_weekly_refresh']):
             baseline=self.b.profile()  # Unrelated daily profile migration precedes activity transactions.
             self.assertEqual(self.exchange(ids)[0][0],55);self.assertEqual(baseline,self.b.profile())
             with patch('network_redirect.system_mail.deliver',side_effect=formation.Rejected('mail unavailable')):
@@ -301,7 +301,7 @@ class TangwangTests(ActivityCase):
         self.assertTrue(self.status()['local_enabled']);ids=self.put([1,2,3,4])
         self.ok(self.exchange(ids));cfg['enabled']=False
         before=self.count(1094)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.assertFalse(self.status()['local_enabled'])
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):self.assertFalse(self.status()['local_enabled'])
         self.assertEqual(self.count(1094),before)
         baseline=self.b.profile();self.assertEqual(self.exchange(self.put([1,2,3,4]))[0][0],55)
         with patch.object(tw,'randbelow',side_effect=AssertionError('disabled draw')):

@@ -35,7 +35,7 @@ def main():
         def request(op,**data):
             nonlocal serial
             serial+=1
-            with patch('network_redirect.backend.time.time',return_value=now):
+            with patch('network_redirect.game_clock.now',return_value=now):
                 raw=backend.respond(encode(1329,dict(serial_num=serial,id=op,data=summon.lua(data))),session)
             decoded=list(map(decode,raw))
             events=[(d['id'],login_fields(d['data'])) for mid,_,d in decoded if mid==2998]

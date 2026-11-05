@@ -19,7 +19,7 @@ from observability.collector import processes
 
 def fixtures():
     data={};serial=100
-    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time',return_value=1792728000):
+    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.game_clock.now',return_value=1792728000):
         b=Backend(Path(tmp),18790,lambda *a,**k:None)
         try:
             role=b.profile();role.update(level=50,gold_coin=100000,silver_coin=100000);summon.add_item(role,1341,2);b.save(role)
@@ -72,7 +72,7 @@ def fixtures():
             req('shop',91,two_type=1)
             req('shop_buy_four',91,two_type=2,index=4,buy_count=4)
             data['next_day_time']=1792728000+86400
-            with patch('network_redirect.backend.time.time',return_value=data['next_day_time']):
+            with patch('network_redirect.game_clock.now',return_value=data['next_day_time']):
                 req('next_day_tasks',83)
         finally:b.close()
     source=(ROOT/'analysis/tools/guild_pet_client_harness.lua').read_text()

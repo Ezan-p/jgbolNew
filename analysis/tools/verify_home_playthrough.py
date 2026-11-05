@@ -15,7 +15,7 @@ from network_redirect.protocol import encode, decode
 def main():
     now=1792987200  # 2026-10-26 noon UTC+8
     report=dict(date='2026-10-26',native_ui_verified=False,fixture='temporary account with funded materials and catalog combat lineup',battles=[])
-    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time',side_effect=lambda:now):
+    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.game_clock.now',side_effect=lambda:now):
         b=Backend(Path(tmp),18770,lambda *a,**k:None); serial=900000; client={'authenticated':True}
         try:
             r=b.profile()

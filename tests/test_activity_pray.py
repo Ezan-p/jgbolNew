@@ -138,11 +138,11 @@ class PrayTests(ActivityCase):
         self.b.db.execute('UPDATE roles SET data=? WHERE account=?', (json.dumps(r), self.b.account))
         self.b.db.commit()
         midnight = ((NOW + 8 * 3600) // 86400 + 1) * 86400 - 8 * 3600
-        with patch('network_redirect.backend.time.time', return_value=midnight - 1):
+        with patch('network_redirect.game_clock.now', return_value=midnight - 1):
             self.ok(self.req(1205, flag=0))
             self.assertEqual(self.b.profile()['spirit_retain'], 1200)
             self.assertNotIn('109', self.b.profile()['achievements']['totals'])
-        with patch('network_redirect.backend.time.time', return_value=midnight):
+        with patch('network_redirect.game_clock.now', return_value=midnight):
             self.ok(self.pray())
             r = self.b.profile()
             self.assertEqual((r['pray_spirit_times'], r['spirit_retain']), (1, 1000))

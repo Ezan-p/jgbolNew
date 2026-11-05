@@ -37,18 +37,36 @@ class BattleAchievementTransportTests(unittest.TestCase):
         parse.assert_not_called()
         self.assertEqual(a.state(role)['totals']['456'], 0)
 
-    def test_other_event_payloads_keep_existing_parse_path(self):
+    def test_unrelated_event_payloads_are_not_parsed(self):
         role = dict(role_id=1)
         parse = Mock(return_value={})
         packets = [summon.event(21, {}), encode(1301, dict(id=121, data='{}'))]
         a.record_events(role, packets, NOW, parse)
-        self.assertEqual(parse.call_count, 2)
+        parse.assert_not_called()
+
+
+    def test_whitelist_parses_only_matching_protocol_events(self):
+        role = dict(role_id=1)
+        parse = Mock(return_value={})
+        packets = [summon.event(e, {}) for e in a.ACHIEVEMENT_EVENTS[2998]]
+        packets += [encode(1301, dict(id=e, data='{}')) for e in (40, 69)]
+        packets += [summon.event(40, {}), encode(1301, dict(id=41, data='{}'))]
+        a.record_events(role, packets, NOW, parse)
+        self.assertEqual(parse.call_count, 9)
+
+    def test_nested_batch_keeps_achievement_facts(self):
+        role = dict(role_id=1)
+        a.record_events(role, [summon.event(114, {1: dict(pass_one_form=True, skill_count=2)})],
+                        NOW, login_fields)
+        self.assertEqual(a.state(role)['totals']['103'], 1)
+        self.assertEqual(a.state(role)['totals']['121'], 1)  # capped at its target
+        self.assertEqual(a.state(role)['totals']['417'], 2)
 
 
 class AchievementTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(); self.addCleanup(self.tmp.cleanup)
-        self.clock = patch('network_redirect.backend.time.time', return_value=NOW)
+        self.clock = patch('network_redirect.game_clock.now', return_value=NOW)
         self.clock.start(); self.addCleanup(self.clock.stop)
         self.b = Backend(Path(self.tmp.name), 18770, lambda *x, **kw: None)
         self.addCleanup(self.b.close)
@@ -294,7 +312,7 @@ class AchievementTests(unittest.TestCase):
         role['guild']['instances']['search'] = self.b.guild_rules['search_daily']
         self.b.save(role)
         self.assertEqual(self.row(self.b.profile(), 139)['times'], 0)
-        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 86400):
             self.unlock_treasure()
             out = self.request(1301, id=43, data=summon.lua(dict(flag=2)))
             self.assert_completion_update(out, 139)

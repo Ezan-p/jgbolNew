@@ -19,7 +19,7 @@ NOW=1792933200
 
 
 def packets():
-    with tempfile.TemporaryDirectory() as tmp,patch('network_redirect.backend.time.time',return_value=NOW):
+    with tempfile.TemporaryDirectory() as tmp,patch('network_redirect.game_clock.now',return_value=NOW):
         b=Backend(Path(tmp),18770,lambda *a,**k:None)
         try:
             r=b.profile();r.update(level=60,gold_coin=10000)

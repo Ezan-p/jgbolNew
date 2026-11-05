@@ -16,7 +16,7 @@ class GoldCardRechargeTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.clock = patch('network_redirect.backend.time.time', return_value=NOW)
+        self.clock = patch('network_redirect.game_clock.now', return_value=NOW)
         self.clock.start(); self.addCleanup(self.clock.stop)
         self.b = Backend(Path(self.tmp.name), 18790, lambda *a, **k: None)
         self.addCleanup(lambda: self.b.close())
@@ -187,7 +187,7 @@ class GoldCardRechargeTests(unittest.TestCase):
         self.b.close(); self.b = Backend(Path(self.tmp.name), 18790, lambda *a, **k: None)
         self.charge(order='durable-gold-card')
         self.assertEqual(after, self.b.profile())
-        with patch('network_redirect.backend.time.time', return_value=NOW + 40 * 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 40 * 86400):
             self.charge(order='durable-gold-card')
         self.assertEqual(self.b.profile()['charge_gold'], 500)
         self.assertEqual(self.count(1152), 19)
@@ -233,11 +233,11 @@ class GoldCardRechargeTests(unittest.TestCase):
         self.assertEqual(self.b.profile()['month_card_time'], NOW + 60 * 86400)
         self.unchanged(lambda: self.req(1201, flag=9, id=0))
         self.unchanged(lambda: self.charge(item=201))
-        with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 86400):
             old = self.b.profile()['gold_coin']
             self.req(1201, flag=9, id=0)
             self.assertEqual(self.b.profile()['gold_coin'], old + 100)
-        with patch('network_redirect.backend.time.time', return_value=NOW + 60 * 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 60 * 86400):
             self.unchanged(lambda: self.req(1201, flag=9, id=0))
 
     def test_growth_fund_is_paid_once_and_reaches_every_charge_hook(self):
@@ -268,7 +268,7 @@ class GoldCardRechargeTests(unittest.TestCase):
         self.stock()
         self.charge()
         _, end = activity_rulai.period(NOW, activity_rulai.load_rules())
-        with patch('network_redirect.backend.time.time', return_value=end):
+        with patch('network_redirect.game_clock.now', return_value=end):
             self.charge(order='new-season-charge')
         role = self.b.profile()
         self.assertEqual(role['charge_gold'], 1000)
@@ -372,33 +372,33 @@ class GoldCardRechargeTests(unittest.TestCase):
         initial_gold = self.b.profile()['gold_coin']
         self.assertNotIn('month_card_rewards_remaining', self.b.profile())
         for day in range(30):
-            with patch('network_redirect.backend.time.time', return_value=NOW + day * 86400):
+            with patch('network_redirect.game_clock.now', return_value=NOW + day * 86400):
                 out = self.req(1201, flag=9, id=0)
                 self.assertIn((74, dict(result=1, gold_count=100)), out)
         self.assertEqual(self.b.profile()['gold_coin'] - initial_gold, 3000)
         self.assertNotIn('month_card_rewards_remaining', self.b.profile())
         # The 31st calendar day starts before 30 elapsed days have finished.
-        with patch('network_redirect.backend.time.time', return_value=NOW + 30 * 86400 - 3600):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 30 * 86400 - 3600):
             self.assertIn((74, dict(result=1, gold_count=100)), self.req(1201, flag=9, id=0))
-        with patch('network_redirect.backend.time.time', return_value=NOW + 30 * 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 30 * 86400):
             self.unchanged(lambda: self.req(1201, flag=9, id=0))
         self.assertEqual(self.b.profile()['charge_gold'], 500)
 
     def test_month_reward_restart_midnight_clock_rollback_and_expired_credit(self):
         self.stock()
         self.charge(item=201)
-        with patch('network_redirect.backend.time.time', return_value=NOW - 1):
+        with patch('network_redirect.game_clock.now', return_value=NOW - 1):
             self.unchanged(lambda: self.req(1201, flag=9, id=0))
         self.req(1201, flag=9, id=0)
         self.assertNotIn('month_card_rewards_remaining', self.b.profile())
         next_midnight = ((NOW + 8 * 3600) // 86400 + 1) * 86400 - 8 * 3600
-        with patch('network_redirect.backend.time.time', return_value=next_midnight - 1):
+        with patch('network_redirect.game_clock.now', return_value=next_midnight - 1):
             self.unchanged(lambda: self.req(1201, flag=9, id=0))
         self.b.close(); self.b = Backend(Path(self.tmp.name), 18790, lambda *a, **k: None)
-        with patch('network_redirect.backend.time.time', return_value=next_midnight):
+        with patch('network_redirect.game_clock.now', return_value=next_midnight):
             self.req(1201, flag=9, id=0)
             self.assertNotIn('month_card_rewards_remaining', self.b.profile())
-        with patch('network_redirect.backend.time.time', return_value=NOW + 31 * 86400):
+        with patch('network_redirect.game_clock.now', return_value=NOW + 31 * 86400):
             self.charge(item=201, order='renew-expired-month')
             self.assertNotIn('month_card_rewards_remaining', self.b.profile())
             self.assertEqual(self.b.profile()['month_card_time'], NOW + 61 * 86400)
@@ -498,7 +498,7 @@ class GoldCardRechargeTests(unittest.TestCase):
         self.stock(0,9)
         self.charge(item=202,large=0,small=9)
         role=self.b.profile();role['level']=99;self.b.save(role)
-        with patch('network_redirect.backend.time.time',return_value=NOW+31*86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+31*86400):
             before=self.b.profile()['gold_coin']
             out=self.req(1127,flag=2,act_type=22,index=0)
             self.assertTrue(any(e==127 and d['flag']==2 for e,d in out))

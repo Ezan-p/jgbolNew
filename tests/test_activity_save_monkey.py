@@ -40,7 +40,7 @@ class SaveMonkeyTests(ActivityCase):
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.call();self.assertEqual(saved,self.saved());self.assertEqual(self.count(1350)-before,17)
         self.assertTrue(next(v for e,v in self.req(1205,flag=0) if e==47)['local_save_monkey']['local_enabled'])
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.call();self.assertEqual(self.count(1350)-before,22)
             self.assertEqual(self.saved()['grid'],saved['grid'])
 
@@ -116,7 +116,7 @@ class SaveMonkeyTests(ActivityCase):
         self.assertEqual(self.saved()['piece'],10)
         self.reject(5,dict(index=1,count=2,local_token=self.saved()['token']))
         end=self.saved()['end'];token=self.saved()['token'];inventory=self.b.profile()['attachments']
-        with patch('network_redirect.backend.time.time',return_value=end):
+        with patch('network_redirect.game_clock.now',return_value=end):
             self.reject(5,dict(index=1,count=1,local_token=token))
             self.call(4);self.assertEqual(self.saved()['piece'],0);self.assertEqual(self.saved()['score'],0)
             self.assertEqual(self.b.profile()['attachments'],inventory)

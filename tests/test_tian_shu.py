@@ -178,7 +178,7 @@ class TianShuGameplayTests(ActivityCase):
 
     def test_actual_party_fights_accumulate_across_days(self):
         for i in range(20):
-            with patch('network_redirect.backend.time.time', return_value=NOW+(i//10)*86400):
+            with patch('network_redirect.game_clock.now', return_value=NOW+(i//10)*86400):
                 self.ok(self.req(1026, fight_type=6, des_value=0))
                 role = self.b.profile()
                 self.assertEqual(role['tian_shu']['party_count'], min(i+1, 20))

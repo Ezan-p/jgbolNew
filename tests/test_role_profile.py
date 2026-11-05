@@ -13,7 +13,7 @@ class ProfileTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.clock = patch('network_redirect.backend.time.time', return_value=NOW)
+        self.clock = patch('network_redirect.game_clock.now', return_value=NOW)
         self.clock.start(); self.addCleanup(self.clock.stop)
         self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **kw: None)
         self.addCleanup(self.b.close)
@@ -154,7 +154,7 @@ class ProfileTests(unittest.TestCase):
         r = self.b.profile(); p.grant_title(r, 103, NOW); self.b.save(r)
         self.request(1078, flag=3, des_id=103)
         end = self.b.profile()['title_endtime']
-        with patch('network_redirect.backend.time.time', return_value=end):
+        with patch('network_redirect.game_clock.now', return_value=end):
             out = self.request(1307, flag=2)
             self.assertEqual(next(d for m, d in out if m == 1077)['wear_id'], 0)
             self.event(self.request(1078, flag=3, des_id=103), 55)

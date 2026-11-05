@@ -44,7 +44,7 @@ class SeasonalCraftTests(ActivityCase):
             self.assertEqual(self.b.profile(),before)
             self.assertEqual(self.craft(name)[0][0],55)
             self.assertEqual(self.b.profile(),before)
-            with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.ok(self.craft(name))
+            with patch('network_redirect.game_clock.now',return_value=NOW+86400):self.ok(self.craft(name))
             self.assertEqual(self.b.profile()['activity']['seasonal'][name+'_count'],101)
 
     def test_invalid_quantities_recipes_and_partial_materials_rollback(self):

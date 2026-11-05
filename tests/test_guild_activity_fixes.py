@@ -16,7 +16,7 @@ class GuildActivityFixTests(unittest.TestCase):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.addCleanup(lambda:self.b.close());self.serial=20000;self.now=FRIDAY
-        clock=patch('network_redirect.backend.time.time',side_effect=lambda:self.now)
+        clock=patch('network_redirect.game_clock.now',side_effect=lambda:self.now)
         clock.start();self.addCleanup(clock.stop)
         role=self.b.profile();role.update(level=50,gold_coin=100000,silver_coin=100000);self.b.save(role)
         self.req(1,union_name='仙盟活动修复')

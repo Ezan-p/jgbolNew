@@ -29,7 +29,7 @@ class GiftCodeTests(unittest.TestCase):
     def request(self, code='JGBOL387', flag=0, serial=None, backend=None):
         self.serial += 1
         self.packet = encode(1104, dict(serial_num=self.serial if serial is None else serial, sn=code, flag=flag))
-        with patch('network_redirect.backend.time.time', return_value=NOW):
+        with patch('network_redirect.game_clock.now', return_value=NOW):
             self.replies = (backend or self.b).respond(self.packet, {'authenticated': True})
         self.decoded = [decode(p) for p in self.replies]
         return next(login_fields(d['data']) for m, _, d in self.decoded if m == 2998 and d['id'] == 18)
@@ -114,7 +114,14 @@ class GiftCodeTests(unittest.TestCase):
         replies, packet, before = self.replies, self.packet, self.b.profile()
         self.assertEqual(self.b.respond(packet, {'authenticated': True}), replies)
         self.assertEqual(before, self.b.profile())
-        self.reject(15, code='JGBOLGIFT', serial=1)
+        claims = self.claims()
+        altered = encode(1104, dict(serial_num=1, sn='JGBOLGIFT', flag=0))
+        rejected = self.b.respond(altered, {'authenticated': True})
+        message = next(login_fields(d['data']) for m, _, d in map(decode, rejected)
+                       if m == 2998 and d['id'] == 55)
+        self.assertIn('本次未重复执行', message['op_string'])
+        self.assertEqual(before, self.b.profile())
+        self.assertEqual(claims, self.claims())
         self.reject(15, serial=0)
 
     def test_restart_preserves_claims(self):

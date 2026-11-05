@@ -15,7 +15,7 @@ def main():
     now = 1792814400
     serial = 100000
     steps = []
-    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time', return_value=now):
+    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.game_clock.now', return_value=now):
         backend = Backend(Path(tmp), 18770, lambda *a, **k: None)
         try:
             r = backend.profile()
@@ -61,7 +61,7 @@ def main():
             assert backend.profile() == r
             r = request('重启后第四次仅使用留存', [], 1000)
             assert r['spirit_retain'] == 16
-            with patch('network_redirect.backend.time.time', return_value=now + 86400):
+            with patch('network_redirect.game_clock.now', return_value=now + 86400):
                 r = request('次日重置费用并保留结余', [row(10, two, 200)], 200)
             assert r['pray_spirit_times'] == 1 and r['spirit_retain'] == 16
             assert r['achievements']['totals']['109'] == 1

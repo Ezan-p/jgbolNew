@@ -72,7 +72,7 @@ class GuildNpcMemberTests(unittest.TestCase):
         self.ok(20, role_id=ids[0]); self.ok(20, role_id=ids[1]); self.ok(22)
         self.assertFalse(self.current()['forbidden'])
         self.ok(20, role_id=ids[0])
-        with patch('network_redirect.backend.time.time', return_value=harness.NOW + self.b.guild_rules['mute_seconds'] + 1):
+        with patch('network_redirect.game_clock.now', return_value=harness.NOW + self.b.guild_rules['mute_seconds'] + 1):
             self.ok(18, query_type=3)
         self.assertFalse(self.current()['forbidden'])
         self.ok(12, role_id=ids[0])
@@ -103,7 +103,7 @@ class GuildNpcMemberTests(unittest.TestCase):
             self.ok(6, role_id=int(ident))
         self.ok(18, query_type=5)
         self.assertFalse(self.current()['applications'])
-        with patch('network_redirect.backend.time.time', return_value=harness.NOW + 86400):
+        with patch('network_redirect.game_clock.now', return_value=harness.NOW + 86400):
             self.ok(18, query_type=5)
             pending = copy.deepcopy(self.current()['applications'])
             self.assertEqual(len(pending), 4)
@@ -157,7 +157,7 @@ class GuildNpcMemberTests(unittest.TestCase):
         self.assertTrue(all(rid not in g['applications'] for g in role['guild']['unions'].values()))
         self.assertEqual(role['guild']['join_count'],1)
         self.ok(3)
-        with patch('network_redirect.backend.time.time',return_value=harness.NOW+10):
+        with patch('network_redirect.game_clock.now',return_value=harness.NOW+10):
             self.ok(18,query_type=4,page=1)
         self.assertEqual(self.role()['union_id'],0)
         self.assertEqual(self.role()['guild']['join_count'],1)

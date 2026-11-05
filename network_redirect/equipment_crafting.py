@@ -2,12 +2,12 @@
 
 Called only on Backend's detached role; failures discard every debit and reward.
 """
+from . import game_clock
 from collections import defaultdict
 from decimal import Decimal
 from datetime import datetime, timezone, timedelta
 import json
 import secrets
-import time
 from . import formation as f, equipment, summon, feature_levels
 
 HANDLED = {1053, 1055, 1056, 1074, 1079, 1225}
@@ -286,7 +286,7 @@ CHINA_TIME = timezone(timedelta(hours=8))
 
 def prepare_week(role, now=None):
     """Monday 00:00 UTC+8. Missed weeks never accumulate; clocks cannot rewind."""
-    now = int(time.time() if now is None else now)
+    now = int(game_clock.now() if now is None else now)
     day = (now + 8 * 3600) // 86400
     week_start = (day - (day + 3) % 7) * 86400 - 8 * 3600
     state = role.setdefault('equipment_forge', {})
@@ -352,7 +352,7 @@ def compose(role, req, rules):
     f.require(role['level'] >= rules['compose_min_level'], '尚未达到装备合成等级')
     op = req['compose_type']
     f.require(op in (1, 2, 3), '装备合成类型无效')
-    now = int(time.time())
+    now = int(game_clock.now())
     if op in (2, 3):
         feature_levels.require(role, 'forge')
         state = prepare_week(role, now)

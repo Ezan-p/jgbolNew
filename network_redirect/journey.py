@@ -3,6 +3,7 @@
 See docs/旅途模块规则与调试.md. Settlement runs on a detached role; the
 backend encodes all replies before committing resources and progress together.
 """
+from . import game_clock
 import copy
 import json
 import math
@@ -307,10 +308,9 @@ def grant(role, spec):
     elif typ == 15:
         # Original object_type.animal; attachment level denotes pet quality.
         from . import activity, activity_home, activity_home_pets
-        import time
         require(tid in activity_home_pets.BASE and level in (1, 2, 3, 4), '未知灵兽或品质')
         role.setdefault('activity', {})
-        home = activity_home.state(role, int(time.time()), activity.load_rules())
+        home = activity_home.state(role, int(game_clock.now()), activity.load_rules())
         from . import pets
         for _ in range(count):
             pets.add(home, tid, level)

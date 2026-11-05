@@ -11,6 +11,7 @@ import uuid
 from urllib.parse import urlsplit
 
 from .protocol import HEADER, MAX_PACKET
+from .request_timing import current, phase
 from .tls import TLSStream
 
 HEALTH = b'JGBOL_LOCAL_REDIRECT_OK\n'
@@ -172,16 +173,41 @@ class LandingServer:
             else:
                 if self.backend:
                     state = {}
+                    request_index = 0
                     while True:
+                        received_at = time.perf_counter()
                         header = data + await asyncio.wait_for(reader.readexactly(HEADER.size - len(data)), timeout=120)
                         mid, size, _ = HEADER.unpack(header)
                         if not HEADER.size <= size <= MAX_PACKET:
                             raise ValueError('Invalid game packet size')
                         packet = header + await asyncio.wait_for(reader.readexactly(size - HEADER.size), timeout=10)
-                        for reply in self.backend.respond(packet, state):
-                            output.write(reply)
-                            emit('game_response', message_id=HEADER.unpack_from(reply)[0], bytes=len(reply))
-                        await output.drain()
+                        request_index += 1
+                        request_id = f'{connection_id}:{request_index}'
+                        metrics = dict(receive_ms=(time.perf_counter() - received_at) * 1000)
+                        token = current.set(metrics)
+                        response_count = response_bytes = 0
+                        status = 'error'
+                        try:
+                            with phase('respond'):
+                                replies = self.backend.respond(packet, state)
+                            with phase('write'):
+                                for reply in replies:
+                                    output.write(reply)
+                                    response_count += 1
+                                    response_bytes += len(reply)
+                                    emit('game_response', request_id=request_id,
+                                         message_id=HEADER.unpack_from(reply)[0], bytes=len(reply))
+                            with phase('drain'):
+                                await output.drain()
+                            status = 'ok'
+                        finally:
+                            current.reset(token)
+                            emit('game_request_timing', request_id=request_id, message_id=mid,
+                                 request_bytes=size, response_count=response_count,
+                                 response_bytes=response_bytes, status=status,
+                                 total_ms=round((time.perf_counter() - received_at) * 1000, 3),
+                                 **{k: round(v, 3) if k.endswith('_ms') else v
+                                    for k, v in metrics.items()})
                         data = await asyncio.wait_for(reader.readexactly(5), timeout=120)
                 emit('tcp_received', bytes=len(data), message='TCP 已到本地；业务协议待实现')
                 # Keep enough time to observe additional bytes, without replying with a fake protocol.

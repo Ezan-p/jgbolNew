@@ -33,7 +33,7 @@ class WelfareRechargeTests(unittest.TestCase):
 
     def request(self, mid, now=NOW, **values):
         self.serial += 1
-        with patch('network_redirect.backend.time.time', return_value=now):
+        with patch('network_redirect.game_clock.now', return_value=now):
             replies = self.backend.respond(encode(mid, dict(serial_num=self.serial, **values)), dict(authenticated=True))
         return [(data['id'], login_fields(data['data'])) for kind, _, data in map(decode, replies) if kind == 2998]
 

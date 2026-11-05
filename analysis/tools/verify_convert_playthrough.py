@@ -16,7 +16,7 @@ NOW = 1792987200  # 2026-10-26 12:00 UTC+8
 def main():
     serial = 100000
     steps = []
-    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time', return_value=NOW):
+    with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.game_clock.now', return_value=NOW):
         b = Backend(Path(tmp), 18770, lambda *a, **k: None)
         try:
             r = b.profile(); r.update(level=60, vip_level=3, gold_coin=1000)
@@ -58,7 +58,7 @@ def main():
             saved = b.profile(); b.close(); b = Backend(Path(tmp), 18770, lambda *a, **k: None)
             assert b.profile() == saved
             request('重启后恢复上次选择', 1205, flag=1)
-            with patch('network_redirect.backend.time.time', return_value=NOW + 86400):
+            with patch('network_redirect.game_clock.now', return_value=NOW + 86400):
                 request('次日再次免费', 1026, fight_type=10, des_value=5011)
                 assert b.profile()['convert_fight_count'] == 1
             assert b.profile()['achievements']['totals']['106'] == 1

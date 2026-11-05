@@ -54,7 +54,7 @@ function land_fixture_next()
  return cases[index].name..': '..land_fixture_errors
 end
 ''']
-with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.backend.time.time',return_value=NOW):
+with tempfile.TemporaryDirectory() as tmp, patch('network_redirect.game_clock.now',return_value=NOW):
  b=Backend(Path(tmp),18770,lambda *a,**k:None);r=b.profile();r.update(level=60,energy=100,gold_coin=10000,silver_coin=10000)
  for c in r['corteges']:c['level']=100
  activity.prepare(r,NOW,b.activity_rules);b.save(r)
@@ -121,7 +121,7 @@ end)''')
   r=b.profile();r['activity']['land'].update(boss_layer=layer-1,inv_boss_layer=layer-1);b.save(r)
   land('normal_boss_'+str(layer),12)
   land('hell_boss_'+str(layer),24)
- with patch('network_redirect.backend.time.time',return_value=NOW+8*3600):
+ with patch('network_redirect.game_clock.now',return_value=NOW+8*3600):
   land('tower_map',1,pre='ms.d_time.getTime=function() return '+str(NOW+8*3600)+' end')
   land('tower_detail',11,tower_id=12)
  b.close()

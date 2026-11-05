@@ -1,11 +1,11 @@
 """3.87 profile wire contracts [A], configurable missing server policies [B]."""
+from . import game_clock
 import csv
 import io
 import copy
 import secrets
 import json
 import re
-import time
 from pathlib import Path
 from . import formation as f, summon
 from .protocol import encode
@@ -51,7 +51,7 @@ def grant_title(role, tid, now):
 
 def prepare(role, rules=None, now=None):
     rules = rules or load_rules()
-    now = int(time.time()) if now is None else now
+    now = int(game_clock.now()) if now is None else now
     if role.get('head_type') not in HEADS:
         role['head_type'] = rules['initial_head']
     role.setdefault('profile_head_changed', role['head_type'] in HEADS)

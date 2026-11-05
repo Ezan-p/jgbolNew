@@ -14,7 +14,7 @@ class VipTests(unittest.TestCase):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         self.b=Backend(Path(self.tmp.name),18790,lambda *a,**k:None)
         self.addCleanup(lambda:self.b.close());self.serial=200
-        clock=patch('network_redirect.backend.time.time',return_value=NOW);clock.start();self.addCleanup(clock.stop)
+        clock=patch('network_redirect.game_clock.now',return_value=NOW);clock.start();self.addCleanup(clock.stop)
         funded_order(self.b,101,'seed-test-cards')
     def req(self,mid=1201,**data):
         self.serial+=1;self.packet=encode(mid,dict(serial_num=self.serial,**data))
@@ -44,7 +44,7 @@ class VipTests(unittest.TestCase):
         self.fixture(10);self.assertEqual(self.req(flag=5,id=0)[-1][0],55)
         self.b.close();self.b=Backend(Path(self.tmp.name),18790,lambda *a,**k:None)
         self.assertEqual(self.req(flag=5,id=0)[-1][0],55)
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):self.assertEqual(self.req(flag=5,id=0)[-1][0],58)
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):self.assertEqual(self.req(flag=5,id=0)[-1][0],58)
     def test_all_gifts_exact_csv_and_use(self):
         self.fixture()
         for v in range(1,11):

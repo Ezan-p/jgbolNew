@@ -117,7 +117,7 @@ class DreamTests(ActivityCase):
         self.b.close(); self.b = Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.assertEqual(self.call()['dream_data']['status'],2)
         self.assertEqual(self.saved(),before)
-        with patch('network_redirect.backend.time.time',return_value=before['end']):
+        with patch('network_redirect.game_clock.now',return_value=before['end']):
             self.reject(3,dict(des_list=[1],index=1,local_token=before['token']))
             fresh=self.call()['dream_data']
             self.assertEqual((fresh['cur_dream'],fresh['status']), (1,1))
@@ -129,7 +129,7 @@ class DreamTests(ActivityCase):
 
     def test_no_daily_reset_and_clock_rollback(self):
         self.call(); self.solve()
-        with patch('network_redirect.backend.time.time',return_value=NOW+86400):
+        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
             self.assertEqual(self.call()['dream_data']['status'],2)
         self.reject(1,{})
 
@@ -163,7 +163,7 @@ class DreamTests(ActivityCase):
         role=self.b.profile();d.record_charge(role,1,NOW);self.b.save(role)
         self.assertTrue(self.call()['dream_data']['can_take'])
         end=self.saved()['end']
-        with patch('network_redirect.backend.time.time',return_value=end):
+        with patch('network_redirect.game_clock.now',return_value=end):
             self.assertFalse(self.call()['dream_data']['can_take'])
             self.assertEqual(self.saved()['charge_gold'],0)
 
