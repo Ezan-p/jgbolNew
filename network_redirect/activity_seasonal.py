@@ -160,3 +160,8 @@ def settle(role,mid,req,now,r):
                                      local_rice_progress=activity_rice.progress(s,r),**craft_status(s,name,now,r)))]
     s['moon_news'].insert(0,f"{role['role_name']}合成了{NAMES[row['dest'][1]]}×{n}");s['moon_news']=s['moon_news'][:5]
     return [summon.event(178,dict(flag=1,prize_list=a.prizes(role,reward),**craft_status(s,name,now,r))),summon.event(178,moon_news(s,r))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

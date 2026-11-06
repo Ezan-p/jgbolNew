@@ -65,3 +65,8 @@ def draw(pool):
 def use(role, req, shared):
     return activity_food.use(role, req, shared['moon_rules']['pools'],
                              {tid: tid for tid in FOODS}, draw, '月饼')
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

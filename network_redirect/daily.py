@@ -172,3 +172,8 @@ def track(role, before, mid, req, events, now, r, parse):
     for kind, count in gains.items():
         if count: record(role, kind, count, now, r)
     return [hint(role, now, r)] if any(gains.values()) else []
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

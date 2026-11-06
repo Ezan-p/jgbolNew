@@ -104,3 +104,8 @@ def settle(role,s,d,now,r,jrules):
     packets.append(response(4,event_data=data))
     if kind==3 and op==1:packets.append(summon.event(44,dict(fight_id=fid,fight_type=25)))
     return packets
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

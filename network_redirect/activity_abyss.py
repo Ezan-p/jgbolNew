@@ -349,3 +349,8 @@ def settle(role,req,now,r,jrules,parse):
             *battle_replay.result_packets(1027, dict(fight_id=fid,fight_type=26,final_result=result,fight_round=len(actions),fight_result=actions)),
             response(6,is_win=win,prize_list=gain,**boss(role,s,now)),summon.event(44,dict(fight_id=fid,fight_type=26))]
     a.require(False,'该九幽操作尚缺可验证的服务端配置')
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

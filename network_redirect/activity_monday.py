@@ -229,3 +229,8 @@ def track(role, before, mid, req, now):
     # Native event112 refreshes flag21 when opening the activity; bootstrap also
     # publishes it. Keep unrelated gameplay's response/event ordering intact.
     return []
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

@@ -99,3 +99,8 @@ def id_list(d):
 
 def update(role,s,now,r):
     return encode(2995,dict(tip_type=2,tip_info=summon.lua(dict(team_info=summary(role,s,now,r)))))
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

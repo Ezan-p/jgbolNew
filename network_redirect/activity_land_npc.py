@@ -121,3 +121,8 @@ def inspection(role,ident):
     if not target:return None
     from . import npc_players
     return summon.event(11, npc_players.inspection_data(catalog()[target['npc_id']], scene_id=ident, count=s['grid_count']))
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

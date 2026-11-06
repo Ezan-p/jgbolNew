@@ -483,3 +483,8 @@ def move(role, s, data, r, jrules):
     if fid is not None:
         events.append(summon.event(44,dict(fight_id=fid,fight_type=200)))
     return events
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

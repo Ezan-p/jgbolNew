@@ -335,3 +335,7 @@ def champions(role,s,g,r,cross=False):
     return [dict(winner,week=s['day'],area='本地区' if own else '本地模拟区',
                  level=g['level'] if own else 1,popularity=g['popularity'] if own else 0,
                  top_member=member_scores(role,s,g,r,cross) if own else [dict(id=winner['leader_id'],name=winner['leader_name'],order=1,score_point=winner['score'],win_count=winner.get('win_count',0),total_count=winner.get('win_count',0)+winner.get('lose_count',0),prize_count=0)])]
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

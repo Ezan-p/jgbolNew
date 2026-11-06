@@ -66,3 +66,8 @@ def settle(role,s,op,d,now,r):
     a.require(available,'宝图奖励已用完');index=secrets.choice(available);board['goods'][index]['got']=True;board['draws']+=1
     gain=grant(role,[board['goods'][index]])
     return [response(3,event_data=dict(view(tid,board,r,2),des_index=index+1,prize_list=gain))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

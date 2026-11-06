@@ -32,3 +32,8 @@ def battle(role,units,rules,effect_values,max_actions=None):
     if units[1]:min(units[1],key=lambda u:u['order'])['extras']=effect_values.copy()
     result, lineup, actions = Battle(role, units, rules, max_actions=max_actions).run()
     return result, lineup, actions, actions.events
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

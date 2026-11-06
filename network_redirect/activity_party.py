@@ -213,3 +213,8 @@ def fight_rewards(role, damage, ar):
     # Preserve any separately configured non-peach participation rewards.
     specs += [p for p in ar['party_rewards'] if p[:2] != [5,1001]]
     return [journey.grant(role, spec) for spec in specs]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

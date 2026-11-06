@@ -181,3 +181,7 @@ def broadcast(a,role,tid,flag):
     row=dict(name=role['role_name'],type_id=tid,flag=flag)
     a['broadcasts']=(a.get('broadcasts',[])+[row])[-30:]
     return u.reply(93,dict(result=1,update_list=[row]))
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

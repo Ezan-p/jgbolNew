@@ -183,3 +183,7 @@ def fight(role,req,now,r,jrules):
         from . import guild_match
         return guild_match.fight(role,s,g,req,now,r,jrules)
     u.require(False,'该仙盟战斗尚未完成接入')
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

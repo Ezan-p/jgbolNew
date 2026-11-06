@@ -268,3 +268,8 @@ def settle(role,req,now,r,jrules,parse):
         return replay_response(4,s,r,replay,fight_type=2,des_id=tid,is_win=win)
     from .activity_land_boss import settle as boss_settle
     return boss_settle(role,s,op,d,now,r,jrules)
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

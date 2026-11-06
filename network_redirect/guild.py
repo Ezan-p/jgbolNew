@@ -412,3 +412,7 @@ def chat(role,msg,now,r):
     row=dict(id=role['role_id'],name=role['role_name'],time=now,chat_msg=msg,channel=6,sub_channel=6,vip_level=role.get('vip_level',0),single_score=0,level=role['level'],head_type=role.get('head_type',1),union_name=g['name'])
     g['chat'].append(row);g['chat']=g['chat'][-30:]
     return [encode(1098,row)]
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

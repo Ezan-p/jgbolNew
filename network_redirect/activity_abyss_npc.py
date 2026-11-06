@@ -53,3 +53,8 @@ def settle_day(role, state, now, rules):
             prizes,now,welfare.load_rules())
         role['welfare']=delivery['welfare']
     state['rank_day']=today
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

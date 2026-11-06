@@ -16,3 +16,8 @@ def status(role,now,r):
 def settle(role,mid,req,now,r):
     if mid in (1210,1211):return caishen.settle(role,mid,req,now,r)
     return tangwang.settle(role,req,now,r)
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

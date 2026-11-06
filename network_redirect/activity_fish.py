@@ -163,3 +163,8 @@ def settle(role, req, now, r):
     s['news'].append(news);s['news']=s['news'][-3:]
     return [summon.event(85,dict(result=1,count=n,item_data=a.prizes(role,[p]),local_fish=payload(s,r))),
             summon.event(86,[news])]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

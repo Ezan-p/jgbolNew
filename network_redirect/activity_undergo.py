@@ -279,3 +279,8 @@ def settle(role, req, now, r, jrules, frules, parse):
         response(6, detail(s)), summon.event(44, dict(fight_id=fid, fight_type=ft, role_add_exp=xp,
             exp_list=exps, silver_coin=money, rewards=gain+first, send_prize_list=gain+first,
             attach_list=gain, first_win_prize=first))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

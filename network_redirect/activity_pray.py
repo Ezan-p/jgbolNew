@@ -71,3 +71,8 @@ def settle(role, req, rules):
     s = role['activity']
     s['pray_total'] = s.get('pray_total', 0) + 1
     return [summon.event(52, dict(pray_item_list=[journey.grant(role, reward)]))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

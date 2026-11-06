@@ -41,3 +41,8 @@ def progress(seasonal, shared):
     step = shared['seasonal_moon_bonus_every']
     return dict(rice_count=count, cur_process=count % step, left_process=step-count % step,
                 bonus_every=step, bonus_rewards=shared['seasonal_moon_bonus'])
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

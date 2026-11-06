@@ -235,3 +235,8 @@ def battle(role, req, now, rules, jrules):
             prize=[], boss_id=boss['boss_id'], hp=boss['hp'], train_times=boss['train_times'], last_train_time=s['trial_next'],
             friend_damage_list=damage_list(role, boss)))),
         summon.event(44, dict(fight_id=fid, fight_type=11, **getattr(actions, 'talent', {})))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

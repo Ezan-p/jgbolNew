@@ -233,3 +233,8 @@ def settle(role, req, now):
     if flag in (3, 4):
         data.update(shop_config=shop(s, r), shop_list=gain)
     return [summon.event(179, data)]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

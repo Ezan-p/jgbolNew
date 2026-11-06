@@ -89,3 +89,8 @@ def weekly(role,s,now,r):
                     sender='系统',delivery_key=key)
                 news(s,now,f"上周逐鹿排名第{mine['order']}，奖励已发至系统邮件。")
     s['week']=week;s['week_soul']=0
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

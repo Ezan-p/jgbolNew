@@ -276,3 +276,8 @@ def settle(role,req,now,r,jrules,parse):
             *battle_replay.result_packets(1027, dict(fight_id=fid,fight_type=34,final_result=result,fight_round=len(actions),fight_result=actions)),
             response(25,dict(has_passed=s['passed'],fight_count=s['fight_count'])),summon.event(44,dict(fight_id=fid,fight_type=34))]
     a.require(False,'洞府操作无效')
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

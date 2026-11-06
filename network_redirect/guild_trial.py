@@ -53,3 +53,7 @@ def advance(a):
         a['train_floor']+=1
         a['train_floor_attempts']=0
         a['train_hp']=current(a)['hp']
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

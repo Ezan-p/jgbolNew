@@ -76,3 +76,8 @@ def settle(role, req, now, rules, peers=None):
         # Native strength means this settlement; personal-best display must
         # retain its own earned strength when the second run scores lower.
         personal_best_strength=best(role)['strength']))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

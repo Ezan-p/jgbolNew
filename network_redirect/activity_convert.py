@@ -90,3 +90,8 @@ def battle(role, req, now, rules, jrules):
         *battle_replay.result_packets(1027, dict(fight_id=fid, fight_type=10, final_result=result,
                          fight_round=len(actions), fight_result=actions)),
         summon.event(70, cards), summon.event(44, dict(fight_id=fid, fight_type=10))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

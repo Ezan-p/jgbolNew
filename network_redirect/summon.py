@@ -430,3 +430,7 @@ def soul_snapshot(role):
 def news_snapshot(role, rules):
     news = role.get('summon', {}).get('news', [])[:rules['news']['limit']]
     return encode(1047, dict(first_send=True, lottery_count=len(news), lottery_list=news))
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

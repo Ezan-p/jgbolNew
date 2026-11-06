@@ -115,3 +115,8 @@ def settle(role, s, op, d, now, r):
         a.require(bool(changed), '该药田已施肥或已成熟')
         return [h.response(op, dict(plant_grid=idx,cur_plus_times=changed[idx],prize_list=[prizes[idx]]))]
     return [h.response(op, dict(plants_plus_time=changed,prize_list=prizes))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

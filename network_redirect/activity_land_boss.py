@@ -174,3 +174,8 @@ def settle(role,s,op,d,now,r,jrules):
         # Original enum has no active request caller; return persisted history only.
         return [response(op,history=query(s,r,op==29)['data']['history'])]
     a.require(False,'逐鹿操作无效')
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

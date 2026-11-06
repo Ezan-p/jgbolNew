@@ -443,3 +443,8 @@ def inspection(role, req, peers, frules=None):
         elif i['attach_type'] == 5:
             out['equip_list'].append(row)
     return [summon.event(11, out)]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

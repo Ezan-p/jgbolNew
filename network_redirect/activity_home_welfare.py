@@ -124,3 +124,8 @@ def settle(role,s,d,now,r):
         w['claims'].append(key);extra['index']=i
     prizes=a.prizes(role,rewards)
     return [h.response(24,dict(flag=2,act_type=typ,prize_list=prizes,all_activity=view(role,s,now,r),**extra))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

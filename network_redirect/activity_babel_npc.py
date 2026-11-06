@@ -137,3 +137,8 @@ def rollover(role, s, now, rules):
     s['last_my_top'] = copy.deepcopy(board['my_top'])
     s.update(week=current, cur_floor=1, history_floor=1, reached_at=now,
              floors={}, opponents={}, complete=False, participated=False)
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

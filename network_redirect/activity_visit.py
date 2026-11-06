@@ -132,3 +132,8 @@ def settle(role, req, r):
             state['claimed'] = True
     return [summon.event(42, dict(visit_index=i, op_type=op, result=1,
                                  visit_list=visit_list(role), **receipt))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

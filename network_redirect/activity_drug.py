@@ -112,3 +112,8 @@ def settle(role,s,op,d,r):
         return [response(8,drug_bag=bag(role))]
     a.require(op==22 and d.get('client_flag',1) in (1,2,3),'药神殿查询参数无效')
     return [response(22,client_flag=d.get('client_flag',1),drug_bag=bag(role))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

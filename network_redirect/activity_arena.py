@@ -313,3 +313,8 @@ def settle(role, req, now, arules, jrules, parse):
             out['local_prizes'] = gain
         return [response(out)]+([summon.event(33, gain)] if gain else [])
     a.require(False, '血战操作无效')
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

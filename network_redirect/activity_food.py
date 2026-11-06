@@ -52,3 +52,8 @@ def use(role, req, pools, mapping, draw_one, label):
     prizes = [item_rewards.grant(role, [typ, target, n, level])
               for (typ, target, level), n in sorted(totals.items())]
     return [summon.event(21, dict(result=1, type_id=tid, count=count, attach_list=prizes))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

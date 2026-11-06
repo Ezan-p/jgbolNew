@@ -225,3 +225,7 @@ def resolve_raid(role,s,g,e,now,r):
     row=dict(id=ident,name=target['player_name'],player_name=target['player_name'],union_name=target['union_name'],time=now,rob_time=now,rob_id=ident,rob_contrib=a['book']['book_level']*2,is_black=any(v['id']==ident for v in e['black']),book_level=target['book_level'],road_type=a['road'],be_grab_times=1,loss=a['book']['book_level']*20,result=1)
     e['raid_log']=(e.get('raid_log',[])+[row])[-30:]
     g['events'].append('取经遭遇离线拦截，完成奖励减少20%');g['events']=g['events'][-100:]
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

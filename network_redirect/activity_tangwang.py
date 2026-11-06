@@ -179,3 +179,8 @@ def settle(role, req, now, shared):
     return [summon.event(90, dict(prize_list=a.prizes(role, list(rewards.values())),
         local_tangwang=payload(s, r, True), pool_index=indices[0] if len(indices)==1 else 0,
         exchange_count=len(cards)//4, pool_counts=pool_counts))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

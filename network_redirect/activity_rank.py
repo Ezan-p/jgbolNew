@@ -345,3 +345,8 @@ def settle(role, mid, req, now, arules, jrules):
         # Refresh the open exchange page in place; 1022 navigates back to the board.
         return [client_state(role),summon.event(36,rewards)]
     raise formation.Rejected('封神榜操作无效')
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

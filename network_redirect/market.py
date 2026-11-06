@@ -275,3 +275,7 @@ def panic_buy(role, request, now, rules, expected_sale_time):
         state['has_buy_item2'] += 1
     return dict(panic_snapshot(role, now, rules), result=0,
                 attach_list=[attachment(item['type_id'], item['count'])])
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

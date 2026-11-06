@@ -108,3 +108,7 @@ def recruit(role, s, g, now, r):
         g['applications'][str(m['id'])] = m
         s.setdefault('pending_notices', []).append(dict(event_id=7, result=1, role_id=m['id']))
 
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

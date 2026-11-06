@@ -321,3 +321,8 @@ def settle(role,mid,req,now,r,jrules,parse):
                 results[len(results)+1]=v
     results['pass_all_form']=all(b['reward_claimed'] for b in s['rape_boards'])
     return [messages(role),summon.event(114,results)]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

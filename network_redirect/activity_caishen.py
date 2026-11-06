@@ -148,3 +148,8 @@ def settle(role,mid,req,now,r):
     prize=a.prizes(role,[row['reward']])[0]
     prize['local_caishen']=payload(s,r)
     return [summon.event(87,prize)]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

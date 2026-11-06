@@ -51,3 +51,8 @@ def remember(role, keys, rules):
             history.remove(key)
         history.append(key)
     del history[:-rules['recent_npc_limit']]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

@@ -186,3 +186,7 @@ def open_box(role, req, now, r):
     if not item['count']: role['attachments'].remove(item)
     prizes = [journey.grant(role, [p[0], p[1], p[2]*n, p[3]]) for p in r['feast_box_rewards'][str(tid)]]
     return [summon.event(21, dict(result=1, type_id=tid, count=n, attach_list=prizes))]
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

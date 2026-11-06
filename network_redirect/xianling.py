@@ -113,3 +113,7 @@ def settle(role,mid,req,now,r):
     # Full state first: original exchange/buy callbacks only repaint their old tables.
     return [summon.event(185,snapshot(role,now,r)),summon.event(185,dict(flag=op,index=index,
             canbuy_count=remaining(role,now,r),take_list=statuses(role,now,r),attach_list=prizes))]
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

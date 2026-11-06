@@ -151,3 +151,8 @@ def use_bag(role, req):
     role['attachments'] = [i for i in role['attachments'] if i is not item or i['count'] > 0]
     gain = a.prizes(role, [[target[0], int(target[1]), BAGS[tid][target] * n, 1]])
     return [summon.event(21, dict(result=1, type_id=tid, count=n, attach_list=gain))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

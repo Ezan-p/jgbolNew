@@ -413,3 +413,7 @@ def settle(role, mid, req, parse):
     if mid == 1079:
         return six_star(role, req, r)
     return transform(role, req, r)
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

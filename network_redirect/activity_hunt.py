@@ -229,3 +229,8 @@ def use_item(role,req,now,ar):
             target=secrets.choice(pool);counts[target]=counts.get(target,0)+1
         prizes=[journey.grant(role,[5,t,c,1]) for t,c in sorted(counts.items())]
     return [summon.event(21,dict(result=1,type_id=tid,count=n,attach_list=prizes,soul_gain=100*n if tid==1036 else 0))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

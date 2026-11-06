@@ -283,3 +283,8 @@ def settle(role,req,now,parse):
         s['token']=secrets.token_hex(16)
     deliver_charge(role,s,now,r)
     return [response(role,s,now,r,op,reward,extra)]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

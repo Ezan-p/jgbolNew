@@ -235,3 +235,8 @@ def settle(role, req, now, peers=None):
     return [summon.event(195, dict(flag=2, index=index, count=count,
                                    snapshot=catalog(role, now, r, peers),
                                    left_count=0, attach_list=gain))] + notifications
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

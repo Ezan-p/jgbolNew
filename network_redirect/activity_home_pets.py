@@ -58,3 +58,8 @@ def settle(role,s,op,d,r):
     pet.update(type_id=tid,main_type=int(BASE[tid]['main_type']),grow_values=copy.deepcopy(growth))
     s['pet_growth'].setdefault(str(tid),{})[str(pet['quality'])]=copy.deepcopy(growth)
     return [h.response(op,dict(update_list={pet['id']:wire(pet)},transform_info=memory(s)))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

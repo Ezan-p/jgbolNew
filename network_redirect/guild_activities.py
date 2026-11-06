@@ -31,3 +31,7 @@ def settle(role,s,g,op,d,now,r):
     if op in (65,66,67,68):
         return guild_feast.settle(role,s,g,op,d,now,r)
     u.require(False,'该仙盟操作尚未完成接入')
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

@@ -231,3 +231,7 @@ def funds(g,amount,r):
     actual=min(r['money_cap'],g['money']+amount)-g['money']
     g['money']+=actual
     return actual
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

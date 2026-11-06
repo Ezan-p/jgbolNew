@@ -436,6 +436,8 @@ def mail_snapshot(role,now,r):
 
 
 def mail_request(role,mid,req,now,r,s):
+    # Claim the actual receipt even if preparation returned a restricted preview.
+    s = role.get('welfare', s)
     mail=next((m for m in s.get('mails',{}).values() if m['mail_id']==req['mail_id']),None)
     f.require(mail is not None,'邮件不存在')
     if mid==1102:
@@ -443,6 +445,13 @@ def mail_request(role,mid,req,now,r,s):
         return [summon.event(14,dict(mail_id=mail['mail_id'],mail_title=mail['mail_title'],
             mail_body=mail['mail_body'],recv_time=mail['recv_time'],send_time=mail['send_time'],
             attach_count=len(ps),attach_list=ps,flag=req['flag']))]
+    from . import time_guard
+    key = next(k for k, m in s.get('mails', {}).items() if m is mail)
+    time_guard.require(role, time_guard.mail_scope(key))
     f.require(not mail['claimed'],'邮件附件已领取')
     prizes=[journey.grant(role,p) for p in mail['prizes']];mail['claimed']=True
     return [summon.event(15,dict(result=1,mail_id=mail['mail_id'],attach_count=len(prizes),attach_list=prizes))]
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

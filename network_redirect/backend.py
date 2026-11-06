@@ -11,7 +11,7 @@ import sqlite3
 import struct
 import time
 
-from . import game_clock
+from . import game_clock, time_guard
 from .protocol import encode, decode, HEADER
 from . import tian_shu, new_role_guide, progression, role_profile, achievements, spirit_array, npc_players, gift_codes, xianyuan_fruit
 from . import summon, formation, market, immortal, journey, activity, reborn, reborn_stars, daily, guild, vip, xianling, welfare, recharge, cheer, monument, equipment
@@ -110,6 +110,7 @@ class Backend:
             self.db.commit()
         self._owns_clock = clock is None
         self.clock = clock if clock is not None else game_clock.GameClock(directory, legacy_db=self.db)
+        self.time_guard = time_guard.Guard(self.db, directory)
         self.tickets = {}
         self.random_key = secrets.randbelow(0x7ffffffe) + 1
         # This instance owns one account, including response replay across reconnects.
@@ -144,6 +145,7 @@ class Backend:
         if row:
             role = json.loads(row[0])
             original_role = copy.deepcopy(role)
+            self.time_guard.load(account, role, game_clock.now(), clock_blocked=getattr(self.clock, 'quarantined', False))
             # Migrate existing bootstrap saves without replacing the user's role.
             changed = False
             if 'cortege_count' not in role:
@@ -187,6 +189,9 @@ class Backend:
     @measured("save")
     def save(self, role, account=None, *, gameplay=True):
         account = self.account if account is None else account
+        if 'time_guard' not in role:
+            self.time_guard.load(account, role, game_clock.now(), clock_blocked=getattr(self.clock, 'quarantined', False))
+        self.time_guard.enforce(account, role)
         progression.prepare(role)
         role_profile.prepare(role, self.profile_rules)
         cheer.prepare(role, self.cheer_rules)
@@ -225,6 +230,7 @@ class Backend:
         else:
             with phase('save_commit'):
                 self.db.execute('INSERT OR REPLACE INTO roles VALUES (?,?)', (account, serialized))
+                self.time_guard.checkpoint(account, role)
                 self.db.commit()
             count('save_writes')
         self.achievement_pending.extend(updates)
@@ -324,6 +330,8 @@ class Backend:
         replies.append(welfare.hint(role, game_clock.now(), self.welfare_rules))
         replies.append(welfare.mail_snapshot(role, game_clock.now(), self.welfare_rules))
         self.save(role)
+        if role.get('time_guard', {}).get('blocked'):
+            replies.append(summon.event(55, dict(op_string=time_guard.MESSAGE)))
         return replies
 
     def roster(self, serial=0, role=None):
@@ -554,6 +562,10 @@ class Backend:
                 self.last_request_serial = serial
             try:
                 replies = self._respond(packet, state)
+            except formation.Rejected as error:
+                if self.db.in_transaction:
+                    self.db.rollback()
+                replies = self.complete(serial, [summon.event(55, dict(op_string=str(error)))])
             except Exception as error:
                 if not guarded:
                     raise
@@ -648,6 +660,10 @@ class Backend:
             raise ValueError('Business message before login')
         if mid == 2999:
             role = self.profile()
+            if '*' in role.get('time_guard', {}).get('blocked', []):
+                # A quarantined legacy save may never have initialized activity
+                # sections. Keep the heartbeat and basic resource sync available.
+                return [encode(2999, dict(time=game_clock.now(), random_key=self.random_key, delay_time=0))] + self.number_replies(self.panel_attributes(role) + self.journey_attributes(role))
             seasonal_before = {'attachments': copy.deepcopy(role['attachments'])}
             # Shared activity.prepare may settle Tangwang before its own heartbeat hook.
             tw_before = copy.deepcopy(role.get('activity',{}).get('seasonal',{}).get('tangwang'))
@@ -719,9 +735,9 @@ class Backend:
             if rulai_rollover:
                 updates.append(activity_rulai.sync(role, now))
                 self.save(role)
-            if previous_month != role['xianling']['month']:
+            if previous_month != role.get('xianling', {}).get('month'):
                 updates.append(xianling.tip(role,now,self.xianling_rules))
-            if previous_day != role['daily']['day']:
+            if previous_day != role.get('daily', {}).get('day'):
                 updates.append(daily.hint(role, now, self.daily_rules))
                 updates.append(welfare.hint(role, now, self.welfare_rules))
                 updates.append(welfare.mail_snapshot(role, now, self.welfare_rules))

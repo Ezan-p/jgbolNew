@@ -404,3 +404,8 @@ def use_bag(role, req):
     # Soul amount [A] from item_name; unspecified peach amount [B].
     gain = a.prizes(role, [[10, 5027, 5 * count, 1], [5, 1001, r['bag_peaches'] * count, 1]])
     return [summon.event(21, dict(result=1, type_id=1243, count=count, attach_list=gain))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

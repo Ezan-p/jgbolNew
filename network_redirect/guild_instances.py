@@ -337,3 +337,7 @@ def catch_update(a,role,tid,now):
     if tid is not None:
         a['catch_history']=(a.get('catch_history',[])+[dict(name=role['role_name'],type_id=tid,time=now)])[-30:]
     return u.reply(94,dict(result=1,catch_list=a.get('catch_history',[])))
+
+
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())

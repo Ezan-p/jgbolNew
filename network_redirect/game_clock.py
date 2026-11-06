@@ -9,6 +9,9 @@ from contextlib import contextmanager
 from functools import wraps, lru_cache
 from datetime import date
 import ctypes
+import hashlib
+import hmac
+import secrets
 import json
 import math
 import os
@@ -123,11 +126,26 @@ class GameClock:
         self.source = source or SystemSource()
         self.path = str((Path(directory) / 'clock.sqlite3').resolve())
         existed = Path(self.path).exists()
+        self.quarantined = False
         self.db = sqlite3.connect(self.path, timeout=10)
         try:
             os.chmod(self.path, 0o600)
             self.db.execute('PRAGMA synchronous=FULL')
             self.db.execute('CREATE TABLE IF NOT EXISTS clock (id INTEGER PRIMARY KEY CHECK(id=1), data TEXT NOT NULL)')
+            self.db.execute('CREATE TABLE IF NOT EXISTS clock_integrity (id INTEGER PRIMARY KEY CHECK(id=1), data TEXT NOT NULL, seal TEXT NOT NULL)')
+            key_path = Path(directory) / 'clock_integrity.key'
+            if not key_path.exists():
+                if self.db.execute('SELECT 1 FROM clock_integrity').fetchone():
+                    raise RuntimeError('时钟校验密钥缺失，请恢复完整备份')
+                try:
+                    with key_path.open('xb') as stream:
+                        stream.write(secrets.token_bytes(32))
+                    key_path.chmod(0o600)
+                except FileExistsError:
+                    pass
+            self.integrity_key = key_path.read_bytes()
+            if len(self.integrity_key) != 32:
+                raise RuntimeError('时钟校验密钥无效')
             with self.db:
                 self.db.execute('BEGIN IMMEDIATE')
                 if self.db.execute('SELECT 1 FROM clock WHERE id=1').fetchone() is None:
@@ -144,7 +162,11 @@ class GameClock:
             raise
 
     def _write(self, state):
-        self.db.execute('INSERT OR REPLACE INTO clock VALUES (1, ?)', (json.dumps(state),))
+        state['integrity_version'] = 1
+        data = json.dumps(state)
+        seal = hmac.new(self.integrity_key, data.encode(), hashlib.sha256).hexdigest()
+        self.db.execute('INSERT OR REPLACE INTO clock VALUES (1, ?)', (data,))
+        self.db.execute('INSERT OR REPLACE INTO clock_integrity VALUES (1, ?, ?)', (data, seal))
 
     def sample(self):
         """Serialize across accounts/processes. Journal before any reward work."""
@@ -161,6 +183,23 @@ class GameClock:
                     or not all(type(state.get(k)) in (int, float) and math.isfinite(state[k])
                                and state[k] >= 0 for k in ('game', 'elapsed'))):
                 raise RuntimeError('Invalid game clock state; refusing wall-clock fallback')
+            checkpoint = self.db.execute('SELECT data,seal FROM clock_integrity WHERE id=1').fetchone()
+            if checkpoint is not None:
+                data, seal = checkpoint
+                expected = hmac.new(self.integrity_key, data.encode(), hashlib.sha256).hexdigest()
+                if not hmac.compare_digest(expected, seal):
+                    raise RuntimeError('可信时钟校验记录损坏，请恢复完整备份')
+                if json.loads(data) != state:
+                    # A valid-shaped edited clock must not advance any rewards.
+                    state = json.loads(data)
+                    state['quarantined'] = True
+                    self._write(state)
+            else:
+                if state.get('integrity_version'):
+                    raise RuntimeError('可信时钟校验记录缺失，请恢复完整备份')
+                # One-time upgrade of the previous clock schema, no guilt inferred.
+                self._write(state)
+            self.quarantined = bool(state.get('quarantined'))
             same_boot = state['boot'] == self.source.boot_id and elapsed >= state['elapsed']
             game = state['game'] + (elapsed - state['elapsed'] if same_boot else 0)
             # At most one journal write per game second during normal requests.

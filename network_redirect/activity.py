@@ -421,6 +421,8 @@ def battle(role,req,now,r,jrules,frules):
 
 
 def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
+    from . import time_guard
+    time_guard.require(role, time_guard.request_scope(mid, req))
     from . import feature_levels
     feature_levels.check(role, mid, req)
     # Babel state() owns migration, daily recovery and weekly settlement.
@@ -583,3 +585,8 @@ def attributes(role):
     values[134]=max(0,role['top_fight_limit']+role.get('top_fight_count_plus',0)-role['activity']['rank_count'])
     attrs=[dict(type=t,value=value) for t,value in values.items()]
     return [encode(1032,dict(id=role['role_id'],unit_type=1,attr_count=len(attrs),attr_list=attrs))]
+
+
+# Guard automatic settlement as well as direct activity operations.
+from .time_guard import protect as _protect_time_rewards
+_protect_time_rewards(globals())
