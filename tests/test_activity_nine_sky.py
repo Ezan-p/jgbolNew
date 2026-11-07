@@ -31,14 +31,14 @@ class NineSkyTests(ActivityCase):
     def test_requested_price_increases_preserve_daily_catalog_and_stock(self):
         cfg = n.load_rules()
         self.assertEqual([r['cost'] for r in cfg['star_shop']],
-                         [25,26,28,30,35,38,42,46,50,180,200,160,180,190,300])
+                         [45,46,48,50,55,58,62,66,70,230,250,210,230,240,350,350,350,350,350])
         with patch.object(n, 'choose_high_shop', return_value=cfg['star_shop'][9]):
             self.result(self.call())
         role=self.b.profile();state=role['activity']['nine_sky']
         for row in state['shop']:
-            row['cost'] -= 0 if row['tier']=='low' else 50
+            row['cost'] -= 20 if row['tier']=='low' else 50
             row.pop('listing_weight', None)
-        state['shop_revision']='nine-sky-2026-11-03-encounter-v4'
+        state['shop_revision']='nine-sky-2026-11-04-weighted-high-v5'
         state['purchases']['1']=[1,0,1,0,0,1]
         before=copy.deepcopy(state);self.b.save(role)
         self.result(self.call())
@@ -46,7 +46,7 @@ class NineSkyTests(ActivityCase):
         self.assertEqual([r['reward'] for r in after['shop']], [r['reward'] for r in before['shop']])
         self.assertEqual(after['purchases'], before['purchases'])
         for old,new in zip(before['shop'],after['shop']):
-            self.assertEqual(new['cost']-old['cost'], 0 if new['tier']=='low' else 50)
+            self.assertEqual(new['cost']-old['cost'], 20 if new['tier']=='low' else 50)
 
     def test_high_shop_exact_listing_probabilities(self):
         cfg=n.load_rules();counts={}
@@ -57,7 +57,7 @@ class NineSkyTests(ActivityCase):
             self.assertEqual(draw.call_args.args, (100,))
             self.assertEqual([r['tier'] for r in state['shop']], ['low']*5+['high'])
             tid=state['shop'][5]['reward'][1];counts[tid]=counts.get(tid,0)+1
-        self.assertEqual(counts,{5027:20,5036:15,1031:20,1249:20,1243:20,1246:5})
+        self.assertEqual(counts,{5027:15,5036:11,1031:15,1249:15,1243:15,1246:5,6002:10,6003:10,6004:2,6005:2})
 
     def test_high_shop_invalid_listing_weights_are_rejected(self):
         for value in (None,True,0,-1,1.5,101,19):
@@ -66,20 +66,20 @@ class NineSkyTests(ActivityCase):
             with self.subTest(value=value), self.assertRaises(n.f.Rejected):n.load_rules(path)
 
     def test_fruit_listing_exchange_persistence_and_duplicate_protection(self):
-        cfg=n.load_rules();fruit=cfg['star_shop'][-1]
-        self.assertEqual(fruit,dict(tier='high',reward=[5,1246,1,1],cost=300,limit=1,listing_weight=5))
-        with patch.object(n.secrets,'randbelow',side_effect=lambda size:size-1):
+        cfg=n.load_rules();fruit=next(row for row in cfg['star_shop'] if row['reward'][1]==1246)
+        self.assertEqual(fruit,dict(tier='high',reward=[5,1246,1,1],cost=350,limit=1,listing_weight=5))
+        with patch.object(n,'choose_high_shop',return_value=fruit):
             self.result(self.call())
         role=self.b.profile();state=role['activity']['nine_sky']
         self.assertEqual(state['shop'][5],fruit)
-        state['stars']=299;self.b.save(role)
+        state['stars']=349;self.b.save(role)
         before=self.b.profile();self.assertEqual(self.call(4,buy_type=1,index=6,count=1,card_list={})[0][0],55)
         self.assertEqual(self.b.profile(),before)
-        role['activity']['nine_sky']['stars']=300;self.b.save(role)
+        role['activity']['nine_sky']['stars']=350;self.b.save(role)
         count=lambda r:sum(x['count'] for x in r['attachments'] if x['attach_type']==5 and x['type_id']==1246)
         before_count=count(role)
         shown=self.result(self.call(3,buy_type=1,first_send=True))['shop_data'][6]
-        self.assertEqual(shown['need_stars'],300)
+        self.assertEqual(shown['need_stars'],350)
         self.assertEqual(shown['attach_data']['attach_type'],1246)
         self.assertEqual(shown['attach_data']['attach_count'],1)
         self.result(self.call(4,buy_type=1,index=6,count=1,card_list={}))
@@ -95,7 +95,7 @@ class NineSkyTests(ActivityCase):
         self.assertEqual(self.sky_state()['purchases']['1'][5],1)
         midnight=(state['shop_day']+1)*86400-8*3600
         with patch('network_redirect.game_clock.now',return_value=midnight), \
-             patch.object(n.secrets,'randbelow',side_effect=lambda size:size-1):
+             patch.object(n,'choose_high_shop',return_value=fruit):
             self.result(self.call())
         self.assertEqual(self.sky_state()['shop'][5],fruit)
         self.assertEqual(self.sky_state()['purchases']['1'][5],0)
@@ -109,6 +109,37 @@ class NineSkyTests(ActivityCase):
         self.assertGreater(status['end_time'], NOW)
         self.assertEqual(n.LEVELS, [10,20,40,70,100,160,220,320,99999])
         self.assertEqual(len(n.ROADS), 42)
+
+    def test_shard_offers_exchange_five_and_enforce_price_and_quota(self):
+        cfg=n.load_rules()
+        for tid in (6002,6003,6004,6005):
+            with self.subTest(tid=tid):
+                offer=next(row for row in cfg['star_shop'] if row['reward'][1]==tid)
+                role=self.b.profile()
+                # Generate each offer through the daily selection path.
+                role.setdefault('activity',{}).pop('nine_sky',None)
+                self.b.save(role)
+                with patch.object(n,'choose_high_shop',return_value=offer):
+                    self.result(self.call())
+                shown=self.result(self.call(3,buy_type=1,first_send=True))['shop_data'][6]
+                self.assertEqual(shown['need_stars'],350)
+                self.assertEqual(shown['attach_data']['attach_type'],tid)
+                self.assertEqual(shown['attach_data']['attach_count'],5)
+                role=self.b.profile();role['activity']['nine_sky']['stars']=349;self.b.save(role)
+                before=self.b.profile()
+                self.assertEqual(self.call(4,buy_type=1,index=6,count=1,card_list={})[0][0],55)
+                self.assertEqual(self.b.profile(),before)
+                role['activity']['nine_sky']['stars']=350;self.b.save(role)
+                count=lambda r:sum(x['count'] for x in r['attachments'] if x['attach_type']==5 and x['type_id']==tid)
+                before_count=count(role)
+                self.result(self.call(4,buy_type=1,index=6,count=1,card_list={}))
+                after=self.b.profile()
+                self.assertEqual(count(after)-before_count,5)
+                self.assertEqual(self.sky_state()['stars'],0)
+                self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
+                self.assertEqual(self.b.profile(),after)
+                self.assertEqual(self.call(4,buy_type=1,index=6,count=1,card_list={})[0][0],55)
+                self.assertEqual(self.b.profile(),after)
 
     def test_free_paid_ten_rolls_original_cost_and_replay(self):
         self.result(self.call())
@@ -246,10 +277,10 @@ class NineSkyTests(ActivityCase):
             path=Path(self.tmp.name)/'invalid.json';path.write_text(json.dumps(cfg))
             with self.assertRaises(n.f.Rejected):n.load_rules(path)
 
-    def test_free_week_route_distribution_with_300_star_fruit(self):
+    def test_free_week_route_distribution_with_350_star_high_items(self):
         cfg = n.load_rules()
         high = [row for row in cfg['star_shop'] if row['tier'] == 'high']
-        self.assertEqual(max(row['cost'] for row in high), 300)
+        self.assertEqual(max(row['cost'] for row in high), 350)
         # Enumerate the exact legal route distribution; exclude all random bonuses.
         states = {(1, 0, 0): 1.0}
         for _ in range(cfg['daily_free'] * cfg['period_days']):
@@ -273,13 +304,13 @@ class NineSkyTests(ActivityCase):
         self.assertGreaterEqual(expected, max(row['cost'] for row in high))
         self.assertLess(expected, 2 * max(row['cost'] for row in high))
         self.assertGreater(sum(p for key, p in states.items() if stars(key) >= 400), .999)
-        # No guarantee that every route can afford even one 300-star fruit.
+        # No guarantee that every route can afford even one 350-star offer.
         self.assertEqual(min(map(stars, states)), 205)
 
     def test_free_week_typical_routes_afford_fruit_without_bonuses(self):
         cfg = n.load_rules()
         high = [row for row in cfg['star_shop'] if row['tier'] == 'high']
-        self.assertEqual(max(row['cost'] for row in high), 300)
+        self.assertEqual(max(row['cost'] for row in high), 350)
         # Exercise real protocol travel, day resets and purchases with the
         # middle eligible route each roll and the most expensive high item every day.
         original_choose, original_refresh = n.choose_map, n.refresh_shop
@@ -323,12 +354,12 @@ class NineSkyTests(ActivityCase):
         cfg = n.load_rules()
         high = [row for row in cfg['star_shop'] if row['tier'] == 'high']
         self.result(self.call())
-        for row, old_cost in zip(high[:5], (130, 150, 110, 130, 140)):
+        for row, old_cost in zip(high[:6], (180, 200, 160, 180, 190, 300)):
             for used in (0, 1):
                 with self.subTest(item=row['reward'][1], used=used):
                     role = self.b.profile(); s = role['activity']['nine_sky']
                     s['shop'][5] = dict(copy.deepcopy(row), cost=old_cost)
-                    s['shop_revision'] = 'nine-sky-2026-11-03-encounter-v4'
+                    s['shop_revision'] = 'nine-sky-2026-11-04-weighted-high-v5'
                     s['shop'][5].pop('listing_weight', None)
                     s['purchases']['1'][5] = used
                     s['stars'] = 1000
@@ -584,16 +615,16 @@ class NineSkyTests(ActivityCase):
 
     def test_high_pool_bag_exchange_open_and_replay(self):
         cfg=n.load_rules();high=[x for x in cfg['star_shop'] if x['tier']=='high']
-        self.assertEqual(len(high),6)
+        self.assertEqual(len(high),10)
         bag=next(x for x in high if x['reward'][1]==1243)
-        self.assertEqual(bag,dict(tier='high',reward=[5,1243,1,1],cost=190,limit=1,listing_weight=20))
+        self.assertEqual(bag,dict(tier='high',reward=[5,1243,1,1],cost=240,limit=1,listing_weight=15))
         with patch.object(n,'choose_high_shop',return_value=bag):self.result(self.call())
         role=self.b.profile();s=role['activity']['nine_sky'];self.assertEqual(s['shop'][5],bag)
         s['stars']=1000;self.b.save(role)
         self.result(self.call(3,buy_type=1,first_send=True))
         before=self.b.profile()
         self.result(self.call(4,buy_type=1,index=6,count=1,card_list={}))
-        self.assertEqual(self.sky_state()['stars'],810)
+        self.assertEqual(self.sky_state()['stars'],760)
         role=self.b.profile();item=next(i for i in role['attachments'] if i['type_id']==1243)
         count=lambda r:sum(i['count'] for i in r['attachments'] if i['attach_type']==5 and i['type_id']==1001)
         peaches=count(role);souls=role.get('souls',{}).get('5027',0)
@@ -613,7 +644,7 @@ class NineSkyTests(ActivityCase):
 
     def test_soul_box_revision_migrates_without_reroll_or_quota_reset(self):
         cfg=n.load_rules();box=next(x for x in cfg['star_shop'] if x['reward'][1]==1249)
-        self.assertEqual((box['reward'],box['cost']),([5,1249,50,1],180))
+        self.assertEqual((box['reward'],box['cost']),([5,1249,50,1],230))
         self.result(self.call());role=self.b.profile();s=role['activity']['nine_sky']
         s['shop'][5]=dict(tier='high',reward=[5,1249,30,1],cost=900,limit=1)
         s['shop_revision']='nine-sky-2026-10-27-v2';s['stars']=1000
@@ -621,7 +652,7 @@ class NineSkyTests(ActivityCase):
         self.result(self.call(3,buy_type=1,first_send=True))
         self.assertEqual(self.sky_state()['shop'][:5],low);self.assertEqual(self.sky_state()['shop'][5],box)
         self.result(self.call(4,buy_type=1,index=6,count=1,card_list={}))
-        self.assertEqual(self.sky_state()['stars'],820)
+        self.assertEqual(self.sky_state()['stars'],770)
         self.assertEqual(sum(i['count'] for i in self.b.profile()['attachments'] if i['type_id']==1249),50)
         role=self.b.profile();role['activity']['nine_sky']['shop_revision']='old-again';self.b.save(role)
         self.result(self.call(3,buy_type=1,first_send=True))

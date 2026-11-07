@@ -1,0 +1,22 @@
+{
+  "apk_sha256": "6115c733f0522a5258c080e49a08ca0753bbb0d8b5589809e34e15ae7d48eb79",
+  "scope": "Lua 5.1 deterministic model using actual APK payload; not a trace of the user device",
+  "actual_activity_ids": {
+    "dream": 40,
+    "saveMonkey": 48,
+    "twoyears": 46
+  },
+  "scenario": "Activity list and permanent Yuanshi config available; preceding save-monkey module not ready",
+  "bundled_result": "pending",
+  "before": "40,48",
+  "after_bundle": "40,48",
+  "critical_patches_absent": {
+    "entry": true,
+    "yuanshi": true
+  },
+  "after_installing_same_packaged_activity_patches_directly": "46",
+  "summon_marker_survives_activity_only_reload": true,
+  "native_guard": "offline_android/native/offline.c:client_patches_current checks only ui.summonUI._localGoldRestore",
+  "exact_trigger_on_user_device": "not yet observed",
+  "activity_id_source": "analysis/evidence/lua_named/lua/ui/activityUI.lua.txt:5755"
+}

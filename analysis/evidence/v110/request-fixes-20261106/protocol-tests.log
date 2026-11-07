@@ -1,0 +1,38 @@
+test_legacy_loaders_fall_back_without_aborting_remaining_patches (test_request_timing_client.RequestTimingClientTests) ... ok
+test_luasocket_gettime_keeps_precise_timing (test_request_timing_client.RequestTimingClientTests) ... ok
+test_cache_reset_clears_partial_queue_and_preserves_sequence_floor (test_request_wait.RequestWaitTests) ... ok
+test_delayed_spinner_without_processing_notice (test_request_wait.RequestWaitTests) ... ok
+test_dispatch_exception_during_ack_is_visible_and_does_not_retry (test_request_wait.RequestWaitTests) ... ok
+test_done_exception_releases_wait_and_advances_only_once (test_request_wait.RequestWaitTests) ... ok
+test_failed_fresh_login_does_not_report_success_or_auto_retry (test_request_wait.RequestWaitTests) ... ok
+test_fast_request_no_spinner_and_immediate_duplicate_guard (test_request_wait.RequestWaitTests) ... ok
+test_idle_reconnect_ack_drains_queued_updates_without_consuming_sequence (test_request_wait.RequestWaitTests) ... ok
+test_reconnect_failure_and_fresh_login_never_auto_resend (test_request_wait.RequestWaitTests) ... ok
+test_reconnect_success_requests_history_without_replacing_pending (test_request_wait.RequestWaitTests) ... ok
+test_retry_uses_frozen_payload_even_when_caller_mutates_its_table (test_request_wait.RequestWaitTests) ... ok
+test_send_exception_keeps_uncertain_intent_and_stops_spinner (test_request_wait.RequestWaitTests) ... ok
+test_stale_and_zero_ack_never_complete_an_unconfirmed_request (test_request_wait.RequestWaitTests) ... ok
+test_timeout_replays_first_then_retry_keeps_original_identity (test_request_wait.RequestWaitTests) ... ok
+test_failed_backend_emits_timing_and_resets_context (test_request_timing.TimingTests) ... Executing <Task pending name='Task-1' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:102> wait_for=<Future pending cb=[<TaskWakeupMethWrapper object at 0x10a9a4af0>()] created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py:424> created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:118> took 0.279 seconds
+Executing <Task pending name='Task-1' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:102> wait_for=<Future pending cb=[<TaskWakeupMethWrapper object at 0x10a9a4b80>()] created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py:424> created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:118> took 0.332 seconds
+Executing <Task pending name='Task-1' coro=<IsolatedAsyncioTestCase._asyncioLoopRunner() running at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:102> wait_for=<Future pending cb=[<TaskWakeupMethWrapper object at 0x10a9a4f40>()] created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py:424> created at /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/async_case.py:118> took 0.105 seconds
+ok
+test_phase_accumulates_even_on_error (test_request_timing.TimingTests) ... ok
+test_actual_reconnect_keeps_request_receipts (test_request_recovery.RequestRecoveryTests) ... ok
+test_changed_payload_and_evicted_receipt_never_repeat_execution (test_request_recovery.RequestRecoveryTests) ... ok
+test_exception_after_commit_is_not_charged_twice_and_has_wait_exit (test_request_recovery.RequestRecoveryTests) ... ok
+test_expired_response_history_resets_sequence_and_sends_snapshot (test_request_recovery.RequestRecoveryTests) ... ok
+test_same_id_after_reconnect_reuses_response_without_running_again (test_request_recovery.RequestRecoveryTests) ... ok
+test_babel_query_skips_global_prepare_and_unchanged_snapshots (test_activity_performance.ActivityPerformanceTests) ... ok
+test_empty_move_persists_without_inventory_and_replay_is_idempotent (test_activity_performance.ActivityPerformanceTests) ... ok
+test_move_with_reward_sends_inventory_and_persists_reward_once (test_activity_performance.ActivityPerformanceTests) ... ok
+test_query_sends_resources_recovered_during_profile_load (test_activity_performance.ActivityPerformanceTests) ... ok
+test_recalculation_cache_invalidates_on_mutation_and_time (test_activity_performance.ActivityPerformanceTests) ... ok
+test_reward_domains_and_zero_values_are_synced (test_activity_performance.ActivityPerformanceTests) ... ok
+test_save_unchanged_does_not_write_but_changes_do (test_activity_performance.ActivityPerformanceTests) ... ok
+test_unchanged_role_still_commits_pending_other_table_write (test_activity_performance.ActivityPerformanceTests) ... ok
+
+----------------------------------------------------------------------
+Ran 30 tests in 12.367s
+
+OK

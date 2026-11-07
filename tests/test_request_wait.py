@@ -1,6 +1,7 @@
 """Lua 5.1 tests: deterministic scheduler, real installed wrappers."""
 import unittest
 from pathlib import Path
+import network_redirect
 try:
     from lupa.lua51 import LuaRuntime
 except ImportError:
@@ -51,17 +52,18 @@ class RequestWaitTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime()
         self.lua.execute(FIXTURE)
-        self.lua.execute(Path('network_redirect/request_wait_client.lua').read_text())
+        self.lua.execute(Path(network_redirect.__file__).with_name('request_wait_client.lua').read_text())
 
     def test_fast_request_no_spinner_and_immediate_duplicate_guard(self):
-        self.lua.execute('''request();request();assert(#sent==1 and u.g_sys_busy)
+        self.lua.execute('''request();request();assert(#sent==1 and u.g_sys_busy and #notices==0)
         advance(0.15);assert(shown==0);ack(101);advance(1)
         assert(shown==0 and not u.g_is_waiting_1106 and not u.g_sys_busy)
         assert(ms._localRequestWait.state()=='idle' and next(tasks)==nil)''')
 
-    def test_delayed_spinner_and_slow_status(self):
+    def test_delayed_spinner_without_processing_notice(self):
         self.lua.execute('''request();advance(0.19);assert(shown==0)
-        advance(0.02);assert(shown==1);advance(3);assert(#notices>0)
+        advance(0.02);assert(shown==1);advance(3);request()
+        assert(#sent==1 and #notices==0)
         ack(101);assert(not u.g_sys_busy)''')
 
     def test_timeout_replays_first_then_retry_keeps_original_identity(self):
@@ -85,11 +87,11 @@ class RequestWaitTests(unittest.TestCase):
         assert(#e.g_net_package_list==0)
         assert(not u.g_is_waiting_1106 and not u.g_sys_busy)
         assert(ms._localRequestWait.state()=='idle' and u.g_client_req_serial_num==102)
-        ack(101);assert(u.g_client_req_serial_num==102)''')
+        ack(101);assert(u.g_client_req_serial_num==102 and #notices==0)''')
 
-    def test_dispatch_exception_during_ack_is_visible_and_does_not_retry(self):
+    def test_dispatch_exception_during_ack_is_silent_and_does_not_retry(self):
         self.lua.execute('''request();drainError=true;ack(101)
-        assert(#notices>0 and #sent==1 and not u.g_sys_busy)
+        assert(#notices==0 and #sent==1 and not u.g_sys_busy)
         assert(ms._localRequestWait.state()=='idle')''')
 
     def test_cache_reset_clears_partial_queue_and_preserves_sequence_floor(self):

@@ -129,6 +129,9 @@ def client_source(rules):
     startup_source = "if not package or not package.loaded then return 'pending' end\n"
     startup_source += Path(__file__).with_name('login_branding_client.lua').read_text(encoding='utf-8')
     startup_source += "\nif type(package.loaded.ms)~='table' then return 'pending' end\n"
+    from . import resource_preload
+    startup_source += Path(__file__).with_name('resource_preload_client.lua').read_text(encoding='utf-8').replace(
+        '__RESOURCE_PRELOAD_PLAN__', lua(resource_preload.load_plan()))
     prices = [rules['grades'][str(grade)]['gold_cost'] for grade in (1, 2, 3)]
     template = Path(__file__).with_name('summon_client.lua').read_text(encoding='utf-8')
     template = Path(__file__).with_name('opening_client.lua').read_text(encoding='utf-8') + '\n' + template
@@ -136,7 +139,6 @@ def client_source(rules):
     template = Path(__file__).with_name('profile_client.lua').read_text(encoding='utf-8') + '\n' + template
     template = Path(__file__).with_name('daily_client.lua').read_text(encoding='utf-8') + '\n' + template
     template = Path(__file__).with_name('progression_client.lua').read_text(encoding='utf-8') + '\n' + template
-    template = Path(__file__).with_name('activity_entry_client.lua').read_text(encoding='utf-8') + '\n' + template
     template = Path(__file__).with_name('party_client.lua').read_text(encoding='utf-8') + '\n' + template
     template = Path(__file__).with_name('activity_level_client.lua').read_text(encoding='utf-8') + '\n' + template
     from . import vip
@@ -191,6 +193,14 @@ def client_source(rules):
     guild_source += '\n' + guild_access.replace('__GUILD_WARS_ENABLED__', lua(guild.load_rules()['wars_enabled']))
     feed_rules = activity.load_rules()
     yuanshi_source = Path(__file__).with_name('yuanshi_client.lua').read_text(encoding='utf-8')
+    # Critical activity entry adapters must not wait for unrelated modules.
+    # Each returns pending locally, and the aggregate must not report ready
+    # until both these adapters and the existing gameplay chain are ready.
+    entry_source = Path(__file__).with_name('activity_entry_client.lua').read_text(encoding='utf-8')
+    startup_source += '\nlocal activity_pending=false\n'
+    for source in (entry_source, yuanshi_source):
+        startup_source += ("do local status=(function()\n" + source
+                           + "\nend)(); if status=='pending' then activity_pending=true end end\n")
     rulai_source = Path(__file__).with_name('rulai_client.lua').read_text(encoding='utf-8')
     nine_source = Path(__file__).with_name('nine_sky_client.lua').read_text(encoding='utf-8')
     caishen_source = Path(__file__).with_name('caishen_client.lua').read_text(encoding='utf-8')
@@ -208,7 +218,9 @@ def client_source(rules):
     from . import activity_save_monkey
     monkey_source = Path(__file__).with_name('save_monkey_client.lua').read_text(encoding='utf-8')
     monkey_source = monkey_source.replace('__SAVE_MONKEY_ENABLED__', lua(activity_save_monkey.load_rules()['enabled']))
-    return startup_source + monkey_source + '\n' + dream_source + '\n' + tangwang_source + '\n' + fish_source + '\n' + caishen_source + '\n' + battle_source + '\n' + trial_source + '\n' + nine_source + '\n' + guild_source + '\n' + visit_source + '\n' + feed_source + '\n' + pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + yuanshi_source + '\n' + rulai_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
+    gameplay_source = monkey_source + '\n' + dream_source + '\n' + tangwang_source + '\n' + fish_source + '\n' + caishen_source + '\n' + battle_source + '\n' + trial_source + '\n' + nine_source + '\n' + guild_source + '\n' + visit_source + '\n' + feed_source + '\n' + pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + rulai_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
+    return (startup_source + '\nlocal gameplay_status=(function()\n' + gameplay_source
+            + "\nend)()\nif activity_pending then return 'pending' end\nreturn gameplay_status\n")
 
 
 def lua(value):
@@ -272,7 +284,10 @@ def prepare(role, now, rules):
 
 
 def remaining(role, now):
-    return {field: max(0, int(role['summon']['ready_at'][str(grade)] - now))
+    # Quarantined new/legacy roles may only have a projected prepare result.
+    # Read legacy counters without creating live cooldowns or granting draws.
+    deadlines = role.get('summon', {}).get('ready_at', {})
+    return {field: max(0, int(deadlines.get(str(grade), now + max(0, role.get(field, 0))) - now))
             for grade, field in TIME_FIELDS.items()}
 
 

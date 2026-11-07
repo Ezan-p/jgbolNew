@@ -1,5 +1,5 @@
 """Local-only account and LS/BS bootstrap. Never contacts a channel service."""
-from .request_timing import measured, current, request_cache, count, phase
+from .request_timing import measured, current, request_cache, count, phase, role_baselines
 from collections import deque
 import copy
 import csv
@@ -139,12 +139,41 @@ class Backend:
             self.clock.close()
         self.db.close()
 
-    def profile(self, account=None):
+    def stored_role(self, account=None):
+        """Read-only persisted baseline, shared only within this request.
+
+        Still read the raw row so direct SQL, rollback and other connections
+        cannot leave a stale baseline. Never expose it as the working role.
+        """
         account = self.account if account is None else account
         row = self.db.execute('SELECT data FROM roles WHERE account=?', (account,)).fetchone()
-        if row:
-            role = json.loads(row[0])
-            original_role = copy.deepcopy(role)
+        raw = row[0] if row else None
+        cache = role_baselines.get()
+        key = (self, account)
+        if cache is not None and key in cache and cache[key][0] == raw:
+            count('role_baseline_hits')
+            return cache[key]
+        baseline = json.loads(raw) if raw is not None else None
+        count('role_baseline_loads')
+        result = (raw, baseline)
+        if cache is not None:
+            cache[key] = result
+        return result
+
+    def operation_baseline(self, role):
+        """Reuse a committed baseline; detach genuinely unsaved changes."""
+        _, baseline = self.stored_role()
+        if baseline == role:
+            return baseline
+        return copy.deepcopy(role)
+
+    def profile(self, account=None):
+        account = self.account if account is None else account
+        raw, original_role = self.stored_role(account)
+        if raw is not None:
+            # JSON decoding is cheaper than deep-copying the parsed baseline,
+            # and the mutable working role must remain independently owned.
+            role = json.loads(raw)
             self.time_guard.load(account, role, game_clock.now(), clock_blocked=getattr(self.clock, 'quarantined', False))
             # Migrate existing bootstrap saves without replacing the user's role.
             changed = False
@@ -157,9 +186,9 @@ class Backend:
             progression.prepare(role)
             role_profile.prepare(role, self.profile_rules)
             cheer.prepare(role, self.cheer_rules)
-            changed = formation.prepare(role, self.formation_rules) or changed
-            changed = immortal.prepare(role, self.immortal_rules) or changed
-            changed = reborn.prepare(role, self.reborn_rules) or changed
+            formation.prepare(role, self.formation_rules, track_changes=False)
+            immortal.prepare(role, self.immortal_rules, track_changes=False)
+            reborn.prepare(role, self.reborn_rules, track_changes=False)
             if 'journey' not in role:
                 changed = journey.prepare(role, game_clock.now(), self.journey_rules) or changed
             else:
@@ -181,7 +210,7 @@ class Backend:
                     attachments=[])
         if account != 'local-player':
             role.update(guide_progress=0, corteges=[])
-        formation.prepare(role, self.formation_rules)
+        formation.prepare(role, self.formation_rules, track_changes=False)
         journey.prepare(role, game_clock.now(), self.journey_rules)
         self.save(role, account, gameplay=False)
         return role
@@ -196,11 +225,10 @@ class Backend:
         role_profile.prepare(role, self.profile_rules)
         cheer.prepare(role, self.cheer_rules)
         vip.prepare(role, self.vip_rules)
-        reborn.prepare(role, self.reborn_rules)
-        immortal.prepare(role, self.immortal_rules)
+        reborn.prepare(role, self.reborn_rules, track_changes=False)
+        immortal.prepare(role, self.immortal_rules, track_changes=False)
         formation.recalculate(role, self.formation_rules)
-        stored = self.db.execute('SELECT data FROM roles WHERE account=?', (account,)).fetchone()
-        before_achievements = json.loads(stored[0]) if stored else None
+        stored, before_achievements = self.stored_role(account)
         # Loading/migrating a save is not a committed player operation.
         context = self.achievement_context if gameplay and account == self.account else None
         mid, req = context or (0, {})
@@ -211,7 +239,9 @@ class Backend:
         activity_monday.track(role, before_achievements, mid, req, game_clock.now())
         achievements.track(role, before_achievements, mid, req, game_clock.now())
         tian_shu.refresh(role)
-        updates = achievements.packets(role, new=1, previous=before_achievements) if context and before_achievements else []
+        # Achievement rows initialize a missing legacy section on their input.
+        # Keep that display-only default out of the shared persisted baseline.
+        updates = achievements.packets(role, new=1, previous=dict(before_achievements)) if context and before_achievements else []
         if context and before_achievements and any(
                 role[k] != before_achievements.get(k, 0) for k in ('task_progress', 'task_prize')):
             updates += tian_shu.sync(role)
@@ -219,7 +249,7 @@ class Backend:
             serialized = json.dumps(role, ensure_ascii=False)
         # Compare only after migrations, tracking and daily refresh have run.
         # JSON roundtrip normalizes integer keys in fresh battle/activity tables.
-        unchanged = stored and (serialized == stored[0] or json.loads(serialized) == before_achievements)
+        unchanged = stored is not None and (serialized == stored or json.loads(serialized) == before_achievements)
         if unchanged:
             count('save_unchanged')
             # Preserve callers' existing transaction boundary if they updated
@@ -370,15 +400,15 @@ class Backend:
             return self.complete(serial, [summon.event(55, {'op_string': '阵容请求已过期，请刷新后重试'})])
         try:
             role = self.profile()
-            before = copy.deepcopy(role)
+            before = self.operation_baseline(role)
             if mid == 1087:
                 events = cheer.settle(role, data, self.cheer_rules)
                 achievements.record_events(role, events, game_clock.now(), login_fields)
-                formation.prepare(role, self.formation_rules)
+                formation.prepare(role, self.formation_rules, track_changes=False)
             else:
                 events = formation.settle(role, mid, data, self.formation_rules, login_fields)
                 achievements.record_events(role, events, game_clock.now(), login_fields)
-            immortal.prepare(role, self.immortal_rules)
+            immortal.prepare(role, self.immortal_rules, track_changes=False)
             attrs = [dict(type=t, value=role.get(k, 0)) for t, k in
                      ((7, 'silver_coin'), (8, 'gold_coin'), (30, 'role_combat_power'), (39, 'max_combat_power'), (71, 'cortege_count'))]
             # Equipment panels keep the selected table throughout repeated
@@ -515,8 +545,8 @@ class Backend:
             result = summon.settle(role, data, game_clock.now(), self.summon_rules)
             achievements.record_events(role, [summon.event(23, result)], game_clock.now(), login_fields)
             welfare.track(role,1045,data,[],game_clock.now(),self.welfare_rules)
-            formation.prepare(role, self.formation_rules)
-            immortal.prepare(role, self.immortal_rules)
+            formation.prepare(role, self.formation_rules, track_changes=False)
+            immortal.prepare(role, self.immortal_rules, track_changes=False)
             # Encode every business response before committing any resources.
             replies = self.inventory(role) + summon.soul_snapshots(role) + immortal.handbook(role, self.immortal_rules) + [
                        encode(1032, dict(id=role['role_id'], unit_type=1, attr_count=1,
@@ -663,7 +693,11 @@ class Backend:
             if '*' in role.get('time_guard', {}).get('blocked', []):
                 # A quarantined legacy save may never have initialized activity
                 # sections. Keep the heartbeat and basic resource sync available.
-                return [encode(2999, dict(time=game_clock.now(), random_key=self.random_key, delay_time=0))] + self.number_replies(self.panel_attributes(role) + self.journey_attributes(role))
+                updates = self.panel_attributes(role) + self.journey_attributes(role)
+                if not state.get('time_guard_notified'):
+                    updates.append(summon.event(55, dict(op_string=time_guard.MESSAGE)))
+                    state['time_guard_notified'] = True
+                return [encode(2999, dict(time=game_clock.now(), random_key=self.random_key, delay_time=0))] + self.number_replies(updates)
             seasonal_before = {'attachments': copy.deepcopy(role['attachments'])}
             # Shared activity.prepare may settle Tangwang before its own heartbeat hook.
             tw_before = copy.deepcopy(role.get('activity',{}).get('seasonal',{}).get('tangwang'))
@@ -879,7 +913,7 @@ class Backend:
             journey.prepare(role, now, self.journey_rules)
             before = copy.deepcopy(role)
             events = new_role_guide.settle(role, data, now, self)
-            formation.prepare(role, self.formation_rules)
+            formation.prepare(role, self.formation_rules, track_changes=False)
             formation.recalculate(role, self.formation_rules)
             replies = (self.companion_deltas(before, role) + self.item_deltas(before, role)
                        + self.inventory(role) + journey.updates(role, before)
@@ -1201,7 +1235,7 @@ class Backend:
             charged = role.get('charge_gold',0)-before.get('charge_gold',0)
             journey.prepare(role, now, self.journey_rules)
             activity.prepare(role, now, self.activity_rules, self.duty_peers())
-            formation.prepare(role, self.formation_rules)
+            formation.prepare(role, self.formation_rules, track_changes=False)
             from . import activity_rulai, activity_yuanshi, activity_pavilion
             replies = self.companion_deltas(before, role) + self.item_deltas(before, role) + self.inventory(role) + self.power_attributes(role) + [vip.attrs(role), recharge.attrs(role), welfare_attributes(role),
                 summon.event(80, dict(local_vip=vip.client_state(role), local_recharge=recharge.client_state(role, now, self.recharge_rules, self.welfare_rules), **(dict(local_welfare=welfare.client_state(role, now, self.welfare_rules)) if mid in (1111,1051) else {})))] + events
@@ -1293,7 +1327,7 @@ class Backend:
             achievements.record_events(role, events, game_clock.now(), login_fields)
             welfare.track(role,mid,data,events,game_clock.now(),self.welfare_rules)
             events = daily.track(role, before, mid, data, events, game_clock.now(), self.daily_rules, login_fields) + events
-            reborn.prepare(role, self.reborn_rules)
+            reborn.prepare(role, self.reborn_rules, track_changes=False)
             formation.recalculate(role, self.formation_rules)
             attrs = [dict(type=t, value=role.get(k, 0)) for t, k in
                      ((7, 'silver_coin'), (8, 'gold_coin'), (30, 'role_combat_power'), (39, 'max_combat_power'),
@@ -1467,7 +1501,7 @@ class Backend:
             role = self.profile()
             previous_journey_day = role.get('journey', {}).get('day')
             journey.prepare(role, now, self.journey_rules)
-            before = copy.deepcopy(role)
+            before = self.operation_baseline(role)
             events = journey.settle(role, mid, data, now, self.journey_rules, self.formation_rules, self.activity_rules)
             if role.get('activity',{}).get('seasonal',{}).get('tangwang',{}).get('last_recycle') != before.get('activity',{}).get('seasonal',{}).get('tangwang',{}).get('last_recycle'):
                 events.insert(0,welfare.mail_snapshot(role,now,self.welfare_rules))
@@ -1479,8 +1513,8 @@ class Backend:
                 events = upgrades + [welfare.hint(role, now, self.welfare_rules)] + events
             # Keep the battle-start callback last.
             events = events + hints if mid == 1061 else hints + events
-            formation.prepare(role, self.formation_rules)
-            immortal.prepare(role, self.immortal_rules)
+            formation.prepare(role, self.formation_rules, track_changes=False)
+            immortal.prepare(role, self.immortal_rules, track_changes=False)
             # Keep existing companion tables alive for the battle-end experience UI.
             # Refresh inventory before event 44 starts the original replay.
             replies = []
@@ -1515,7 +1549,9 @@ class Backend:
                     + immortal.handbook(role, self.immortal_rules) + attrs
                     + self.power_attributes(role) + self.journey_attributes(role))
         changed = {key for key in ('corteges', 'attachments') if before.get(key) != role.get(key)}
-        replies = self.companion_deltas(before, role) + self.item_deltas(before, role)
+        replies = self.companion_deltas(before, role) if 'corteges' in changed else []
+        if 'attachments' in changed:
+            replies += self.item_deltas(before, role)
         replies += self.inventory(role, changed=changed)
         if before.get('souls') != role.get('souls'):
             replies += summon.soul_snapshots(role)
@@ -1529,7 +1565,9 @@ class Backend:
             return activity_attrs + self.power_attributes(value) + self.journey_attributes(value)
 
         old = {}
-        for packet in attributes(before):
+        # activity.attributes populates top-level display fields. A shallow
+        # view keeps those writes out of the shared persisted baseline.
+        for packet in attributes(dict(before)):
             _, _, data = decode(packet)
             old.update({(data['unit_type'], data['id'], a['type']): a['value'] for a in data['attr_list']})
         sent = set()
@@ -1557,10 +1595,9 @@ class Backend:
         if not poll and (not serial or serial <= self.last_activity_serial):
             return self.complete(serial, [summon.event(55, {'op_string': '活动请求已过期，请刷新后重试'})])
         try:
-            stored = self.db.execute('SELECT data FROM roles WHERE account=?', (self.account,)).fetchone()
-            sync_before = json.loads(stored[0]) if stored else None
+            _, sync_before = self.stored_role()
             role = self.profile()
-            before = copy.deepcopy(role)
+            before = self.operation_baseline(role)
             events = activity.settle(role, mid, data, now, self.activity_rules,
                                      self.journey_rules, self.formation_rules, login_fields, self.duty_peers() if mid != 1353 else None)
             if (role.get('welfare', {}).get('mails', {}) != before.get('welfare', {}).get('mails', {}) or
@@ -1579,8 +1616,8 @@ class Backend:
                 tian_shu.record_events(role, events)
             events = daily.track(role, before, mid, data, events, now, self.daily_rules, login_fields) + events
             if role != before:
-                formation.prepare(role, self.formation_rules)
-                immortal.prepare(role, self.immortal_rules)
+                formation.prepare(role, self.formation_rules, track_changes=False)
+                immortal.prepare(role, self.immortal_rules, track_changes=False)
             replies = self.activity_changes(sync_before, role, mid) + events
             if poll:
                 replies = events

@@ -10,7 +10,7 @@ import csv
 import json
 from pathlib import Path
 import secrets
-from .request_timing import recalculation_cache, count, phase
+from .request_timing import recalculation_cache, count, phase, state_token
 
 from . import summon
 
@@ -220,12 +220,14 @@ def migrate_level_culture(c, rules=None):
     c['level_culture_version'] = 3
 
 
-def prepare(role, rules):
+def prepare(role, rules, *, track_changes=True):
     """Idempotent migration: retain IDs, skill levels, resources and companion progress."""
     # Fresh battle effects mix numeric action indices with named metadata.
     # Compare the detached state directly: JSON key sorting cannot order those
     # keys, and persistence must not be required before formation migration.
-    before = copy.deepcopy(role)
+    # Backend already owns a persisted baseline; do not copy the entire save
+    # just to compute a return value those callers never use.
+    before = copy.deepcopy(role) if track_changes else None
     role.setdefault('attachments', [])
     if 'corteges' not in role:
         role.setdefault('summon', {})
@@ -234,6 +236,18 @@ def prepare(role, rules):
         role['corteges'] = [c]
     level = min(max(1, role['level']), max(LEVELS))
     role['cortege_count'] = int(LEVELS[level]['cortege_count'])
+    # Index the initial inventory once, preserving its first-match priority.
+    # Claimed IDs exclude entries whose ownership changes during migration.
+    innate_owners, legacy_owners, legacy_orders = {}, {}, {}
+    for position, item in enumerate(role['attachments']):
+        if item.get('attach_type') != 6 or item.get('protogenic') != 1:
+            continue
+        entry = (position, item)
+        owner = item.get('innate_owner_id')
+        innate_owners.setdefault(owner, []).append(entry)
+        if not owner:
+            legacy_owners.setdefault((item.get('owner_id'), item.get('type_id')), []).append(entry)
+            legacy_orders.setdefault((item.get('equip_order'), item.get('type_id')), []).append(entry)
     claimed = set()
     for c in role['corteges']:
         base = BASES.get(c['type'])
@@ -249,12 +263,13 @@ def prepare(role, rules):
         innate = int(base['chushijineng'])
         if innate not in SKILLS:
             continue
-        candidates = [i for i in role['attachments'] if i.get('attach_type') == 6 and i.get('protogenic') == 1
-                      and i['id'] not in claimed and (i.get('innate_owner_id') == c['id'] or
-                      (not i.get('innate_owner_id') and i.get('type_id') == innate and
-                       (i.get('owner_id') == c['id'] or (c.get('order', 0) and i.get('equip_order') == c['order']))))]
-        if candidates:
-            item = candidates[0]
+        candidates = (innate_owners.get(c['id'], [])
+                      + legacy_owners.get((c['id'], innate), [])
+                      + (legacy_orders.get((c['order'], innate), []) if c.get('order') else []))
+        candidate = min((entry for entry in candidates if entry[1]['id'] not in claimed),
+                        key=lambda entry: entry[0], default=None)
+        if candidate is not None:
+            item = candidate[1]
         else:
             item = dict(id=new_id(role), attach_type=6, type_id=innate, count=0,
                         level=int(SKILLS[innate]['begin_level']), protogenic=1)
@@ -276,7 +291,7 @@ def prepare(role, rules):
     from . import cheer
     cheer.prepare(role)
     recalculate(role, rules)
-    return before != role
+    return before != role if track_changes else None
 
 
 def recalculate(role, rules):
@@ -285,16 +300,16 @@ def recalculate(role, rules):
     now = int(game_clock.now())
     # Compare the entire post-calculation state, not an incomplete list of
     # combat inputs. Any mutation or second boundary invalidates reuse.
-    if (cache is not None and cache.get('role_id') == id(role)
-            and cache.get('now') == now and cache.get('rules') == rules
-            and cache.get('role') == role):
+    if (cache is not None and cache.get('role') is role
+            and cache.get('now') == now
+            and cache.get('state') == state_token((role, rules))):
         count('recalculate_skipped')
         return
     with phase('recalculate'):
         combat_power.recalculate(role, rules, now=now)
     count('recalculate_calls')
     if cache is not None:
-        cache.update(role_id=id(role), now=now, rules=copy.deepcopy(rules), role=copy.deepcopy(role))
+        cache.update(role=role, now=now, state=state_token((role, rules)))
 
 
 def change_order(role, req):
@@ -694,5 +709,5 @@ def settle(role, mid, req, rules, parse):
         result = [(193, dict(des_id=item['id'], id=item['id'], flag=req['flag'], is_lock=item['is_lock']))]
     else:
         raise Rejected('阵容操作尚未实现')
-    prepare(role, rules)
+    prepare(role, rules, track_changes=False)
     return [summon.event(event, payload) for event, payload in result]

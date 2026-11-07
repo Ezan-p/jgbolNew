@@ -68,7 +68,6 @@ do
    local item=finishing or pending
    if item then item.failed=true end
    hide();log('callback_error_'..tostring(mid))
-   notice('界面更新异常，请重新打开当前界面查看结果；请勿重复领取或购买')
   end
   local function tick(dt)
    if not pending then cancelTimer();return end
@@ -79,9 +78,6 @@ do
      item.shown=true
      local ok=pcall(start,nil,math.max(0.1,10-item.elapsed),recover)
      if not ok then callbackFailed('spinner') end
-    end
-    if item.elapsed>=3 and not item.slow then
-     item.slow=true;notice('正在处理，请稍候；无需再次点击')
     end
     if item.elapsed>=10 then recover() end
    elseif item.stage=='recovering' then
@@ -100,8 +96,8 @@ do
   end
   function api.retry()
    if not pending or pending.stage~='uncertain' then return false end
-   if pending.failed then notice('界面状态异常，请重连或重新登录确认结果');return false end
-   pending.stage='waiting';pending.elapsed=0;pending.shown=false;pending.slow=false
+   if pending.failed then log('retry_blocked_callback_error');return false end
+   pending.stage='waiting';pending.elapsed=0;pending.shown=false
    u.g_sys_busy=true;u.g_is_waiting_1106=true;arm();log('retry_same_id')
    local ok=pcall(send,pending.mid,copy(pending.data))
    if not ok then uncertain('连接尚未恢复，请重连后查看原请求结果') end
@@ -115,7 +111,7 @@ do
   u.main_server_send_msg=function(mid,data,wait,...)
    if not control[mid] and pending and (wait==nil or wait>0) then
     if pending.stage=='uncertain' and mid==pending.mid and same(data,pending.data) then return api.retry() end
-    notice(pending.stage=='uncertain' and '上一操作结果尚未确认，请重连后查看' or '正在处理，请勿重复点击')
+    if pending.stage=='uncertain' then notice('上一操作结果尚未确认，请重连后查看') end
     return false
    end
    local previousInvoking=invoking
@@ -181,7 +177,6 @@ do
    finishing=nil
    u.g_client_req_serial_num=math.max(u.g_client_req_serial_num or 0,previous,serial+1)
    if not pending then hide();u.g_is_waiting_1106=false;u.g_last_send_msg_id=0 end
-   if item.failed then notice('请求已确认，但界面更新异常，请重新打开界面查看结果') end
    return result
   end
   event.msg_process_done_1106=receive

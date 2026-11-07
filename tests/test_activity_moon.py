@@ -27,6 +27,8 @@ class MoonTests(ActivityCase):
     def test_exact_all_pool_weight_tickets(self):
         for pool in moon.load_rules()['pools'].values():
             groups=pool['groups'];weights=[g['weight'] for g in groups]
+            if pool['name']=='红豆月饼':
+                self.assertEqual(sum(g['weight'] for g in groups if g['candidates']==[[5,1100,1,1]]),100)
             with patch.object(moon, 'randbelow', side_effect=range(10000)):
                 actual=Counter(moon.weighted(list(range(len(groups))),weights) for _ in range(10000))
             self.assertEqual(actual, dict(enumerate(weights)))

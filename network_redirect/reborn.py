@@ -62,8 +62,8 @@ def prize(t, n=1, level=1):
     return dict(object_type=5, attach_type=t, attach_count=n, attach_level=level)
 
 
-def prepare(role, rules):
-    old = copy.deepcopy(role)
+def prepare(role, rules, *, track_changes=True):
+    old = copy.deepcopy(role) if track_changes else None
     role.setdefault('reborn_layer', 0)
     for c in role['corteges']:
         for k in ('reborn_layer', 'reborn_vein_level'):
@@ -82,7 +82,7 @@ def prepare(role, rules):
     i = min(role['reborn_layer'], 3)
     need = rules['realms'][i]['required_layer']
     role['maxlayer_reborn_count'] = sum(c.get('reborn_layer', 0) >= need for c in role['corteges']) if need else 0
-    return old != role
+    return old != role if track_changes else None
 
 
 def debit_material(role, tid, count):
@@ -178,7 +178,7 @@ def settle(role, req, rules, parse):
             consume(role, list(CAST[main, nxt].values())[2])
             item['cast_level'] = nxt
         item['effect_value'] = f.equip_effect(item)
-    prepare(role, rules)
+    prepare(role, rules, track_changes=False)
     return [summon.event(172, dict(flag=op))]
 
 

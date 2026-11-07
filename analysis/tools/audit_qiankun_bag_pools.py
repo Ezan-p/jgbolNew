@@ -25,6 +25,9 @@ for star in range(2, 6):
 NAMES = {int(r['Ftype_id']): r['name'] for r in summon.rows('item_name.csv')}
 SKILLS = {int(r['type_id']): r['name'] for r in summon.rows('skill_name.csv')}
 TIER_NAMES = dict(low='低品质',medium='中品质',high='高品质')
+for key in ('manual', 'manual_advanced'):
+    LABELS[key + '_low_exp'] = LABELS[key] + '（经验≤80万）'
+    LABELS[key + '_high_exp'] = LABELS[key] + '（经验>80万）'
 
 
 def name(kind, tid):
@@ -50,7 +53,8 @@ def main():
             for group in tier['groups']:
                 pool = group['pool']; used.add(pool)
                 candidates = q.CATALOG[pool]
-                p = Fraction(tier['weight'] * group['weight'], 10000*len(candidates))
+                p = Fraction(tier['weight'] * group['weight'],
+                             100*tier.get('group_weight_total', 100)*len(candidates))
                 for kind, target in candidates:
                     entries.append(dict(tier=key, pool=pool, kind=kind, id=target,
                                         name=name(kind,target), count=group['count'], level=1,
@@ -67,8 +71,9 @@ def main():
                       '| 奖励类别／目录键 | 候选数 | 每个候选命中时数量 | 组权重／档内概率 | 单袋整组概率 | 单袋每个候选概率 |',
                       '| --- | ---: | ---: | ---: | ---: | ---: |']
             for g in tier['groups']:
-                p=Fraction(tier['weight']*g['weight'],10000); n=len(q.CATALOG[g['pool']])
-                lines.append(f"| {LABELS[g['pool']]} `{g['pool']}` | {n} | {g['count']:,} | {g['weight']}／{g['weight']}% | {percent(p)} | {percent(p/n)} |")
+                conditional = Fraction(g['weight'], tier.get('group_weight_total', 100))
+                p=Fraction(tier['weight'],100)*conditional; n=len(q.CATALOG[g['pool']])
+                lines.append(f"| {LABELS[g['pool']]} `{g['pool']}` | {n} | {g['count']:,} | {g['weight']}／{percent(conditional)} | {percent(p)} | {percent(p/n)} |")
             lines.append('')
     lines += ['## 8. 全量候选目录（ID不省略）', '',
               '同一类别在不同池中共享这份候选目录，但数量和权重以第7节该池对应行独立定义。每个候选的单袋概率就是该行最后一列；协议对象5为道具／装备，6为法术，11为元宝，12为银两。', '']
@@ -77,7 +82,7 @@ def main():
                   '| 对象类型 | ID | 原表名称 | 说明 |', '| ---: | ---: | --- | --- |']
         for kind, tid in q.CATALOG[pool]:
             detail = ''
-            if pool in ('manual','manual_advanced'):
+            if pool.startswith('manual'):
                 detail = f"使用提供神仙经验{int(f.ITEMS[tid]['experience_plus']):,}"
             elif kind==5 and f.ITEMS[tid]['main_type'] in ('1','2','3'):
                 detail = f"{f.ITEMS[tid]['quality']}星；每次1件"

@@ -90,7 +90,9 @@ class Runtime:
                        'save_ms', 'write_ms', 'drain_ms', 'achievement_parse_ms',
                        'achievement_packets', 'achievement_parsed', 'achievement_skipped',
                        'save_serialize_ms', 'save_commit_ms', 'save_unchanged', 'save_writes',
-                       'recalculate_ms', 'recalculate_calls', 'recalculate_skipped')
+                       'recalculate_ms', 'recalculate_calls', 'recalculate_skipped',
+                       'role_baseline_loads', 'role_baseline_hits',
+                       'achievement_refresh_ms', 'achievement_refresh_calls', 'achievement_refresh_skipped')
             record = dict(time=time.time(), kind=kind,
                           **{key: fields[key] for key in allowed if key in fields})
             with log.open('a', encoding='utf-8') as stream:
@@ -185,7 +187,7 @@ class Runtime:
             raise TimeoutError('Offline game service is still shutting down')
 
 
-def start(files_dir, resource_root=None, port=PORT, timeout=90.0):
+def start(files_dir, resource_root=None, port=PORT, timeout=180.0):
     """Called by the Android bootstrap worker; return only after the listener binds.
 
     CPython remains initialized for the process lifetime. The native bootstrap

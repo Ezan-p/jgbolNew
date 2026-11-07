@@ -25,6 +25,10 @@ class Source:
     def elapsed(self):
         return self.seconds
 
+    def advance(self, seconds):
+        self.seconds += seconds
+        self.wall_seconds += seconds
+
 
 class ClockTests(unittest.TestCase):
     def setUp(self):
@@ -45,6 +49,75 @@ class ClockTests(unittest.TestCase):
             self.source.seconds = 100 + step*10
             self.assertEqual(clock.sample(), NOW + step*10)
 
+    def test_both_wall_jump_directions_persist_across_restore_and_reopen(self):
+        for offset in (86400, -86400):
+            with self.subTest(offset=offset), tempfile.TemporaryDirectory() as directory:
+                source = Source()
+                clock = game_clock.GameClock(directory, source=source)
+                source.wall_seconds += offset
+                self.assertEqual(clock.sample(), NOW)
+                self.assertTrue(clock.quarantined)
+                source.wall_seconds = NOW
+                source.boot_id = 'boot-b'
+                source.seconds = 10
+                clock.close()
+                clock = game_clock.GameClock(directory, source=source)
+                try:
+                    self.assertTrue(clock.quarantined)
+                    self.assertEqual(clock.sample(), NOW)
+                finally:
+                    clock.close()
+
+    def test_small_adjustments_accumulate_against_fixed_baseline(self):
+        clock = self.clock()
+        self.source.wall_seconds += game_clock.WALL_JUMP_TOLERANCE
+        clock.sample()
+        self.assertFalse(clock.quarantined)
+        self.source.advance(60)
+        clock.sample()
+        self.assertFalse(clock.quarantined)
+        self.source.wall_seconds += 1
+        clock.sample()
+        self.assertTrue(clock.quarantined)
+
+    def test_normal_elapsed_sleep_and_reboot_do_not_quarantine(self):
+        clock = self.clock()
+        self.source.advance(30 * 86400)
+        self.assertEqual(clock.sample(), NOW + 30 * 86400)
+        self.assertFalse(clock.quarantined)
+        self.source.boot_id = 'boot-b'
+        self.source.seconds = 10
+        self.source.wall_seconds += 7 * 86400
+        clock.sample()
+        self.assertFalse(clock.quarantined)
+        self.source.advance(600)
+        clock.sample()
+        self.assertFalse(clock.quarantined)
+
+    def test_reboot_backward_date_is_detected(self):
+        clock = self.clock()
+        self.source.advance(86400)
+        clock.sample()
+        self.source.boot_id = 'boot-b'
+        self.source.seconds = 10
+        self.source.wall_seconds -= 86400
+        clock.sample()
+        self.assertTrue(clock.quarantined)
+
+    def test_old_signed_clock_establishes_wall_baseline_without_penalty(self):
+        clock = self.clock()
+        state = json.loads(clock.db.execute('SELECT data FROM clock').fetchone()[0])
+        for key in ('wall_reference', 'wall_elapsed', 'wall_seen'):
+            del state[key]
+        with clock.db:
+            clock._write(state)
+        self.source.wall_seconds += 365 * 86400
+        self.assertEqual(clock.sample(), NOW)
+        self.assertFalse(clock.quarantined)
+        self.source.wall_seconds += 86400
+        clock.sample()
+        self.assertTrue(clock.quarantined)
+
     def test_android_bridge_old_shell_fallback_and_invalid_marker(self):
         with patch.object(game_clock, '_android_boot', None):
             game_clock.configure_android(self.path)
@@ -63,6 +136,7 @@ class ClockTests(unittest.TestCase):
         self.source.wall_seconds += 365*86400
         restarted = self.clock()
         self.assertEqual(restarted.sample(), NOW+3*86400)
+        self.assertTrue(restarted.quarantined)
 
     def test_device_restart_discards_unknown_gap_even_when_uptime_grows(self):
         first = self.clock()
@@ -126,6 +200,7 @@ class ClockTests(unittest.TestCase):
         clock = game_clock.GameClock(self.path, source=self.source, legacy_db=db)
         self.addCleanup(clock.close)
         self.assertEqual(clock.sample(), NOW+2000)
+        self.assertFalse(clock.quarantined)
 
     def test_legacy_daily_only_history_does_not_move_backwards(self):
         db = sqlite3.connect(':memory:')
@@ -200,16 +275,18 @@ class BackendClockTests(unittest.TestCase):
         for offset in (86400, 8*86400, 365*86400, -365*86400, 0):
             self.source.wall_seconds = NOW+offset
             current = self.backend.snapshot()
+            self.assertEqual(current['time_guard']['blocked'], ['*'])
+            original['time_guard'] = current['time_guard']
             self.assertEqual(current, original)
         self.assertEqual(current['server_time'], NOW)
 
     def test_real_elapsed_restores_resources_and_daily_state_then_restart(self):
         original = self.backend.snapshot()
-        self.source.seconds += 1800
+        self.source.advance(1800)
         current = self.backend.snapshot()
         self.assertEqual(current['strength'], original['strength']+1)
         self.assertEqual(current['activity']['babel']['energy_tick'], (NOW+1800)//1800)
-        self.source.seconds += 86400
+        self.source.advance(86400)
         current = self.backend.snapshot()
         self.assertGreater(current['activity']['babel']['shop_day'], original['activity']['babel']['shop_day'])
         self.backend.close()

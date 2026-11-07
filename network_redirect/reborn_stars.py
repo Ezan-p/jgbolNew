@@ -215,12 +215,14 @@ def awaken(role, mid, req, rules):
     return [summon.event(183, dict(result=0))]
 
 
-def bonuses(role, c, values):
-    innate = next((x for x in role['attachments'] if x.get('innate_owner_id') == c['id']), {})
+def bonuses(role, c, values, *, innate=None, owned=None):
+    if innate is None:
+        innate = next((x for x in role['attachments'] if x.get('innate_owner_id') == c['id']), {})
     kind = innate.get('awaken', 0)
     if kind in AWAKEN:
         values[{1:'gongji', 2:'fangyu', 3:'magic'}[kind]] += int(AWAKEN[kind]['plus_value'])
-    equipped = [x for x in role['attachments'] if x['type_id'] in STARS and x.get('owner_id') == c['id']]
+    items = role['attachments'] if owned is None else owned
+    equipped = [x for x in items if x['type_id'] in STARS and x.get('owner_id') == c['id']]
     elements = {x.get('ext_awaken_pos') for x in equipped}
     for row in ELEMENT_RELATIONS:
         if {int(row['element_a']), int(row['element_b'])} <= elements:

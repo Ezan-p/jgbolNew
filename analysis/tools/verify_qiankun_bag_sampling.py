@@ -33,7 +33,8 @@ def main(samples=100000):
                                  expected_percent=100*p, deviation_sigma=(tiers[name]-samples*p)/sigma)
         report['bags'][tid] = dict(name=bag['name'], quality=quality,
             groups=[dict(tier=name, pool=g['pool'], count=g['count'], samples=groups[name,i],
-                         expected_samples=samples*bag['tiers'][name]['weight']*g['weight']/10000)
+                         expected_samples=samples*bag['tiers'][name]['weight']*g['weight']
+                         /(100*bag['tiers'][name].get('group_weight_total', 100)))
                     for name in q.TIERS for i,g in enumerate(bag['tiers'][name]['groups'])])
     target = ROOT/'analysis/evidence/qiankun_bag_pools/sampling.json'
     target.parent.mkdir(parents=True,exist_ok=True)

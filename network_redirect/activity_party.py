@@ -191,7 +191,8 @@ def inspection(role, ident):
 
 
 def client_config(role, ar):
-    h=role['activity']['party']['history']
+    # Blocked accounts can log in before any activity state was initialized.
+    h=role.get('activity',{}).get('party',{}).get('history',{})
     return dict(pay_consume_gold=ar['party_fight_gold'],party_top_list=dict(
         top_list=copy.deepcopy(h.get('top_list',[])),top_order=h.get('self_order',0),damage=h.get('self_damage_his',0)))
 

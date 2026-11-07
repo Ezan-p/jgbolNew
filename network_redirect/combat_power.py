@@ -8,6 +8,7 @@ from decimal import Decimal, ROUND_FLOOR, ROUND_HALF_UP
 import json
 from pathlib import Path
 import copy
+from heapq import merge
 from . import summon
 
 STATS = ('hp', 'gongji', 'fangyu', 'magic')
@@ -38,12 +39,12 @@ if (ESSENCE_CONFIG.get('version') != SCORE_VERSION or ESSENCE_CONFIG.get('mode')
     raise ValueError('精魄V1.1评分表须包含38种精魄的190项非负整数评分')
 
 
-def essence_score(role, c):
+def essence_score(role, c, *, owned=None):
     """V1.1 fixed scores; combat effects never get applied to permanent stats here."""
     from .fate_rebuild import essence_slots
     slots = essence_slots(c)
     candidates = []
-    for item in role.get('attachments', []):
+    for item in role.get('attachments', []) if owned is None else owned:
         kind, level, pos = item.get('type_id'), item.get('level'), item.get('ext_skill_pos')
         if (item.get('attach_type') != 5 or item.get('owner_id') != c['id']
                 or kind not in ESSENCE_SCORES or type(level) is not int or not 1 <= level <= 5
@@ -214,6 +215,16 @@ def recalculate(role, rules, now=None):
     reports = {}
     pending = {}
 
+    # Local to this calculation: all callers may mutate ownership in place
+    # between settlements. Keep inventory order for exact panel equivalence.
+    innate_owners, equip_orders, owners = {}, {}, {}
+    for position, item in enumerate(role['attachments']):
+        innate = item.get('innate_owner_id')
+        innate_owners.setdefault(innate, []).append((position, item))
+        if not innate:
+            equip_orders.setdefault(item.get('equip_order'), []).append((position, item))
+        owners.setdefault(item.get('owner_id'), []).append(item)
+
     active_types = {c['type'] for c in role['corteges'] if c.get('order', 0) or c.get('cheer_order', 0)}
     for c in role['corteges']:
         base = BASES.get(c['type'])
@@ -234,10 +245,10 @@ def recalculate(role, rules, now=None):
         record(trace, 'evolution', values)
         spirit_array.base_bonuses(role, c, values)
         ling = spirit_array.effects(role) if 1 <= c.get('order', 0) <= 8 else {}
-        equipped = [i for i in role['attachments'] if
-                    (i.get('innate_owner_id') == c['id']) or
-                    (not i.get('innate_owner_id') and 1 <= c.get('order', 0) <= 8
-                     and i.get('equip_order') == c['order'])]
+        equipped = [item for _, item in merge(
+            innate_owners.get(c['id'], ()),
+            equip_orders.get(c['order'], ()) if 1 <= c.get('order', 0) <= 8 else (),
+            key=lambda entry: entry[0])]
         extra_rates = {s: Decimal(0) for s in STATS}
         passive_rates = {s: Decimal(0) for s in STATS}
         for item in equipped:
@@ -261,7 +272,10 @@ def recalculate(role, rules, now=None):
         record(trace, 'passive_skills', values)
         reborn.bonuses(role, c, values, equipped)
         record(trace, 'rebirth', values)
-        reborn_stars.bonuses(role, c, values)
+        innate_items = innate_owners.get(c['id'], ())
+        reborn_stars.bonuses(role, c, values,
+                            innate=innate_items[0][1] if innate_items else {},
+                            owned=owners.get(c['id'], ()))
         fate_rebuild.bonuses(c, values)
         record(trace, 'awakening_and_stars', values)
         rates = {s: 0 for s in STATS}
@@ -331,7 +345,7 @@ def recalculate(role, rules, now=None):
                                                  'companion': c.get('combat_sources', {})})
         for s in STATS:
             c[s] = bounded(values[s])
-        trace['essence'] = essence_score(role, c)
+        trace['essence'] = essence_score(role, c, owned=owners.get(c['id'], ()))
         c['combat_power'] = score_panel(c, rules['combat_weights'], trace['essence']['total'])
         trace['panel'] = {s: c[s] for s in STATS}
         trace['combat_power'] = c['combat_power']

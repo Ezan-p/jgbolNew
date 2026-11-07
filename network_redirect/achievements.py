@@ -1,5 +1,5 @@
 """Original hotupdate 1263 catalogue [A]; authoritative local settlement [B]."""
-from .request_timing import phase, count as timing_count
+from .request_timing import phase, count as timing_count, achievement_refresh_cache, state_token
 import csv
 import json
 from pathlib import Path
@@ -135,7 +135,36 @@ def daily_add(role, ident, amount, now, source='all'):
             (v for k, v in counts.items() if k.startswith(f'{ident}:')), default=0))
 
 
+def _refresh_token(role):
+    """All role domains read or written by _refresh, including its outputs.
+
+    Keep whole nested domains so in-place item/companion/progress mutations
+    invalidate reuse. Add a domain here when _refresh gains a new source.
+    Catalogs are static for the lifetime of the service. No event tracking is
+    skipped: track/record_events still execute before considering this cache.
+    """
+    keys = ('achievements', 'tao_point', 'spirit_array', 'vip_level', 'reborn_layer',
+            'top_order', 'activity', 'corteges', 'attachments', 'journey')
+    return state_token({key: role[key] for key in keys if key in role})
+
+
 def refresh(role, now):
+    """Reuse only a successful refresh of this object's unchanged facts/time."""
+    with phase('achievement_refresh'):
+        cache = achievement_refresh_cache.get()
+        if (cache is not None and cache.get('role') is role
+                and cache.get('now') == now and cache.get('state') == _refresh_token(role)):
+            timing_count('achievement_refresh_skipped')
+            return
+        if cache is not None:
+            cache.clear()
+        timing_count('achievement_refresh_calls')
+        _refresh(role, now)
+        if cache is not None:
+            cache.update(role=role, now=now, state=_refresh_token(role))
+
+
+def _refresh(role, now):
     """Recover only facts still provable from the saved role; no invented history."""
     from . import formation as f, equipment, journey, reborn_stars, fate_rebuild
     s = state(role)
@@ -224,9 +253,16 @@ def refresh(role, now):
     for k, g in gates.items():
         if k.startswith('2:'): observe(role, 225, int(g.get('pass_star', 0) >= 3), k)
     if 'journey' in role:
-        for mid in journey.MAPS[1]:
-            for ident, stars in ((443, 1), (444, 3)):
-                observe(role, ident, int(journey.completed(role, 1, mid, stars)), str(mid))
+        for mid, keys in journey.MAP_GATE_KEYS[1].items():
+            # Both achievements depend on the weakest gate. Visit each indexed
+            # gate at most once; zero/missing progress makes both unavailable.
+            stars = 3
+            for key in keys:
+                stars = min(stars, gates.get(key, {'pass_star': 0})['pass_star'])
+                if stars < 1:
+                    break
+            observe(role, 443, int(stars >= 1), str(mid))
+            observe(role, 444, int(stars >= 3), str(mid))
     abyss = max(0, activity.get('abyss', {}).get('boss', 1) - 1)
     observe(role, 471, abyss)
     for ident in range(472, 476): observe(role, ident, abyss)

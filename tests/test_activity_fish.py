@@ -24,7 +24,7 @@ class FishTests(ActivityCase):
 
     def test_preview_and_config_validation(self):
         data=self.status()
-        self.assertEqual(len(data['random_get_item']),8)
+        self.assertEqual(len(data['random_get_item']),9)
         self.assertEqual(len(data['exchange_data']),5)
         self.assertEqual(data['cost_gold_count'],100)
         self.assertTrue(data['local_permanent'])
@@ -70,6 +70,56 @@ class FishTests(ActivityCase):
         self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
         self.assertEqual(after,self.b.profile())
         self.assertEqual(self.fishing()['weekly_casts'],10)
+
+    def test_vip_bag_probability_and_single_ten_delivery(self):
+        data=self.status();cfg=self.b.activity_rules
+        preview=next(x for x in data['random_get_item'].values() if x['attach_type']==1031)
+        self.assertEqual(preview['probability'],0.03)
+        self.assertEqual(preview['attach_count'],1)
+        hits=0
+        for ticket in range(sum(cfg['fish_pool_weights'])):
+            with patch.object(fish,'randbelow',return_value=ticket):
+                hits+=fish.draw(cfg['fish_pool'],cfg['fish_pool_weights'])==[5,1031,1,1]
+        self.assertEqual(hits/sum(cfg['fish_pool_weights']),0.03)
+        for n in (1,10):
+            before=self.count(1031)
+            with patch.object(fish,'randbelow',side_effect=[0,99]*n):
+                self.ok(self.req(1208,count=n,type_id=0))
+            self.assertEqual(self.count(1031)-before,n)
+            after=self.b.profile()
+            self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
+            self.assertEqual(self.b.profile(),after)
+
+    def test_price_upgrade_preserves_shop_quota_and_requires_40_koi(self):
+        for tid,ticket in ((5034,90),(1246,95)):
+            for used in (0,1):
+                with self.subTest(tid=tid,used=used):
+                    role=self.b.profile()
+                    role['activity'].setdefault('seasonal',{}).pop('fish',None)
+                    with patch.object(fish,'randbelow',side_effect=[0,0,0,0,ticket]):
+                        fish.status(role,NOW,self.b.activity_rules)
+                    s=role['activity']['seasonal']['fish']
+                    s['shop_revision']='fish-shop-2026-11-03-v4'
+                    s['shop'][4]['cost']=20;s['purchases']={str(tid):used}
+                    ids=[x['reward'][1] for x in s['shop']]
+                    role['attachments']=[x for x in role['attachments'] if x['type_id']!=1027]
+                    summon.add_item(role,1027,39);self.b.save(role)
+                    with patch.object(fish,'randbelow',side_effect=AssertionError('reroll')):
+                        data=self.status()
+                    self.assertEqual([x['reward'][1] for x in self.fishing()['shop']],ids)
+                    self.assertEqual(self.fishing()['purchases'],{str(tid):used})
+                    offer=next(x for x in data['exchange_data'].values() if x['type_id']==tid)
+                    self.assertEqual((offer['cost_fish_count'],offer['count']),(40,1-used))
+                    before=self.b.profile()
+                    self.assertEqual(self.req(1208,count=1,type_id=tid)[0][0],55)
+                    self.assertEqual(self.b.profile(),before)
+                    role=self.b.profile();summon.add_item(role,1027,1);self.b.save(role)
+                    if not used:
+                        self.ok(self.req(1208,count=1,type_id=tid))
+                        self.assertEqual(self.count(1027),0)
+                    else:
+                        self.assertEqual(self.req(1208,count=1,type_id=tid)[0][0],55)
+                        self.assertEqual(self.count(1027),40)
 
     def test_shop_no_duplicates_and_no_query_reroll(self):
         self.status();s=self.fishing()
@@ -139,8 +189,9 @@ class FishTests(ActivityCase):
             self.assertEqual(self.b.profile(),before)
             self.ok(self.req(1208,count=1,type_id=tid))
             after=self.b.profile()
-            self.assertEqual(row['cost'],20)
-            self.assertEqual(sum(i['count'] for i in before['attachments'] if i['type_id']==1027)-self.count(1027),20)
+            cost=40 if tid in (5034,1246) else 20
+            self.assertEqual(row['cost'],cost)
+            self.assertEqual(sum(i['count'] for i in before['attachments'] if i['type_id']==1027)-self.count(1027),cost)
             if typ==10:self.assertEqual(after['souls'].get(str(tid),0)-before.get('souls',{}).get(str(tid),0),n)
             else:self.assertEqual(sum(i['count'] for i in after['attachments'] if i['type_id']==tid)-sum(i['count'] for i in before['attachments'] if i['type_id']==tid),n)
             self.assertEqual(self.b.respond(self.packet,self.state),self.replies)

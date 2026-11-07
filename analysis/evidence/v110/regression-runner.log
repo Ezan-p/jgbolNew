@@ -1,0 +1,18 @@
+Finished shard 0 exit 1
+Finished shard 1 exit 0
+Finished shard 2 exit -15
+Finished shard 3 exit 0
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/run_v110_regressions.py", line 43, in <module>
+    (EVIDENCE / 'protocol-tests.log').write_text('\n'.join(
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/run_v110_regressions.py", line 24, in main
+    stdout=log, stderr=subprocess.STDOUT)
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/run_v110_regressions.py", line 24, in <listcomp>
+    stdout=log, stderr=subprocess.STDOUT)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1256, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1242, in open
+    return io.open(self, mode, buffering, encoding, errors, newline,
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1110, in _opener
+    return self._accessor.open(self, flags, mode)
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/evidence/v110/protocol-shard-2.json'

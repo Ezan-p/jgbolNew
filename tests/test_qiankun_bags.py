@@ -13,6 +13,46 @@ from tests import test_equipment as original
 
 
 class QiankunPoolTests(unittest.TestCase):
+    def test_high_experience_manual_probabilities_halved(self):
+        rules = q.load_rules()
+        # Original category probability within the quality tier, before splitting.
+        originals = [('1034', 'high', 'manual', 20),
+                     ('1033', 'medium', 'manual', 15),
+                     ('1033', 'high', 'manual_advanced', 10),
+                     ('1032', 'medium', 'manual', 20),
+                     ('1032', 'high', 'manual_advanced', 12),
+                     ('1031', 'low', 'manual', 12),
+                     ('1031', 'low', 'manual_advanced', 5)]
+        for tid, tier_name, key, old_weight in originals:
+            tier = rules['bags'][tid]['tiers'][tier_name]
+            groups = {g['pool']: g for g in tier['groups']}
+            low, high = (groups[key + suffix] for suffix in ('_low_exp', '_high_exp'))
+            total = tier['group_weight_total']
+            self.assertEqual(Fraction(low['weight'] + high['weight'], total), Fraction(old_weight, 100))
+            self.assertEqual(set(q.CATALOG[low['pool']]) | set(q.CATALOG[high['pool']]), set(q.CATALOG[key]))
+            old_each = Fraction(tier['weight'] * old_weight, 100 * 100 * 20)
+            for group in (low, high):
+                candidates = q.CATALOG[group['pool']]
+                each = Fraction(tier['weight'] * group['weight'], 100 * total * len(candidates))
+                for _, target in candidates:
+                    if int(f.ITEMS[target]['experience_plus']) > 800000:
+                        self.assertEqual(each, old_each / 2)
+                    else:
+                        self.assertGreater(each, old_each)
+                self.assertEqual(group['count'], 1)
+
+    def test_vip_fruit_total_probability_and_soul_pill_count(self):
+        bag = q.load_rules()['bags']['1031']
+        probability = Fraction()
+        for tier in bag['tiers'].values():
+            for group in tier['groups']:
+                if group['pool'] == 'fruit':
+                    probability += Fraction(tier['weight'] * group['weight'],
+                                            100 * tier.get('group_weight_total', 100))
+                if group['pool'] == 'soul_pill':
+                    self.assertEqual(group['count'], 1)
+        self.assertEqual(probability, Fraction(1, 100))
+
     def test_table_rates_and_full_original_equipment_skill_coverage(self):
         rules = q.load_rules()
         expected = {'1034': (65, 30, 5), '1033': (50, 40, 10),
@@ -44,13 +84,14 @@ class QiankunPoolTests(unittest.TestCase):
             for name in q.TIERS:
                 tier = bag['tiers'][name]
                 weights = {i: g['weight'] for i, g in enumerate(tier['groups'])}
-                with patch.object(summon.secrets, 'randbelow', side_effect=range(100)):
-                    self.assertEqual(dict(Counter(summon.weighted_choice(weights) for _ in range(100))), weights)
+                total = tier.get('group_weight_total', 100)
+                with patch.object(summon.secrets, 'randbelow', side_effect=range(total)):
+                    self.assertEqual(dict(Counter(summon.weighted_choice(weights) for _ in range(total))), weights)
                 group_start = 0
                 for group in tier['groups']:
                     candidates = q.CATALOG[group['pool']]
                     for candidate in candidates:
-                        mass += Fraction(tier['weight'] * group['weight'], 10000 * len(candidates))
+                        mass += Fraction(tier['weight'] * group['weight'], 100 * total * len(candidates))
                         # Both ends of the quality and category interval hit the same group.
                         for t, g in ((tier_start, group_start),
                                      (tier_start+tier['weight']-1, group_start+group['weight']-1)):
@@ -68,6 +109,8 @@ class QiankunPoolTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / 'rules.json'
             changes = [lambda r: r['bags'].pop('1034'),
+                       lambda r: r['bags']['1031']['tiers']['medium'].update(group_weight_total=0),
+                       lambda r: r['bags']['1031']['tiers']['medium'].update(group_weight_total=100),
                        lambda r: r['bags']['1031'].update(min_vip=0),
                        lambda r: r['bags']['1034']['tiers']['low'].update(weight=64),
                        lambda r: r['bags']['1034']['tiers']['low']['groups'][0].update(weight=0),

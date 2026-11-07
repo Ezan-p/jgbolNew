@@ -47,7 +47,7 @@ end)
 check('native initial screen eight rewards',function()
  response(FIXTURE.entry);assert(ui.g_self.main_layer);assert(#ui.g_self.data.reward_list==8)
  assert(#ui.g_self.tt_reward_splash==8);assert(ui.g_self.data.total_time==0)
- local expected={{1246,3},{1031,3},{6005,5},{6004,5},{1249,10},{1015,5},{1367,1},{1368,1}}
+ local expected={{1246,3},{1031,3},{6005,5},{6004,5},{1249,10},{1015,100},{1367,1},{1368,1}}
  for i,p in ipairs(ui.g_self.data.reward_list) do
   assert(p.object_type==5 and p.attach_type==expected[i][1] and p.attach_count==expected[i][2],
    'wrong replacement reward in native slot '..i)

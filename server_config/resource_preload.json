@@ -1,0 +1,826 @@
+{
+  "version": 1,
+  "retained_texture_bytes": 29360128,
+  "startup_slice_seconds": 0.5,
+  "startup_max_jobs": 64,
+  "warm_interval_seconds": 0.12,
+  "warm_delay_seconds": 2,
+  "slow_job_seconds": 0.012,
+  "cooldown_seconds": 0.5,
+  "max_warm_seconds": 180,
+  "core": [
+    {
+      "kind": "config",
+      "module": "d_mainUI",
+      "getter": "getRoleLevelConfig",
+      "cache_fields": [
+        "g_cortegeCountTable",
+        "g_roleLevelConfig"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_packageUI",
+      "getter": "getPackageCSVConfig",
+      "cache_fields": [
+        "g_itemAttrTable",
+        "g_itemSkillTable"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getCharacterExperienceCSVConfig",
+      "cache_fields": [
+        "g_characterExpTable"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getCharacterQualityCSVConfig",
+      "cache_fields": [
+        "g_characterQualityTable"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getShopItemsPriceCSVConfig",
+      "cache_fields": [
+        "g_shopItemsPriceTable"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getTopScoreExchangeCSVConfig",
+      "cache_fields": [
+        "g_topScoreExchangeTable"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getTopScoreCSVConfig",
+      "cache_fields": [
+        "g_topScoreTable"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getRechargeItemsPriceCSVConfig",
+      "cache_fields": [
+        "g_rechargeItemsPriceTable"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getStoneAttrCSVConfig",
+      "cache_fields": [
+        "g_stoneAttrTable"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getMaterialTransformCSVConfig",
+      "cache_fields": [
+        "g_convertTable",
+        "g_materialIndexTable",
+        "g_materialTable"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getCortCollectCSVConfig",
+      "cache_fields": [
+        "g_cort_collect_tab"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getAscensionConfig",
+      "cache_fields": [
+        "g_asc_CortTab",
+        "g_asc_PointTab",
+        "g_asc_StageEffectTab",
+        "g_asc_StageNeedTab"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getEquipAscConfig",
+      "cache_fields": [
+        "g_equipAsc_avgTab",
+        "g_equipAsc_baseTab",
+        "g_equipAsc_castTab",
+        "g_equipAsc_tierTab"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getPetCSVConfig",
+      "cache_fields": [
+        "g_pet_base",
+        "g_pet_baseExp",
+        "g_pet_baseFusion",
+        "g_pet_expNeed",
+        "g_pet_expSpecial",
+        "g_pet_growup",
+        "g_pet_plusControl",
+        "g_pet_star"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getSkillCsv_advance",
+      "cache_fields": [
+        "g_skill_csv_advance_Table"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getSpecialitemuseCSVConfig",
+      "cache_fields": [
+        "g_specialItemUseTable"
+      ]
+    },
+    {
+      "kind": "texture",
+      "path": "v2/mainUI/tip_bkg.png",
+      "estimated_bytes": 87382,
+      "group": "main"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/mainUI/up.png",
+      "estimated_bytes": 87382,
+      "group": "main"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/mainUI/btn11.png",
+      "estimated_bytes": 174763,
+      "group": "main"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/mainUI/btn12.png",
+      "estimated_bytes": 174763,
+      "group": "main"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/mainUI/btn21.png",
+      "estimated_bytes": 174763,
+      "group": "main"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/mainUI/btn22.png",
+      "estimated_bytes": 174763,
+      "group": "main"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/mainUI/btn31.png",
+      "estimated_bytes": 174763,
+      "group": "main"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/mainUI/btn32.png",
+      "estimated_bytes": 174763,
+      "group": "main"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/mainUI/plate.png",
+      "estimated_bytes": 699051,
+      "group": "main"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/mainUI/title.png",
+      "estimated_bytes": 699051,
+      "group": "main"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/mainUI/tollgate1.png",
+      "estimated_bytes": 2796203,
+      "group": "main"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/common/star.png",
+      "estimated_bytes": 5462,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/common/pro_index.png",
+      "estimated_bytes": 21846,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/buy1.png",
+      "estimated_bytes": 87382,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/buy2.png",
+      "estimated_bytes": 87382,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/cancel1.png",
+      "estimated_bytes": 87382,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/cancel2.png",
+      "estimated_bytes": 87382,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/inherit1.png",
+      "estimated_bytes": 87382,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/inherit2.png",
+      "estimated_bytes": 87382,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/common/cancel1.png",
+      "estimated_bytes": 87382,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/common/cancel2.png",
+      "estimated_bytes": 87382,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/common/close1.png",
+      "estimated_bytes": 87382,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/common/close2.png",
+      "estimated_bytes": 87382,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/cancel_choose1.png",
+      "estimated_bytes": 174763,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/cancel_choose2.png",
+      "estimated_bytes": 174763,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/choose_all1.png",
+      "estimated_bytes": 174763,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/choose_all2.png",
+      "estimated_bytes": 174763,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/ensure1.png",
+      "estimated_bytes": 174763,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/ensure2.png",
+      "estimated_bytes": 174763,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/filter1.png",
+      "estimated_bytes": 174763,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/filter2.png",
+      "estimated_bytes": 174763,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/filter21.png",
+      "estimated_bytes": 174763,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/buttons/filter22.png",
+      "estimated_bytes": 174763,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/common/pro1.png",
+      "estimated_bytes": 349526,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/common/pro2.png",
+      "estimated_bytes": 699051,
+      "group": "common"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/common/small_label.png",
+      "estimated_bytes": 699051,
+      "group": "common"
+    }
+  ],
+  "warm": [
+    {
+      "kind": "config",
+      "module": "d_lineupUI",
+      "getter": "getFateCSVConfig",
+      "cache_fields": [
+        "g_fateAttrTable"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_packageUI",
+      "getter": "getItemLevelPriceCSVConfig",
+      "cache_fields": [
+        "g_itemLevelPriceTable"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_packageUI",
+      "getter": "getItembasePriceCSVConfig",
+      "cache_fields": [
+        "g_itemBasePriceTable"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getAchievementsCSVConfig",
+      "cache_fields": [
+        "g_achieveTable"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getCheerCSVConfig",
+      "cache_fields": [
+        "g_cheerTable"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getAdaptiveCSVConfig",
+      "cache_fields": [
+        "g_adaptiveTable"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getTowerCSVConfig",
+      "cache_fields": [
+        "g_towerComposeConfig",
+        "g_towerLevelConfig",
+        "g_towerUnionConfig"
+      ]
+    },
+    {
+      "kind": "config",
+      "module": "d_data",
+      "getter": "getGoldRushCSVConfig",
+      "cache_fields": [
+        "g_goldRushTable"
+      ]
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/CHAR_fa.png",
+      "estimated_bytes": 21846,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/CHAR_fang.png",
+      "estimated_bytes": 21846,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/CHAR_gong.png",
+      "estimated_bytes": 21846,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/CHAR_ming.png",
+      "estimated_bytes": 21846,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/level.png",
+      "estimated_bytes": 21846,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/enhance1.png",
+      "estimated_bytes": 87382,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/enhance2.png",
+      "estimated_bytes": 87382,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/piliangchushou1.png",
+      "estimated_bytes": 87382,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/piliangchushou2.png",
+      "estimated_bytes": 87382,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/piliangshiyong1.png",
+      "estimated_bytes": 87382,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/piliangshiyong2.png",
+      "estimated_bytes": 87382,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/use1.png",
+      "estimated_bytes": 87382,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/use2.png",
+      "estimated_bytes": 87382,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/Label_armor1.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/Label_armor2.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/Label_magic-item1.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/Label_magic-item2.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/Label_props1.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/Label_props2.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/Label_spell1.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/Label_spell2.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/Label_weapon1.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/Label_weapon2.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/board_edge1.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/board_mid_edge.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/equip1.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/equip2.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/stone1.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/stone2.png",
+      "estimated_bytes": 174763,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/board_chain.png",
+      "estimated_bytes": 349526,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/open_again1.png",
+      "estimated_bytes": 349526,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/open_again2.png",
+      "estimated_bytes": 349526,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/treasure.png",
+      "estimated_bytes": 349526,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/packageUI/board_edge2.png",
+      "estimated_bytes": 699051,
+      "group": "inventory"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/funUI/title35.png",
+      "estimated_bytes": 174763,
+      "group": "activities"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/funUI/title37.png",
+      "estimated_bytes": 174763,
+      "group": "activities"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/funUI/title40.png",
+      "estimated_bytes": 174763,
+      "group": "activities"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/funUI/title47.png",
+      "estimated_bytes": 174763,
+      "group": "activities"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/funUI/btn201.png",
+      "estimated_bytes": 349526,
+      "group": "activities"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/funUI/btn202.png",
+      "estimated_bytes": 349526,
+      "group": "activities"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/funUI/btn211.png",
+      "estimated_bytes": 349526,
+      "group": "activities"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/fishRushUI/fishIcon.png",
+      "estimated_bytes": 21846,
+      "group": "fish"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/fishRushUI/costFish.png",
+      "estimated_bytes": 87382,
+      "group": "fish"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/fishRushUI/dragonWord.png",
+      "estimated_bytes": 87382,
+      "group": "fish"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/fishRushUI/batch_use_title.png",
+      "estimated_bytes": 174763,
+      "group": "fish"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/fishRushUI/dragonCost.png",
+      "estimated_bytes": 174763,
+      "group": "fish"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/fishRushUI/goCostFishPage.png",
+      "estimated_bytes": 174763,
+      "group": "fish"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/fishRushUI/goldNet.png",
+      "estimated_bytes": 349526,
+      "group": "fish"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/fishRushUI/goldNet2.png",
+      "estimated_bytes": 349526,
+      "group": "fish"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/fishRushUI/net.png",
+      "estimated_bytes": 349526,
+      "group": "fish"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/fishRushUI/net2.png",
+      "estimated_bytes": 349526,
+      "group": "fish"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/fishRushUI/tenNet.png",
+      "estimated_bytes": 349526,
+      "group": "fish"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/fishRushUI/tenNet2.png",
+      "estimated_bytes": 349526,
+      "group": "fish"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/qiFuUI/hz_bkg.png",
+      "estimated_bytes": 87382,
+      "group": "pray"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/qiFuUI/char1.png",
+      "estimated_bytes": 174763,
+      "group": "pray"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/qiFuUI/char2.png",
+      "estimated_bytes": 174763,
+      "group": "pray"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/qiFuUI/char3.png",
+      "estimated_bytes": 174763,
+      "group": "pray"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/qiFuUI/soul1.png",
+      "estimated_bytes": 174763,
+      "group": "pray"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/qiFuUI/soul2.png",
+      "estimated_bytes": 174763,
+      "group": "pray"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/qiFuUI/soul3.png",
+      "estimated_bytes": 174763,
+      "group": "pray"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/qiFuUI/beginQiFu2.png",
+      "estimated_bytes": 349526,
+      "group": "pray"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/qiFuUI/mask.png",
+      "estimated_bytes": 349526,
+      "group": "pray"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/qiFuUI/qiFu1.png",
+      "estimated_bytes": 349526,
+      "group": "pray"
+    },
+    {
+      "kind": "texture",
+      "path": "v2/qiFuUI/qiFu2.png",
+      "estimated_bytes": 349526,
+      "group": "pray"
+    }
+  ]
+}

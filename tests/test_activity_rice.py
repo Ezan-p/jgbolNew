@@ -34,6 +34,8 @@ class RiceTests(ActivityCase):
         for tid,moon_id in rice.FOOD_POOLS.items():
             pool=self.b.activity_rules['moon_rules']['pools'][str(moon_id)]
             groups=pool['groups'];weights=[g['weight'] for g in groups]
+            if tid==1214:
+                self.assertEqual(sum(g['weight'] for g in groups if g['candidates']==[[5,1100,1,1]]),100)
             with patch.object(rice,'randbelow',side_effect=range(10000)):
                 counts=Counter(food.weighted(list(range(len(groups))),weights,rice.randbelow) for _ in range(10000))
             self.assertEqual(counts,dict(enumerate(weights)))

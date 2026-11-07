@@ -28,6 +28,9 @@ def catalog():
     names = {int(row['Ftype_id']): row['name'] for row in summon.rows('item_name.csv')}
     for key, name in (('manual', '仙佛密卷'), ('manual_advanced', '高级仙佛密卷')):
         pools[key] = [(5, t) for t in sorted(f.ITEMS) if names.get(t) == name]
+        # Separate experience bands so each group remains uniform internally.
+        pools[key + '_low_exp'] = [p for p in pools[key] if int(f.ITEMS[p[1]]['experience_plus']) <= 800000]
+        pools[key + '_high_exp'] = [p for p in pools[key] if int(f.ITEMS[p[1]]['experience_plus']) > 800000]
     for star in range(2, 6):
         for key, main in (('weapon', 1), ('armor', 2), ('treasure', 3)):
             pools[f'{key}_{star}'] = [(5, t) for t, row in sorted(f.ITEMS.items())
@@ -58,12 +61,14 @@ def load_rules(path=PATH):
                   and sum(t['weight'] for t in bag['tiers'].values()) == 100, '乾坤袋品质概率总和须为100')
         for tier in bag['tiers'].values():
             groups = tier['groups']
+            total = tier.get('group_weight_total', 100)
+            f.require(type(total) is int and 0 < total <= 10000, '乾坤袋类别总权重无效')
             f.require(isinstance(groups, list) and groups, '乾坤袋品质池不能为空')
             seen = set()
             for group in groups:
                 pool, weight, count = group['pool'], group['weight'], group['count']
                 f.require(pool in CATALOG and bool(CATALOG[pool]), '乾坤袋奖励类别不存在或为空')
-                f.require(type(weight) is int and 0 < weight <= 100
+                f.require(type(weight) is int and 0 < weight <= total
                           and type(count) is int and 0 < count <= 1000000, '乾坤袋权重或数量无效')
                 for kind, target in CATALOG[pool]:
                     f.require((kind, target, count) not in seen, '乾坤袋同档奖励重复')
@@ -76,7 +81,7 @@ def load_rules(path=PATH):
                         f.require(count == 1, '乾坤袋装备、法术和召唤符每次须为1件')
                     if target in (6002, 6003, 6004, 6005, 10001) and kind == 5:
                         f.require(count == 5, '乾坤袋碎片每次须为5个')
-            f.require(sum(g['weight'] for g in groups) == 100, '乾坤袋类别权重总和须为100')
+            f.require(sum(g['weight'] for g in groups) == total, '乾坤袋类别权重总和须等于配置总权重')
     return rules
 
 

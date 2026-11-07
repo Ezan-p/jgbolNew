@@ -135,17 +135,40 @@ static void *offline_ssl_new(void *context) {
     return ssl_new_original(context);
 }
 
+static int activity_patch_current(lua_State *state, int ms, const char *module,
+                                  const char *check) {
+    int top = lua_gettop_(state), current = 0;
+    lua_getfield_(state, ms, module);
+    if (lua_type_(state, -1) == 5) {
+        lua_getfield_(state, -1, check);
+        if (lua_type_(state, -1) == 6 && !lua_pcall_original(state, 0, 1, 0)) {
+            const char *value = lua_tolstring_(state, -1, (u32 *)0);
+            current = value && !strcmp(value, "ready");
+        }
+    }
+    lua_settop_(state, top);
+    return current;
+}
+
 static int client_patches_current(lua_State *state) {
     int top = lua_gettop_(state), current = 0;
     lua_getfield_(state, -10002, "package"); /* LUA_GLOBALSINDEX, LuaJIT 2.0 */
     if (lua_type_(state, -1) == 5) {
         lua_getfield_(state, -1, "loaded");
         if (lua_type_(state, -1) == 5) {
+            int loaded = lua_gettop_(state);
             lua_getfield_(state, -1, "ui.summonUI");
             if (lua_type_(state, -1) == 5) {
                 lua_getfield_(state, -1, "_localGoldRestore");
                 current = lua_type_(state, -1) == 6;
             }
+            lua_settop_(state, loaded);
+            lua_getfield_(state, loaded, "ms");
+            if (current && lua_type_(state, -1) == 5) {
+                int ms = lua_gettop_(state);
+                current = activity_patch_current(state, ms, "d_funUI", "_localActivityEntryCurrent")
+                    && activity_patch_current(state, ms, "d_twoYearsCelebrateUI", "_localYuanshiCurrent");
+            } else current = 0;
         }
     }
     lua_settop_(state, top);
@@ -156,9 +179,14 @@ static int offline_pcall(lua_State *state, int nargs, int nresults, int errfunc)
     struct timespec32 now;
     clock_gettime(1, &now);
     u32 ms = (u32)now.sec * 1000 + (u32)now.nsec / 1000000;
-    if (!evaluating && !lua_failed && (u32)(ms - previous_ms) >= 250) {
+    /* Module initialization may temporarily throw. Keep retrying on the Lua
+     * thread, with backoff, instead of disabling all patches for the process. */
+    if (!evaluating && (u32)(ms - previous_ms) >= (lua_failed ? 5000u : 250u)) {
         previous_ms = ms;
-        if (lua_ready && client_patches_current(state))
+        evaluating = 1;
+        int current = lua_ready && client_patches_current(state);
+        evaluating = 0;
+        if (current)
             return lua_pcall_original(state, nargs, nresults, errfunc);
         /* The original client unloads modules when returning to the login UI.
          * Reinstall the unchanged idempotent patches after that normal reload. */
@@ -170,11 +198,15 @@ static int offline_pcall(lua_State *state, int nargs, int nresults, int errfunc)
         if (!result) result = lua_pcall_original(state, 0, 1, 0);
         const char *value = lua_tolstring_(state, -1, (u32 *)0);
         if (result) {
+            if (!lua_failed) ERR("offline_lua_error: %s; retrying after 5s", value ? value : "unknown Lua error");
             lua_failed = 1;
-            ERR("offline_lua_error: %s", value ? value : "unknown Lua error");
-        } else if (value && !strcmp(value, "ready")) {
-            lua_ready = 1;
-            LOG("offline_lua_ready: frozen client patches installed");
+        } else {
+            if (lua_failed) LOG("offline_lua_recovered: patch evaluation resumed");
+            lua_failed = 0;
+            if (value && !strcmp(value, "ready")) {
+                lua_ready = 1;
+                LOG("offline_lua_ready: frozen client patches installed");
+            }
         }
         lua_settop_(state, top);
         evaluating = 0;

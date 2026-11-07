@@ -3,10 +3,19 @@
 do
  local ms=package.loaded.ms
  local ui=ms and ms.d_twoYearsCelebrateUI
- if not ui or not ms.d_activityUI or not ms.d_time then return 'pending' end
- if ui._localYuanshiRestore and ui._localYuanshiVersion~=2 then ui._localYuanshiRestore() end
+ if not ui or not ms.d_activityUI or not ms.d_time or not ms.d_data
+     or type(ms.d_data.g_new_config)~='table'
+     or type(ms.d_data.callback_update_config)~='function'
+     or type(ms.d_activityUI.getQiwenStatus)~='function'
+     or type(ms.d_time.getTime)~='function' then return 'pending' end
+ for _,name in ipairs({'showNews','onGetResult','pray','tickTime','createMainFrame','canJoin',
+     'getChar','buy','openGiftPackEnsure','createShop','openGiftPack','showGiftDetail'}) do
+  if type(ui[name])~='function' then return 'pending' end
+ end
+ if ui._localYuanshiCurrent and ui._localYuanshiCurrent()~='ready' then ui._localYuanshiRestore() end
+ if ui._localYuanshiRestore and ui._localYuanshiVersion~=3 then ui._localYuanshiRestore() end
  if not ui._localYuanshiRestore then
-  ui._localYuanshiVersion=2
+  ui._localYuanshiVersion=3
   local act=ms.d_activityUI
   local originalNews=ui.showNews
   local originalResult,originalPray=ui.onGetResult,ui.pray
@@ -137,12 +146,27 @@ do
    end
    return result
   end
+  local installed={}
+  for _,name in ipairs({'showNews','onGetResult','pray','tickTime','createMainFrame','canJoin'}) do
+   installed[name]=ui[name]
+  end
+  for name in pairs(actions) do installed[name]=ui[name] end
+  local dataModule=ms.d_data
+  ui._localYuanshiCurrent=function()
+   if package.loaded.ms~=ms or ms.d_twoYearsCelebrateUI~=ui
+       or ms.d_activityUI~=act or ms.d_data~=dataModule then return 'pending' end
+   for name,fn in pairs(installed) do if ui[name]~=fn then return 'pending' end end
+   return 'ready'
+  end
+  local installedStatus,installedConfig=act.getQiwenStatus,dataModule.callback_update_config
   ui._localYuanshiRestore=function()
-   ui.showNews=originalNews
-   act.getQiwenStatus=originalStatus;ms.d_data.callback_update_config=originalConfig
-   ui.onGetResult=originalResult;ui.pray=originalPray;ui._localYuanshiRestore=nil
-   ui.tickTime=originalTick;ui.createMainFrame=originalFrame;ui.canJoin=originalJoin
-   for name,original in pairs(actions) do ui[name]=original end
+   local originals={showNews=originalNews,onGetResult=originalResult,pray=originalPray,
+    tickTime=originalTick,createMainFrame=originalFrame,canJoin=originalJoin}
+   for name,fn in pairs(actions) do originals[name]=fn end
+   for name,fn in pairs(originals) do if ui[name]==installed[name] then ui[name]=fn end end
+   if act.getQiwenStatus==installedStatus then act.getQiwenStatus=originalStatus end
+   if dataModule.callback_update_config==installedConfig then dataModule.callback_update_config=originalConfig end
+   ui._localYuanshiRestore=nil;ui._localYuanshiCurrent=nil
    ui._localYuanshiVersion=nil
   end
  end

@@ -10,7 +10,7 @@ import secrets
 from pathlib import Path
 
 VERSION = 1
-MESSAGE = '检测到存档时间记录异常，相关时间活动已封锁；角色数据保留。异常编号：TIME-001'
+MESSAGE = '系统时间或存档时间记录异常，异常编号：TIME-001'
 _preview = ContextVar('time_guard_preview', default=False)
 TIME_KEYS = {'clock', 'day', 'shop_day', 'rank_day', 'strength_day', 'start_day',
              'week_start_day', 'week', 'shop_week', 'last_rank_week'}
@@ -173,7 +173,7 @@ class Guard:
                             reason='升级后的受保护时间记录与校验记录不一致', code='TIME-001')
         if clock_blocked or (row is None and role.get('time_guard')):
             info = dict(version=VERSION, status='blocked', blocked=['*'], since=now,
-                        reason='共享时钟被修改或已迁移角色的校验记录丢失', code='TIME-001')
+                        reason='系统时间跳变、共享时钟被修改或已迁移角色的校验记录丢失', code='TIME-001')
         role['time_guard'] = info
         # Commit quarantine before gameplay, including failed/rejected requests.
         self.checkpoint(account, role)

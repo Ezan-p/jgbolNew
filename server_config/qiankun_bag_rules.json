@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "mode": "inferred",
-  "revision": "2026-10-31.2",
-  "reason": "用户提供四种乾坤袋表格；2026-10-31按用户要求在VIP高品质池加入四星武器、防具、法宝，并将VIP高品质概率从5%降至1%，减少的4%分配到低品质，低／中／高为69%／30%／1%；其他袋概率、类别权重及每次数量保持不变，批量无保底。",
+  "revision": "2026-11-06.2",
+  "reason": "用户提供四种乾坤袋表格；2026-10-31按用户要求在VIP高品质池加入四星武器、防具、法宝，并将VIP高品质概率从5%降至1%，减少的4%分配到低品质，低／中／高为69%／30%／1%；其他袋概率、类别权重及每次数量保持不变，批量无保底。2026-11-06按用户要求将VIP仙缘果单袋总概率调为1%，中品质池采用300总权重，仙缘果10，减少的14权重补到20元宝组；VIP魂缘丹每次改为1个。2026-11-06高经验密卷调整：两类密卷经验超过80万的每个模板概率减半，减少的概率等分到同类80万及以下模板；品质概率和密卷类别总概率不变。",
   "bags": {
     "1034": {
       "name": "棉布乾坤袋",
@@ -73,55 +73,61 @@
           "groups": [
             {
               "pool": "gold",
-              "weight": 25,
+              "weight": 500,
               "count": 5
             },
             {
-              "pool": "manual",
-              "weight": 20,
+              "pool": "manual_low_exp",
+              "weight": 320,
               "count": 1
             },
             {
               "pool": "summon_advanced",
-              "weight": 15,
+              "weight": 300,
               "count": 1
             },
             {
               "pool": "summon_super",
-              "weight": 5,
+              "weight": 100,
               "count": 1
             },
             {
               "pool": "weapon_3",
-              "weight": 10,
+              "weight": 200,
               "count": 1
             },
             {
               "pool": "armor_3",
-              "weight": 8,
+              "weight": 160,
               "count": 1
             },
             {
               "pool": "skill_3",
-              "weight": 7,
+              "weight": 140,
               "count": 1
             },
             {
               "pool": "weapon_4",
-              "weight": 4,
+              "weight": 80,
               "count": 1
             },
             {
               "pool": "armor_4",
-              "weight": 3,
+              "weight": 60,
               "count": 1
             },
             {
               "pool": "skill_4",
-              "weight": 3,
+              "weight": 60,
+              "count": 1
+            },
+            {
+              "pool": "manual_high_exp",
+              "weight": 80,
               "count": 1
             }
-          ]
+          ],
+          "group_weight_total": 2000
         }
       }
     },
@@ -169,90 +175,102 @@
           "groups": [
             {
               "pool": "silver",
-              "weight": 35,
+              "weight": 700,
               "count": 30000
             },
             {
               "pool": "weapon_2",
-              "weight": 15,
+              "weight": 300,
               "count": 1
             },
             {
               "pool": "armor_2",
-              "weight": 15,
+              "weight": 300,
               "count": 1
             },
             {
               "pool": "skill_2",
-              "weight": 10,
+              "weight": 200,
               "count": 1
             },
             {
-              "pool": "manual",
-              "weight": 15,
+              "pool": "manual_low_exp",
+              "weight": 240,
               "count": 1
             },
             {
               "pool": "summon_advanced",
-              "weight": 10,
+              "weight": 200,
+              "count": 1
+            },
+            {
+              "pool": "manual_high_exp",
+              "weight": 60,
               "count": 1
             }
-          ]
+          ],
+          "group_weight_total": 2000
         },
         "high": {
           "weight": 10,
           "groups": [
             {
               "pool": "summon_super",
-              "weight": 10,
+              "weight": 200,
               "count": 1
             },
             {
               "pool": "gold",
-              "weight": 25,
+              "weight": 500,
               "count": 5
             },
             {
               "pool": "weapon_3",
-              "weight": 12,
+              "weight": 240,
               "count": 1
             },
             {
               "pool": "armor_3",
-              "weight": 10,
+              "weight": 200,
               "count": 1
             },
             {
               "pool": "skill_3",
-              "weight": 10,
+              "weight": 200,
               "count": 1
             },
             {
               "pool": "weapon_4",
-              "weight": 6,
+              "weight": 120,
               "count": 1
             },
             {
               "pool": "armor_4",
-              "weight": 5,
+              "weight": 100,
               "count": 1
             },
             {
               "pool": "skill_4",
-              "weight": 5,
+              "weight": 100,
               "count": 1
             },
             {
-              "pool": "manual_advanced",
-              "weight": 10,
+              "pool": "manual_advanced_low_exp",
+              "weight": 150,
               "count": 1
             },
             {
               "pool": "soul_pill",
-              "weight": 7,
+              "weight": 140,
               "count": 2
+            },
+            {
+              "pool": "manual_advanced_high_exp",
+              "weight": 50,
+              "count": 1
             }
-          ]
+          ],
+          "group_weight_total": 2000
         }
       }
     },
@@ -295,125 +313,137 @@
           "groups": [
             {
               "pool": "gold",
-              "weight": 20,
+              "weight": 400,
               "count": 5
             },
             {
               "pool": "soul_pill",
-              "weight": 20,
+              "weight": 400,
               "count": 3
             },
             {
-              "pool": "manual",
-              "weight": 20,
+              "pool": "manual_low_exp",
+              "weight": 320,
               "count": 1
             },
             {
               "pool": "summon_advanced",
-              "weight": 15,
+              "weight": 300,
               "count": 1
             },
             {
               "pool": "weapon_3",
-              "weight": 10,
+              "weight": 200,
               "count": 1
             },
             {
               "pool": "armor_3",
-              "weight": 8,
+              "weight": 160,
               "count": 1
             },
             {
               "pool": "skill_3",
-              "weight": 7,
+              "weight": 140,
+              "count": 1
+            },
+            {
+              "pool": "manual_high_exp",
+              "weight": 80,
               "count": 1
             }
-          ]
+          ],
+          "group_weight_total": 2000
         },
         "high": {
           "weight": 20,
           "groups": [
             {
               "pool": "gold",
-              "weight": 20,
+              "weight": 400,
               "count": 20
             },
             {
-              "pool": "manual_advanced",
-              "weight": 12,
+              "pool": "manual_advanced_low_exp",
+              "weight": 180,
               "count": 1
             },
             {
               "pool": "summon_super",
-              "weight": 8,
+              "weight": 160,
               "count": 1
             },
             {
               "pool": "purple_shard",
-              "weight": 8,
+              "weight": 160,
               "count": 5
             },
             {
               "pool": "realm_box",
-              "weight": 8,
+              "weight": 160,
               "count": 1
             },
             {
               "pool": "weapon_4",
-              "weight": 10,
+              "weight": 200,
               "count": 1
             },
             {
               "pool": "armor_4",
-              "weight": 8,
+              "weight": 160,
               "count": 1
             },
             {
               "pool": "skill_4",
-              "weight": 8,
+              "weight": 160,
               "count": 1
             },
             {
               "pool": "diamond",
-              "weight": 6,
+              "weight": 120,
               "count": 1
             },
             {
               "pool": "soul_stone",
-              "weight": 6,
+              "weight": 120,
               "count": 1
             },
             {
               "pool": "treasure_3",
-              "weight": 1,
+              "weight": 20,
               "count": 1
             },
             {
               "pool": "treasure_4",
-              "weight": 1,
+              "weight": 20,
               "count": 1
             },
             {
               "pool": "weapon_shard",
-              "weight": 1,
+              "weight": 20,
               "count": 5
             },
             {
               "pool": "armor_shard",
-              "weight": 1,
+              "weight": 20,
               "count": 5
             },
             {
               "pool": "treasure_shard",
-              "weight": 1,
+              "weight": 20,
               "count": 5
             },
             {
               "pool": "passive_shard",
-              "weight": 1,
+              "weight": 20,
               "count": 5
+            },
+            {
+              "pool": "manual_advanced_high_exp",
+              "weight": 60,
+              "count": 1
             }
-          ]
+          ],
+          "group_weight_total": 2000
         }
       }
     },
@@ -426,125 +456,137 @@
           "groups": [
             {
               "pool": "small_bun",
-              "weight": 15,
+              "weight": 300,
               "count": 1
             },
             {
               "pool": "bun",
-              "weight": 12,
+              "weight": 240,
               "count": 1
             },
             {
               "pool": "pill",
-              "weight": 12,
+              "weight": 240,
               "count": 1
             },
             {
               "pool": "soul_pill",
-              "weight": 12,
-              "count": 3
-            },
-            {
-              "pool": "manual",
-              "weight": 12,
+              "weight": 240,
               "count": 1
             },
             {
-              "pool": "manual_advanced",
-              "weight": 5,
+              "pool": "manual_low_exp",
+              "weight": 192,
+              "count": 1
+            },
+            {
+              "pool": "manual_advanced_low_exp",
+              "weight": 75,
               "count": 1
             },
             {
               "pool": "silver",
-              "weight": 27,
+              "weight": 540,
               "count": 30000
             },
             {
               "pool": "gold",
-              "weight": 5,
+              "weight": 100,
               "count": 5
+            },
+            {
+              "pool": "manual_high_exp",
+              "weight": 48,
+              "count": 1
+            },
+            {
+              "pool": "manual_advanced_high_exp",
+              "weight": 25,
+              "count": 1
             }
-          ]
+          ],
+          "group_weight_total": 2000
         },
         "medium": {
           "weight": 30,
           "groups": [
             {
               "pool": "gold",
-              "weight": 20,
+              "weight": 74,
               "count": 20
             },
             {
               "pool": "summon_advanced",
-              "weight": 10,
+              "weight": 30,
               "count": 1
             },
             {
               "pool": "summon_super",
-              "weight": 5,
+              "weight": 15,
               "count": 1
             },
             {
               "pool": "diamond",
-              "weight": 8,
+              "weight": 24,
               "count": 1
             },
             {
               "pool": "fruit",
-              "weight": 8,
+              "weight": 10,
               "count": 1
             },
             {
               "pool": "holy_peach",
-              "weight": 8,
+              "weight": 24,
               "count": 1
             },
             {
               "pool": "soul_stone",
-              "weight": 8,
+              "weight": 24,
               "count": 1
             },
             {
               "pool": "purple_shard",
-              "weight": 8,
+              "weight": 24,
               "count": 5
             },
             {
               "pool": "realm_box",
-              "weight": 8,
+              "weight": 24,
               "count": 1
             },
             {
               "pool": "weapon_shard",
-              "weight": 3,
+              "weight": 9,
               "count": 5
             },
             {
               "pool": "armor_shard",
-              "weight": 3,
+              "weight": 9,
               "count": 5
             },
             {
               "pool": "treasure_shard",
-              "weight": 3,
+              "weight": 9,
               "count": 5
             },
             {
               "pool": "passive_shard",
-              "weight": 3,
+              "weight": 9,
               "count": 5
             },
             {
               "pool": "treasure_3",
-              "weight": 3,
+              "weight": 9,
               "count": 1
             },
             {
               "pool": "treasure_4",
-              "weight": 2,
+              "weight": 6,
               "count": 1
             }
-          ]
+          ],
+          "group_weight_total": 300
         },
         "high": {
           "weight": 1,

@@ -32,7 +32,7 @@ class RulaiTests(ActivityCase):
         self.assertEqual(d['order_pay'], 0)
         self.assertEqual(len(d['random_table']), 8)
         expected = [(1246, 3), (1031, 3), (6005, 5), (6004, 5),
-                    (1249, 10), (1015, 5), (1367, 1), (1368, 1)]
+                    (1249, 10), (1015, 100), (1367, 1), (1368, 1)]
         self.assertEqual([(p['attach_type'], p['attach_count'])
                           for p in d['random_table'].values()], expected)
         self.assertEqual(d['ext_info']['prize_flag'], 1)

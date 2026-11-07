@@ -56,9 +56,10 @@ def load_rules(path=ROOT / 'server_config/nine_sky_rules.json'):
         f.require(all(type(row.get('weight')) is int and 1 <= row['weight'] <= 10000 for row in r[name]), '九重天奖励权重缺失')
     low = [x for x in r['star_shop'] if x.get('tier') == 'low']
     high = [x for x in r['star_shop'] if x.get('tier') == 'high']
-    f.require(len(r['star_shop']) == 15 and len(low) == 9 and len(high) == 6 and
+    f.require(len(r['star_shop']) == 19 and len(low) == 9 and len(high) == 10 and
               [x['reward'] for x in low] == [[5, t, 1, 1] for t in (1022,1023,1041,1033,1006,1032,1024,1042,1007)] and
-              {tuple(x['reward']) for x in high} == {(10,5027,5,1),(10,5036,5,1),(5,1031,5,1),(5,1249,50,1),(5,1243,1,1),(5,1246,1,1)}, '九重商会奖励池不完整')
+              {tuple(x['reward']) for x in high} == {(10,5027,5,1),(10,5036,5,1),(5,1031,5,1),(5,1249,50,1),(5,1243,1,1),(5,1246,1,1),
+                  (5,6002,5,1),(5,6003,5,1),(5,6004,5,1),(5,6005,5,1)}, '九重商会奖励池不完整')
     f.require(all(type(x.get('listing_weight')) is int and 1 <= x['listing_weight'] <= 100 for x in high)
               and sum(x['listing_weight'] for x in high) == 100, '九重商会高级池上架权重须为正整数且合计100')
     f.require(all(x['cost'] < y['cost'] for x,y in zip(low,low[1:])) and

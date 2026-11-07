@@ -46,8 +46,8 @@ def client_config(rules):
     return dict({int(q): n for q, n in rules['exchange_silver_per_soul'].items()}, adaptive_visible=rules['adaptive_visible'])
 
 
-def prepare(role, rules):
-    before = copy.deepcopy(role)
+def prepare(role, rules, *, track_changes=True):
+    before = copy.deepcopy(role) if track_changes else None
     history = role.setdefault('handbook', {})
     for kind in (4, 5, 6, 15):
         history.setdefault(str(kind), [])
@@ -68,7 +68,7 @@ def prepare(role, rules):
             acquired[kind].add(i['type_id'])
     role['handbook'] = {k: sorted(v) for k, v in acquired.items()}
     collection_bonuses(role)
-    return before != role
+    return before != role if track_changes else None
 
 
 def collection_bonuses(role):
@@ -299,5 +299,5 @@ def settle(role, mid, req, rules, parse):
         events = activate(role, req, rules)
     else:
         raise f.Rejected('神仙请求无效')
-    prepare(role, rules)
+    prepare(role, rules, track_changes=False)
     return [summon.event(e, data) for e, data in events]

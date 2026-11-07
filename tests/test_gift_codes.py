@@ -252,7 +252,7 @@ class GiftCodeTests(unittest.TestCase):
                     for code, prizes in expected.items()}
         self.assertEqual({row['code']: row['prizes'] for row in rows}, expected)
         self.assertEqual(len(rows), 24)
-        self.assertEqual(len({row['group'] for row in self.b.gift_code_rules['codes']}), 67)
+        self.assertEqual(len({row['group'] for row in self.b.gift_code_rules['codes']}), 77)
         self.assert_gifts_redemption(rows, expected)
 
     def assert_gifts_redemption(self, rows, expected):
@@ -269,8 +269,9 @@ class GiftCodeTests(unittest.TestCase):
                 self.assertEqual(actual, expected[code])
                 after = self.b.profile()
                 for kind, tid, count, _ in expected[code]:
-                    if kind == 11:
-                        self.assertEqual(after['gold_coin'] - before['gold_coin'], count)
+                    if kind in (11, 12):
+                        field = 'gold_coin' if kind == 11 else 'silver_coin'
+                        self.assertEqual(after[field] - before[field], count)
                     else:
                         total = lambda r: sum(i['count'] for i in r['attachments']
                                               if i['attach_type'] == 5 and i['type_id'] == tid)
@@ -307,7 +308,7 @@ class GiftCodeTests(unittest.TestCase):
                     [5, tid, count * factor, 1] for tid, count in items]
         for amount in (100, 500, 1000, 2000):
             expected_groups[f'gift-gold-new-{amount}-v1'] = [[5, 1152, amount // 50, 1]]
-        rows = self.b.gift_code_rules['codes'][51:]
+        rows = self.b.gift_code_rules['codes'][51:67]
         self.assertEqual(len(rows), 16)
         self.assertEqual({row['group']: row['prizes'] for row in rows}, expected_groups)
         for row in rows:
@@ -316,14 +317,33 @@ class GiftCodeTests(unittest.TestCase):
                 self.assertEqual(row['prizes'][0][2] * self.b.recharge_rules['large_rmb'], amount)
         self.assert_gifts_redemption(rows, {row['code']: expected_groups[row['group']] for row in rows})
 
+    def test_ten_designed_packs_exact_rewards_and_independent_claims(self):
+        rows = self.b.gift_code_rules['codes'][67:]
+        self.assertEqual(len(rows), 10)
+        self.assertEqual(sum(row['name'].startswith('更新福利·') for row in rows), 5)
+        expected = {
+            '37KNV6HT60UF': [[11, 0, 300, 1], [12, 0, 300000, 1]],
+            '4MXVESNVA02A': [[11, 0, 100, 1], [5, 1022, 10, 1], [5, 1023, 10, 1]],
+            'BDUC3UYQQ2UK': [[5, 1001, 300, 1], [5, 1042, 50, 1], [5, 1024, 5, 1]],
+            'OIHPSUM2JVF4': [[5, 1310, 200, 1], [5, 1311, 200, 1], [5, 1312, 200, 1], [5, 1320, 10, 1], [5, 1321, 10, 1]],
+            'R4GWWD7HX6ST': [[11, 0, 300, 1], [5, 1031, 3, 1], [5, 1032, 5, 1]],
+            'SIJGFETZ2RNT': [[5, 1026, 15, 1], [5, 1033, 5, 1], [12, 0, 100000, 1]],
+            'DV78ZW3YIJH9': [[5, 1006, 3, 1], [5, 1246, 2, 1], [5, 1249, 5, 1], [5, 1001, 100, 1]],
+            'ELYE7D35D3TT': [[5, 6002, 10, 1], [5, 6003, 10, 1], [5, 6004, 10, 1], [5, 6005, 10, 1], [5, 1093, 3, 1], [5, 1100, 1, 1]],
+            'NOOYSUNT84DS': [[5, 1130, 3, 1], [5, 1131, 3, 1], [5, 1132, 3, 1], [5, 1133, 3, 1], [5, 1213, 3, 1], [5, 1214, 3, 1], [5, 1215, 3, 1], [5, 1216, 3, 1]],
+            'K98RHNXZB85L': [[5, 1362, 200, 1], [5, 1361, 1000, 1], [5, 1364, 5, 1], [5, 1363, 2, 1]],
+        }
+        self.assertEqual({row['code']: row['prizes'] for row in rows}, expected)
+        self.assert_gifts_redemption(rows, expected)
+
     def test_random_codes_unique_stable_and_documented(self):
         rules = self.b.gift_code_rules
-        self.assertEqual(len(rules['codes']), 67)
+        self.assertEqual(len(rules['codes']), 77)
         randomized = [row for row in rules['codes']
                       if row['group'].startswith(('gift-jgcard', 'gift-jgfest'))]
         randomized += rules['codes'][51:]
-        self.assertEqual(len(randomized), 24)
-        self.assertEqual(len({row['code'] for row in rules['codes']}), 67)
+        self.assertEqual(len(randomized), 34)
+        self.assertEqual(len({row['code'] for row in rules['codes']}), 77)
         for row in randomized:
             self.assertRegex(row['code'], r'\A(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{12}\Z')
         self.assertEqual(gift_codes.load_rules(), rules)

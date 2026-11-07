@@ -121,7 +121,7 @@ do
    label('东海寻宝 · 奖励概率',0.5,0.91,32)
    label('每网获得锦鲤，并从以下奖励中独立抽取一种',0.5,0.83,22)
    for i,row in ipairs(data.random_get_item) do
-    local x=0.2+((i-1)%4)*0.2;local y=0.65-math.floor((i-1)/4)*0.30
+    local x=0.14+((i-1)%5)*0.18;local y=0.65-math.floor((i-1)/5)*0.30
     local icon=ms.d_data.getCertainSmallSprite(row.object_type,row.attach_type,row.attach_level)
     ms.d_u.setStyles(icon,{x=x,y=y});layer:addChild(icon,2)
     local info=ms.d_data.getCertainInfo(row.object_type,row.attach_type,row.attach_level)

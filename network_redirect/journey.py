@@ -21,6 +21,20 @@ def table(name, key):
 
 GATES = {1: table('tollgate_config.csv', 'id'), 2: table('elite/elite_tollgate_config.csv', 'tollgate_id')}
 MAPS = {1: table('map_config.csv', 'id'), 2: table('elite/elite_map_config.csv', 'id')}
+# Static catalog index only; completion always reads the current role progress.
+GATES_BY_MAP = {}
+for _kind, _gates in GATES.items():
+    _by_map = {}
+    for _gid, _gate in _gates.items():
+        _by_map.setdefault(int(_gate['map_id']), []).append(_gid)
+    GATES_BY_MAP[_kind] = {mid: tuple(ids) for mid, ids in _by_map.items()}
+# Persisted progress uses string keys. Include empty maps to retain all([])
+# semantics, and build these keys once rather than on every achievement scan.
+MAP_GATE_KEYS = {
+    kind: {mid: tuple(f'{kind}:{gid}' for gid in GATES_BY_MAP[kind].get(mid, ()))
+           for mid in maps}
+    for kind, maps in MAPS.items()
+}
 NPCS = {}
 for path in sorted((ROOT / 'analysis/configs/cortege').glob('cortege_base_*.csv')):
     NPCS.update(table('cortege/' + path.name, 'type_id'))
@@ -157,7 +171,7 @@ def progress(role, kind, gid):
 
 def completed(role, kind, mid, stars=1):
     return all(progress(role, kind, gid)['pass_star'] >= stars
-               for gid, g in GATES[kind].items() if int(g['map_id']) == mid)
+               for gid in GATES_BY_MAP[kind].get(mid, ()))
 
 
 def map_prize_state(role, mid):
@@ -198,9 +212,10 @@ def updates(role, old):
     packets, opened = [], []
     for kind in (1, 2):
         for gid in GATES[kind]:
-            if unlocked(role, kind, gid) and not unlocked(old, kind, gid):
+            is_unlocked = unlocked(role, kind, gid)
+            if is_unlocked and not unlocked(old, kind, gid):
                 opened.append(gate_row(role, kind, gid))
-            if unlocked(role, kind, gid) and progress(role, kind, gid) != progress(old, kind, gid):
+            if is_unlocked and progress(role, kind, gid) != progress(old, kind, gid):
                 row = gate_row(role, kind, gid)
                 row['pass_map'] = map_prize_state(role, row['map_id'])
                 packets.append(encode(1019, row))

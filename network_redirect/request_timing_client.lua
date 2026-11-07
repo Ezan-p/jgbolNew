@@ -5,9 +5,10 @@ do
  local event=ms and ms.d_event_mgr
  if ms and transport and event and type(transport.send_msg)=='function'
     and type(event.msg_process_done_1106)=='function' and not ms._localRequestTiming then
-  ms._localRequestTiming=true
   local ok,socket=pcall(require,'socket')
-  local precise=ok and type(socket.gettime)=='function'
+  -- Lua 5.1 loaders may register the module without returning a table;
+  -- require then returns true. Optional timing must not abort UI injection.
+  local precise=ok and type(socket)=='table' and type(socket.gettime)=='function'
   local now=precise and socket.gettime or os.time
   local pending={}
   local function log(text) pcall(print,'[request_timing] '..text) end
@@ -43,6 +44,7 @@ do
   end
   event.msg_process_done_1106=receive
   if event.g_msg_fun then event.g_msg_fun[1106]=receive end
+  ms._localRequestTiming=true
   log('stage=installed clock='..(precise and 'socket_wall' or 'wall_seconds'))
  end
 end
