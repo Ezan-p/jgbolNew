@@ -12,9 +12,9 @@ from .protocol import decode, encode
 
 
 class Accounts:
-    def __init__(self, directory, port, emit):
+    def __init__(self, directory, port, emit, *, network_time=None):
         self.directory, self.port, self.emit = directory, port, emit
-        self.base = Backend(directory, port, emit)
+        self.base = Backend(directory, port, emit, network_time=network_time)
         self.db = self.base.db
         self.db.execute('CREATE TABLE IF NOT EXISTS accounts (name TEXT PRIMARY KEY, salt BLOB NOT NULL, digest BLOB NOT NULL)')
         self.db.execute('CREATE TABLE IF NOT EXISTS remembered_logins (digest TEXT PRIMARY KEY, name TEXT NOT NULL, expires REAL NOT NULL)')
@@ -110,7 +110,8 @@ class Accounts:
         self.pending.clear()
         token = secrets.token_urlsafe(32)
         if name not in self.backends:
-            self.backends[name] = Backend(self.directory, self.port, self.emit, account=name)
+            self.backends[name] = Backend(self.directory, self.port, self.emit, account=name,
+                                          clock=self.base.clock)
         backend = self.backends[name]
         backend.token = token
         self.sessions[token] = (backend, now + 12 * 3600)
@@ -152,3 +153,5 @@ class Accounts:
         for backend in self.backends.values():
             backend.close()
         self.base.close()
+        if self.base.clock.network_time is not None:
+            self.base.clock.network_time.close()

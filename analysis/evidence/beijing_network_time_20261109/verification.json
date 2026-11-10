@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-09",
+  "scope": "Workspace implementation, no APK publication or device validation",
+  "regression": {
+    "passed": 306,
+    "command": "PYTHONPATH=/private/tmp/qmxy-battle-test-deps .runtime/venv/bin/python -m unittest tests.test_network_time tests.test_trusted_game_clock tests.test_network_time_runtime tests.test_game_clock tests.test_game_clock_resume tests.test_game_clock_client tests.test_time_guard tests.test_activity_clock_boundaries tests.test_local_accounts tests.test_android_offline_backend tests.test_offline_backend.ProtocolTests tests.test_summon tests.test_daily tests.test_welfare tests.test_guild tests.test_market tests.test_equipment_crafting tests.test_activity_entry_client tests.test_request_wait -v",
+    "log": "regression.log",
+    "note": "Before final small client calendar/resume and VM diagnostic refinements; final affected paths retested below."
+  },
+  "final_focused": {
+    "passed": 36,
+    "command": "PYTHONPATH=/private/tmp/qmxy-battle-test-deps .runtime/venv/bin/python -m unittest tests.test_network_time tests.test_trusted_game_clock tests.test_game_clock_client -q",
+    "log": "focused.log"
+  },
+  "final_runtime": {
+    "passed": 3,
+    "command": "PYTHONPATH=/private/tmp/qmxy-battle-test-deps .runtime/venv/bin/python -m unittest tests.test_network_time_runtime tests.test_android_offline_backend.PayloadTests.test_packed_program_boots_in_isolation_and_has_no_player_data -v",
+    "log": "final-runtime.log",
+    "note": "Localhost binding requires sandbox permission; payload boot disables external HTTP, default production network startup covered using injected observations."
+  },
+  "counts_overlap": true,
+  "native_loader_checks": 10,
+  "native_readiness_checks": 14,
+  "live_https": {
+    "synchronized": true,
+    "transport": "HTTPS HEAD with certificate and hostname verification",
+    "player_data_sent": false,
+    "hosts": [
+      "www.baidu.com",
+      "www.qq.com"
+    ],
+    "utc_timestamp": 1794285915,
+    "beijing": "2026-11-10T12:45:15+08:00",
+    "uncertainty_seconds": 1.0488219373801257,
+    "settlement_matches_display": true,
+    "quarantined": false,
+    "status": null
+  },
+  "apk_rebuilt": false,
+  "device_validated": false,
+  "real_player_data_modified": false,
+  "sha256": {
+    "network_redirect/network_time.py": "6561b6ae3d86e084480d69cf01292c2c6b3ac485490c6ae874d369ef6b058b7c",
+    "network_redirect/game_clock.py": "14869741b8c0ae8fbeaee509b72fd8ba7933c9dbb619b4f4aa58f3cddf11ff9c",
+    "network_redirect/game_clock_client.lua": "440c57ac2d291822f34929cce596598520e0b3aa5b54bb8fbace25e081d49e06",
+    "network_redirect/backend.py": "961c412ce068f2ba7df26e19c1f1eafef83295e9ff93bfe4cf1385a0178c0f33",
+    "network_redirect/accounts.py": "bc99a48e2bbe0b7f7fe61456060c82ad958ce083187a076299ca78256c8fdaa1",
+    "network_redirect/cli.py": "675172b10b5cabb730eb2531ad72a5e20595867d11b8c72657f1b407bf047b92",
+    "offline_android/backend.py": "416572c4c624c3daa494ba408e7db51d3fd11fea06b7c0625f52058510de2d15",
+    "offline_android/native/offline.c": "3017703f82e6f1f65474cc385deb198c40b091a3b289ba52c562b19a6b3a4bac",
+    "tests/test_network_time.py": "3e253b633f00bbf2125cd98c75a872a57960941b770b7281c4f21dede5a21b47",
+    "tests/test_trusted_game_clock.py": "60d6e052c5c4dd70acb9e056bc18e862ebd088313a57fac1bde1db18eff65d8f",
+    "tests/test_network_time_runtime.py": "98249eab5d87dc936357b42dea28253a866c3f074276871d1f78a57768baeef7",
+    "tests/test_game_clock_client.py": "11c1206c275c103b4376b1a82c06195d308e6394c92d44bf6bd9155417fbf991",
+    "tests/test_android_offline_backend.py": "3474e33c4b0e82aab564fcb6248f3e7ffd464e0a62e4ebcf57b481417c4cace7"
+  }
+}

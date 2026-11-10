@@ -61,7 +61,7 @@ import pathlib, sys
 sys.path.insert(0, sys.argv[1])
 from offline_android.backend import start, stop
 from network_redirect import npc_players
-state = start(sys.argv[2], sys.argv[1], 0)
+state = start(sys.argv[2], sys.argv[1], 0, network_time=False)
 assert state['ready']
 assert 'luaparser.ast' in sys.modules
 assert not list(pathlib.Path(sys.argv[2], 'cache').iterdir())
@@ -86,7 +86,7 @@ class RuntimeTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.files = Path(self.tmp.name)
-        self.state = backend.start(self.files, ROOT, port=0)
+        self.state = backend.start(self.files, ROOT, port=0, network_time=False)
         self.port = self.state['port']
 
     def tearDown(self):
@@ -139,7 +139,7 @@ class RuntimeTests(unittest.TestCase):
         with sqlite3.connect(self.files / 'save/game.sqlite3') as db:
             self.assertEqual(db.execute('SELECT count(*) FROM roles').fetchone()[0], 0)
             self.assertEqual(db.execute('SELECT count(*) FROM accounts').fetchone()[0], 0)
-        self.assertTrue(backend.start(self.files, ROOT)['ready'])
+        self.assertTrue(backend.start(self.files, ROOT, network_time=False)['ready'])
 
     def test_real_login_and_account_save_survive_service_restart(self):
         csrf = self.csrf()
@@ -167,7 +167,7 @@ class RuntimeTests(unittest.TestCase):
             original = json.loads(row[0])
             original['gold_coin'] = 4321
             db.execute('UPDATE roles SET data=? WHERE account=?', (json.dumps(original), 'android_player'))
-        self.state = backend.start(self.files, ROOT, port=0)
+        self.state = backend.start(self.files, ROOT, port=0, network_time=False)
         self.port = self.state['port']
         resumed = json.loads(self.request('/local-auth', {'action': 'resume'}, self.csrf(), cookie)[2])
         self.assertTrue(resumed['ok'])
@@ -182,7 +182,7 @@ class RuntimeTests(unittest.TestCase):
         database.write_bytes(b'broken-save-must-not-be-replaced')
         before = hashlib.sha256(database.read_bytes()).hexdigest()
         with self.assertRaisesRegex(RuntimeError, 'not a database'):
-            backend.start(self.files, ROOT, port=0)
+            backend.start(self.files, ROOT, port=0, network_time=False)
         self.assertEqual(hashlib.sha256(database.read_bytes()).hexdigest(), before)
 
 

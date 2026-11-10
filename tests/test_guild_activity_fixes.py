@@ -30,13 +30,13 @@ class GuildActivityFixTests(unittest.TestCase):
         self.assertEqual(bool(errors),not ok,errors)
         return [login_fields(d['data']) for m,_,d in replies if m==1301]
 
-    def test_pet_calendar_is_open_on_all_seven_days(self):
+    def test_trials_open_daily_but_adoption_only_on_weekends(self):
         r=self.b.guild_rules
-        self.assertFalse(r['train_weekend_only']);self.assertFalse(r['lucky_weekend_only']);self.assertTrue(r['hunt_weekend_open'])
+        self.assertFalse(r['train_weekend_only']);self.assertTrue(r['lucky_weekend_only']);self.assertTrue(r['hunt_weekend_open'])
         for day in range(7):
             self.now=FRIDAY+day*86400
             info=self.req(79)[-1]
-            self.assertEqual(info['result'],61)
+            self.assertIn(info['result'],(61,41))  # Adoption may reduce residents below 240.
             self.assertGreater(info['last_time'],self.now)
             self.assertLessEqual(info['last_time']-self.now,86400)
             self.assertEqual(len(self.req(83)[-1]['union_task']),3)
@@ -44,8 +44,11 @@ class GuildActivityFixTests(unittest.TestCase):
             self.assertGreater(deadline,self.now)
             self.assertLessEqual(deadline-self.now,86400)
             self.assertEqual((deadline+r['timezone_offset_hours']*3600)%86400,0)
-        self.req(89)
-        self.assertEqual(self.b.profile()['guild']['instances']['lucky_week_used'],1)
+            if day in (1,2):
+                self.req(89)
+            else:
+                before=self.b.profile();self.req(89,ok=False)
+                self.assertEqual(self.b.profile(),before)
 
     def test_escort_claim_survives_reconnect_and_other_road(self):
         self.req(69,flag=6,road_type=2,book_level=1,des_id=0)
@@ -100,13 +103,16 @@ class GuildActivityFixTests(unittest.TestCase):
         fighters=list(map(int,self.b.profile()['guild']['instances']['team']['members']))
         for floor in range(1,4):
             with patch('network_redirect.guild_instances.simulate',return_value=(1,[],{})):
-                self.req(41,fight_list=fighters)
+                settled=self.req(41,fight_list=fighters)[-1]
+            self.assertEqual((settled['free_times'],settled['search_free_times']),(3,floor*5))
+            self.assertEqual(settled['search_per_layer'],5)
             info=self.req(44)[-1]['team']
             self.assertEqual((info['max_layer'],info['cleared_layer'],info['fight_count']),(3,floor,floor))
             self.assertEqual(info['can_continue'],floor<3)
             self.assertEqual(info['last_search_time'],self.now)
             result=self.req(43,flag=1)[-1]
             self.assertEqual((result['free_times'],result['earned_search_times']),(floor*5,floor*5))
+            self.assertEqual((result['max_free_times'],result['daily_search_limit']),(floor*5,15))
             self.req(42)  # Replay is read-only, never another layer/quota grant.
             self.assertEqual(self.req(43,flag=1)[-1]['free_times'],floor*5)
         before=self.b.profile();self.req(41,ok=False,fight_list=fighters);self.assertEqual(before,self.b.profile())
@@ -119,11 +125,27 @@ class GuildActivityFixTests(unittest.TestCase):
         self.req(28,role_list=applicants[:2])
         fighters=list(map(int,self.b.profile()['guild']['instances']['team']['members']))
         with patch('network_redirect.guild_instances.simulate',return_value=(4,[],{})):
-            self.req(41,fight_list=fighters)
+            settled=self.req(41,fight_list=fighters)[-1]
+        self.assertEqual((settled['cleared_layer'],settled['search_free_times']),(0,0))
         info=self.req(44)[-1]['team']
         self.assertEqual((info['cleared_layer'],info['fight_count']),(0,1))
         self.assertTrue(info['can_continue'])
         self.assertEqual(self.req(43,flag=1)[-1]['free_times'],0)
+
+    def test_settlement_and_replay_quota_after_spending_then_winning(self):
+        self.req(26)
+        applicants=list(map(int,self.b.profile()['guild']['instances']['team']['applications']))
+        self.req(28,role_list=applicants[:2])
+        fighters=list(map(int,self.b.profile()['guild']['instances']['team']['members']))
+        with patch('network_redirect.guild_instances.simulate',return_value=(1,[],{})):
+            self.req(41,fight_list=fighters)
+            self.req(43,flag=2);self.req(43,flag=2)
+            settled=self.req(41,fight_list=fighters)[-1]
+        self.assertEqual((settled['search_free_times'],settled['earned_search_times'],settled['search_count']),(8,10,2))
+        replay=self.req(42)[-1]
+        self.assertEqual((replay['search_free_times'],replay['cleared_layer']),(8,2))
+        self.assertEqual(self.req(44)[-1]['team']['search_free_times'],8)
+        self.assertEqual(self.req(43,flag=1)[-1]['free_times'],8)
 
     def test_legacy_search_board_replaces_obsolete_rewards_without_regranting(self):
         from network_redirect import daily

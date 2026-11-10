@@ -1,4 +1,8 @@
-"""Persistent offline game time. Wall time is only an unverified first anchor.
+"""Persistent game time with HTTPS consensus in production entry points.
+
+Policy 3 uses trusted UTC for display and a settlement high-water mark. Policy 2
+is retained for old standalone analysis/test callers with no network service;
+an already migrated clock never downgrades when the service is unavailable.
 
 A separate journal is committed BEFORE gameplay; failed requests cannot roll it
 back. No rewards live here. Role balances and settlement receipts retain their
@@ -25,8 +29,10 @@ import uuid
 _context = ContextVar('game_clock', default=None)
 _PROCESS_BOOT = 'process:' + uuid.uuid4().hex
 _android_boot = None
-# Wall time is diagnostic only; it must never advance reward time.
+# Pure offline policy: ordinary reboot gaps are accepted, not authenticated.
 WALL_JUMP_TOLERANCE = 5 * 60
+MAX_OFFLINE_GAP = 30 * 86400
+DEFERRED_MESSAGE = '检测到时间校准或异常离线间隔，该间隔暂未补算；游戏可继续，请检查系统日期。'
 
 
 def configure_android(files_dir):
@@ -87,7 +93,7 @@ class SystemSource:
             identity = _mac_boot_identity()
             self.boot_id = 'mac:' + identity if identity else _PROCESS_BOOT
         else:
-            # Conservative fallback: no cross-process offline credit.
+            # No continuous identity: restart credit uses the bounded wall policy.
             self.elapsed = time.monotonic
             self.boot_id = _PROCESS_BOOT
         self.elapsed()  # Fail closed if the promised continuous source is absent.
@@ -124,11 +130,14 @@ def legacy_floor(db):
 
 
 class GameClock:
-    def __init__(self, directory, *, source=None, legacy_db=None):
-        self.source = source or SystemSource()
+    def __init__(self, directory, *, source=None, legacy_db=None, network_time=None):
+        self.source = source or (network_time.source if network_time else SystemSource())
+        self.network_time = network_time
+        self.display_time = None
         self.path = str((Path(directory) / 'clock.sqlite3').resolve())
         existed = Path(self.path).exists()
         self.quarantined = False
+        self.notice = None
         self.db = sqlite3.connect(self.path, timeout=10)
         try:
             os.chmod(self.path, 0o600)
@@ -160,6 +169,9 @@ class GameClock:
                     state = dict(version=1, boot=self.source.boot_id, elapsed=elapsed,
                                  game=initial, status='initial_unverified', legacy_floor=floor,
                                  wall_reference=wall, wall_elapsed=elapsed, wall_seen=wall)
+                    if network_time is not None:
+                        # No gameplay has observed this unverified wall anchor.
+                        state.update(policy_version=3, settlement_floor=floor)
                     self._write(state)
             self.sample()
         except BaseException:
@@ -207,6 +219,8 @@ class GameClock:
                     raise RuntimeError('可信时钟校验记录缺失，请恢复完整备份')
                 # One-time upgrade of the previous clock schema, no guilt inferred.
                 self._write(state)
+            if self.network_time is not None or state.get('policy_version') == 3:
+                return self._network_sample(state, wall, elapsed)
             same_boot = state['boot'] == self.source.boot_id and elapsed >= state['elapsed']
             wall_keys = ('wall_reference', 'wall_elapsed', 'wall_seen')
             missing_baseline = not any(key in state for key in wall_keys)
@@ -214,32 +228,151 @@ class GameClock:
                     type(state.get(key)) in (int, float) and math.isfinite(state[key])
                     and state[key] >= 0 for key in wall_keys):
                 raise RuntimeError('Invalid wall-clock observation record')
-            dirty = missing_baseline
-            if not missing_baseline and not state.get('quarantined'):
-                # Keep one baseline per boot, so small repeated edits accumulate.
-                expected_wall = state['wall_reference'] + elapsed - state['wall_elapsed']
-                deviation = wall - (expected_wall if same_boot else state['wall_seen'])
-                # Across reboots, forward gaps cannot be distinguished from a
-                # normal shutdown offline. Backward movement is still observable.
-                if ((same_boot and abs(deviation) > WALL_JUMP_TOLERANCE) or
-                        (not same_boot and deviation < -WALL_JUMP_TOLERANCE)):
-                    state.update(quarantined=True, wall_anomaly=dict(
-                        direction='forward' if deviation > 0 else 'backward',
-                        deviation=deviation, observed=wall))
-                    dirty = True
+            dirty = missing_baseline or state.get('policy_version') != 2
+            state['policy_version'] = 2
+            delta = elapsed - state['elapsed'] if same_boot else 0
+
+            def defer(reason, seconds, *, active):
+                nonlocal dirty
+                state['notice_serial'] = state.get('notice_serial', 0) + 1
+                state['deferred_gap'] = dict(id=state['notice_serial'], reason=reason,
+                    seconds=seconds, observed=wall, game=state['game'], status='uncredited')
+                state['deferred_history'] = (state.get('deferred_history', []) +
+                                             [state['deferred_gap']])[-16:]
+                state['wall_untrusted'] = active
+                dirty = True
+
+            if not missing_baseline:
+                if same_boot:
+                    # Keep the baseline fixed: incremental edits accumulate.
+                    # Continuous time remains usable even while wall time is suspect.
+                    deviation = wall - (state['wall_reference'] + elapsed - state['wall_elapsed'])
+                    if abs(deviation) > WALL_JUMP_TOLERANCE:
+                        if not state.get('wall_untrusted'):
+                            defer('wall_discontinuity', deviation, active=True)
+                    elif state.get('wall_untrusted'):
+                        state['wall_untrusted'] = False
+                        dirty = True
+                else:
+                    gap = wall - state['wall_seen']
+                    # Never turn an already deferred adjustment into a reboot reward.
+                    if state.get('wall_untrusted'):
+                        defer('restart_after_discontinuity', gap, active=False)
+                    elif gap < -WALL_JUMP_TOLERANCE or gap > MAX_OFFLINE_GAP:
+                        defer('backward_reboot' if gap < 0 else 'long_offline_gap', gap, active=False)
+                    elif not state.get('quarantined'):
+                        delta = max(0, gap)
             if missing_baseline or not same_boot:
                 # Upgrade existing saves without treating their dates as proof.
                 state.update(wall_reference=wall, wall_elapsed=elapsed, wall_seen=wall)
             self.quarantined = bool(state.get('quarantined'))
-            game = state['game'] + (elapsed - state['elapsed'] if same_boot else 0)
+            # Preserve old quarantines: historical records do not reliably prove
+            # whether a wall anomaly was the only cause. No blanket unblocking.
+            self.notice = state.get('deferred_gap')
+            game = state['game'] + delta
             # At most one journal write per game second during normal requests.
             # Retain fractional remainder; do not truncate each interval.
             if dirty or not same_boot or int(game) != int(state['game']):
                 state.update(game=game, elapsed=elapsed, boot=self.source.boot_id,
-                             status='continuous' if same_boot else 'restart_gap_discarded',
-                             wall_seen=max(state['wall_seen'], wall))
+                             status='continuous' if same_boot else (
+                                 'offline_credited' if delta > 0 else 'restart_reanchored'),
+                             wall_seen=wall)
                 self._write(state)
+            self.display_time = int(game)
             return int(game)
+
+    def _network_sample(self, state, wall, elapsed):
+        """Called under the journal transaction; network work never holds its lock.
+
+        Display follows authenticated consensus. Settlement has a high-water
+        mark so correcting a future save cannot reopen a previously paid period.
+        """
+        from . import network_time
+        previous = dict(state)
+        same_boot = state['boot'] == self.source.boot_id and elapsed >= state['elapsed']
+        if state.get('policy_version') != 3:
+            state.update(policy_version=3, settlement_floor=state['game'])
+        floor = state['settlement_floor']
+        if type(floor) not in (int, float) or not math.isfinite(floor) or floor < 0:
+            raise RuntimeError('Invalid settlement high-water mark')
+        game = state['game'] + (elapsed - state['elapsed'] if same_boot else 0)
+        trusted = state.get('network_anchor')
+        fresh = False
+        observation = None
+        if self.network_time is not None:
+            self.network_time.request()
+            observation = self.network_time.read()
+        if (observation is not None and observation.boot == self.source.boot_id
+                and 0 <= elapsed - observation.elapsed <= 30
+                and observation.token != (trusted or {}).get('token')
+                and len(set(observation.hosts)) >= 2
+                and set(observation.hosts) <= set(network_time.HOSTS)
+                and math.isfinite(observation.epoch) and 1577836800 <= observation.epoch <= 4102444800
+                and math.isfinite(observation.uncertainty) and 0 <= observation.uncertainty <= 10):
+            game = observation.epoch + elapsed - observation.elapsed
+            offset = wall - game
+            baseline = state.get('trusted_wall_offset')
+            diagnostic = state.get('wall_diagnostic')
+            wall_changed = bool(diagnostic and (
+                diagnostic['boot'] != self.source.boot_id or
+                abs(wall - diagnostic['wall'] - (elapsed - diagnostic['elapsed'])) > WALL_JUMP_TOLERANCE))
+            # First verification establishes a baseline; existing date errors are
+            # not evidence of cheating. Automatic corrections toward real UTC
+            # and VM pauses with a correct wall date must not be punished.
+            if (baseline is not None and wall_changed and abs(offset) > WALL_JUMP_TOLERANCE
+                    and abs(offset) - abs(baseline) > WALL_JUMP_TOLERANCE):
+                state.update(quarantined=True, wall_anomaly=dict(
+                    reason='network_confirmed_wall_change', deviation=offset - baseline,
+                    observed=wall, trusted=game, hosts=list(observation.hosts)))
+            predicted = state['game'] + (elapsed - state['elapsed'] if same_boot else 0)
+            server_correction = same_boot and not wall_changed and abs(game - predicted) > WALL_JUMP_TOLERANCE
+            if baseline is None or abs(offset) < abs(baseline) or server_correction:
+                state['trusted_wall_offset'] = offset
+                state['wall_diagnostic'] = dict(wall=wall, elapsed=elapsed, boot=self.source.boot_id)
+            elif (not same_boot or (wall_changed and abs(offset) <= WALL_JUMP_TOLERANCE
+                                    and abs(game - predicted) > WALL_JUMP_TOLERANCE)):
+                # A verified VM pause is a new continuous-observation baseline.
+                state['wall_diagnostic'] = dict(wall=wall, elapsed=elapsed, boot=self.source.boot_id)
+            state['network_anchor'] = dict(epoch=observation.epoch, elapsed=observation.elapsed,
+                boot=observation.boot, hosts=list(observation.hosts), token=observation.token,
+                uncertainty=observation.uncertainty)
+            state.update(wall_reference=wall, wall_elapsed=elapsed, wall_seen=wall,
+                         wall_untrusted=False, status='network_synchronized')
+            fresh = True
+            trusted = state['network_anchor']
+        elif not same_boot:
+            state['status'] = 'network_required_after_restart'
+            state.update(wall_reference=wall, wall_elapsed=elapsed, wall_seen=wall)
+        # Failed requests do not remove trusted anchors or persistent punishment.
+        # No wall-clock gap is credited, including before the first network sync.
+        uncertain = (not trusted or trusted['boot'] != self.source.boot_id
+                     or state.get('status') == 'network_required_after_restart')
+        if not fresh and same_boot and trusted:
+            wall_expected = state.get('wall_reference', wall) + elapsed - state.get('wall_elapsed', elapsed)
+            if abs(wall - wall_expected) > WALL_JUMP_TOLERANCE:
+                state['wall_untrusted'] = True
+                if self.network_time is not None:
+                    self.network_time.request(force=True)
+        self.quarantined = bool(state.get('quarantined'))
+        self.display_time = int(game)
+        settlement = max(floor, game)
+        if uncertain or state.get('wall_untrusted'):
+            self.notice = dict(id='network-unavailable', message=network_time.WAIT_MESSAGE)
+        elif floor - game > 5:
+            self.notice = dict(id='future-settlement', message=network_time.FUTURE_MESSAGE)
+        else:
+            self.notice = None
+        state.update(game=game, settlement_floor=settlement, elapsed=elapsed, boot=self.source.boot_id)
+        # Preserve subsecond anchors without rewriting a journal on every query.
+        if (fresh or not same_boot or int(game) != int(previous['game'])
+                or any(state.get(key) != previous.get(key) for key in
+                       ('policy_version', 'wall_untrusted', 'quarantined', 'status'))):
+            self._write(state)
+        return int(settlement)
+
+    def request_network_sync(self):
+        if self.network_time is not None:
+            self.network_time.request(force=True)
 
     def close(self):
         self.db.close()
@@ -252,13 +385,19 @@ def now():
     return context[1] if context is not None else int(time.time())
 
 
+def display_now():
+    context = _context.get()
+    return context[2] if context is not None else now()
+
+
 @contextmanager
 def scope(clock):
     context = _context.get()
     if context is not None and context[0] == clock.path:
         yield context[1]
         return
-    token = _context.set((clock.path, clock.sample()))
+    value = clock.sample()
+    token = _context.set((clock.path, value, getattr(clock, 'display_time', None) or value))
     try:
         yield _context.get()[1]
     finally:

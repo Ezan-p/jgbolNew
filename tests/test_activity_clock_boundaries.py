@@ -140,17 +140,54 @@ class ActivityClockBoundaryTests(unittest.TestCase):
         self.assertEqual(role['activity']['babel']['life'], 100)
         self.assertFalse(role['time_guard']['blocked'])
 
-    def test_device_reboot_does_not_invent_offline_day_or_freeze_future_progress(self):
+    def test_reboot_crosses_week_once_and_preserves_settlement_after_reopen(self):
         before = self.exhaust()
+        old_week = before['activity']['nine_sky']['start']
+        self.backend.close()
+        self.clock.close()
         self.source.boot_id = 'rebooted-device'
         self.source.seconds = 900000
         self.source.wall_seconds += 7 * 86400
+        self.clock = game_clock.GameClock(self.path, source=self.source)
+        self.addCleanup(self.clock.close)
+        self.backend = Backend(self.path, 0, lambda *a, **k: None, clock=self.clock)
         self.heartbeat()
-        role = self.backend.profile()
-        for key in ('nine_sky', 'babel'):
-            self.assertEqual(role['activity'][key], before['activity'][key])
-        self.source.advance(1)
-        self.heartbeat()
-        role = self.backend.profile()
+        role = self.backend.snapshot()
+        self.assertEqual(role['server_time'], self.initial + 7 * 86400)
         self.assertEqual(role['activity']['nine_sky']['free_times'], 5)
+        self.assertEqual(role['activity']['nine_sky']['stars'], 0)
         self.assertEqual(role['activity']['babel']['life'], 100)
+        key = f'nine-sky-recycle-{old_week}'
+        self.assertEqual(role['welfare']['mails'][key]['prizes'], [[5, 1001, 51, 1]])
+        self.backend.close()
+        self.clock.close()
+        self.clock = game_clock.GameClock(self.path, source=self.source)
+        self.addCleanup(self.clock.close)
+        self.backend = Backend(self.path, 0, lambda *a, **k: None, clock=self.clock)
+        self.heartbeat()
+        repeated = self.backend.snapshot()
+        for field in ('server_time', 'welfare'):
+            self.assertEqual(repeated[field], role[field])
+        for field in ('nine_sky', 'babel'):
+            self.assertEqual(repeated['activity'][field], role['activity'][field])
+
+    def test_food_weekly_settlement_uses_game_clock_and_restarts_without_duplicates(self):
+        from network_redirect import activity_seasonal as season, summon
+        role = self.backend.profile()
+        for tid in (1134, 1208):summon.add_item(role, tid, 11)
+        saved_week = season.state(role)['craft_weeks']['moon']['week']
+        self.backend.save(role)
+        # Small wall-clock edits do not advance the game's week.
+        self.source.wall_seconds += 60
+        self.heartbeat()
+        self.assertNotIn(f'moon-recycle-{saved_week}',self.backend.profile()['welfare'].get('mails',{}))
+        self.source.wall_seconds -= 60
+        self.advance_to('2026-11-09T00:00:00')
+        self.heartbeat()
+        role = self.backend.profile()
+        for name in ('moon','rice'):
+            self.assertEqual(role['welfare']['mails'][f'{name}-recycle-{saved_week}']['prizes'],[[5,1001,1,1]])
+        self.backend.close()
+        self.backend = Backend(self.path,0,lambda *a,**k:None,clock=self.clock)
+        self.heartbeat()
+        self.assertEqual(role['welfare']['mails'],self.backend.profile()['welfare']['mails'])

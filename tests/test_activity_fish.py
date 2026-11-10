@@ -24,7 +24,7 @@ class FishTests(ActivityCase):
 
     def test_preview_and_config_validation(self):
         data=self.status()
-        self.assertEqual(len(data['random_get_item']),9)
+        self.assertEqual(len(data['random_get_item']),12)
         self.assertEqual(len(data['exchange_data']),5)
         self.assertEqual(data['cost_gold_count'],100)
         self.assertTrue(data['local_permanent'])
@@ -83,12 +83,46 @@ class FishTests(ActivityCase):
         self.assertEqual(hits/sum(cfg['fish_pool_weights']),0.03)
         for n in (1,10):
             before=self.count(1031)
-            with patch.object(fish,'randbelow',side_effect=[0,99]*n):
+            with patch.object(fish,'randbelow',side_effect=[0,96]*n):
                 self.ok(self.req(1208,count=n,type_id=0))
             self.assertEqual(self.count(1031)-before,n)
             after=self.b.profile()
             self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
             self.assertEqual(self.b.profile(),after)
+
+    def test_new_souls_and_box_exact_probability_and_delivery(self):
+        self.status();cfg=self.b.activity_rules
+        expected={(10,5034):1,(5,1249):1,(10,5048):1}
+        counts=dict.fromkeys(expected,0)
+        tickets={}
+        for ticket in range(sum(cfg['fish_pool_weights'])):
+            with patch.object(fish,'randbelow',return_value=ticket):
+                reward=fish.draw(cfg['fish_pool'],cfg['fish_pool_weights'])
+            key=tuple(reward[:2])
+            if key in counts:
+                self.assertEqual(reward[2:],[1,1])
+                counts[key]+=1;tickets[key]=ticket
+        self.assertEqual(sum(cfg['fish_pool_weights']),100)
+        self.assertEqual(counts,expected)
+        for (typ,tid),ticket in tickets.items():
+            for n in (1,10):
+                with self.subTest(typ=typ,tid=tid,count=n):
+                    before=self.b.profile();items=self.count(tid)
+                    with patch.object(fish,'randbelow',side_effect=[0,ticket]*n):
+                        out=self.req(1208,count=n,type_id=0);self.ok(out)
+                    after=self.b.profile()
+                    if typ==10:
+                        self.assertEqual(after['souls'].get(str(tid),0)-before.get('souls',{}).get(str(tid),0),n)
+                        self.assertEqual(self.count(tid),items)
+                    else:
+                        self.assertEqual(self.count(tid)-items,n)
+                        self.assertEqual(after.get('souls',{}),before.get('souls',{}))
+                    rows=next(d for e,d in out if e==85)['item_list'].values()
+                    awarded=[x for x in rows if x['object_type']==typ and x['attach_type']==tid]
+                    self.assertEqual(len(awarded),n)
+                    self.assertTrue(all(x['attach_count']==1 for x in awarded))
+                    self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
+                    self.assertEqual(self.b.profile(),after)
 
     def test_price_upgrade_preserves_shop_quota_and_requires_40_koi(self):
         for tid,ticket in ((5034,90),(1246,95)):

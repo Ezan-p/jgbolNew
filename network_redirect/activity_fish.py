@@ -11,7 +11,7 @@ def validate(r):
     for key, minimum in (('fish_daily_nets', 0), ('fish_gold_per_net', 1), ('fish_recycle_peaches_per_koi', 1)):
         a.require(type(r.get(key)) is int and minimum <= r[key] <= 1000, '东海价格或赠网配置无效')
     pool, weights = r.get('fish_pool'), r.get('fish_pool_weights')
-    a.require(isinstance(pool, list) and len(pool) == 9, '东海道具池须含九种奖励')
+    a.require(isinstance(pool, list) and len(pool) == 12, '东海道具池须含十二种奖励')
     a.require(isinstance(weights, list) and len(weights) == len(pool) and
               all(type(w) is int and 0 < w <= 10000 for w in weights), '东海概率权重无效')
     def valid(p):
@@ -20,7 +20,8 @@ def validate(r):
                 (p[0] == 5 and p[1] in formation.ITEMS or p[0] == 10 and p[1] in summon.BASES
                  or p[0] == 12 and p[1] == 0))
     a.require(all(valid(p) for p in pool) and {(p[0],p[1]) for p in pool} ==
-              {(5,t) for t in (1020,1022,1023,1001,1006,1034,1033,1031)} | {(12,0)}, '东海道具奖励无效')
+              {(5,t) for t in (1020,1022,1023,1001,1006,1034,1033,1031,1249)} |
+              {(10,5034),(10,5048),(12,0)}, '东海道具奖励无效')
     koi = r.get('fish_koi_pool')
     a.require(isinstance(koi,list) and len(koi)==3 and all(isinstance(x,dict) for x in koi), '锦鲤池无效')
     a.require([x.get('count') for x in koi] == [2,3,5] and all(type(x.get('weight')) is int for x in koi)

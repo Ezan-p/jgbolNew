@@ -202,12 +202,16 @@ def fixed_accounts_class():
             return super().complete(request_serial, replies)
 
     class FixedAccounts(Accounts):
-        def __init__(self, directory, port, emit):
-            super().__init__(directory, port, emit)
-            fixed = TestBackend(directory, port, emit, account=ACCOUNT)
-            with game_clock.scope(fixed.clock) as now:
-                initialize(fixed, now)
+        def __init__(self, directory, port, emit, *, network_time=None):
+            super().__init__(directory, port, emit, network_time=network_time)
+            fixed = TestBackend(directory, port, emit, account=ACCOUNT, clock=self.base.clock)
             self.backends[ACCOUNT] = fixed
+            try:
+                with game_clock.scope(fixed.clock) as now:
+                    initialize(fixed, now)
+            except BaseException:
+                self.close()
+                raise
 
         def authenticate(self, data, remembered=''):
             return self.start_session(ACCOUNT)

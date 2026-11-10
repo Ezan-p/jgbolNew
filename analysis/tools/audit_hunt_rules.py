@@ -36,7 +36,7 @@ def main():
            'contour approximated from original alpha-mask silhouette;30px radius;right edge absorbing trap',
            'each colour independently adds rand_count with rand_weight/100 probability;positions uniform rejection sampling',
            'combo floor(base*min(100,10*(captured-1))/100);clear respawns board automatically',
-           '10 soul per energy;200 soul shop reset;six configurable goods;one equal-weight item per box',
+           '10 soul per energy;200 soul shop reset;six configurable goods;soul box equal weights x1;upgrade box weights17/6,essences x10,others x1',
            '29 NPC identities from project catalog;400..2400 daily deterministic scores;independent account leaderboard',
            'historical board retains best observed period;ties by role_id;no score for cards or spending',
            'lazy settlement on login/activity;missed unclaimed weekly rewards become permanent mail;no inactive-day awards'],

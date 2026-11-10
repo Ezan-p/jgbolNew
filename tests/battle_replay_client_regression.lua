@@ -23,6 +23,17 @@ local ms={d_event_mgr={callback_fight_extra_logic=nativeEvents},d_fightUI={actFi
  d_u={createByStyle=create,playSoundEffect=sound},d_alert={stop_wait=function() stopped=stopped+1 end},
  d_info={show=function(message) errors[#errors+1]=message end}}
 local fight=ms.d_fightUI
+local attacks={}
+fight.showFightDetailStepByStep=function()
+ fight.g_fightUI.iAttackStep=fight.g_fightUI.iAttackStep+1
+end
+local nativeAttack=function(action,marker)
+ attacks[#attacks+1]={action=action,marker=marker}
+ fight.g_fightUI.iAttackStepNoBuff=fight.g_fightUI.iAttackStepNoBuff+1
+ fight.showFightDetailStepByStep()
+ return 'attack'
+end
+fight.showSingleAttackEffect=nativeAttack
 local nativeResult=function(head,data) received[#received+1]={result=data};return data end
 ms.d_event_mgr.fight_result_1027=nativeResult
 ms.d_event_mgr.special_fight_result_1140=nativeResult
@@ -74,6 +85,36 @@ local function preload(key,value,fid)
 end
 check('idempotent_installation',function()
  local handler=ms.d_event_mgr.callback_fight_extra_logic;assert(loadstring(source))();assert(handler==ms.d_event_mgr.callback_fight_extra_logic)
+end)
+check('both_sides_healing_slots_do_not_play_zero_damage_attacks',function()
+ for _,logic in ipairs({101101,102101}) do
+  local state=fight.g_fightUI
+  state.iAttackStep=1;state.iAttackStepNoBuff=0;attacks={};character.hp=100
+  for _,side in ipairs({true,false}) do
+   ms.d_skillExt.showSkillExt({logic_type=logic,skill_result_list={{field=65,field_plus=20}}})
+   fight.showSingleAttackEffect({skill_type=1,self_use=true,is_src=side,
+    src_order=1,des_order=1,damage_list={0,0}})
+  end
+  assert(character.hp==140 and #attacks==0)
+  assert(state.iAttackStep==3 and state.iAttackStepNoBuff==2)
+  for _,side in ipairs({true,false}) do
+   local action={skill_type=1,self_use=false,is_src=side,src_order=1,des_order=1,damage_list={100,0}}
+   assert(fight.showSingleAttackEffect(action,'forwarded')=='attack')
+   assert(attacks[#attacks].action==action and attacks[#attacks].marker=='forwarded')
+  end
+  assert(#attacks==2 and state.iAttackStep==5 and state.iAttackStepNoBuff==4)
+ end
+ character.hp=100
+end)
+check('real_zero_damage_attacks_and_other_skills_still_play',function()
+ for _,action in ipairs({
+  {skill_type=1,self_use=false,src_order=1,des_order=1,damage_list={0}},
+  {skill_type=1,self_use=true,src_order=1,des_order=1,damage_list={0,30}},
+  {skill_type=6,self_use=true,src_order=1,des_order=1,damage_list={0}},
+  {skill_type=22,self_use=true,src_order=1,des_order=1,damage_list={0}}
+ }) do
+  assert(fight.showSingleAttackEffect(action)=='attack')
+ end
 end)
 check('all_event_chunks_merge_once_in_index_order',function()
  local data={fight_id=17,[1]={cur_action=1,speak='吸血'},[2]={cur_action=2,speak='复活'}}
@@ -274,7 +315,9 @@ check('all_references_resolve_before_bounded_cache_is_trimmed',function()
  local value=table.loadstring(encode({_local_replay_id='many-response'}));for i=1,70 do assert(value[i].value==i) end
 end)
 check('unload_restores_original_functions',function()
+ assert(fight.showSingleAttackEffect~=nativeAttack)
  ms._localBattleReplayRestore()
+ assert(fight.showSingleAttackEffect==nativeAttack)
  assert(not ms._localBattleReplayRestore and table.loadstring==loadData)
  assert(fight.actFight==nativeFight and fight.showFightEnd==nativeEnd and ms.d_event_mgr.callback_fight_extra_logic==nativeEvents)
  assert(ms.d_event_mgr.g_msg_fun[1027]==nativeResult and ms.d_event_mgr.g_msg_fun[1140]==nativeResult)

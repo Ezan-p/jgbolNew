@@ -1,7 +1,7 @@
 """太虚血战: original arenaUI/event 199 contract, local NPC tournament.
 
 A session advances explicitly through qualification, practice and three blood
-stages. NPC identities and combat builds come from players/catalog.json.
+stages. NPC identities and combat builds come from the shared player catalogs.
 """
 import copy
 import hashlib
@@ -28,11 +28,26 @@ def group_for(level):
 def select_roster(group, day):
     a.require(FIRST_GROUP <= group < FIRST_GROUP+len(rules()['arena_groups']), '血战分组无效')
     lo, hi = rules()['arena_groups'][group-FIRST_GROUP]
-    pool = [e for e in npc_players.catalog().values() if lo <= e['profile']['level'] <= hi]
-    a.require(len(pool) >= rules()['arena_size']-1, '本地NPC库不足以组成血战分组')
-    # Stratify by power, so each bracket includes attainable and aspirational opponents.
+    day = week_start(day)
+    eligible = [e for e in npc_players.catalog().values() if lo <= e['profile']['level'] <= hi]
+    # Reserve the strongest actual builds in every level group, regardless of tier.
+    eligible.sort(key=lambda e: (e['profile']['role_combat_power'], e['npc_id']))
+    top_count = rules()['arena_top_power_count']
+    a.require(len(eligible) >= top_count, '本地NPC库不足以组成血战前列')
+    result = [e['npc_id'] for e in eligible[-top_count:]]
+    reserved = set(result)
+    pool = [e for e in eligible if e['profile']['tier'].startswith('T') and e['npc_id'] not in reserved]
+    count = rules()['arena_size']-1-top_count
+    result.extend(sample_power_bands(pool, count, group, day))
+    # Qualification starts strongest first (new_season reverses this list).
+    return sorted(result, key=lambda key: (npc_players.catalog()[key]['profile']['role_combat_power'], key))
+
+
+def sample_power_bands(pool, count, group, day):
+    a.require(len(pool) >= count, '本地NPC库不足以组成血战分组')
+    # Keep ordinary opponents spread across absolute power, without player scaling.
     pool.sort(key=lambda e: (e['profile']['role_combat_power'], e['npc_id']))
-    count = rules()['arena_size']-1; result = []
+    result = []
     for i in range(count):
         band = pool[i*len(pool)//count:(i+1)*len(pool)//count]
         chosen = min(band, key=lambda e: hashlib.sha256(f"{day}:{group}:{e['npc_id']}".encode()).digest())

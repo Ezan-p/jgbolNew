@@ -1,0 +1,92 @@
+Verified baseline v111 installed
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+Waiting for old-v111-attempt-1 runtime
+old-v111-attempt-1 packaged runtime and native engine ready
+Replacement installing refreshed v111
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-1 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Waiting for new-v111-attempt-2 runtime
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v111_ten_updates_device.py", line 122, in <module>
+    main()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v111_ten_updates_device.py", line 102, in main
+    checked_start('new-v111', current['program_sha256'])
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v111_ten_updates_device.py", line 50, in checked_start
+    start(label+'-attempt-'+str(attempt+1),program_hash)
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v111_ten_updates_device.py", line 36, in start
+    assert not any(s in logs for s in ('Offline startup failed', 'native_install_failed:', 'offline_lua_error:')), logs
+AssertionError: --------- beginning of main
+--------- beginning of system
+11-10 04:33:44.682  2803  2824 E JGBOffline: Offline startup failed
+11-10 04:33:44.682  2803  2824 E JGBOffline: java.lang.RuntimeException: Traceback (most recent call last):
+11-10 04:33:44.682  2803  2824 E JGBOffline:   File "<string>", line 12, in <module>
+11-10 04:33:44.682  2803  2824 E JGBOffline:   File "/data/user/0/com.sygame.jingubang.p360/files/program/d4bc09de1fa6b7845e4e4bbf7203d22cffbecc935790db8d35e3761edf0e9cb3/offline_android/backend.py", line 221, in start
+11-10 04:33:44.682  2803  2824 E JGBOffline:     raise TimeoutError('Offline game service did not become ready')
+11-10 04:33:44.682  2803  2824 E JGBOffline: TimeoutError: Offline game service did not become ready
+11-10 04:33:44.682  2803  2824 E JGBOffline: 
+11-10 04:33:44.682  2803  2824 E JGBOffline: 	at com.jgbol.offline.PythonBridge.start(Native Method)
+11-10 04:33:44.682  2803  2824 E JGBOffline: 	at com.jgbol.offline.OfflineRuntime$1.run(OfflineRuntime.java:40)
+11-10 04:33:44.682  2803  2824 E JGBOffline: 	at java.lang.Thread.run(Thread.java:818)
+

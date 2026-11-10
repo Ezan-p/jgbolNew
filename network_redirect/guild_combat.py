@@ -105,24 +105,34 @@ def simulate(role,s,r,jrules,ft,name,hp=None,*,enemy_npc=None,ally_roles=None,ac
         # Normalize random identities so every later floor is strictly harder.
         units[1][0].update(hp=trial['hp'],max_hp=trial['hp'],gongji=trial['attack'],fangyu=trial['defense'],magic=trial['magic'])
     if ft==27:
-        boost=s.get('instances',{}).get('train_support',0)*r['train_support_percent']
+        boost=guild_trial.support_info(s.get('instances',{}),r)['support_bonus_percent']
         for unit in units[0]:
             for key in ('hp','max_hp','gongji','fangyu','magic'):unit[key]=unit[key]*(100+boost)//100
-    sources=[];battle_owner=actor
+    sources=[];battle_owner=actor;secret_difficulty=None
     if ally_roles:
         allies,sources,power=joint_units(ally_roles)
         units=(allies,units[1])
         battle_owner=dict(role_id=role['role_id'],level=role['level'],corteges=[],attachments=[])
-        if enemy_npc is None:
+        if enemy_npc is None and ft!=15:
             a=s.setdefault('instances',{});floor=str(a.get('layer',0))
             opponents=a.setdefault('team_opponents',{})
             if floor not in opponents:
                 opponents[floor]=choose_enemy(role,s,power=power,layer=a.get('layer',0),excluded=[v['role_id'] for v in ally_roles])
             enemy_npc=opponents[floor]
+    if ft==15 and enemy_npc is None:
+        from . import guild_secret
+        enemy_npc=guild_secret.choose(role,s,r,[v['role_id'] for v in (ally_roles or [role])])
+        a=s['instances']
+        a.setdefault('team_opponents',{})[str(a.get('layer',0))]=enemy_npc
     if enemy_npc is not None:
         enemy=npc_players.get(enemy_npc);u.require(enemy is not None,'仙盟NPC阵容不存在')
         units=(units[0],player_units(enemy['role']))
         name=enemy['role']['role_name']
+        if ft==15:
+            from . import guild_secret
+            floor=min(r['team_daily'],s.get('instances',{}).get('layer',0)+1)
+            secret_difficulty=guild_secret.scale(units[1],role['level'],floor,r)
+            name=f'秘境第{floor}层·{name}'
     if ft==15 and s.get('feast_fam_rate',0):
         for unit in units[0]:
             for key in ('hp','max_hp','gongji','fangyu','magic'):unit[key]=unit[key]*(100+s['feast_fam_rate'])//100
@@ -132,8 +142,12 @@ def simulate(role,s,r,jrules,ft,name,hp=None,*,enemy_npc=None,ally_roles=None,ac
         bonus=min(100,sum(pet_power(p) for p in pets(a))//100)
         for unit in units[0]:
             for key in ('hp','max_hp','gongji','fangyu','magic'):unit[key]=unit[key]*(100+bonus)//100
-    if hp is not None:units[1][0].update(hp=hp,max_hp=trial['hp'] if trial else hp)
+    if hp is not None and not trial:units[1][0].update(hp=hp,max_hp=hp)
     result,lineup,actions=journey.battle(battle_owner,{},jrules,units=units,slots=8)
+    if trial and actions.final_hp[2][1]>0:
+        # Generic combat compares surviving HP at round 30. A trial requires
+        # killing the boss: emit defeat before building packets AND replay.
+        result=4
     s['fight_id']=s.get('fight_id',0)+1;fid=s['fight_id']
     lineup_packet=encode(1028,dict(fight_id=fid,first_hand=1,des_name=name,lineup_count=len(lineup),lineup=lineup))
     result_fields=dict(fight_id=fid,fight_type=ft,final_result=result,fight_round=len(actions),fight_result=actions)
@@ -141,11 +155,15 @@ def simulate(role,s,r,jrules,ft,name,hp=None,*,enemy_npc=None,ally_roles=None,ac
     replay=dict(line_up_msg=decode(lineup_packet)[2],fight_result_msg=battle_replay.result_message(result_fields),
         fight_events=journey.combat_engine.event_data(actions,fid),damage_total=journey.combat_engine.total_damage(actions))
     if sources:replay['participants']=sources
+    if secret_difficulty:replay['secret_difficulty']=secret_difficulty
     if enemy_npc is not None:replay['enemy_npc']=enemy['npc_id']
     if actor_role is not None:replay['actor_role_id']=actor['role_id']
     if trial:
+        replay['trial_support']=guild_trial.support_info(s['instances'],r)
         replay['trial_boss']=dict(trial,floor=s['instances']['train_floor'])
         replay['boss_remaining_hp']=actions.final_hp[2][1]
+        replay['battle_rounds']=actions.rounds
+        replay['stop_reason']=actions.stop_reason
     return result,journey.combat_engine.event_packets(actions,fid)+packets,replay
 
 

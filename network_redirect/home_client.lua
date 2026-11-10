@@ -4,6 +4,8 @@ do
  local ui=ms and ms.d_homeUI
  if ui and not ui._localHomeRestore then
   local oldResult,oldRest,oldActivity=ui.onGetResult,ui.getRestDay,ui.hasActivity
+  local oldHCJ=ui.showHCJ
+  local oldPet=ui.showPet
   local textIndex,textOriginal
   if ui.showHolePlan and debug and debug.getupvalue then
    for i=1,100 do
@@ -32,6 +34,12 @@ do
    return oldRest(kind,...)
   end
   ui.onGetResult=function(op,data,...)
+   -- Native scale success refreshes its buttons inside oldResult, but only
+   -- copies level/point. Install the new stage before that refresh runs.
+   if op==26 and data and data.result==1 and data.upgrade_info and ui.g_data then
+    ui.g_data.base_data=ui.g_data.base_data or {}
+    ui.g_data.base_data.upgrade_info=data.upgrade_info
+   end
    local result=oldResult(op,data,...)
    if data and data.result==1 then
     if op==5 and ui.g_data then
@@ -53,8 +61,33 @@ do
    end
    return result
   end
+  if oldHCJ then
+   ui.showHCJ=function(...)
+    local base=ui.g_data and ui.g_data.base_data
+    if base and base.upgrade_info and base.upgrade_info.is_max_scale then return end
+    return oldHCJ(...)
+   end
+  end
+  if oldPet then
+   ui.showPet=function(...)
+    local create=ms.d_u.createMenu
+    ms.d_u.createMenu=function(styles,...)
+     -- Native 1205/1263 skill entry only displays the unfinished-feature tip.
+     for _,button in ipairs(styles) do
+      if button.npic=='v2/homeUI/pet_skill1.png' then button.visible=false end
+     end
+     return create(styles,...)
+    end
+    local ok,result=pcall(oldPet,...)
+    ms.d_u.createMenu=create
+    if not ok then error(result,0) end
+    return result
+   end
+  end
   ui._localHomeRestore=function()
    ui.onGetResult=oldResult;ui.getRestDay=oldRest;ui.hasActivity=oldActivity
+   ui.showHCJ=oldHCJ
+   ui.showPet=oldPet
    if textIndex then debug.setupvalue(ui.showHolePlan,textIndex,textOriginal) end
    ui._localHomeRestore=nil
   end

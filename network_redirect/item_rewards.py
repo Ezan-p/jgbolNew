@@ -13,7 +13,7 @@ NAMES = {int(r['Ftype_id']): r for r in summon.rows('item_name.csv')}
 SPECIAL = frozenset([1031, 1032, 1033, 1034, 1037, 1120, 1121, 1243, 1249, 1324, 1346,
                      1367, 1368, 1808, *range(1101, 1111), *range(1213, 1218)])
 # Same main_type does not imply a container: gold cards recharge and fruit exchanges.
-NON_CONTAINERS = frozenset([1150, 1151, 1152, 1156, 1246])
+NON_CONTAINERS = frozenset([1150, 1151, 1152, 1156, 1246, 1901])
 CONTAINERS = frozenset(t for t, r in f.ITEMS.items()
                        if int(r['main_type']) in (6, 7, 8)) - NON_CONTAINERS
 HANDLED = CONTAINERS - SPECIAL

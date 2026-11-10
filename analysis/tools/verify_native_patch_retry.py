@@ -12,7 +12,7 @@ from lupa import lua51
 
 def main():
  source=(ROOT/'offline_android/native/offline.c').read_text()
- body=source[source.index('static int activity_patch_current('):source.index('static void branch(')]
+ body=source[source.index('static int continuous_time('):source.index('static void branch(')]
  pre=r'''
 #include <string.h>
 #include <dlfcn.h>
@@ -21,14 +21,18 @@ typedef void lua_State; typedef unsigned int u32;
 struct timespec32 { int sec; int nsec; };
 static u32 now_ms, previous_ms; static int evaluating, lua_ready, lua_failed;
 static char *patch_source; static u32 patch_size;
-static int messages;
+static int messages, clock_error;
 static void log_message(const char *format, ...) { (void)format; messages++; }
 #define LOG(...) log_message(__VA_ARGS__)
 #define ERR(...) log_message(__VA_ARGS__)
 static int test_clock(int id, struct timespec32 *t) {
- (void)id;t->sec=now_ms/1000;t->nsec=(now_ms%1000)*1000000;return 0;
+ if(id==7 && clock_error)return -1;
+ t->sec=now_ms/1000;t->nsec=(now_ms%1000)*1000000;return 0;
 }
 #define clock_gettime test_clock
+static void (*lua_pushinteger_)(lua_State *, int);
+static void (*lua_pushcclosure_)(lua_State *, int (*)(lua_State *), int);
+static void (*lua_setfield_)(lua_State *, int, const char *);
 static int (*lua_gettop_)(lua_State *);
 static void (*lua_settop_)(lua_State *, int);
 static void (*lua_getfield_)(lua_State *, int, const char *);
@@ -39,6 +43,8 @@ static const char *(*lua_tolstring_)(lua_State *, int, u32 *);
 '''
  footer=r'''
 void initialize(void *lib, char *code) {
+ lua_pushinteger_=dlsym(lib,"lua_pushinteger");lua_pushcclosure_=dlsym(lib,"lua_pushcclosure");
+ lua_setfield_=dlsym(lib,"lua_setfield");
  lua_gettop_=dlsym(lib,"lua_gettop");lua_settop_=dlsym(lib,"lua_settop");
  lua_getfield_=dlsym(lib,"lua_getfield");lua_type_=dlsym(lib,"lua_type");
  lua_pcall_original=dlsym(lib,"lua_pcall");lua_tolstring_=dlsym(lib,"lua_tolstring");
@@ -46,6 +52,7 @@ void initialize(void *lib, char *code) {
  patch_source=code;patch_size=strlen(code);
 }
 int invoke(lua_State *state, unsigned int ms) {now_ms=ms;return offline_pcall(state,0,1,0);}
+void fail_clock(int value) {clock_error=value;}
 int failed(void) {return lua_failed;}
 int ready(void) {return lua_ready;}
 int logs(void) {return messages;}
@@ -84,12 +91,17 @@ int logs(void) {return messages;}
    execute('available=true');call(10250);execute('assert(attempts==3)');assert native.failed()==0;checks.append('transient error recovers to pending')
    call(10499);execute('assert(attempts==3)');call(10500);execute('assert(attempts==4)');checks.append('normal pending interval restored')
    execute("status='ready'");call(10750);assert native.ready()==1;checks.append('recovered loader reaches ready')
-   execute("package.loaded['ui.summonUI']={_localGoldRestore=function()end};package.loaded.ms={d_funUI={_localActivityEntryCurrent=function()return 'ready'end},d_twoYearsCelebrateUI={_localYuanshiCurrent=function()return 'ready'end}}")
-   call(11000);execute('assert(attempts==5)');checks.append('ready modules skip redundant installation')
+   execute("package.loaded['ui.summonUI']={_localGoldRestore=function()end};package.loaded.ms={d_time={_localGameClockCurrent=function()return 'ready'end},d_funUI={_localActivityEntryCurrent=function()return 'ready'end},d_twoYearsCelebrateUI={_localYuanshiCurrent=function()return 'ready'end}}")
+   call(11000);execute('assert(attempts==5);assert(_jgbolContinuousTime()==11)');checks.append('ready modules skip redundant installation')
+   native.fail_clock(1);execute('assert(_jgbolContinuousTime()==nil)')
+   native.fail_clock(0);execute('assert(_jgbolContinuousTime()==11)')
+   checks.append('continuous source failure returns no wall-time fallback')
+   call(11001);execute('local sec,nsec=_jgbolContinuousTime();assert(sec==11 and nsec==1000000)')
+   checks.append('integer ABI preserves seconds and nanoseconds')
    execute('package.loaded.ms=nil;available=false');call(11250);assert native.failed()==1;execute('assert(attempts==6)')
    execute('available=true');call(16250);assert native.ready()==1;execute('assert(attempts==7)');checks.append('reload failure also recovers')
   finally:lua.lua_close(state)
  report=dict(passed=True,checks=checks,native_source_sha256=hashlib.sha256(source.encode()).hexdigest(),scope='Actual C loader compiled for host, real Lua 5.1, simulated monotonic clock; not Guangsu device validation')
- out=ROOT/'analysis/evidence/v110/guangsu-retry-20261106';out.mkdir(parents=True,exist_ok=True)
+ out=ROOT/'analysis/evidence/game_clock_resume_20261109';out.mkdir(parents=True,exist_ok=True)
  (out/'native-retry-validation.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
 if __name__=='__main__':main()

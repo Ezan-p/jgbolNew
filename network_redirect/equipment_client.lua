@@ -124,6 +124,41 @@ do
   end
  end
 end
+-- Native recycle selection only checks quality and equip_order. Match the
+-- server's disposal restrictions so one protected item cannot reject a batch.
+do
+ local ms=package.loaded.ms
+ local ui=ms and ms.d_cortegeRecycleUI
+ if ui and ui.getEquipsForRecycle and not ui._localEquipRecycleRestore then
+  local original=ui.getEquipsForRecycle
+  local function marked(item,key)
+   local value=item[key]
+   return value~=nil and value~=false and value~=0
+  end
+  ui.getEquipsForRecycle=function(...)
+   local result={}
+   for _,item in ipairs(original(...) or {}) do
+    local cfg=item.csvInfo or {}
+    local valid=(item.count or 0)>0 and (cfg.quality==4 or cfg.quality==5)
+    for _,key in ipairs({'equip_order','owner_id','is_lock','innate_owner_id',
+      'protogenic','star_level','reborn_bit'}) do
+     if marked(item,key) then valid=false end
+    end
+    if (item.count or 0)>1 then
+     if (item.level or 1)~=1 then valid=false end
+     for _,key in ipairs({'advance_level','star_count','cur_spirit_count','drill_count'}) do
+      if marked(item,key) then valid=false end
+     end
+    end
+    if valid then result[#result+1]=item end
+   end
+   return result
+  end
+  ui._localEquipRecycleRestore=function()
+   ui.getEquipsForRecycle=original;ui._localEquipRecycleRestore=nil
+  end
+ end
+end
 -- Batch sale retains its category array even when inventory snapshots replace it.
 -- Remove consumed IDs from that same array before the original result refresh.
 do

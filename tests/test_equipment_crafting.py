@@ -90,6 +90,50 @@ class CraftingTests(unittest.TestCase):
                 for tid in {x[1] for x in expected}:
                     self.assertEqual(sum(x['attach_count'] for x in got if x['object_type']==5 and x['attach_type']==tid), sum(x[3] for x in expected if x[1]==tid))
 
+    def test_recycle_legacy_equipment_stacks_and_replay(self):
+        for main in (1, 2, 3):
+            for quality in (4, 5):
+                with self.subTest(main=main, quality=quality):
+                    ident = self.gear(main, quality, count=3)
+                    tid = self.get(ident)['type_id']
+                    before = self.b.profile()
+                    total = sum(i['count'] for i in before['attachments'] if i['type_id'] == tid)
+                    event = self.convert(1, [ident])[-1]
+                    self.assertEqual(event[0], 116)
+                    after = self.b.profile()
+                    self.assertNotIn(ident, [i['id'] for i in after['attachments']])
+                    self.assertEqual(sum(i['count'] for i in after['attachments'] if i['type_id'] == tid), total - 1)
+                    row = c.RECYCLE[quality]
+                    expected = c.parts(row['is_fabao']) if main == 3 else [
+                        (5, int(row['des_type']), 1, int(row['des_count']))] + c.parts(row['attach_list'])
+                    got = event[1]['transform_list'].values()
+                    self.assertEqual(sorted((x['object_type'], x['attach_type'], x['attach_level'], x['attach_count']) for x in got), sorted(expected))
+                    self.assertEqual(self.b.respond(self.packet, {'authenticated': True}), self.replies)
+                    self.assertEqual(self.b.profile(), after)
+        after = self.b.profile()
+        self.b.close()
+        self.b = original.Backend(original.Path(self.tmp.name), 18770, lambda *a, **kw: None)
+        self.assertEqual(self.b.profile(), after)
+
+    def test_recycle_invalid_batch_rolls_back_stacks_and_rewards(self):
+        stack = self.gear(quality=4, count=3)
+        for invalid in (dict(is_lock=1), dict(equip_order=1, equip_pos=1),
+                        dict(star_level=1), dict(reborn_bit=1)):
+            with self.subTest(invalid=invalid):
+                target = self.gear(quality=5, **invalid)
+                before = self.b.profile()
+                self.assertEqual(self.convert(1, [stack, target])[-1][0], 55)
+                self.assertEqual(self.b.profile(), before)
+
+    def test_unmigrated_invested_stack_cannot_duplicate_recycle_refunds(self):
+        role = self.b.profile()
+        item = dict(id=f.new_id(role), attach_type=5, type_id=2001, count=2, level=2)
+        role['attachments'].append(item)
+        before = copy.deepcopy(role)
+        with self.assertRaises(f.Rejected):
+            c.dispose(role, item)
+        self.assertEqual(role, before)
+
     def test_transform_preserves_growth_and_returns_stones(self):
         for state in (1, 2):
             gear = self.add(2001, level=50, advance_level=3, star_count=2, cur_spirit_count=1, drill_count=2, stone1_level=10)
@@ -180,8 +224,12 @@ class CraftingTests(unittest.TestCase):
         role=self.b.profile();role['reborn_layer']=4
         next(i for i in role['attachments'] if i['id']==target)['count']=2
         self.b.save(role);before=self.b.profile()
-        self.assertEqual(self.req(1079,equipid=target,equip_order=0,material_equipid=material)[-1][0],55)
-        self.assertEqual(before,self.b.profile())
+        # Loading now repairs the legacy stack before the upgrade request.
+        spare = next(i for i in before['attachments'] if i['type_id']==2001 and i['id'] not in (target, material))
+        self.assertEqual(self.req(1079,equipid=target,equip_order=0,material_equipid=material)[-1][0],201)
+        self.assertEqual(self.get(target)['star_level'], 1)
+        self.assertEqual(self.get(spare['id']), spare)
+        self.assertNotIn(material, [i['id'] for i in self.b.profile()['attachments']])
 
     def test_skill_recipe_and_reopen_crafting_state(self):
         role=self.b.profile();role['gold_coin']=1000

@@ -127,7 +127,7 @@ class GuardTests(unittest.TestCase):
         source.seconds += 60
         self.assertEqual(clock.sample(), NOW + 60)
 
-    def test_system_time_jumps_block_all_activities_and_notify_without_relogin(self):
+    def test_system_time_jumps_defer_without_blocking_and_notify_once(self):
         from network_redirect.protocol import encode, decode
         for offset in (7 * 86400, -7 * 86400):
             with self.subTest(offset=offset), tempfile.TemporaryDirectory() as directory:
@@ -139,40 +139,38 @@ class GuardTests(unittest.TestCase):
                     role['level'] = 60
                     backend.save(role)
                     backend.bootstrap()
-                    before = backend.profile()
+                    backend.respond(encode(1353, dict(serial_num=499, id=1, data='{}')),
+                                    {'authenticated': True})
+                    before = backend.snapshot()
                     session = {'authenticated': True}
                     source.wall_seconds += offset
                     replies = backend.respond(encode(2999, {}), session)
                     notices = [login_fields(data['data'])['op_string']
                                for mid, _, data in map(decode, replies)
                                if mid == 2998 and data['id'] == 55]
-                    self.assertEqual(notices, [time_guard.MESSAGE])
-                    blocked = backend.profile()
-                    self.assertEqual(blocked['time_guard']['blocked'], ['*'])
-                    for path in Path('network_redirect').glob('activity*.py'):
-                        self.assertTrue(time_guard.blocked(blocked, path.stem))
-                    # Rejected requests must neither pay nor undo quarantine.
-                    for serial, mid in enumerate((1353, 1309, 1349, 1208, 1325, 1351), 500):
-                        replies = backend.respond(encode(mid, dict(
-                            serial_num=serial, id=1, data='{}')), session)
-                        self.assertTrue(any(mid == 2998 and data['id'] == 55 and
-                            'TIME-001' in login_fields(data['data'])['op_string']
-                            for mid, _, data in map(decode, replies)))
-                    source.wall_seconds = NOW
-                    source.advance(14 * 86400)
+                    self.assertEqual(notices, [game_clock.DEFERRED_MESSAGE])
+                    current = backend.snapshot()
+                    self.assertEqual(current['server_time'], before['server_time'])
+                    self.assertEqual(current['time_guard']['blocked'], [])
+                    self.assertEqual(current['activity']['babel'], before['activity']['babel'])
+                    replies = backend.respond(encode(1353, dict(
+                        serial_num=500, id=1, data='{}')), session)
+                    self.assertFalse(any(mid == 2998 and data['id'] == 55
+                        for mid, _, data in map(decode, replies)))
+                    source.advance(86400)
                     replies = backend.respond(encode(2999, {}), session)
                     self.assertFalse(any(mid == 2998 and data['id'] == 55
-                                         for mid, _, data in map(decode, replies)))
-                    after = backend.profile()
-                    self.assertEqual(after['activity'], before['activity'])
-                    self.assertEqual(after['welfare'].get('mails', {}), before['welfare'].get('mails', {}))
-                    self.assertEqual(after['gold_coin'], before['gold_coin'])
-                    self.assertEqual(after['silver_coin'], before['silver_coin'])
+                        for mid, _, data in map(decode, replies)))
+                    after = backend.snapshot()
+                    self.assertEqual(after['server_time'], before['server_time'] + 86400)
+                    self.assertGreater(after['activity']['babel']['shop_day'],
+                                       before['activity']['babel']['shop_day'])
+                    self.assertEqual(after['time_guard']['blocked'], [])
                     backend.close()
                     backend = Backend(Path(directory), 0, lambda *a, **k: None,
                                       account='another-player', clock=clock)
                     backend.bootstrap()
-                    self.assertEqual(backend.profile()['time_guard']['blocked'], ['*'])
+                    self.assertEqual(backend.profile()['time_guard']['blocked'], [])
                 finally:
                     backend.close()
                     clock.close()

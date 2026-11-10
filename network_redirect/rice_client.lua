@@ -13,7 +13,7 @@ __SEASONAL_CRAFT_HELPER__
   local originalEnd=ui.g_self.end_time
   local progress={rice_count=0,left_process=__RICE_BONUS_EVERY__}
   local labels={
-   rice1='每累计制作__RICE_BONUS_EVERY__个粽子，额外领取蟠桃×__RICE_BONUS_COUNT__',
+   rice1='本周每制作__RICE_BONUS_EVERY__个粽子，额外领取蟠桃×__RICE_BONUS_COUNT__',
    rice2='旅途、天命胜利及蟠桃会挑战均可随机获得材料',
    rice3='制作了',rice4='获得'
   }
@@ -48,12 +48,7 @@ __SEASONAL_CRAFT_HELPER__
    return craftBatch(index,'rice',ui.g_ricePuddingUI)
   end
   ui.tickTime=function()
-   local layer=ui.g_ricePuddingUI and ui.g_ricePuddingUI.main_layer
-   if not layer then return end
-   layer:removeChildByTag(ui.g_self.timeTag,true)
-   layer:addChild(ms.d_u.createByStyles({type='label',font='arial',fontsize=28,
-    x=ui.g_self.mx,y=ui.g_self.my+ui.g_self.h*0.46,
-    string=enabled and '常驻开放' or '暂未开放',color={255,255,255}}),1,ui.g_self.timeTag)
+   showActivityCountdown('g_ricePuddingUI')
   end
   ui.create=function(...)
    local create=ms.d_u.createByStyles
@@ -78,7 +73,7 @@ __SEASONAL_CRAFT_HELPER__
     layer:addChild(ms.d_u.createByStyles({type='label',font='arial',fontsize=size,x=x,
      y=s.my+s.h*y,string=text,color={120,30,0}}),1,tag)
    end
-   label('个人粽子累计制作',0.30,24,91141)
+   label('本周粽子累计制作',0.30,24,91141)
    label(tostring(progress.rice_count)..' 个',0.20,30,91142)
    label('再做'..tostring(progress.left_process)..'个领蟠桃',0.10,22,91143)
    local recent=s.luck_list and s.luck_list[1]
@@ -89,6 +84,7 @@ __SEASONAL_CRAFT_HELPER__
    end
   end
   ui._localRiceRestore=function()
+   stopActivityCountdown()
    for key,value in pairs(old) do ui[key]=value end
    ui.g_self.end_time=originalEnd
    ms.d_commonLayerUI.recvUsedItem=usedItem

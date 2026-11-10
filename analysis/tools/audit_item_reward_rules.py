@@ -55,7 +55,7 @@ def main():
         1121:'guild_feast.py / guild_rules.json feast_box_rewards (B fixed)',
         1243:'activity_nine_sky.py / nine_sky_rules.json (A soul 5; B peaches)',
         1249:'xianling.py / xianling_rules.json (A chosen target; B cost)',
-        1324:'activity_hunt.py / hunt_rules.json upgrade_box_pool (B equal weights)',
+        1324:'activity_hunt.py / hunt_rules.json upgrade_box_pool / upgrade_box_weights / upgrade_box_counts (B weighted; essences x10)',
         1346:'pets.py / pet_rules.json training_box_count (A training pills; B fixed amount)',
         1367:'activity_rulai.py / happiness_bag_config.csv (A choice)',
         1368:'activity_rulai.py / happiness_bag_config.csv (A choice)',

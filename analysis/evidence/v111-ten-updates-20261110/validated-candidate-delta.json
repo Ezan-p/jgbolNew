@@ -1,0 +1,19 @@
+{
+  "apk_sha256": "b97f7a8d234368f78be5d119e9aefd982794c86e14ad062059d349969fc0724f",
+  "tested_apk_sha256": "52200240ba14c0db0ce9c80ea0a4163e82d8ff896505fa62d3dd4d9e5e3bf800",
+  "passed": true,
+  "changed_apk_entries": [
+    "AndroidManifest.xml",
+    "assets/offline/build.properties",
+    "assets/offline/program.zip"
+  ],
+  "changed_payload_entries": [
+    "network_redirect/activity_party.py",
+    "network_redirect/login_branding_client.lua",
+    "offline_client.lua",
+    "payload-manifest.json"
+  ],
+  "unchanged_gameplay_except": "activity_party.py: load ten elite NPC templates without initializing 500-role ladder",
+  "targeted_recheck_tests": 125,
+  "only_client_code_change": "Login version label v110 to v111; rerun full Lua and countdown checks"
+}

@@ -40,8 +40,8 @@ class TianxianTokenTests(ActivityCase):
         self.assertEqual(next(i['count'] for i in snapshot if i['type_id'] == 1361), before + 80000)
         self.assertFalse(any(i['id'] == ident for i in snapshot))
         wood = self.count(1362)
-        self.ok(self.req(1348, id=15, data=summon.lua(dict(shop_page=1, item_index=2, buy_count=1))))
-        self.assertEqual(self.count(1361), before + 79900)
+        self.ok(self.req(1348, id=15, data=summon.lua(dict(shop_page=1, item_index=1, buy_count=1))))
+        self.assertEqual(self.count(1361), before + 79000)
         self.assertEqual(self.count(1362), wood + 100)
 
     def test_invalid_requests_leave_save_unchanged(self):

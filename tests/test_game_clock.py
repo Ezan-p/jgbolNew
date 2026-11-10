@@ -49,21 +49,23 @@ class ClockTests(unittest.TestCase):
             self.source.seconds = 100 + step*10
             self.assertEqual(clock.sample(), NOW + step*10)
 
-    def test_both_wall_jump_directions_persist_across_restore_and_reopen(self):
+    def test_both_wall_jumps_are_deferred_without_quarantine_across_reopen(self):
         for offset in (86400, -86400):
             with self.subTest(offset=offset), tempfile.TemporaryDirectory() as directory:
                 source = Source()
                 clock = game_clock.GameClock(directory, source=source)
                 source.wall_seconds += offset
                 self.assertEqual(clock.sample(), NOW)
-                self.assertTrue(clock.quarantined)
+                self.assertFalse(clock.quarantined)
+                self.assertIsNotNone(clock.notice)
                 source.wall_seconds = NOW
                 source.boot_id = 'boot-b'
                 source.seconds = 10
                 clock.close()
                 clock = game_clock.GameClock(directory, source=source)
                 try:
-                    self.assertTrue(clock.quarantined)
+                    self.assertFalse(clock.quarantined)
+                    self.assertIsNotNone(clock.notice)
                     self.assertEqual(clock.sample(), NOW)
                 finally:
                     clock.close()
@@ -78,7 +80,8 @@ class ClockTests(unittest.TestCase):
         self.assertFalse(clock.quarantined)
         self.source.wall_seconds += 1
         clock.sample()
-        self.assertTrue(clock.quarantined)
+        self.assertFalse(clock.quarantined)
+        self.assertIsNotNone(clock.notice)
 
     def test_normal_elapsed_sleep_and_reboot_do_not_quarantine(self):
         clock = self.clock()
@@ -102,7 +105,8 @@ class ClockTests(unittest.TestCase):
         self.source.seconds = 10
         self.source.wall_seconds -= 86400
         clock.sample()
-        self.assertTrue(clock.quarantined)
+        self.assertFalse(clock.quarantined)
+        self.assertIsNotNone(clock.notice)
 
     def test_old_signed_clock_establishes_wall_baseline_without_penalty(self):
         clock = self.clock()
@@ -116,7 +120,8 @@ class ClockTests(unittest.TestCase):
         self.assertFalse(clock.quarantined)
         self.source.wall_seconds += 86400
         clock.sample()
-        self.assertTrue(clock.quarantined)
+        self.assertFalse(clock.quarantined)
+        self.assertIsNotNone(clock.notice)
 
     def test_android_bridge_old_shell_fallback_and_invalid_marker(self):
         with patch.object(game_clock, '_android_boot', None):
@@ -136,7 +141,8 @@ class ClockTests(unittest.TestCase):
         self.source.wall_seconds += 365*86400
         restarted = self.clock()
         self.assertEqual(restarted.sample(), NOW+3*86400)
-        self.assertTrue(restarted.quarantined)
+        self.assertFalse(restarted.quarantined)
+        self.assertIsNotNone(restarted.notice)
 
     def test_device_restart_discards_unknown_gap_even_when_uptime_grows(self):
         first = self.clock()
@@ -158,12 +164,12 @@ class ClockTests(unittest.TestCase):
             clock.sample()
         self.assertEqual(clock.sample(), NOW+10)
 
-    def test_repeated_reboots_and_date_changes_do_not_credit_offline_gaps(self):
+    def test_repeated_abnormally_long_reboot_gaps_are_not_credited(self):
         clock = self.clock()
         for reboot in range(10):
             self.source.boot_id = 'restart-' + str(reboot)
             self.source.seconds = 5000 + reboot*10000
-            self.source.wall_seconds += 30*86400
+            self.source.wall_seconds += 31*86400
             self.assertEqual(clock.sample(), NOW)
 
     def test_shared_accounts_do_not_double_count(self):
@@ -275,8 +281,7 @@ class BackendClockTests(unittest.TestCase):
         for offset in (86400, 8*86400, 365*86400, -365*86400, 0):
             self.source.wall_seconds = NOW+offset
             current = self.backend.snapshot()
-            self.assertEqual(current['time_guard']['blocked'], ['*'])
-            original['time_guard'] = current['time_guard']
+            self.assertEqual(current['time_guard']['blocked'], [])
             self.assertEqual(current, original)
         self.assertEqual(current['server_time'], NOW)
 

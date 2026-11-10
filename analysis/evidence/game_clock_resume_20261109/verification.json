@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-09",
+  "policy": {
+    "max_offline_gap_seconds": 2592000,
+    "wall_tolerance_seconds": 300,
+    "old_quarantines_preserved": true
+  },
+  "python": ".runtime/venv/bin/python",
+  "lua_dependency_path": "/private/tmp/qmxy-battle-test-deps",
+  "commands": [
+    "PYTHONPATH=/private/tmp/qmxy-battle-test-deps .runtime/venv/bin/python -m unittest tests.test_game_clock_resume tests.test_game_clock_client -q",
+    ".runtime/venv/bin/python offline_android/native/build_native.py",
+    "PYTHONPATH=/private/tmp/qmxy-battle-test-deps .runtime/venv/bin/python analysis/tools/verify_native_patch_retry.py",
+    "PYTHONPATH=/private/tmp/qmxy-battle-test-deps .runtime/venv/bin/python analysis/tools/verify_activity_native_guard.py",
+    "PYTHONPATH=/private/tmp/qmxy-battle-test-deps .runtime/venv/bin/python -m unittest tests.test_game_clock tests.test_game_clock_resume tests.test_game_clock_client tests.test_time_guard tests.test_activity_clock_boundaries tests.test_summon tests.test_market tests.test_equipment_crafting tests.test_daily tests.test_welfare tests.test_guild tests.test_activity_party tests.test_offline_backend.ProtocolTests tests.test_activity_entry_client tests.test_request_wait tests.test_request_timing_client tests.test_android_offline_backend -q",
+    "PYTHONPATH=/private/tmp/qmxy-battle-test-deps .runtime/venv/bin/python -m unittest tests.test_android_offline_backend.RuntimeTests tests.test_android_offline_backend.PayloadTests.test_packed_program_boots_in_isolation_and_has_no_player_data -q",
+    "PYTHONPATH=/private/tmp/qmxy-battle-test-deps .runtime/venv/bin/python -m unittest tests.test_android_offline_backend.PayloadTests.test_packed_program_boots_in_isolation_and_has_no_player_data -q"
+  ],
+  "apk_rebuilt": false,
+  "real_player_save_modified": false,
+  "guangsu_device_tested": false,
+  "validation": {
+    "combined_regression": {
+      "tests": 284,
+      "initial_passed": 280,
+      "initial_environment_failures": 4,
+      "runtime_retry_passed": 3,
+      "payload_final_passed": 1,
+      "resolved": true
+    },
+    "latest_focused": {
+      "tests": 18,
+      "passed": true,
+      "overlaps_combined": true
+    },
+    "native_loader_checks": 10,
+    "native_readiness_checks": 14,
+    "engine_export_checks": 13,
+    "arm32_compiled": true,
+    "diff_check_passed": true
+  },
+  "notes": [
+    "Initial four integration failures were localhost bind denials in the sandbox; retried with loopback permission.",
+    "First payload retry detected a concurrent client source edit and correctly refused packaging; final retry after source stabilization passed.",
+    "Combined suite preceded final nanosecond bridge refinement; latest focused tests and native verifiers cover final code."
+  ],
+  "source_sha256": {
+    "network_redirect/game_clock.py": "105da3cb40088d38fc544fb8cad71b6e8dc616b4c3eda537f8007f86c14428a1",
+    "network_redirect/game_clock_client.lua": "c106bf14e3c5437b1083011b0c852caf2fb06f05545d8e5fbb250b99650e5f76",
+    "network_redirect/backend.py": "4b7ffda343fbf0dbe6263af04b58511a9a6476396be39633c49a3277d6bd20c3",
+    "network_redirect/summon.py": "2a696676a7c23b82170274f3c6978aa863567439962a953ff7a351e824977a21",
+    "network_redirect/summon_client.js": "97322285677d265d61d8fafe79e2b15601b7f4d730f792071154c73de59f8e9f",
+    "offline_android/native/offline.c": "3017703f82e6f1f65474cc385deb198c40b091a3b289ba52c562b19a6b3a4bac"
+  }
+}

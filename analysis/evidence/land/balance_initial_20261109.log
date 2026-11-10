@@ -1,0 +1,52 @@
+======================================================================
+FAIL: test_hell_64_shield_events_do_not_truncate_winning_battle (tests.test_activity_land_tower.LandTowerTests) (seed=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_activity_land_tower.py", line 337, in test_hell_64_shield_events_do_not_truncate_winning_battle
+    self.ok(out);self.assertTrue(out[-1][1]['is_win'])
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_hell_64_shield_events_do_not_truncate_winning_battle (tests.test_activity_land_tower.LandTowerTests) (seed=7)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_activity_land_tower.py", line 337, in test_hell_64_shield_events_do_not_truncate_winning_battle
+    self.ok(out);self.assertTrue(out[-1][1]['is_win'])
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_tower_growth_starts_at_the_tuned_level_and_increases_per_floor (tests.test_activity_land_tower.LandTowerTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_activity_land_tower.py", line 23, in test_tower_growth_starts_at_the_tuned_level_and_increases_per_floor
+    self.assertEqual(normal[0]['power'],3077)
+AssertionError: 3076 != 3077
+
+======================================================================
+FAIL: test_complete_64_layers_both_worlds_real_battles (tests.test_activity_land.OfflineLandTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_activity_land.py", line 101, in test_complete_64_layers_both_worlds_real_battles
+    self.assertTrue(result[-1][1]['is_win'],('hell',layer))
+AssertionError: False is not true : ('hell', 64)
+
+======================================================================
+FAIL: test_team_tower_battle_and_cannot_change_while_occupied (tests.test_activity_land.OfflineLandTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_activity_land.py", line 44, in test_team_tower_battle_and_cannot_change_while_occupied
+    self.assertGreater(len(army),2);self.assertTrue(out[-1][1]['is_win'])
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_tower_capture_ticks_no_double_and_leave (tests.test_activity.LandTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/tests/test_activity.py", line 556, in test_tower_capture_ticks_no_double_and_leave
+    self.assertEqual(self.b.profile()['activity']['land']['tower_id'],11)
+AssertionError: 0 != 11
+
+----------------------------------------------------------------------
+Ran 57 tests in 135.083s
+
+FAILED (failures=6)

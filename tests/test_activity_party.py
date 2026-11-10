@@ -3,7 +3,7 @@ import copy
 from unittest.mock import patch
 from tests.test_activity import ActivityCase, NOW
 from network_redirect import activity, activity_party as party, achievements
-from network_redirect.backend import Backend
+from network_redirect.backend import Backend, login_fields
 from network_redirect.protocol import decode
 from pathlib import Path
 
@@ -89,6 +89,94 @@ class PartyTests(ActivityCase):
         for ident in (next(iter(party.catalog())),next(reversed(party.catalog()))):
             self.ok(self.req(1039,des_type=1,des_id=ident,flag=3))
         self.assertTrue(all(n['role']['level']>=13 for n in party.catalog().values()))
+
+    def test_catalog_does_not_initialize_entire_ladder(self):
+        from network_redirect import activity_rank
+        party.catalog.cache_clear()
+        self.addCleanup(party.catalog.cache_clear)
+        with patch.object(activity_rank, 'catalog', side_effect=AssertionError('Full ladder loaded')):
+            entries = party.catalog()
+            self.assertEqual(len(entries), 109)
+            self.assertTrue(all(ident in entries for ident in range(950101, 950111)))
+
+    def test_top_ten_use_rank_11_to_20_templates_and_inspection(self):
+        from network_redirect import activity_rank, npc_players, summon
+        r=self.b.profile();day=r['activity']['party']['day']
+        original_ladder={ident:copy.deepcopy(activity_rank.catalog()[ident]) for ident in range(930011,930021)}
+        for offset in (0,1,7,30):
+            board=party.daily_board(r,day+offset,0,self.b.activity_rules)
+            self.assertEqual(len(board),20)
+            self.assertEqual(len({row['id'] for row in board}),20)
+            for position,row in enumerate(board[:10],1):
+                source=activity_rank.catalog()[930010+position]
+                self.assertEqual(party.catalog()[row['id']],source)
+                self.assertEqual(row['name'],source['role']['role_name'])
+                self.assertEqual(row['power'],source['role']['role_combat_power'])
+                self.assertIn(row['damage'],party.rules()['npc_damage_tiers'][position-1]['values'])
+                if offset==0:
+                    actual=dict(self.req(1039,des_type=1,des_id=row['id'],flag=3))[11]
+                    packet=summon.event(11,npc_players.inspection_data(source,scene_id=row['id']))
+                    expected=login_fields(decode(packet)[2]['data'])
+                    self.assertEqual(actual,expected)
+        before=party.daily_board(r,day,0,self.b.activity_rules)
+        activity_rank.swap(r['activity'],11)
+        r['activity']['party'].update(count=1,damage=100_000_000)
+        after=party.daily_board(r,day,0,self.b.activity_rules)
+        self.assertEqual([(x['id'],x['damage']) for x in before],
+                         [(x['id'],x['damage']) for x in after if x['id']!=r['role_id']])
+        party.finish_day(r,self.b.activity_rules,NOW)
+        saved=copy.deepcopy(r['activity']['party']['history'])
+        party.prepare(r,NOW+86400,self.b.activity_rules)
+        self.assertEqual(r['activity']['party']['history'],saved)
+        for row in saved['top_list']:
+            if row['id']!=r['role_id']:
+                self.assertEqual(party.inspection(r,row['id']),
+                                 summon.event(11,npc_players.inspection_data(
+                                     original_ladder[930010+row['id']-950100],scene_id=row['id'])))
+        self.assertEqual({ident:activity_rank.catalog()[ident] for ident in original_ladder},original_ladder)
+
+    def test_fixed_damage_tiers_daily_draw_and_restart(self):
+        r=self.b.profile();day=r['activity']['party']['day']
+        tiers=party.rules()['npc_damage_tiers']
+        seen=[set() for _ in tiers]
+        first=party.daily_board(r,day,0,self.b.activity_rules)
+        for offset in range(365):
+            board=party.daily_board(r,day+offset,0,self.b.activity_rules)
+            self.assertEqual(len(board),20)
+            self.assertEqual([x['id'] for x in board[:10]],list(range(950101,950111)))
+            self.assertEqual([x['damage'] for x in board],sorted((x['damage'] for x in board),reverse=True))
+            for i,row in enumerate(board[:10]):
+                self.assertIn(row['damage'],tiers[i]['values'])
+                self.assertTrue(79_150_000<=row['damage']<=117_700_000)
+                seen[i].add(row['damage'])
+            for row in board[10:]:
+                self.assertEqual(row['damage'],10000+party.stable('party-score',day+offset,row['id'])%party.rules()['boss_hp'])
+        self.assertEqual(seen,[set(t['values']) for t in tiers])
+        self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        party.rules.cache_clear()
+        self.assertEqual(first,party.daily_board(self.b.profile(),day,43200,self.b.activity_rules))
+        r=self.b.profile();r['activity']['party'].update(count=1,damage=100_000_000)
+        board=party.daily_board(r,day,0,self.b.activity_rules)
+        player=next(x for x in board if x['id']==r['role_id'])
+        self.assertEqual(player['damage'],100_000_000)
+        self.assertEqual(player['rank'],1+sum(x['damage']>100_000_000 for x in first))
+
+    def test_invalid_fixed_damage_tiers_are_rejected(self):
+        import json
+        base=copy.deepcopy(party.rules())
+        variants=[]
+        bad=copy.deepcopy(base);bad['npc_damage_tiers'].pop();variants.append(bad)
+        bad=copy.deepcopy(base);bad['npc_damage_tiers'][0]['values'][0]=117_700_001;variants.append(bad)
+        bad=copy.deepcopy(base);bad['npc_damage_tiers'][-1]['values'][-1]=79_149_999;variants.append(bad)
+        bad=copy.deepcopy(base);bad['npc_damage_tiers'][1]['values'][0]=base['npc_damage_tiers'][0]['values'][-1];variants.append(bad)
+        bad=copy.deepcopy(base);bad['npc_damage_tiers'][0]['values']=[117_700_000]*5;variants.append(bad)
+        try:
+            for bad in variants:
+                party.rules.cache_clear()
+                with patch.object(Path,'read_text',return_value=json.dumps(bad)),self.assertRaises(ValueError):
+                    party.rules()
+        finally:
+            party.rules.cache_clear()
 
     def test_bonus_cost_cap_and_atomic_failure(self):
         gold=self.b.profile()['gold_coin']
@@ -241,6 +329,18 @@ class PartyTests(ActivityCase):
                 decoded=decode(encode(1027,dict(fight_id=1,fight_type=6,final_result=result,
                     fight_round=len(actions),fight_result=actions)))[2]
                 self.assertEqual(decoded['fight_result'][-1]['damage_list'],[2147483647]*8)
+
+    def test_boss_skill_probability_boundaries_are_party_only(self):
+        from network_redirect import combat, journey
+        for boss in party.rules()['boss_pool']:
+            with self.subTest(boss=boss['type']):
+                ordinary=journey.fighters({'corteges':[]},dict(cortege_list=f"{boss['type']}|60|{boss['aoe_skill']}"))[1][0]
+                enemy=copy.deepcopy(ordinary)
+                party.prepare_boss(enemy,dict(boss_type=boss['type'],cur_hp=10000000))
+                for draw, triggered in [(99999,True),(100000,True),(199999,True),(200000,False)]:
+                    with patch('network_redirect.combat.secrets.randbelow',return_value=draw):
+                        self.assertEqual(combat.select_skill(enemy), (boss['aoe_skill'],1) if triggered else (1,1))
+                        self.assertEqual(combat.select_skill(ordinary), (boss['aoe_skill'],1) if draw < 100000 else (1,1))
 
     def test_finisher_is_not_in_other_encounters(self):
         from network_redirect import combat_engine, journey

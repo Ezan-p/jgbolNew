@@ -64,11 +64,15 @@ def split_one(role, item):
         rest.update(id=f.new_id(role), count=item['count'] - 1)
         role['attachments'].append(rest)
         # Splitting a legacy stack is not another earned stone achievement.
-        observed = role.get('achievements', {}).get('observed', {})
-        for ident in (228 + STONES[item['type_id']], 480 + STONES[item['type_id']], 562 + STONES[item['type_id']]):
-            previous = observed.get(f"{ident}:{item['id']}")
-            if previous is not None:
-                observed[f"{ident}:{rest['id']}"] = previous
+        # This helper also splits equipment before recycling/sale/reforging.
+        # Only stones have entries in STONES and per-instance stone milestones.
+        kind = STONES.get(item['type_id']) if item['attach_type'] == 5 else None
+        if kind is not None:
+            observed = role.get('achievements', {}).get('observed', {})
+            for ident in (228 + kind, 480 + kind, 562 + kind):
+                previous = observed.get(f"{ident}:{item['id']}")
+                if previous is not None:
+                    observed[f"{ident}:{rest['id']}"] = previous
         item['count'] = 1
 
 

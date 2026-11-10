@@ -47,6 +47,10 @@ do
   end
   ui.createStaticElements=function(...)
    local result=old.createStaticElements(...)
+   -- The native main-layer touch handler only opens the reward preview.
+   -- Menu controls handle casting, exchange and closing independently.
+   ui.g_FishRushUI.main_layer:unregisterScriptTouchHandler()
+   ui.g_FishRushUI.main_layer:setTouchEnabled(false)
    -- The original "activity ends" caption is baked into the background bitmap.
    local size=CCDirector:sharedDirector():getVisibleSize()
    local cover=CCLayerColor:create(ccc4(15,47,56,255),size.width*0.34,size.height*0.145)
@@ -106,35 +110,8 @@ do
    end
    return result
   end
-  -- Eight entries and probabilities fit on one page; this is a preview, not a claim.
-  ui.showPriceListInfo=function()
-   if not data or not active() then return end
-   local main=ui.g_FishRushUI.main_layer
-   main:removeChildByTag(91027,true)
-   local layer=CCLayerColor:create(ccc4(10,28,38,245))
-   main:addChild(layer,100,91027)
-   ms.d_u.createSwallowTouchLayer(layer)
-   local function label(text,x,y,size)
-    layer:addChild(ms.d_u.createByStyles({type='label',font='arial',fontsize=size,
-     x=x,y=y,string=text,color={254,235,185}}),2)
-   end
-   label('东海寻宝 · 奖励概率',0.5,0.91,32)
-   label('每网获得锦鲤，并从以下奖励中独立抽取一种',0.5,0.83,22)
-   for i,row in ipairs(data.random_get_item) do
-    local x=0.14+((i-1)%5)*0.18;local y=0.65-math.floor((i-1)/5)*0.30
-    local icon=ms.d_data.getCertainSmallSprite(row.object_type,row.attach_type,row.attach_level)
-    ms.d_u.setStyles(icon,{x=x,y=y});layer:addChild(icon,2)
-    local info=ms.d_data.getCertainInfo(row.object_type,row.attach_type,row.attach_level)
-    label((info and info.name or '银两')..' ×'..row.attach_count,x,y-0.105,20)
-    label(string.format('概率 %g%%',row.probability*100),x,y-0.155,20)
-   end
-   local parts={};local total=0
-   for _,row in ipairs(data.koi_pool) do total=total+row.weight end
-   for _,row in ipairs(data.koi_pool) do parts[#parts+1]=string.format('%d条 %g%%',row.count,row.weight/total*100) end
-   label('锦鲤：'..table.concat(parts,' / '),0.5,0.10,22)
-   layer:addChild(ms.d_u.createMenu({x=0,y=0,{npic='v2/introUI/close1.png',spic='v2/introUI/close2.png',
-    x=0.95,y=0.93,scalexx=0.1,call_back=function() main:removeChildByTag(91027,true) end}}),3)
-  end
+  -- Keep stale/native callbacks harmless without opening a preview layer.
+  ui.showPriceListInfo=function() end
   ui.onGetFishRushResult=function(value,...)
    local result=old.onGetFishRushResult(value,...)
    if value.local_fish then

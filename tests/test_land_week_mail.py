@@ -50,7 +50,7 @@ class LandWeekMailTests(ActivityCase):
         sunday=self.monday-600
         with patch('network_redirect.game_clock.now',return_value=sunday):
             self.ok(self.req(1302,id=1,data='{}'))
-            self.ok(self.req(1302,id=4,data=summon.lua(dict(flag=1,des_type=2,des_id=14))))
+            self.ok(self.req(1302,id=16,data=summon.lua(dict(tower_id=14))))
         with patch('network_redirect.game_clock.now',return_value=self.monday-1):
             self.b.respond(encode(2999,{}),self.state)
             self.assertFalse(self.mails())

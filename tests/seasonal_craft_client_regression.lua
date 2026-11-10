@@ -1,7 +1,10 @@
 -- Production adapters with the native recipe/picker contract; no live account.
 local moonSource,riceSource=...
 local function node()
- return {addChild=function() end,removeChildByTag=function() end}
+ return {children={},
+  addChild=function(self,child,z,tag) self.children[tag]=child end,
+  removeChildByTag=function(self,tag) self.children[tag]=nil end,
+  setString=function(self,value) self.text=value end}
 end
 local now=1000
 local picker,sends,notices=nil,{},{}
@@ -17,11 +20,12 @@ local function makeUI(name,common)
 end
 local moon,rice=makeUI('moon',1134),makeUI('rice',1208)
 local bag={g_propsTable={},getAllProps=noop}
-local ms={d_moonCakeUI=moon,d_ricePuddingUI=rice,d_packageUI=bag,
+local ms={d_activityUI={getQiwenStatus=noop},d_moonCakeUI=moon,d_ricePuddingUI=rice,d_packageUI=bag,
  d_hz={gethz=function(key) return key end},
  d_info={show=function(text) notices[#notices+1]=text end},
  d_time={getTime=function() return now end},
  d_u={createByStyles=node,clearLayer=function() return nil end,
+  delay=function(parent,seconds,callback) parent.tick=callback end,
   main_server_send_msg=function(mid,request) sends[#sends+1]={mid=mid,request=request} end},
  d_data={createBatchUse=function(layer,options,callback) picker={layer=layer,options=options,callback=callback} end},
  d_msg_def={gscl_msg_id={msg_common_event=2998}},d_commonLayerUI={recvUsedItem=noop}}
@@ -40,6 +44,27 @@ local function quota(ui,left)
 end
 for _,spec in ipairs({{ui=moon,name='moon',common=1134},{ui=rice,name='rice',common=1208}}) do
  local ui,name,common=spec.ui,spec.name,spec.common
+ check(function()
+  local frame=ui[name=='moon' and 'g_moonCakeUI' or 'g_ricePuddingUI']
+  now=1000
+  ui.updateActivityStatus({local_permanent=true,local_enabled=true,next_weekly_refresh=91061})
+  local label=frame.main_layer.children[ui.g_self.timeTag]
+  assert(label.text=='活动倒计时：1天 01:01:01')
+  now=1001;label.tick();assert(label.text=='活动倒计时：1天 01:01:00')
+  now=91060;label.tick();assert(label.text=='活动倒计时：0天 00:00:01')
+  now=91061;label.tick();assert(label.text=='活动倒计时：7天 00:00:00')
+  local oldText=label.text
+  ui.tickTime();now=91062;label.tick();assert(label.text==oldText,'replaced timer must stop')
+  label=frame.main_layer.children[ui.g_self.timeTag]
+  label.tick();assert(label.text=='活动倒计时：6天 23:59:59')
+  local layer=frame.main_layer;frame.main_layer=nil
+  oldText=label.text;now=91063;label.tick();assert(label.text==oldText,'closed timer must stop')
+  frame.main_layer=layer
+  ui.updateActivityStatus({local_permanent=true,local_enabled=false})
+  label=layer.children[ui.g_self.timeTag];assert(label.text=='暂未开放' and not label.tick)
+  ui.updateActivityStatus({local_permanent=true,local_enabled=true})
+  now=1000
+ end)
  check(function()
   stock(common,1500);quota(ui,100)
   for index=1,4 do
@@ -105,6 +130,14 @@ check(function()
  quota(moon,3);quota(rice,7)
  stock(1134,1500);moon.cook(1);assert(picker.options.max==3)
  stock(1208,1500);rice.cook(1);assert(picker.options.max==7)
+end)
+check(function()
+ ms.d_activityUI.getQiwenStatus({local_seasonal_only=true,
+  midautumn_data={local_permanent=true,local_enabled=true,local_craft_remaining=41},
+  dragon_boat_info={local_permanent=true,local_enabled=true,local_craft_remaining=52,rice_count=0,left_process=10}})
+ stock(1134,1500);moon.cook(1);assert(picker.options.max==41)
+ stock(1208,1500);rice.cook(1);assert(picker.options.max==52)
+ assert(ms.d_hz.gethz('mooncake9')=='本周累计制作进度')
 end)
 check(function()
  rice._localRiceRestore();moon._localMoonRestore()

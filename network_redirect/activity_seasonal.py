@@ -13,6 +13,47 @@ MOON={original_spec(x['src_type'])[1]:dict(source=[original_spec(x['src_type']),
 NAMES={int(x['Ftype_id']):x['name'] for x in summon.rows('item_name.csv')}
 FOODS={1130,1131,1132,1133,1213,1214,1215,1216,1217}
 BATCH_EVENT = 249  # Local 2998 request; native recipe messages remain single-craft.
+MATERIALS = {'moon': set(range(1134, 1139)), 'rice': set(range(1208, 1213))}
+TITLES = {'moon': '缘聚中秋', 'rice': '粽叶飘香'}
+
+
+def rollover(role, now, r):
+    """Close each saved week once, before any new materials enter inventory."""
+    role.setdefault('activity', {})
+    s = state(role)
+    week = (a.day(now, r)+3)//7
+    weeks = s.setdefault('craft_weeks', {})
+    for name, tids in MATERIALS.items():
+        # Upgrade preserves existing inventory/progress until the next Monday.
+        saved = weeks.setdefault(name, dict(week=week, supplied=any(
+            key.startswith(name+':') for key in s['supplies'])))
+        previous = saved['week']
+        if week <= previous:
+            continue
+        materials = [i for i in role['attachments'] if i['attach_type']==5 and i['type_id'] in tids]
+        count = sum(i['count'] for i in materials)
+        peaches = count//10
+        mail_id = None
+        if peaches:
+            from . import system_mail, welfare
+            delivery = copy.deepcopy(role)
+            _, mail = system_mail.deliver(delivery, key=f'{name}-recycle-{previous}',
+                title=TITLES[name]+'周结算·材料返还',
+                body=f'{TITLES[name]}每周一北京时间00:00刷新。上周剩余材料共{count}个'
+                     f'（含锁定材料）已全部回收，合计按10:1兑换普通蟠桃{peaches}个，'
+                     '向下取整，不足10个的尾数清空。本周制作累计与赠料资格已重置，'
+                     '已制作的成品和已获得的奖励保留。请领取附件。',
+                prizes=[[5,1001,peaches,1]], now=now, rules=welfare.load_rules())
+            role['welfare'] = delivery['welfare']
+            mail_id = mail['mail_id']
+        if count:
+            role['attachments'] = [i for i in role['attachments'] if not (i['attach_type']==5 and i['type_id'] in tids)]
+            saved['last_recycle'] = dict(week=previous, materials=count, peaches=peaches, mail_id=mail_id)
+        saved.update(week=week, supplied=False)
+        s[name+'_count'] = 0
+        s[name+'_news'] = []
+        s['counts'] = {k:v for k,v in s['counts'].items() if not k.startswith(name+':')}
+    return s
 
 
 def craft_status(s, name, now, r):
@@ -37,6 +78,7 @@ def settle_batch(role, req, now, r, parse):
 
 
 def travel_drop(role,now,r):
+    rollover(role,now,r)
     if not any(is_open(r,n,now) for n in r['seasonal_games']):return []
     role.setdefault('activity',{});s=state(role);s['travel_wins']=s.get('travel_wins',0)+1
     from . import activity_tangwang
@@ -76,30 +118,36 @@ def is_open(r,name,now):
 
 
 def supply(role,s,r,name,now):
-    # Permanent events keep old season-claim markers as one lifetime starter set.
-    cfg=r['seasonal_games'][name];key=f"{name}:{cfg['start_time']}"
-    if name in ('moon','rice'):
-        key=f'{name}:permanent'
-        # Preserve already claimed starter sets when migrating the seasonal event.
-        if any(k.startswith(f'{name}:') for k in s['supplies']):
-            s['supplies'][key]=True
-    if not is_open(r,name,now) or key in s['supplies']:return
-    s['supplies'][key]=True
+    s=rollover(role,now,r)
+    saved=s['craft_weeks'][name]
+    if saved['supplied']:
+        s['supplies'][f'{name}:permanent']=True
+        return
+    if not is_open(r,name,now):return
+    saved['supplied']=True
+    s['supplies'][f'{name}:permanent']=True
     for row in (RICE if name=='rice' else MOON).values():a.prizes(role,row['source'])
 
 
-def status(role,now,r):
-    s=state(role);out={}
+def food_status(role,now,r,grant_supplies=False):
+    s=rollover(role,now,r);out={}
     for name,field,start in (('rice','dragon_boat_info','start_time'),('moon','midautumn_data','begin_time')):
         cfg=r['seasonal_games'][name]
-        supply(role,s,r,name,now)
-        out[field]={start:cfg['start_time'] if cfg['enabled'] else 0,'end_time':cfg['end_time'] if cfg['enabled'] else 0}
+        if grant_supplies:supply(role,s,r,name,now)
+        begin=(s['craft_weeks'][name]['week']*7-3)*86400-r['timezone_offset_hours']*3600
+        out[field]={start:begin if cfg['enabled'] else 0,'end_time':begin+7*86400 if cfg['enabled'] else 0,
+                    'next_weekly_refresh':begin+7*86400,'local_weekly':True,'recycle_materials_per_peach':10}
         out[field].update(craft_status(s,name,now,r))
     out['dragon_boat_info']['luck_list']=copy.deepcopy(s['rice_news'])
     from . import activity_rice
     out['dragon_boat_info'].update(local_permanent=True,local_enabled=r['seasonal_games']['rice']['enabled'],
                                    **activity_rice.progress(s,r))
     out['midautumn_data'].update(local_permanent=True,local_enabled=r['seasonal_games']['moon']['enabled'])
+    return out
+
+
+def status(role,now,r):
+    out=food_status(role,now,r,grant_supplies=True)
     from .activity_spring import status as spring_status
     out.update(spring_status(role,now,r))
     from .activity_fish import status as fish_status
@@ -114,7 +162,7 @@ def moon_news(s,r):
 
 def settle(role,mid,req,now,r):
     name='rice' if mid==1126 else 'moon';a.require(is_open(r,name,now),'活动尚未开放或已经结束')
-    s=state(role)
+    s=rollover(role,now,r)
     if mid==1333 and req['flag']==0:return [summon.event(178,moon_news(s,r))]
     a.require(mid!=1333 or req['flag']==1,'月饼操作无效')
     n=req.get('count',1)

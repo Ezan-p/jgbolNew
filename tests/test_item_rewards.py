@@ -92,10 +92,10 @@ class ItemRewardTests(unittest.TestCase):
             self.assertEqual(amount(1015)-before, 100)
         self.assertEqual(amount(1206), 0)
 
-    def test_seven_gifts_every_bonus_exact_fixed_inventory_and_replay(self):
+    def test_fixed_random_gifts_every_bonus_exact_fixed_inventory_and_replay(self):
         rules = r.load_rules()
         baseline = self.b.profile()
-        for tid in (1247, 1084, 1085, 1086, 1098, 1099, 1205):
+        for tid in (1247, 1084, 1085, 1086, 1098, 1099, 1205, 1325):
             rule = rules['items'][str(tid)]
             self.assertEqual(rule['mode'], 'fixed_random')
             for group in rules['pools'][rule['pool']]:

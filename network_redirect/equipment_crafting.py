@@ -78,8 +78,10 @@ def take(role, item, count):
 
 
 def grant(role, entries):
+    from . import level_card
     totals = defaultdict(int)
     for kind, tid, level, count, *unused in entries:
+        level_card.require_grant(role, kind, tid)
         f.require(count > 0 and kind in (5, 6, 11, 12), '奖励配置无效')
         totals[kind, tid, level] += count
     result = []

@@ -10,33 +10,40 @@ ESSENCE_POOLS = {
            if int(a.formation.ITEMS[int(row['id'])]['quality']) == quality}
     for name, quality in (('yellow', 4), ('purple', 5))
 }
-CARD_POOLS = dict(ESSENCE_POOLS, purple_fragment={10001})
+CARD_POOLS = {name: {(5, tid, 1, 1) for tid in ids}
+              for name, ids in dict(ESSENCE_POOLS, purple_fragment={10001}).items()}
+CARD_POOLS.update(stone_10={(5, 10000, 10, 1)}, stone_20={(5, 10000, 20, 1)})
+CARD_ORDER = ('stone_10', 'stone_20', 'yellow', 'purple_fragment', 'purple')
 
 
 def validate_cards(r):
-    expected = {(5, tid, 1, 1) for ids in CARD_POOLS.values() for tid in ids}
+    expected = set().union(*CARD_POOLS.values())
     a.require({tuple(p) for p in r['land_card_rewards']} == expected,
-              '猎魂翻牌奖池须包含全部黄紫精魄及紫色精魄碎片，每份1个、1级')
+              '猎魂翻牌奖池须包含全部黄紫精魄、紫色精魄碎片及精魄石10个/20个')
     weights = r.get('land_card_weights')
     a.require(isinstance(weights, dict) and set(weights) == set(CARD_POOLS)
               and all(type(v) is int and v > 0 for v in weights.values())
               and sum(weights.values()) == 100, '猎魂翻牌分类概率须为正整数且合计100%')
 
 
-def draw_cards(r, count):
-    # Roll the category first, then an equal-chance essence within it. Each
-    # position is independent, so the rare category keeps its stated chance.
-    pools = {name: [p for p in r['land_card_rewards'] if p[1] in ids]
-             for name, ids in CARD_POOLS.items()}
+def draw_cards(r, count, stone_limit=None):
+    # Once the board's stone allowance is exhausted, renormalize the remaining
+    # categories. Shuffle so the capped categories do not favor early positions.
+    pools = {name: [p for p in r['land_card_rewards'] if tuple(p) in prizes]
+             for name, prizes in CARD_POOLS.items()}
     rng = secrets.SystemRandom()
     rewards = []
     for _ in range(count):
-        roll = rng.randrange(100)
-        for name in ('yellow', 'purple_fragment', 'purple'):
+        categories = [name for name in CARD_ORDER
+                      if stone_limit is None or stone_limit > 0 or not name.startswith('stone_')]
+        roll = rng.randrange(sum(r['land_card_weights'][name] for name in categories))
+        for name in categories:
             roll -= r['land_card_weights'][name]
             if roll < 0:
                 rewards.append(copy.deepcopy(rng.choice(pools[name])))
+                if stone_limit is not None and name.startswith('stone_'):stone_limit -= 1
                 break
+    if stone_limit is not None:rng.shuffle(rewards)
     return rewards
 
 
@@ -88,7 +95,12 @@ def weekly(role,s,now,r):
                     recv_time=now,send_time=now,prizes=prizes,claimed=False,no_expiry=True,expires_at=None,
                     sender='系统',delivery_key=key)
                 news(s,now,f"上周逐鹿排名第{mine['order']}，奖励已发至系统邮件。")
-    s['week']=week;s['week_soul']=0
+    # Close the old week's rank before clearing progression. Growth and wallet
+    # belong to the account; clears, first-win cards and map access to the week.
+    s.update(week=week,week_soul=0,map_level=1,boss_layer=0,inv_boss_layer=0,
+             total_score=0,history={},inv_history={},boss=None,hell=None,
+             unlocked=[],hell_counts={},swept=False,tower_id=0,towers={},travel=None)
+    news(s,now,'猎魂之地已刷新：镇妖塔与地图进度重置，魂力、阵位和符咒保留。')
 
 
 # Guard automatic settlement as well as direct activity operations.

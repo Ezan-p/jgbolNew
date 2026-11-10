@@ -122,7 +122,8 @@ def mail_scope(key):
                           ('hunt', 'hunt'), ('babel', 'babel'), ('home', 'home'),
                           ('caishen', 'caishen'), ('fish', 'fish'), ('duty', 'duty'),
                           ('abyss', 'abyss'), ('monday', 'monday'), ('tangwang', 'tangwang'),
-                          ('party', 'party')):
+                          ('party', 'party'), ('moon-recycle-', 'seasonal'),
+                          ('rice-recycle-', 'seasonal')):
         if key.startswith(prefix):
             return 'activity_' + scope
     if key == 'anniversary':

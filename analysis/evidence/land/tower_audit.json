@@ -1,5 +1,5 @@
 {
-  "revision": "land-tower-power-2026-10-30-v4",
+  "revision": "land-tower-power-2026-11-09-v5",
   "rule_class": "B",
   "floors_per_world": 64,
   "distinct_chiefs": 64,
@@ -12,45 +12,243 @@
     "hell_level_step": 8,
     "stat_percent": 115,
     "min_floor_growth_percent": 3,
-    "normal_stat_multiplier": 2,
-    "hell_stat_multiplier": 4
+    "normal_stat_multiplier": 4,
+    "hell_stat_multiplier": 8
   },
   "rewards": {
     "pool": [
       [
-        12,
-        0,
-        10000,
-        1
-      ],
-      [
-        12,
-        0,
-        30000,
-        1
-      ],
-      [
-        11,
-        0,
-        20,
-        1
-      ],
-      [
         5,
-        1001,
+        10101,
         1,
         1
       ],
       [
         5,
-        1001,
-        3,
+        10102,
+        1,
         1
       ],
       [
         5,
-        10000,
+        10103,
+        1,
+        1
+      ],
+      [
         5,
+        10104,
+        1,
+        1
+      ],
+      [
+        5,
+        10105,
+        1,
+        1
+      ],
+      [
+        5,
+        10106,
+        1,
+        1
+      ],
+      [
+        5,
+        10107,
+        1,
+        1
+      ],
+      [
+        5,
+        10108,
+        1,
+        1
+      ],
+      [
+        5,
+        10109,
+        1,
+        1
+      ],
+      [
+        5,
+        10110,
+        1,
+        1
+      ],
+      [
+        5,
+        10111,
+        1,
+        1
+      ],
+      [
+        5,
+        10112,
+        1,
+        1
+      ],
+      [
+        5,
+        10113,
+        1,
+        1
+      ],
+      [
+        5,
+        10114,
+        1,
+        1
+      ],
+      [
+        5,
+        10115,
+        1,
+        1
+      ],
+      [
+        5,
+        10116,
+        1,
+        1
+      ],
+      [
+        5,
+        10117,
+        1,
+        1
+      ],
+      [
+        5,
+        10118,
+        1,
+        1
+      ],
+      [
+        5,
+        10119,
+        1,
+        1
+      ],
+      [
+        5,
+        10001,
+        1,
+        1
+      ],
+      [
+        5,
+        10201,
+        1,
+        1
+      ],
+      [
+        5,
+        10202,
+        1,
+        1
+      ],
+      [
+        5,
+        10203,
+        1,
+        1
+      ],
+      [
+        5,
+        10204,
+        1,
+        1
+      ],
+      [
+        5,
+        10205,
+        1,
+        1
+      ],
+      [
+        5,
+        10206,
+        1,
+        1
+      ],
+      [
+        5,
+        10207,
+        1,
+        1
+      ],
+      [
+        5,
+        10208,
+        1,
+        1
+      ],
+      [
+        5,
+        10209,
+        1,
+        1
+      ],
+      [
+        5,
+        10210,
+        1,
+        1
+      ],
+      [
+        5,
+        10211,
+        1,
+        1
+      ],
+      [
+        5,
+        10212,
+        1,
+        1
+      ],
+      [
+        5,
+        10213,
+        1,
+        1
+      ],
+      [
+        5,
+        10214,
+        1,
+        1
+      ],
+      [
+        5,
+        10215,
+        1,
+        1
+      ],
+      [
+        5,
+        10216,
+        1,
+        1
+      ],
+      [
+        5,
+        10217,
+        1,
+        1
+      ],
+      [
+        5,
+        10218,
+        1,
+        1
+      ],
+      [
+        5,
+        10219,
+        1,
         1
       ],
       [
@@ -61,14 +259,25 @@
       ],
       [
         5,
-        10001,
-        1,
+        10000,
+        20,
         1
       ]
     ],
     "normal_cards": 5,
     "hell_cards": 3,
-    "draw": "uniform_without_replacement_random_order",
+    "draw": "weighted_category_with_stone_cap_then_shuffle",
+    "stone_card_limits": {
+      "normal": 2,
+      "hell": 1
+    },
+    "category_weights": {
+      "stone_10": 20,
+      "stone_20": 15,
+      "yellow": 55,
+      "purple_fragment": 8,
+      "purple": 2
+    },
     "costs": [
       0,
       20,
@@ -90,10 +299,31 @@
         1001,
         10,
         1
+      ],
+      [
+        5,
+        10000,
+        5,
+        1
       ]
     ]
   },
   "unit_rows": 576,
+  "guard_rows": 70,
+  "top_guard_min_exceeds_twice_202610_max": true,
+  "entry_guard_max_below_40_percent_of_20261109_min": true,
+  "travel_soul_by_map": [
+    100,
+    200,
+    350,
+    500
+  ],
+  "tower_soul_by_type": [
+    80,
+    40,
+    20,
+    10
+  ],
   "original_sources": [
     "analysis/configs/cortege/cortege_base_0.csv",
     "analysis/configs/cortege/cortege_name_0.csv"

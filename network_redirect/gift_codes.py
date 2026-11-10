@@ -119,7 +119,9 @@ def settle(db, role, account, req, now, rules):
     specs.extend(list(choice(random_pool(c))) for c in row.get('random_prizes', []))
     role.setdefault('summon', {})  # Fresh accounts may not have summoned yet.
     previous_ids = {item['id'] for item in role['attachments']}
-    prizes = [item_rewards.grant(role, p) for p in specs]
+    from . import level_card
+    prizes = [level_card.grant_code_prize(role, p) if p[:2] == [5, level_card.ITEM]
+              else item_rewards.grant(role, p) for p in specs]
     for item in role['attachments']:
         if (item['id'] not in previous_ids and item['attach_type'] == 5
                 and int(formation.ITEMS[item['type_id']]['main_type']) in (1, 2, 3)):

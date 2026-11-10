@@ -1,10 +1,48 @@
 -- Embedded in each event adapter so their selection and quota stay independent.
   local craftRemaining,craftReset=__CRAFT_DAILY_LIMIT__,0
+  local weeklyRefresh,countdownRevision=0,0
   local function updateCraft(data)
+   if data and type(data.next_weekly_refresh)=='number' then
+    weeklyRefresh=data.next_weekly_refresh
+   end
    if data and type(data.local_craft_remaining)=='number' then
     craftRemaining=data.local_craft_remaining
     craftReset=data.local_craft_reset_time or 0
    end
+  end
+  local function stopActivityCountdown()
+   countdownRevision=countdownRevision+1
+  end
+  local function showActivityCountdown(frameName)
+   stopActivityCountdown()
+   local frame=ui[frameName]
+   local layer=frame and frame.main_layer
+   if not layer then return end
+   local revision=countdownRevision
+   layer:removeChildByTag(ui.g_self.timeTag,true)
+   local label=ms.d_u.createByStyles({type='label',font='arial',fontsize=22,
+    x=ui.g_self.mx,y=ui.g_self.my+ui.g_self.h*0.46,
+    string='',color={255,255,255}})
+   layer:addChild(label,1,ui.g_self.timeTag)
+   local function tick()
+    if revision~=countdownRevision or ui[frameName]~=frame or frame.main_layer~=layer then return end
+    if not enabled then label:setString('暂未开放');return end
+    local now=ms.d_time.getTime()
+    local deadline=weeklyRefresh
+    if deadline<=0 then
+     -- Beijing Monday 00:00, until the first server status arrives.
+     local day=math.floor((now+8*3600)/86400)
+     deadline=(math.floor((day+3)/7)*7+4)*86400-8*3600
+    elseif now>=deadline then
+     deadline=deadline+(math.floor((now-deadline)/(7*86400))+1)*7*86400
+    end
+    local left=math.max(0,math.floor(deadline-now))
+    label:setString(string.format('活动倒计时：%d天 %02d:%02d:%02d',
+     math.floor(left/86400),math.floor(left/3600)%24,math.floor(left/60)%60,left%60))
+    -- Attach the timer to the label so replacing/closing it cancels the action.
+    ms.d_u.delay(label,1,tick)
+   end
+   tick()
   end
   local function availableCrafts()
    if craftReset>0 and ms.d_time.getTime()>=craftReset then

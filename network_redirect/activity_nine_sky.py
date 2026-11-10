@@ -56,14 +56,15 @@ def load_rules(path=ROOT / 'server_config/nine_sky_rules.json'):
         f.require(all(type(row.get('weight')) is int and 1 <= row['weight'] <= 10000 for row in r[name]), '九重天奖励权重缺失')
     low = [x for x in r['star_shop'] if x.get('tier') == 'low']
     high = [x for x in r['star_shop'] if x.get('tier') == 'high']
-    f.require(len(r['star_shop']) == 19 and len(low) == 9 and len(high) == 10 and
-              [x['reward'] for x in low] == [[5, t, 1, 1] for t in (1022,1023,1041,1033,1006,1032,1024,1042,1007)] and
+    f.require(len(r['star_shop']) == 17 and len(low) == 7 and len(high) == 10 and
+              [x['reward'] for x in low] == [[5, t, 1, 1] for t in (1022,1023,1033,1006,1032,1024,1007)] and
               {tuple(x['reward']) for x in high} == {(10,5027,5,1),(10,5036,5,1),(5,1031,5,1),(5,1249,50,1),(5,1243,1,1),(5,1246,1,1),
                   (5,6002,5,1),(5,6003,5,1),(5,6004,5,1),(5,6005,5,1)}, '九重商会奖励池不完整')
     f.require(all(type(x.get('listing_weight')) is int and 1 <= x['listing_weight'] <= 100 for x in high)
               and sum(x['listing_weight'] for x in high) == 100, '九重商会高级池上架权重须为正整数且合计100')
-    f.require(all(x['cost'] < y['cost'] for x,y in zip(low,low[1:])) and
-              all(x['limit'] == 1 for x in r['star_shop']), '九重商会定价须递增、每种每日限兑一份')
+    f.require(all(x['cost'] < y['cost'] for x,y in zip(low,low[1:])), '九重商会低级池定价须递增')
+    f.require(all(x['limit'] == (1 if x['reward'][1] == 1024 else 5) for x in low) and
+              all(x['limit'] == 1 for x in high), '九重商会低级商品限兑五份，魂缘丹与高级商品限兑一份')
     return r
 
 
@@ -128,9 +129,19 @@ def refresh_shop(s, r, today):
                           '2': list(s.get('purchases',{}).get('2',[])) if legacy else [0]*len(r['credit_shop'])}
         s['shop_day'] = today
     if s.get('shop_revision') != r['revision']:
-        # Configuration updates retain today's selection and purchases.
+        # Retain existing offers and their quotas; replace retired offers only.
         configured = {tuple(x['reward'][:2]): x for x in r['star_shop']}
-        s['shop'] = [copy.deepcopy(configured[tuple(x['reward'][:2])]) for x in s['shop']]
+        present = {tuple(x['reward'][:2]) for x in s['shop']}
+        replacements = [x for x in r['star_shop'] if x['tier'] == 'low'
+                        and tuple(x['reward'][:2]) not in present]
+        updated = []
+        for index, row in enumerate(s['shop']):
+            current = configured.get(tuple(row['reward'][:2]))
+            if current is None:
+                current = replacements.pop(secrets.randbelow(len(replacements)))
+                s['purchases']['1'][index] = 0
+            updated.append(copy.deepcopy(current))
+        s['shop'] = updated
         s['shop_revision'] = r['revision']
 
 

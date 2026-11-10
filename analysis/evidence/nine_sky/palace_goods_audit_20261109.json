@@ -1,0 +1,438 @@
+{
+  "checked_on": "2026-11-09",
+  "scope": "Research only; candidate additions are not historical palace inventory or implemented changes.",
+  "client_sources": [
+    {
+      "logical": "lua/ui/towerUI.lua",
+      "path": "jgbol3.87/assets/release_/ca54c49c8a53f04343f4f2774428ba45.data",
+      "sha256": "1b7cc09f055fee860511043d344368aed4eb4b5b0eb063129ededc1561b3e842"
+    },
+    {
+      "logical": "csv_config/item_name.csv",
+      "path": "jgbol3.87/assets/release_/70cb741174c493cf0a6d5de29ad7894c.data",
+      "sha256": "107da82bd2e8050c6e44dd8da0875f874a56de4cd29db58bc6a4959d3072e685"
+    },
+    {
+      "logical": "v2/String.plist",
+      "path": "jgbol3.87/assets/release_/08b0428edce64d19f304d30c3829ec87.data",
+      "sha256": "e04af124a848226b08c5a73069666e5eb5fd96294725e380a3e187e7a63b4dc4"
+    },
+    {
+      "logical": "v2/String2.plist",
+      "path": "jgbol3.87/assets/release_/e926a25accffd37afafb015933e815d4.data",
+      "sha256": "1fe10126d1e888551fbe998879cd2d0a1db404e9c6406bccb620f117e31a4943"
+    }
+  ],
+  "client_functions": [
+    {
+      "function": "getItemIcon",
+      "prototype": 21,
+      "source_lines": [
+        500,
+        512
+      ],
+      "strings": [
+        "object_type",
+        "attach_type",
+        "getStarCardSprite",
+        "attach_level",
+        "create",
+        "v2/towerUI/p_roll.png",
+        "d_ms",
+        "d_data",
+        "getCertainSmallSprite"
+      ],
+      "numbers": [
+        1,
+        -1
+      ]
+    },
+    {
+      "function": "getItemName",
+      "prototype": 22,
+      "source_lines": [
+        514,
+        526
+      ],
+      "strings": [
+        "object_type",
+        "attach_type",
+        "format",
+        "tower11",
+        "attach_level",
+        "tower12",
+        "d_ms",
+        "d_data",
+        "getCertainInfo",
+        "name"
+      ],
+      "numbers": [
+        1,
+        -1
+      ]
+    },
+    {
+      "function": "processTinaInfo",
+      "prototype": 40,
+      "source_lines": [
+        904,
+        919
+      ],
+      "strings": [
+        "g_self",
+        "tinaIndex",
+        "shop_index",
+        "special_shop_data",
+        "left_shop",
+        "special_role_shop_data",
+        "role_buy_list",
+        "shop_data",
+        "shopTag",
+        "Cur",
+        "right_shop",
+        "role_shop_data",
+        "Next",
+        "predit_shop"
+      ],
+      "numbers": []
+    },
+    {
+      "function": null,
+      "prototype": 48,
+      "source_lines": [
+        1050,
+        1092
+      ],
+      "strings": [
+        "shopTag",
+        "Big",
+        "g_self",
+        "shop_data",
+        "buy_limit",
+        "role_shop_data",
+        "richman5",
+        "showComplexBuyLayer",
+        "Small",
+        "need_credits",
+        "role_data",
+        "credits",
+        "tower10",
+        "sendRequest",
+        "buy_shop_item",
+        "index",
+        "Special",
+        "special_shop_data",
+        "special_role_shop_data",
+        "money_type",
+        "gold_coin",
+        "d_ms",
+        "d_mainUI",
+        "g_playerInfo",
+        "need_count",
+        "d_summonUI",
+        "needGold",
+        "g_towerUI",
+        "main_layer",
+        "silver_coin",
+        "enhance_cannot1",
+        "buy_tina_item",
+        "tinaIndex",
+        "shop_index",
+        "Cur"
+      ],
+      "numbers": []
+    },
+    {
+      "function": "showSpecialItem",
+      "prototype": 77,
+      "source_lines": [
+        1626,
+        1687
+      ],
+      "strings": [
+        "g_towerUI",
+        "main_layer",
+        "getChildByTag",
+        "g_self",
+        "Tags",
+        "Mystery",
+        "removeChildByTag",
+        "Special",
+        "create",
+        "MysterySize",
+        "width",
+        "height",
+        "special_shop_data",
+        "special_role_shop_data",
+        "attach_data",
+        "d_ms",
+        "d_data",
+        "getCertainSmallSprite",
+        "object_type",
+        "attach_type",
+        "attach_level",
+        "getCertainInfo",
+        "name",
+        "attach_count",
+        "X",
+        "addChild",
+        "d_u",
+        "createByStyle",
+        "string",
+        "x",
+        "y",
+        "color",
+        "money_type",
+        "gold_coin",
+        "v2/money_gold.png",
+        "tokenPic",
+        "v2/money_silver.png",
+        "pic",
+        "scale",
+        ": ",
+        "need_count",
+        "anchor",
+        "number",
+        "buy_limit",
+        "nsprite",
+        "ssprite",
+        "call_back",
+        "createMenu",
+        "grayMenuItem"
+      ],
+      "numbers": [
+        0.31,
+        0.5,
+        0.15,
+        0.335,
+        0.25,
+        0.03,
+        0.2,
+        0.11,
+        0.35
+      ]
+    }
+  ],
+  "client_strings": {
+    "tower1": "天星",
+    "tower2": "残星",
+    "tower3": "合计",
+    "tower4": "选择兑换数量，可兑换 %d / %d",
+    "tower5": "可使用卡片数量",
+    "tower6": "本次可购买:",
+    "tower7": "下次天宫开启:",
+    "tower8": "免费: %d次",
+    "tower9": "天星不足",
+    "tower10": "残星不足",
+    "tower11": "减%d天星卡",
+    "tower12": "免费骰子",
+    "tower13": "在九重天宫处可购买天星卡",
+    "tower14": "已选择: %d / %d",
+    "tower15": "前进过程一定几率获得天星卡",
+    "tower16": "卡片价值超过商品价值部分将会被回收",
+    "tower17": "卡片价值已经达到商品价格",
+    "tower18": "该卡片数量达到上限",
+    "tower19": "次数",
+    "tower_desc1": "正当你小心探秘时，天边类似流星的物品迅速向你飞来，你费了九牛二虎之力降服了流星，惊喜地发现了宝物。",
+    "tower_desc2": "烈日当空，你寻了一处隐秘的地方进行休息，突然发现你所坐的地方土壤不同其他，你灵机一动，向下挖土，发现了一个宝箱。",
+    "tower_desc3": "你探秘时发现了一处隐秘的洞穴，你小心翼翼地潜入，看着洞中的宝物震惊狂喜。古人诚不欺我。",
+    "tower_desc4": "你被绊倒在地。你捡起害你绊倒的物品破口大骂，却突然发现这竟然是宝贝。",
+    "tower_tip1": "玩家当前坐标",
+    "tower_tip2": "下一重天传送阵坐标",
+    "tower_tip3": "累计前进距离",
+    "tower_tip4": "点击使用进行前进",
+    "tower_tip5": "点击兑换物品"
+  },
+  "original_item_rows": [
+    {
+      "Ftype_id": "1001",
+      "name": "蟠桃",
+      "desc": "延年益寿的神物，培养神仙必备的东西。",
+      "introduce": "培养神仙必备的东西",
+      "order": "600",
+      "product_desc": "封神榜排名积分兑换、大闹蟠桃会、跨服战场、释厄副本"
+    },
+    {
+      "Ftype_id": "1006",
+      "name": "高级召唤符",
+      "desc": "凭此符咒你可以免费进行一次高级召唤。",
+      "introduce": "免费进行一次高级召唤",
+      "order": "12",
+      "product_desc": "召唤时随机获取"
+    },
+    {
+      "Ftype_id": "1007",
+      "name": "超级召唤符",
+      "desc": "凭此符咒你可以免费进行一次超级召唤。",
+      "introduce": "免费进行一次超级召唤",
+      "order": "11",
+      "product_desc": "召唤时随机获取"
+    },
+    {
+      "Ftype_id": "1024",
+      "name": "魂缘丹",
+      "desc": "参加天缘召唤必备道具。",
+      "introduce": "参加天缘召唤必备道具。",
+      "order": "405",
+      "product_desc": "集市出售"
+    },
+    {
+      "Ftype_id": "1031",
+      "name": "VIP乾坤袋",
+      "desc": "来路不明的宝物袋，造型华丽异常。据说不是VIP就敢乱开的人会遭天谴。",
+      "introduce": "VIP才能开的罕见宝物袋",
+      "order": "301",
+      "product_desc": "集市出售"
+    },
+    {
+      "Ftype_id": "1032",
+      "name": "金丝乾坤袋",
+      "desc": "由天庭派发给各路神仙的宝物袋，只有极少数能流落到凡间。",
+      "introduce": "珍贵的宝物袋",
+      "order": "302",
+      "product_desc": "天命之战、集市出售"
+    },
+    {
+      "Ftype_id": "1243",
+      "name": "九重天礼包",
+      "desc": "开启可获得王母魂魄*5和大量蟠桃",
+      "introduce": "开启可获得王母魂魄*5和大量蟠桃",
+      "order": "222",
+      "product_desc": "活动期间集市出售"
+    },
+    {
+      "Ftype_id": "1246",
+      "name": "仙缘果",
+      "desc": "融入顶级神仙魂魄的果子，可逆向归真为指定顶级神仙的魂魄",
+      "introduce": "可指定获得顶级神仙的魂魄",
+      "order": "222",
+      "product_desc": "魂缘万寿山"
+    },
+    {
+      "Ftype_id": "1249",
+      "name": "五法界魂箱",
+      "desc": "开启后可选择获得佛、仙、魔3种五法界魂中的其中一种",
+      "introduce": "界魂宝箱",
+      "order": "222",
+      "product_desc": "仙灵店铺"
+    },
+    {
+      "Ftype_id": "6002",
+      "name": "五星武器碎片",
+      "desc": "神兵碎片散落三界，集齐可锻造出五星武器",
+      "introduce": "五星武器碎片，可用于合成五星武器",
+      "order": "697",
+      "product_desc": "圣尊经书袋、开启乾坤袋"
+    },
+    {
+      "Ftype_id": "6003",
+      "name": "五星防具碎片",
+      "desc": "神兵碎片散落三界，集齐可锻造出五星防具",
+      "introduce": "五星防具碎片，可用于合成五星防具",
+      "order": "698",
+      "product_desc": "圣尊经书袋、开启乾坤袋"
+    },
+    {
+      "Ftype_id": "6004",
+      "name": "五星法宝碎片",
+      "desc": "神兵碎片散落三界，集齐可锻造出五星法宝",
+      "introduce": "五星法宝碎片，可用于合成五星法宝",
+      "order": "699",
+      "product_desc": ""
+    },
+    {
+      "Ftype_id": "6005",
+      "name": "五星被动碎片",
+      "desc": "神术碎片散落三界，集齐可锻造出五星被动",
+      "introduce": "五星被动碎片，可用于合成五星被动",
+      "order": "696",
+      "product_desc": "圣尊经书袋、寿星玩法"
+    }
+  ],
+  "tower_csv_resources": [
+    "csv_config/tower_compose.csv",
+    "csv_config/tower_level.csv",
+    "csv_config/tower_road.csv"
+  ],
+  "current_local_config": {
+    "revision": "nine-sky-2026-11-06-shard-shop-v7",
+    "palace_every": 10,
+    "palace_special": {
+      "reward": [
+        10,
+        5027,
+        5,
+        1
+      ],
+      "money_type": 11,
+      "cost": 300,
+      "limit": 1
+    },
+    "palace_cards": [
+      {
+        "reward": [
+          1,
+          -1,
+          1,
+          50
+        ],
+        "money_type": 11,
+        "cost": 25,
+        "limit": 2
+      },
+      {
+        "reward": [
+          1,
+          -1,
+          1,
+          100
+        ],
+        "money_type": 11,
+        "cost": 50,
+        "limit": 2
+      },
+      {
+        "reward": [
+          1,
+          -1,
+          1,
+          200
+        ],
+        "money_type": 11,
+        "cost": 100,
+        "limit": 2
+      },
+      {
+        "reward": [
+          1,
+          -1,
+          1,
+          500
+        ],
+        "money_type": 11,
+        "cost": 250,
+        "limit": 2
+      }
+    ]
+  },
+  "web": {
+    "queries": [
+      "金箍棒OL 九重天 天宫 商品",
+      "金箍棒 天星卡",
+      "金箍棒OL 九重天宫",
+      "金箍棒 九重天礼包",
+      "金箍棒 九重天 site:9game.cn",
+      "金箍棒 九重天 site:18183.com",
+      "金箍棒 九重天 site:apps.23you.net"
+    ],
+    "complete_original_palace_catalog_found": false,
+    "corroboration_url": "https://apps.23you.net/h-gl-1212-id-5400.html",
+    "corroboration_scope": "仙缘果 belongs to 魂缘万寿山; not evidence of palace sale."
+  },
+  "conclusions": [
+    "Original client renders one general special item from left_shop[1]; item identity and price come from server data.",
+    "Current local palace already sells 王母魂魄 x5 for 300 gold, once per palace.",
+    "No complete original palace inventory, sale probabilities or prices established.",
+    "All proposed additional palace items require inferred design; item existence alone does not prove historical sale."
+  ]
+}

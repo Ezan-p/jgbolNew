@@ -12,7 +12,7 @@ do
   -- Per-function environments also cover the nested native timer closures.
   -- Never change the game's global clock/weekend rules for other activities.
   local pet=ms.d_petHomeUI
-  for name,weekend in pairs({GetPetMenu=true,createShiLianLayer=true,GetResultInsidePetInfo=false}) do
+  for name,weekend in pairs({createShiLianLayer=true}) do
    local fn=pet[name];local original=getfenv(fn)
    local time=setmetatable({is_weekend=function() return weekend end},{__index=ms.d_time})
    local proxy=setmetatable({d_time=time},{__index=ms})
@@ -21,13 +21,26 @@ do
   end
   local petMS=pet.d_ms
   local hz=setmetatable({gethz=function(key,...)
-   if key=='pet_lucky_hint5' then return '领养活动每日开放' end
+   if key=='pet_lucky_hint5' or key=='pet_lucky_hint4' then return '领养活动仅周六、周日开放' end
    return ms.d_hz.gethz(key,...)
   end},{__index=ms.d_hz})
   pet.d_ms=setmetatable({d_hz=hz},{__index=petMS})
   undo[#undo+1]=function() pet.d_ms=petMS end
 
   local secret=ms.d_secretAreaUI
+  -- Native fight callbacks keep challenge limits in free_times/fight_count.
+  -- Only the settlement rendering uses treasure quota and cleared floors.
+  local nativeEnd=secret.showFightEnd
+  replace(secret,'showFightEnd',function(...)
+   local s=secret.g_self;local data=s.fight_data or {}
+   local free,count=s.free_times,s.fight_count
+   if data.search_free_times~=nil then s.free_times=data.search_free_times end
+   if data.cleared_layer~=nil then s.fight_count=data.cleared_layer end
+   local ok,result=pcall(nativeEnd,...)
+   s.free_times=free;s.fight_count=count
+   if not ok then error(result) end
+   return result
+  end)
   local remainingLabel,remainingParent
   local function rememberLabel(node,parent)
    remainingLabel=node;remainingParent=parent;node:setTag(910043)
@@ -124,7 +137,7 @@ do
    if data.result==1 and data.flag~=7 then
     local cached=secret.g_self.prize_data
     if cached then
-     for _,key in ipairs({'free_times','max_free_times','search_count','cleared_layer','max_layer','all_point'}) do
+     for _,key in ipairs({'free_times','max_free_times','earned_search_times','search_per_layer','search_count','cleared_layer','max_layer','all_point'}) do
       if data[key]~=nil then cached[key]=data[key] end
      end
     end
@@ -157,6 +170,22 @@ do
   end)
 
   local escort=ms.d_escortUI
+  -- User-confirmed no-pity refresh overrides the native guaranteed-purple text.
+  -- Scope translations to this module, preserving other screens and restore.
+  local escortMS=escort.d_ms or ms
+  local originalEscortMS=escort.d_ms
+  local escortTips={
+   book_tip28='还可刷新%d次，品质随机',
+   book_tip281='已获得最高档经书',
+   book_tip282='刷新次数已用完，可运送当前经书',
+   book_tip283='已获得最高档经书',
+   book_tip284='仅随机刷新高四档，可降档、可重复，无保底',
+  }
+  local escortHZ=setmetatable({gethz=function(key,...)
+   return escortTips[key] or escortMS.d_hz.gethz(key,...)
+  end},{__index=escortMS.d_hz})
+  escort.d_ms=setmetatable({d_hz=escortHZ},{__index=escortMS})
+  undo[#undo+1]=function() escort.d_ms=originalEscortMS end
   local nativeRest=escort.getEscortRestTime
   replace(escort,'getEscortRestTime',function(format,...)
    local state=escort.g_escortUI

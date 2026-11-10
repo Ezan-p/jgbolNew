@@ -152,13 +152,9 @@ class PetTests(ActivityCase):
         self.assertEqual(self.req(1330,flag=1,id=1,data=summon.lua(dict(des_id=target,src_list=[food])))[0][0],55)
         self.assertEqual(before,self.b.profile())
 
-    def test_star_stones_have_purchasable_source(self):
-        r=self.b.profile();summon.add_item(r,1361,10000);self.b.save(r)
-        for tid in (1347,1348,1349):
-            rows=[row for row in self.b.activity_rules['home_shop'] if row.get('page',1)==2]
-            index=next(i for i,row in enumerate(rows,1) if row['reward'][1]==tid)
-            self.ok(self.req(1348,id=15,data=summon.lua(dict(shop_page=2,item_index=index,buy_count=1))))
-            self.assertEqual(sum(p['count'] for p in self.b.profile()['attachments'] if p['type_id']==tid),5)
+    def test_star_stones_removed_from_home_shop(self):
+        offered={row['reward'][1] for row in self.b.activity_rules['home_shop']}
+        self.assertTrue(offered.isdisjoint({1347,1348,1349}))
 
     def test_full_capacity_query_fits_native_packet(self):
         self.seed([(201,4)]*pets.load_rules()['capacity'])
@@ -173,7 +169,9 @@ class PetTests(ActivityCase):
     def test_training_box_use_replay_and_locked_rejection(self):
         r=self.b.profile();summon.add_item(r,1346,3);self.b.save(r)
         item=next(p for p in r['attachments'] if p['type_id']==1346)
-        self.ok(self.req(1051,item_type=1346,item_id=item['id'],item_count=2,des_type=1,des_id=0))
+        with patch('network_redirect.pets.summon.weighted_choice',side_effect=[10,20]) as draw:
+            self.ok(self.req(1051,item_type=1346,item_id=item['id'],item_count=2,des_type=1,des_id=0))
+            self.assertEqual(draw.call_count,2)
         r=self.b.profile()
         self.assertEqual(sum(p['count'] for p in r['attachments'] if p['type_id']==1345),30)
         self.assertEqual(self.b.respond(self.packet,self.state),self.replies)

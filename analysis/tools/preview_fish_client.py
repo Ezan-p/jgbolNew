@@ -51,7 +51,8 @@ def main():
         evaluate('fishPreview.shop();return "shop"')
         capture('shop.png')
         evaluate('fishPreview.preview();return "preview"')
-        capture('rewards.png')
+        assert evaluate('return tostring(package.loaded.ms.d_fishRushUI.g_FishRushUI.main_layer:getChildByTag(91027)==nil)') == 'true'
+        report['reward_preview_removed'] = True
         report['passed'] = True
     finally:
         try:

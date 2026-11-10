@@ -59,14 +59,13 @@ check('native single and ten rewards',function()
  ui.onGetFishRushResult(ms.d_c.table_copy(FIXTURE.single))
  ui.onGetFishRushResult(ms.d_c.table_copy(FIXTURE.ten))
 end)
-check('native nine reward preview with silver and VIP bag',function()
- local count=0;local sprite=ms.d_data.getCertainSmallSprite
- local close;local menu=ms.d_u.createMenu
- ms.d_u.createMenu=function(styles,...) close=styles[1].call_back;return menu(styles,...) end
- ms.d_data.getCertainSmallSprite=function(...) count=count+1;return sprite(...) end
- ui.showPriceListInfo();ms.d_data.getCertainSmallSprite=sprite
- assert(count==9 and ui.g_FishRushUI.main_layer:getChildByTag(91027))
- close();ms.d_u.createMenu=menu;assert(not ui.g_FishRushUI.main_layer:getChildByTag(91027))
+check('reward preview disabled',function()
+ local main=ui.g_FishRushUI.main_layer
+ assert(not main:isTouchEnabled())
+ local children=main:getChildrenCount();local requests=#sent
+ ui.showPriceListInfo()
+ assert(main:getChildrenCount()==children and #sent==requests)
+ assert(not main:getChildByTag(91027))
 end)
 for idx=1,#FIXTURE.shops do check('native high shop '..idx,function()
  update(FIXTURE.shops[idx])

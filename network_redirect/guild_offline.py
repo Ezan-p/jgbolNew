@@ -79,13 +79,14 @@ def prepare(role,s,g,now,r):
 
 def store(s,r):
     if not s.get('store_stock') or s.get('store_pool_version')!=r['store_pool_version']:
-        # Migrate the old six-slot stock once, keeping today's spent quotas.
+        # Migrate outdated reward pools once, keeping today's spent quotas.
         refresh_store(s,r)
-    # Keep saved slots and spent quotas while applying current offer limits.
-    limits={tuple(row['prize'][:2]):row['limit'] for row in r['store']}
+    # Keep saved slots and spent quotas while applying current prices/limits.
+    offers={tuple(row['prize']):row for row in r['store']}
     for row in s['store_stock']:
-        key=tuple(row['prize'][:2])
-        if key in limits:row['limit']=limits[key]
+        key=tuple(row['prize'])
+        if key in offers:
+            row.update(cost=offers[key]['cost'],limit=offers[key]['limit'])
     return s['store_stock']
 
 
@@ -179,10 +180,15 @@ def validate_rules(r):
     rates=r.get('catch_prop_rates',{})
     require(set(rates)=={'1338','1339','1340','1341'} and all(type(v)is int and 0<v<=100 for v in rates.values()) and rates['1338']<rates['1339']<rates['1340']<rates['1341']==100,'镇魂符概率配置无效')
     require(type(r.get('train_support_percent'))is int and 1<=r['train_support_percent']<=100,'点赞增益配置无效')
+    require(type(r.get('train_support_gold'))is int and 0<r['train_support_gold']<=100000000,'点赞元宝消耗配置无效')
     require(r['catch_success_percent']<=100 and r['pet_limit']<=240 and r['search_daily']<=18,'概率、兽栏或棋盘配置越界')
     require(r['team_daily']==3,'秘境每日最多挑战三层')
-    require(type(r.get('search_per_layer'))is int and r['search_per_layer']>0 and r['search_daily']==r['team_daily']*r['search_per_layer'],'探宝次数必须按通关层数配置')
+    require(type(r.get('search_per_layer'))is int and r['search_per_layer']==5 and r['search_daily']==r['team_daily']*r['search_per_layer'],'探宝次数必须每层5次')
+    require(type(r.get('secret_power_per_level_squared'))is int and 1<=r['secret_power_per_level_squared']<=1000,'秘境等级战力系数无效')
+    rates=r.get('secret_floor_percent')
+    require(isinstance(rates,list) and len(rates)==r['team_daily'] and all(type(n)is int and 100<=n<=1000 for n in rates) and rates[0]==100 and all(y>=2*x for x,y in zip(rates,rates[1:])),'秘境各层战力须至少翻倍')
     require(r['train_resident_required']==240,'原版试炼需要240只栖息宠物')
+    require(type(r.get('train_adoptions_per_floor'))is int and 1<=r['train_adoptions_per_floor']<=100,'试炼每层领养次数无效')
     floors=r.get('train_floors')
     require(type(r.get('train_reference_level')) is int and 1<=r['train_reference_level']<=100,'试炼基准等级无效')
     require(isinstance(floors,list) and len(floors)==4,'试炼必须配置四层')
@@ -204,6 +210,17 @@ def validate_rules(r):
     require(isinstance(r.get('pet_shop_items'),list) and r['pet_shop_items'],'宠物商店配置缺失')
     for item in r['pet_shop_items']:daily.validate_prize(item)
     require(all(any(p[0]==5 and p[1]==tid for p in r['pet_shop_items']) for tid in (1338,1339,1340,1341)),'宠物商店必须包含四种镇魂符')
+    expected={1338:1,1339:1,1340:1,1341:1,1345:5,1347:1,1348:1,1349:1,1346:1}
+    require(len(r['pet_shop_items'])==len(expected) and {p[1]:p[2] for p in r['pet_shop_items'] if p[0]==5}==expected,'宠物商店商品池或每份数量无效')
+    fixed=r.get('pet_shop_fixed_items')
+    require(fixed==[1338,1339,1345],'宠物商店固定商品必须为下品、中品镇魂符和驯养丹')
+    require(type(r.get('pet_shop_random_slots')) is int and r['pet_shop_random_slots']==3,'宠物商店随机位置必须为3个')
+    weights=r.get('pet_shop_weights')
+    require(isinstance(weights,list) and len(weights)==len(expected) and all(type(v)is int and 0<=v<=1000000 for v in weights),'宠物商店抽取权重配置无效')
+    require(all((w==0 if p[1] in fixed else w>0) for p,w in zip(r['pet_shop_items'],weights)),'宠物商店固定商品权重须为0，随机商品权重须为正数')
+    limits=r.get('pet_shop_daily_limits')
+    require(isinstance(limits,list) and len(limits)==len(expected) and all(type(v)is int and v>=0 for v in limits),'宠物商店限购配置无效')
+    require(all(limit==(0 if p[1] in (1338,1339,1340,1341) else 3 if p[1]==1345 else 1 if p[1]==1346 else 5) for p,limit in zip(r['pet_shop_items'],limits)),'宠物商店驯养丹限购3、宝箱限购1、升星材料各5，镇魂符沿用声望规则')
     require(len(r['hunt_shop_unlock'])==len(r['pet_shop_items']) and all(type(v)is int and v>=0 for v in r['hunt_shop_unlock']),'声望解锁配置无效')
     prices=r.get('pet_shop_reputation')
     require(isinstance(prices,list) and len(prices)==len(r['pet_shop_items']) and all(type(v)is int and 0<v<=100000000 for v in prices),'宠物商店声望价格配置无效')
@@ -218,6 +235,16 @@ def validate_rules(r):
     slots=r.get('search_reward_slots')
     require(isinstance(slots,list) and len(slots)==len(r['search_rewards']) and all(type(n)is int and n>0 for n in slots) and sum(slots)==18,'寻宝奖励必须配置18格')
     require(set(r['west_config']['book_worth_config'])==set(map(str,range(1,6))),'取经品质配置不完整')
+    refresh=r.get('escort_refresh',{})
+    require(isinstance(refresh,dict) and refresh.get('mode')=='inferred' and
+            isinstance(refresh.get('reason'),str) and bool(refresh['reason'].strip()),'经书刷新概率推测来源缺失')
+    weights=refresh.get('grade_weights',{})
+    require(isinstance(weights,dict) and set(weights)=={'2','3','4','5'} and
+            all(type(v)is int and 0<v<=100 for v in weights.values()) and
+            sum(weights.values())==100 and len(set(weights.values()))>1,
+            '经书刷新概率必须仅覆盖高四档、非等概率且合计100%')
+    require(r['west_config']['grade_book_max_count']==r['escort_flush_limit'] and
+            r['escort_free_flush']<=r['escort_flush_limit'],'经书刷新次数配置不一致')
     compose=r.get('escort_compose',{})
     require(compose.get('mode')=='inferred' and bool(compose.get('reason')),'经书合成推测来源缺失')
     weights=compose.get('bag_weights',{})

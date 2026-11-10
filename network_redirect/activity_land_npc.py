@@ -26,6 +26,35 @@ def power(n, count):
     return sum(c['combat_power'] for c in n['role']['corteges'] if 1 <= c.get('order', 0) <= count)
 
 
+def guard_pool(map_level,tower_type,r):
+    level=r['land_guard_level_by_map'][map_level-1]
+    tier=r['land_guard_tier_by_type'][tower_type-1]
+    candidates=sorted((n for n in catalog().values() if n['role']['level']==level and n['tier']==tier),
+                      key=lambda n:(power(n,8),n['npc_id']))
+    # Use the strongest real loadouts for both top towers, with disjoint power
+    # bands. The two entry towers use the much weaker T4/T5 loadouts.
+    if tower_type==1:candidates=candidates[len(candidates)//2:]
+    elif tower_type==2:candidates=candidates[:len(candidates)//2]
+    return sorted(n['npc_id'] for n in candidates)
+
+
+def guard(s,tower_type,r):
+    pool=guard_pool(s['map_level'],tower_type,r)
+    a.require(bool(pool),'守塔NPC配置为空')
+    return pool[s['day']%len(pool)]
+
+
+def refresh_entry_guards(s,r):
+    """Replace cached entry guards without resetting occupation or resources."""
+    for t in s.get('towers',{}).values():
+        typ=t['tower_type']
+        if typ not in (3,4) or s['tower_id']==t['id']:continue
+        map_level=t['id']//10
+        if t.get('npc_id') not in guard_pool(map_level,typ,r):
+            key=guard(dict(s,map_level=map_level),typ,r)
+            t.update(npc_id=key,owner_name=catalog()[key]['role']['name'],defender_count=8)
+
+
 def choose(role, s, index=0, fixed=False, excluded=()):
     count = s['grid_count']
     if fixed:
@@ -116,11 +145,11 @@ def inspection(role,ident):
     if s.get('team'):candidates+=s['team']['members']+s['team']['applications']
     candidates+=roster(role,s)
     for t in s.get('towers',{}).values():
-        if t.get('npc_id'):candidates.append(dict(id=940100+t['id'],npc_id=t['npc_id']))
+        if t.get('npc_id'):candidates.append(dict(id=940100+t['id'],npc_id=t['npc_id'],count=t.get('defender_count',s['grid_count'])))
     target=next((m for m in candidates if m['id']==ident and m.get('npc_id')),None)
     if not target:return None
     from . import npc_players
-    return summon.event(11, npc_players.inspection_data(catalog()[target['npc_id']], scene_id=ident, count=s['grid_count']))
+    return summon.event(11, npc_players.inspection_data(catalog()[target['npc_id']], scene_id=ident, count=target.get('count',s['grid_count'])))
 
 
 # Guard automatic settlement as well as direct activity operations.

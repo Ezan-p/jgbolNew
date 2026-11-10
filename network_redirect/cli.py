@@ -138,7 +138,12 @@ async def run(config, args):
         if args.offline:
             from .accounts import Accounts
             from .tls import LocalTLS
-            backend = Accounts(config['runtime_dir'] / 'offline', args.port, emit)
+            from .game_clock import SystemSource
+            from .network_time import TimeService
+            service = TimeService(SystemSource())
+            service.request(force=True)
+            await asyncio.to_thread(service.wait)
+            backend = Accounts(config['runtime_dir'] / 'offline', args.port, emit, network_time=service)
             tls = await asyncio.to_thread(LocalTLS, config['runtime_dir'] / 'offline/tls')
             await asyncio.to_thread(adb, config, 'push', tls.ca, ca_path)
             await asyncio.to_thread(adb, config, 'shell', 'chmod', '644', ca_path)

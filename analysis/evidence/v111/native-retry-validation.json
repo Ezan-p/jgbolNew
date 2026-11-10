@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "checks": [
+    "initial error preserves original callback and stack",
+    "five second error backoff",
+    "persistent errors retry without log flooding",
+    "transient error recovers to pending",
+    "normal pending interval restored",
+    "recovered loader reaches ready",
+    "ready modules skip redundant installation",
+    "continuous source failure returns no wall-time fallback",
+    "integer ABI preserves seconds and nanoseconds",
+    "reload failure also recovers"
+  ],
+  "native_source_sha256": "3017703f82e6f1f65474cc385deb198c40b091a3b289ba52c562b19a6b3a4bac",
+  "scope": "Actual C loader compiled for host, real Lua 5.1, simulated monotonic clock; not Guangsu device validation"
+}

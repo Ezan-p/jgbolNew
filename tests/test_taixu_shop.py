@@ -33,12 +33,29 @@ class TaixuShopTests(TaixuCase):
         self.assertEqual(self.query(), first)
         seen = set(); combinations = set()
         role = self.b.profile()
-        for offset in range(90):
+        for offset in range(365):
             s = u.state(role, NOW + offset * 86400, self.b.activity_rules)
             ids = tuple(p['reward'][1] for p in s['shop'])
             self.assertEqual(len(set(ids)), 6); seen.update(ids); combinations.add(ids)
+            self.assertTrue({1310, 1311, 1312, 1320} <= set(ids))
         self.assertEqual(seen, {p['reward'][1] for p in self.b.activity_rules['undergo_shop']})
-        self.assertGreater(len(combinations), 80)
+        self.assertGreater(len(combinations), 20)
+
+    def test_rare_goods_have_lower_daily_inclusion_probability(self):
+        counts = {p['reward'][1]: 0 for p in self.b.activity_rules['undergo_shop']}
+        role = self.b.profile(); s = {}
+        for day in range(10000):
+            u.refresh_shop(s, role, self.b.activity_rules, day)
+            ids = {p['reward'][1] for p in s['shop']}
+            self.assertEqual(len(ids), 6)
+            for tid in ids:
+                counts[tid] += 1
+        for tid in (1310, 1311, 1312, 1320):
+            self.assertEqual(counts[tid], 10000)
+        for tid in (1314, 1334, 1335):
+            self.assertTrue(430 < counts[tid] < 630, (tid, counts[tid]))
+        for tid in (1313, 1321, 1322, 1323):
+            self.assertTrue(4200 < counts[tid] < 4800, (tid, counts[tid]))
 
     def test_every_product_batch_grants_exact_bundle_and_packet_replay(self):
         self.query(); self.fund()
@@ -96,7 +113,8 @@ class TaixuShopTests(TaixuCase):
         self.assertEqual(migrated['activity']['undergo']['purchases'],
                          {'1001':20, '1343':2, '1034':7, '1024':3})
         s = migrated['activity']['undergo']
-        s['shop'] = copy.deepcopy(self.b.activity_rules['undergo_shop'][:6])
+        catalog = {p['reward'][1]: p for p in self.b.activity_rules['undergo_shop']}
+        s['shop'] = [copy.deepcopy(catalog[tid]) for tid in (1310, 1311, 1312, 1320, 1314, 1334)]
         counts = {p['attach_type']:p['buy_times'] for p in u.shop(s, self.b.activity_rules)}
         self.assertEqual(set(counts), {p['reward'][1] for p in s['shop']})
         self.assertTrue(all(counts[p['reward'][1]] == p['limit'] for p in s['shop']))
@@ -104,7 +122,8 @@ class TaixuShopTests(TaixuCase):
     def test_balance_update_preserves_daily_goods_order_and_used_counts(self):
         self.query(); self.fund()
         role = self.b.profile(); s = role['activity']['undergo']
-        s['shop'] = copy.deepcopy(self.b.activity_rules['undergo_shop'][:6])
+        catalog = {p['reward'][1]: p for p in self.b.activity_rules['undergo_shop']}
+        s['shop'] = [copy.deepcopy(catalog[tid]) for tid in (1310, 1311, 1312, 1320, 1314, 1334)]
         for row in s['shop']: row['limit'] = 5
         s.update(shop_revision='taixu-shop-2026-10-28-v1', shop_token='old-token',
                  shop_view_token='old-token', purchases={'1314':4, '1310':2})
@@ -114,7 +133,7 @@ class TaixuShopTests(TaixuCase):
         self.assertEqual([p['reward'][1] for p in current['shop']], old_ids)
         self.assertEqual(current['purchases'], {'1314':4, '1310':2})
         self.assertEqual(self.b.profile()['attachments'], before)
-        self.assertEqual(rows[1]['buy_times'], 3)
+        self.assertEqual(rows[1]['buy_times'], 98)
         self.assertEqual(rows[5]['buy_times'], 0)
         self.assertNotEqual(rows[1]['shop_token'], 'old-token')
         before = self.b.profile()
@@ -131,7 +150,7 @@ class TaixuShopTests(TaixuCase):
         self.fund(); before = self.b.profile()
         for data in (dict(index=0), dict(index=7), dict(index=True), dict(index=1, count=0),
                      dict(index=1, count=-1), dict(index=1, count=1.5), dict(index=1, count=True),
-                     dict(index=1, count=6), dict(index=1, shop_token='forged')):
+                     dict(index=1, count=101), dict(index=1, shop_token='forged')):
             self.assertEqual(self.call(5, data)[0][0], 55); self.assertEqual(self.b.profile(), before)
         with patch('network_redirect.activity_undergo.encode', side_effect=ValueError('bad response')):
             self.assertEqual(self.call(5, dict(index=1, count=1))[0][0], 55)
@@ -161,6 +180,24 @@ class TaixuShopTests(TaixuCase):
         self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
         self.assertEqual(self.query(), rows)
 
+    def test_v3_material_shelf_missing_guaranteed_goods_is_replaced(self):
+        self.query(); self.fund()
+        role = self.b.profile(); s = role['activity']['undergo']
+        s['shop'] = copy.deepcopy(self.b.activity_rules['undergo_shop'][:6])
+        s.update(shop_revision='taixu-shop-2026-10-31-v3', shop_token='v3-token',
+                 shop_view_token='v3-token', purchases={'1310':5, '1320':5, '1314':2})
+        self.b.save(role); before = self.b.profile()
+        self.assertEqual(self.call(5, dict(index=1, shop_token='v3-token'))[0][0], 55)
+        self.assertEqual(self.b.profile(), before)
+        rows = self.query(); current = self.b.profile()
+        by_id = {p['attach_type']:p for p in rows.values()}
+        self.assertTrue({1310, 1311, 1312, 1320} <= set(by_id))
+        self.assertEqual(by_id[1310]['buy_times'], 95)
+        self.assertEqual(by_id[1320]['buy_times'], 5)
+        self.assertEqual(current['activity']['undergo']['purchases'], before['activity']['undergo']['purchases'])
+        self.assertEqual(current['attachments'], before['attachments'])
+        self.assertTrue(all(p['attach_count'] == 1 for p in rows.values()))
+
     def test_material_pool_covers_equipment_progression_and_conversion_prices(self):
         # Audit against real consumers rather than only the shop's own allowlist.
         used = {int(part.split('|')[0]) for row in summon.rows('equip_advance_cost.csv')
@@ -170,13 +207,17 @@ class TaixuShopTests(TaixuCase):
         catalog = {p['reward'][1]:p for p in self.b.activity_rules['undergo_shop']}
         self.assertEqual(set(catalog), used)
         unit_price = {tid:p['cost']/p['reward'][2] for tid,p in catalog.items()}
-        for src, count, dst in ((1313,10,1314),(1314,2,1334),(1320,5,1321),
+        for src, count, dst in ((1313,10,1314),(1320,5,1321),
                                 (1321,5,1322),(1322,5,1323),(1323,2,1335)):
             self.assertLessEqual(unit_price[dst], unit_price[src]*count)
+        # The requested direct divine-vessel price includes a premium over synthesis.
+        self.assertEqual(unit_price[1334], 3600)
+        self.assertEqual(unit_price[1314]*2, 2000)
 
     def test_config_rejects_missing_pool_duplicate_wrong_quantity_and_wrong_limits(self):
         original = self.b.activity_rules
-        for kind in ('missing', 'duplicate', 'foreign', 'quantity', 'limit', 'high_limit', 'count', 'price'):
+        for kind in ('missing', 'duplicate', 'foreign', 'quantity', 'limit', 'high_limit', 'count', 'price',
+                     'bundle', 'guaranteed', 'extra_guaranteed', 'weight', 'rare_weight'):
             r = copy.deepcopy(original)
             if kind == 'missing': r['undergo_shop'].pop()
             if kind == 'duplicate': r['undergo_shop'][1] = copy.deepcopy(r['undergo_shop'][0])
@@ -186,5 +227,10 @@ class TaixuShopTests(TaixuCase):
             if kind == 'high_limit': r['undergo_shop'][-1]['limit'] = 5
             if kind == 'count': r['undergo_shop_daily_count'] = 5
             if kind == 'price': r['undergo_shop'][0]['cost'] = 0
+            if kind == 'bundle': r['undergo_shop'][0]['reward'][2] = 2
+            if kind == 'guaranteed': r['undergo_shop'][0]['guaranteed'] = False
+            if kind == 'extra_guaranteed': r['undergo_shop'][-1]['guaranteed'] = True
+            if kind == 'weight': r['undergo_shop'][-1]['weight'] = 0
+            if kind == 'rare_weight': r['undergo_shop'][-1]['weight'] = 100
             path = Path(self.tmp.name)/'invalid-rules.json'; path.write_text(json.dumps(r))
             with self.subTest(kind=kind), self.assertRaises(ValueError): activity.load_rules(path)

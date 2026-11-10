@@ -50,7 +50,7 @@ def login_fields(text):
 
 @game_clock.bind_backend
 class Backend:
-    def __init__(self, directory, port, emit, account="local-player", *, clock=None):
+    def __init__(self, directory, port, emit, account="local-player", *, clock=None, network_time=None):
         self.account = account
         self.gift_code_rules = gift_codes.load_rules()
         self.gift_code_replies = {}
@@ -109,7 +109,7 @@ class Backend:
             self.db.execute('INSERT INTO settings VALUES (?, ?)', ('sdk_token', self.token))
             self.db.commit()
         self._owns_clock = clock is None
-        self.clock = clock if clock is not None else game_clock.GameClock(directory, legacy_db=self.db)
+        self.clock = clock if clock is not None else game_clock.GameClock(directory, legacy_db=self.db, network_time=network_time)
         self.time_guard = time_guard.Guard(self.db, directory)
         self.tickets = {}
         self.random_key = secrets.randbelow(0x7ffffffe) + 1
@@ -216,7 +216,7 @@ class Backend:
         return role
 
     @measured("save")
-    def save(self, role, account=None, *, gameplay=True):
+    def save(self, role, account=None, *, gameplay=True, level_card_grant=0):
         account = self.account if account is None else account
         if 'time_guard' not in role:
             self.time_guard.load(account, role, game_clock.now(), clock_blocked=getattr(self.clock, 'quarantined', False))
@@ -245,6 +245,8 @@ class Backend:
         if context and before_achievements and any(
                 role[k] != before_achievements.get(k, 0) for k in ('task_progress', 'task_prize')):
             updates += tian_shu.sync(role)
+        from . import level_card
+        level_card.check_save(before_achievements, role, level_card_grant)
         with phase('save_serialize'):
             serialized = json.dumps(role, ensure_ascii=False)
         # Compare only after migrations, tracking and daily refresh have run.
@@ -284,7 +286,7 @@ class Backend:
         monument.prepare(role, now, self.monument_rules)
         role.update(summon.remaining(role, now))
         self.save(role)
-        return dict(role, server_time=now, random_key=self.random_key)
+        return dict(role, server_time=game_clock.display_now(), random_key=self.random_key)
 
     def bootstrap(self, reconnect=False):
         # 2998/event 80 feeds data.callback_update_config before mainUI is created.
@@ -368,6 +370,14 @@ class Backend:
         role = self.profile() if role is None else role
         return encode(1034, dict(serial_num=serial, first_send=True,
                                 cortege_count=len(role['corteges']), cortege_list=role['corteges']))
+
+    def clock_notifications(self, session):
+        notice = getattr(self.clock, 'notice', None)
+        if (not notice or self.clock.quarantined or
+                session.get('clock_notice_id') == notice['id']):
+            return []
+        session['clock_notice_id'] = notice['id']
+        return [summon.event(55, dict(op_string=notice.get('message', game_clock.DEFERRED_MESSAGE)))]
 
     def inventory(self, role=None, *, changed=None):
         """The byte count is a per-packet limit, not a 255-object account cap."""
@@ -678,17 +688,20 @@ class Backend:
             state['market_sale_time'] = market.sale_time(game_clock.now(), self.market_rules)
             state['market_rotation_start'] = market.rotation_start(game_clock.now(), self.market_rules)
             self.emit('game_login_ok', message='本地账号通过 LS→BS 认证')
-            return [encode(1002, {'result': 0})] + self.bootstrap()
+            return [encode(1002, {'result': 0})] + self.bootstrap() + self.clock_notifications(state)
         if mid == 1016:
             if data['account'] == self.account and data['random_key'] == self.random_key:
                 state['authenticated'] = True
                 state['market_sale_time'] = market.sale_time(game_clock.now(), self.market_rules)
                 state['market_rotation_start'] = market.rotation_start(game_clock.now(), self.market_rules)
-                return [encode(2996, {'ret': 0})] + self.bootstrap(reconnect=True)
+                return [encode(2996, {'ret': 0})] + self.bootstrap(reconnect=True) + self.clock_notifications(state)
             return [encode(2996, {'ret': 1})]
         if not state.get('authenticated'):
             raise ValueError('Business message before login')
         if mid == 2999:
+            from .network_time import RESUME_MARKER
+            if data.get('delay_time') == RESUME_MARKER:
+                self.clock.request_network_sync()
             role = self.profile()
             if '*' in role.get('time_guard', {}).get('blocked', []):
                 # A quarantined legacy save may never have initialized activity
@@ -697,12 +710,16 @@ class Backend:
                 if not state.get('time_guard_notified'):
                     updates.append(summon.event(55, dict(op_string=time_guard.MESSAGE)))
                     state['time_guard_notified'] = True
-                return [encode(2999, dict(time=game_clock.now(), random_key=self.random_key, delay_time=0))] + self.number_replies(updates)
+                return [encode(2999, dict(time=game_clock.display_now(), random_key=self.random_key, delay_time=0))] + self.number_replies(updates)
             seasonal_before = {'attachments': copy.deepcopy(role['attachments'])}
+            food_weeks_before = copy.deepcopy(role.get('activity',{}).get('seasonal',{}).get('craft_weeks'))
             # Shared activity.prepare may settle Tangwang before its own heartbeat hook.
             tw_before = copy.deepcopy(role.get('activity',{}).get('seasonal',{}).get('tangwang'))
             nine_before = copy.deepcopy(role.get('activity', {}).get('nine_sky', {}).get('last_recycle'))
             now = game_clock.now()
+            from . import activity_seasonal
+            food_state = activity_seasonal.rollover(role,now,self.activity_rules)
+            food_weeks_changed = food_weeks_before != food_state.get('craft_weeks')
             rank_state = role.get('activity', {})
             rank_changed = (rank_state.get('rank_day', -1) < activity.day(now, self.activity_rules)
                             or rank_state.get('rank_reward_version', 1) < 2)
@@ -763,6 +780,10 @@ class Backend:
                 updates.append(summon.event(47,dict(local_tangwang_only=True,tangwang_info=activity_tangwang.payload(
                     tw_state,self.activity_rules['tangwang_rules'],
                     self.activity_rules['seasonal_games']['spring_cards']['enabled']))))
+            if food_weeks_changed:
+                updates.append(summon.event(47,dict(local_seasonal_only=True,
+                    **activity_seasonal.food_status(role,now,self.activity_rules))))
+                updates.append(summon.event(178,activity_seasonal.moon_news(food_state,self.activity_rules)))
             if previous_journey_day != role['journey']['day']:
                 # Reset all cached gate counts without changing last_fight_npc.
                 updates += journey.snapshots(role, reset=False)
@@ -776,7 +797,7 @@ class Backend:
                 updates.append(welfare.hint(role, now, self.welfare_rules))
                 updates.append(welfare.mail_snapshot(role, now, self.welfare_rules))
                 self.save(role)
-            return [encode(2999, dict(time=now, random_key=self.random_key, delay_time=0))] + self.number_replies(self.achievement_pending + updates)
+            return [encode(2999, dict(time=game_clock.display_now(), random_key=self.random_key, delay_time=0))] + self.number_replies(self.achievement_pending + updates + self.clock_notifications(state))
         if mid == 1105:
             last = data['req_serial_num']
             if last == self.server_serial or (last == 0 and not self.reply_history):
@@ -843,7 +864,7 @@ class Backend:
                 or (mid == 1059 and data['flag'] == 3)
                 or (mid == 1201 and data['flag'] in (1, 2))):
             return self.activities(packet, mid, data)
-        if (mid in journey.HANDLED or (mid == 1051 and data['item_type'] in (1020, 1022, 1023))
+        if (mid in journey.HANDLED or (mid == 1051 and data['item_type'] in (1020, 1022, 1023, 1901))
                 or (mid == 2998 and data['id'] == 3)):
             return self.journeys(packet, mid, data)
         if mid == 1094:
@@ -1126,7 +1147,13 @@ class Backend:
             if result == 1:
                 replies = (self.item_deltas(before, role) + self.inventory(role)
                            + summon.soul_snapshots(role) + [welfare_attributes(role), event])
-                self.save(role)  # One SQLite commit for rewards and redemption ledger.
+                # Only this authenticated, successful redemption can authorize
+                # a new card balance; derive its allowance from the claim ledger.
+                from . import level_card
+                claim = self.db.execute('SELECT rewards FROM gift_code_claims WHERE code=? AND account=?',
+                                        (data['sn'].strip().upper(), self.account)).fetchone()
+                card_count = sum(p[2] for p in json.loads(claim[0]) if p[:2] == [5, level_card.ITEM])
+                self.save(role, level_card_grant=card_count)  # Rewards and ledger commit together.
             else:
                 self.db.rollback()
                 replies = [event]
@@ -1503,7 +1530,8 @@ class Backend:
             journey.prepare(role, now, self.journey_rules)
             before = self.operation_baseline(role)
             events = journey.settle(role, mid, data, now, self.journey_rules, self.formation_rules, self.activity_rules)
-            if role.get('activity',{}).get('seasonal',{}).get('tangwang',{}).get('last_recycle') != before.get('activity',{}).get('seasonal',{}).get('tangwang',{}).get('last_recycle'):
+            if (role.get('welfare',{}).get('mails',{}) != before.get('welfare',{}).get('mails',{}) or
+                role.get('activity',{}).get('seasonal',{}).get('tangwang',{}).get('last_recycle') != before.get('activity',{}).get('seasonal',{}).get('tangwang',{}).get('last_recycle')):
                 events.insert(0,welfare.mail_snapshot(role,now,self.welfare_rules))
             achievements.record_events(role, events, game_clock.now(), login_fields)
             welfare.track(role,mid,data,events,now,self.welfare_rules)
@@ -1618,7 +1646,12 @@ class Backend:
             if role != before:
                 formation.prepare(role, self.formation_rules, track_changes=False)
                 immortal.prepare(role, self.immortal_rules, track_changes=False)
-            replies = self.activity_changes(sync_before, role, mid) + events
+            if mid == 1051 and data.get('item_type') == 1346:
+                # Box use only changes inventory. A player can earn this box
+                # before any ladder/seasonal activity has been initialized.
+                replies = self.item_deltas(sync_before or before, role) + self.inventory(role, changed={'attachments'}) + events
+            else:
+                replies = self.activity_changes(sync_before, role, mid) + events
             if poll:
                 replies = events
             self.save(role)

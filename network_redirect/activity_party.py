@@ -16,8 +16,20 @@ BOSS_MAGIC_CAP = 2147483647
 def rules():
     r = json.loads((ROOT/'server_config/party_rules.json').read_text())
     require(r['mode'] == 'inferred', '蟠桃配置须标记推测规则')
-    for k, maximum in [('npc_count', 99), ('boss_hp', 100000000), ('damage_per_peach', 100000000), ('peach_cap', 100)]:
+    for k, maximum in [('npc_count', 99), ('boss_hp', 100000000), ('boss_skill_probability', 100), ('damage_per_peach', 100000000), ('peach_cap', 100)]:
         require(type(r[k]) is int and 1 <= r[k] <= maximum, '蟠桃配置无效：'+k)
+    tiers = r.get('npc_damage_tiers')
+    require(isinstance(tiers, list) and len(tiers) == 10 and r['npc_count'] >= 10, '蟠桃NPC伤害须配置十档')
+    previous_min = 117_700_001
+    for position, tier in enumerate(tiers, 1):
+        require(isinstance(tier, dict) and tier.get('rank') == position, '蟠桃NPC伤害档位顺序无效')
+        values = tier.get('values')
+        require(isinstance(values, list) and len(values) >= 2
+                and all(type(v) is int and 79_150_000 <= v <= 117_700_000 for v in values),
+                '蟠桃NPC预设伤害无效')
+        require(len(set(values)) == len(values) and max(values) < previous_min, '蟠桃NPC伤害档位重复或重叠')
+        previous_min = min(values)
+    require(previous_min > r['boss_hp'] + 9999, '蟠桃NPC前十档须高于普通NPC伤害')
     pool=r.get('boss_pool')
     require(isinstance(pool,list) and len(pool)==3 and {b.get('type') for b in pool}=={4020,5025,3015}, '蟠桃首领池无效')
     require(all(b['type'] in journey.NPCS and isinstance(b.get('name'),str) and b['name'] for b in pool), '蟠桃首领配置无效')
@@ -28,7 +40,7 @@ def rules():
                 and skill.get('formula') == '3' and int(skill.get('use_probability', 0)) > 0,
                 '蟠桃首领群攻技能无效')
     for key in ('daily_rewards',):
-        require([x['end'] for x in r[key]] == [5, 10, 50], '蟠桃奖励名次无效')
+        require([x['end'] for x in r[key]] == [5, 10, 20, 50], '蟠桃奖励名次无效')
         for row in r[key]:
             for p in row['prizes']:
                 require(len(p) == 4 and p[0] in (5, 11, 12) and (p[0] != 5 or p[1] in formation.ITEMS) and 0 < p[2] <= 100000, '蟠桃奖励无效')
@@ -41,13 +53,29 @@ def stable(*parts):
 
 @lru_cache(maxsize=1)
 def catalog():
-    from . import npc_players
+    from . import npc_players, activity_rank
     pool = json.loads((ROOT/'analysis/npc_design/v1/catalog.json').read_text())['npcs']
     pool = [npc_players.decorate(n) for n in pool]
     pool = sorted((n for n in pool if n['role']['level'] >= 13), key=lambda n: (n['role']['role_combat_power'], n['npc_id']))
     # Keep legacy IDs inspectable in saved historical boards.
     count = 99
-    return {950001+i: pool[i*(len(pool)-1)//max(1,count-1)] for i in range(count)}
+    result = {950001+i: pool[i*(len(pool)-1)//max(1,count-1)] for i in range(count)}
+    # Dedicated aliases keep current and historical inspections independent of
+    # both daily score ordering and the player's swaps on the live ladder.
+    # Bootstrap needs ten elite templates, not a full 500-role ladder rebuild.
+    # Use the same source, decoration and power calculation as the ladder loader.
+    from . import combat_power, formation
+    ladder = json.loads((ROOT / activity_rank.rules()['ladder_catalog']).read_text())['npcs']
+    elite = ladder[10:20]
+    require(len(elite) == 10, '蟠桃NPC模板不足十名')
+    for position, row in enumerate(elite, 1):
+        require(row['order'] == position + 10 and row['scene_id'] == 930010 + position,
+                '蟠桃NPC封神榜模板顺序无效')
+        npc = npc_players.decorate(npc_players.source_file(row['source_file'])[row['npc_id']])
+        combat_power.recalculate(npc['role'], formation.load_rules())
+        require(npc['role']['role_combat_power'] == row['power'], '蟠桃NPC战力明细已过期')
+        result[950100 + position] = npc
+    return result
 
 
 def week(day):
@@ -63,9 +91,18 @@ def identity(role, ident):
 
 def daily_board(role, day, second, ar):
     # Ranking-only NPC scores: fixed for the entire local day, unrelated to HP.
-    ids = sorted(catalog(), key=lambda ident: stable('party-roster', day, ident))[:rules()['npc_count']]
+    ids = sorted((ident for ident in catalog() if 950001 <= ident <= 950099),
+                 key=lambda ident: stable('party-roster', day, ident))[:rules()['npc_count']]
     rows = [dict(identity(role, ident), damage=10000 + stable('party-score', day, ident) % rules()['boss_hp'], lucky=0)
             for ident in ids]
+    rows.sort(key=lambda x: (-x['damage'], x['id']))
+    # Preserve the ordinary NPCs; each elite tier draws one fixed candidate per day.
+    tiers = rules()['npc_damage_tiers']
+    rows = rows[len(tiers):]
+    for tier in tiers:
+        position, values = tier['rank'], tier['values']
+        damage = values[stable('party-tier-score', day, position) % len(values)]
+        rows.append(dict(identity(role, 950100+position), damage=damage, lucky=0))
     p = role['activity']['party']
     if p['day'] == day and p['count']:
         rows.append(dict(identity(role,role['role_id']),damage=p['damage'],lucky=0))
@@ -153,7 +190,8 @@ def prepare_boss(unit, boss):
     config = next(b for b in rules()['boss_pool'] if b['type'] == boss['boss_type'])
     skill = config['aoe_skill']
     unit.update(hp=boss['cur_hp'], max_hp=rules()['boss_hp'], magic=BOSS_MAGIC_CAP,
-                skills=[(skill, 1)], party_finisher_skill=skill)
+                skills=[(skill, 1)], party_finisher_skill=skill,
+                skill_probabilities={skill: rules()['boss_skill_probability']})
 
 
 def record(role, damage, gain, ar):
@@ -205,6 +243,7 @@ def sync(role):
 
 def seasonal_rewards(role, now, ar):
     from . import activity_seasonal as season
+    season.rollover(role,now,ar)
     return [journey.grant(role,p) for p in season.material_specs(ar)]
 
 

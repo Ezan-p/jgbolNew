@@ -37,6 +37,8 @@ class OfflineLandTests(ActivityCase):
         when=NOW+8*3600
         with patch('network_redirect.game_clock.now',return_value=when):
             self.ok(self.land(1));self.assertEqual(self.land(4,flag=1,des_type=2,des_id=11)[0][0],55)
+            from tests.test_activity_land_balance import strong_party
+            strong_party(self)
             self.ok(self.team(1));self.ok(self.team(3,id_list=[940001,940002]))
             out=self.land(4,flag=1,des_type=2,des_id=11);self.ok(out)
             replay=out[-1][1]['final_result_list'][1]
@@ -82,7 +84,7 @@ class OfflineLandTests(ActivityCase):
         self.ok(self.land(1));r=self.b.profile();identity=r['role_id']
         # A designed endgame army with a full set of activity charms. This is
         # an isolated flow fixture for the stronger towers, not a natural grind.
-        model=next(n for n in npc.catalog().values() if n['role']['level']==99 and n['tier']=='T2')
+        model=next(n for n in npc.catalog().values() if n['role']['level']==99 and n['tier']=='T1')
         r.update(copy.deepcopy(model['role']));r['role_id']=identity
         r['activity']['land'].update(soul_count=100000,
             charms={str(i):dict(key=(i-1)%4+1,value=30,unlock=True,is_open=True)

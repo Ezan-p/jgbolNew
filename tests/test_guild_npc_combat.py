@@ -99,6 +99,15 @@ class GuildNpcCombatTests(unittest.TestCase):
         self.assertEqual(first,s['instances']['team_opponents'])
         self.assertEqual(serial,s['random_serial'])
         self.assertEqual(second['enemy_npc'],replay['enemy_npc'])
+        self.assertEqual(second['secret_difficulty'],replay['secret_difficulty'])
+        for row in replay['secret_difficulty']['units']:
+            self.assertEqual(replay['line_up_msg']['lineup'][row['order']-1]['des_hp'],row['hp'])
+        s['instances']['layer']=1
+        self.backend.save(role)
+        restored=self.backend.profile();s=restored['guild']
+        _,_,later=guild_combat.simulate(restored,s,self.backend.guild_rules,self.backend.journey_rules,15,'仙盟秘境',ally_roles=actors)
+        self.assertEqual(later['enemy_npc'],replay['enemy_npc'])
+        self.assertGreater(later['secret_difficulty']['attribute_power'],2*replay['secret_difficulty']['attribute_power'])
 
     def test_selected_npc_fights_training_with_own_formation(self):
         self.request(1,union_name='试炼道友盟')
@@ -170,7 +179,7 @@ class GuildNpcCombatTests(unittest.TestCase):
         with patch('network_redirect.guild_instances.simulate',return_value=fake):
             for _ in range(3):self.request(80)
         role=self.backend.profile();a=role['guild']['instances']
-        self.assertEqual(a['train_hp'],a['train_bosses'][0]['hp']-300)
+        self.assertEqual(a['train_hp'],a['train_bosses'][0]['hp'])
         self.assertEqual(a['train_end'],NOW+self.backend.guild_rules['train_seconds'])
         a.update(train_cleared=1,train_floor=2,train_hp=20000,train_floor_attempts=0);self.backend.save(role)
         self.assertEqual(self.request(79)[-1][2]['result'],58)

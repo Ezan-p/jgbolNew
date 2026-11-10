@@ -34,6 +34,12 @@ def load_rules(path=ROOT/'server_config/hunt_rules.json'):
     f.require(bool(r['upgrade_box_pool']) and len(set(r['upgrade_box_pool'])) == len(r['upgrade_box_pool'])
               and all(t in (1310,1311,1312,1313,1314,1320,1321,1322,1323)
                       for t in r['upgrade_box_pool']),'升阶宝箱必须产出装备升阶材料')
+    for key in ('upgrade_box_weights', 'upgrade_box_counts'):
+        values = r.get(key)
+        f.require(isinstance(values, dict)
+                  and set(values) == {str(t) for t in r['upgrade_box_pool']}
+                  and all(type(v) is int and 0 < v <= 1000 for v in values.values()),
+                  '升阶宝箱权重或数量配置无效：' + key)
     return r
 
 
@@ -226,7 +232,18 @@ def use_item(role,req,now,ar):
     else:
         pool=r['soul_box_pool' if tid==1037 else 'upgrade_box_pool'];counts={}
         for _ in range(n):
-            target=secrets.choice(pool);counts[target]=counts.get(target,0)+1
+            if tid == 1324:
+                weights = r['upgrade_box_weights']
+                ticket = secrets.randbelow(sum(weights[str(t)] for t in pool))
+                for target in pool:
+                    ticket -= weights[str(target)]
+                    if ticket < 0:
+                        break
+                count = r['upgrade_box_counts'][str(target)]
+            else:
+                target = secrets.choice(pool)
+                count = 1
+            counts[target] = counts.get(target, 0) + count
         prizes=[journey.grant(role,[5,t,c,1]) for t,c in sorted(counts.items())]
     return [summon.event(21,dict(result=1,type_id=tid,count=n,attach_list=prizes,soul_gain=100*n if tid==1036 else 0))]
 

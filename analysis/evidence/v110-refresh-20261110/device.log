@@ -1,0 +1,97 @@
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Waiting for disposable Android first boot
+Installing preserved old v110 in disposable QA
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+Waiting for old-v110 runtime
+old-v110 packaged runtime and native engine ready
+Replacement installing refreshed v110
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Waiting for new-v110 runtime
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v110_refresh_20261110_device.py", line 103, in <module>
+    main()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v110_refresh_20261110_device.py", line 83, in main
+    start('new-v110', current['program_sha256'])
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v110_refresh_20261110_device.py", line 36, in start
+    assert not any(s in logs for s in ('Offline startup failed', 'native_install_failed:', 'offline_lua_error:')), logs
+AssertionError: --------- beginning of main
+--------- beginning of system
+11-10 04:11:47.721  2345  2362 E JGBOffline: Offline startup failed
+11-10 04:11:47.721  2345  2362 E JGBOffline: java.lang.RuntimeException: Traceback (most recent call last):
+11-10 04:11:47.721  2345  2362 E JGBOffline:   File "<string>", line 12, in <module>
+11-10 04:11:47.721  2345  2362 E JGBOffline:   File "/data/user/0/com.sygame.jingubang.p360/files/program/3267dd7a441e2dc7f95383b846e40d11937bf9015060f4d3c4674a1295588b27/offline_android/backend.py", line 221, in start
+11-10 04:11:47.721  2345  2362 E JGBOffline:     raise TimeoutError('Offline game service did not become ready')
+11-10 04:11:47.721  2345  2362 E JGBOffline: TimeoutError: Offline game service did not become ready
+11-10 04:11:47.721  2345  2362 E JGBOffline: 
+11-10 04:11:47.721  2345  2362 E JGBOffline: 	at com.jgbol.offline.PythonBridge.start(Native Method)
+11-10 04:11:47.721  2345  2362 E JGBOffline: 	at com.jgbol.offline.OfflineRuntime$1.run(OfflineRuntime.java:40)
+11-10 04:11:47.721  2345  2362 E JGBOffline: 	at java.lang.Thread.run(Thread.java:818)
+

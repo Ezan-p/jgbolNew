@@ -28,11 +28,14 @@ class AcquisitionTests(unittest.TestCase):
     def test_paid_and_free_tasks_add_residents_and_one_encounter(self):
         self.ok(88);r=self.role();g=r['guild']['unions'][str(r['union_id'])];before=sum(g['resident_pets'].values())
         self.assertEqual(self.req(86,two_type=2)[-1][1],55)
-        for payment in (1,2):self.ok(84,task_index=payment,task_type=1,pay_type=payment)
+        for index in (1,2,3):self.ok(84,task_index=index,task_type=1,pay_type=1)
+        replay=dict(fight_result_msg=dict(fight_result=[]))
+        with patch('network_redirect.guild_hunt.simulate',return_value=(1,[],replay)):
+            self.ok(84,task_index=1,task_type=2,pay_type=2)
         r=self.role();g=r['guild']['unions'][str(r['union_id'])]
-        self.assertEqual(sum(g['resident_pets'].values()),before+2)
-        self.assertEqual(self.ok(83)[-1][2]['wander_times'],2)
-        for _ in range(2):self.ok(86,two_type=2);self.ok(87,two_type=1)
+        self.assertEqual(sum(g['resident_pets'].values()),before+4)
+        self.assertEqual(self.ok(83)[-1][2]['wander_times'],4)
+        for _ in range(4):self.ok(86,two_type=2);self.ok(87,two_type=1)
         self.assertEqual(self.req(86,two_type=2)[-1][1],55)
 
     def test_god_charm_guarantees_capture_and_missing_item_is_atomic(self):
@@ -45,7 +48,8 @@ class AcquisitionTests(unittest.TestCase):
         self.assertEqual(len(self.role()['activity']['home']['pets']),1)
         self.assertEqual(set(guild.load_rules()['catch_prop_rates']),{'1338','1339','1340','1341'})
         items=self.ok(91,two_type=1)[-1][2]['item_list']
-        self.assertEqual(len(items),6)
+        self.assertIn(1338,[v['item']['attach_type'] for v in items.values()])
+        self.assertTrue(all(v['item']['attach_type'] in (1338,1339,1340,1341,1345,1346,1347,1348,1349) for v in items.values()))
 
     def test_failed_task_does_not_spend_attempt_or_grant_pet(self):
         self.ok(88);before=self.role()
@@ -65,12 +69,16 @@ class AcquisitionTests(unittest.TestCase):
 
     def test_support_is_not_a_battle_and_does_not_deal_damage(self):
         self.ok(79);r=self.role();a=r['guild']['instances']
-        a.update(train_open=True,train_hp=9000,train_end=1792818000,train_attempts=1)
+        # Trials now start each attempt at full health; a legacy partial HP
+        # fixture is normalized on entry before the support action runs.
+        full_hp=a['train_hp'];gold=r['gold_coin']
+        a.update(train_open=True,train_end=1792818000,train_attempts=1)
         self.b.save(r)
         with patch('network_redirect.guild_instances.simulate',side_effect=AssertionError('support cannot fight')):
             result=self.ok(78)
         self.assertEqual([op for mid,op,_ in result if mid==1301],[78])
         a=self.role()['guild']['instances']
-        self.assertEqual((a['train_hp'],a['train_attempts'],a['train_support']),(9000,1,1))
+        self.assertEqual((a['train_hp'],a['train_attempts'],a['train_support']),(full_hp,1,1))
+        self.assertEqual(self.role()['gold_coin'],gold-20)
 
 del GuildTests

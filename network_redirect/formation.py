@@ -190,6 +190,24 @@ def legacy_culture_budget(c, rules=None):
     return dict(ordinary=ordinary, rebirth_cycles=cycles, evolution=evolution, rebirth=rebirth)
 
 
+def migrate_equipment_stacks(role):
+    """Recover legacy gear quantities without copying a single item's investment."""
+    for item in list(role['attachments']):
+        if (item.get('attach_type') != 5 or item.get('count', 0) <= 1
+                or int(ITEMS.get(item.get('type_id'), {}).get('main_type', 0)) not in (1, 2, 3)):
+            continue
+        count = item['count']
+        # The original ID retains its growth, sockets and formation links.
+        # Extra copies were hidden by stacking; restore them as unused gear.
+        # Keep the lock on all recovered copies to avoid accidental disposal.
+        item['count'] = 1
+        for _ in range(count - 1):
+            role['attachments'].append(dict(
+                id=new_id(role), attach_type=5, type_id=item['type_id'], count=1,
+                level=1, equip_order=0, equip_pos=0, owner_id=0,
+                is_lock=item.get('is_lock', 0)))
+
+
 def migrate_level_culture(c, rules=None):
     """Normalize v0/v1/v2 once: debit available points, then proportional training."""
     version = c.get('level_culture_version', 0)
@@ -229,6 +247,7 @@ def prepare(role, rules, *, track_changes=True):
     # just to compute a return value those callers never use.
     before = copy.deepcopy(role) if track_changes else None
     role.setdefault('attachments', [])
+    migrate_equipment_stacks(role)
     if 'corteges' not in role:
         role.setdefault('summon', {})
         c = summon.companion(role, 5004)

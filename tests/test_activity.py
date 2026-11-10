@@ -260,7 +260,9 @@ class HomeAbyssTests(ActivityCase):
         self.assertNotIn('main_type',data['update_list'][1])
         self.ok(self.req(1348,id=21,data='{pet_id=1,des_type=202}'))
         changed=self.b.profile()['activity']['home']['pets'][0]
-        self.assertEqual(changed['type_id'],202);self.assertEqual(changed['grow_values'],[v+d for v,d in zip(pet['grow_values'],[-9,-14,15,9])])
+        self.assertEqual(changed['type_id'],202)
+        expected=[min(hi,max(lo,v+d)) for v,d,(lo,hi) in zip(pet['grow_values'],[-9,-14,15,9],[(30,40),(20,27),(40,50),(35,45)])]
+        self.assertEqual(changed['grow_values'],expected)
         before=self.b.profile();self.assertEqual(self.req(1348,id=21,data='{pet_id=1,des_type=202}')[0][0],55);self.assertEqual(before,self.b.profile())
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.ok(self.req(1348,id=21,data='{pet_id=1,des_type=201}'))
@@ -314,11 +316,11 @@ class HomeAbyssTests(ActivityCase):
         self.assertEqual(self.b.profile()['gold_coin'],gold)
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
         self.assertEqual(self.b.profile()['activity']['abyss']['maps']['1431'],board)
-        for _ in range(3):self.ok(self.req(1329,id=3,data='{op_type=2,type_id=1431}'))
-        self.assertEqual(self.b.profile()['gold_coin'],gold-60)
+        for _ in range(4):self.ok(self.req(1329,id=3,data='{op_type=2,type_id=1431}'))
+        self.assertEqual(self.b.profile()['gold_coin'],gold-80)
         before=self.b.profile();self.assertEqual(self.req(1329,id=3,data='{op_type=2,type_id=1431}')[0][0],55);self.assertEqual(before,self.b.profile())
         self.ok(self.req(1329,id=24,data='{map_type=1431,treasure_count=2,open_count=2}'))
-        self.assertEqual(self.b.profile()['gold_coin'],gold-100)
+        self.assertEqual(self.b.profile()['gold_coin'],gold-120)
         self.assertEqual(self.req(1329,id=3,data='{op_type=1,type_id=1431}')[0][0],55)
 
     def test_treasure_map_invalid_removal_quick_monthcard_and_atomic_batch(self):
@@ -552,11 +554,13 @@ class LandTests(ActivityCase):
         when=NOW+8*3600
         with patch('network_redirect.game_clock.now',return_value=when):
             self.ok(self.land(1));self.ok(self.req(1303,id=1,op_type=1,data='{}'))
+            from tests.test_activity_land_balance import strong_party
+            strong_party(self)
             self.ok(self.land(11,tower_id=11));self.ok(self.land(4,flag=1,des_type=2,des_id=11))
             self.assertEqual(self.b.profile()['activity']['land']['tower_id'],11)
         with patch('network_redirect.game_clock.now',return_value=when+600):
-            self.ok(self.land(1));self.assertEqual(self.b.profile()['activity']['land']['soul_count'],100)
-            self.ok(self.land(1));self.assertEqual(self.b.profile()['activity']['land']['soul_count'],100)
+            self.ok(self.land(1));self.assertEqual(self.b.profile()['activity']['land']['soul_count'],800)
+            self.ok(self.land(1));self.assertEqual(self.b.profile()['activity']['land']['soul_count'],800)
             self.ok(self.land(5,tower_id=11));self.assertEqual(self.b.profile()['activity']['land']['tower_id'],0)
     def test_map_grid_gates_and_daily_travel_cap(self):
         self.ok(self.land(1));self.assertEqual(self.land(2,des_level=2)[0][0],55)

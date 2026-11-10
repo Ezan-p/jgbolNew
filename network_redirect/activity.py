@@ -96,8 +96,12 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     require(len(r['land_card_rewards'])>=5 and len({tuple(p) for p in r['land_card_rewards']})==len(r['land_card_rewards']),'猎魂翻牌奖池至少需要5档不同奖励')
     from .activity_land_rewards import validate_cards
     validate_cards(r)
+    from .activity_land import validate_balance
+    validate_balance(r)
     require(all(p[0]==11 and p[1]==0 and p[3]==1 for p in r['pray_rewards']),'神石祈福奖励必须为元宝')
     require(len(r['abyss_map_rewards'])==12 and r['abyss_map_remove_count']+r['abyss_map_paid_draws']<12,'宝图奖盘或次数无效')
+    from .activity_treasure import validate
+    validate(r)
     require(set(r.get('train_increase',{}))==set(formation.STATS) and all(type(v)is int and 0<v<=10000 for v in r['train_increase'].values()),'修炼属性配置无效')
     for name in ('undergo_shop','home_shop','abyss_shop'):
         require(isinstance(r.get(name),list) and 1<=len(r[name])<=(60 if name=='abyss_shop' else 30),'活动商店配置无效')
@@ -110,6 +114,14 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
                 q=goods.get('consume')
                 require(isinstance(q,list) and len(q)==4 and all(type(v)is int for v in q) and q[0]==5 and q[1] in formation.ITEMS and 0<q[2]<=1000000 and q[3]==1,'洞府商品消耗无效')
             else:require(type(goods.get('cost'))is int and 0<goods['cost']<=1000000,'活动商品价格无效')
+    home_keys=[goods.get('purchase_key') for goods in r['home_shop']]
+    require(all(type(key) in (str,int) and bool(key) for key in home_keys) and
+            len(set(map(str,home_keys)))==len(home_keys),'洞府商品购买标识无效或重复')
+    home_limited=[goods for goods in r['home_shop'] if goods.get('page',1)==2]
+    require(type(r.get('home_shop_daily_count'))is int and r['home_shop_daily_count']==3 and
+            len(home_limited)>=3,'洞府限时商店每日须抽取3种商品')
+    require(all(type(goods.get('weight'))is int and goods['weight']>0 for goods in home_limited),
+            '洞府限时商品权重无效')
     require(type(r.get('undergo_shop_daily_count')) is int and r['undergo_shop_daily_count']==6, '幻境商店每日须抽取6种商品')
     require(isinstance(r.get('undergo_shop_revision'),str) and bool(r['undergo_shop_revision']), '幻境商店版本缺失')
     # Complete equipment material pool: three essences, three vessels, five crystals.
@@ -117,9 +129,18 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     require(len(r['undergo_shop'])==len(expected_undergo) and
             {p['reward'][1] for p in r['undergo_shop']}==expected_undergo,
             '幻境商店须包含全部11种精华、水晶和灵器材料，且不得重复')
-    require(all(p['limit'] == (1 if p['cost'] >= 3600 else 2 if p['cost'] >= 1800 else
-                              3 if p['cost'] >= 900 else 5) for p in r['undergo_shop']),
-            '幻境商店每份3600/1800/900仙晶及以上分别限兑1/2/3次，其余限兑5次')
+    undergo_limits = {1310:100,1311:100,1312:100,1313:5,1314:1,1334:1,
+                      1320:10,1321:10,1322:3,1323:2,1335:1}
+    require(all(p['reward'][2] == 1 and p['limit'] == undergo_limits[p['reward'][1]]
+                for p in r['undergo_shop']), '幻境商店须单件出售，限兑次数须符合各材料配置')
+    require(all(type(p.get('guaranteed')) is bool for p in r['undergo_shop']) and
+            {p['reward'][1] for p in r['undergo_shop'] if p['guaranteed']} == {1310,1311,1312,1320},
+            '幻境商店三种精华及近古水晶须每日必上架')
+    require(all(type(p.get('weight')) is int and 0 < p['weight'] <= 1000000
+                for p in r['undergo_shop']), '幻境商店抽取权重无效')
+    rare_weights = [p['weight'] for p in r['undergo_shop'] if p['reward'][1] in (1314,1334,1335)]
+    common_weights = [p['weight'] for p in r['undergo_shop'] if p['reward'][1] in (1313,1321,1322,1323)]
+    require(max(rare_weights) < min(common_weights), '幻境商店五星／神装灵器及神源水晶须低概率上架')
     require(type(r.get('abyss_shop_daily_count')) is int and 1<=r['abyss_shop_daily_count']<=len(r['abyss_shop']), '九幽每日商品数量无效')
     require(isinstance(r.get('abyss_shop_revision'),str) and bool(r['abyss_shop_revision']), '九幽商店版本缺失')
     require(len({tuple(x['reward']) for x in r['abyss_shop']})==len(r['abyss_shop']), '九幽商店商品不得重复')
@@ -164,6 +185,8 @@ def prepare(role,now,r,peers=None):
     from . import activity_monday
     activity_monday.prepare(role,now)
     s=role.setdefault('activity',{})
+    from . import activity_seasonal
+    activity_seasonal.rollover(role,now,r)
     from . import activity_land
     if activity_land.weekly_due(role,now,r):
         # Settle saved tower income before closing the old week's soul total.
@@ -430,6 +453,11 @@ def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     if mid == 1353:
         from . import activity_babel
         return activity_babel.settle(role,req,now,r,jrules,parse)
+    if mid == 1051 and req['item_type'] == 1346:
+        # An inventory box must not depend on unrelated activity calendars,
+        # home settlement or seasonal configuration to grant its pills.
+        from . import pets
+        return pets.use_box(role,req)
     s=prepare(role,now,r,peers)
     if mid==1346:
         from . import activity_save_monkey
@@ -493,9 +521,6 @@ def settle(role,mid,req,now,r,jrules,frules,parse,peers=None):
     if mid in (1029,1041,1060,1072) or mid==1026 and req['fight_type'] in (3,12):
         from . import activity_rape
         return activity_rape.settle(role,mid,req,now,r,jrules,parse)
-    if mid == 1051 and req['item_type'] == 1346:
-        from . import pets
-        return pets.use_box(role,req)
     if mid == 1330:
         from . import pets
         return pets.settle(role,req,now,r,parse)

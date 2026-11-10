@@ -294,6 +294,8 @@ def battle(role, cfg, rules, *, units=None, slots=8):
 
 def grant(role, spec):
     typ, tid, count, level = spec
+    from . import level_card
+    level_card.require_grant(role, typ, tid)
     require(count > 0, '奖励数量无效')
     if typ in (11, 12):
         role['gold_coin' if typ == 11 else 'silver_coin'] += count
@@ -445,6 +447,9 @@ def resource_item(role, req, now, rules, buy=False):
 
 
 def settle(role, mid, req, now, rules, formation_rules, activity_rules=None):
+    if mid == 1051 and req['item_type'] == 1901:
+        from . import level_card
+        return level_card.use(role, req, now)
     if mid == 1018:
         require(req['flag'] in (0, 1, 2), '地图查询参数无效')
         return snapshots(role)

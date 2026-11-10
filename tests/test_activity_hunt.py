@@ -148,8 +148,37 @@ class HuntTests(ActivityCase):
         self.setup_hunt();self.ok(self.use(1036,3));self.assertEqual(self.hunt()['soul'],300)
         self.assertEqual(self.hunt()['day_score'],0)
         for box,pool in [(1037,list(range(5001,5006))),(1324,[1310,1311,1312,1313,1314,1320,1321,1322,1323])]:
-            before=sum(self.amount(t) for t in pool);self.ok(self.use(box,10))
-            self.assertEqual(sum(self.amount(t) for t in pool)-before,10)
+            before=sum(self.amount(t) for t in pool)
+            with patch.object(h.secrets, 'randbelow', return_value=0):
+                self.ok(self.use(box,10))
+            self.assertEqual(sum(self.amount(t) for t in pool)-before,100 if box==1324 else 10)
+
+    def test_upgrade_box_all_weight_tickets_and_batch_quantities(self):
+        self.setup_hunt()
+        expected = {1310:170, 1311:170, 1312:170, 1313:17, 1314:6,
+                    1320:17, 1321:17, 1322:6, 1323:6}
+        before = {t:self.amount(t) for t in expected}
+        boxes_before = self.amount(1324)
+        # Exhaust the 120 equally likely tickets through real use packets,
+        # covering every weight boundary, aggregation and persisted inventory.
+        with patch.object(h.secrets, 'randbelow', side_effect=range(120)) as draw:
+            self.ok(self.use(1324,60))
+            self.ok(self.use(1324,60))
+        self.assertEqual(draw.call_count,120)
+        self.assertTrue(all(call.args == (120,) for call in draw.call_args_list))
+        self.assertEqual({t:self.amount(t)-before[t] for t in expected},expected)
+        self.assertEqual(self.amount(1324),boxes_before)
+
+    def test_upgrade_box_rejects_invalid_weights_and_counts(self):
+        for key in ('upgrade_box_weights', 'upgrade_box_counts'):
+            for value in (None, {}, {'1310': 1},
+                          dict(h.load_rules()[key], **{'1310': 0}),
+                          dict(h.load_rules()[key], **{'1310': True}),
+                          dict(h.load_rules()[key], **{'1310': 1.5})):
+                with self.subTest(key=key,value=value):
+                    r=h.load_rules();r[key]=value
+                    p=Path(self.tmp.name)/'bad.json';p.write_text(json.dumps(r))
+                    with self.assertRaises(formation.Rejected):h.load_rules(p)
 
     def test_duplicate_serial_changed_payload_and_encoding_rollback(self):
         self.setup_hunt();self.data(self.call(2,count=1,index=90))

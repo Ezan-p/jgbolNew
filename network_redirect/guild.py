@@ -27,7 +27,8 @@ def load_rules(path=ROOT/'server_config/guild_rules.json'):
     require(r.get('store_count')==8 and type(r.get('store_pool_version')) is int and r['store_pool_version']>0,'仙盟宝库货位或版本无效')
     require(isinstance(r.get('store'),list) and len(r['store'])>=r['store_count'],'仙盟宝库候选不足')
     require(len({x['id'] for x in r['store']})==len(r['store']),'仙盟宝库候选ID重复')
-    require(len({tuple(x['prize'][:2]) for x in r['store']})==len(r['store']),'仙盟宝库奖励重复')
+    # The same currency may have distinct quantity tiers (100k / 500k silver).
+    require(len({tuple(x['prize']) for x in r['store']})==len(r['store']),'仙盟宝库奖励重复')
     for row in r['store']:
         daily.validate_prize(row['prize'])
         require(all(type(row[k]) is int and 0<row[k]<=100000 for k in ('id','cost','limit')),'商店配置无效')
@@ -35,6 +36,14 @@ def load_rules(path=ROOT/'server_config/guild_rules.json'):
     for key in ('tree_rewards','match_rewards','team_rewards','train_rewards','hunt_rewards'):
         require(isinstance(r.get(key),list) and r[key], '仙盟奖励配置缺失: '+key)
         for prize in r[key]:daily.validate_prize(prize)
+    require(isinstance(r.get('hunt_task_reward_source'),str) and bool(r['hunt_task_reward_source']), '宠物任务奖励来源缺失')
+    require(isinstance(r.get('hunt_task_rewards'),list) and len(r['hunt_task_rewards'])==2, '宠物任务两类奖励配置缺失')
+    for reward in r['hunt_task_rewards']:
+        require(isinstance(reward,dict) and all(type(reward.get(k)) is int and 0<=reward[k]<=1000000 for k in ('reputation','union_funds')), '宠物任务声望或资金奖励无效')
+        require(isinstance(reward.get('items'),list), '宠物任务物品奖励无效')
+        for prize in reward['items']:
+            daily.validate_prize(prize)
+            require(prize[:2]!=[5,1346], '驯养宝箱须使用独立配置，不能重复追加')
     require(len(r['feast_gifts'])==2 and {v['type'] for v in r['feast_gifts']}=={1,2},'宴会礼物配置无效')
     for v in r['feast_gifts']:
         daily.validate_prize([5,v['item'],1,1])

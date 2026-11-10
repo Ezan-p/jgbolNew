@@ -50,6 +50,14 @@ def rows(name):
         key = {'item_base.csv': 'type_id', 'item_name.csv': 'Ftype_id'}.get(name, 'category')
         replaced = {row[key] for row in additions}
         result = [row for row in result if row[key] not in replaced] + additions
+    if name in ('item_base.csv', 'item_name.csv'):
+        key = 'type_id' if name == 'item_base.csv' else 'Ftype_id'
+        with (ROOT / 'analysis/configs/local_items' / name).open(encoding='utf-8-sig', newline='') as source:
+            additions = list(csv.DictReader(source))
+        ids = [row[key] for row in result + additions]
+        if len(ids) != len(set(ids)):
+            raise ValueError('本地道具编号与已有道具重复')
+        result.extend(additions)
     return result
 
 
@@ -146,6 +154,8 @@ def client_source(rules):
     welfare_source = Path(__file__).with_name('welfare_client.lua').read_text(encoding='utf-8')
     monument_source = Path(__file__).with_name('monument_client.lua').read_text(encoding='utf-8')
     equipment_source = Path(__file__).with_name('equipment_client.lua').read_text(encoding='utf-8')
+    from . import level_card
+    equipment_source += '\n' + level_card.client_source()
     equipment_source += '\n' + Path(__file__).with_name('equipment_exchange_client.lua').read_text(encoding='utf-8')
     equipment_source += '\n' + Path(__file__).with_name('market_client.lua').read_text(encoding='utf-8')
     equipment_source += '\n' + Path(__file__).with_name('state_refresh_client.lua').read_text(encoding='utf-8')
@@ -192,6 +202,8 @@ def client_source(rules):
     guild_access = Path(__file__).with_name('guild_access_client.lua').read_text(encoding='utf-8')
     guild_source += '\n' + guild_access.replace('__GUILD_WARS_ENABLED__', lua(guild.load_rules()['wars_enabled']))
     feed_rules = activity.load_rules()
+    from . import activity_treasure
+    treasure_source = activity_treasure.client_source(feed_rules)
     yuanshi_source = Path(__file__).with_name('yuanshi_client.lua').read_text(encoding='utf-8')
     # Critical activity entry adapters must not wait for unrelated modules.
     # Each returns pending locally, and the aggregate must not report ready
@@ -219,8 +231,11 @@ def client_source(rules):
     monkey_source = Path(__file__).with_name('save_monkey_client.lua').read_text(encoding='utf-8')
     monkey_source = monkey_source.replace('__SAVE_MONKEY_ENABLED__', lua(activity_save_monkey.load_rules()['enabled']))
     gameplay_source = monkey_source + '\n' + dream_source + '\n' + tangwang_source + '\n' + fish_source + '\n' + caishen_source + '\n' + battle_source + '\n' + trial_source + '\n' + nine_source + '\n' + guild_source + '\n' + visit_source + '\n' + feed_source + '\n' + pavilion_source + '\n' + babel_source + '\n' + pray_source + '\n' + home_source + '\n' + taixu_source + '\n' + pet_source + '\n' + rape_source + '\n' + rank_source + '\n' + reborn_source + '\n' + equipment_source + '\n' + vip_source + '\n' + monument_source + '\n' + welfare_source + '\n' + rulai_source + '\n' + template.replace('__SUMMON_GOLD_PRICES__', lua(prices))
-    return (startup_source + '\nlocal gameplay_status=(function()\n' + gameplay_source
-            + "\nend)()\nif activity_pending then return 'pending' end\nreturn gameplay_status\n")
+    clock_source = Path(__file__).with_name('game_clock_client.lua').read_text(encoding='utf-8')
+    return (startup_source + '\nlocal clock_status=(function()\n' + clock_source + '\nend)()'
+            + '\nlocal treasure_status=(function()\n' + treasure_source + '\nend)()'
+            + '\nlocal gameplay_status=(function()\n' + gameplay_source
+            + "\nend)()\nif activity_pending or treasure_status=='pending' or clock_status=='pending' then return 'pending' end\nreturn gameplay_status\n")
 
 
 def lua(value):
@@ -300,9 +315,12 @@ def next_id(role):
 
 
 def add_item(role, type_id, count):
-    # Original stones are individual objects (can_stack=0); material selection
-    # transmits one ID per stone, with no quantity field.
-    if type_id in (1090, 1091, 1092):
+    from . import level_card
+    level_card.require_grant(role, 5, type_id)
+    from . import formation
+    # Equipment selection and stone materials address instances by ID. Honor
+    # the item table for every reward path, including journey/activity grants.
+    if formation.ITEMS[type_id]['can_stack'] == '0':
         for _ in range(count):
             role['attachments'].append(dict(id=next_id(role), attach_type=5, type_id=type_id, count=1, level=1))
         return

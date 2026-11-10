@@ -113,9 +113,9 @@ def settle(role,s,op,d,now,r,jrules):
         for _ in range(n):
             land.travel(s,r,role);target=s['travel'][0];result,_=land.simulate(role,s,r,jrules,target['level'],target=target.get('npc_id'));s['travel']=None
             if 1<=result<=3:
-                wins+=1;land.gain(s,r['land_travel_soul']);kind=secrets.randbelow(4)+1;land.charm(s,kind,5,1);gains[kind]=gains.get(kind,0)+1
-        land.news(s,now,f'批量游历{n}次，获胜{wins}次，获得{wins*r["land_travel_soul"]}魂力。')
-        return [response(22,win_count=wins,reward_soul=wins*r['land_travel_soul'],prize_list=[],
+                wins+=1;land.gain(s,land.travel_soul(s,r));kind=secrets.randbelow(4)+1;land.charm(s,kind,5,1);gains[kind]=gains.get(kind,0)+1
+        land.news(s,now,f'批量游历{n}次，获胜{wins}次，获得{wins*land.travel_soul(s,r)}魂力。')
+        return [response(22,win_count=wins,reward_soul=wins*land.travel_soul(s,r),prize_list=[],
             reward_charm={k:{5:n} for k,n in gains.items()})]
     if op in (12,24):return [response(op,**query(s,r,op==24))]
     if op==26:
@@ -148,7 +148,7 @@ def settle(role,s,op,d,now,r,jrules):
                 s[history][str(layer)]=dict(score=newscore,cur_num=n)
         land.news(s,now,f"{'冥界' if hell else '普通'}首领第{layer}层：{'胜利' if win else '未获胜'}。")
         if reward:
-            rewards=draw_cards(r,3 if hell else 5)
+            rewards=draw_cards(r,3 if hell else 5,stone_limit=1 if hell else 2)
             s[key]=dict(layer=layer,cards=[],rewards=copy.deepcopy(rewards))
         return land.replay_response(4,s,r,replay,fight_type=4 if hell else 3,des_level=layer,is_win=win,is_reward=reward,
             return_soul=0,card_list=[],cost_gold_list=r['land_card_gold'])

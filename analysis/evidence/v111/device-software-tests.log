@@ -1,0 +1,13 @@
+error: could not connect to TCP port 5572: Connection refused
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v111_device.py", line 87, in <module>
+    main()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v111_device.py", line 32, in main
+    assert call('emu', 'avd', 'name').decode().splitlines()[0] == 'standalone32'
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v111_device.py", line 20, in call
+    return subprocess.check_output(ADB + list(args), timeout=timeout)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 424, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/sdk/platform-tools/adb', '-s', 'emulator-5572', 'emu', 'avd', 'name']' returned non-zero exit status 1.

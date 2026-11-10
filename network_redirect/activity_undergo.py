@@ -7,6 +7,7 @@ import copy
 import hashlib
 import json
 import math
+import random
 from fractions import Fraction
 from functools import lru_cache
 from pathlib import Path
@@ -39,6 +40,8 @@ def rules():
     a.require(len(groups) == 4 and groups[0][0] == r['arena_level'] == 50 and groups[-1][1] == 99
               and all(len(v) == 2 and all(type(n) is int for n in v) and v[0] <= v[1] for v in groups)
               and all(groups[i][1]+1 == groups[i+1][0] for i in range(len(groups)-1)), '血战等级分组无效')
+    a.require(type(r['arena_top_power_count']) is int
+              and r['arena_top_power_count'] == 15 < r['arena_size']-1, '血战最强NPC席位无效')
     prizes = r['arena_rank_prizes']
     a.require(bool(prizes) and prizes[0]['front'] == 1 and prizes[-1]['back'] == r['arena_size']
               and all(all(type(p[k]) is int and 0 < p[k] <= 1000000
@@ -113,15 +116,25 @@ def refresh_shop(s, role, r, today):
                           for i, tid in enumerate((1001, 1343, 1034, 1024), 1)}
     seed = f"{revision}:{today}:{role.get('role_id', role.get('id', 0))}"
     catalog = {row['reward'][1]: row for row in r['undergo_shop']}
+    guaranteed = [row for row in r['undergo_shop'] if row['guaranteed']]
     current = s.get('shop', [])
-    # A same-day balance update changes quotas, not the selected goods/order.
+    # Preserve compatible shelves, but immediately restore missing guaranteed goods.
     if (s.get('shop_day') == today and len(current) == r['undergo_shop_daily_count']
             and len({row['reward'][1] for row in current}) == len(current)
+            and {row['reward'][1] for row in guaranteed} <= {row['reward'][1] for row in current}
             and all(row['reward'][1] in catalog for row in current)):
         offers = [catalog[row['reward'][1]] for row in current]
     else:
-        offers = sorted(r['undergo_shop'], key=lambda row: hashlib.sha256(
-            f"{seed}:{row['reward'][1]}".encode()).digest())[:r['undergo_shop_daily_count']]
+        offers = list(guaranteed)
+        pool = [row for row in r['undergo_shop'] if not row['guaranteed']]
+        rng = random.Random(seed)
+        while len(offers) < r['undergo_shop_daily_count']:
+            roll = rng.randrange(sum(row['weight'] for row in pool))
+            for index, row in enumerate(pool):
+                roll -= row['weight']
+                if roll < 0:
+                    offers.append(pool.pop(index))
+                    break
     s.update(shop=copy.deepcopy(offers), shop_day=today, shop_revision=revision,
              shop_token=hashlib.sha256(seed.encode()).hexdigest()[:24])
 

@@ -373,6 +373,7 @@ def battle(role, req, now, r, jrules, peers=None):
     material_events = []
     if win:
         from . import activity_seasonal
+        activity_seasonal.rollover(role,now,r)
         materials = [journey.grant(role, p) for p in activity_seasonal.material_specs(r)]
         if materials:
             material_events.append(summon.event(22, dict(prize_type=1, prize_list=materials)))

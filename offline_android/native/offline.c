@@ -51,6 +51,9 @@ static int (*lua_type_)(lua_State *, int);
 static int (*luaL_loadbuffer_)(lua_State *, const char *, u32, const char *);
 static int (*lua_pcall_original)(lua_State *, int, int, int);
 static const char *(*lua_tolstring_)(lua_State *, int, u32 *);
+static void (*lua_pushinteger_)(lua_State *, int);
+static void (*lua_pushcclosure_)(lua_State *, int (*)(lua_State *), int);
+static void (*lua_setfield_)(lua_State *, int, const char *);
 static int (*curl_setopt_)(void *, int, ...);
 static int (*curl_perform_original)(void *);
 static int (*curl_add_original)(void *, void *);
@@ -135,6 +138,17 @@ static void *offline_ssl_new(void *context) {
     return ssl_new_original(context);
 }
 
+/* Same suspend-aware source as the Python backend. Never fall back to wall time. */
+static int continuous_time(lua_State *state) {
+    struct timespec32 now;
+    if (clock_gettime(7, &now)) return 0;
+    /* The frozen engine exports pushinteger, but not pushnumber. Preserve
+     * subsecond precision with two integers and combine them in Lua. */
+    lua_pushinteger_(state, now.sec);
+    lua_pushinteger_(state, now.nsec);
+    return 2;
+}
+
 static int activity_patch_current(lua_State *state, int ms, const char *module,
                                   const char *check) {
     int top = lua_gettop_(state), current = 0;
@@ -167,7 +181,8 @@ static int client_patches_current(lua_State *state) {
             if (current && lua_type_(state, -1) == 5) {
                 int ms = lua_gettop_(state);
                 current = activity_patch_current(state, ms, "d_funUI", "_localActivityEntryCurrent")
-                    && activity_patch_current(state, ms, "d_twoYearsCelebrateUI", "_localYuanshiCurrent");
+                    && activity_patch_current(state, ms, "d_twoYearsCelebrateUI", "_localYuanshiCurrent")
+                    && activity_patch_current(state, ms, "d_time", "_localGameClockCurrent");
             } else current = 0;
         }
     }
@@ -194,6 +209,8 @@ static int offline_pcall(lua_State *state, int nargs, int nresults, int errfunc)
         lua_ready = 0;
         int top = lua_gettop_(state);
         evaluating = 1;
+        lua_pushcclosure_(state, continuous_time, 0);
+        lua_setfield_(state, -10002, "_jgbolContinuousTime");
         int result = luaL_loadbuffer_(state, patch_source, patch_size, "@offline-summon-gold");
         if (!result) result = lua_pcall_original(state, 0, 1, 0);
         const char *value = lua_tolstring_(state, -1, (u32 *)0);
@@ -296,6 +313,9 @@ void Java_com_jgbol_offline_NativeBridge_install(void *env, void *klass, void *r
     RESOLVE(lua_type_, "lua_type");
     RESOLVE(luaL_loadbuffer_, "luaL_loadbuffer");
     RESOLVE(lua_tolstring_, "lua_tolstring");
+    RESOLVE(lua_pushinteger_, "lua_pushinteger");
+    RESOLVE(lua_pushcclosure_, "lua_pushcclosure");
+    RESOLVE(lua_setfield_, "lua_setfield");
     RESOLVE(curl_setopt_, "curl_easy_setopt");
     RESOLVE(curl_multi_perform_, "curl_multi_perform");
     RESOLVE(curl_getinfo_, "curl_easy_getinfo");

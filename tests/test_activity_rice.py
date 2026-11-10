@@ -153,7 +153,7 @@ class RiceTests(ActivityCase):
         with patch.object(rice,'randbelow',return_value=0):self.ok(self.use(1213,ident))
 
     def test_legacy_claim_preserved_and_counters_start_without_invented_history(self):
-        r=self.b.profile();s=season.state(r);s.pop('rice_count');s['supplies']['rice:1']=True
+        r=self.b.profile();s=season.state(r);s.pop('rice_count');s.pop('craft_weeks',None);s['supplies']['rice:1']=True
         s['rice_news']=[dict(name='旧记录',data=[1213])];s['moon_count']=9;self.b.save(r)
         self.ok(self.req(1205,flag=0));self.assertEqual(self.count(1208),0)
         s=self.b.profile()['activity']['seasonal'];self.assertEqual(s['rice_count'],0);self.assertEqual(s['moon_count'],9)

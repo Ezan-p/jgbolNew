@@ -14,6 +14,22 @@ CHARMS=table('prey_open_charm','index')
 CONVERT=table('prey_charm_convert','charm')
 
 
+def validate_balance(r):
+    for key in ('land_travel_soul_by_map','land_tower_soul_by_type','land_guard_level_by_map'):
+        values=r.get(key)
+        a.require(isinstance(values,list) and len(values)==4
+                  and all(type(v)is int and 0<v<=100000 for v in values),'猎魂分档配置无效：'+key)
+    a.require(all(x<y for x,y in zip(r['land_travel_soul_by_map'],r['land_travel_soul_by_map'][1:])),
+              '游历魂力须随地图递增')
+    a.require(all(x>y for x,y in zip(r['land_tower_soul_by_type'],r['land_tower_soul_by_type'][1:])),
+              '占塔魂力须按铁脊、天风、地元、千魂递减')
+    a.require(r.get('land_guard_tier_by_type')==['T1','T1','T4','T5']
+              and r['land_guard_level_by_map']==[50,70,90,99],'守塔NPC分档无效')
+
+
+def travel_soul(s,r):return r['land_travel_soul_by_map'][s['map_level']-1]
+
+
 def status(now,r):
     begin=a.day(now,r)*86400-r['timezone_offset_hours']*3600
     attack=begin+r['land_tower_start_hour']*3600
@@ -38,13 +54,17 @@ def state(role,now,r):
     if s['tower_id']:
         t=s['towers'][str(s['tower_id'])]
         end=min(now,t['expire'],(s['day']+1)*86400-r['timezone_offset_hours']*3600);n=max(0,end-t['last_tick'])//r['land_tower_tick']
-        gained=min(t['left_soul'],n*r['land_tower_soul'])
+        gained=min(t['left_soul'],n*t.get('soul_per_tick',r['land_tower_soul']))
         gain(s,gained);t['left_soul']-=gained;t['last_tick']+=n*r['land_tower_tick']
         if gained:news(s,now,f'占塔获得{gained}魂力。')
         if now>=t['expire'] or not t['left_soul']:t['owner_type']=2;t['owner_name']=npc.catalog()[t['npc_id']]['role']['name'];s['tower_id']=0
+    from .activity_land_rewards import titles
+    titles(role,s,now)
     weekly(role,s,now,r)
     if s['day']!=a.day(now,r):
         s.update(day=a.day(now,r),travel_count=0,attack_count=0,hell_counts={},swept=False,tower_id=0,towers={},travel=None)
+    npc.refresh_entry_guards(s,r)
+    for target in s.get('travel') or []:target['expect_soul']=travel_soul(s,r)
     if s['auto_tower'] and not s['tower_id'] and status(now,r)['cur_status']==3 and s['attack_count']<r['land_daily_attack']:
         towers(s,now,r);tid=s['map_level']*10+4;t=s['towers'][str(tid)]
         if t['left_soul']>0:
@@ -53,7 +73,9 @@ def state(role,now,r):
     for kind,count in (('boss',5),('hell',3)):
         pending=s[kind]
         if pending and len(pending['rewards'])<count:
-            pending['rewards'].extend(draw_cards(r,count-len(pending['rewards'])))
+            used=sum(p[0]==5 and p[1]==10000 for p in pending['rewards'])
+            pending['rewards'].extend(draw_cards(r,count-len(pending['rewards']),
+                                                stone_limit=max(0,(2 if kind=='boss' else 1)-used)))
     for i,row in CHARMS.items():
         if str(i) in s['charms'] and s['boss_layer']>=int(row['need_boss']):s['charms'][str(i)]['unlock']=True
         if int(row['auto_open']) and s['boss_layer']>=int(row['need_boss']):
@@ -61,8 +83,6 @@ def state(role,now,r):
     from .activity_land_boss import migrate_inverse, migrate_scores
     migrate_inverse(s,r)
     migrate_scores(s)
-    from .activity_land_rewards import titles
-    titles(role,s,now)
     return s
 
 
@@ -103,15 +123,15 @@ def travel(s,r,role):
     n=min(4,secrets.choice(list(map(int,MAPS[s['map_level']]['count_list'].split('|')))))
     keys=[]
     for i in range(n):keys.append(npc.choose(role,s,i,excluded=keys))
-    s['travel']=[npc.view(key,s['grid_count'],942001+i,r['land_travel_soul']) for i,key in enumerate(keys)]
+    s['travel']=[npc.view(key,s['grid_count'],942001+i,travel_soul(s,r)) for i,key in enumerate(keys)]
 
 
-def simulate(role,s,r,jrules,level,count=1,cur_num=None,target=None,team=False,encounter=None):
+def simulate(role,s,r,jrules,level,count=1,cur_num=None,target=None,team=False,encounter=None,target_count=None):
     a.require(any(1<=c.get('order',0)<=8 for c in role['corteges']),'请先上阵神仙')
     ours,enemies=journey.fighters(role,dict(cortege_list='/'.join([f"{r['battle_npc']}|{level}"]*count)))
     ours=ours[:cur_num or s['grid_count']]
     if target:
-        enemies=npc.units(target,cur_num or s['grid_count'])
+        enemies=npc.units(target,target_count or cur_num or s['grid_count'])
     if encounter is not None:
         enemies=copy.deepcopy(encounter['units'])
     if team and s.get('team'):
@@ -140,9 +160,12 @@ def simulate(role,s,r,jrules,level,count=1,cur_num=None,target=None,team=False,e
 def towers(s,now,r):
     for i in range(1,5):
         ident=s['map_level']*10+i
-        key=npc.choose(None,s,(i-1)%3,fixed=True)
+        key=npc.guard(s,i,r)
+        rate=r['land_tower_soul_by_type'][i-1]
+        total=rate*(r['land_tower_duration']//r['land_tower_tick'])
         s['towers'].setdefault(str(ident),dict(id=ident,position=i,tower_type=i,create_time=now-1,
-            all_soul=r['land_tower_total'],left_soul=r['land_tower_total'],owner_type=2,owner_name=npc.catalog()[key]['role']['name'],npc_id=key,
+            all_soul=total,left_soul=total,soul_per_tick=rate,defender_count=8,
+            owner_type=2,owner_name=npc.catalog()[key]['role']['name'],npc_id=key,
             last_tick=now,expire=now+r['land_tower_duration']))
     return [copy.deepcopy(s['towers'][str(s['map_level']*10+i)]) for i in range(1,5)]
 
@@ -151,7 +174,7 @@ def tower_view(role,s,t,now,r):
     from .activity_land_team import member
     owned=s['tower_id']==t['id']
     t.setdefault('npc_id',npc.choose(role,s,(t['position']-1)%3,fixed=True))
-    defender=npc.view(t['npc_id'],s['grid_count'],940100+t['id'])
+    defender=npc.view(t['npc_id'],t.get('defender_count',s['grid_count']),940100+t['id'])
     if not owned:t['owner_name']=defender['name']
     if owned and s.get('team') and t['tower_type']==1:
         count=min(s['grid_count'],8//len(s['team']['members']))
@@ -159,8 +182,8 @@ def tower_view(role,s,t,now,r):
     else:players=([dict(member(role,s),had_soulcount=0)] if owned else [defender])
     head=players[0]
     return dict(t,tower_id=t['id'],player_list=players,is_owner=owned,end_time=t['expire'],role_list=[],
-        owner_id=role['role_id'] if owned else defender['id'],fps_count=r['land_tower_soul'],
-        soul_speed=r['land_tower_soul'],expect_soul=t['left_soul'],fight_power=sum(m.get('power',0) for m in players),
+        owner_id=role['role_id'] if owned else defender['id'],fps_count=t.get('soul_per_tick',r['land_tower_soul']),
+        soul_speed=t.get('soul_per_tick',r['land_tower_soul']),expect_soul=t['left_soul'],fight_power=sum(m.get('power',0) for m in players),
         cortege_count=sum(m['cortege_count'] for m in players),type_id=head['type_id'],cortege_layer=head['cortege_layer'])
 
 
@@ -201,7 +224,7 @@ def settle(role,req,now,r,jrules,parse):
         a.require(target is not None and d.get('flag')==1,'游历目标无效')
         a.require(status(now,r)['cur_status']==1,'当前是占塔时段')
         result,replay=simulate(role,s,r,jrules,target['level'],target=target.get('npc_id'));win=1<=result<=3
-        reward=r['land_travel_soul'] if win else 0;drop=None
+        reward=travel_soul(s,r) if win else 0;drop=None
         if win:
             gain(s,reward);kind=secrets.randbelow(4)+1;charm(s,kind,5,1);drop=dict(key=kind,value=5)
         news(s,now,f"游历挑战{target['name']}：{'胜利' if win else '未获胜'}，获得{reward}魂力。")
@@ -262,7 +285,8 @@ def settle(role,req,now,r,jrules,parse):
         a.require(d.get('flag')==1,'攻塔参数无效')
         tower_view(role,s,t,now,r)
         a.require(t['tower_type']!=1 or bool(s.get('team')),'铁脊塔需要先组队')
-        result,replay=simulate(role,s,r,jrules,s['map_level']*5,count=s['map_level'],target=t['npc_id'],team=t['tower_type']==1);s['attack_count']+=1;win=1<=result<=3
+        result,replay=simulate(role,s,r,jrules,s['map_level']*5,count=s['map_level'],target=t['npc_id'],
+                               team=t['tower_type']==1,target_count=t.get('defender_count',s['grid_count']));s['attack_count']+=1;win=1<=result<=3
         news(s,now,f"攻打{tid}号塔：{'胜利' if win else '未获胜'}。")
         if win:s['tower_id']=tid;t.update(owner_type=1,owner_name=role['role_name'],last_tick=now,expire=now+r['land_tower_duration'])
         return replay_response(4,s,r,replay,fight_type=2,des_id=tid,is_win=win)

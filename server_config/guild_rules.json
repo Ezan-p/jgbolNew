@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "mode": "inferred",
-  "revision": "guild-store-weights-2026-10-31",
+  "revision": "guild-escort-refresh-2026-11-09",
   "wars_enabled": false,
   "npc_recruit_daily": 4,
   "timezone_offset_hours": 8,
@@ -29,17 +29,17 @@
   "store_flush_gold": 100,
   "store_flush_limit": 5,
   "store_count": 8,
-  "store_pool_version": 1,
+  "store_pool_version": 2,
   "store": [
     {
       "id": 1,
       "prize": [
         5,
         1001,
-        20,
+        100,
         1
       ],
-      "cost": 20,
+      "cost": 100,
       "limit": 5,
       "weight": 5
     },
@@ -47,23 +47,23 @@
       "id": 2,
       "prize": [
         5,
-        1022,
-        5,
+        1015,
+        20,
         1
       ],
-      "cost": 50,
-      "limit": 2,
+      "cost": 100,
+      "limit": 5,
       "weight": 5
     },
     {
       "id": 3,
       "prize": [
         5,
-        1023,
+        1022,
         5,
         1
       ],
-      "cost": 50,
+      "cost": 200,
       "limit": 2,
       "weight": 5
     },
@@ -71,71 +71,71 @@
       "id": 4,
       "prize": [
         5,
-        1006,
+        1023,
         5,
         1
       ],
-      "cost": 100,
-      "limit": 1,
+      "cost": 200,
+      "limit": 2,
       "weight": 5
     },
     {
       "id": 5,
       "prize": [
         5,
-        1007,
+        1006,
         5,
         1
       ],
-      "cost": 100,
+      "cost": 200,
       "limit": 2,
-      "weight": 1
+      "weight": 5
     },
     {
       "id": 6,
       "prize": [
-        12,
-        0,
+        5,
+        1007,
         5,
         1
       ],
-      "cost": 20,
-      "limit": 5,
-      "weight": 5
+      "cost": 300,
+      "limit": 2,
+      "weight": 1
     },
     {
       "id": 7,
       "prize": [
-        5,
-        1034,
-        5,
+        12,
+        0,
+        100000,
         1
       ],
-      "cost": 20,
-      "limit": 2,
+      "cost": 100,
+      "limit": 5,
       "weight": 5
     },
     {
       "id": 8,
       "prize": [
-        5,
-        1033,
-        5,
+        12,
+        0,
+        500000,
         1
       ],
-      "cost": 20,
-      "limit": 2,
+      "cost": 200,
+      "limit": 5,
       "weight": 5
     },
     {
       "id": 9,
       "prize": [
         5,
-        1032,
+        1034,
         5,
         1
       ],
-      "cost": 20,
+      "cost": 50,
       "limit": 2,
       "weight": 5
     },
@@ -143,73 +143,85 @@
       "id": 10,
       "prize": [
         5,
-        1031,
+        1033,
         5,
         1
       ],
-      "cost": 20,
+      "cost": 100,
       "limit": 2,
-      "weight": 1
+      "weight": 5
     },
     {
       "id": 11,
       "prize": [
         5,
-        10000,
+        1032,
         5,
         1
       ],
-      "cost": 20,
-      "limit": 5,
+      "cost": 100,
+      "limit": 2,
       "weight": 5
     },
     {
       "id": 12,
       "prize": [
         5,
-        1310,
+        1031,
         5,
         1
       ],
-      "cost": 20,
-      "limit": 5,
-      "weight": 5
+      "cost": 300,
+      "limit": 2,
+      "weight": 1
     },
     {
       "id": 13,
       "prize": [
         5,
-        1311,
-        5,
+        1327,
+        1,
         1
       ],
-      "cost": 20,
-      "limit": 5,
+      "cost": 200,
+      "limit": 3,
       "weight": 5
     },
     {
       "id": 14,
       "prize": [
         5,
-        1312,
-        5,
+        1346,
+        1,
         1
       ],
-      "cost": 20,
-      "limit": 5,
+      "cost": 200,
+      "limit": 1,
       "weight": 5
     },
     {
       "id": 15,
       "prize": [
         5,
-        1015,
-        20,
+        1206,
+        1,
         1
       ],
-      "cost": 20,
-      "limit": 5,
+      "cost": 100,
+      "limit": 1,
       "weight": 5
+    },
+    {
+      "id": 16,
+      "prize": [
+        5,
+        1343,
+        1,
+        1
+      ],
+      "cost": 100,
+      "limit": 10,
+      "weight": 1
     }
   ],
   "battle_npc": 1001,
@@ -294,7 +306,58 @@
   "hunt_daily": 3,
   "wander_daily": 0,
   "hunt_silver": 1000,
-  "hunt_gold": 10,
+  "hunt_gold": 100,
+  "hunt_task_reward_source": "原版pethuntUI按prize_info[1/2]预览并按结算字段展示奖励；以下数量、目标编号倍率和两类相同收益为离线补全，非原服确认值。驯养宝箱按pet_rules.task_training_boxes单独追加。hunt_rewards仅用于灵兽周排行。",
+  "hunt_task_rewards": [
+    {
+      "reputation": 10,
+      "union_funds": 100,
+      "items": [
+        [
+          5,
+          1001,
+          5,
+          1
+        ],
+        [
+          12,
+          0,
+          1000,
+          1
+        ],
+        [
+          5,
+          1338,
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "reputation": 10,
+      "union_funds": 100,
+      "items": [
+        [
+          5,
+          1001,
+          5,
+          1
+        ],
+        [
+          12,
+          0,
+          1000,
+          1
+        ],
+        [
+          5,
+          1338,
+          1,
+          1
+        ]
+      ]
+    }
+  ],
   "hunt_rewards": [
     [
       5,
@@ -320,10 +383,25 @@
   "escort_flush_limit": 5,
   "escort_free_flush": 1,
   "escort_flush_gold": 10,
+  "escort_refresh": {
+    "mode": "inferred",
+    "reason": "用户确认：刷新仅在第2至5档独立随机，概率不同，可降档、可重复，无保底。原包未发现服务端刷新概率表；60/25/12/3为暂定本地权重，不代表原版精确概率，与残卷合成概率配置独立。",
+    "grade_weights": {
+      "2": 60,
+      "3": 25,
+      "4": 12,
+      "5": 3
+    }
+  },
   "escort_compose": {
     "mode": "inferred",
     "reason": "A：天地人残卷各1个；单次产物可立即使用，十连展示逐次奖励；原包定义四档取经经书袋。B：合成产出四档袋的映射与60/25/12/3概率；十连逐次抽袋并按同一开袋池直接结算。",
-    "bag_weights": {"1304": 60, "1305": 25, "1306": 12, "1307": 3}
+    "bag_weights": {
+      "1304": 60,
+      "1305": 25,
+      "1306": 12,
+      "1307": 3
+    }
   },
   "search_card_points": 100,
   "tree_require_pop": 50,
@@ -375,6 +453,7 @@
   "train_hp": 10000,
   "train_seconds": 3600,
   "train_support_limit": 3,
+  "train_support_gold": 20,
   "pet_limit": 240,
   "pet_feed_silver": 1000,
   "pet_feed_exp": 25,
@@ -609,20 +688,30 @@
     ]
   ],
   "hunt_shop_unlock": [
-    0,
-    20,
     30,
     50,
     100,
-    200
+    200,
+    0,
+    50,
+    100,
+    200,
+    50
   ],
+  "pet_shop_fixed_items": [1338, 1339, 1345],
+  "pet_shop_random_slots": 3,
+  "pet_shop_weights": [0, 0, 25, 10, 0, 25, 20, 5, 15],
+  "pet_shop_daily_limits": [0, 0, 0, 0, 3, 5, 5, 5, 1],
   "pet_shop_reputation": [
-    20,
-    20,
     20,
     40,
     60,
-    100
+    100,
+    20,
+    40,
+    60,
+    100,
+    60
   ],
   "match_merit": {
     "1": 5,
@@ -655,7 +744,8 @@
   "catch_item": 1338,
   "catch_item_bonus": 15,
   "train_weekend_only": false,
-  "lucky_weekend_only": false,
+  "lucky_weekend_only": true,
+  "train_adoptions_per_floor": 3,
   "train_attempt_limit": 3,
   "train_resident_required": 240,
   "npc_resident_pets": 60,
@@ -674,18 +764,6 @@
   },
   "train_support_percent": 5,
   "pet_shop_items": [
-    [
-      5,
-      1001,
-      5,
-      1
-    ],
-    [
-      12,
-      0,
-      1000,
-      1
-    ],
     [
       5,
       1338,
@@ -707,6 +785,36 @@
     [
       5,
       1341,
+      1,
+      1
+    ],
+    [
+      5,
+      1345,
+      5,
+      1
+    ],
+    [
+      5,
+      1347,
+      1,
+      1
+    ],
+    [
+      5,
+      1348,
+      1,
+      1
+    ],
+    [
+      5,
+      1349,
+      1,
+      1
+    ],
+    [
+      5,
+      1346,
       1,
       1
     ]
@@ -799,6 +907,12 @@
     }
   ],
   "search_per_layer": 5,
+  "secret_power_per_level_squared": 120,
+  "secret_floor_percent": [
+    100,
+    220,
+    500
+  ],
   "search_reward_slots": [
     4,
     4,

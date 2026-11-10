@@ -67,11 +67,18 @@ int check(lua_State *state) {
         bundle = client_source(load_rules())
         def reset():
             execute(FIXTURE)
+            execute("""_jgbolContinuousTime=function()return 100 end
+              ms.d_time.g_self={server_time=1000};ms.d_time.setTime=function()end
+              ms.d_event_mgr={g_msg_fun={},msg_keep_alive_2999=function()end,
+                event_client_info_20=function()end}""")
             execute("package.loaded['ui.summonUI']={_localGoldRestore=function() end}")
             execute(bundle)
         try:
             check('prelogin', 0)
             reset(); check('all_critical_adapters_installed', 1)
+            execute('ms.d_time.getTime=function()return 0 end')
+            check('clock_redefinition_detected', 0)
+            execute(bundle); check('clock_reinstalled', 1)
             execute('ms.d_funUI.getFunList=function() return {{id=40},{id=48},{id=46}} end')
             check('in_place_entry_reload_despite_summon_marker', 0)
             execute(bundle); check('entry_reinstalled', 1)
@@ -93,7 +100,8 @@ int check(lua_State *state) {
             lua.lua_close(state)
     report = dict(passed=True, checks=checks, native_source_sha256=hashlib.sha256(source.encode()).hexdigest(),
                   scope='Exact C guard compiled for host with real Lua 5.1; Android ARM binary is rebuilt separately')
-    out = ROOT / 'analysis/evidence/v110/activity-entry-fix-20261106/native-guard-validation.json'
+    out = ROOT / 'analysis/evidence/game_clock_resume_20261109/native-guard-validation.json'
+    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps(report, indent=2))
 

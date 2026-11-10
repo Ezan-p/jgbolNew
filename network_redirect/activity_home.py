@@ -98,11 +98,8 @@ def point(s):
 
 
 def upgrade_info(s,r):
-    from .combat_power import score_panel
-    _,enemies=journey.fighters({'corteges':[]},dict(cortege_list=f"{r['battle_npc']}|{s['level']*r['battle_level']}"))
-    power=score_panel(enemies[0],formation.load_rules()['combat_weights'])
-    return dict(has_passed=s['passed'],fight_count=s['fight_count'],boss_info=dict(cortege_type=r['battle_npc'],
-        cortege_layer=0,combat_power=power,cortege_count=1,train_level=s['level']))
+    from .activity_home_ordeal import preview
+    return preview(s)
 
 
 def info(s,r):
@@ -118,14 +115,26 @@ def info(s,r):
     return data
 
 
-def shop_rows(r,page):
+def shop_rows(s,r,page):
     # Keep legacy purchase keys stable when goods are removed or reordered.
-    return [(row.get('purchase_key',i),row) for i,row in enumerate(r['home_shop'],1) if row.get('page',1)==page]
+    rows=[(row.get('purchase_key',i),row) for i,row in enumerate(r['home_shop'],1) if row.get('page',1)==page]
+    if page==1:return rows
+    if s.get('limited_shop_day')!=s['day'] or 'limited_shop_keys' not in s:
+        pool=rows.copy();chosen=[]
+        for _ in range(r['home_shop_daily_count']):
+            roll=secrets.randbelow(sum(row['weight'] for _,row in pool))
+            for index,(key,row) in enumerate(pool):
+                roll-=row['weight']
+                if roll<0:
+                    chosen.append(key);pool.pop(index);break
+        s.update(limited_shop_day=s['day'],limited_shop_keys=chosen)
+    by_key=dict(rows)
+    return [(key,by_key[key]) for key in s['limited_shop_keys']]
 
 
 def shop(s,r):
     return [[dict(item=a.prize_spec(row['reward']),consume=a.prize_spec(row['consume']),
-                  limit=row['limit']-s['purchases'].get(str(i),0)) for i,row in shop_rows(r,page)] for page in (1,2)]
+                  limit=max(0,row['limit']-s['purchases'].get(str(i),0))) for i,row in shop_rows(s,r,page)] for page in (1,2)]
 
 
 def settle(role,req,now,r,jrules,parse):
@@ -168,7 +177,7 @@ def settle(role,req,now,r,jrules,parse):
         if op==15:
             i,n,page=d.get('item_index'),d.get('buy_count',1),d.get('shop_page')
             a.require(type(page)is int and page in (1,2),'洞府商店分页无效')
-            rows=shop_rows(r,page)
+            rows=shop_rows(s,r,page)
             a.require(type(i)is int and 1<=i<=len(rows) and type(n)is int and n>0,'洞府兑换参数无效')
             key,row=rows[i-1];used=s['purchases'].get(str(key),0)
             a.require(n+used<=row['limit'],'兑换次数不足')
@@ -261,16 +270,18 @@ def settle(role,req,now,r,jrules,parse):
         if tr['level']==maximum:tr['cur_exp']=0
         return [response(20,dict(train_type=typ,consume_type=way,train_count=used+n,**tr))]
     if op in (25,26):
-        a.require(s['level']<max(OWNER),'洞府规模已满')
-        maximum=int(OWNER[s['level']]['max_building_level'])
-        a.require(all(s['build'][str(i)]>=maximum for i in (1,2,3)),'请先将主殿、药园和佛堂升至当前上限')
+        from . import activity_home_ordeal as ordeal
+        ordeal.require_ready(s)
         if op==26:
             a.require(s['passed'],'请先通过红尘劫');cost(role,OWNER[s['level']+1]['upgrade_list']);s['level']+=1;s['passed']=False;role['hole_hp_plus']=point(s)
-            return [response(26,dict(level=s['level'],point=point(s)))]
-        a.require(s['fight_count']>0 and not s['passed'],'红尘劫次数已用完或已经通过');s['fight_count']-=1
-        cfg=dict(cortege_list=f"{r['battle_npc']}|{s['level']*r['battle_level']}")
-        a.require(any(c.get('order') for c in role['corteges']),'请先上阵神仙')
-        result,lineup,actions=journey.battle(role,cfg,jrules);s['passed']=1<=result<=3
+            return [response(26,dict(level=s['level'],point=point(s),upgrade_info=upgrade_info(s,r)))]
+        a.require(not s['passed'],'已经通过红尘劫，请升级洞府规模')
+        a.require(s['fight_count']>0,'红尘劫次数已用完，请明日再来')
+        cfg,enemies=ordeal.enemies(s['level'])
+        ours,_=journey.fighters(role,cfg)
+        a.require(bool(ours),'请先上阵神仙')
+        result,lineup,actions=journey.battle(role,cfg,jrules,units=(ours,enemies))
+        s['fight_count']-=1;s['passed']=1<=result<=3
         role['activity']['fight_id']+=1;fid=role['activity']['fight_id']
         return journey.combat_engine.event_packets(actions,fid)+[encode(1028,dict(fight_id=fid,first_hand=1,des_name='红尘劫',lineup_count=len(lineup),lineup=lineup)),
             *battle_replay.result_packets(1027, dict(fight_id=fid,fight_type=34,final_result=result,fight_round=len(actions),fight_result=actions)),

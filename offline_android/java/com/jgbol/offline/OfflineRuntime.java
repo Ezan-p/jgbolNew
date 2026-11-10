@@ -105,7 +105,7 @@ public final class OfflineRuntime {
             try {
                 String kernel = read(new FileInputStream("/proc/sys/kernel/random/boot_id")).trim();
                 if (!kernel.isEmpty()) identity = "kernel:" + kernel;
-            } catch (IOException unavailable) { /* Conservatively discard process-offline gaps. */ }
+            } catch (IOException unavailable) { /* Backend applies bounded wall-time catch-up if identity is unavailable. */ }
         }
         if (identity == null) identity = "process:" + java.util.UUID.randomUUID().toString();
         FileOutputStream output = new FileOutputStream(new File(files, "clock_boot_id"));

@@ -34,6 +34,53 @@ do
  end
 end
 
+-- Native showNumberGuess L3704 counts digits in min_num (0 initially), so
+-- pressNum rejects the second digit. Its keypad/reset closures share numCount.
+-- Size that input from the largest allowed integer; keep the native rendering,
+-- reset button, range checks and request callback.
+do
+ local ms=package.loaded.ms
+ local ui=ms and ms.d_abyssUI
+ if ui and ui.showNumberGuess and not ui._localAbyssNumberRestore then
+  if not debug or not debug.getupvalue or not debug.setupvalue then return 'pending' end
+  local original=ui.showNumberGuess
+  ui.showNumberGuess=function(...)
+   local data=ui.g_data and ui.g_data.random
+   local maximum=data and tonumber(data.max_num) or 40
+   local digits=math.max(2,#tostring(math.ceil(maximum)-1))
+   local create=ms.d_u.createMenu
+   local initialized=false
+   ms.d_u.createMenu=function(config,...)
+    for _,row in ipairs(config) do
+     if not initialized and row.npic=='v2/abyssUI/randomEvent/num_btn1.png' then
+      local callback=row.call_back
+      local countIndex,reset
+      for i=1,64 do
+       local name,value=debug.getupvalue(callback,i)
+       if not name then break end
+       if name=='numCount' then countIndex=i end
+       if name=='pressReenter' then reset=value end
+      end
+      if countIndex and reset then
+       debug.setupvalue(callback,countIndex,digits)
+       reset()
+       initialized=true
+      end
+     end
+    end
+    return create(config,...)
+   end
+   local ok,result=pcall(original,...)
+   ms.d_u.createMenu=create
+   if not ok then error(result,0) end
+   return result
+  end
+  ui._localAbyssNumberRestore=function()
+   ui.showNumberGuess=original;ui._localAbyssNumberRestore=nil
+  end
+ end
+end
+
 -- Native showChallengeSuccess looks up every reward as an item (L2393).
 -- Silver has attach_type=0, so it throws before installing the close touch
 -- handler (L2407). Give the delayed renderer its own currency-aware helpers;

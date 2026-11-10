@@ -129,9 +129,14 @@ def settle(role,s,g,d,now,r):
     elif flag in (4,5):
         u.require(e['active'] is None,'已有取经队伍，请先领取奖励')
         if flag==5:
+            # [A] Native escortUI L1395 also stops refreshing at grade 5.
+            u.require(e['level']<5,'经书已达最高档次')
             u.require(e['flushes']<r['escort_flush_limit'],'刷新次数已用完')
             if e['flushes']>=r['escort_free_flush']:u.pay(role,'gold_coin',r['escort_flush_gold'])
-            e['flushes']+=1;e['level']=min(5,e['level']+1+int(offline.roll(s,100)<20))
+            # Each accepted refresh draws from grades 2–5, independently of
+            # the previous grade/count. Repeats and downgrades are intentional.
+            e['level']=int(u.summon.weighted_choice(r['escort_refresh']['grade_weights']))
+            e['flushes']+=1
         out.update(flush_gold=r['escort_flush_gold'],free_flush_count=r['escort_free_flush'],cloud_cost_gold=30,
             book_level=e['level'],flush_count=e['flushes'],flush_west_book=e['flushes'],contribute=e['level']*10,
             protect_list=[dict(id=m['id'],name=m['name'],count=e['credits']) for m in g['members'].values() if m['rank'] in (1,7)] if e['credits'] else [],top_rank_list=[m for m in g['members'].values() if m['rank'] in (1,7)])

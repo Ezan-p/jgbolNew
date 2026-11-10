@@ -7,7 +7,44 @@ from network_redirect import activity_save_monkey as m, activity, summon, daily,
 from network_redirect.backend import Backend
 
 
+class DisabledSaveMonkeyTests(ActivityCase):
+    def test_release_disabled_rejects_all_activity_operations(self):
+        self.assertFalse(m.load_rules()['enabled'])
+        status = next(v for e, v in self.req(1205, flag=0) if e == 47)
+        self.assertFalse(status['local_save_monkey']['local_enabled'])
+        for op in (1, 2, 3, 4, 5, 6, 7, 9):
+            with self.subTest(op=op):
+                before = self.b.profile()
+                out = self.req(1346, id=op, data='{}')
+                self.assertIn(55, [e for e, _ in out])
+                self.assertEqual(self.b.profile(), before)
+
+    def test_real_recharge_preserves_existing_progress_without_granting_tools(self):
+        role = self.b.profile()
+        state = m.state(role, NOW, dict(m.load_rules(), enabled=True))
+        state.update(score=60, charge_gold=2999)
+        activity.prizes(role, [[5, t, 7, 1] for t in m.TOOLS] + [[5, 1152, 1, 1]])
+        self.b.save(role)
+        before_state = copy.deepcopy(state)
+        card = next(i for i in role['attachments'] if i['type_id'] == 1152)
+        self.ok(self.req(1051, item_id=card['id'], item_type=1152,
+                         item_count=1, des_type=1, des_id=0))
+        after = self.b.profile()
+        self.assertEqual(after['charge_gold'] - role['charge_gold'], 500)
+        self.assertEqual(after['activity']['save_monkey'], before_state)
+        self.assertEqual([recharge.count(after, t) for t in m.TOOLS], [7]*4)
+        self.assertFalse(any(k.startswith('save-monkey:') for k in after['welfare']['mails']))
+
+
 class SaveMonkeyTests(ActivityCase):
+    def setUp(self):
+        # Exercise retained gameplay explicitly enabled, independent of release policy.
+        enabled_rules = dict(m.load_rules(), enabled=True)
+        rules_patch = patch.object(m, 'load_rules', return_value=enabled_rules)
+        rules_patch.start()
+        self.addCleanup(rules_patch.stop)
+        super().setUp()
+
     def saved(self): return self.b.profile()['activity']['save_monkey']
 
     def call(self,op=1,**data):

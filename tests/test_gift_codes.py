@@ -252,7 +252,7 @@ class GiftCodeTests(unittest.TestCase):
                     for code, prizes in expected.items()}
         self.assertEqual({row['code']: row['prizes'] for row in rows}, expected)
         self.assertEqual(len(rows), 24)
-        self.assertEqual(len({row['group'] for row in self.b.gift_code_rules['codes']}), 77)
+        self.assertEqual(len({row['group'] for row in self.b.gift_code_rules['codes']}), 100)
         self.assert_gifts_redemption(rows, expected)
 
     def assert_gifts_redemption(self, rows, expected):
@@ -318,7 +318,7 @@ class GiftCodeTests(unittest.TestCase):
         self.assert_gifts_redemption(rows, {row['code']: expected_groups[row['group']] for row in rows})
 
     def test_ten_designed_packs_exact_rewards_and_independent_claims(self):
-        rows = self.b.gift_code_rules['codes'][67:]
+        rows = self.b.gift_code_rules['codes'][67:77]
         self.assertEqual(len(rows), 10)
         self.assertEqual(sum(row['name'].startswith('更新福利·') for row in rows), 5)
         expected = {
@@ -336,14 +336,49 @@ class GiftCodeTests(unittest.TestCase):
         self.assertEqual({row['code']: row['prizes'] for row in rows}, expected)
         self.assert_gifts_redemption(rows, expected)
 
+    def test_ten_gold_supply_packs_exact_rewards_and_independent_claims(self):
+        rows = self.b.gift_code_rules['codes'][80:90]
+        self.assertEqual(len(rows), 10)
+        self.assertEqual({row['group'] for row in rows},
+                         {f'gift-gold-supply-20261110-{i}-v1' for i in range(1, 11)})
+        expected = {row['code']: [[5, 1152, 1, 1], [5, 1156, 5, 1]] for row in rows}
+        self.assertEqual({row['code']: row['prizes'] for row in rows}, expected)
+        self.assert_gifts_redemption(rows, expected)
+        # Existing card entitlement groups must not block any new pack.
+        self.assertEqual(self.request('7H1DSO85ZUXF')['result'], 1)
+        other = self.backend('gold-supply-other')
+        try:
+            self.assertEqual(self.request('7H1DSO85ZUXF', backend=other)['result'], 1)
+            for row in rows:
+                self.assertEqual(self.request(row['code'], backend=other)['result'], 1)
+        finally:
+            other.close()
+
+    def test_ten_gold_fruit_packs_exact_rewards_and_independent_claims(self):
+        rows = self.b.gift_code_rules['codes'][90:]
+        self.assertEqual(len(rows), 10)
+        self.assertEqual({row['group'] for row in rows},
+                         {f'gift-gold-fruit-20261110-{i}-v1' for i in range(1, 11)})
+        expected = {row['code']: [[5, 1152, 1, 1], [5, 1246, 5, 1]] for row in rows}
+        self.assertEqual({row['code']: row['prizes'] for row in rows}, expected)
+        self.assert_gifts_redemption(rows, expected)
+        self.assertEqual(self.request('6A90HBYB438N')['result'], 1)
+        other = self.backend('gold-fruit-other')
+        try:
+            self.assertEqual(self.request('6A90HBYB438N', backend=other)['result'], 1)
+            for row in rows:
+                self.assertEqual(self.request(row['code'], backend=other)['result'], 1)
+        finally:
+            other.close()
+
     def test_random_codes_unique_stable_and_documented(self):
         rules = self.b.gift_code_rules
-        self.assertEqual(len(rules['codes']), 77)
+        self.assertEqual(len(rules['codes']), 100)
         randomized = [row for row in rules['codes']
                       if row['group'].startswith(('gift-jgcard', 'gift-jgfest'))]
         randomized += rules['codes'][51:]
-        self.assertEqual(len(randomized), 34)
-        self.assertEqual(len({row['code'] for row in rules['codes']}), 77)
+        self.assertEqual(len(randomized), 57)
+        self.assertEqual(len({row['code'] for row in rules['codes']}), 100)
         for row in randomized:
             self.assertRegex(row['code'], r'\A(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{12}\Z')
         self.assertEqual(gift_codes.load_rules(), rules)

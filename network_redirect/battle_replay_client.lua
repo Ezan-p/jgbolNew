@@ -239,6 +239,31 @@ do
    end
   end
 
+  -- Upkeep HP events need their own timeline slots (poison/revival ordering
+  -- and reserve entry depend on them). Native skill-1 playback ignores
+  -- self_use and animates these zero-damage slots as attacks on the enemy.
+  -- Events and their delays have already run before showSingleAttackEffect.
+  if fight.showSingleAttackEffect and fight.showFightDetailStepByStep then
+   local nativeAttack=fight.showSingleAttackEffect
+   replace(fight,'showSingleAttackEffect',function(action,...)
+    local upkeep=action.self_use==true and action.skill_type==1
+     and action.src_order==action.des_order and type(action.damage_list)=='table'
+     and #action.damage_list>0
+    if upkeep then
+     for _,damage in pairs(action.damage_list) do
+      if damage~=0 then upkeep=false;break end
+     end
+    end
+    if upkeep then
+     -- Keep the native non-passive action counter aligned with lineup entry.
+     local state=fight.g_fightUI
+     state.iAttackStepNoBuff=state.iAttackStepNoBuff+1
+     return fight.showFightDetailStepByStep()
+    end
+    return nativeAttack(action,...)
+   end)
+  end
+
   local nativeFight=fight.actFight
   replace(fight,'actFight',function(replay,...)
    local ok,value=pcall(function() return hydrate(copy(replay)) end)

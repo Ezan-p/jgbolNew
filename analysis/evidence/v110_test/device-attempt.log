@@ -1,0 +1,20 @@
+Dedicated fresh ARM32 QA booted
+/Users/ezan/Desktop/vibeCoidng/JGBOLNew/build/金箍棒ol测试版-v108.apk: 1 file pushed, 0 skipped. 1.8 MB/s (198585977 bytes in 102.997s)
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v110_test_device.py", line 104, in <module>
+    if __name__ == '__main__':
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v110_test_device.py", line 59, in main
+    if 'versionCode=108 ' not in info:
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v110_test_device.py", line 18, in call
+    return subprocess.check_output(ADB + list(args), timeout=timeout)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 424, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 507, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1134, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1980, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1178, in _check_timeout
+    raise TimeoutExpired(
+subprocess.TimeoutExpired: Command '['/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/sdk/platform-tools/adb', '-s', 'emulator-5574', 'install', '--no-streaming', '-r', '/Users/ezan/Desktop/vibeCoidng/JGBOLNew/build/金箍棒ol测试版-v108.apk']' timed out after 360 seconds

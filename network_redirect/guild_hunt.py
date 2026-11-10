@@ -8,19 +8,32 @@ from . import guild_offline as offline
 def prepare(s):
     a=state(s)
     for k,v in dict(tasks=[],wander=0,field=None,shop_bought={},rank_claimed=False).items():a.setdefault(k,v)
-    # Older saves only recorded free completions. Keep those targets retired.
+    # Older saves only recorded free completions. Keep those targets completed.
     a.setdefault('completed_tasks',list(a['tasks']))
+    # Legacy saves did not record the challenge type. Count each old target
+    # as its leisure challenge; preserve spent quotas and all granted rewards.
+    a.setdefault('task_modes',{str(i)+':1':True for i in set(a['completed_tasks'])|set(a['tasks'])})
     return a
 
 
-def task_prizes(r,index):
+def task_prizes(r,index,task_type=1):
     from . import pets
-    return [p[:2]+[p[2]*index,p[3]] for p in r['hunt_rewards']]+[[5,1346,pets.load_rules()['task_training_boxes'],1]]
+    return [p[:2]+[p[2]*index,p[3]] for p in r['hunt_task_rewards'][task_type-1]['items']]+[[5,1346,pets.load_rules()['task_training_boxes'],1]]
+
+
+def task_reward(r,index,task_type):
+    """Native prize_info[type] and settlement share one server-owned offer.
+
+    The APK defines the two offers and reward fields, not their quantities.
+    Configured base amounts and target multipliers are offline policy.
+    """
+    rule=r['hunt_task_rewards'][task_type-1]
+    return dict(add_reputation=rule['reputation']*index,add_union_gold=rule['union_funds']*index,
+                prize_list=[daily.spec(p) for p in task_prizes(r,index,task_type)])
 
 
 def task(r,index,day=0):
-    reward=dict(add_reputation=10*index,prize_list=[daily.spec(p) for p in task_prizes(r,index)])
-    return dict(task_info={1:[101+(day+index)%5],2:[201+(day+index)%6],3:[]},prize_info=[reward,reward],boss_info=dict(cur_hp=10000,max_hp=10000,cost_gold=10,fight_count=0),index=index)
+    return dict(task_info={1:[101+(day+index)%5],2:[201+(day+index)%6],3:[]},prize_info=[task_reward(r,index,typ) for typ in (1,2)],boss_info=dict(cur_hp=10000,max_hp=10000,cost_gold=10,fight_count=0),index=index)
 
 
 def wander_capacity(a,r):
@@ -29,16 +42,50 @@ def wander_capacity(a,r):
 
 
 def main(a,now,r,g):
-    completed=set(a.get('completed_tasks',[]))|set(a['tasks'])
-    remaining=[task(r,i,a['day']) for i in range(1,4) if i not in completed] if r['hunt_weekend_open'] or not weekend(a) else []
-    return dict(result=1,cur_reputation=a['reputation'],free_task_times=min(len(remaining),max(0,r['hunt_daily']-len(a['tasks']))),pay_task_times=min(len(remaining),max(0,r['hunt_paid_limit']-a.get('paid_tasks',0))),pay_task_gold=r['hunt_gold'],
-        union_task=remaining,task_day=a['day'],has_prize=False,pet_info=resident_info(g,r),task_last_time=(a['day']+1)*86400-r['timezone_offset_hours']*3600,
-        drop_baoxiang_item=daily.spec([5,1346,1,1]),week_reputation=a.get('week_score',0),wander_times=max(0,wander_capacity(a,r)-a['wander']))
+    targets=[]
+    if r['hunt_weekend_open'] or not weekend(a):
+        for i in range(1,4):
+            modes=[bool(a['task_modes'].get(str(i)+':'+str(typ))) for typ in (1,2)]
+            targets.append(dict(task(r,i,a['day']),completed=all(modes),completed_modes=modes))
+    remaining=sum(not done for row in targets for done in row['completed_modes'])
+    return dict(result=1,cur_reputation=a['reputation'],free_task_times=min(remaining,max(0,r['hunt_daily']-len(a['tasks']))),pay_task_times=min(remaining,max(0,r['hunt_paid_limit']-a.get('paid_tasks',0))),pay_task_gold=r['hunt_gold'],
+        union_task=targets,task_day=a['day'],has_prize=False,pet_info=resident_info(g,r),task_last_time=(a['day']+1)*86400-r['timezone_offset_hours']*3600,
+        drop_baoxiang_item=daily.spec([5,1346,a.get('last_task_box_count',0),1]),week_reputation=a.get('week_score',0),wander_times=max(0,wander_capacity(a,r)-a['wander']))
+
+
+def prepare_shop(a,s,r):
+    # Old purchases used fixed slots: peaches, silver, then four charms.
+    if not a.get('pet_shop_v2'):
+        old=a['shop_bought']
+        a['shop_bought']={str(tid):old[str(index)] for index,tid in enumerate(range(1338,1342),3) if str(index) in old}
+        a['pet_shop_v2']=True
+        a.pop('shop_view_day',None)
+    if a.get('pet_shop_version')!=3 or a.get('shop_goods_day')!=a['day']:
+        fixed=[i for tid in r['pet_shop_fixed_items'] for i,p in enumerate(r['pet_shop_items']) if p[1]==tid]
+        pool=[i for i in range(len(r['pet_shop_items'])) if i not in fixed]
+        chosen=[]
+        for _ in range(r['pet_shop_random_slots']):
+            ticket=offline.roll(s,sum(r['pet_shop_weights'][i] for i in pool))
+            for i in pool:
+                ticket-=r['pet_shop_weights'][i]
+                if ticket<0:
+                    chosen.append(i);pool.remove(i);break
+        a['shop_goods']=fixed+sorted(chosen)
+        a['shop_goods_day']=a['day']
+        a['pet_shop_version']=3
+        # A same-day configuration migration also invalidates old row indices.
+        a.pop('shop_view_day',None)
 
 
 def shop(a,r):
+    items=[]
+    for i in a['shop_goods']:
+        p=r['pet_shop_items'][i]
+        limit=r['pet_shop_daily_limits'][i] or 3+a.get('total_reputation',0)//100
+        items.append(dict(item=daily.spec(p),consume_gold=0,buy_reputation=r['pet_shop_reputation'][i],
+                          total_reputation=r['hunt_shop_unlock'][i],left_times=max(0,limit-a['shop_bought'].get(str(p[1]),0))))
     return dict(result=1,two_type=1,cur_reputation=a['reputation'],total_reputation=a.get('total_reputation',a['reputation']),
-        item_list=[dict(item=daily.spec(p),consume_gold=0,buy_reputation=r['pet_shop_reputation'][i-1],total_reputation=r['hunt_shop_unlock'][i-1],left_times=max(0,3+a.get('total_reputation',0)//100-a['shop_bought'].get(str(i),0))) for i,p in enumerate(r['pet_shop_items'],1)])
+        shop_day=a['day'],item_list=items)
 
 
 def shop_positive(data,key,maximum=2147483647):
@@ -54,12 +101,14 @@ def settle(role,s,g,op,d,now,r):
     if op in (84,85):
         u.authorize(role,r,28);idx=u.positive(d,'task_index',3)
         if 'task_day' in d:u.require(type(d['task_day']) is int and d['task_day']==a['day'],'灵兽任务已刷新，请重新进入灵宠仙地')
-        u.require(idx not in a['completed_tasks'] and idx not in a['tasks'],'该灵兽任务今日已完成，请等待每日刷新')
+        typ=d.get('task_type',2 if op==85 else None);u.require(type(typ) is int and typ in (1,2),'任务类型无效')
+        key=str(idx)+':'+str(typ)
+        u.require(not a['task_modes'].get(key),'已挑战，请等待每日刷新')
+        u.require(type(d.get('pay_type',1)) is int and d.get('pay_type',1) in (1,2),'任务支付方式无效')
         paid=d.get('pay_type')==2
-        u.require((a.get('paid_tasks',0)<r['hunt_paid_limit'] if paid else idx not in a['tasks'] and len(a['tasks'])<r['hunt_daily']),'任务已完成或今日次数不足')
+        if paid:u.require(len(a['tasks'])>=r['hunt_daily'],'请先使用免费挑战次数')
+        u.require((a.get('paid_tasks',0)<r['hunt_paid_limit'] if paid else len(a['tasks'])<r['hunt_daily']),'今日挑战次数不足')
         u.require(r['hunt_weekend_open'] or (s['day']+3)%7<5,'周末任务休息，可领取排行奖励')
-        typ=d.get('task_type',2 if op==85 else None);u.require(typ in (1,2),'任务类型无效')
-        u.require(d.get('pay_type',1) in (1,2),'任务支付方式无效')
         if d.get('pay_type')==2:u.pay(role,'gold_coin',r['hunt_gold'])
         else:u.pay(role,'silver_coin',r['hunt_silver'])
         # [A] APK checks checkDeviceFit/checkPuzzleFit locally before sending
@@ -67,24 +116,30 @@ def settle(role,s,g,op,d,now,r):
         won=True;out=[]
         if typ==2:
             opponents=a.setdefault('task_opponents',{})
-            key=str(idx)
-            if key not in opponents:
-                opponents[key]=choose_enemy(role,s,layer=idx-1,excluded=[m['id'] for m in g['members'].values()])
-            result,packets,replay=simulate(role,s,r,journey.load_rules(),28,'仙盟任务守卫',enemy_npc=opponents[key]);won=1<=result<=3
+            opponent_key=str(idx)
+            if opponent_key not in opponents:
+                opponents[opponent_key]=choose_enemy(role,s,layer=idx-1,excluded=[m['id'] for m in g['members'].values()])
+            result,packets,replay=simulate(role,s,r,journey.load_rules(),28,'仙盟任务守卫',enemy_npc=opponents[opponent_key]);won=1<=result<=3
             out.extend(record_events([replay]))
-        prizes=[];arrivals=[]
+        prizes=[];arrivals=[];reputation=0;funds=0
+        a['last_task_box_count']=0
         if won:
+            reward=task_reward(r,idx,typ)
+            a['task_modes'][key]=True
             a['completed_tasks'].append(idx)
             if paid:a['paid_tasks']=a.get('paid_tasks',0)+1
-            elif idx not in a['tasks']:a['tasks'].append(idx)
-            a['reputation']+=10*idx;a['week_score']=a.get('week_score',0)+10*idx;a['total_reputation']=a.get('total_reputation',0)+10*idx;offline.funds(g,100*idx,r)
-            prizes=[journey.grant(role,p) for p in task_prizes(r,idx)]
+            else:a['tasks'].append(idx)
+            reputation=reward['add_reputation']
+            a['reputation']+=reputation;a['week_score']=a.get('week_score',0)+reputation;a['total_reputation']=a.get('total_reputation',0)+reputation
+            funds=offline.funds(g,reward['add_union_gold'],r)
+            prizes=[journey.grant(role,[p['object_type'],p['attach_type'],p['attach_count'],p['attach_level']]) for p in reward['prize_list']]
+            a['last_task_box_count']=sum(p['attach_count'] for p in prizes if p['object_type']==5 and p['attach_type']==1346)
             population=residents(g,r)
             tid=r['pet_types'][offline.roll(s,len(r['pet_types']))]
             population[str(tid)]=population.get(str(tid),0)+1
             arrivals=[dict(attach_type=tid,attach_count=1)]
         # Cache settlement/counts before the battle response destroys the page.
-        out.append(u.reply(84,dict(result=1,task_type=typ,task_index=idx,fight_result=won,boss_info=task(r,idx)['boss_info'],prize_reputation=10*idx if won else 0,prize_union_gold=100*idx if won else 0,prize_list=prizes,animal_info=arrivals,task_state=main(a,now,r,g))))
+        out.append(u.reply(84,dict(result=1,task_type=typ,task_index=idx,fight_result=won,boss_info=task(r,idx)['boss_info'],prize_reputation=reputation,prize_union_gold=funds,prize_list=prizes,animal_info=arrivals,task_state=main(a,now,r,g))))
         if typ==2:
             out.extend(replay_reply(85,dict(result=1,fight_result_list=client_records([replay]),free_times=1,fight_count=1,task_index=idx)))
         return out
@@ -138,16 +193,22 @@ def settle(role,s,g,op,d,now,r):
         return [u.reply(op,dict(result=1,two_type=2,flag=flag,left_times=0 if caught else left,animal_list=acquired)),broadcast(a,role,tid,flag)]
     if op==91:
         typ=d.get('two_type');u.require(typ in (1,2),'灵兽商店操作无效')
-        if typ==1:return [u.reply(op,shop(a,r))]
-        idx=shop_positive(d,'index',len(r['pet_shop_items']));n=shop_positive(d,'buy_count')
+        prepare_shop(a,s,r)
+        if typ==1:
+            a['shop_view_day']=a['day']
+            return [u.reply(op,shop(a,r))]
+        # Native requests identify the visible row. Never reuse yesterday's
+        # row index against a newly rolled list before a fresh shop query.
+        u.require(a.get('shop_view_day')==a['day'],'宠物商店已刷新，请重新打开商店')
+        if 'shop_day' in d:u.require(type(d['shop_day']) is int and d['shop_day']==a['day'],'宠物商店已刷新，请重新打开商店')
+        idx=shop_positive(d,'index',len(a['shop_goods']));n=shop_positive(d,'buy_count')
         offer=shop(a,r)['item_list'][idx-1]
         u.require(a.get('total_reputation',0)>=offer['total_reputation'],'累计声望尚未解锁商品')
-        # The native UI allows the full advertised stock, which grows with
-        # lifetime reputation. The former fixed cap of 3 rejected valid buys.
         u.require(n<=offer['left_times'],'购买次数不足')
         cost=offer['buy_reputation']*n;u.require(a['reputation']>=cost,'声望不足')
-        a['reputation']-=cost;a['shop_bought'][str(idx)]=a['shop_bought'].get(str(idx),0)+n
-        p=list(r['pet_shop_items'][idx-1]);p[2]*=n;journey.grant(role,p)
+        p=list(r['pet_shop_items'][a['shop_goods'][idx-1]])
+        key=str(p[1]);a['reputation']-=cost;a['shop_bought'][key]=a['shop_bought'].get(key,0)+n
+        p[2]*=n;journey.grant(role,p)
         return [u.reply(op,dict(result=1,two_type=2,index=idx,cur_reputation=a['reputation'],total_reputation=a.get('total_reputation',0),buy_item=shop(a,r)['item_list'][idx-1]))]
     if op==92:
         typ=d.get('two_type');u.require(type(typ)is int and typ in (1,2),'灵兽排行操作无效');q=d.get('query_type',1);u.require(type(q)is int and q in (1,2),'灵兽排行范围无效')

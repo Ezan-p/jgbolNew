@@ -117,39 +117,114 @@ class HomeTests(ActivityCase):
             self.rejected(20,train_type=1,consume_type=1,use_count=1)
         self.assertEqual(self.b.profile()['activity']['home']['welfare']['race_exp'],2000)
 
+    def item_count(self,role,tid):
+        return sum(p['count'] for p in role['attachments'] if p['type_id']==tid)
+
     def test_shop_refresh_keeps_daily_limits_and_rolls_over(self):
-        self.prepared();shop=self.home(14)['shop_data']
-        self.assertEqual((len(shop[1]),len(shop[2])),(5,3))
-        self.assertNotIn(1363,[row['item']['attach_type'] for page in shop.values() for row in page.values()])
-        self.assertEqual(shop[1][2]['item']['attach_count'],100)
+        self.prepared()
+        with patch('network_redirect.activity_home.secrets.randbelow',return_value=0) as draw:
+            shop=self.home(14)['shop_data']
+            self.assertEqual(draw.call_count,3)
+        self.assertEqual((len(shop[1]),len(shop[2])),(4,3))
+        self.assertEqual([(row['item']['attach_type'],row['item']['attach_count'],
+                           row['consume']['attach_count'],row['limit']) for row in shop[1].values()],
+                         [(1362,100,1000,20),(1364,5,1000,10),(1365,1,5000,1),(1345,5,1000,10)])
         self.home(15,shop_page=2,item_index=1,buy_count=10)
         self.rejected(15,shop_page=2,item_index=1,buy_count=1)
-        self.rejected(15,shop_page=1,item_index=6,buy_count=1)
+        self.rejected(15,shop_page=1,item_index=5,buy_count=1)
+        self.rejected(15,shop_page=2,item_index=4,buy_count=1)
         before=self.b.profile()
-        self.home(15,shop_page=1,item_index=2,buy_count=10)
+        self.home(15,shop_page=1,item_index=1,buy_count=20)
         after=self.b.profile()
-        for tid,delta in ((1361,-1000),(1362,1000),(1363,0)):
-            count=lambda role:sum(p['count'] for p in role['attachments'] if p['type_id']==tid)
-            self.assertEqual(count(after)-count(before),delta)
-        self.rejected(15,shop_page=1,item_index=2,buy_count=1)
-        self.assertEqual(self.home(14,flush_flag=True)['shop_data'][1][2]['limit'],0)
-        with patch('network_redirect.game_clock.now',return_value=NOW+86400):
-            self.assertEqual(self.home(14)['shop_data'][1][2]['limit'],10)
+        for tid,delta in ((1361,-20000),(1362,2000),(1363,0)):
+            self.assertEqual(self.item_count(after,tid)-self.item_count(before,tid),delta)
+        self.rejected(15,shop_page=1,item_index=1,buy_count=1)
+        with patch('network_redirect.activity_home.secrets.randbelow',side_effect=AssertionError('reroll')):
+            current=self.home(14,flush_flag=True)['shop_data']
+            self.assertEqual(current[1][1]['limit'],0)
+            self.assertEqual(current[2][1]['limit'],0)
+        self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        with patch('network_redirect.activity_home.secrets.randbelow',side_effect=AssertionError('reroll')):
+            self.assertEqual(self.home(14)['shop_data'],current)
+        midnight=NOW+(86400-(NOW+self.b.activity_rules['timezone_offset_hours']*3600)%86400)
+        with patch('network_redirect.game_clock.now',return_value=midnight-1):
+            self.assertEqual(self.home(14)['shop_data'],current)
+        with patch('network_redirect.game_clock.now',return_value=midnight), \
+             patch('network_redirect.activity_home.secrets.randbelow',side_effect=lambda total:total-1) as draw:
+            refreshed=self.home(14)['shop_data']
+            self.assertEqual(draw.call_count,3)
+            self.assertEqual(refreshed[1][1]['limit'],20)
+            self.assertEqual(refreshed[2][1]['item']['attach_type'],1363)
+            self.assertTrue(all(row['limit']==1 for row in refreshed[2].values()))
+            self.assertNotEqual(refreshed[2],current[2])
 
     def test_shop_removal_preserves_legacy_purchase_keys(self):
         r=self.prepared()
         purchases={'1':1,'2':2,'3':10,'4':3,'5':4,'6':5,'7':6,'8':7,'9':8}
         r['activity']['home']['purchases']=purchases.copy();self.b.save(r)
         self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
-        shop=self.home(14)['shop_data']
-        self.assertEqual([row['limit'] for row in shop[1].values()],[9,8,2,6,5])
-        self.assertEqual([row['limit'] for row in shop[2].values()],[4,3,2])
-        self.home(15,shop_page=1,item_index=3,buy_count=2)
-        self.home(15,shop_page=2,item_index=1,buy_count=4)
-        purchases.update({'4':5,'7':10})
+        with patch('network_redirect.activity_home.secrets.randbelow',return_value=0):
+            shop=self.home(14)['shop_data']
+        self.assertEqual([row['limit'] for row in shop[1].values()],[18,7,0,5])
+        self.assertEqual([row['limit'] for row in shop[2].values()],[10,10,10])
+        self.home(15,shop_page=1,item_index=2,buy_count=7)
+        self.home(15,shop_page=2,item_index=1,buy_count=10)
+        purchases.update({'4':10,'limited_1362_100':10})
         self.assertEqual(self.b.profile()['activity']['home']['purchases'],purchases)
+        self.rejected(15,shop_page=1,item_index=2,buy_count=1)
         self.rejected(15,shop_page=1,item_index=3,buy_count=1)
         self.rejected(15,shop_page=2,item_index=1,buy_count=1)
+
+    def test_limited_pool_weights_and_unique_daily_selection(self):
+        rules=self.b.activity_rules
+        pool=[row for row in rules['home_shop'] if row['page']==2]
+        self.assertEqual([(p['reward'][1],p['reward'][2],p['consume'][2],p['limit'],p['weight']) for p in pool],
+            [(1362,100,500,10,10),(1362,200,1000,10,10),(1362,500,2000,10,10),
+             (1362,1000,5000,10,1),(1364,30,5000,1,10),(1364,50,10000,1,10),
+             (1364,100,20000,1,10),(1365,1,5000,1,10),(1345,5,500,1,10),
+             (1345,20,2000,1,10),(1363,1,2000,1,1)])
+        first_counts={row['purchase_key']:0 for row in pool}
+        for roll in range(sum(row['weight'] for row in pool)):
+            with patch('network_redirect.activity_home.secrets.randbelow',side_effect=[roll,0,0]):
+                rows=h.shop_rows(dict(day=10),rules,2)
+            self.assertEqual(len(set(key for key,_ in rows)),3)
+            first_counts[rows[0][0]]+=1
+        self.assertEqual(first_counts,{row['purchase_key']:row['weight'] for row in pool})
+
+    def test_all_shop_goods_charge_and_grant_exact_bundles(self):
+        self.prepared()
+        for row in self.b.activity_rules['home_shop']:
+            with self.subTest(key=row['purchase_key']):
+                role=self.b.profile();s=role['activity']['home']
+                summon.add_item(role,1361,1000000)
+                if row['page']==2:
+                    others=[p['purchase_key'] for p in self.b.activity_rules['home_shop']
+                            if p['page']==2 and p['purchase_key']!=row['purchase_key']][:2]
+                    s.update(limited_shop_day=s['day'],limited_shop_keys=[row['purchase_key']]+others)
+                    index=1
+                else:
+                    index=next(i for i,(_,p) in enumerate(h.shop_rows(s,self.b.activity_rules,1),1) if p==row)
+                self.b.save(role)
+                n=row['limit'];tid=row['reward'][1]
+                self.home(15,shop_page=row['page'],item_index=index,buy_count=n)
+                after=self.b.profile()
+                self.assertEqual(self.item_count(after,1361)-self.item_count(role,1361),-row['consume'][2]*n)
+                self.assertEqual(self.item_count(after,tid)-self.item_count(role,tid),row['reward'][2]*n)
+                self.b.respond(self.packet,self.state)
+                self.assertEqual(self.b.profile(),after)
+                self.rejected(15,shop_page=row['page'],item_index=index,buy_count=1)
+
+    def test_shop_insufficient_coins_and_encoding_failure_are_atomic(self):
+        role=self.prepared()
+        self.home(14)
+        role=self.b.profile()
+        role['attachments']=[p for p in role['attachments'] if p['type_id']!=1361]
+        self.b.save(role)
+        self.rejected(15,shop_page=1,item_index=3,buy_count=1)
+        summon.add_item(role,1361,10000);self.b.save(role)
+        with patch('network_redirect.activity_home.response',side_effect=OverflowError('fixture')):
+            self.rejected(15,shop_page=1,item_index=3,buy_count=1)
+        self.home(15,shop_page=1,item_index=3,buy_count=1)
 
     def test_prayer_unlock_starter_pet_and_main_level_limit(self):
         self.prepared();self.rejected(11)

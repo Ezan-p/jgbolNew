@@ -193,7 +193,8 @@ class GuildTests(unittest.TestCase):
     def test_donate_store_limits(self):
         self.create();self.req(36,count=100);self.assertEqual(self.role()['cur_union_contrib'],100)
         stock=self.ok(38)[-1][2]['item_list']
-        row=next(x for x in stock.values() if x['cost_contrib']==20)
+        row=next(iter(stock.values()))
+        role=self.role();role['cur_union_contrib']=row['cost_contrib']*row['buy_times'];self.b.save(role)
         out=self.ok(40,item_id=row['id'],buy_count=row['buy_times']);self.assertEqual(out[-1][2]['item_info']['buy_times'],0)
         r=self.role();self.assertEqual(r['cur_union_contrib'],0)
         self.assertEqual(self.req(40,item_id=row['id'],buy_count=1)[-1][1],55);self.assertEqual(self.role(),r)
@@ -242,6 +243,7 @@ class GuildTests(unittest.TestCase):
         for i in (1,2,3):self.ok(84,task_index=i,task_type=1,pay_type=1)
         self.assertEqual(sum(p["count"] for p in self.role()["attachments"] if p["type_id"]==1346),3)
         r=self.role();self.assertEqual(self.req(84,task_index=1,task_type=1)[-1][1],55);self.assertEqual(r,self.role())
+        self.ok(91,two_type=1)
         self.ok(91,two_type=2,index=1,buy_count=1)
         self.assertEqual(self.role()['guild']['instances']['reputation'],40)
         self.ok(92,two_type=2,query_type=1);self.assertEqual(self.req(92,two_type=2)[-1][1],55)
@@ -260,7 +262,8 @@ class GuildTests(unittest.TestCase):
         for _ in range(3):self.ok(89)
         self.assertEqual(self.req(89)[-1][1],55)
     def test_escort_timer_and_replay(self):
-        self.create();self.ok(69,flag=3,road_type=1);self.ok(69,flag=4,road_type=1);self.ok(69,flag=5,road_type=1)
+        self.create();self.ok(69,flag=3,road_type=1);self.ok(69,flag=4,road_type=1)
+        with patch.object(summon,'weighted_choice',return_value='2'):self.ok(69,flag=5,road_type=1)
         self.ok(69,flag=6,road_type=1,book_level=2,des_id=0)
         r=self.role();self.assertEqual(self.req(69,flag=11)[-1][1],55);self.assertEqual(r,self.role())
         with patch('network_redirect.game_clock.now',return_value=NOW+3601),patch('network_redirect.guild_offline.roll',return_value=99):self.ok(69,flag=11)
@@ -448,12 +451,15 @@ class GuildTests(unittest.TestCase):
             self.ok(83);self.assertEqual(self.role()['guild']['instances']['week_score'],0)
             self.assertEqual(self.req(92,two_type=2)[-1][1],55)
 
-    def test_paid_task_limit_even_with_unused_free_tasks(self):
+    def test_paid_task_limit_after_free_tasks(self):
         self.create()
         self.b.guild_rules['hunt_paid_limit']=2
+        before=self.role();self.assertEqual(self.req(84,task_index=1,task_type=1,pay_type=2)[-1][1],55);self.assertEqual(before,self.role())
+        replay=dict(fight_result_msg=dict(fight_result=[]))
+        with patch('network_redirect.guild_hunt.simulate',return_value=(1,[],replay)):
+            for index in (1,2,3):self.ok(84,task_index=index,task_type=2,pay_type=1)
         for index in (1,2):self.ok(84,task_index=index,task_type=1,pay_type=2)
         before=self.role();self.assertEqual(self.req(84,task_index=3,task_type=1,pay_type=2)[-1][1],55);self.assertEqual(before,self.role())
-        self.ok(84,task_index=3,task_type=1,pay_type=1)
 
     def test_match_life_merit_and_streak(self):
         from network_redirect import guild_match
@@ -467,7 +473,7 @@ class GuildTests(unittest.TestCase):
         m['life']=0
         with self.assertRaises(guild.formation.Rejected):guild_match.fight(role,s,g,dict(fight_type=14,des_id=90002),NOW,r,self.b.journey_rules)
 
-    def test_train_persistent_damage_and_support_limit(self):
+    def test_train_independent_damage_and_support_limit(self):
         def replay():return (4,[],dict(fight_result_msg=dict(fight_result=[dict(is_src=True,damage_list=[100])])) )
         self.create()
         for ident in list(self.role()['guild']['unions']['2']['applications']):self.ok(5,role_id=int(ident))
@@ -475,10 +481,10 @@ class GuildTests(unittest.TestCase):
             self.ok(80)
             for _ in range(3):self.ok(78)
             before=self.role();self.assertEqual(self.req(78)[-1][1],55);self.assertEqual(before,self.role())
-        a=self.role()['guild']['instances'];self.assertEqual(a['train_hp'],149900)
+        a=self.role()['guild']['instances'];self.assertEqual(a['train_hp'],150000)
         self.assertEqual(a['train_support'],3);self.assertEqual(sum(v['damage'] for v in a['train_damage'].values()),100)
         data=self.ok(79)[-1][2];self.assertEqual(data['rest_time'],NOW+3600)
-        self.assertEqual(data['boss_info']['boss_hp'],149900)
+        self.assertEqual(data['boss_info']['boss_hp'],150000)
 
     def test_escort_protection_raid_and_blacklist(self):
         self.ok(4,union_id=1)

@@ -27,7 +27,12 @@ def load_rules(path=RULES_PATH):
     a.require(r.get('plus_rate_list') == [0.4, 0.3, 0.7, 0.2], '宠物属性系数须与客户端默认值一致')
     a.require(type(r.get('capacity')) is int and 10 <= r['capacity'] <= 120, '宠物容量无效')
     a.require(r.get('starter_type') in hp.BASE and r.get('starter_quality') in (1, 2, 3, 4), '初始宠物配置无效')
-    a.require(type(r.get('training_box_count')) is int and 1 <= r['training_box_count'] <= 1000, '驯养宝箱奖励数量无效')
+    pool = r.get('training_box_pool')
+    a.require(isinstance(pool, list) and len(pool) == 3 and all(
+        isinstance(row, dict) and type(row.get('count')) is int and row['count'] in (10,15,20)
+        and type(row.get('weight')) is int and 0 < row['weight'] <= 100 for row in pool), '驯养宝箱奖池无效')
+    a.require({row['count'] for row in pool} == {10,15,20}
+              and sum(row['weight'] for row in pool) == 100, '驯养宝箱须含10、15、20颗且概率合计100%')
     a.require(type(r.get('task_training_boxes')) is int and 1 <= r['task_training_boxes'] <= 100, '宠物任务宝箱数量无效')
     return r
 
@@ -35,6 +40,22 @@ def load_rules(path=RULES_PATH):
 def growth_range(tid, stat, quality):
     base = int(hp.BASE[tid]['base_'+stat])
     return next(row[quality-1] for row in GROW.values() if row[0][0] <= base <= row[0][1])
+
+
+def effective_growth_range(tid, stat, quality, star=0):
+    """Saved growth includes the current star's bonus, applied once with floor."""
+    lo, hi = growth_range(tid, stat, quality)
+    for token in filter(None, STAR[star]['plus_growup_rate'].split('/')):
+        direction, rate = map(int, token.split('|'))
+        if hp.ATTR[direction-1] == stat:
+            lo, hi = lo*(100+rate)//100, hi*(100+rate)//100
+    return lo, hi
+
+
+def bounded_growth(tid, quality, star, growth):
+    """Keep valid legacy growth; normalize only out-of-range transformation values."""
+    return [min(hi, max(lo, value)) for value, (lo, hi) in zip(
+        growth, (effective_growth_range(tid, stat, quality, star) for stat in hp.ATTR))]
 
 
 def add(home, tid, quality, r=None):
@@ -105,6 +126,16 @@ def consume_item(role, raw):
     a.consume(role, tid, count)
 
 
+def effective_fusion_probabilities(main, quality, value, star=0):
+    """Merge protected outcomes before sampling; the client previews this table."""
+    minimum = 4 if star > 6 else 3 if star else 1
+    result = {}
+    for q, chance in fusion_probabilities(main, quality, value).items():
+        target = max(q, minimum)
+        result[target] = result.get(target, 0) + chance
+    return result
+
+
 def settle(role, req, now, arules, parse):
     r = load_rules()
     a.require(role['level'] >= 50, '宠物系统50级开放')
@@ -144,15 +175,13 @@ def settle(role, req, now, arules, parse):
             sources = materials(home, d, pet, 3)
             a.require(all(hp.BASE[p['type_id']]['is_exp_pet'] != 'Y' for p in sources+[pet]), '经验宠物不能融合')
             value = pet.get('prob_compen', 0) + sum(int(VALUES[p['main_type'], p['quality']]['base_quality_value']) for p in sources)
-            probs = fusion_probabilities(pet['main_type'], pet['quality'], value)
+            probs = effective_fusion_probabilities(pet['main_type'], pet['quality'], value, pet['star_level'])
             roll = secrets.randbelow(1000000)/1000000
             quality = max(probs)
             for q, chance in sorted(probs.items()):
                 roll -= chance
                 if roll < 0:
                     quality = q; break
-            # [B] A trained pet retains the minimum quality required by its stars.
-            quality = max(quality, 4 if pet['star_level'] > 6 else 3 if pet['star_level'] else 1)
             pet['prob_compen'] = min(1000000,value) if quality <= pet['quality'] else 0
             # [B] Preserve type/level/star; resample growth using the original range table.
             pet['quality'] = quality
@@ -199,12 +228,15 @@ def use_box(role, req):
     """Original item-use request/event; missing reward amount is explicit [B]."""
     from . import formation
     n = req.get('item_count')
-    a.require(req.get('item_type') == 1346 and type(n) is int and 1 <= n <= 100, '驯养宝箱数量无效')
+    # Native packageUI opens one box, or a batch of at most 15.
+    a.require(req.get('item_type') == 1346 and type(n) is int and 1 <= n <= 15, '驯养宝箱数量无效（每批1至15个）')
     a.require(req.get('des_type') == 1 and req.get('des_id',0) in (0,role['role_id']), '驯养宝箱目标无效')
     item = formation.lookup(role,'attachments',req.get('item_id'))
     a.require(item['attach_type'] == 5 and item['type_id'] == 1346 and item['count'] >= n
               and not any(item.get(k) for k in ('is_lock','owner_id','equip_pos')), '驯养宝箱不足或不可使用')
-    reward = load_rules()['training_box_count'] * n
+    weights = {row['count']: row['weight'] for row in load_rules()['training_box_pool']}
+    # One independent draw per box, including batch use; report the actual sum.
+    reward = sum(summon.weighted_choice(weights) for _ in range(n))
     item['count'] -= n
     if not item['count']: role['attachments'].remove(item)
     prizes = a.prizes(role,[[5,1345,reward,1]])

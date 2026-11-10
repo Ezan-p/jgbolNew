@@ -191,7 +191,7 @@ class MoonTests(ActivityCase):
             with self.assertRaises(formation.Rejected):moon.load_rules(path)
 
     def test_legacy_starter_migration_and_recipe_failure_rollback(self):
-        r=self.b.profile();s=season.state(r);s['supplies']['moon:1']=True;self.b.save(r)
+        r=self.b.profile();s=season.state(r);s.pop('craft_weeks',None);s['supplies']['moon:1']=True;self.b.save(r)
         self.ok(self.req(1205,flag=0));self.assertEqual(self.count(1134),0)
         self.assertTrue(self.b.profile()['activity']['seasonal']['supplies']['moon:permanent'])
         self.put(1135,15);before=self.b.profile()

@@ -53,8 +53,10 @@ def settle(role,s,op,d,r):
     h.cost(role,COST[pet['quality']])
     s['pet_growth'].setdefault(str(pet['type_id']),{})[str(pet['quality'])]=copy.deepcopy(pet['grow_values'])
     saved=s['pet_growth'].get(str(tid),{}).get(str(pet['quality']))
-    # Revisit restores recorded values; first visit keeps the source's increase over base.
+    # [B] Preserve legacy memory/deltas within the destination's quality/star bounds.
     growth=saved or [max(1,int(BASE[tid]['base_'+k])+pet['grow_values'][i]-int(BASE[pet['type_id']]['base_'+k])) for i,k in enumerate(ATTR)]
+    from .pets import bounded_growth
+    growth=bounded_growth(tid,pet['quality'],pet.get('star_level',0),growth)
     pet.update(type_id=tid,main_type=int(BASE[tid]['main_type']),grow_values=copy.deepcopy(growth))
     s['pet_growth'].setdefault(str(tid),{})[str(pet['quality'])]=copy.deepcopy(growth)
     return [h.response(op,dict(update_list={pet['id']:wire(pet)},transform_info=memory(s)))]

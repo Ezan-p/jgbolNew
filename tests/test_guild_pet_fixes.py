@@ -82,20 +82,20 @@ class SpiritLandTests(unittest.TestCase):
             info=self.req(79)[0];self.assertEqual(info['result'],58)
             self.assertEqual(info['cleared_layer'],floor);self.assertEqual(info['boss_layer'],min(4,floor+1))
             claim=self.req(82)[0]
-            self.assertEqual(claim['add_catch_count'],0)
+            self.assertEqual(claim['add_catch_count'],3)
             self.assertEqual(claim['trial_state'],self.req(79)[0])
             self.assertEqual(claim['trial_state']['result'],54 if floor==4 else 1)
             before=self.b.profile();self.req(82,ok=False);self.assertEqual(self.b.profile(),before)
         self.assertEqual(self.req(79)[0]['result'],54)
         before=self.b.profile();self.req(80,ok=False);self.assertEqual(self.b.profile(),before)
-        self.assertEqual(self.b.profile()['guild']['instances']['lucky_bonus'],0)
+        self.assertEqual(self.b.profile()['guild']['instances']['lucky_bonus'],12)
 
     def test_floor_attempt_limit_damage_and_no_partial_clear_reward(self):
         fake=(4,[],dict(fight_result_msg=dict(fight_result=[]),damage_total=1000))
         with patch('network_redirect.guild_instances.simulate',return_value=fake):
             for _ in range(3):self.req(80)
         info=self.req(79)[0]
-        self.assertEqual(info['boss_info']['boss_hp'],147000);self.assertEqual(info['remaining_attempts'],0)
+        self.assertEqual(info['boss_info']['boss_hp'],150000);self.assertEqual(info['remaining_attempts'],0)
         self.req(82,ok=False)
         before=self.b.profile();self.req(80,ok=False);self.assertEqual(self.b.profile(),before)
         self.now+=86400
@@ -109,19 +109,19 @@ class SpiritLandTests(unittest.TestCase):
         self.assertEqual(replay['trial_boss']['hp'],info['boss_info']['boss_full_hp'])
         self.assertTrue(replay['fight_result_msg']['fight_result'])
 
-    def test_old_save_migration_preserves_claims_damage_deadline(self):
+    def test_old_save_migration_preserves_claims_deadline_resets_damage(self):
         a=dict(train_open=True,train_done=False,train_hp=6000,train_claimed_stage=1,train_end=123,train_attempts=2)
         guild_trial.prepare(a,dict(random_serial=0),self.b.guild_rules,50)
-        self.assertEqual((a['train_cleared'],a['train_floor'],a['train_hp'],a['train_end'],a['train_floor_attempts']),(1,2,225000,123,2))
+        self.assertEqual((a['train_cleared'],a['train_floor'],a['train_hp'],a['train_end'],a['train_floor_attempts']),(1,2,375000,123,2))
 
     def test_healing_boss_uses_final_hp_instead_of_total_damage(self):
         fake=(4,[],dict(fight_result_msg=dict(fight_result=[]),damage_total=15000,boss_remaining_hp=3000))
         with patch('network_redirect.guild_instances.simulate',return_value=fake):self.req(80)
         info=self.req(79)[0]
-        self.assertEqual((info['boss_layer'],info['cleared_layer'],info['boss_info']['boss_hp']),(1,0,3000))
+        self.assertEqual((info['boss_layer'],info['cleared_layer'],info['boss_info']['boss_hp']),(1,0,150000))
         self.req(82,ok=False)
 
-    def test_level_scaling_preserves_damage_progress_and_reconnect(self):
+    def test_level_scaling_preserves_clears_and_reconnect(self):
         self.req(79)
         role=self.b.profile();a=role['guild']['instances']
         types=[v['type_id'] for v in a['train_bosses']]
@@ -130,7 +130,7 @@ class SpiritLandTests(unittest.TestCase):
         role['level']=80;self.b.save(role)
         info=self.req(79)[0]
         self.assertEqual(info['boss_info']['boss_full_hp'],960000)
-        self.assertEqual(info['boss_info']['boss_hp'],480000)
+        self.assertEqual(info['boss_info']['boss_hp'],960000)
         self.assertEqual(info['boss_info']['level'],95)
         role=self.b.profile();a=role['guild']['instances']
         self.assertEqual([v['type_id'] for v in a['train_bosses']],types)
@@ -146,7 +146,7 @@ class SpiritLandTests(unittest.TestCase):
                  train_claimed_stage=1,train_end=self.now+200)
         self.b.save(role)
         info=self.req(79)[0]
-        self.assertEqual(info['boss_info']['boss_hp'],93750)
+        self.assertEqual(info['boss_info']['boss_hp'],375000)
         self.assertEqual(info['remaining_attempts'],1)
         self.assertEqual(self.b.profile()['guild']['instances']['train_claimed_stage'],1)
         self.assertEqual(self.req(79)[0],info)
@@ -163,7 +163,7 @@ class SpiritLandTests(unittest.TestCase):
                 for key in ('hp','attack','defense','magic'):
                     self.assertEqual(boss[key],first[key]*level*level//2500)
 
-    def test_cumulative_rewards_are_only_silver_and_peaches_and_cannot_repeat(self):
+    def test_floor_rewards_include_adoptions_and_cannot_repeat(self):
         preview=self.req(79)[0]['train_prize']
         role=self.b.profile();a=role['guild']['instances']
         a.update(train_cleared=3,train_floor=4)
@@ -174,9 +174,10 @@ class SpiritLandTests(unittest.TestCase):
         self.assertEqual(after['silver_coin']-before['silver_coin'],150000)
         self.assertEqual(peaches(after)-peaches(before),15)
         self.assertEqual(after['guild']['unions'],before['guild']['unions'])
-        for key in ('reputation','week_score','total_reputation','lucky_bonus'):
+        for key in ('reputation','week_score','total_reputation'):
             self.assertEqual(after['guild']['instances'].get(key),before['guild']['instances'].get(key))
-        self.assertEqual((claim['add_reputation'],claim['add_union_gold'],claim['add_catch_count']),(0,0,0))
+        self.assertEqual((claim['add_reputation'],claim['add_union_gold'],claim['add_catch_count']),(0,0,9))
+        self.assertEqual(after['guild']['instances']['lucky_bonus'],9)
         self.req(82,ok=False);self.assertEqual(self.b.profile(),after)
         after['guild']['instances'].update(train_cleared=4,train_done=True);self.b.save(after)
         claim=self.req(82)[0]

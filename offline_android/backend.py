@@ -50,7 +50,8 @@ def local_server_list(resource_root, port):
 
 
 class Runtime:
-    def __init__(self, files_dir, resource_root, port):
+    def __init__(self, files_dir, resource_root, port, network_time=True):
+        self.network_time = network_time
         self.files_dir = Path(files_dir).resolve()
         self.resource_root = Path(resource_root).resolve()
         self.save_dir = self.files_dir / 'save'
@@ -133,7 +134,19 @@ class Runtime:
                 warmup.close()
         self.loop = asyncio.get_running_loop()
         self.stopped = asyncio.Event()
-        backend = Accounts(self.save_dir, self.port, self.emit)
+        service = None
+        if self.network_time is not False:
+            from network_redirect.network_time import TimeService
+            service = (TimeService(game_clock.SystemSource()) if self.network_time is True
+                       else self.network_time)
+            service.request(force=True)
+            await asyncio.to_thread(service.wait)
+        try:
+            backend = Accounts(self.save_dir, self.port, self.emit, network_time=service)
+        except BaseException:
+            if service is not None:
+                service.close()
+            raise
         server = None
         try:
             if backend.db.execute('PRAGMA quick_check').fetchone()[0] != 'ok':
@@ -187,7 +200,7 @@ class Runtime:
             raise TimeoutError('Offline game service is still shutting down')
 
 
-def start(files_dir, resource_root=None, port=PORT, timeout=180.0):
+def start(files_dir, resource_root=None, port=PORT, timeout=180.0, *, network_time=True):
     """Called by the Android bootstrap worker; return only after the listener binds.
 
     CPython remains initialized for the process lifetime. The native bootstrap
@@ -201,7 +214,7 @@ def start(files_dir, resource_root=None, port=PORT, timeout=180.0):
                     or _runtime.resource_root != resource_root.resolve()):
                 raise RuntimeError('A different offline game instance is already running')
         else:
-            _runtime = Runtime(files_dir, resource_root, port)
+            _runtime = Runtime(files_dir, resource_root, port, network_time=network_time)
             _runtime.thread.start()
         runtime = _runtime
     if not runtime.ready.wait(timeout):
