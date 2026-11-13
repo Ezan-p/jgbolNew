@@ -36,7 +36,8 @@ def fixture():
             p=moon.use(role,dict(item_type=1133,item_id=item['id'],item_count=1,des_type=1,des_id=0),r)[0]
         data['opened_moon']=login_fields(decode(p)[2]['data'])
         summon.add_item(role,1217,1);item=next(i for i in role['attachments'] if i['type_id']==1217)
-        p=season.use_food(role,dict(item_type=1217,item_id=item['id'],item_count=1,des_type=1,des_id=0),r)[0]
+        with patch.object(rice,'randbelow',return_value=4000):
+            p=season.use_food(role,dict(item_type=1217,item_id=item['id'],item_count=1,des_type=1,des_id=0),r)[0]
         data['opened_legacy']=login_fields(decode(p)[2]['data'])
         source='local RICE_PREVIEW=true\nlocal FIXTURE='+summon.lua(data)+'\n'+(ROOT/'analysis/tools/rice_client_harness.lua').read_text().replace('-- INSTALL_PATCH',rice.client_source(r))
         b.close();return source

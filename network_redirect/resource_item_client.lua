@@ -6,7 +6,7 @@ do
  if not bag._localResourceItemRestore then
   local original=bag.requestUseItem
   local foods={[1130]=true,[1131]=true,[1132]=true,[1133]=true,
-               [1213]=true,[1214]=true,[1215]=true,[1216]=true}
+               [1213]=true,[1214]=true,[1215]=true,[1216]=true,[1217]=true}
   bag.requestUseItem=function(item,...)
    if not item or (item.type_id~=1020 and item.type_id~=1022 and item.type_id~=1023 and not foods[item.type_id])
      or (item.count or 0)<=1 then return original(item,...) end

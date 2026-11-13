@@ -362,9 +362,15 @@ def settle(role,req,now,r,parse,daily_rules):
             else:require(g['popularity']>=r['tree_require_pop'],'仙盟威望不足，请先捐献或举办宴席');require(t['seed']>0,'没有树种');t.pop('hp',None);t.update(state=2,seed=t['seed']-1,planted=now,exp=0,records=[],ranks=[])
         if op==36:
             count=positive(d,'count',r['donate_limit']);require(s['donations']+count<=r['donate_limit'],'今日捐献额度不足')
-            pay(role,'gold_coin',count);s['donations']+=count;offline.funds(g,count*r['donate_money_rate'],r);g['popularity']+=count;contribution(role,count*r['donate_contrib_rate'])
+            pay(role,'gold_coin',count);s['donations']+=count;offline.funds(g,count*r['donate_money_rate'],r);g['popularity']+=count
+            gain=contribution(role,count*r['donate_contrib_rate'])
             from . import monument_wealth
             monument_wealth.record(role,now,donation_money=count*r['donate_money_rate'])
+            # Send both the reward and authoritative balances: the native
+            # donation callback only refreshes the tree, unlike cultivation.
+            data=tree_data(role,s,g,now,r)
+            data.update(contribution_gain=gain,union_contrib=role['union_contrib'],cur_union_contrib=role['cur_union_contrib'])
+            return [reply(op,data)]
         if op==15:
             authorize(role,r,14);require(t['state']==2,'当前不能培育');require(s['cultivations']<r['cultivate_limit'],'今日培育次数已用完')
             require(d.get('cultivate_record_count')==s['cultivations'] and d.get('cultivate_record_time')==s['day'],'培育任务已过期，请刷新')

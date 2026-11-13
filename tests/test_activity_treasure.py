@@ -22,6 +22,8 @@ class TreasureTests(ActivityCase):
         return result['event_data'] if op == 3 else result
 
     def count(self, tid):
+        if tid == 1441:
+            return self.b.profile()['activity']['abyss']['crystals']
         return sum(i['count'] for i in self.b.profile()['attachments'] if i['attach_type'] == 5 and i['type_id'] == tid)
 
     def reject(self, op=3, **data):
@@ -36,8 +38,8 @@ class TreasureTests(ActivityCase):
         self.assertEqual(self.count(1431), 11)
         self.assertEqual(self.b.profile()['gold_coin'], gold)
         self.assertEqual(len(out['prize_list']), 1)
-        self.assertEqual(out['prize_list'][1]['attach_type'], 1310)
-        self.assertEqual(out['prize_list'][1]['attach_count'], 99)
+        self.assertEqual(out['prize_list'][1]['attach_type'], 1001)
+        self.assertEqual(out['prize_list'][1]['attach_count'], 990)
 
     def test_five_draw_batch_cost_aggregation_and_no_replacement(self):
         before = self.count(1431); gold = self.b.profile()['gold_coin']
@@ -132,14 +134,20 @@ class TreasureTests(ActivityCase):
             self.assertEqual(self.b.profile()['gold_coin'], gold - 20)
 
     def test_all_ten_tiers_and_twelve_rewards_reach_inventory(self):
-        for tid in range(1431, 1441):
-            for index, spec in enumerate(self.b.activity_rules['abyss_map_rewards']):
-                before = self.count(spec[1])
+        for tier in range(1, 11):
+            ids = [1001,1441,1400+tier,1410+tier,1420+tier,1249,1343,1329,1331,1330,1332,10000]
+            counts = [10*tier,20*tier,1,1,1,
+                      tier,tier,tier,tier,tier,[1,1,2,2,3,3,4,4,5,5][tier-1],
+                      10*tier+10]
+            for index, (item_id, expected) in enumerate(zip(ids, counts)):
+                before = self.count(item_id)
                 ticket = sum(self.b.activity_rules['abyss_map_weights'][:index])
                 with patch.object(treasure.secrets, 'randbelow', return_value=ticket):
-                    out = self.call(24, map_type=tid, treasure_count=1, open_count=1)
-                self.assertEqual(self.count(spec[1]) - before, spec[2] * (tid - 1430))
-                self.assertEqual(out['prize_list'][1]['attach_type'], spec[1])
+                    out = self.call(24, map_type=1430+tier, treasure_count=1, open_count=1)
+                self.assertEqual(self.count(item_id) - before, expected)
+                self.assertEqual(out['prize_list'][1]['attach_type'], item_id)
+                self.assertEqual(out['prize_list'][1]['attach_level'], 1)
+            self.assertFalse(any(i['type_id'] == 1441 for i in self.b.profile()['attachments']))
 
     def test_weight_boundaries_removal_and_probability_mass(self):
         board = treasure.new_board(1431, self.b.activity_rules)
@@ -147,7 +155,7 @@ class TreasureTests(ActivityCase):
         for ticket in range(sum(board['weights'])):
             with patch.object(treasure.secrets, 'randbelow', return_value=ticket):
                 hits[treasure.draw(copy.deepcopy(board))] += 1
-        self.assertEqual(hits, [17,17,17,2,2,2,10,10,2,2,9,10])
+        self.assertEqual(hits, [100, 280, 100, 50, 30, 70, 70, 69, 10, 70, 1, 150])
         board['goods'][0]['rm'] = True; board['goods'][1]['got'] = True
         board['weights'] = list(range(1, 13))
         start = 0
@@ -168,9 +176,18 @@ class TreasureTests(ActivityCase):
     def test_config_validation(self):
         for key, value in (('abyss_map_weights', [1] * 11), ('abyss_map_weights', [0] + [1] * 11),
                            ('abyss_map_weights', [True] * 12), ('abyss_map_batch_limit', 100),
-                           ('abyss_map_paid_draws', 3), ('abyss_map_revision', '')):
+                           ('abyss_map_paid_draws', 3), ('abyss_map_revision', ''),
+                           ('abyss_map_quantity_by_tier', [[1]*10]*11),
+                           ('abyss_map_quantity_by_tier', [[0]*10]*12),
+                           ('abyss_map_quantity_by_tier', [[True]*10]*12),
+                           ('abyss_map_quantity_by_tier', [[1]*9]*12),
+                           ('abyss_map_item_id_steps', [0]*12),
+                           ('abyss_map_item_id_steps', [True]*12)):
             rules = copy.deepcopy(self.b.activity_rules); rules[key] = value
             with self.assertRaises(formation.Rejected): treasure.validate(rules)
+        rules = copy.deepcopy(self.b.activity_rules)
+        rules['abyss_map_quantity_by_tier'][0][0] = 9
+        with self.assertRaises(formation.Rejected): treasure.validate(rules)
 
     def old_board(self, draws=0):
         old = [(1001,10),(1022,1),(1023,1),(1034,1),(1343,1),(1442,1),
@@ -180,14 +197,11 @@ class TreasureTests(ActivityCase):
 
     def test_user_pool_quantities_and_category_probabilities(self):
         rules = self.b.activity_rules
-        old_ids = {p['attach_type'] for p in self.old_board()['goods']}
-        new_ids = {p[1] for p in rules['abyss_map_rewards']}
-        self.assertEqual(old_ids & new_ids, {1343})
-        self.assertNotIn(1060, new_ids); self.assertNotIn(1246, new_ids)
-        self.assertEqual([p[2] for p in rules['abyss_map_rewards']], [1] * 12)
-        groups = ({1310,1311,1312}, {1313,1314,1323}, {1333}, {1343}, {1329,1331,1332}, {1249})
-        for group, weight in zip(groups, (51,14,2,10,14,9)):
-            self.assertTrue(group <= new_ids)
+        ids = [p[1] for p in rules['abyss_map_rewards']]
+        self.assertEqual(ids, [1001,1441,1401,1411,1421,1249,1343,1329,1331,1330,1332,10000])
+        self.assertEqual([p[2] for p in rules['abyss_map_rewards']], [10,20,1,1,1,1,1,1,1,1,1,20])
+        groups = ({1001,1343}, {1441}, {1401,1411,1421}, {1329,1331,1330,1332}, {1249}, {10000})
+        for group, weight in zip(groups, (170,280,180,150,70,150)):
             self.assertEqual(sum(w for p,w in zip(rules['abyss_map_rewards'], rules['abyss_map_weights'])
                                  if p[1] in group), weight)
         for bad in (1001,1330,1442,1310,1343):
@@ -203,7 +217,7 @@ class TreasureTests(ActivityCase):
             self.reject(op_type=2, type_id=1431)
             before = self.count(1431); gold = self.b.profile()['gold_coin']
             out = self.call(op_type=1, type_id=1431)
-            self.assertEqual(out['shop_list'][1]['attach_type'], 1310)
+            self.assertEqual(out['shop_list'][1]['attach_type'], 1001)
             self.assertEqual(self.count(1431), before)
             self.assertEqual(self.b.profile()['gold_coin'], gold)
             self.assertEqual(out['max_pay_times'], 4)
@@ -221,19 +235,19 @@ class TreasureTests(ActivityCase):
         self.assertEqual(self.count(1023), before + 1)
         for _ in range(3): self.call(op_type=2, type_id=1431)
         self.reject(op_type=2, type_id=1431)
-        self.assertEqual(self.call(op_type=1, type_id=1431)['shop_list'][1]['attach_type'], 1310)
+        self.assertEqual(self.call(op_type=1, type_id=1431)['shop_list'][1]['attach_type'], 1001)
 
-    def test_new_peach_and_four_star_vessel_are_distinct_and_merge_across_maps(self):
-        with patch.object(treasure.secrets, 'randbelow', side_effect=[57,80,57,80]):
+    def test_new_peach_and_spirit_stone_are_distinct_and_merge_across_maps(self):
+        with patch.object(treasure.secrets, 'randbelow', side_effect=[630,780,630,780]):
             out = self.call(24, map_type=1440, treasure_count=2, open_count=2)
         self.assertEqual({p['attach_type']: p['attach_count'] for p in out['prize_list'].values()},
-                         {1343: 20, 1313: 20})
+                         {1343: 20, 10000: 220})
         self.call(op_type=1, type_id=1431)
-        with patch.object(treasure.secrets, 'randbelow', side_effect=[57,80]):
+        with patch.object(treasure.secrets, 'randbelow', side_effect=[630,780]):
             first = self.call(op_type=2, type_id=1431)
             second = self.call(op_type=2, type_id=1431)
         self.assertEqual((first['des_index'], second['des_index']), (7,12))
-        self.assertEqual(second['shop_list'][12]['attach_type'], 1313)
+        self.assertEqual(second['shop_list'][12]['attach_type'], 10000)
         self.assertTrue(second['shop_list'][7]['got'] and second['shop_list'][12]['got'])
 
     def test_v4_preview_refreshes_but_started_board_keeps_both_peach_slots(self):
@@ -261,24 +275,57 @@ class TreasureTests(ActivityCase):
                 self.assertEqual(result['prize_list'][1]['attach_type'], 1343)
             else:
                 self.assertEqual(stored['revision'], self.b.activity_rules['abyss_map_revision'])
-                self.assertEqual(stored['weights'], [17,17,17,2,2,2,10,10,2,2,9,10])
-                self.assertEqual(stored['goods'][11]['attach_type'], 1313)
-                self.assertTrue(all(p['attach_count']==1 for p in stored['goods']))
+                self.assertEqual(stored['weights'], [100, 280, 100, 50, 30, 70, 70, 69, 10, 70, 1, 150])
+                self.assertEqual(stored['goods'][11]['attach_type'], 10000)
+                self.assertEqual([p['attach_count'] for p in stored['goods']], [10,20,1,1,1,1,1,1,1,1,1,20])
 
-    def test_peach_reward_can_be_used_for_targeted_training(self):
-        with patch.object(treasure.secrets, 'randbelow', return_value=57):
+    def test_v5_preview_refreshes_but_started_board_keeps_saved_pool(self):
+        for draws in (0, 1):
+            role = self.b.profile()
+            ids = [1310,1311,1312,1314,1323,1333,1343,1329,1331,1332,1249,1313]
+            board = dict(draws=draws, quick=False, revision='2026-11-09-user-pool-v5',
+                         paid_draws=4, gold=20, remove_count=2,
+                         weights=[17,17,17,2,2,2,10,10,2,2,9,10],
+                         goods=[activity.prize_spec([5, tid, 10, 1]) for tid in ids])
+            if draws:
+                board['goods'][0]['got'] = True
+                board['goods'][1]['rm'] = True
+            role['activity']['abyss']['maps'] = {'1440': copy.deepcopy(board)}
+            self.b.save(role)
+            if not draws:
+                self.reject(op_type=2, type_id=1440)
+            before = self.count(1440)
+            self.call(op_type=1, type_id=1440)
+            self.assertEqual(self.count(1440), before)
+            stored = self.b.profile()['activity']['abyss']['maps']['1440']
+            if draws:
+                self.assertEqual(stored, board)
+                self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+                old = self.count(1343)
+                with patch.object(treasure.secrets, 'randbelow', return_value=23):
+                    result = self.call(op_type=2, type_id=1440)
+                self.assertEqual(result['des_index'], 7)
+                self.assertEqual(self.count(1343), old + 10)
+            else:
+                self.assertEqual(stored['revision'], '2026-11-13-user-pool-v10')
+                self.assertEqual([p['attach_count'] for p in stored['goods']],
+                                 [100,200,1,1,1,10,10,10,10,10,5,110])
+
+    def test_pill_reward_can_be_used_for_companion_experience(self):
+        with patch.object(treasure.secrets, 'randbelow', return_value=530):
             self.call(24, map_type=1431, treasure_count=1, open_count=1)
         role = self.b.profile(); c = role['corteges'][0]
-        c['culture_point'] = 5; self.b.save(role)
-        old = self.count(1343); attack = c['gongji_plus']
-        self.ok(self.req(1089, cortege_id=c['id'], train_field=2, train_point=5))
-        self.assertEqual(self.count(1343), old - 1)
+        c.update(level=1, cur_exp=0); self.b.save(role)
+        old = self.count(1421)
+        formation.feed(role, dict(flag=2, first_send=True, cortege_id=c['id'], roll_count=1,
+                                 roll_list=[dict(type_id=1421, count=1)]), self.b.formation_rules)
+        self.b.save(role)
+        self.assertEqual(self.count(1421), old - 1)
         updated = next(x for x in self.b.profile()['corteges'] if x['id'] == c['id'])
-        self.assertEqual(updated['culture_point'], 0)
-        self.assertGreater(updated['gongji_plus'], attack)
+        self.assertGreater(updated['level'], 1)
 
     def test_awarded_realm_boxes_can_be_exchanged_for_owned_companion_souls(self):
-        with patch.object(treasure.secrets, 'randbelow', return_value=86):
+        with patch.object(treasure.secrets, 'randbelow', return_value=560):
             self.call(24, map_type=1431, treasure_count=1, open_count=5)
         role = self.b.profile(); box = next(i for i in role['attachments'] if i['type_id'] == 1249)
         self.ok(self.req(1051, item_type=1249, item_id=box['id'], item_count=5, des_type=5, des_id=5005))
@@ -287,3 +334,127 @@ class TreasureTests(ActivityCase):
         self.ok(self.req(1051, item_type=5005, item_id=realm['id'], item_count=5, des_type=4, des_id=5004))
         self.assertEqual(self.b.profile()['souls']['5004'], souls + 5)
         self.assertEqual(self.b.profile()['silver_coin'], silver - 25000)
+
+    def test_v6_preview_refreshes_but_started_board_preserves_pill_quantity(self):
+        for draws in (0, 1):
+            role = self.b.profile()
+            ids = [1310,1311,1312,1314,1323,1421,1322,1329,1331,1330,1249,1313]
+            counts = [50,50,50,5,5,10,5,10,10,10,10,10]
+            board = dict(draws=draws, quick=False, revision='2026-11-13-user-pool-v6',
+                         paid_draws=4, gold=20, remove_count=2,
+                         weights=[40,40,40,1,1,20,2,20,4,10,12,10],
+                         goods=[activity.prize_spec([5, tid, n, 1]) for tid, n in zip(ids, counts)])
+            if draws:
+                board['goods'][0]['got'] = True
+                board['goods'][1]['rm'] = True
+            role['activity']['abyss']['maps'] = {'1440': copy.deepcopy(board)}; self.b.save(role)
+            if not draws: self.reject(op_type=2, type_id=1440)
+            self.call(op_type=1, type_id=1440)
+            if draws:
+                self.assertEqual(self.b.profile()['activity']['abyss']['maps']['1440'], board)
+                self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+                before = self.count(1421)
+                with patch.object(treasure.secrets, 'randbelow', return_value=42):
+                    result = self.call(op_type=2, type_id=1440)
+                self.assertEqual(result['des_index'], 6)
+                self.assertEqual(self.count(1421), before + 10)
+            else:
+                stored = self.b.profile()['activity']['abyss']['maps']['1440']
+                self.assertEqual(stored['goods'][4]['attach_type'], 1430)
+                self.assertEqual(stored['goods'][4]['attach_count'], 1)
+
+    def test_crystals_single_and_100_map_split_batch_credit_currency_once(self):
+        self.call(op_type=1, type_id=1440)
+        before = self.count(1441)
+        with patch.object(treasure.secrets, 'randbelow', return_value=100):
+            self.call(op_type=2, type_id=1440)
+        self.assertEqual(self.count(1441), before + 200)
+        self.call(op_type=3, type_id=1440)
+        before = self.count(1441)
+        with patch.object(treasure.secrets, 'randbelow', return_value=100):
+            for count in (99, 1):
+                self.call(24, map_type=1440, treasure_count=1, open_count=count)
+        self.assertEqual(self.count(1441), before + 20000)
+        snapshot = self.b.profile()
+        self.assertEqual(self.b.respond(self.packet, self.state), self.replies)
+        self.assertEqual(self.b.profile(), snapshot)
+        self.assertFalse(any(i['type_id'] == 1441 for i in snapshot['attachments']))
+
+    def test_v7_preview_refreshes_but_started_board_keeps_old_crystal_amount(self):
+        for draws in (0, 1):
+            role = self.b.profile()
+            ids = [1001,1441,1410,1420,1430,1249,1343,1329,1331,1330,1332,10000]
+            counts = [100,120,1,1,1,10,10,10,10,10,5,50]
+            board = dict(draws=draws, quick=False, revision='2026-11-13-user-pool-v7',
+                         paid_draws=4, gold=20, remove_count=2,
+                         weights=[20,30,20,20,20,20,10,20,10,9,1,20],
+                         goods=[activity.prize_spec([5, tid, n, 1]) for tid, n in zip(ids, counts)])
+            if draws: board['goods'][0]['got'] = True
+            role['activity']['abyss']['maps'] = {'1440': copy.deepcopy(board)}; self.b.save(role)
+            if not draws: self.reject(op_type=2, type_id=1440)
+            self.call(op_type=1, type_id=1440)
+            stored = self.b.profile()['activity']['abyss']['maps']['1440']
+            if draws:
+                self.assertEqual(stored, board)
+                self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+                before = self.count(1441)
+                with patch.object(treasure.secrets, 'randbelow', return_value=0):
+                    result = self.call(op_type=2, type_id=1440)
+                self.assertEqual(result['des_index'], 2)
+                self.assertEqual(self.count(1441), before + 120)
+            else:
+                self.assertEqual(stored['revision'], '2026-11-13-user-pool-v10')
+                self.assertEqual(stored['goods'][1]['attach_count'], 200)
+                self.assertEqual(stored['goods'][11]['attach_count'], 110)
+
+    def test_v8_preview_refreshes_but_started_board_keeps_saved_weights(self):
+        for draws in (0, 1):
+            role = self.b.profile()
+            ids = [1001,1441,1410,1420,1430,1249,1343,1329,1331,1330,1332,10000]
+            counts = [100,200,1,1,1,10,10,10,10,10,5,110]
+            board = dict(draws=draws, quick=False, revision='2026-11-13-user-pool-v8',
+                         paid_draws=4, gold=20, remove_count=2,
+                         weights=[100,250,100,60,40,80,70,100,69,30,1,100],
+                         goods=[activity.prize_spec([5, tid, n, 1]) for tid, n in zip(ids, counts)])
+            if draws: board['goods'][0]['got'] = True
+            role['activity']['abyss']['maps'] = {'1440': copy.deepcopy(board)}; self.b.save(role)
+            if not draws: self.reject(op_type=2, type_id=1440)
+            self.call(op_type=1, type_id=1440)
+            stored = self.b.profile()['activity']['abyss']['maps']['1440']
+            if draws:
+                self.assertEqual(stored, board)
+                self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+                before = self.count(1332)
+                with patch.object(treasure.secrets, 'randbelow', return_value=799):
+                    result = self.call(op_type=2, type_id=1440)
+                self.assertEqual(result['des_index'], 11)
+                self.assertEqual(self.count(1332), before + 5)
+            else:
+                self.assertEqual(stored['revision'], '2026-11-13-user-pool-v10')
+                self.assertEqual(stored['weights'], self.b.activity_rules['abyss_map_weights'])
+
+    def test_v9_preview_refreshes_but_started_board_keeps_saved_weights(self):
+        for draws in (0, 1):
+            role = self.b.profile()
+            ids = [1001,1441,1410,1420,1430,1249,1343,1329,1331,1330,1332,10000]
+            counts = [100,200,1,1,1,10,10,10,10,10,5,110]
+            board = dict(draws=draws, quick=False, revision='2026-11-13-user-pool-v9',
+                         paid_draws=4, gold=20, remove_count=2,
+                         weights=[100,270,100,50,30,80,70,69,50,30,1,150],
+                         goods=[activity.prize_spec([5, tid, n, 1]) for tid, n in zip(ids, counts)])
+            if draws: board['goods'][0]['got'] = True
+            role['activity']['abyss']['maps'] = {'1440': copy.deepcopy(board)}; self.b.save(role)
+            if not draws: self.reject(op_type=2, type_id=1440)
+            self.call(op_type=1, type_id=1440)
+            stored = self.b.profile()['activity']['abyss']['maps']['1440']
+            if draws:
+                self.assertEqual(stored, board)
+                self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+                before = self.count(1331)
+                with patch.object(treasure.secrets, 'randbelow', return_value=700):
+                    result = self.call(op_type=2, type_id=1440)
+                self.assertEqual(result['des_index'], 9)
+                self.assertEqual(self.count(1331), before + 10)
+            else:
+                self.assertEqual(stored['revision'], '2026-11-13-user-pool-v10')
+                self.assertEqual(stored['weights'], self.b.activity_rules['abyss_map_weights'])

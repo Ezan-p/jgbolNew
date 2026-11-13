@@ -109,7 +109,7 @@ def profiles(selected):
                        region='蓬莱岛', personality='执着', active_period='夜间', signature='以剑会友，以诚相待。',
                        preferred_archetype=n.get('archetype', n.get('theme')), union_id=0, union_name='', title_id=0, is_npc=True)
         result.append(dict(npc_id=key, version='extreme_rank', legacy_role_id=role['role_id'], source_file=source, profile=profile))
-    return dict(schema_version=1, revision='rank-500-2026-11-03-v1', players=result)
+    return dict(schema_version=1, revision='rank-500-2026-11-13-v2', players=result)
 
 
 def build(check=False):
@@ -125,10 +125,10 @@ def build(check=False):
                          companion_levels=span(levels), evolve_levels=span(evolves), tier=n['tier'],
                          stage=n.get('stage', ''), archetype=n.get('theme_name', {'attack':'强袭','magic':'法术','endurance':'固守'}.get(n.get('archetype'))),
                          lineup=' / '.join(f"{c['order']}:{NAMES[c['type']]}" for c in members), source_file=source))
-    manifest = dict(schema_version=1, revision='rank-500-2026-11-03-v1', npc_count=500,
+    manifest = dict(schema_version=1, revision='rank-500-2026-11-13-v2', npc_count=500,
                     selection='极高战力八人集合去重取最强100；普通库每角色等级取4名、25/50/75/99级取5名，按等级与T档分层取样后降序排列', npcs=rows)
-    buf = io.StringIO(); writer = csv.DictWriter(buf, fieldnames=list(rows[0])); writer.writeheader(); writer.writerows(rows)
-    lines = ['# 封神榜前500名战力与等级明细', '', '更新：2026-11-03。此表为初始NPC席位；玩家胜负换位后，以存档中的实时名次为准。500名NPC＋玩家，共501席；新角色初始第501名。旧存档在更新后首次打开封神榜时重置到第501名，并提示“玩法更新，排名重置”；重置标记持久保存，后续打开或重启不再重置。排名重置同时清空梯度奖励的历史达成名次和已领记录；已做过上一版排名重置的旧档只补清梯度数据，不再次退回501名，需新的胜利解锁。', '',
+    buf = io.StringIO(); writer = csv.DictWriter(buf, fieldnames=list(rows[0]), lineterminator='\n'); writer.writeheader(); writer.writerows(rows)
+    lines = ['# 封神榜前500名战力与等级明细', '', '更新：2026-11-13，正逆助阵改为按神仙 ID 一对一绑定后重算。本次不新增排名重置。此表为初始NPC席位；玩家胜负换位后，以存档中的实时名次为准。500名NPC＋玩家，共501席；新角色初始第501名。旧存档在更新后首次打开封神榜时重置到第501名，并提示“玩法更新，排名重置”；重置标记持久保存，后续打开或重启不再重置。排名重置同时清空梯度奖励的历史达成名次和已领记录；已做过上一版排名重置的旧档只补清梯度数据，不再次退回501名，需新的胜利解锁。', '',
              '前100名来自本地118名极高战力设计。先按八人神仙类型集合去重，同集合只留实算战力最高者，再取最强100名；前十名也按此规则取最高十名。站位不同不算新阵容。未入选者保留原设计。', '',
              '第101～500名来自V1/V2：覆盖角色1～99级，每级4名，25／50／75／99级各5名；各级保留最强T1与最低T5，T2～T4轮换选两档（上述四个节点等级五档全选），再统一降序排列。角色等级与出战神仙等级分列；等级不强制随名次单调。', '',
              '战力由生产结算器重算，包含出战替补，助威经属性计入；不缩放面板、不修改源快照。来源与查询ID见同目录overview.csv及catalog.json。', '',

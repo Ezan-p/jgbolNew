@@ -10,7 +10,9 @@ ROOT = Path(__file__).resolve().parents[2]
 with tempfile.TemporaryDirectory() as tmp:
     b = Backend(Path(tmp), 18790, lambda *a, **k: None)
     role = b.profile(); role.update(level=99, reborn_layer=4, gold_coin=100000)
-    for t in (1015,1016,1017,1206): summon.add_item(role,t,100000)
+    for t in (1015,1016,1017): summon.add_item(role,t,100000)
+    # A legacy material stack keeps this isolated client fixture compact.
+    role['attachments'].append(dict(id=f.new_id(role),attach_type=5,type_id=1206,count=100000,level=1))
     for t in (5002,5003): role['corteges'].append(summon.companion(role,t))
     item = dict(id=f.new_id(role),type_id=22,attach_type=6,count=1,level=1,equip_order=0,equip_pos=0)
     role['attachments'].append(item)
@@ -65,6 +67,7 @@ end
     request('skill_unload',11,pos=2)
     request('innate_query',12,identity=ids[1])
     for order in range(4, 9): request('open_positive_'+str(order),8,order)
+    request('release_positive_target',2)
     request('open_reverse',8,9);request('reverse_supporter',1,9,ids[2]);request('reverse_target',2,9,ids[0])
     for n in range(2,11):request('reverse_upgrade_'+str(n),3,9)
     request('reverse_skill_open',9,9,pos=2)

@@ -2,7 +2,7 @@
 -- Native-like layer removal exposes stale-stage bugs in settlement navigation.
 local exitEvent={name='exit'}
 local function node(w,h)
- local n={children={},width=w or 960,height=h or 640,enabled=true}
+ local n={children={},width=w or 960,height=h or 640,enabled=true,visible=true}
  function n:addChild(child,z,tag) child.parent=self;child.tag=tag or child.tag;self.children[#self.children+1]=child end
  function n:removeChildByTag(tag) local c=self:getChildByTag(tag);if c then c:removeFromParentAndCleanup(true) end end
  function n:getChildByTag(tag) for _,c in ipairs(self.children) do if c.tag==tag then return c end end end
@@ -71,7 +71,9 @@ local function render(name,parent)
   if event=='exit' or type(event)=='table' and event.name=='exit' then n.nativeExited=true end
  end)
  ui.g_arenaUI[name=='showQualifyFight' and 'qualify_layer' or name=='showBloodFight' and 'blood_layer' or 'rank_parent']=n
- local close=node();close:registerScriptTapHandler(function() ms.d_u.remove(n) end);n:addChild(close);n.close=close
+ local menu=ms.d_u.createMenu({x=0,y=0,{npic='v2/introUI/close1.png',spic='v2/introUI/close2.png',
+  call_back=function() ms.d_u.remove(n) end}})
+ n:addChild(menu);n.close=menu.children[1]
  rendered[#rendered+1]=name
 end
 for _,name in ipairs({'showQualifyFight','showExerFight','showBloodFight','showCommonRank','showDoubleRank'}) do ui[name]=function(parent) render(name,parent) end end
@@ -103,8 +105,18 @@ for g=4,7 do
 end
 for g=1,3 do assert(not entryOption(g)) end
 local function board(stage,ready,group)
- return {id=2,enter_group=group or 5,rank_type=math.min(stage,3),rank_data={},event_info={in_rank=stage<6},
-  local_arena={title='阶段',stage=stage,stage_fights=ready and 1 or 0,can_advance=ready,own=true,settled=stage==6}}
+ local own=(group or 5)==ui.g_data.enter.role_group
+ return {id=2,enter_group=group or 5,rank_type=math.min(stage,3),rank_data={},event_info={in_rank=own and stage<6},
+  local_arena={title='阶段',stage=stage,stage_fights=ready and 1 or 0,can_advance=ready,own=own,settled=stage==6,
+   started=true,week_start_day=20766,last_place=20,forfeit_prize={gold=300,holy_peach=10,crystals=5000}}}
+end
+local function confirmPanel() return ui.g_arenaUI.main_layer:getChildByTag(9888) end
+local function forfeitResponse()
+ local data=board(6,false)
+ data.local_forfeit=true
+ data.local_prizes={{object_type=11},{object_type=5},{object_type=5,attach_type=1366}}
+ data.local_arena.settlement={order=20,forfeited=true}
+ return data
 end
 for stage=1,5 do
  ui.onGetResult(board(stage,false))
@@ -127,7 +139,23 @@ for _,event in ipairs({{name='exit'},'exit'}) do
    ui.onGetResult(board(stage,true))
    local key=stage==1 and 'qualify_layer' or (stage==2 or stage==6) and 'rank_parent' or 'blood_layer'
    local rank=assert(ui.g_arenaUI[key])
+   local count=#sent
    rank.close:tap()
+   if stage<6 then
+    local panel=assert(confirmPanel(),'Every unfinished own stage must ask before exiting')
+    rank.close:tap();assert(confirmPanel()==panel,'Repeated close must not stack dialogs')
+    assert(not rank.nativeExited and rank:getParent(),'Opening confirmation must preserve the stage')
+    panel:getChildByTag(9889).item:tap()
+    assert(not confirmPanel() and #sent==count,'Cancel must not send a settlement request')
+    assert(not rank.nativeExited and rank:getParent())
+    rank.close:tap();panel=assert(confirmPanel())
+    local confirm=panel:getChildByTag(9890).item
+    confirm:tap();confirm:tap()
+    assert(#sent==count+1 and sent[#sent].id==8)
+    assert(sent[#sent].data.confirmed and sent[#sent].data.stage==stage and sent[#sent].data.week_start_day==20766)
+    assert(not rank.nativeExited and rank:getParent(),'Wait for the server before closing')
+    ui.onGetResult(forfeitResponse())
+   else assert(not confirmPanel() and #sent==count,'Settled ranks close without a penalty dialog') end
    assert(rank.nativeExited,'Native exit callback must be preserved')
    assert(ui.g_arenaUI[key]==nil,'Closed board reference must be cleared')
    assert(ui.g_arenaUI.main_layer:getChildByTag(9879).visible,'Closing any stage must restore entry')
@@ -142,6 +170,30 @@ for _,event in ipairs({{name='exit'},'exit'}) do
  end
 end
 exitEvent={name='exit'}
+-- An active player can browse another group without forfeiting by closing its board.
+ui.onGetResult({id=1,role_group=5,group_type_level=groups,schedule_list={match_time_list={{},{},{start_time=1}}}})
+ui.onGetResult(board(1,true,7))
+local spectator=assert(ui.g_arenaUI.rank_parent)
+local count=#sent;spectator.close:tap()
+assert(spectator.nativeExited and not confirmPanel() and #sent==count)
+-- Closing the entire arena after participation still requires confirmation.
+local function closeHost()
+ local host=ui.g_arenaUI.main_layer;local visual=host:getChildByTag(9879)
+ for _,child in ipairs(visual.children) do
+  if child.children[1] and child.children[1].callback and not child.item then child.children[1]:tap();return host end
+ end
+ error('Missing arena host close button')
+end
+local host=closeHost();local panel=assert(confirmPanel())
+panel:getChildByTag(9889).item:tap();assert(host:getParent() and #sent==count)
+closeHost();panel=assert(confirmPanel());panel:getChildByTag(9890).item:tap()
+assert(host:getParent() and sent[#sent].id==8)
+ui.onGetResult(forfeitResponse())
+assert(not root:getChildByTag(9875) and not ui.g_arenaUI.main_layer,'Confirmed host exit removes the arena after settlement')
+-- Opening the group menu alone does not count as participation; stale state is replaced.
+ui.onGetResult({id=1,role_group=5,group_type_level=groups,schedule_list={match_time_list={{},{},{start_time=1}}},
+ local_arena={stage=1,started=false,settled=false}})
+count=#sent;host=closeHost();assert(not host:getParent() and #sent==count)
 for _,group in ipairs({5,7}) do
  ui.onGetResult({id=1,role_group=group,group_type_level=groups,schedule_list={match_time_list={{},{},{start_time=1}}}})
  ui.onGetResult(board(5,true,group));local previous=ui.g_arenaUI.main_layer
@@ -172,4 +224,4 @@ ms.d_undergoOrdealUI.sendMsg(3,{})
 assert(shopSent[#shopSent].data.shop_token==nil and #shopResults==3)
 ui._localTaixuRestore();assert(ui.show==originalShow and ui.onFightReturn==originalReturn)
 assert(ms.d_undergoOrdealUI.sendMsg==nativeShopSend and ms.d_undergoOrdealUI.onGetResult==nativeShopResult)
-print('taixu client regression passed: four groups, stage buttons, fight/record returns, six-stage exit/reentry with table/string events, native exit handlers, host cleanup, settlement, restore')
+print('taixu client regression passed: four groups, stage buttons, fight/record returns, five-stage exit confirmation/cancel/last-place settlement, spectator close, host exit, native cleanup, settlement, restore')

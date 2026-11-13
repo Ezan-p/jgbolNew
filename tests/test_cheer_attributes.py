@@ -22,6 +22,7 @@ class CheerAttributeTests(unittest.TestCase):
         self.role['attachments'] = []
         self.support = self.add(5013, cheer_order=1, evolve_level=2)
         self.role.update(cheer_heaven_level=7, cheer_heaven_effect=1)
+        self.role['cheer_targets']['heaven'] = self.role['corteges'][0]['id']
         cheer.prepare(self.role)
 
     def add(self, kind, **fields):
@@ -88,10 +89,10 @@ class CheerAttributeTests(unittest.TestCase):
         for order, name in enumerate(cheer.NAMES, 1):
             with self.subTest(order=order):
                 for direction in cheer.NAMES:
-                    self.role['cheer_' + direction + '_effect'] = 0
+                    self.role['cheer_targets'][direction] = 0
                 self.support['cheer_order'] = order
                 self.role['cheer_' + name + '_level'] = 7
-                self.role['cheer_' + name + '_effect'] = 1
+                self.role['cheer_targets'][name] = self.role['corteges'][0]['id']
                 cheer.prepare(self.role)
                 self.calculate()
                 self.assertEqual(self.support['gongji'], 429)

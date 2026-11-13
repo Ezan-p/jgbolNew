@@ -66,7 +66,7 @@ def _shop_id(product):
 
 
 def refresh_shop(s,role,r,today):
-    """Select the configured weighted materials per category without replacement.
+    """Draw six materials from the complete weighted pool without replacement.
 
     The server persists the selected products so reconnects do not reshuffle the
     list. The revision is part of the key and migrates older shop saves when
@@ -79,16 +79,15 @@ def refresh_shop(s,role,r,today):
         role_id=role.get('role_id',role.get('id',0))
         seed=f'{revision}:{today}:{role_id}'
         offers=[]
-        for category, slots in r['abyss_shop_category_slots'].items():
-            rng=random.Random(f'{seed}:{category}')
-            pool=sorted((p for p in r['abyss_shop'] if p['category']==category),key=_shop_id)
-            for _ in range(slots):
-                roll=rng.randrange(sum(p['weight'] for p in pool))
-                for index, product in enumerate(pool):
-                    roll-=product['weight']
-                    if roll<0:
-                        offers.append(pool.pop(index))
-                        break
+        rng=random.Random(seed)
+        pool=sorted(r['abyss_shop'],key=_shop_id)
+        for _ in range(count):
+            roll=rng.randrange(sum(p['weight'] for p in pool))
+            for index, product in enumerate(pool):
+                roll-=product['weight']
+                if roll<0:
+                    offers.append(pool.pop(index))
+                    break
         s['shop']=copy.deepcopy(offers)
         s['shop_day']=today
         s['shop_revision']=revision
@@ -103,6 +102,8 @@ def state(role,now,r):
         bag=[],reductions=[0]*4,pills={},day=-1))
     s.setdefault('last_time',now);s.setdefault('double_end',0);s.setdefault('grid_count',30)
     s.setdefault('bag',[]);s.setdefault('reductions',[0]*4);s.setdefault('pills',{});s.setdefault('day',-1)
+    # Rebuild cached medicine effects from saved pills and original attributes.
+    s['reductions']=reductions(s,s['pills'])
     from . import activity_drug as drug
     # Older saves may already be in the last regions without the new course XP.
     # Catch up training once; never replay historical money/item boss rewards.
@@ -182,23 +183,16 @@ def bag(s,r):return dict(bag_list=copy.deepcopy(s['bag']),grid_count=s['grid_cou
 
 
 def enemies(s):
-    out=[];balance=abyss_balance.rules();scale=balance['region_stat_percent'][abyss_balance.region(s['boss'])]
+    out=[]
     for pos,token in enumerate(next(v for k,v in BOSSES[s['boss']].items() if k and k.startswith('cortege_list')).split('/'),1):
         tid,lv=map(int,token.split('|'));n=NPCS[tid]
         u=dict(type=tid,order=pos,level=1,evolve=0,reborn=0,skills=[])
-        for key,column,idx in (('gongji','base_gongji',0),('fangyu','base_fangyu',1),('hp','base_max_hp',2),('magic','base_max_magic',3)):
-            u[key]=max(1,int(n[column])*scale//100)
-        # Original magic values reach 36 million, while their missing skill
-        # logic is unknown. Bound the inferred spell budget before pill effects.
-        u['magic']=min(u['magic'],u['gongji']*balance['magic_attack_cap_percent']//100)
+        for key,column in (('gongji','base_gongji'),('fangyu','base_fangyu'),('hp','base_max_hp'),('magic','base_max_magic')):
+            u[key]=int(n[column])
+        # Follow the specter table literally: no inherited or fallback spells
+        # when chushijineng is 0. The original server's inheritance is unproven.
         u['max_hp']=u['hp'];sk=int(n['chushijineng'] or 0)
         if sk in formation.SKILLS:u['skills']=[(sk,lv)]
-        elif pos==1:
-            inherited=int(journey.NPCS[int(n['base_type_id'])]['chushijineng'])
-            skill=formation.SKILLS.get(inherited,{})
-            if skill.get('use_mode(1-active，2-passive)')!='1' or int(skill.get('use_probability',0))<=0:
-                inherited=balance['leader_fallback_skill']
-            u['skills']=[(inherited,lv)]
         out.append(u)
     # [B] A drug debuffs the displayed aggregate once, distributed by base
     # attribute. Allocate rounding in slot order; every living unit retains 1.

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "mode": "inferred",
-  "revision": "nine-sky-2026-11-10-shop-v8",
+  "revision": "nine-sky-2026-11-13-weighted-shop-v10",
   "enabled": true,
   "timezone_offset_hours": 8,
   "period_days": 7,
@@ -83,7 +83,8 @@
         1
       ],
       "cost": 45,
-      "limit": 5
+      "limit": 5,
+      "permanent": false
     },
     {
       "tier": "low",
@@ -94,7 +95,8 @@
         1
       ],
       "cost": 46,
-      "limit": 5
+      "limit": 5,
+      "permanent": false
     },
     {
       "tier": "low",
@@ -105,7 +107,8 @@
         1
       ],
       "cost": 50,
-      "limit": 5
+      "limit": 5,
+      "permanent": false
     },
     {
       "tier": "low",
@@ -116,7 +119,8 @@
         1
       ],
       "cost": 55,
-      "limit": 5
+      "limit": 5,
+      "permanent": false
     },
     {
       "tier": "low",
@@ -127,7 +131,8 @@
         1
       ],
       "cost": 58,
-      "limit": 5
+      "limit": 5,
+      "permanent": false
     },
     {
       "tier": "low",
@@ -138,7 +143,8 @@
         1
       ],
       "cost": 62,
-      "limit": 1
+      "limit": 1,
+      "permanent": false
     },
     {
       "tier": "low",
@@ -149,7 +155,8 @@
         1
       ],
       "cost": 100,
-      "limit": 5
+      "limit": 5,
+      "permanent": false
     },
     {
       "tier": "high",
@@ -161,7 +168,7 @@
       ],
       "cost": 350,
       "limit": 1,
-      "listing_weight": 15
+      "permanent": true
     },
     {
       "tier": "high",
@@ -173,7 +180,7 @@
       ],
       "cost": 500,
       "limit": 1,
-      "listing_weight": 11
+      "permanent": false
     },
     {
       "tier": "high",
@@ -185,7 +192,7 @@
       ],
       "cost": 200,
       "limit": 1,
-      "listing_weight": 15
+      "permanent": false
     },
     {
       "tier": "high",
@@ -197,7 +204,7 @@
       ],
       "cost": 300,
       "limit": 1,
-      "listing_weight": 15
+      "permanent": true
     },
     {
       "tier": "high",
@@ -209,7 +216,7 @@
       ],
       "cost": 350,
       "limit": 1,
-      "listing_weight": 15
+      "permanent": false
     },
     {
       "tier": "high",
@@ -221,7 +228,7 @@
       ],
       "cost": 500,
       "limit": 1,
-      "listing_weight": 5
+      "permanent": false
     },
     {
       "tier": "high",
@@ -233,7 +240,7 @@
       ],
       "cost": 350,
       "limit": 1,
-      "listing_weight": 10
+      "permanent": false
     },
     {
       "tier": "high",
@@ -245,7 +252,7 @@
       ],
       "cost": 350,
       "limit": 1,
-      "listing_weight": 10
+      "permanent": false
     },
     {
       "tier": "high",
@@ -257,7 +264,7 @@
       ],
       "cost": 400,
       "limit": 1,
-      "listing_weight": 2
+      "permanent": false
     },
     {
       "tier": "high",
@@ -269,7 +276,7 @@
       ],
       "cost": 400,
       "limit": 1,
-      "listing_weight": 2
+      "permanent": false
     }
   ],
   "credit_shop": [
@@ -421,5 +428,9 @@
         1
       ]
     }
-  ]
+  ],
+  "star_shop_tier_weights": {
+    "low": 4,
+    "high": 1
+  }
 }

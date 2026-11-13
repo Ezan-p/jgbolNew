@@ -95,15 +95,7 @@ def use_food(role,req,r):
     from . import activity_moon, activity_rice
     if req['item_type'] in activity_moon.FOODS:return activity_moon.use(role,req,r)
     if req['item_type'] in activity_rice.FOOD_POOLS:return activity_rice.use(role,req,r)
-    tid,n=req['item_type'],req['item_count']
-    a.require(tid in FOODS and type(n)is int and 1<=n<=100,'节日礼包使用数量无效')
-    a.require(req['des_type']==1 and req['des_id'] in (0,role['role_id']),'节日礼包使用目标无效')
-    item=formation.lookup(role,'attachments',req['item_id'])
-    a.require(item['attach_type']==5 and item['type_id']==tid and item['count']>=n and not item.get('is_lock'),'节日礼包不足或已锁定')
-    a.consume(role,tid,n)
-    rewards=copy.deepcopy(r['seasonal_food_rewards'][str(tid)])
-    for p in rewards:p[2]*=n
-    return [summon.event(21,dict(result=1,type_id=tid,count=n,attach_list=a.prizes(role,rewards)))]
+    raise formation.Rejected('节日食品类型无效')
 
 
 def state(role):

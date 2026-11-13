@@ -1,0 +1,64 @@
+test_default_network_service_and_fixed_account_share_trusted_clock (__main__.RuntimeTests) ... ERROR
+test_offline_restart_waits_for_verification_without_wall_credit (__main__.RuntimeTests) ... ERROR
+
+======================================================================
+ERROR: test_default_network_service_and_fixed_account_share_trusted_clock (__main__.RuntimeTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v112_test_runtime.py", line 33, in test_default_network_service_and_fixed_account_share_trusted_clock
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/offline_android/backend.py", line 224, in start
+    raise RuntimeError(runtime.error or 'Offline game service stopped during startup')
+RuntimeError: Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/offline_android/backend.py", line 183, in _thread_main
+    asyncio.run(self._serve())
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/offline_android/backend.py", line 157, in _serve
+    await server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v112-test-20261113/payload-new/network_redirect/server.py", line 62, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+
+======================================================================
+ERROR: test_offline_restart_waits_for_verification_without_wall_credit (__main__.RuntimeTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v112_test_runtime.py", line 75, in test_offline_restart_waits_for_verification_without_wall_credit
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/offline_android/backend.py", line 224, in start
+    raise RuntimeError(runtime.error or 'Offline game service stopped during startup')
+RuntimeError: Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/offline_android/backend.py", line 183, in _thread_main
+    asyncio.run(self._serve())
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/offline_android/backend.py", line 157, in _serve
+    await server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v112-test-20261113/payload-new/network_redirect/server.py", line 62, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.389s
+
+FAILED (errors=2)
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v112_test.py", line 302, in <module>
+    globals()[args.mode]()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v112_test.py", line 246, in runtime
+    exec(compile(source, namespace['__file__'], 'exec'), namespace)
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v112_test_runtime.py", line 93, in <module>
+AssertionError: offline_android.pack_payload

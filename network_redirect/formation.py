@@ -342,6 +342,9 @@ def change_order(role, req):
         c = lookup(role, 'corteges', change['id'])
         require(not c.get('cheer_order'), '助威中的神仙不能同时上阵')
         require(0 <= change['new_order'] <= min(8, role['cortege_count']), '阵位尚未开放')
+    from . import cheer
+    # Resolve legacy order-only bindings before anyone moves.
+    cheer.sync_targets(role)
     if req['flag'] == 4:
         require(len(changes) == 1 and changes[0]['new_order'] > 0, '更换神仙参数无效')
         target = changes[0]['new_order']
@@ -366,6 +369,7 @@ def change_order(role, req):
             item['equip_order'] = new_orders.get(item['innate_owner_id'], 0)
         elif req['flag'] != 4 and item.get('equip_order') in moves:
             item['equip_order'] = moves[item['equip_order']]
+    cheer.sync_targets(role)
     return [(1, {'flag': req['flag']})]
 
 

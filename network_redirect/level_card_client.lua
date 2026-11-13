@@ -40,9 +40,20 @@ do
   end
   common.recvUsedItem=function(data,...)
    if not data or data.type_id~=config.id then return originalResult(data,...) end
-   -- Event 2 owns the level rewards. The native gift callback expects an
-   -- attach_list and would otherwise open a second, empty reward window.
-   if data.result==1 then bag.refreshPackage() end
+   -- Event 2 has populated levelUpInfo before this result, but only marks
+   -- isLevelUp; the bag does not run the battle/main-screen level-up check.
+   -- Open the native box here, above the bag, and let playerLevelUp consume
+   -- the pending flag so returning to the main screen cannot show it again.
+   -- Do not call the native gift callback: it expects an attach_list.
+   if data.result==1 then
+    bag.refreshPackage()
+    local main=ms.d_mainUI
+    local player=main and main.g_playerInfo
+    if player and player.isLevelUp and player.levelUpInfo and main.playerLevelUp then
+     local scene=CCDirector:sharedDirector():getRunningScene()
+     if scene then main.playerLevelUp(scene) end
+    end
+   end
   end
   bag._localLevelCardRestore=function()
    bag.getPackageCSVConfig=originalConfig;bag.requestUseItem=originalUse

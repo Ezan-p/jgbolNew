@@ -170,7 +170,7 @@ class GuildWarFeastTests(unittest.TestCase):
     def test_tree_buff_is_limited_50_percent_not_global_multiplier(self):
         self.req(65,feast_type=2);self.req(68)
         before=self.role();self.req(36,count=1)
-        self.assertEqual(self.role()['cur_union_contrib']-before['cur_union_contrib'],1)
+        self.assertEqual(self.role()['cur_union_contrib']-before['cur_union_contrib'],10)
         self.req(14)
         for index,expected in enumerate((15,15,10)):
             before=self.role();s=before['guild']

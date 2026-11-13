@@ -1,0 +1,18 @@
+{
+  "apk_sha256": "1f77439d339e671d0cd5e147d5ed304ba5335e430215e55c5302c02d0759c53a",
+  "passed": false,
+  "device": "v110refreshqa / emulator-5592 / Android 6 ARM32",
+  "candidate_installed": false,
+  "startup_ui_verified": false,
+  "physical_device_tested": false,
+  "feature_touch_acceptance_completed": false,
+  "status": "qa_android_system_unavailable",
+  "error": "专用Android 6 QA环境出现系统ANR及SystemUI异常，未完成应用级装机验收；本轮未安装v112候选包",
+  "last_adb_error": "Command '['/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/sdk/platform-tools/adb', '-s', 'emulator-5592', 'install', '--no-streaming', '/Users/ezan/Desktop/vibeCoidng/JGBOLNew/build/金箍棒ol离线正式版v111.apk']' returned non-zero exit status 255.",
+  "observed_system_diagnostics": [
+    "ActivityManager: ANR in system; executing service android/com.android.internal.backup.LocalTransportService",
+    "AndroidRuntime: com.android.systemui keyguard inflation failed; error reporting crash: android.os.DeadObjectException"
+  ],
+  "qa_environment_stopped": true,
+  "termination_note": "After repeated system startup failures the dedicated QA emulator was stopped. A baseline v111 installation command racing with shutdown then exited 255; this is not a v112 installation result."
+}

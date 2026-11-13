@@ -29,7 +29,7 @@ for _,tid in ipairs({1020,1022,1023}) do
 end
 assert(bag.requestUseItem({type_id=1029,count=20})=='native')
 assert(uses==7)
-for _,tid in ipairs({1130,1131,1132,1133,1213,1214,1215,1216}) do
+for _,tid in ipairs({1130,1131,1132,1133,1213,1214,1215,1216,1217}) do
  for _,count in ipairs({0,1}) do
   assert(bag.requestUseItem({type_id=tid,count=count})=='native')
  end
@@ -47,8 +47,6 @@ for _,tid in ipairs({1130,1131,1132,1133,1213,1214,1215,1216}) do
   assert(bag.g_lastRequestUsedItem.count==maximum)
  end
 end
--- Five-star rice dumplings are a separate gift, outside the four food pools.
-assert(bag.requestUseItem({type_id=1217,count=20})=='native')
 bag._localResourceItemRestore()
 assert(bag.requestUseItem({type_id=1020,count=20})=='native')
 assert(loadstring(source))()

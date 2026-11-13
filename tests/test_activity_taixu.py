@@ -169,6 +169,83 @@ class UndergoCompleteTests(TaixuCase):
 
 
 class ArenaTests(TaixuCase):
+    def forfeit_request(self, **overrides):
+        s = self.b.profile()['activity']['arena']
+        data = dict(stage=s['stage'], week_start_day=s['week_start_day'], confirmed=True)
+        data.update(overrides)
+        return self.call(8, data, mid=1350)
+
+    def test_forfeit_every_stage_pays_last_place_even_when_leading(self):
+        def items(role, tid):
+            return sum(x['count'] for x in role['attachments'] if x['type_id'] == tid and x['attach_type'] == 5)
+        for stage in range(1, 6):
+            with self.subTest(stage=stage):
+                role = self.b.profile()
+                role['activity']['arena'] = arena.new_season(role, activity.day(NOW, self.b.activity_rules), NOW)
+                s = role['activity']['arena']; s.update(stage=stage, started=True)
+                s['competitors']['self'].update(hp=99999, score=999999)
+                self.assertEqual(arena.ranking(s)[0], 'self')
+                self.b.save(role); before = self.b.profile()
+                events = self.forfeit_request(); self.ok(events)
+                out = next(d for e, d in events if e == 199)
+                after = self.b.profile(); saved = after['activity']['arena']
+                self.assertEqual((saved['stage'], saved['settled'], saved['settlement']['order']), (6, True, 20))
+                self.assertTrue(saved['settlement']['forfeited'])
+                self.assertEqual(arena.ranking(saved)[-1], 'self')
+                self.assertEqual(after['gold_coin']-before['gold_coin'], 300)
+                self.assertEqual(items(after, 1343)-items(before, 1343), 10)
+                self.assertEqual(items(after, 1366)-items(before, 1366), 5000)
+                self.assertTrue(out['local_forfeit'])
+                self.assertFalse(out['local_arena']['can_advance'])
+                self.assertEqual(out['rank_data'][20]['is_me'], True)
+                self.assertEqual(out['local_prizes'], next(d for e, d in events if e == 33))
+                self.assertEqual(saved['competitors'], before['activity']['arena']['competitors'])
+
+    def test_forfeit_requires_participation_confirmation_and_current_stage_week(self):
+        self.ok(self.call(1, mid=1350)); before = self.b.profile()
+        self.assertFalse(next(d for e, d in self.call(1, mid=1350) if e == 199)['local_arena']['started'])
+        self.assertEqual(self.forfeit_request()[0][0], 55)
+        self.assertEqual(self.b.profile(), before)
+        self.arena_enter(); before = self.b.profile(); s = before['activity']['arena']
+        for data in (dict(confirmed=False), dict(confirmed=1), dict(confirmed='true'),
+                     dict(stage=2), dict(stage=True), dict(week_start_day=s['week_start_day']-7),
+                     dict(week_start_day=True), dict(week_start_day=str(s['week_start_day']))):
+            with self.subTest(data=data):
+                self.assertEqual(self.forfeit_request(**data)[0][0], 55)
+                self.assertEqual(self.b.profile(), before)
+        self.assertEqual(self.call(8, dict(stage=1, confirmed=True), mid=1350)[0][0], 55)
+        self.assertEqual(self.b.profile(), before)
+
+    def test_forfeit_is_atomic_idempotent_and_survives_restart(self):
+        self.arena_enter(); before = self.b.profile()
+        with patch('network_redirect.activity_arena.response', side_effect=ValueError('bad packet')):
+            self.assertEqual(self.forfeit_request()[0][0], 55)
+        self.assertEqual(self.b.profile(), before)
+        self.ok(self.forfeit_request()); saved = self.b.profile(); replies = self.replies
+        self.assertEqual(self.b.respond(self.packet, self.state), replies)
+        self.assertEqual(self.b.profile(), saved)
+        self.assertEqual(self.forfeit_request()[0][0], 55)
+        self.assertEqual(self.b.profile(), saved)
+        self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        self.ok(self.call(1, mid=1350)); self.assertEqual(self.b.profile(), saved)
+        self.assertEqual(self.forfeit_request()[0][0], 55)
+        self.assertEqual(self.b.profile(), saved)
+
+    def test_old_forfeit_cannot_settle_a_new_week(self):
+        s = self.arena_enter(); old_week = s['week_start_day']; before = self.b.profile()
+        boundary = (old_week+7)*86400-8*3600
+        with patch('network_redirect.game_clock.now', return_value=boundary):
+            events = self.forfeit_request(); self.ok(events)
+            out = next(d for e, d in events if e == 199)
+            self.assertEqual(out['id'], 1)
+            self.assertFalse(out['local_arena']['started'])
+            self.assertNotIn('local_prizes', out)
+            self.arena_enter(); fresh = self.b.profile()
+            self.assertEqual(self.forfeit_request(week_start_day=old_week)[0][0], 55)
+            self.assertEqual(self.b.profile(), fresh)
+        self.assertEqual(fresh['gold_coin'], before['gold_coin'])
+        self.assertEqual(fresh['attachments'], before['attachments'])
+
     @patch('network_redirect.activity_arena.journey.battle',return_value=(0,[],[]))
     def test_draw_in_final_stage_awards_no_score_or_life_damage(self,_):
         self.arena_enter();role=self.b.profile();s=role['activity']['arena']

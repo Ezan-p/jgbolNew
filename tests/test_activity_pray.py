@@ -36,8 +36,9 @@ class PrayTests(ActivityCase):
             self.ok(events)
             after = self.b.profile()
             reward = next(d['pray_item_list'][1] for e, d in events if e == 52)
-            self.assertEqual((reward['object_type'], reward['attach_count']), (11, 20))
-            self.assertEqual(after['gold_coin'] - before['gold_coin'], 20)
+            gold = 100 if cost == 1000 else 20
+            self.assertEqual((reward['object_type'], reward['attach_count']), (11, gold))
+            self.assertEqual(after['gold_coin'] - before['gold_coin'], gold)
             self.assertEqual(after['spirit_retain'], before['spirit_retain'] + 1200 - cost)
             self.assertEqual(after['souls']['5004'], before['souls']['5004'] - 150)
             self.assertEqual(after['pray_spirit_times'], completed + 1)
@@ -65,6 +66,27 @@ class PrayTests(ActivityCase):
         self.assertEqual(snapshot['pray_spirit_times'], 1)
         self.ok(self.pray())
         self.assertEqual(self.b.profile()['spirit_retain'], 2008)
+
+    def test_thousand_soul_retained_reward_restart_and_overflow(self):
+        before = self.seed(retained=2000, souls={}, completed=2)
+        self.ok(self.pray())
+        after = self.b.profile()
+        self.assertEqual(after['gold_coin'] - before['gold_coin'], 100)
+        self.assertEqual(after['spirit_retain'], 1000)
+        self.b.close()
+        self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        self.assertEqual(after, self.b.profile())
+        self.ok(self.pray())
+        self.assertEqual(self.b.profile()['gold_coin'] - after['gold_coin'], 100)
+        self.assertEqual(self.b.profile()['spirit_retain'], 0)
+        r = self.seed(retained=1000, souls={}, completed=4)
+        r['gold_coin'] = pray.MAX_VALUE - 99
+        self.b.save(r)
+        self.reject()
+        r['gold_coin'] = pray.MAX_VALUE - 100
+        self.b.save(r)
+        self.ok(self.pray())
+        self.assertEqual(self.b.profile()['gold_coin'], pray.MAX_VALUE)
 
     def test_soul_quality_values_and_insufficient_atomic(self):
         for q, worth in ((2, 1), (3, 2), (4, 4), (5, 8)):

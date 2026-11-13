@@ -109,6 +109,7 @@ end
  lines.append('ms.d_xianmengUI.getGuildConfig(ms.d_data.g_new_config[8])')
  lines.append("step('entrance',function() ms.d_xianmengUI.showFirstPage() end)")
  lines.append("local guildPatchPresent={};for _,name in ipairs({'d_guildFightUI','d_crossRealm'}) do guildPatchPresent[name]=ms[name] and ms[name]._localGuildRestore~=nil end")
+ lines.append('local guildDonationPresent=ms.d_worldTreeUI._localGuildDonationRestore~=nil')
  lines.append((ROOT/'network_redirect/guild_client.lua').read_text())
  access_source=(ROOT/'network_redirect/guild_access_client.lua').read_text()
  lines.append('local guildAccessPresent=ms._localGuildAccessRestore~=nil')
@@ -131,6 +132,9 @@ end
    mid,_,data=decode(p)
    if mid==2998 and data['id']==55:raise AssertionError((name,data['data']))
    if mid in (1032,1301,1098) or mid==2998 and data['id']==82:lines.append('apply('+str(mid)+','+summon.lua(data)+')')
+  if op==36:
+   role=b.profile()
+   lines.append('assert(ms.d_mainUI.g_playerInfo.union_contrib=='+str(role['union_contrib'])+' and ms.d_mainUI.g_playerInfo.cur_union_contrib=='+str(role['cur_union_contrib'])+',"donation contribution balance mismatch")')
   if capture:lines.append('end)')
   if name=='pet_train_battle':lines.append("end);assert(battles>0,'trial battle callback missing');ms.d_event_mgr.setSpecialFightType(0)")
   if name=='escort_claim':lines.append('end)')
@@ -343,6 +347,7 @@ local function restore()
  if guildAccessPresent then assert(loadstring(guildAccessSource))() end
  if not guildActivitiesPresent and ms._localGuildActivitiesRestore then ms._localGuildActivitiesRestore() end
  for _,name in ipairs({'d_guildFightUI','d_crossRealm'}) do if not guildPatchPresent[name] and ms[name] and ms[name]._localGuildRestore then ms[name]._localGuildRestore() end end
+ if not guildDonationPresent and ms.d_worldTreeUI._localGuildDonationRestore then ms.d_worldTreeUI._localGuildDonationRestore() end
  ms.d_u.main_server_send_msg=saved.send;ms.MS_report_error=saved.report;ms.d_time.getTime=saved.time
  ms.d_mainUI.g_playerInfo=saved.player;ms.d_data.g_new_config=saved.config
  ms.d_xianmengUI.getGuildConfig(saved.guildConfig)

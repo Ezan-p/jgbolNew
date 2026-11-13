@@ -1,5 +1,6 @@
 """Bagua original binary requests: settlement, failure atomicity and reconnect."""
 import copy
+import json
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -19,8 +20,12 @@ class CheerTests(unittest.TestCase):
         self.serial = 1000
         role = self.b.profile()
         role.update(level=99, reborn_layer=4, gold_coin=10000)
-        for t in (1015, 1016, 1017, 1206):
+        for t in (1015, 1016, 1017):
             summon.add_item(role, t, 100000)
+        # Legacy material stacks are supported; avoid creating 100,000 separate
+        # non-stackable gift instances just to exercise Bagua settlement.
+        role['attachments'].append(dict(id=f.new_id(role), attach_type=5, type_id=1206,
+                                        count=100000, level=1))
         for t in (5002, 5003):
             role['corteges'].append(summon.companion(role, t))
         f.prepare(role, self.b.formation_rules)
@@ -56,13 +61,26 @@ class CheerTests(unittest.TestCase):
             if not self.b.profile()['cheer_' + name + '_level']:
                 self.req(8, order)
 
+    def move(self, flag, *changes):
+        self.serial += 1
+        packet = encode(1024, dict(serial_num=self.serial, flag=flag, count=len(changes),
+                                  change_info=[dict(id=i, new_order=p) for i, p in changes]))
+        rows = [decode(p) for p in self.b.respond(packet, {'authenticated': True})]
+        self.assertFalse(any(m == 2998 and d['id'] == 55 for m, _, d in rows), rows)
+        self.assertEqual(rows[-1][0], 1106)
+        return rows
+
+    def cheer_gain(self, role, identity):
+        trace = role['combat_power_breakdown']['companions'][str(identity)]
+        return {s: Decimal(trace['cheer'][s]) - Decimal(trace['pet'][s]) for s in cheer.STATS}
+
     def test_config_original_types_and_realm(self):
         cfg = login_fields(decode(self.b.bootstrap()[0])[2]['data'])
         self.assertIs(cfg[14]['is_open'], True)
         self.assertEqual(cfg[14]['is_open_ni'], 2)
         self.assertIsInstance(cfg[14]['cost_item_count'], int)
         self.assertEqual(list(cfg[14]['cheer_level_limit'].values()),
-                         [40, 40, 42, 44, 46, 48, 50, 52] + [60] * 8)
+                         [40, 40] + [60] * 14)
         self.assertTrue(cfg[31][4]['rights']['open_cheer_skill'])
 
     def test_all_sixteen_positions_and_level_cap(self):
@@ -72,7 +90,7 @@ class CheerTests(unittest.TestCase):
         role = self.b.profile(); role['level'] = 40; self.b.save(role)
         for order, name in enumerate(cheer.NAMES, 1):
             if 3 <= order <= 8:
-                role = self.b.profile(); role['level'] = 40 + (order - 2) * 2; self.b.save(role)
+                role = self.b.profile(); role['level'] = 60; self.b.save(role)
             if order == 9:
                 for level in (40, 59):
                     role = self.b.profile(); role['level'] = level; self.b.save(role)
@@ -114,7 +132,7 @@ class CheerTests(unittest.TestCase):
             return {tid: sum(i['count'] for i in role['attachments'] if i['type_id'] == tid)
                     for tid in (1016, 1017)}
 
-        for order, required_level in enumerate((42, 44, 46, 48, 50, 52), 3):
+        for order, required_level in enumerate((60,) * 6, 3):
             with self.subTest(order=order, required_level=required_level):
                 key = 'cheer_' + cheer.NAMES[order - 1] + '_level'
                 role = self.b.profile()
@@ -142,6 +160,30 @@ class CheerTests(unittest.TestCase):
             role = other.profile()
             self.assertEqual([role['cheer_' + n + '_level'] for n in cheer.NAMES], [1] * 8 + [0] * 8)
             self.assertEqual(token_counts(role), expected)
+        finally:
+            other.close()
+
+    def test_all_paid_positive_positions_reject_old_level_thresholds(self):
+        for level in (40, 42, 44, 46, 48, 50, 52, 59):
+            role = self.b.profile(); role['level'] = level; self.b.save(role)
+            for order in range(3, 9):
+                with self.subTest(level=level, order=order):
+                    self.req(8, order, fail=True)
+            self.assertEqual(self.b.profile()['cheer_count'], 2)
+
+    def test_unlock_gate_update_preserves_legacy_open_positions(self):
+        role = self.b.profile()
+        role['level'] = 50
+        role.update(cheer_shake_level=7, shake_skill_level=100)
+        self.b.save(role)
+        before = self.b.profile()
+        other = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        try:
+            restored = other.profile()
+            self.assertEqual(restored['cheer_shake_level'], 7)
+            self.assertEqual(restored['shake_skill_level'], 100)
+            self.assertEqual(restored['attachments'], before['attachments'])
+            self.assertEqual(restored['cheer_targets'], before['cheer_targets'])
         finally:
             other.close()
 
@@ -173,14 +215,17 @@ class CheerTests(unittest.TestCase):
         self.req(1)
         self.assertEqual(self.b.profile()['corteges'][1]['cheer_order'], 0)
 
-    def test_reverse_adds_and_innate_uses_separate_inventory(self):
+    def test_reverse_target_conflicts_and_innate_uses_separate_inventory(self):
         self.open_positives()
         self.req(8); self.req(8, 9)
         self.req(1, identity=self.ids[1]); self.req(2, identity=self.ids[0])
-        first = self.b.profile()['corteges'][0]['gongji']
-        self.req(1, 9, self.ids[2]); self.req(2, 9, self.ids[0])
+        self.req(1, 9, self.ids[2]); self.req(2, 9, self.ids[0], fail=True)
+        self.req(2)
+        self.req(2, 9, self.ids[0])
         role = self.b.profile()
-        self.assertGreater(role['corteges'][0]['gongji'], first)
+        self.assertEqual(role['cheer_heaven_effect'], 0)
+        self.assertEqual(role['cheer_targets']['unheaven'], self.ids[0])
+        self.assertTrue(all(v > 0 for v in self.cheer_gain(role, self.ids[0]).values()))
         innate = next(i for i in role['attachments'] if i.get('innate_owner_id') == self.ids[2])
         self.assertEqual(innate['equip_order'], 17)
         self.assertEqual(self.req(12, 9, self.ids[2])['skill_id'], innate['id'])
@@ -301,12 +346,143 @@ class CheerTests(unittest.TestCase):
         role['level']=40
         self.assertEqual(len(cheer.market_goods(role)), 4)
 
-    def test_target_empty_slot_clears_without_client_nil(self):
+    def test_target_moves_to_empty_slot_without_losing_binding(self):
         self.req(1,identity=self.ids[1]);self.req(2,identity=self.ids[0])
         role=self.b.profile()
         f.change_order(role,dict(flag=5,count=1,change_info=[dict(id=self.ids[0],new_order=2)]))
         f.prepare(role,self.b.formation_rules)
-        self.assertEqual(role['cheer_heaven_effect'],0)
+        self.assertEqual(role['cheer_heaven_effect'],2)
+        self.assertEqual(role['cheer_targets']['heaven'], self.ids[0])
+
+    def test_all_sixteen_slots_share_one_target_occupancy(self):
+        self.open_positives()
+        for order in range(9, 17):
+            self.req(8, order)
+        for order, name in enumerate(cheer.NAMES, 1):
+            with self.subTest(order=order):
+                self.req(1, order, self.ids[1])
+                self.req(2, order, self.ids[0])
+                self.req(2, order, self.ids[0])  # Re-selecting the same binding is valid.
+                for other in (1, 2, 9, 16):
+                    if other != order:
+                        self.req(2, other, self.ids[0], fail=True)
+                self.assertEqual(self.b.profile()['cheer_targets'][name], self.ids[0])
+                self.req(1, order)  # Removing a supporter also releases its target.
+                self.assertEqual(self.b.profile()['cheer_targets'][name], 0)
+
+    def test_distinct_targets_and_retargeting_release_previous_target(self):
+        self.move(5, (self.ids[2], 2))
+        self.req(1, identity=self.ids[1])
+        self.req(2, identity=self.ids[0])
+        self.req(2, identity=self.ids[2])
+        self.req(2, 2, self.ids[0])
+        role = self.b.profile()
+        self.assertEqual((role['cheer_targets']['heaven'], role['cheer_targets']['earth']),
+                         (self.ids[2], self.ids[0]))
+        self.req(2, 2, self.ids[2], fail=True)
+
+    def test_swap_keeps_each_support_and_spell_bonus_with_companion(self):
+        self.move(5, (self.ids[2], 2))
+        self.req(1, identity=self.ids[1]); self.req(2, identity=self.ids[0])
+        self.req(9, pos=2)
+        role = self.b.profile()
+        item = dict(id=f.new_id(role), type_id=22, attach_type=6, count=1,
+                    level=1, equip_order=0, equip_pos=0)
+        role['attachments'].append(item); self.b.save(role)
+        self.req(11, identity=item['id'], pos=2)
+        before = self.cheer_gain(self.b.profile(), self.ids[0])
+        self.assertTrue(any(before.values()))
+        for flag, changes in ((5, ((self.ids[0], 2), (self.ids[2], 1))),
+                              (4, ((self.ids[0], 1),)),
+                              (0, ((self.ids[0], 2), (self.ids[2], 1)))):
+            with self.subTest(flag=flag):
+                rows = self.move(flag, *changes)
+                role = self.b.profile()
+                target = f.lookup(role, 'corteges', self.ids[0])
+                self.assertEqual(self.cheer_gain(role, self.ids[0]), before)
+                self.assertFalse(any(self.cheer_gain(role, self.ids[2]).values()))
+                self.assertEqual(role['cheer_heaven_effect'], target['order'])
+                self.assertTrue(any(a == dict(type=171, value=target['order'])
+                                    for m, _, d in rows if m == 1032 and d['unit_type'] == 1
+                                    for a in d['attr_list']))
+                self.assertEqual(cheer.inspection(role)['owner_cheer_info'][171], target['order'])
+
+    def test_replacement_suspends_binding_and_return_restores_after_restart(self):
+        self.req(1, identity=self.ids[1]); self.req(2, identity=self.ids[0])
+        gain = self.cheer_gain(self.b.profile(), self.ids[0])
+        self.move(4, (self.ids[2], 1))
+        role = self.b.profile()
+        self.assertEqual(role['cheer_heaven_effect'], 0)
+        self.assertEqual(role['cheer_targets']['heaven'], self.ids[0])
+        self.assertFalse(any(self.cheer_gain(role, self.ids[2]).values()))
+        other = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        try:
+            self.assertEqual(other.profile()['cheer_targets'], role['cheer_targets'])
+        finally:
+            other.close()
+        self.move(4, (self.ids[0], 1))
+        self.assertEqual(self.cheer_gain(self.b.profile(), self.ids[0]), gain)
+        self.req(2, 2, self.ids[0], fail=True)
+
+    def test_two_supported_companions_swap_without_exchanging_bonuses(self):
+        self.move(5, (self.ids[2], 2))
+        role = self.b.profile()
+        second = summon.companion(role, 5005)
+        role['corteges'].append(second); self.b.save(role)
+        self.req(1, identity=self.ids[1]); self.req(2, identity=self.ids[0])
+        self.req(1, 2, second['id']); self.req(2, 2, self.ids[2])
+        before = self.b.profile()
+        gains = {i: self.cheer_gain(before, i) for i in (self.ids[0], self.ids[2])}
+        self.assertTrue(all(any(v.values()) for v in gains.values()))
+        self.move(5, (self.ids[0], 2), (self.ids[2], 1))
+        after = self.b.profile()
+        for identity, gain in gains.items():
+            self.assertEqual(self.cheer_gain(after, identity), gain)
+        self.assertEqual((after['cheer_heaven_effect'], after['cheer_earth_effect']), (2, 1))
+
+    def test_legacy_slot_bindings_migrate_once_and_remove_duplicates(self):
+        self.open_positives(); self.req(8, 9)
+        role = self.b.profile()
+        role.pop('cheer_targets')
+        role.update(cheer_heaven_effect=1, cheer_earth_effect=1,
+                    cheer_unheaven_effect=1, cheer_pool_effect=8)
+        original_items = copy.deepcopy(role['attachments'])
+        peak = role['max_combat_power'] = 9999999
+        self.b.db.execute('UPDATE roles SET data=? WHERE account=?',
+                          (json.dumps(role), self.b.account))
+        self.b.db.commit()
+        role = self.b.profile()
+        self.assertEqual(role['cheer_targets']['heaven'], self.ids[0])
+        for name in ('earth', 'unheaven', 'pool'):
+            self.assertEqual(role['cheer_targets'][name], 0)
+            self.assertEqual(role['cheer_' + name + '_effect'], 0)
+        self.assertEqual(role['attachments'], original_items)
+        self.assertEqual(role['max_combat_power'], peak)
+        self.move(5, (self.ids[0], 2))
+        other = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
+        try:
+            restored = other.profile()
+            self.assertEqual(restored['cheer_targets']['heaven'], self.ids[0])
+            self.assertEqual(restored['cheer_heaven_effect'], 2)
+            wire = [decode(p) for p in other.bootstrap(reconnect=True)]
+            self.assertTrue(any(a == dict(type=171, value=2)
+                                for m, _, d in wire if m == 1032 and d['unit_type'] == 1
+                                for a in d['attr_list']))
+        finally:
+            other.close()
+
+    def test_deleted_target_does_not_rebind_to_new_occupant(self):
+        self.req(1, identity=self.ids[1]); self.req(2, identity=self.ids[0])
+        role = self.b.profile()
+        role['corteges'] = [c for c in role['corteges'] if c['id'] != self.ids[0]]
+        f.lookup(role, 'corteges', self.ids[2])['order'] = 1
+        cheer.prepare(role)
+        self.assertEqual(role['cheer_targets']['heaven'], 0)
+        self.assertEqual(role['cheer_heaven_effect'], 0)
+        # Wire fields are derived after migration, never a new binding source.
+        role['cheer_heaven_effect'] = 1
+        cheer.prepare(role)
+        self.assertEqual(role['cheer_heaven_effect'], 0)
 
     def test_no_recalculation_feedback(self):
         self.req(8); self.req(1, identity=self.ids[1]); self.req(2, identity=self.ids[0])
@@ -418,6 +594,7 @@ class CheerTests(unittest.TestCase):
         target, supporter = role['corteges'][:2]
         supporter.update(order=0, cheer_order=9)
         role.update(cheer_unheaven_effect=target['order'], unheaven_gongji_plus=175)
+        role['cheer_targets']['unheaven'] = target['id']
         role['attachments'].append(dict(type_id=22, equip_order=17, equip_pos=2, level=1))
         pending = {c['id']: dict.fromkeys(cheer.STATS, Decimal(1000)) for c in (target, supporter)}
         values = dict.fromkeys(cheer.STATS, Decimal(0))

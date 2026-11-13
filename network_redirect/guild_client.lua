@@ -1,3 +1,50 @@
+-- Donation already credits the save; also refresh the client balances and
+-- cached member rows, and show the reward just as cultivation does.
+do
+ local ms=package.loaded.ms
+ if not (ms and ms.d_worldTreeUI and ms.d_worldTreeUI.donateGoldSuccess and ms.d_xianmengUI and ms.d_mainUI) then return 'pending' end
+ local ui=ms.d_worldTreeUI
+ if not ui._localGuildDonationRestore then
+  local native=ui.donateGoldSuccess
+  ui.donateGoldSuccess=function(data,...)
+   local player=ms.d_mainUI.g_playerInfo
+   if player and type(data.union_contrib)=='number' and type(data.cur_union_contrib)=='number' then
+    -- 1032 may already have applied these balances. Never add the gain again.
+    player.union_contrib=data.union_contrib
+    player.cur_union_contrib=data.cur_union_contrib
+    local function sync(row)
+     row.union_contrib=data.union_contrib;row.cur_union_contrib=data.cur_union_contrib
+     row.totalcontrib=data.union_contrib;row.contrib=data.cur_union_contrib
+     row.contribute=data.union_contrib
+    end
+    local response=ms.d_xianmengUI.getServerResponse
+    if response and debug and debug.getupvalue then
+     for i=1,100 do
+      local name,value=debug.getupvalue(response,i)
+      if not name then break end
+      if type(value)=='table' then
+       if name=='tipsInfo' or name=='selfInfo' then sync(value)
+       elseif name=='memberList' then
+        for _,row in pairs(value) do
+         if row.id==player.role_id then sync(row) end
+        end
+       end
+      end
+     end
+    end
+   end
+   local result=native(data,...)
+   if type(data.contribution_gain)=='number' and data.contribution_gain>0 then
+    ms.d_info.show('捐赠成功，获得贡献度：'..tostring(data.contribution_gain))
+   end
+   return result
+  end
+  ui._localGuildDonationRestore=function()
+   ui.donateGoldSuccess=native;ui._localGuildDonationRestore=nil
+  end
+ end
+end
+
 -- Original 3.87 betting dialogs mix old globals with the new page's locals.
 -- Repair only that bridge; keep the native dialog, selection and send handlers.
 do

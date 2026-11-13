@@ -30,8 +30,9 @@ def main():
             'qiFuUI L202-270 bulk selection only includes low-quality souls',
             'qiFuUI L848-900 warns for level >=2 then allows confirmation',
             '1085 carries type/id/count; spirit=10 (7 is calc), cortege=4; event 52 pray_item_list drives native reward UI'],
+        user_confirmed=['1000-soul cost tier grants exactly 100 gold (2026-11-13)'],
         inferred=[
-            'equal chance of 10 / 20 / 30 gold per successful prayer',
+            'equal chance of 10 / 20 / 30 gold for the 200 / 500-soul cost tiers',
             'completed-count storage, UTC+8 daily cost reset, persistent remaining soul value',
             'no daily hard cap: follows native last-cost fallback; official server cap unknown',
             'zero-worth offerings rejected; lock/training/attached essence protections',

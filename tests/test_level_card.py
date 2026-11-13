@@ -50,12 +50,19 @@ class LevelCardTests(unittest.TestCase):
     def test_wire_rewards_sync_replay_and_reload(self):
         ident = self.setup_card()
         before = self.b.profile()
-        events = dict(self.use(ident))
+        ordered_events = self.use(ident)
+        events = dict(ordered_events)
         after = self.b.profile()
         self.assertEqual((after['level'], after['cur_exp']), (20, 37))
         self.assertEqual(after['gold_coin']-before['gold_coin'], 100)
         self.assertEqual(events[21]['count'], 1)
         self.assertEqual(events[2]['new_level'], 20)
+        self.assertEqual(events[2]['old_level'], 19)
+        event_ids = [eid for eid, _ in ordered_events]
+        self.assertLess(event_ids.index(2), event_ids.index(21))
+        upgrade_index = next(i for i, (mid, _, data) in enumerate(self.decoded)
+                             if mid == 2998 and data['id'] == 2)
+        self.assertTrue(any(mid == 1032 for mid, _, _ in self.decoded[:upgrade_index]))
         self.assertEqual(after['cortege_count'], int(f.LEVELS[20]['cortege_count']))
         attrs = {a['type']: a['value'] for mid, _, data in self.decoded
                  if mid == 1032 and data['unit_type'] == 1 for a in data['attr_list']}

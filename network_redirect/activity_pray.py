@@ -1,4 +1,4 @@
-"""神石祈福: original CSV costs/values and explicitly inferred gold rewards.
+"""神石祈福: original CSV costs/values and a confirmed 1000-soul reward.
 
 The persisted counter counts completed prayers; native UI indexes the NEXT one.
 The last CSV cost repeats. All validation precedes consumption on a detached role.
@@ -60,7 +60,7 @@ def settle(role, req, rules):
             value += int(QUALITY[q]['cortage_worth'])
     f.require(value >= needed, '祭品魂元不足')
     f.require(value - needed <= MAX_VALUE, '留存魂元超过上限，请减少祭品')
-    reward = secrets.choice(rules['pray_rewards'])
+    reward = [11, 0, 100, 1] if needed == 1000 else secrets.choice(rules['pray_rewards'])
     f.require(role['gold_coin'] + reward[2] <= MAX_VALUE, '元宝已达上限')
     for tid, n in souls.items():
         role['souls'][tid] -= n

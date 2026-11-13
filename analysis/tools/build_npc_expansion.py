@@ -104,6 +104,7 @@ def candidate(level, tier, variant, attempt):
         c = base.make_companion(role, style, tier, tid, order=order)
         styles[int(c['id'])] = style
     support_count = min(p['support_count'], cap['positive_support_cap'] + cap['reverse_support_cap'])
+    available_targets = list(range(1, n + 1))
     for pos in range(1, support_count + 1):
         q = 5 if rng.random() < 0.65 else 4
         tid = draw(rng, q, used, variant)
@@ -112,7 +113,10 @@ def candidate(level, tier, variant, attempt):
         styles[int(c['id'])] = variant
         name = base.cheer.NAMES[pos - 1]
         role['cheer_' + name + '_level'] = p['cheer_level']
-        role['cheer_' + name + '_effect'] = rng.randint(1, n)
+        target = rng.choice(available_targets) if available_targets else 0
+        if target:
+            available_targets.remove(target)
+        role['cheer_' + name + '_effect'] = target
     for _ in range(2):
         tid = draw(rng, 5 if rng.random() < 0.65 else 4, used, variant)
         used.add(tid)

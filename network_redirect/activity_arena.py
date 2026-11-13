@@ -60,7 +60,7 @@ def new_season(role, day, now):
     group = group_for(role['level'])
     s = dict(version=3, day=day, week_start_day=day, clock=now, group=group, viewing=group, stage=1,
              stage_fights=0, fights=0, paid=0, actions=rules()['arena_action_points'],
-             records=[], replays={}, settled=False, competitors={})
+             records=[], replays={}, settled=False, started=False, competitors={})
     for i, key in enumerate(reversed(select_roster(group, day))):
         s['competitors'][key] = dict(score=(rules()['arena_size']-i)*100, hp=rules()['arena_hp_base'])
     s['competitors']['self'] = dict(score=0, hp=rules()['arena_hp_base'])
@@ -96,8 +96,12 @@ def rank_type(s):
 
 
 def ranking(s):
-    return sorted(s['competitors'], key=lambda k: (-s['competitors'][k]['hp'] if s['stage'] >= 3 else 0,
-                                                  -s['competitors'][k]['score'], k))
+    result = sorted(s['competitors'], key=lambda k: (-s['competitors'][k]['hp'] if s['stage'] >= 3 else 0,
+                                                    -s['competitors'][k]['score'], k))
+    if s.get('settlement', {}).get('forfeited'):
+        result.remove('self')
+        result.append('self')
+    return result
 
 
 def row(role, key, progress, order):
@@ -141,10 +145,23 @@ def schedule(now, stage):
                 grade_time_list={1: [dict(periods[0])], 2: [dict(periods[1])], 3: blood})
 
 
+def local_state(s):
+    own = s['viewing'] == s['group']
+    last = rules()['arena_size']
+    prize = next(p for p in rules()['arena_rank_prizes'] if p['front'] <= last <= p['back'])
+    return dict(stage=s['stage'], title=STAGES[s['stage']], own=own,
+                started=s.get('started', s['fights'] > 0 or s['stage'] > 1),
+                week_start_day=s['week_start_day'], last_place=last, forfeit_prize=copy.deepcopy(prize),
+                can_advance=own and not s['settled'] and (s['stage_fights'] > 0 or s['competitors']['self']['hp'] <= 0),
+                stage_fights=s['stage_fights'], action_cost=rules()['arena_action_cost'],
+                paid_left=max(0, rules()['arena_paid_limit']-s['paid']),
+                settled=s['settled'], settlement=s.get('settlement', {}))
+
+
 def entry(role, s, now):
     return dict(id=1, role_group=s['group'], group_type_level={i: dict(index=i, min_level=b[0], max_level=b[1],
                 inherit_level=0, pick_num=rules()['arena_qualify_count']) for i, b in enumerate(rules()['arena_groups'], FIRST_GROUP)},
-                schedule_list=schedule(now, s['stage']), offline=True)
+                schedule_list=schedule(now, s['stage']), local_arena=local_state(s), offline=True)
 
 
 def board(role, s, op=2):
@@ -162,10 +179,7 @@ def board(role, s, op=2):
                     buy_fight_challenge=rules()['arena_paid_gold'], solo_bet_fight=0, enhance_may_add=0,
                     solo_rank_last_half=0, action_point=s['actions'], buy_action_point=rules()['arena_paid_gold'],
                     fight_records=copy.deepcopy(list(reversed(s['records'])))),
-                local_arena=dict(stage=s['stage'], title=STAGES[s['stage']], own=own,
-                    can_advance=own and not s['settled'] and (s['stage_fights'] > 0 or s['competitors']['self']['hp'] <= 0),
-                    stage_fights=s['stage_fights'], action_cost=rules()['arena_action_cost'], paid_left=max(0, rules()['arena_paid_limit']-s['paid']),
-                    settled=s['settled'], settlement=s.get('settlement', {})), reward_score=0)
+                local_arena=local_state(s), reward_score=0)
 
 
 def response(data):
@@ -180,9 +194,9 @@ def resolve_target(role, s, data):
     return key
 
 
-def settle_prizes(role, s):
+def settle_prizes(role, s, forfeited=False):
     a.require(not s['settled'], '本届血战已经结算')
-    order = ranking(s).index('self')+1
+    order = rules()['arena_size'] if forfeited else ranking(s).index('self')+1
     prize = next((p for p in rules()['arena_rank_prizes'] if p['front'] <= order <= p['back']), None)
     gain = []
     if prize:
@@ -190,6 +204,8 @@ def settle_prizes(role, s):
             gain.append(journey.grant(role, spec))
     s.pop('reputation', None)
     s.update(settled=True, stage=6, settlement=dict(order=order, attach_list=gain))
+    if forfeited:
+        s['settlement']['forfeited'] = True
     return gain
 
 
@@ -309,6 +325,8 @@ def settle(role, req, now, arules, jrules, parse):
         group = data.get('enter_group', s['group'])
         a.require(type(group) is int and FIRST_GROUP <= group < FIRST_GROUP+len(rules()['arena_groups']), '血战分组无效')
         s['viewing'] = group
+        if group == s['group'] and not s['settled']:
+            s['started'] = True
         return [response(board(role, s, op))]
     if op == 4:
         ident = data.get('des_id'); key = npc_players.resolve(ident)
@@ -317,10 +335,20 @@ def settle(role, req, now, arules, jrules, parse):
         return [npc_players.inspection(key)]
     if op == 5:
         return fight(role, s, data, now, jrules)
-    if op == 7:
+    if op in (7, 8):
         a.require(type(data.get('stage')) is int and data['stage'] == s['stage'], '赛程已变化，请刷新')
-        gain = advance(role, s)
+        if op == 8:
+            a.require(data.get('confirmed') is True, '请先确认退出并按最后一名结算')
+            a.require(type(data.get('week_start_day')) is int and data['week_start_day'] == s['week_start_day'],
+                      '赛周已变化，请刷新血战')
+            a.require(local_state(s)['started'], '请先进入自己的血战分组参赛')
+            gain = settle_prizes(role, s, forfeited=True)
+            s['viewing'] = s['group']
+        else:
+            gain = advance(role, s)
         out = board(role, s)
+        if op == 8:
+            out['local_forfeit'] = True
         out['local_entry'] = entry(role, s, now)
         # Display only the rewards from this settlement, never historical prizes
         # on ordinary board refreshes or replay returns. Event 33 keeps bag sync.

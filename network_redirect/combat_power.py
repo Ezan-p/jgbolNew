@@ -18,10 +18,8 @@ DEFAULT_POLICY = dict(title=True, pet=True, cheer=True, explicit_channels=True)
 TITLES = {int(r['title_id']): r for r in summon.rows('title_config.csv')}
 PETS = {int(r['type_id']): {k.split('(')[0]: v for k, v in r.items()}
         for r in summon.rows('animal_base.csv')}
-CHEER = {(int(r['cheer_order']), int(r['level'])): r for r in summon.rows('cortege_cheer_config.csv')}
 HOME_TRAIN = {(int(r['train_type']), int(r['level'])): r
               for r in summon.rows('hole/hole_train_config.csv')}
-DIRECTIONS = ('heaven', 'earth', 'shake', 'sunda', 'water', 'fire', 'hill', 'pool')
 
 
 ATTRIBUTE_STAGES = ['base_and_culture', 'evolution', 'equipment', 'passive_skills', 'rebirth',
@@ -144,22 +142,8 @@ def add_pet(role, c, values):
 
 
 def add_cheer(role, c, values, pending):
-    if 'cheer_pending' in role:
-        from .cheer import bonuses
-        bonuses(role, c, values, pending)
-        return
-    # Legacy external callers without migrated Bagua state.
-    order = c['order']
-    level = role.get('cheer_' + DIRECTIONS[order - 1] + '_level', 1)
-    supporters = [x for x in role['corteges'] if not x.get('order')
-                  and x.get('cheer_order') == order and x['id'] in pending]
-    if not supporters:
-        return
-    supporter = min(supporters, key=lambda x: x['id'])
-    for stat, column in zip(STATS, ('maxhp_plus', 'gongji_plus', 'fangyu_plus', 'maxmagic_plus')):
-        rate = sum((Decimal(CHEER[order, n][column]) for n in range(1, min(10, level) + 1)
-                    if (order, n) in CHEER), Decimal(0))
-        values[stat] += pending[supporter['id']][stat] * rate
+    from .cheer import bonuses
+    bonuses(role, c, values, pending)
 
 
 # Source channels for missing producers. Explicit inputs live under
@@ -205,7 +189,8 @@ def explain(role, rules, now=None):
 
 def recalculate(role, rules, now=None):
     """[B] Server formula using [A] base/growth/equipment/fate coefficients."""
-    from . import formation as f, reborn, reborn_stars, immortal, spirit_array
+    from . import formation as f, reborn, reborn_stars, immortal, spirit_array, cheer
+    cheer.sync_targets(role)
     immortal.collection_bonuses(role)
     BASES, SKILLS, ITEMS, FATES = f.BASES, f.SKILLS, f.ITEMS, f.FATES
     BASE_COLUMNS, GROWTH_COLUMNS = f.BASE_COLUMNS, f.GROWTH_COLUMNS

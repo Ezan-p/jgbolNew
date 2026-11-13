@@ -70,6 +70,32 @@ class AbyssTests(ActivityCase):
             self.assertEqual(stats['now_fight_len'],r['abyss_tick_seconds'])
             self.assertEqual(stats['crystals'],expected*gain)
 
+    def test_sixfold_daily_crystals_all_regions_and_double(self):
+        rules=self.b.activity_rules
+        # Midnight through the next midnight: daily stats include the final tick
+        # in the next day, while the wallet receives all 288 settlement points.
+        start=(NOW//86400)*86400-8*3600
+        normal=[5184,6912,8640,10368,12096,13824,15552,17280,19008]
+        original=self.b.profile()
+        for region,expected in enumerate(normal):
+            states=[]
+            for double in (False,True):
+                with self.subTest(region=region+1,double=double):
+                    role=copy.deepcopy(original);role['role_combat_power']=10**9
+                    state=role['activity']['abyss']
+                    state.update(layer=region*9+1,last_time=start,crystals=123,
+                        double_start=start,double_end=start+86400 if double else 0)
+                    result=abyss.state(role,start+86400,rules)
+                    self.assertEqual(result['crystals'],123+expected*(2 if double else 1))
+                    self.assertEqual(result['earned'],(2 if double else 1)*6*(region+3))
+                    self.assertEqual(result['fight_count'],1)
+                    saved=copy.deepcopy(role)
+                    abyss.state(role,start+86400,rules)
+                    self.assertEqual(role,saved)
+                    states.append(result)
+            self.assertEqual(states[0]['item_count'],1)
+            self.assertEqual(states[1]['item_count'],2)
+
     def test_shop_pool_is_six_items_and_refreshes_once_per_day(self):
         first=self.call(13)
         first_rows=list(first['shop_list'].values())

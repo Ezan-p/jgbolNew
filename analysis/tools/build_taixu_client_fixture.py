@@ -22,7 +22,7 @@ with tempfile.TemporaryDirectory() as tmp:
                        shop_token='catalog-fixture') for p in b.activity_rules['undergo_shop']]
     ar=arena.state(role,NOW,b.activity_rules);fixtures={'entry':arena.entry(role,ar,NOW)}
     for stage in range(1,7):
-        ar.update(stage=stage,settled=stage==6,stage_fights=1)
+        ar.update(stage=stage,settled=stage==6,stage_fights=1,started=True)
         fixtures[str(stage)]=arena.board(role,ar)
         fixtures['entry_'+str(stage)]=arena.entry(role,ar,NOW)
     fixtures['update']=arena.board(role,ar,5)
@@ -32,6 +32,10 @@ with tempfile.TemporaryDirectory() as tmp:
     fixtures['settlement']=arena.board(role,ar)
     fixtures['settlement']['local_prizes']=arena.settle_prizes(role,ar)
     fixtures['settlement'].update(arena.board(role,ar))
+    forfeited=copy.deepcopy(ar);forfeited.update(stage=1,settled=False)
+    gain=arena.settle_prizes(role,forfeited,forfeited=True)
+    fixtures['forfeit']=arena.board(role,forfeited)
+    fixtures['forfeit'].update(local_forfeit=True,local_prizes=gain)
     b.close()
 script=r'''
 local ms=assert(package.loaded.ms);local ui=assert(ms.d_arenaUI);local map=assert(ms.d_undergoMapUI)
@@ -113,16 +117,34 @@ for stage=1,6 do
    for cycle=1,2 do
     ui.g_arenaUI.parent_layer=root
     ui.onGetResult(clone(fixtures['entry_'..stage]))
-    local closeEntry=assert(close)
+    assert(close)
     ui.onGetResult(clone(fixtures[tostring(stage)]))
     -- Settlement rebuilds its own entrance, so capture that callback below
     -- by removing the host through the same native remove helper instead.
     local key=stage==1 and 'qualify_layer' or (stage==2 or stage==6) and 'rank_parent' or 'blood_layer'
-    assert(ui.g_arenaUI[key]);assert(close);close()
+    local rank=assert(ui.g_arenaUI[key]);local count=#sent
+    local closeRank=assert(close);closeRank()
+    if stage<6 then
+     local host=assert(ui.g_arenaUI.main_layer)
+     local panel=assert(host:getChildByTag(9888),'Unfinished stages must confirm before exiting')
+     assert(ui.g_arenaUI[key]==rank and #sent==count,'Opening the panel must preserve progress')
+     local function activate(panel,tag)
+      local menu=assert(panel:getChildByTag(tag))
+      tolua.cast(menu:getChildren():objectAtIndex(0),'CCMenuItemSprite'):activate()
+     end
+     activate(panel,9889)
+     assert(not host:getChildByTag(9888) and #sent==count,'Cancel must not send a request')
+     closeRank();panel=assert(host:getChildByTag(9888));activate(panel,9890)
+     assert(sent[#sent].mid==1350 and sent[#sent].data.id==8)
+     local request=assert(loadstring('return '..sent[#sent].data.data))()
+     assert(request.confirmed and request.stage==stage and request.week_start_day==fixtures[tostring(stage)].local_arena.week_start_day)
+     assert(ui.g_arenaUI[key]==rank,'Exit must wait for the server')
+     ui.onGetResult(clone(fixtures.forfeit))
+    end
     assert(ui.g_arenaUI[key]==nil,'Closed rank reference must be cleared')
     local host=assert(root:getChildByTag(9875))
     assert(host:getChildByTag(9879):isVisible(),'Entry must be visible after rank close')
-    if stage==6 then ms.d_u.remove(host) else closeEntry() end
+    ms.d_u.remove(host)
     assert(not root:getChildByTag(9875),'Touch-blocking host must be removed')
     assert(ui.g_arenaUI.main_layer==nil,'Closed entrance reference must be cleared')
    end

@@ -32,6 +32,8 @@ do
   local entryTag=9875
   local entryVisualTag=9879
   local entryVisual=nil
+  local exitConfirmTag=9888
+  local exitWhole=false
   local function isExit(event)
    return event=='exit' or type(event)=='table' and event.name=='exit'
   end
@@ -97,6 +99,58 @@ do
    menu:setScale(math.min(1,CCDirector:sharedDirector():getWinSize().width/960))
    parent:addChild(menu,40);return menu
   end
+  local function requestExit(close,whole)
+   if not state.started or state.settled or (not whole and not state.own) then return close() end
+   local parent=ui.g_arenaUI.main_layer
+   if not parent or parent:getChildByTag(exitConfirmTag) then return end
+   local stage,week=state.stage,state.week_start_day
+   local panel=CCLayer:create();parent:addChild(panel,3000,exitConfirmTag)
+   ms.d_u.createSwallowTouchLayer(panel)
+   local size=CCDirector:sharedDirector():getWinSize()
+   panel:addChild(CCLayerColor:create(ccc4(0,0,0,210),size.width,size.height),-2)
+   local box=CCLayerColor:create(ccc4(61,40,29,255),size.width*0.84,size.height*0.58)
+   box:setPosition(ccp(size.width*0.08,size.height*0.21));panel:addChild(box,-1)
+   local function label(text,y,font)
+    local n=CCLabelTTF:create(text,'arial',font)
+    n:setColor(ccc3(255,230,172))
+    n:setScale(math.min(1,size.width*0.76/math.max(1,n:getContentSize().width)))
+    n:setPosition(ccp(size.width*0.5,size.height*y));panel:addChild(n)
+   end
+   label('确认退出本届血战？',0.72,28)
+   label('退出将按最后一名（第'..tostring(state.last_place)..'名）结算本届。',0.61,24)
+   local prize=state.forfeit_prize or {}
+   label(tostring(prize.gold or '-')..'元宝  /  '..tostring(prize.holy_peach or '-')..'个圣母蟠桃  /  '..tostring(prize.crystals or '-')..'仙晶',0.53,22)
+   label('确认后本周不能再次参赛，已获得的战斗奖励保留。',0.45,21)
+   local submitted=false
+   optionButton(panel,'继续血战',0.32,0.31,function() removeLayer(panel) end,true,180):setTag(9889)
+   optionButton(panel,'确认退出并结算',0.68,0.31,function()
+    if submitted then return end
+    submitted=true;exitWhole=whole
+    removeLayer(panel)
+    ui.sendRequest(8,{stage=stage,week_start_day=week,confirmed=true})
+   end,true,220):setTag(9890)
+  end
+  -- Only wrap native close-button callbacks while a rank view is constructed.
+  -- Scene cleanup, battle transitions and modal close buttons remain ordinary removals.
+  local function renderWithExit(native,...)
+   local oldMenu=ms.d_u.createMenu
+   ms.d_u.createMenu=function(config,...)
+    local wrapped={}
+    for key,value in pairs(config) do
+     if type(value)=='table' and value.npic=='v2/introUI/close1.png' and value.call_back then
+      local item={};for k,v in pairs(value) do item[k]=v end
+      local close=value.call_back
+      item.call_back=function() requestExit(close,false) end
+      wrapped[key]=item
+     else wrapped[key]=value end
+    end
+    return oldMenu(wrapped,...)
+   end
+   local ok,result=pcall(native,...)
+   ms.d_u.createMenu=oldMenu
+   if not ok then error(result) end
+   return result
+  end
   local rulesEntryTag,rulesPanelTag=9881,9882
   local rulePages={
    {title='玩法流程',lines={
@@ -106,6 +160,7 @@ do
     '每段血战有9行动力，每战消耗3点；全届共24场免费战。',
     '每阶段完成一战即可手动推进，不要求获胜；血量为0也可推进。',
     '提前推进不保留剩余次数，不能回到上一阶段补打。',
+    '中途退出须确认，按第20名结算，本周不能再次参赛。',
     '正式赛胜利加100分、对手扣20血；前两段进攻失败不扣血。',
     '第三段进攻失败扣20血；按血量优先、积分其次排名。',
     '免费次数用完可付20元宝补一战，全届最多补5次。',
@@ -117,7 +172,7 @@ do
     '未完成的阶段、积分、血量、次数和战报均不跨周保留。',
     '新周重置免费挑战、行动力和付费补战额度，重新确定分组。',
     '同周结算后不能再开第二届，需等下周一00:00刷新。',
-    '同周退出、重登或跨日保留进度，零点不额外补次数。',
+    '确认退出按末名结算；断线、重登或跨日保留未结算进度。',
     '请在周刷新前结算；未结算的上周排名奖励不补发。',
     '已经获得的元宝、圣母蟠桃和仙晶保留，不随周刷新清空。',
    }},
@@ -125,10 +180,10 @@ do
     '冲榜、练习和三段血战：每次击败对手都获得100仙晶。',
     '重复击败同一对手照常发奖；失败、平局及战报回放不发奖。',
     '最终排名奖励：元宝 / 圣母蟠桃 / 仙晶',
-    '第1名         1000元宝     200个圣母蟠桃       10000仙晶',
-    '第2—3名       500元宝     100个圣母蟠桃         8000仙晶',
-    '第4—10名     300元宝       50个圣母蟠桃         5000仙晶',
-    '第11—20名   150元宝       10个圣母蟠桃         3000仙晶',
+    '第1名         1500元宝     200个圣母蟠桃       20000仙晶',
+    '第2—3名       800元宝     100个圣母蟠桃       15000仙晶',
+    '第4—10名     500元宝       50个圣母蟠桃       10000仙晶',
+    '第11—20名   300元宝       10个圣母蟠桃         5000仙晶',
     '点击“结算本届”自动发放三项奖励，每届只发一次。',
     '最终奖励不再记录声望；关闭奖励弹窗不影响已经到账的奖励。',
    }},
@@ -218,7 +273,7 @@ do
     end
    end
    visual:addChild(ms.d_u.createMenu({x=0,y=0,{npic='v2/introUI/close1.png',spic='v2/introUI/close2.png',x=0.95,y=0.93,
-    call_back=function() ms.d_u.remove(layer) end}}),10)
+    call_back=function() requestExit(function() ms.d_u.remove(layer) end,true) end}}),10)
    if returnFromFight~=nil and ui.g_data.rank then
     hideEntryVisual()
     local snapshot={};for key,value in pairs(ui.g_data.rank) do snapshot[key]=value end
@@ -265,11 +320,11 @@ do
       if seconds==1 then return end
       return oldDelay(parent,seconds,callback,...)
      end
-     local ok,value=pcall(native,...)
+     local ok,value=pcall(renderWithExit,native,...)
      ms.d_time.getRestTime=oldRest;ms.d_u.delay=oldDelay
      if not ok then error(value) end
      result=value
-    else result=native(...) end
+    else result=renderWithExit(native,...) end
     local parent=ui.g_arenaUI[name=='showQualifyFight' and 'qualify_layer' or name=='showBloodFight' and 'blood_layer' or 'rank_parent']
     controls(parent)
     watchRankClose(parent)
@@ -287,7 +342,21 @@ do
   ui.onGetResult=function(data)
    if data.local_arena then state=data.local_arena end
    if data.local_entry then ui.g_data.enter=data.local_entry end
+   if data.local_forfeit then
+    -- Close only after the server commits the last-place settlement. Rebuild
+    -- the entrance instead of calling a native callback holding a destroyed node.
+    ui.g_data.rank=data
+    local whole=exitWhole;exitWhole=false
+    ui.show()
+    local parent=ui.g_arenaUI.main_layer
+    if whole then removeLayer(parent);parent=ui.g_arenaUI.parent_layer end
+    if data.local_prizes and #data.local_prizes>0 then
+     ms.d_commonLayerUI.showPrizeResLayer(parent,data.local_prizes)
+    end
+    return
+   end
    if data.id==1 then
+    exitWhole=false
     ui.g_data.enter=data
     return ui.show()
    end

@@ -13,15 +13,24 @@ def validate(r):
     a.require(r['abyss_map_paid_draws'] == 4, '原版批量宝图界面固定最多5抽')
     a.require(type(r.get('abyss_map_batch_limit')) is int and 1 <= r['abyss_map_batch_limit'] <= 99,
               '宝图批量上限无效')
-    # Each native slot now holds a distinct progression item, including the
-    # four-star vessel in slot 12 instead of a second peach slot.
-    expected = {1310, 1311, 1312, 1314, 1323, 1333, 1343, 1329, 1331, 1332, 1249, 1313}
+    expected = [1001, 1441, 1401, 1411, 1421, 1249, 1343, 1329, 1331, 1330, 1332, 10000]
     rewards = r.get('abyss_map_rewards')
     a.require(isinstance(rewards, list) and len(rewards) == 12 and
               all(isinstance(p, list) and len(p) == 4 and all(type(v) is int for v in p)
                   and p[0] == 5 and p[1] in expected and 0 < p[2] <= 1000000 and p[3] == 1
-                  for p in rewards) and {p[1] for p in rewards} == expected
-              and rewards[6][1] == 1343 and rewards[11][1] == 1313, '宝图养成奖池缺失或格子配置无效')
+                  for p in rewards) and [p[1] for p in rewards] == expected,
+              '宝图养成奖池缺失或格子配置无效')
+    quantities = r.get('abyss_map_quantity_by_tier')
+    a.require(isinstance(quantities, list) and len(quantities) == 12 and
+              all(isinstance(row, list) and len(row) == 10 and
+                  all(type(v) is int and 0 < v <= 1000000 for v in row) and row[0] == p[2]
+                  for p, row in zip(rewards, quantities)), '宝图各阶奖励数量无效')
+    steps = r.get('abyss_map_item_id_steps')
+    a.require(isinstance(steps, list) and len(steps) == 12 and
+              all(type(v) is int for v in steps) and steps == [0,0,1,1,1,0,0,0,0,0,0,0],
+              '宝图丹药档位配置无效')
+    a.require(all(p[1] + step * tier in a.formation.ITEMS
+                  for p, step in zip(rewards, steps) for tier in range(10)), '宝图奖励道具不存在')
 
 
 def client_source(r):
@@ -31,8 +40,11 @@ def client_source(r):
 
 
 def pool(tid, r):
-    scale = tid - 1430
-    return [a.prize_spec([p[0], p[1], p[2] * scale, p[3]]) for p in r['abyss_map_rewards']]
+    tier = tid - 1431
+    # Pill strength changes by item ID; every pill hit still awards one item.
+    return [a.prize_spec([p[0], p[1] + step * tier, quantities[tier], p[3]])
+            for p, quantities, step in zip(r['abyss_map_rewards'], r['abyss_map_quantity_by_tier'],
+                                           r['abyss_map_item_id_steps'])]
 
 
 def new_board(tid, r, quick=False):

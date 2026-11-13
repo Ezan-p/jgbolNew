@@ -1,0 +1,28 @@
+test_default_network_service_and_fixed_account_share_trusted_clock (__main__.RuntimeTests) ... FAIL
+test_offline_restart_waits_for_verification_without_wall_credit (__main__.RuntimeTests) ... ERROR
+
+======================================================================
+ERROR: test_offline_restart_waits_for_verification_without_wall_credit (__main__.RuntimeTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v112_test_runtime.py", line 77, in test_offline_restart_waits_for_verification_without_wall_credit
+sqlite3.OperationalError: unable to open database file
+
+======================================================================
+FAIL: test_default_network_service_and_fixed_account_share_trusted_clock (__main__.RuntimeTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v112_test_runtime.py", line 37, in test_default_network_service_and_fixed_account_share_trusted_clock
+AssertionError: Posix[41 chars]6hrv2_fjmkkl00000gn/T/tmpyksbzsdd/save/game.sqlite3') != Posix[41 chars]6hrv2_fjmkkl00000gn/T/tmpyksbzsdd/test-save-v106/game.sqlite3')
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.441s
+
+FAILED (failures=1, errors=1)
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v112_test.py", line 304, in <module>
+    globals()[args.mode]()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v112_test.py", line 248, in runtime
+    exec(compile(source, namespace['__file__'], 'exec'), namespace)
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/analysis/tools/verify_v112_test_runtime.py", line 93, in <module>
+AssertionError: offline_android.backend

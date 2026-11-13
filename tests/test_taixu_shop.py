@@ -76,6 +76,10 @@ class TaixuShopTests(TaixuCase):
                 remaining = product['limit']-count
                 if remaining:
                     self.ok(self.call(5, dict(index=1, count=remaining)))
+                self.assertEqual(self.balance(tid)-before, product['reward'][2]*product['limit'])
+                self.assertEqual(currency-self.balance(1366), product['cost']*product['limit'])
+                result = next(login_fields(d['data']) for mid, _, d in self.decoded if mid == 1349)
+                self.assertEqual(result['attach_list'][1]['buy_times'], 0)
                 after = self.b.profile()
                 self.assertEqual(self.call(5, dict(index=1, count=1))[0][0], 55)
                 self.assertEqual(self.b.profile(), after)
@@ -119,25 +123,33 @@ class TaixuShopTests(TaixuCase):
         self.assertEqual(set(counts), {p['reward'][1] for p in s['shop']})
         self.assertTrue(all(counts[p['reward'][1]] == p['limit'] for p in s['shop']))
 
-    def test_balance_update_preserves_daily_goods_order_and_used_counts(self):
+    def test_v4_balance_update_preserves_daily_goods_order_and_used_counts(self):
         self.query(); self.fund()
         role = self.b.profile(); s = role['activity']['undergo']
         catalog = {p['reward'][1]: p for p in self.b.activity_rules['undergo_shop']}
         s['shop'] = [copy.deepcopy(catalog[tid]) for tid in (1310, 1311, 1312, 1320, 1314, 1334)]
-        for row in s['shop']: row['limit'] = 5
-        s.update(shop_revision='taixu-shop-2026-10-28-v1', shop_token='old-token',
-                 shop_view_token='old-token', purchases={'1314':4, '1310':2})
+        old_values = {1310:(20,100),1311:(20,100),1312:(20,100),1320:(100,10),
+                      1314:(1000,1),1334:(3600,1)}
+        for row in s['shop']:
+            row['cost'], row['limit'] = old_values[row['reward'][1]]
+        used = {'1314':1, '1310':100, '1320':10, '1334':1}
+        s.update(shop_revision='taixu-shop-2026-11-10-v4', shop_token='old-token',
+                 shop_view_token='old-token', purchases=used.copy())
         old_ids = [p['reward'][1] for p in s['shop']]
         self.b.save(role); before = copy.deepcopy(role['attachments'])
         rows = self.query(); current = self.b.profile()['activity']['undergo']
         self.assertEqual([p['reward'][1] for p in current['shop']], old_ids)
-        self.assertEqual(current['purchases'], {'1314':4, '1310':2})
+        self.assertEqual(current['purchases'], used)
         self.assertEqual(self.b.profile()['attachments'], before)
-        self.assertEqual(rows[1]['buy_times'], 98)
-        self.assertEqual(rows[5]['buy_times'], 0)
+        self.assertEqual(rows[1]['buy_times'], 900)
+        self.assertEqual(rows[4]['buy_times'], 10)
+        self.assertEqual(rows[5]['buy_times'], 4)
+        self.assertEqual(rows[6]['buy_times'], 0)
+        for row in rows.values():
+            self.assertEqual(row['crystals'], catalog[row['attach_type']]['cost'])
         self.assertNotEqual(rows[1]['shop_token'], 'old-token')
         before = self.b.profile()
-        self.assertEqual(self.call(5, dict(index=5))[0][0], 55)
+        self.assertEqual(self.call(5, dict(index=6))[0][0], 55)
         self.assertEqual(self.call(5, dict(index=1, shop_token='old-token'))[0][0], 55)
         self.assertEqual(self.b.profile(), before)
         self.b.close(); self.b = Backend(Path(self.tmp.name), 18770, lambda *a, **k: None)
@@ -150,7 +162,7 @@ class TaixuShopTests(TaixuCase):
         self.fund(); before = self.b.profile()
         for data in (dict(index=0), dict(index=7), dict(index=True), dict(index=1, count=0),
                      dict(index=1, count=-1), dict(index=1, count=1.5), dict(index=1, count=True),
-                     dict(index=1, count=101), dict(index=1, shop_token='forged')):
+                     dict(index=1, count=1001), dict(index=1, shop_token='forged')):
             self.assertEqual(self.call(5, data)[0][0], 55); self.assertEqual(self.b.profile(), before)
         with patch('network_redirect.activity_undergo.encode', side_effect=ValueError('bad response')):
             self.assertEqual(self.call(5, dict(index=1, count=1))[0][0], 55)
@@ -192,8 +204,8 @@ class TaixuShopTests(TaixuCase):
         rows = self.query(); current = self.b.profile()
         by_id = {p['attach_type']:p for p in rows.values()}
         self.assertTrue({1310, 1311, 1312, 1320} <= set(by_id))
-        self.assertEqual(by_id[1310]['buy_times'], 95)
-        self.assertEqual(by_id[1320]['buy_times'], 5)
+        self.assertEqual(by_id[1310]['buy_times'], 995)
+        self.assertEqual(by_id[1320]['buy_times'], 15)
         self.assertEqual(current['activity']['undergo']['purchases'], before['activity']['undergo']['purchases'])
         self.assertEqual(current['attachments'], before['attachments'])
         self.assertTrue(all(p['attach_count'] == 1 for p in rows.values()))
@@ -207,12 +219,10 @@ class TaixuShopTests(TaixuCase):
         catalog = {p['reward'][1]:p for p in self.b.activity_rules['undergo_shop']}
         self.assertEqual(set(catalog), used)
         unit_price = {tid:p['cost']/p['reward'][2] for tid,p in catalog.items()}
-        for src, count, dst in ((1313,10,1314),(1320,5,1321),
+        for src, count, dst in ((1313,10,1314),(1314,2,1334),(1320,5,1321),
                                 (1321,5,1322),(1322,5,1323),(1323,2,1335)):
             self.assertLessEqual(unit_price[dst], unit_price[src]*count)
-        # The requested direct divine-vessel price includes a premium over synthesis.
-        self.assertEqual(unit_price[1334], 3600)
-        self.assertEqual(unit_price[1314]*2, 2000)
+        self.assertEqual(unit_price[1334], unit_price[1314]*2)
 
     def test_config_rejects_missing_pool_duplicate_wrong_quantity_and_wrong_limits(self):
         original = self.b.activity_rules

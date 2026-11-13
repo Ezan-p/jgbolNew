@@ -38,7 +38,8 @@ def main():
                 assert not any(e == 55 for e, _ in events), events
                 reward = next(d['pray_item_list'][1] for e, d in events if e == 52)
                 after = backend.profile()
-                assert reward['object_type'] == 11 and reward['attach_count'] in (10, 20, 30)
+                expected = (100,) if cost == 1000 else (10, 20, 30)
+                assert reward['object_type'] == 11 and reward['attach_count'] in expected
                 assert after['gold_coin'] - before['gold_coin'] == reward['attach_count']
                 assert backend.respond(packet, {'authenticated': True}) == reply
                 assert backend.profile() == after

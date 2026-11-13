@@ -112,7 +112,7 @@ def generate(index, arch):
         allocate(c, arch, 75)
         name = b.cheer.NAMES[pos - 1]
         role['cheer_' + name + '_level'] = 10
-        role['cheer_' + name + '_effect'] = (pos - 1) % 8 + 1
+        role['cheer_' + name + '_effect'] = pos if pos <= 8 else 0
     for _ in range(2):
         tid = b.choose(arch, 3, used)
         used.add(tid)

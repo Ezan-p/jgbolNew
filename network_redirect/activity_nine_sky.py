@@ -60,8 +60,13 @@ def load_rules(path=ROOT / 'server_config/nine_sky_rules.json'):
               [x['reward'] for x in low] == [[5, t, 1, 1] for t in (1022,1023,1033,1006,1032,1024,1007)] and
               {tuple(x['reward']) for x in high} == {(10,5027,5,1),(10,5036,5,1),(5,1031,5,1),(5,1249,50,1),(5,1243,1,1),(5,1246,1,1),
                   (5,6002,5,1),(5,6003,5,1),(5,6004,5,1),(5,6005,5,1)}, '九重商会奖励池不完整')
-    f.require(all(type(x.get('listing_weight')) is int and 1 <= x['listing_weight'] <= 100 for x in high)
-              and sum(x['listing_weight'] for x in high) == 100, '九重商会高级池上架权重须为正整数且合计100')
+    f.require(all(type(x.get('permanent')) is bool for x in r['star_shop']) and
+              {tuple(x['reward'][:2]) for x in r['star_shop'] if x['permanent']} == {(10,5027),(5,1249)},
+              '九重商会常驻商品须为王母魂魄和五法界魂箱')
+    weights = r.get('star_shop_tier_weights')
+    f.require(isinstance(weights, dict) and set(weights) == {'low', 'high'} and
+              all(type(v) is int and 1 <= v <= 10000 for v in weights.values()) and
+              weights['low'] > weights['high'], '九重商会上架权重须为正整数且低级高于高级')
     f.require(all(x['cost'] < y['cost'] for x,y in zip(low,low[1:])), '九重商会低级池定价须递增')
     f.require(all(x['limit'] == (1 if x['reward'][1] == 1024 else 5) for x in low) and
               all(x['limit'] == 1 for x in high), '九重商会低级商品限兑五份，魂缘丹与高级商品限兑一份')
@@ -102,23 +107,27 @@ def recycle(role, s, now, r):
     return dict(start=s['start'], stars=stars, peaches=peaches, mail_id=mail['mail_id'])
 
 
-def choose_high_shop(r):
-    """One daily high-tier offer; listing weights are percentages, totaling 100."""
-    high = [x for x in r['star_shop'] if x['tier'] == 'high']
-    pick = secrets.randbelow(sum(x['listing_weight'] for x in high))
-    for row in high:
-        if pick < row['listing_weight']:
-            return row
-        pick -= row['listing_weight']
+def choose_shop(r, count=4, exclude=()):
+    """Weighted sampling without replacement across both tiers, excluding permanent offers."""
+    pool = [x for x in r['star_shop'] if not x['permanent']
+            and tuple(x['reward'][:2]) not in exclude]
+    weights = r['star_shop_tier_weights']
+    chosen = []
+    for _ in range(count):
+        pick = secrets.randbelow(sum(weights[row['tier']] for row in pool))
+        for index, row in enumerate(pool):
+            if pick < weights[row['tier']]:
+                chosen.append(pool.pop(index))
+                break
+            pick -= weights[row['tier']]
+    return chosen
 
 
 def refresh_shop(s, r, today):
     old = s.get('shop')
+    permanent = [x for x in r['star_shop'] if x['permanent']]
     if today > s.get('shop_day', -1) or old is None:
-        low = [x for x in r['star_shop'] if x['tier'] == 'low']
-        chosen = [low.pop(secrets.randbelow(len(low))) for _ in range(5)]
-        chosen.sort(key=lambda row: row['cost'])
-        chosen.append(choose_high_shop(r))
+        chosen = permanent + choose_shop(r)
         # Preserve matching quotas when upgrading the legacy fixed shop on the same day.
         legacy = {}
         if old is None and today == s['day']:
@@ -128,20 +137,23 @@ def refresh_shop(s, r, today):
         s['purchases'] = {'1': [min(x['limit'], legacy.get(tuple(x['reward'][:2]), 0)) for x in chosen],
                           '2': list(s.get('purchases',{}).get('2',[])) if legacy else [0]*len(r['credit_shop'])}
         s['shop_day'] = today
+        s['shop_revision'] = r['revision']
     if s.get('shop_revision') != r['revision']:
-        # Retain existing offers and their quotas; replace retired offers only.
         configured = {tuple(x['reward'][:2]): x for x in r['star_shop']}
-        present = {tuple(x['reward'][:2]) for x in s['shop']}
-        replacements = [x for x in r['star_shop'] if x['tier'] == 'low'
-                        and tuple(x['reward'][:2]) not in present]
-        updated = []
-        for index, row in enumerate(s['shop']):
-            current = configured.get(tuple(row['reward'][:2]))
-            if current is None:
-                current = replacements.pop(secrets.randbelow(len(replacements)))
-                s['purchases']['1'][index] = 0
-            updated.append(copy.deepcopy(current))
-        s['shop'] = updated
+        used = {tuple(row['reward'][:2]): count for row, count in zip(s['shop'], s['purchases']['1'])}
+        # Keep the existing layout for price-only revisions. For old daily catalogs,
+        # keep purchased random offers first so migration cannot restore their quota.
+        valid = [configured[tuple(row['reward'][:2])] for row in s['shop']
+                 if tuple(row['reward'][:2]) in configured]
+        keys = {tuple(row['reward'][:2]) for row in valid}
+        if len(valid) != 6 or len(keys) != 6 or not all(tuple(x['reward'][:2]) in keys for x in permanent):
+            random = [row for row in valid if not row['permanent']]
+            random.sort(key=lambda row: not used.get(tuple(row['reward'][:2]), 0))
+            random = random[:4]
+            random += choose_shop(r, 4-len(random), {tuple(x['reward'][:2]) for x in random})
+            valid = permanent + random
+        s['shop'] = copy.deepcopy(valid)
+        s['purchases']['1'] = [min(row['limit'], used.get(tuple(row['reward'][:2]), 0)) for row in valid]
         s['shop_revision'] = r['revision']
 
 

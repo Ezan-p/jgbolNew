@@ -218,7 +218,7 @@ def generate(level, tier, arch):
         make_companion(role, arch, tier, tid, support=pos)
         name = cheer.NAMES[pos - 1]
         role['cheer_' + name + '_level'] = p['cheer_level']
-        role['cheer_' + name + '_effect'] = (pos - 1) % cap['formation_slots'] + 1
+        role['cheer_' + name + '_effect'] = pos if pos <= cap['formation_slots'] else 0
     for _ in range(2):
         tid = choose(arch, 3, used)
         used.add(tid)
@@ -237,6 +237,8 @@ def validate(npc):
     role, level = npc['role'], npc['role']['level']
     cap = caps(level)
     members = role['corteges']
+    targets = [target for target in role['cheer_targets'].values() if target]
+    assert len(targets) == len(set(targets))
     assert sorted(c['order'] for c in members if c['order']) == list(range(1, cap['formation_slots'] + 1))
     assert len({c['type'] for c in members}) == len(members)
     ids = [i['id'] for i in members + role['attachments']]
@@ -261,7 +263,7 @@ def validate(npc):
             pos = c['cheer_order']
             assert level >= CHEER['cheer_level_limit'][pos - 1]
             assert role['cheer_' + cheer.NAMES[pos - 1] + '_level'] > 0
-            assert role['cheer_' + cheer.NAMES[pos - 1] + '_effect'] in range(1, cap['formation_slots'] + 1)
+            assert role['cheer_' + cheer.NAMES[pos - 1] + '_effect'] in range(cap['formation_slots'] + 1)
             if pos > 8:
                 assert role['cheer_' + cheer.NAMES[pos - 9] + '_level'] > 0
         innates = [i for i in role['attachments'] if i.get('innate_owner_id') == c['id']]

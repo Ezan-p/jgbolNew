@@ -53,7 +53,7 @@ class GuildTests(unittest.TestCase):
         for n in range(10):
             out=self.req(15,mission_id=1,mission_type=1,cultivate_type=1,cultivate_record_time=daily.day(NOW,self.b.guild_rules),cultivate_record_count=n)
             self.assertFalse(any(i==55 for m,i,d in out))
-        r=self.role();self.assertEqual(r['union_contrib'],150);self.assertEqual(r['daily']['points']['9'],5)
+        r=self.role();self.assertEqual(r['union_contrib'],600);self.assertEqual(r['daily']['points']['9'],5)
         self.assertEqual(self.req(15,mission_id=1,mission_type=1,cultivate_type=1,cultivate_record_time=daily.day(NOW,self.b.guild_rules),cultivate_record_count=10)[-1][1],55)
         self.assertEqual(self.role(),r)
     def test_create_has_no_daily_count_limit(self):
@@ -190,8 +190,33 @@ class GuildTests(unittest.TestCase):
         self.assertEqual(data['donate_count'],7)
         self.assertEqual(after['cur_union_contrib'],7*self.b.guild_rules['donate_contrib_rate'])
 
+    def test_donation_contribution_response_replay_and_reload(self):
+        self.create()
+        role=self.role();role.update(union_contrib=120,cur_union_contrib=20);self.b.save(role)
+        data=self.ok(36,count=7)[-1][2]
+        self.assertEqual(data['contribution_gain'],70)
+        self.assertEqual((data['union_contrib'],data['cur_union_contrib']),(190,90))
+        attrs={a['type']:a['value'] for m,_,d in map(decode,self.replies)
+               if m==1032 and d['unit_type']==1 for a in d['attr_list']}
+        self.assertEqual((attrs[146],attrs[148]),(190,90))
+        after=self.role()
+        self.assertEqual(self.b.respond(self.packet,{'authenticated':True}),self.replies)
+        self.assertEqual(self.role(),after)
+        self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.assertEqual((self.role()['union_contrib'],self.role()['cur_union_contrib']),(190,90))
+        info=self.ok(18,query_type=1)[-1][2]['role_info']
+        self.assertEqual((info['totalcontrib'],info['contrib']),(190,90))
+
+    def test_rejected_donation_preserves_contribution_and_money(self):
+        self.create()
+        role=self.role();role.update(gold_coin=0,union_contrib=120,cur_union_contrib=20);self.b.save(role)
+        before=self.role()
+        self.assertEqual(self.req(36,count=7)[-1][1],55)
+        self.assertEqual(self.role(),before)
+        self.assertFalse(any(m==1301 and d['id']==36 for m,_,d in map(decode,self.replies)))
+
     def test_donate_store_limits(self):
-        self.create();self.req(36,count=100);self.assertEqual(self.role()['cur_union_contrib'],100)
+        self.create();self.req(36,count=100);self.assertEqual(self.role()['cur_union_contrib'],1000)
         stock=self.ok(38)[-1][2]['item_list']
         row=next(iter(stock.values()))
         role=self.role();role['cur_union_contrib']=row['cost_contrib']*row['buy_times'];self.b.save(role)
@@ -221,7 +246,7 @@ class GuildTests(unittest.TestCase):
     def test_cross_day(self):
         self.create();self.req(36,count=100)
         with patch('network_redirect.game_clock.now',return_value=NOW+86400):self.req(36,count=100)
-        self.assertEqual(self.role()['union_contrib'],200)
+        self.assertEqual(self.role()['union_contrib'],2000)
 
     def ok(self,op,**d):
         out=self.req(op,**d)

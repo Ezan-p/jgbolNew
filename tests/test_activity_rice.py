@@ -1,5 +1,6 @@
 """Dragon Boat protocol rewards, independent rolls, persistence and parity."""
 import copy
+import json
 from collections import Counter
 from pathlib import Path
 from unittest.mock import patch
@@ -29,11 +30,14 @@ class RiceTests(ActivityCase):
         return self.req(1126,compose_type=index,material_count=len(ids),material_list=[dict(id=i) for i in ids])
 
     def test_shared_pools_all_tickets_and_every_concrete_reward(self):
-        self.assertEqual(rice.FOOD_POOLS,{1213:1130,1214:1131,1215:1132,1216:1133})
+        self.assertEqual(rice.FOOD_POOLS,{1213:1130,1214:1131,1215:1132,1216:1133,1217:1217})
         outcomes=0
         for tid,moon_id in rice.FOOD_POOLS.items():
-            pool=self.b.activity_rules['moon_rules']['pools'][str(moon_id)]
+            pool=self.b.activity_rules['rice_rules']['pools'][str(moon_id)]
             groups=pool['groups'];weights=[g['weight'] for g in groups]
+            if tid==1217:
+                self.assertEqual(weights,[4000,3000,900,900,600,600])
+                self.assertFalse(any(p[:2]==[6,21] for g in groups for p in g['candidates']))
             if tid==1214:
                 self.assertEqual(sum(g['weight'] for g in groups if g['candidates']==[[5,1100,1,1]]),100)
             with patch.object(rice,'randbelow',side_effect=range(10000)):
@@ -61,7 +65,7 @@ class RiceTests(ActivityCase):
                     self.assertEqual(self.count(tid,role=after),self.count(tid,role=before)-1)
                     self.assertEqual(before.get('recharge'),after.get('recharge'))
                 ticket+=g['weight']
-        self.assertEqual(outcomes,108)
+        self.assertEqual(outcomes,148)
 
     def test_material_probability_boundaries_and_independent_events(self):
         shared=self.b.activity_rules
@@ -214,6 +218,86 @@ class RiceTests(ActivityCase):
             self.ok(self.req(1026,fight_type=6))
         self.assertEqual((rr.call_count,mr.call_count),(5,5));self.assertEqual((self.count(1208),self.count(1134)),(6,6))
 
-    def test_legacy_five_star_inventory_can_still_be_opened(self):
-        ident=self.put(1217);before=self.count(1343)
-        self.ok(self.use(1217,ident));self.assertEqual(self.count(1343),before+1)
+    def test_five_star_drop_in_each_normal_food_and_no_auto_open(self):
+        for tid in (1213,1214,1215,1216):
+            ident=self.put(tid,2);before=self.b.profile()
+            # Last ordinary ticket and both ends of the new 0.25% interval.
+            pool=self.b.activity_rules['rice_rules']['pools'][str(rice.FOOD_POOLS[tid])]
+            with patch.object(rice,'randbelow',return_value=9974):
+                self.assertNotEqual(rice.draw(pool),[5,1217,1,1])
+            with patch.object(rice,'randbelow',side_effect=[9975,9999]) as rng:
+                out=self.use(tid,ident,2)
+            self.ok(out);self.assertEqual(rng.call_count,2)
+            self.assertEqual(self.count(1217)-self.count(1217,role=before),2)
+            self.assertEqual(self.b.profile()['gold_coin'],before['gold_coin'])
+            self.assertEqual(next(d for e,d in out if e==21)['attach_list'],
+                             {1:activity.prize_spec([5,1217,2,1])})
+
+    def test_existing_five_star_stack_new_rewards_batch_replay_and_restart(self):
+        ident=self.put(1217,6);before=self.b.profile()
+        with patch.object(rice,'randbelow',side_effect=[0,4000,7000,0,7900,0,8800,0,9400,0]) as rng:
+            out=self.use(1217,ident,6)
+        self.ok(out);self.assertEqual(rng.call_count,10)
+        after=self.b.profile()
+        self.assertEqual(after['gold_coin']-before['gold_coin'],1000)
+        self.assertEqual(self.count(1152)-self.count(1152,role=before),1)
+        self.assertEqual(self.count(1343),self.count(1343,role=before))
+        self.assertEqual(len(next(d for e,d in out if e==21)['attach_list']),6)
+        with patch.object(rice,'randbelow',side_effect=AssertionError('reroll')):
+            self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
+        self.assertEqual(after,self.b.profile())
+        self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.assertEqual(after,self.b.profile())
+        self.assertEqual(self.use(1217,ident)[0][0],55)
+
+    def test_five_star_selected_stack_lock_overflow_and_rollback(self):
+        first=self.put(1217,2);r=self.b.profile()
+        second=dict(id=formation.new_id(r),attach_type=5,type_id=1217,count=2,level=1)
+        r['attachments'].append(second);self.b.save(r)
+        with patch.object(rice,'randbelow',return_value=4000):self.ok(self.use(1217,second['id']))
+        self.assertEqual(formation.lookup(self.b.profile(),'attachments',first)['count'],2)
+        for changes in (dict(item_count=0),dict(item_count=101),dict(item_count=2),dict(des_type=2),dict(des_id=999999)):
+            before=self.b.profile()
+            with patch.object(rice,'randbelow',side_effect=AssertionError('invalid draw')):
+                self.assertEqual(self.use(1217,second['id'],**changes)[0][0],55)
+            self.assertEqual(self.b.profile(),before)
+        r=self.b.profile();formation.lookup(r,'attachments',first)['is_lock']=1;self.b.save(r)
+        before=self.b.profile();self.assertEqual(self.use(1217,first)[0][0],55)
+        self.assertEqual(self.b.profile(),before)
+        r=self.b.profile();r['gold_coin']=2147483647;self.b.save(r);before=self.b.profile()
+        with patch.object(rice,'randbelow',return_value=0):
+            self.assertEqual(self.use(1217,second['id'])[0][0],55)
+        self.assertEqual(self.b.profile(),before)
+        with patch.object(rice,'randbelow',return_value=4000),patch.object(food.item_rewards,'grant',side_effect=formation.Rejected('grant failure')):
+            self.assertEqual(self.use(1217,second['id'])[0][0],55)
+        self.assertEqual(self.b.profile(),before)
+        original=summon.event
+        def fail_reward(kind,data):
+            if kind==21:raise formation.Rejected('encode failure')
+            return original(kind,data)
+        with patch.object(rice,'randbelow',return_value=4000),patch.object(summon,'event',side_effect=fail_reward):
+            self.assertEqual(self.use(1217,second['id'])[0][0],55)
+        self.assertEqual(self.b.profile(),before)
+
+    def test_rice_configuration_validation_and_moon_pools_untouched(self):
+        base=moon.load_rules();before=copy.deepcopy(base)
+        r=rice.load_rules(base);self.assertEqual(base,before)
+        for key,pool in base['pools'].items():
+            derived=r['pools'][key]
+            self.assertEqual(sum(g['weight'] for g in derived['groups']),10000)
+            self.assertEqual(derived['groups'][-1],dict(name='五星粽子',weight=25,candidates=[[5,1217,1,1]]))
+            diffs=[(a,b) for a,b in zip(pool['groups'],derived['groups']) if a!=b]
+            self.assertEqual(len(diffs),1)
+            a,b=diffs[0];self.assertEqual(a['weight']-b['weight'],25)
+            self.assertTrue(all(p[0]==12 for p in b['candidates']))
+        for kind in ('weight','total','recursive','active','excluded','duplicate','quantity'):
+            bad=copy.deepcopy(r);bad.pop('pools')
+            if kind=='weight':bad['normal_five_star_weight']=True
+            if kind=='total':bad['five_star_pool']['groups'][0]['weight']+=1
+            if kind=='recursive':bad['five_star_pool']['groups'][1]['candidates']=[[5,1217,1,1]]
+            if kind=='active':bad['five_star_pool']['groups'][-1]['candidates'][0]=[6,202,1,1]
+            if kind=='excluded':bad['five_star_pool']['groups'][-1]['candidates'][0]=[6,21,1,1]
+            if kind=='duplicate':bad['five_star_pool']['groups'][2]['candidates'][1]=bad['five_star_pool']['groups'][2]['candidates'][0]
+            if kind=='quantity':bad['five_star_pool']['groups'][0]['candidates'][0][2]=999
+            path=Path(self.tmp.name)/'bad-rice.json';path.write_text(json.dumps(bad))
+            with self.subTest(kind=kind),self.assertRaises(formation.Rejected):rice.load_rules(base,path)

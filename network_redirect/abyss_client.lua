@@ -117,6 +117,74 @@ do
  end
 end
 
+-- Native getShopItem L1655-1661 only batches slots 5/6, capped at 15.
+-- Keep its card layout and native quantity picker, enable all six slots up to 100.
+do
+ local ms=package.loaded.ms
+ local ui=ms and ms.d_abyssUI
+ if ui and ui.getShopItem and not ui._localAbyssShopBatchRestore then
+  local original=ui.getShopItem
+  local knownShop,unitCounts
+  ui.getShopItem=function(item,index,...)
+   local shop=ui.g_data and ui.g_data.shop
+   if shop~=knownShop then
+    knownShop=shop;unitCounts={}
+    for i,row in pairs(shop and shop.shop_list or {}) do unitCounts[i]=row.attach_count end
+   end
+   unitCounts=unitCounts or {}
+   unitCounts[index]=unitCounts[index] or item.attach_count
+   -- Purchase replies contain the total received quantity. The native renderer
+   -- stores that reply as a shop row; display the original per-portion quantity.
+   local card={}
+   for key,value in pairs(item) do card[key]=value end
+   card.attach_count=unitCounts[index]
+   local day,revision=shop and shop.shop_day,shop and shop.shop_revision
+   local function maximum()
+    local current=ui.g_data and ui.g_data.shop
+    local row=current and current.shop_list and current.shop_list[index]
+    if not current or current.shop_day~=day or current.shop_revision~=revision or
+       not row or row.attach_type~=card.attach_type then return 0,'商店已刷新，请重新打开商店。' end
+    local remaining=math.max(0,math.floor(tonumber(row.buy_times) or 0))
+    if remaining==0 then return 0,'该商品今日兑换次数已用尽。' end
+    local info=ui.g_data.hook and ui.g_data.hook.specter_data
+    local balance=math.max(0,tonumber(info and info.crystal_count) or 0)
+    local price=tonumber(row.crystals) or 0
+    if price<=0 then return 0,'商品价格无效，请重新打开商店。' end
+    local count=math.min(100,remaining,math.floor(balance/price))
+    if count==0 then return 0,'魂晶不足。' end
+    return count
+   end
+   local function confirm(count)
+    local limit,message=maximum()
+    if type(count)~='number' or count~=math.floor(count) or count<1 or count>limit then
+     ms.d_info.show(message or '兑换数量已变化，请重新选择。');return
+    end
+    ui.sendRequest(12,{index=index,count=count,shop_day=day,shop_revision=revision})
+   end
+   local function buy()
+    local limit,message=maximum()
+    if limit==0 then ms.d_info.show(message);return end
+    if limit==1 then confirm(1);return end
+    ms.d_data.createBatchUse(ui.g_abyssUI.shop_layer,{min=1,max=limit,defaultCount=1},confirm)
+   end
+   local create=ms.d_tableView.createTableViewMenu
+   ms.d_tableView.createTableViewMenu=function(config,...)
+    for _,row in ipairs(config.menuItems or {}) do
+     if row.npic=='v2/soulHuntUI/btn_buy1.png' then row.tapHandler=buy end
+    end
+    return create(config,...)
+   end
+   local ok,result=pcall(original,card,index,...)
+   ms.d_tableView.createTableViewMenu=create
+   if not ok then error(result,0) end
+   return result
+  end
+  ui._localAbyssShopBatchRestore=function()
+   ui.getShopItem=original;ui._localAbyssShopBatchRestore=nil
+  end
+ end
+end
+
 -- The native random-event redraw creates a fresh empty button upvalue when
 -- reusing its existing layer. A thief response then indexes btns[2] (nil).
 do

@@ -62,8 +62,8 @@ def main():
         1808:'activity_yuanshi.py (A named companion at role level * 2; B duplicate conversion)',
     }
     delegates.update({t:'vip.py / item_receive_config.csv (A fixed contents)' for t in range(1101,1111)})
-    delegates.update({t:'activity_rice.py / moon_rules.json (B shared weighted pools, independent draws)' for t in range(1213,1217)})
-    delegates[1217]='activity_seasonal.py / activity_rules.json seasonal_food_rewards (B legacy fixed)'
+    delegates.update({t:'activity_rice.py / moon_rules.json + rice_rules.json (B derived weighted pools)' for t in range(1213,1217)})
+    delegates[1217]='activity_rice.py / rice_rules.json (B five-star weighted pool)'
     assert set(delegates) == r.SPECIAL
     for tid in sorted(r.CONTAINERS):
         entry=dict(id=tid, original=r.NAMES[tid], handler=delegates.get(tid,'item_rewards.py'),

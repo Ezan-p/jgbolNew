@@ -81,25 +81,58 @@ class AbyssBalanceTests(ActivityCase):
         summon.add_item(role,1544,1);self.b.save(role);self.call(17,index=3,type_id=1544)
         before=self.b.profile();out=self.call(6);after=self.b.profile()
         self.assertTrue(out['is_win'])
-        self.assertEqual(after['activity']['abyss']['crystals']-before['activity']['abyss']['crystals'],604)
+        self.assertEqual(after['activity']['abyss']['crystals']-before['activity']['abyss']['crystals'],1208)
+        self.assertEqual(self.b.respond(self.packet,self.state),self.replies)
+        self.assertEqual(after,self.b.profile())
         self.assertEqual(after['silver_coin']-before['silver_coin'],120000)
         self.assertTrue(set((1,6,11,16))<=set(after['activity']['abyss']['recipes']))
         self.assertEqual(after['drug_exp']-before['drug_exp'],balance.course_total(1))
         self.assertEqual(after['activity']['abyss']['pills'],{})
 
-    def test_fixed_enemy_stats_spells_and_magic_drug_changes_damage(self):
-        from network_redirect import combat
+    def test_original_enemy_attributes_skills_and_panels_all_floors(self):
+        original=copy.deepcopy(ab.NPCS)
         for floor in range(1,82):
-            units=ab.enemies(dict(boss=floor,reductions=[0]*4))
-            self.assertTrue(units[0]['skills'])
-            self.assertTrue(all(not u['skills'] for u in units[1:]))
-            self.assertTrue(all(u['magic']<=u['gongji']*2 for u in units))
-        state=dict(boss=81,reductions=[0]*4);raw=ab.enemies(state)[0]
-        reduced=ab.enemies(dict(state,reductions=[0,0,0,9148000]))[0]
-        target=dict(hp=10**9,max_hp=10**9,fangyu=0)
-        sk,lv=raw['skills'][0]
-        self.assertGreater(combat.damage(raw,copy.deepcopy(target),sk,lv,self.b.journey_rules['battle']),
-                           combat.damage(reduced,copy.deepcopy(target),sk,lv,self.b.journey_rules['battle']))
+            with self.subTest(floor=floor):
+                state=dict(boss=floor,reductions=[0]*4)
+                units=ab.enemies(state)
+                tokens=next(v for k,v in ab.BOSSES[floor].items() if k and k.startswith('cortege_list')).split('/')
+                self.assertEqual(len(units),len(tokens))
+                for order,(unit,token) in enumerate(zip(units,tokens),1):
+                    tid,_=map(int,token.split('|'));row=original[tid]
+                    self.assertEqual((unit['type'],unit['order']),(tid,order))
+                    for key,column in (('gongji','base_gongji'),('fangyu','base_fangyu'),
+                                       ('hp','base_max_hp'),('magic','base_max_magic')):
+                        self.assertEqual(unit[key],int(row[column]))
+                    self.assertEqual(unit['max_hp'],int(row['base_max_hp']))
+                    self.assertEqual((unit['level'],unit['evolve'],unit['reborn']),(1,0,0))
+                    self.assertEqual(int(row['chushijineng']),0)
+                    self.assertEqual(unit['skills'],[])
+                role=self.b.profile();saved=ab.state(role,NOW,self.b.activity_rules)
+                saved.update(boss=floor,reductions=[0]*4,pills={})
+                panel=ab.boss(role,saved,NOW)['boss_data']
+                totals=[sum(u[k] for u in units) for k in ('gongji','fangyu','hp','magic')]
+                self.assertEqual(panel['boss_info'],totals)
+                self.assertEqual(panel['max_list'],[v-len(units) for v in totals])
+        self.assertEqual(ab.NPCS,original)
+        self.assertEqual(ab.enemies(dict(boss=81,reductions=[0]*4))[0]['magic'],36000100)
+
+    def test_original_magic_pill_panel_replay_and_restart(self):
+        self.call(1);role=self.b.profile();state=role['activity']['abyss']
+        state.update(boss=81,pills={'4':1656},reductions=[0,0,0,71921])
+        before=copy.deepcopy(role['attachments']);self.b.save(role)
+        panel=self.call(16)['boss_data']
+        self.assertEqual(panel['boss_info'],dict(enumerate([1002599,45875,6002435,26852400],1)))
+        self.assertEqual(panel['pill_list'],dict(enumerate([0,0,0,9148000],1)))
+        self.assertEqual(self.b.profile()['attachments'],before)
+        self.b.close();self.b=Backend(Path(self.tmp.name),18770,lambda *a,**k:None)
+        self.assertEqual(self.call(16)['boss_data'],panel)
+        self.call(6)
+        lineup=next(d for mid,_,d in self.decoded if mid==1028)['lineup']
+        self.assertEqual(sum(u['des_magic'] for u in lineup if 'des_magic' in u),26852400)
+        actions=[a for mid,_,d in self.decoded if mid==1027 for a in d['fight_result']]
+        enemy_actions=[a for a in actions if not a['is_src']]
+        self.assertTrue(enemy_actions)
+        self.assertTrue(all(a['skill_type']==1 for a in enemy_actions))
 
     def test_essence_only_leader(self):
         units=ab.enemies(dict(boss=81,reductions=[0]*4))
@@ -112,13 +145,45 @@ class AbyssBalanceTests(ActivityCase):
         self.assertTrue(all('extras' not in u for u in units))
 
     def test_economy_course_and_config_bounds(self):
-        self.assertEqual(sum(next(p[2] for p in balance.victory_rewards(i) if p[1]==1441) for i in range(1,82)),90005)
+        self.assertEqual(sum(next(p[2] for p in balance.victory_rewards(i) if p[1]==1441) for i in range(1,82)),180010)
         self.assertEqual(balance.course_total(72),sum(drug.LEVELS[i] for i in range(4,36)))
         self.assertEqual(balance.course_total(81),balance.course_total(72))
-        self.assertEqual([balance.crystal_tick(dict(role_combat_power=10**9),dict(layer=i),self.b.activity_rules) for i in range(1,82,9)],list(range(3,12)))
+        self.assertEqual([balance.crystal_tick(dict(role_combat_power=10**9),dict(layer=i),self.b.activity_rules) for i in range(1,82,9)],[18,24,30,36,42,48,54,60,66])
         bad=copy.deepcopy(balance.rules());bad['quality_weights'][0][0]=-1
         path=Path(self.tmp.name)/'bad.json';path.write_text(json.dumps(bad))
         with self.assertRaises(formation.Rejected):balance.load_rules(path)
+        for key,value in (('enemy_config_mode','scaled'),('region_stat_percent',[100]*9),
+                          ('magic_attack_cap_percent',200),('leader_fallback_skill',101)):
+            bad=copy.deepcopy(balance.rules());bad[key]=value
+            path.write_text(json.dumps(bad))
+            with self.assertRaises(formation.Rejected):balance.load_rules(path)
+
+    def test_idle_multiplier_applies_below_cap_and_rejects_invalid_config(self):
+        for floor in range(1,82):
+            for power in (0,999,1000,1999,2000,2999,5000,11000,10**9):
+                with self.subTest(floor=floor,power=power):
+                    old_gain=min(3+(floor-1)//9,max(1,power//1000))
+                    self.assertEqual(balance.crystal_tick(dict(role_combat_power=power),
+                        dict(layer=floor),self.b.activity_rules),old_gain*6)
+        path=Path(self.tmp.name)/'bad-multiplier.json'
+        for value in (0,-1,True,1.5,None):
+            cfg=copy.deepcopy(balance.rules());cfg['idle_crystal_multiplier']=value
+            path.write_text(json.dumps(cfg))
+            with self.assertRaises(formation.Rejected):balance.load_rules(path)
+
+    def test_all_boss_crystals_double_after_rounding(self):
+        for floor,row in ab.BOSSES.items():
+            expected=[]
+            for token in row['prirze_list'].split('/'):
+                typ,tid,lv,n=map(int,token.split('|'))
+                expected.append([typ,tid,2*max(1,n//100) if (typ,tid)==(5,1441) else n,lv])
+            expected.append([12,0,100000+20000*floor,1])
+            self.assertEqual(balance.victory_rewards(floor),expected)
+        path=Path(self.tmp.name)/'bad-boss-multiplier.json'
+        for value in (0,-1,True,1.5,None):
+            cfg=copy.deepcopy(balance.rules());cfg['boss_crystal_multiplier']=value
+            path.write_text(json.dumps(cfg))
+            with self.assertRaises(formation.Rejected):balance.load_rules(path)
 
     def test_all_recipe_flags_fit_real_wire_and_persist(self):
         self.call(1);role=self.b.profile()

@@ -77,6 +77,7 @@ class CombatPowerTests(unittest.TestCase):
         support = summon.companion(self.role, 5002)
         support.update(order=0, cheer_order=1)
         self.role.update(cheer_heaven_level=1, cheer_heaven_effect=1)
+        self.role['cheer_targets']['heaven'] = self.role['corteges'][0]['id']
         cheer.prepare(self.role)
         self.role['corteges'].append(support)
         self.role['attachments'] = []

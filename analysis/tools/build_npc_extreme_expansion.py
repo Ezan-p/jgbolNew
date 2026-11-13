@@ -160,7 +160,7 @@ def generate(index,attempt,tier,coverage):
         c.update(level=200,evolve_level=49,reborn_layer=0,level_culture_version=3)
         base.allocate(c,style,75)
         name=b.cheer.NAMES[support-1]
-        role['cheer_'+name+'_level']=10;role['cheer_'+name+'_effect']=targets[support-1]
+        role['cheer_'+name+'_level']=10;role['cheer_'+name+'_effect']=targets[support-1] if support <= 8 else 0
     c=b.make_companion(role,'endurance','T1',remaining[-1],reserve=True)
     c.update(level=100,evolve_level=0,reborn_layer=0,level_culture_version=3)
     base.allocate(c,'endurance',0)
@@ -190,8 +190,8 @@ def validate(n):
     r=next(r for r in RANGES if r['tier']==n['tier'])
     assert r['lower']<=role['role_combat_power'] and (not r['upper'] or role['role_combat_power']<=r['upper'])
     for name in b.cheer.NAMES:
-        assert role['cheer_'+name+'_level']==10 and role['cheer_'+name+'_effect'] in range(1,9)
-    assert Counter(role['cheer_'+name+'_effect'] for name in b.cheer.NAMES)==Counter({p:2 for p in range(1,9)})
+        assert role['cheer_'+name+'_level']==10 and role['cheer_'+name+'_effect'] in range(9)
+    assert Counter(role['cheer_'+name+'_effect'] for name in b.cheer.NAMES)==Counter({**{p:1 for p in range(1,9)}, 0:8})
     for c in members:
         assert bool(c.get('fate_rebullding_state'))==(c['order'] in n['active_orders'])
         if c.get('fate_rebullding_state'):

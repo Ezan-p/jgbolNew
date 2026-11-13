@@ -1,0 +1,144 @@
+test_v15_bulk_essences_migrate_to_single_units_and_500_limit (test_abyss_shop.AbyssShopTests) ... ok
+test_v17_fixed_shelf_migrates_to_all_random_without_losing_resources (test_abyss_shop.AbyssShopTests) ... ok
+test_double_expiry_partial_purchase_and_daily_statistics (test_activity_abyss.AbyssTests) ... ok
+test_news_poll_drain_and_event_badge (test_activity_abyss.AbyssTests) ... ok
+test_rank_mail_cross_day_exactly_once_and_complete_state (test_activity_abyss.AbyssTests) ... ok
+test_shop_pool_is_six_items_and_refreshes_once_per_day (test_activity_abyss.AbyssTests) ... ok
+test_economy_course_and_config_bounds (test_abyss_balance.AbyssBalanceTests) ... ok
+test_original_enemy_attributes_skills_and_panels_all_floors (test_abyss_balance.AbyssBalanceTests) ... ok
+test_batch_invalid_counts_types_resources_and_level_are_atomic (test_activity_treasure.TreasureTests) ... ok
+test_batch_replay_and_restart_no_double_award (test_activity_treasure.TreasureTests) ... ok
+test_native_batch_field_order_and_99_maps_one_draw_free (test_activity_treasure.TreasureTests) ... ok
+test_new_peach_and_spirit_stone_are_distinct_and_merge_across_maps (test_activity_treasure.TreasureTests) ... ok
+test_started_v2_board_preserves_old_rewards_weights_and_paid_opportunities (test_activity_treasure.TreasureTests) ... ok
+test_unpaid_old_preview_requires_reopen_then_refreshes_without_debit (test_activity_treasure.TreasureTests) ... ok
+test_v4_preview_refreshes_but_started_board_keeps_both_peach_slots (test_activity_treasure.TreasureTests) ... ok
+test_v8_preview_refreshes_but_started_board_keeps_saved_weights (test_activity_treasure.TreasureTests) ... ok
+test_weight_boundaries_removal_and_probability_mass (test_activity_treasure.TreasureTests) ... ok
+test_all_three_visits_two_phase_and_duplicate (test_activity.ActivityTests) ... ok
+test_config_validation (test_activity.ActivityTests) ... ok
+test_duty_query_start_fight_claim (test_activity.ActivityTests) ... ok
+test_pray_original_value_and_carryover (test_activity.ActivityTests) ... ok
+test_rape_fight_full_board_grants_skill_once (test_activity.ActivityTests) ... ok
+test_serialization_failure_rolls_back (test_activity.ActivityTests) ... ok
+test_visit_restart_preserves_pending_and_claim (test_activity.ActivityTests) ... ok
+test_abyss_random_events_persist_answers_and_reject_duplicate_rewards (test_activity.HomeAbyssTests) ... ok
+test_abyss_random_soul_boss_uses_server_damage_and_free_limit (test_activity.HomeAbyssTests) ... ok
+test_drug_recipe_materials_craft_recycle_and_slot (test_activity.HomeAbyssTests) ... ok
+test_home_invitation_messages_and_harvest_details (test_activity.HomeAbyssTests) ... ok
+test_home_original_garden_fields_and_manual_bug_resolution (test_activity.HomeAbyssTests) ... ok
+test_home_seventh_prayer_uses_original_level_multiplier (test_activity.HomeAbyssTests) ... ok
+test_home_training_bonus_applies_to_simulation (test_activity.HomeAbyssTests) ... ok
+test_treasure_map_costs_shielding_restart_and_batch (test_activity.HomeAbyssTests) ... ok
+test_treasure_map_invalid_removal_quick_monthcard_and_atomic_batch (test_activity.HomeAbyssTests) ... ok
+test_undergo_shop_and_day_prize (test_activity.UndergoTests) ... ok
+test_every_product_batch_grants_exact_bundle_and_packet_replay (test_taixu_shop.TaixuShopTests) ... ok
+test_legacy_usage_migrates_by_item_without_refunds_or_extra_limits (test_taixu_shop.TaixuShopTests) ... ok
+test_midnight_stale_views_cannot_buy_replacement (test_taixu_shop.TaixuShopTests) ... ok
+test_v4_balance_update_preserves_daily_goods_order_and_used_counts (test_taixu_shop.TaixuShopTests) ... ok
+test_complete_tournament_settles_once_then_next_week (test_activity_taixu.ArenaTests) ... ok
+test_cross_week_old_fight_or_settlement_only_refreshes (test_activity_taixu.ArenaTests) ... ok
+test_draw_in_final_stage_awards_no_score_or_life_damage (test_activity_taixu.ArenaTests) ... ok
+test_effect_battles_persist_and_replay_in_every_stage (test_activity_taixu.ArenaTests) ... ok
+test_encode_failure_and_request_replay (test_activity_taixu.ArenaTests) ... ok
+test_forfeit_every_stage_pays_last_place_even_when_leading (test_activity_taixu.ArenaTests) ... ok
+test_four_groups_preserve_existing_season_and_reject_removed_groups (test_activity_taixu.ArenaTests) ... ok
+test_legacy_same_week_migrates_without_restarting_or_regranting (test_activity_taixu.ArenaTests) ... ok
+test_old_forfeit_cannot_settle_a_new_week (test_activity_taixu.ArenaTests) ... ok
+test_all_original_guardians_and_training_load (test_activity_taixu.UndergoCompleteTests) ... ok
+test_bad_positions_and_ids_are_atomic (test_activity_taixu.UndergoCompleteTests) ... ok
+test_real_nine_position_battle_and_packet_replay (test_activity_taixu.UndergoCompleteTests) ... ok
+test_shop_bounds_rollover_and_insufficient_balance (test_activity_taixu.UndergoCompleteTests) ... ok
+test_exact_threshold_queries_succeed_after_rejected_request (test_feature_levels.FeatureLevelTests) ... ok
+test_limited_activity_opening_boundaries (test_feature_levels.FeatureLevelTests) ... ok
+test_taixu_shop_purchase_at_12_does_not_unlock_ordeal (test_feature_levels.FeatureLevelTests) ... ok
+test_all_runtime_imports_resources_and_original_rules_are_included (test_android_offline_backend.PayloadTests) ... ok
+test_packed_program_boots_in_isolation_and_has_no_player_data (test_android_offline_backend.PayloadTests) ... FAIL
+test_http_tls_loopback_and_transport_only_server_list_rewrite (test_android_offline_backend.RuntimeTests) ... ERROR
+test_default_startup_enables_network_before_player_clock_is_opened (test_network_time_runtime.RuntimeNetworkClockTests) ... ERROR
+
+======================================================================
+ERROR: test_http_tls_loopback_and_transport_only_server_list_rewrite (test_android_offline_backend.RuntimeTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v112-abyss-20261114/tests/test_android_offline_backend.py", line 89, in setUp
+    self.state = backend.start(self.files, ROOT, port=0, network_time=False)
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v112-abyss-20261114/payload-new/offline_android/backend.py", line 224, in start
+    raise RuntimeError(runtime.error or 'Offline game service stopped during startup')
+RuntimeError: Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v112-abyss-20261114/payload-new/offline_android/backend.py", line 183, in _thread_main
+    asyncio.run(self._serve())
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v112-abyss-20261114/payload-new/offline_android/backend.py", line 157, in _serve
+    await server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v112-abyss-20261114/payload-new/network_redirect/server.py", line 62, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+
+======================================================================
+ERROR: test_default_startup_enables_network_before_player_clock_is_opened (test_network_time_runtime.RuntimeNetworkClockTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v112-abyss-20261114/tests/test_network_time_runtime.py", line 21, in test_default_startup_enables_network_before_player_clock_is_opened
+    status=backend.start(tmp, ROOT, port=0)
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v112-abyss-20261114/payload-new/offline_android/backend.py", line 224, in start
+    raise RuntimeError(runtime.error or 'Offline game service stopped during startup')
+RuntimeError: Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v112-abyss-20261114/payload-new/offline_android/backend.py", line 183, in _thread_main
+    asyncio.run(self._serve())
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v112-abyss-20261114/payload-new/offline_android/backend.py", line 157, in _serve
+    await server.start()
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v112-abyss-20261114/payload-new/network_redirect/server.py", line 62, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+
+======================================================================
+FAIL: test_packed_program_boots_in_isolation_and_has_no_player_data (test_android_offline_backend.PayloadTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ezan/Desktop/vibeCoidng/JGBOLNew/.runtime/v112-abyss-20261114/tests/test_android_offline_backend.py", line 80, in test_packed_program_boots_in_isolation_and_has_no_player_data
+    self.assertEqual(result.returncode, 0, result.stderr)
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+  File "/var/folders/zj/frlq7jns0p96hrv2_fjmkkl00000gn/T/tmp5uzrbad3/files/program/d849d3821f66acbf7b1c7de5fd1585988dab928c6a1dd10fb6c0dc2b0a9bfb7a/offline_android/backend.py", line 224, in start
+    raise RuntimeError(runtime.error or 'Offline game service stopped during startup')
+RuntimeError: Traceback (most recent call last):
+  File "/var/folders/zj/frlq7jns0p96hrv2_fjmkkl00000gn/T/tmp5uzrbad3/files/program/d849d3821f66acbf7b1c7de5fd1585988dab928c6a1dd10fb6c0dc2b0a9bfb7a/offline_android/backend.py", line 183, in _thread_main
+    asyncio.run(self._serve())
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/var/folders/zj/frlq7jns0p96hrv2_fjmkkl00000gn/T/tmp5uzrbad3/files/program/d849d3821f66acbf7b1c7de5fd1585988dab928c6a1dd10fb6c0dc2b0a9bfb7a/offline_android/backend.py", line 157, in _serve
+    await server.start()
+  File "/var/folders/zj/frlq7jns0p96hrv2_fjmkkl00000gn/T/tmp5uzrbad3/files/program/d849d3821f66acbf7b1c7de5fd1585988dab928c6a1dd10fb6c0dc2b0a9bfb7a/network_redirect/server.py", line 62, in start
+    self.server = await asyncio.start_server(self.handle, '127.0.0.1', self.port, limit=16384)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/streams.py", line 94, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+PermissionError: [Errno 1] error while attempting to bind on address ('127.0.0.1', 0): operation not permitted
+
+
+
+----------------------------------------------------------------------
+Ran 58 tests in 99.717s
+
+FAILED (failures=1, errors=2)

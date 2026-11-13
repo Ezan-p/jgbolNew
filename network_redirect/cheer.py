@@ -35,6 +35,33 @@ def client_config(r):
     return {k: r[k] for k in ('is_open', 'is_open_ni', 'cheer_level_limit', 'open_cheer_item', 'cost_item_count', 'cost_gold_count')}
 
 
+def sync_targets(role):
+    """Persist companion IDs; project current formation orders for the original UI.
+
+    Legacy saves only have orders. Resolve them once, retaining the first Bagua
+    position on conflicts (positive 1-8, then reverse 9-16). A benched target
+    keeps its binding but has no wire/display order until it returns.
+    """
+    roster = {c['id']: c for c in role.get('corteges', [])}
+    if 'cheer_targets' not in role:
+        by_order = {c['order']: c['id'] for c in roster.values()
+                    if 1 <= c.get('order', 0) <= 8}
+        role['cheer_targets'] = {
+            name: by_order.get(role.get('cheer_' + name + '_effect', 0), 0)
+            for name in NAMES}
+    targets, claimed = role['cheer_targets'], set()
+    for name in NAMES:
+        identity = targets.get(name, 0)
+        c = roster.get(identity)
+        if not c or identity in claimed:
+            identity, c = 0, None
+        if identity:
+            claimed.add(identity)
+        targets[name] = identity
+        order = c.get('order', 0) if c else 0
+        role['cheer_' + name + '_effect'] = order if 1 <= order <= 8 else 0
+
+
 def prepare(role, rules=None):
     role.setdefault('cheer_pending', {})
     for key in ATTRS:
@@ -50,10 +77,8 @@ def prepare(role, rules=None):
             if role['level'] >= rules['cheer_level_limit'][order - 1]:
                 key = 'cheer_' + NAMES[order - 1] + '_level'
                 role[key] = max(1, role[key])
+    sync_targets(role)
     for order, name in enumerate(NAMES, 1):
-        effect_key = 'cheer_' + name + '_effect'
-        if role[effect_key] and not any(c.get('order') == role[effect_key] for c in role['corteges']):
-            role[effect_key] = 0
         level = role['cheer_' + name + '_level']
         for stat, column in zip(STATS, ('gongji_plus', 'fangyu_plus', 'maxhp_plus', 'maxmagic_plus')):
             # [B] Sum the original per-level increments, mirror positive CSV for reverse positions.
@@ -85,7 +110,7 @@ def settle(role, req, r):
     f.require(role['level'] >= r['cheer_level_limit'][order - 1], '未达到八卦开启等级')
     f.require(order <= 8 or r['is_open_ni'] >= (1 if flag in (1, 2, 8, 12) else 2), '逆八卦功能未开启')
     name = NAMES[order - 1]
-    level_key, effect_key = 'cheer_' + name + '_level', 'cheer_' + name + '_effect'
+    level_key = 'cheer_' + name + '_level'
     skill_key = name + '_skill_level'
     result = dict(flag=flag, result=1, cheer_order=order, client_flag=pos)
     if flag == 8:
@@ -112,10 +137,15 @@ def settle(role, req, r):
                     x['cheer_order'] = 0
             if c:
                 c['cheer_order'] = order
+            else:
+                role['cheer_targets'][name] = 0
         elif flag == 2:
             c = f.lookup(role, 'corteges', identity) if identity else None
             f.require(c is None or 1 <= c.get('order', 0) <= 8, '加成目标必须为上阵神仙')
-            role[effect_key] = c['order'] if c else 0
+            f.require(c is None or not any(
+                n != name and target == c['id'] for n, target in role['cheer_targets'].items()),
+                '该神仙已有助阵，请先解除原助阵绑定')
+            role['cheer_targets'][name] = c['id'] if c else 0
         elif flag == 3:
             f.require(role[level_key] < 10, '八卦位已满级')
             cost = int(ROWS[(order - 1) % 8 + 1, role[level_key] + 1]['upgrade_cost'])
@@ -188,10 +218,12 @@ def settle(role, req, r):
 
 
 def bonuses(role, c, values, pending):
-    """[B] Explicit chosen target; positive and reverse support sum without feedback."""
+    """[B] One supporter per companion ID, independent of formation position."""
+    if not 1 <= c.get('order', 0) <= 8:
+        return
     for order, name in enumerate(NAMES, 1):
         if (role.get('cheer_' + name + '_level', 0) <= 0
-                or role.get('cheer_' + name + '_effect', 0) != c['order']):
+                or role.get('cheer_targets', {}).get(name, 0) != c['id']):
             continue
         supporter = next((x for x in role['corteges'] if x.get('cheer_order') == order and not x.get('order')), None)
         if not supporter or supporter['id'] not in pending:

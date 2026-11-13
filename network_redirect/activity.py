@@ -79,11 +79,8 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     require(all(type(r.get(k))is int and 1<=r[k]<=1000 for k in ('seasonal_craft_daily_limit','seasonal_moon_bonus_every')),'节日制作次数配置无效')
     from . import activity_moon
     r['moon_rules'] = activity_moon.load_rules()
-    require(set(r.get('seasonal_food_rewards',{}))=={'1217'},'历史五星粽子奖励配置无效')
-    for rewards in r['seasonal_food_rewards'].values():
-        require(isinstance(rewards,list) and 1<=len(rewards)<=10,'节日礼包奖励无效')
-        for p in rewards:
-            require(isinstance(p,list) and len(p)==4 and all(type(v)is int for v in p) and 0<p[2]<=1000 and p[3]==1 and (p[0] in (11,12) or p[0]==5 and p[1] in formation.ITEMS or p[0]==6 and p[1] in formation.SKILLS),'节日礼包奖励无效')
+    from . import activity_rice
+    r['rice_rules'] = activity_rice.load_rules(r['moon_rules'])
     require(isinstance(r.get('abyss_eye_choices'),list) and len(r['abyss_eye_choices'])==4 and len(set(r['abyss_eye_choices']))==4 and all(t in formation.BASES for t in r['abyss_eye_choices']),'火眼金睛选项无效')
     from . import activity_visit
     r['visit_rules'] = activity_visit.load_rules()
@@ -129,8 +126,8 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
     require(len(r['undergo_shop'])==len(expected_undergo) and
             {p['reward'][1] for p in r['undergo_shop']}==expected_undergo,
             '幻境商店须包含全部11种精华、水晶和灵器材料，且不得重复')
-    undergo_limits = {1310:100,1311:100,1312:100,1313:5,1314:1,1334:1,
-                      1320:10,1321:10,1322:3,1323:2,1335:1}
+    undergo_limits = {1310:1000,1311:1000,1312:1000,1313:10,1314:5,1334:1,
+                      1320:20,1321:20,1322:5,1323:3,1335:1}
     require(all(p['reward'][2] == 1 and p['limit'] == undergo_limits[p['reward'][1]]
                 for p in r['undergo_shop']), '幻境商店须单件出售，限兑次数须符合各材料配置')
     require(all(type(p.get('guaranteed')) is bool for p in r['undergo_shop']) and
@@ -149,18 +146,22 @@ def load_rules(path=ROOT/'server_config/activity_rules.json'):
         return {int(part.split('|')[1]) for row in summon.rows(filename)
                 for key,value in row.items() if key.startswith(prefix) for part in value.split('/')}
     material_categories={
-        'reborn':cost_ids('cortege_reborn_layer.csv','consum_list') |
-                 (cost_ids('cortege_reborn_vein.csv','consume_list') & {10000}),
-        'apotheosis':cost_ids('equip_reborn_base.csv','cosume_item') |
-                     cost_ids('equip_reborn_advance.csv','consume_list')}
-    slots=r.get('abyss_shop_category_slots')
-    require(isinstance(slots,dict) and set(slots)==set(material_categories) and
-            all(type(n)is int and n==3 for n in slots.values()) and
-            sum(slots.values())==r['abyss_shop_daily_count'],'九幽商店神仙转生、装备封神材料必须各选3种')
+        'reborn':cost_ids('cortege_reborn_layer.csv','consum_list'),
+        'apotheosis':(cost_ids('equip_reborn_base.csv','cosume_item') |
+                     cost_ids('equip_reborn_advance.csv','consume_list')) - {1334,1335}}
+    require(r['abyss_shop_daily_count']==6 and
+            all(type(p.get('guaranteed')) is bool for p in r['abyss_shop']) and
+            not any(p['guaranteed'] for p in r['abyss_shop']),
+            '九幽商店须全部参与随机抽取，不设常驻商品，每日选6种')
     for p in r['abyss_shop']:
         require(isinstance(p.get('category'),str) and p['category'] in material_categories and
                 p['reward'][1] in material_categories[p['category']], '九幽商店仅允许转生与封神材料，不含普通或高级精魄')
         require(type(p.get('weight'))is int and 1<=p['weight']<=10000,'九幽商店抽取权重无效')
+    weights={p['reward'][1]:p['weight'] for p in r['abyss_shop']}
+    if {1310,1311,1312,1329,1330,1331,1332,1333}<=set(weights):
+        require(min(weights[tid] for tid in (1310,1311,1312,1329,1330)) > weights[1331] >
+                max(weights[tid] for tid in (1332,1333)),
+                '九幽商店精华及初阶转生材料须高权重，明心居中，无上及补天低权重')
     for category, allowed in material_categories.items():
         ids=[p['reward'][1] for p in r['abyss_shop'] if p['category']==category]
         require(len(ids)==len(set(ids)) and set(ids)==allowed,'九幽商店材料缺失或重复')
